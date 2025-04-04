@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Specify the Qt installation path
 set(CMAKE_PREFIX_PATH "C:/Qt/6.5.3/msvc2019_64/lib/cmake")
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Sql)
 
 # Collect all source files in the directory
 file(GLOB_RECURSE LIB_SOURCES
@@ -16,11 +16,24 @@ file(GLOB_RECURSE INCLUDE_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/*.h
 )
 
+file(GLOB_RECURSE UI_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.ui
+)
+
+# Generate .h and .cpp files from .ui files
+qt_wrap_ui(UI_GENERATED_FILES ${UI_FILES})
+
+# Automatically process files that require MOC
+set(CMAKE_AUTOMOC ON)
+
 # Create a static library
-add_library(qt_gui STATIC ${LIB_SOURCES} ${INCLUDE_HEADERS})
+add_library(qt_gui STATIC ${LIB_SOURCES} ${INCLUDE_HEADERS} ${UI_GENERATED_FILES})
 
 # Include directories
-target_include_directories(qt_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(qt_gui PUBLIC 
+    ${CMAKE_CURRENT_SOURCE_DIR} 
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
 
 # Link Qt libraries
-target_link_libraries(qt_gui PRIVATE Qt6::Widgets)
+target_link_libraries(qt_gui PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Sql)

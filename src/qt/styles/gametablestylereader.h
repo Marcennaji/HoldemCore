@@ -18,7 +18,7 @@
 #ifndef GAMETABLESTYLEREADER_H
 #define GAMETABLESTYLEREADER_H
 
-#include <tinyxml.h>
+#include <third_party/tiny/tinyxml.h>
 #include <configfile.h>
 #include <qt/gametable/gametableimpl.h>
 #include <qt/mymessagedialog/mymessagedialogimpl.h>

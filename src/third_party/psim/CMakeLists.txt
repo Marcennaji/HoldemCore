@@ -1,5 +1,3 @@
-project(psim)
-
 # Collect all source files in the lib directory
 file(GLOB_RECURSE LIB_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp

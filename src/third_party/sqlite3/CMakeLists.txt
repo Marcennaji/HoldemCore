@@ -1,5 +1,3 @@
-project(sqlite)
-
 # Collect all source files in the sqlite module
 file(GLOB_RECURSE sqlite_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/*.c

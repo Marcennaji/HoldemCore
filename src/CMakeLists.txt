@@ -1,3 +1,5 @@
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
 # Add subdirectories
 add_subdirectory(engine)
 add_subdirectory(qt)
@@ -17,11 +19,11 @@ target_include_directories(PokerTraining PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Add shared include directories
 target_include_directories(PokerTraining PUBLIC
-    ${CMAKE_SOURCE_DIR}/engine/include
-    ${CMAKE_SOURCE_DIR}/qt/include
-    ${CMAKE_SOURCE_DIR}/third_party/include
+    ${CMAKE_SOURCE_DIR}/engine
+    ${CMAKE_SOURCE_DIR}/qt
+    ${CMAKE_SOURCE_DIR}/third_party
 )
 
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
-target_link_libraries(PokerTraining PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets engine third_party qt)
+target_link_libraries(PokerTraining PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets engine tiny sqlite poker_eval psim qt_gui)

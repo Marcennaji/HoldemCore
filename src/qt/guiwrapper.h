@@ -18,7 +18,7 @@
 #ifndef GUIWRAPPER_H
 #define GUIWRAPPER_H
 
-#include <guiinterface.h>
+#include <qt/guiinterface.h>
 #include <gamedata.h>
 #include <string>
 

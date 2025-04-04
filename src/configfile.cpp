@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 #include "configfile.h"
-#include <qttoolsinterface.h>
-#include <tinyxml.h>
+#include <qt/qttoolsinterface.h>
+#include <third_party/tiny/tinyxml.h>
 
 #define MODUS 0711
 

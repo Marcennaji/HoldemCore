@@ -1,5 +1,3 @@
-project(poker_eval)
-
 # Collect all source files in the lib directory
 file(GLOB_RECURSE LIB_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/*.c

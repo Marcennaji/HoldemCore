@@ -1,5 +1,3 @@
-project(tiny)
-
 # Collect all source files in the tiny module
 file(GLOB_RECURSE TINY_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
