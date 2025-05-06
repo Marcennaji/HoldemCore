@@ -22,10 +22,6 @@
 changeCompleteBlindsDialogImpl::changeCompleteBlindsDialogImpl(QWidget *parent, ConfigFile *c)
     : QDialog(parent), myConfig(c), settingsCorrect(true)
 {
-#ifdef __APPLE__
-	setWindowModality(Qt::ApplicationModal);
-	setWindowFlags(Qt::WindowSystemMenuHint | Qt::CustomizeWindowHint | Qt::Dialog);
-#endif
 	setupUi(this);
 
 	connect( pushButton_add, SIGNAL( clicked() ), this, SLOT( addBlindValueToList() ) );

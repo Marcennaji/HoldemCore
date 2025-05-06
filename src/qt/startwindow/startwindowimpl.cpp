@@ -58,28 +58,6 @@ startWindowImpl::startWindowImpl(ConfigFile *c, Log *l)
 	this->setStatusBar(0);
 
 #ifdef GUI_800x480
-#ifdef ANDROID
-    this->setMenuBar(0);
-    //	this->menubar->clear();
-    //	this->menubar->hide();
-
-    //check if custom background picture for the resolution is there. Otherwise create it!
-    QString UserDataDir = QString::fromUtf8(myConfig->readConfigString("UserDataDir").c_str());
-    QScreen* dw = QGuiApplication::primaryScreen();
-    int screenWidth = dw->geometry().width();
-    int screenHeight = dw->geometry().height();
-    QString customStartWindowBgFileString(UserDataDir+"/startwindowbg10_"+QString::number(screenWidth)+"x"+QString::number(screenHeight)+".png");
-    QFile customStartWindowBgFile(customStartWindowBgFileString);
-    if(customStartWindowBgFile.exists()) {
-        centralwidget->setStyleSheet(".QWidget { background-image: url("+QFileInfo(customStartWindowBgFile).absoluteFilePath()+"); background-position: top center; background-origin: content; background-repeat: no-repeat;}");
-    } else {
-        //if custom bg file could not be found load the big origin file
-        centralwidget->setStyleSheet(".QWidget { background-image: url(:/android/android-data/gfx/gui/misc/startwindowbg10_mobile.png); background-position: top center; background-origin: content; background-repeat: no-repeat;}");
-    }
-    this->showFullScreen();
-
-#else
-
 
 	this->menubar->setStyleSheet("QMenuBar { background-color: #4B4B4B; font-size:12px; border-width: 0px;} QMenuBar::item { color: #F0F0F0; }");
 
@@ -89,7 +67,6 @@ startWindowImpl::startWindowImpl(ConfigFile *c, Log *l)
 
     connect( actionAbout_Pokertraining, SIGNAL( triggered() ), this, SLOT( callAboutPokerTrainingDialog() ) );
     connect( actionConfigurePokerTraining, SIGNAL( triggered() ), this, SLOT( callSettingsDialogFromStartwindow() ) );
-#endif
 #endif
 
 	// 	Dialogs

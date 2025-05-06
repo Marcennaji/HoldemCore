@@ -53,66 +53,10 @@ std::string QtHelper::getDefaultLanguage()
 std::string QtHelper::getDataPathStdString(const char * /*argv0*/)
 {
 	QString path(QCoreApplication::instance()->applicationDirPath());
-
-#ifdef _WIN32
 	path += "/data/";
-#else
-#ifdef __APPLE__
-	if (QRegExp("Contents/MacOS/?$").indexIn(path) != -1) {
-		// pointing into an macosx application bundle
-		path += "/../Resources/data/";
-	} else {
-		path += "/data/";
-	}
-#else //Unix
-    QRegularExpression rx;
-    rx.setPattern("PokerTraining/?$");
-    QRegularExpressionMatch match = rx.match(path);
-    if (match.hasMatch())
-    {
-		// there is an own application directory
-		path += "/data/";
-    } else
-    {
-        rx.setPattern("usr/games/bin/?$");
-        match = rx.match(path);
-        if (match.hasMatch())
-        {
-            // we are in /usr/games/bin (like gentoo linux does)
-            path += "/../../share/games/PokerTraining/data/";
-        }else
-        {
-            rx.setPattern("usr/games/?$");
-            match = rx.match(path);
-            if (match.hasMatch())
-            {
-                // we are in /usr/games (like Debian linux does)
-                path += "/../share/games/PokerTraining/";
-            }
-            else
-            {
-                    rx.setPattern("bin/?$");
-                    match = rx.match(path);
-                    if (match.hasMatch())
-                    {
-                        // we are in a bin directory. e.g. /usr/bin
-                        path += "/../share/PokerTraining/data/";
-                    }
-                    else
-                    {
-                            path += "/data/";
-                    }
-            }
-        }
-    }
-#endif
-#endif
+
 	return (QDir::cleanPath(path) + "/").toStdString();
 }
-// [01:09] <Zhenech> doitux|mob, mach den pfad als define, und nur wenns nich gesetzt is wildes raten
-// [01:10] <Zhenech> dann compilieren die distries mit -DDATAPTH="/usr/share/games/PokerTraining" o.ä.
-// [01:10] <Zhenech> und du suchst eine liste ab:
-// [01:10] <Zhenech> ist es in [/usr/share/PokerTraining, /usr/share/games/PokerTraining/, /usr/local/..., $PWD/data]
 
 
 

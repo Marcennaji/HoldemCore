@@ -51,7 +51,6 @@ ConfigFile::ConfigFile(char* argv0, bool readonly) : noWriteAccess(readonly)
 	//standard defaults
 	logOnOffDefault = "1";
 
-#ifdef _WIN32
 	const char* appDataPath = getenv("AppData");
 	if (appDataPath && appDataPath[0] != 0) {
 		configFileName = appDataPath;
@@ -95,39 +94,11 @@ ConfigFile::ConfigFile(char* argv0, bool readonly) : noWriteAccess(readonly)
 	_mkdir(dataDir.c_str());
 	_mkdir(cacheDir.c_str());
 
-#else
-	//define app-dir
-	const char* homePath = getenv("HOME");
-	if (homePath) {
-		configFileName = homePath;
-#ifndef ANDROID
-		configFileName += "/.poker_training/";
-#endif
-		////define log-dir
-		logDir = configFileName;
-		logDir += "log-files/";
-		////define data-dir
-		dataDir = configFileName;
-		dataDir += "data/";
-		////define cache-dir
-		cacheDir = configFileName;
-		cacheDir += "cache/";
-		//create directories on first start of app
-		mkdir(configFileName.c_str(), MODUS);
-		mkdir(logDir.c_str(), MODUS);
-		mkdir(dataDir.c_str(), MODUS);
-		mkdir(cacheDir.c_str(), MODUS);
-	}
-#endif
 
 	ostringstream tempIntToString;
 	tempIntToString << configRev;
 	configList.push_back(ConfigInfo("ConfigRevision", CONFIG_TYPE_INT, tempIntToString.str()));
-#ifdef ANDROID
-	configList.push_back(ConfigInfo("AppDataDir", CONFIG_TYPE_STRING, ":/android/android-data/"));
-#else
 	configList.push_back(ConfigInfo("AppDataDir", CONFIG_TYPE_STRING, myQtToolsInterface->getDataPathStdString(myArgv0)));
-#endif
 	configList.push_back(ConfigInfo("Language", CONFIG_TYPE_INT, myQtToolsInterface->getDefaultLanguage()));
 	configList.push_back(ConfigInfo("ShowLeftToolBox", CONFIG_TYPE_INT, "1"));
 	configList.push_back(ConfigInfo("ShowCountryFlagInAvatar", CONFIG_TYPE_INT, "1"));
@@ -321,13 +292,9 @@ ConfigFile::ConfigFile(char* argv0, bool readonly) : noWriteAccess(readonly)
 				const char* tmpStr = confAppDataPath->Attribute("value");
 				if (tmpStr) tempAppDataPath = tmpStr;
 				//if appdatapath changes directly update it here not in UpdateConfig()
-#ifdef ANDROID
-				if (tempAppDataPath != ":/android/android-data/") {
-					confAppDataPath->SetAttribute("value", ":/android/android-data/");
-#else
+
 				if (tempAppDataPath != myQtToolsInterface->getDataPathStdString(myArgv0)) {
 					confAppDataPath->SetAttribute("value", myQtToolsInterface->stringToUtf8(myQtToolsInterface->getDataPathStdString(myArgv0)));
-#endif
 					doc.SaveFile(configFileName);
 				}
 				}

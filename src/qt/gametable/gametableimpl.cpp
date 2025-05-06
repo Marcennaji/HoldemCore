@@ -97,12 +97,7 @@ gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
     //tabsDiag = new QDialog(this);
     //tabs.setupUi(tabsDiag);
     textLabel_handLabel->hide();
-#ifdef ANDROID
-    this->setStyleSheet("QObject { font: 26px; } QDialog { background-image: url(:/android/android-data/gfx/gui/table/default_800x480/table_dark.png); background-position: bottom center; background-origin: content;  background-repeat: no-repeat;}");
-    this->setWindowState(Qt::WindowFullScreen);
-#else
     tabs.pushButton_settings->hide();
-#endif
     label_chance->setStyle(myGameTableStyle);
 #else
     label_chance->setStyle(myGameTableStyle);
@@ -350,11 +345,9 @@ gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
 	}
 
 	//fix for away string bug in righttabwidget on windows
-#if (defined _WIN32) || (defined __APPLE__)
 	tabWidget_Right->setTabText(0, " "+tabWidget_Right->tabText(0)+" ");
 	tabWidget_Right->setTabText(1, " "+tabWidget_Right->tabText(1)+" ");
 	tabWidget_Right->setTabText(2, " "+tabWidget_Right->tabText(2)+" ");
-#endif
 
 	//resize stop-button depending on translation
 	QFontMetrics tempMetrics = this->fontMetrics();
@@ -3482,16 +3475,8 @@ void gameTableImpl::refreshActionButtonFKeyIndicator(bool clear)
 void gameTableImpl::refreshGameTableStyle()
 {
 	myGameTableStyle->setWindowsGeometry(this);
-#ifdef GUI_800x480
-#ifdef ANDROID
-        //myGameTableStyle->setChatLogStyle(tabs.textBrowser_Log);
-#endif
-    //myGameTableStyle->setChatLogStyle(tabs.textBrowser_Chat);
-//	myGameTableStyle->setChatLogStyle(tabs.textEdit_tipInput);
-//	myGameTableStyle->setChatInputStyle(tabs.lineEdit_ChatInput);
-#else
 	myGameTableStyle->setChatLogStyle(textBrowser_Log);
-#endif
+
 
 	int i;
 	for (i=0; i<MAX_NUMBER_OF_PLAYERS; i++) {
@@ -3640,9 +3625,6 @@ void gameTableImpl::saveGameTableGeometry()
 
 void gameTableImpl::restoreGameTableGeometry()
 {
-#ifdef ANDROID
-    this->showFullScreen();
-#else
 	if(myConfig->readConfigInt("GameTableFullScreenSave")) {
     #ifndef GUI_800x480
 		if(actionFullScreen->isEnabled()) this->showFullScreen();
@@ -3654,7 +3636,6 @@ void gameTableImpl::restoreGameTableGeometry()
 			this->resize(myConfig->readConfigInt("GameTableWidthSave"), myConfig->readConfigInt("GameTableHeightSave"));
 		}
 	}
-#endif
 }
 
 void gameTableImpl::registeredUserMode()

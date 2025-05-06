@@ -37,11 +37,6 @@ CardDeckStyleReader::~CardDeckStyleReader()
 
 void CardDeckStyleReader::readStyleFile(QString file)
 {
-#ifdef ANDROID
-//on Android we use just the defaul style packed with the binary via qrc
-    currentFileName = ":/android/android-data/gfx/cards/default_800x480/defaultdeckstyle_800x480.xml";
-    currentDir = ":/android/android-data/gfx/cards/default_800x480/";
-#else
 	//if style file failed --> default style fallback
 	if(QFile(file).exists()) {
 		currentFileName = file;
@@ -52,7 +47,7 @@ void CardDeckStyleReader::readStyleFile(QString file)
 
 	QFileInfo info(currentFileName);
 	currentDir = info.absolutePath()+"/";
-#endif
+
         QFile myFile(currentFileName);
         myFile.open(QIODevice::ReadOnly);
         fileContent = myFile.readAll();

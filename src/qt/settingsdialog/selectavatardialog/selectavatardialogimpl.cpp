@@ -26,10 +26,6 @@
 selectAvatarDialogImpl::selectAvatarDialogImpl(QWidget *parent, ConfigFile *c)
 	: QDialog(parent), myConfig(c), settingsCorrect(true), avatarDir("")
 {
-#ifdef __APPLE__
-	setWindowModality(Qt::ApplicationModal);
-	setWindowFlags(Qt::WindowSystemMenuHint | Qt::CustomizeWindowHint | Qt::Dialog);
-#endif
 	setupUi(this);
 
 	myAppDataPath = QString::fromUtf8(myConfig->readConfigString("AppDataDir").c_str());

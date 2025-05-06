@@ -29,10 +29,6 @@ using namespace std;
 myMessageDialogImpl::myMessageDialogImpl(ConfigFile *c, QWidget *parent)
 	: QDialog(parent), myConfig(c), currentMsgId(0)
 {
-#ifdef __APPLE__
-	setWindowModality(Qt::ApplicationModal);
-	setWindowFlags(Qt::WindowSystemMenuHint | Qt::CustomizeWindowHint | Qt::Dialog);
-#endif
 	setupUi(this);
 }
 

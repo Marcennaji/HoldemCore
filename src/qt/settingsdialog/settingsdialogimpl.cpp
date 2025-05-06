@@ -35,17 +35,7 @@ using namespace std;
 settingsDialogImpl::settingsDialogImpl(QWidget *parent, ConfigFile *c, selectAvatarDialogImpl *s, Log *l)
 	: QDialog(parent), myConfig(c), mySelectAvatarDialogImpl(s), myLog(l)
 {
-#ifdef __APPLE__
-	setWindowModality(Qt::ApplicationModal);
-	setWindowFlags(Qt::WindowSystemMenuHint | Qt::CustomizeWindowHint | Qt::Dialog);
-#endif
 	setupUi(this);
-
-#ifdef ANDROID
-    listWidget->takeItem(1);
-    listWidget->takeItem(1);
-#endif
-
 
 	myManualBlindsOrderDialog = new manualBlindsOrderDialogImpl;
 
@@ -155,11 +145,6 @@ void settingsDialogImpl::prepareDialog()
 	// 	define PokerTraining default GameTableStyle for Maemo
 	treeWidget_gameTableStyles->clear();
         QString filename;
-#ifdef MAEMO
-        filename = "defaulttablestyle_800x480.xml";
-#elif ANDROID
-        filename = "android_tablestyle_800x480.xml";
-#endif
 	GameTableStyleReader defaultTableStyle(myConfig, this);
         defaultTableStyle.readStyleFile(QString::fromUtf8(myConfig->readConfigString("AppDataDir").c_str())+"gfx/gui/table/default_800x480/"+filename);
 	if(defaultTableStyle.getLoadedSuccessfull()) {
