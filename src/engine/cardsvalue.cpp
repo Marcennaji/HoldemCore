@@ -1,6 +1,6 @@
 /*****************************************************************************
- * PokerTraining - THNL training software, based on the PokerTH GUI          *
- * Copyright (C) 2013 Marc Ennaji                                            *
+ * PokerTraining - Texas Holdem No Limit training software          *
+ * Copyright (C) 2025 Marc Ennaji                                            *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU Affero General Public License as            *
@@ -17,7 +17,6 @@
  *****************************************************************************/
 
 #include <engine/cardsvalue.h>
-#include "arraydata.h"
 #include "tools.h"
 #include <engine/Player.h>
 
@@ -646,84 +645,6 @@ int CardsValue::cardsValue(int* cards, int* position)
 	}
 	return array[0][1]*1000000+array[1][1]*10000+array[2][1]*100+array[3][1]*10+array[4][1];
 }
-
-
-//std::vector< std::vector<int> > CardsValue::calcCardsChance(GameState beRoID, int* playerCards, int* boardCards)
-//{
-//	int i,j;
-//
-//	std::vector< std::vector<int> > chance(2);
-//
-//	chance[0].resize(10);
-//	chance[1].resize(10);
-//
-//	for(i=0; i<10; i++) {
-//		chance[0][i] = 0;
-//		chance[1][i] = 0;
-//	}
-//
-//	int cards[7];
-//	int sum = 0;
-//
-//	cards[0] = playerCards[0];
-//	cards[1] = playerCards[1];
-//	for(i=0; i<5; i++) cards[i+2] = boardCards[i];
-//
-//	switch(beRoID) {
-//	case GAME_STATE_PREFLOP: {
-//
-//		chance = ArrayData::getHandChancePreflop(holeCardsToIntCode(playerCards));
-//
-//	}
-//	break;
-//	case GAME_STATE_FLOP: {
-//
-//		for(i=0; i<51; i++) {
-//			if(i!=cards[0] && i!=cards[1] && i!=cards[2] && i!=cards[3] && i!=cards[4]) {
-//				for(j=i+1; j<52; j++) {
-//					if(j!=cards[0] && j!=cards[1] && j!=cards[2] && j!=cards[3] && j!=cards[4]) {
-//						cards[5] = i;
-//						cards[6] = j;
-//						(chance[0][cardsValue(cards,0)/100000000])++;
-//						sum++;
-//					}
-//				}
-//			}
-//		}
-//		for(i=0; i<10; i++) {
-//			if(chance[0][i] > 0) chance[1][i] = 1;
-//			chance[0][i] = (int)(((double)chance[0][i]/(double)sum)*100.0+0.5);
-//		}
-//
-//	}
-//	break;
-//	case GAME_STATE_TURN: {
-//
-//		for(i=0; i<52; i++) {
-//			if(i!=cards[0] && i!=cards[1] && i!=cards[2] && i!=cards[3] && i!=cards[4] && i!=cards[5]) {
-//				cards[6] = i;
-//				(chance[0][cardsValue(cards,0)/100000000])++;
-//				sum++;
-//			}
-//		}
-//		for(i=0; i<10; i++) {
-//			if(chance[0][i] > 0) chance[1][i] = 1;
-//			chance[0][i] = (int)(((double)chance[0][i]/(double)sum)*100.0+0.5);
-//		}
-//
-//	}
-//	break;
-//	case GAME_STATE_RIVER: {
-//		chance[0][cardsValue(cards,0)/100000000] = 100;
-//		chance[1][cardsValue(cards,0)/100000000] = 1;
-//	}
-//	break;
-//	default: {
-//	}
-//	}
-//
-//	return chance;
-//}
 
 std::string CardsValue::determineHandName(int myCardsValueInt, PlayerList activePlayerList)
 {

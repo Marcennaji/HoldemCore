@@ -1,6 +1,6 @@
 /*****************************************************************************
- * PokerTraining - THNL training software, based on the PokerTH GUI          *
- * Copyright (C) 2013 Marc Ennaji                                            *
+ * PokerTraining - Texas Holdem No Limit training software          *
+ * Copyright (C) 2025 Marc Ennaji                                            *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU Affero General Public License as            *
@@ -137,10 +137,6 @@ void Board::distributePot()
 
 			if (winnerCount == 0 || potLevel.size() == 0)
 				break;
-
-			//if (winnerCount == 0 || potLevel.size() == 0) {
-			//	throw Exception(__FILE__, __LINE__, ERR_NO_WINNER);
-			//}
 
 			// distribute the pot level sum to level winners
 			mod = (potLevel[1])%winnerCount;

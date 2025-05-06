@@ -33,3 +33,7 @@
 
 build
 .vscode
+
+# cppdepend analysis
+CppDependOut
+*.cdproj

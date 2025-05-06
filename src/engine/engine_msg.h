@@ -1,6 +1,6 @@
 /*****************************************************************************
- * PokerTraining - THNL training software, based on the PokerTH GUI          *
- * Copyright (C) 2013 Marc Ennaji                                            *
+ * PokerTraining - Texas Holdem No Limit training software          *
+ * Copyright (C) 2025 Marc Ennaji                                            *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU Affero General Public License as            *
@@ -30,7 +30,6 @@
 #define ERR_NEXT_ACTIVE_PLAYER_NOT_FOUND		10011
 #define ERR_FORMER_RUNNING_PLAYER_NOT_FOUND		10012
 
-#define ERR_NO_WINNER					10020
 #define ERR_PLAYER_ACTION					10030
 
 #endif

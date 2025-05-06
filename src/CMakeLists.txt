@@ -11,6 +11,8 @@ file(GLOB ROOT_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/*.h
 )
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Define the executable target
 add_executable(PokerTraining ${ROOT_SOURCES})
 

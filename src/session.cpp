@@ -1,6 +1,6 @@
 /*****************************************************************************
- * PokerTraining - THNL training software, based on the PokerTH GUI          *
- * Copyright (C) 2013 Marc Ennaji                                            *
+ * PokerTraining - Texas Holdem No Limit training software          *
+ * Copyright (C) 2025 Marc Ennaji                                            *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU Affero General Public License as            *
@@ -156,10 +156,6 @@ void Session::startGame(const GameData &gameData, const StartData &startData)
 
 			if (i > startData.numberOfPlayers / 2)
 				tableProfile = RANDOM_OPPONENTS; // fill the remaining opponents with random profiles */
-
-			// test :
-			//if (i >= startData.numberOfPlayers / 2)
-				//tableProfile = MANIAC_OPPONENTS; 
 		}
 
 		player->setIsSessionActive(true);

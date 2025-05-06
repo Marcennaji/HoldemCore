@@ -1,6 +1,6 @@
 /*****************************************************************************
- * PokerTraining - THNL training software, based on the PokerTH GUI          *
- * Copyright (C) 2013 Marc Ennaji                                            *
+ * PokerTraining - Texas Holdem No Limit training software          *
+ * Copyright (C) 2025 Marc Ennaji                                            *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU Affero General Public License as            *
@@ -39,9 +39,7 @@ public:
 
 	~Session();
 
-	// Only one of the two inits should be called.
 	bool init();
-//	void init(std::shared_ptr<AvatarManager> manager);
 
 	void addOwnAvatar(const std::string &avatarFile);
 

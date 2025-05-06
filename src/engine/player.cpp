@@ -1,6 +1,6 @@
 /*****************************************************************************
- * PokerTraining - THNL training software, based on the PokerTH GUI          *
- * Copyright (C) 2013 Marc Ennaji                                            *
+ * PokerTraining - Texas Holdem No Limit training software          *
+ * Copyright (C) 2025 Marc Ennaji                                            *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
  * it under the terms of the GNU Affero General Public License as            *
@@ -29,7 +29,6 @@
 #include <sstream>
 #include <cmath>
 #include <algorithm>
-#include <sys/stat.h>
 
 using namespace std;
 
@@ -913,13 +912,7 @@ void Player::loadStatistics(){
 	sqlite3 *db;
 	std::filesystem::path sqliteLogFileName;
 
-	struct stat info;
-	bool dirExists;
-
-	if (stat(myConfig->readConfigString("LogDir").c_str(), &info) != 0)
-		dirExists = false;
-	else if (info.st_mode & S_IFDIR)  // S_ISDIR() doesn't exist on my windows 
-		dirExists = true;
+	bool dirExists = std::filesystem::is_directory(myConfig->readConfigString("LogDir"));
 
 	// check if logging path exist
 	if(myConfig->readConfigString("LogDir") != "" && dirExists) {
