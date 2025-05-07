@@ -20,8 +20,8 @@
 #include <sstream>
 #include <cstdlib>
 #include <fstream>
-#include <qt/mymessagebox/mymessagebox.h>
 #include "game_defs.h"
+#include "loghelper.h"
 
 using namespace std;
 
@@ -63,9 +63,7 @@ void CardDeckStyleReader::readStyleFile(QString file)
 
 		TiXmlElement *GameTableElement = docHandle.FirstChild( "PokerTraining" ).FirstChild( "TableStyle" ).ToElement();
 		if(GameTableElement) {
-			MyMessageBox::warning(myW, tr("Card Deck Style Error"),
-								 tr("A game table style was selected instead of a card deck style.\nPlease select a card deck style and try again!"),
-								 QMessageBox::Ok);
+			LOG_ERROR(__FILE__ << " (" << __LINE__ << "A game table style was selected instead of a card deck style.\nPlease select a card deck style and try again!");
 		} else {
 
 			TiXmlElement* itemsList = docHandle.FirstChild( "PokerTraining" ).FirstChild( "CardDeck" ).FirstChild().ToElement();
@@ -135,9 +133,7 @@ void CardDeckStyleReader::readStyleFile(QString file)
 		}
 	} else {
 		loadedSuccessfull = 0;
-		MyMessageBox::warning(myW, tr("Card Deck Style Error"),
-							 tr("Cannot load card deck style file: %1 \n\nPlease check the style file or choose another style!").arg(currentFileName),
-							 QMessageBox::Ok);
+		LOG_ERROR(__FILE__ << " (" << __LINE__ <<"Cannot load card deck style file: \n\nPlease check the style file or choose another style!");
 	}
 
 }
@@ -148,9 +144,7 @@ void CardDeckStyleReader::showLeftItemsErrorMessage(QString style, QStringList f
 	QString EMail;
 	if(email != "NULL") EMail = email;
 
-	MyMessageBox::warning(myW, tr("Card Deck Style Error"),
-						 tr("Selected card deck style \"%1\" seems to be incomplete or defective. \n\nThe value(s) of \"%2\" is/are missing. \n\nPlease contact the card deck style builder %3.").arg(style).arg(items).arg(EMail),
-						 QMessageBox::Ok);
+	LOG_ERROR(__FILE__ << " (" << __LINE__ << "Selected card deck style seems to be incomplete or defective.");
 }
 
 void CardDeckStyleReader::showCardsLeftErrorMessage(QString style, QStringList failedItems, QString email)
@@ -159,7 +153,5 @@ void CardDeckStyleReader::showCardsLeftErrorMessage(QString style, QStringList f
 	QString EMail;
 	if(email != "NULL") EMail = email;
 
-	MyMessageBox::warning(myW, tr("Card Deck Style Error"),
-						 tr("Selected card deck style \"%1\" seems to be incomplete or defective. \nThe card picture(s) \"%2\" is/are not available. \n\nPlease contact the card deck style builder %3.").arg(style).arg(items).arg(EMail),
-						 QMessageBox::Ok);
+	LOG_ERROR(__FILE__ << " (" << __LINE__ << "Selected card deck style seems to be incomplete or defective");
 }

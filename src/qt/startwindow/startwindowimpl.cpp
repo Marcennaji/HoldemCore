@@ -25,7 +25,6 @@
 #include <qt/gametable/gametableimpl.h>
 #include <qt/newgamedialog/newgamedialogimpl.h>
 #include <qt/mymessagedialog/mymessagedialogimpl.h>
-#include <qt/mymessagebox/mymessagebox.h>
 #include <qt/gametable/log/guilog.h>
 
 using namespace std;

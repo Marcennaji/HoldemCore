@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 #include <qt/styles/gametablestylereader.h>
-#include <qt/mymessagebox/mymessagebox.h>
 #include <cstdlib>
 #include <QtWidgets/QLineEdit>
+#include "loghelper.h"
 
 using namespace std;
 
@@ -72,9 +72,7 @@ void GameTableStyleReader::readStyleFile(QString file)
 
         TiXmlElement *CardDeckElement = docHandle.FirstChild( "PokerTraining" ).FirstChild( "CardDeck" ).ToElement();
         if(CardDeckElement) {
-            MyMessageBox::warning(myW, tr("Game Table Style Error"),
-                                  tr("A card deck style was selected instead of a game table style.\nPlease select a game table style and try again!"),
-                                  QMessageBox::Ok);
+            LOG_ERROR(__FILE__ << " (" << __LINE__ << "A card deck style was selected instead of a game table style");
         } else {
             //in case of rereading clear old variables:
             StyleDescription.clear();
@@ -1401,9 +1399,7 @@ void GameTableStyleReader::readStyleFile(QString file)
         }
     } else {
         loadedSuccessfull = 0;
-        MyMessageBox::warning(myW, tr("Game Table Style Error"),
-                              tr("Cannot load game table style file: %1 \n\nPlease check the style file or choose another style!").arg(currentFileName),
-                              QMessageBox::Ok);
+        LOG_ERROR(__FILE__ << " (" << __LINE__ << "Cannot load game table style file");
     }
 }
 
@@ -1839,9 +1835,7 @@ QString GameTableStyleReader::getFallBackFieldContent(QString field, int type)
 
         TiXmlElement *CardDeckElement = docHandle.FirstChild( "PokerTraining" ).FirstChild( "CardDeck" ).ToElement();
         if(CardDeckElement) {
-            MyMessageBox::warning(myW, tr("Game Table Style Error"),
-                                  tr("A card deck style was selected instead of a game table style.\nPlease select a game table style and try again!"),
-                                  QMessageBox::Ok);
+            LOG_ERROR(__FILE__ << " (" << __LINE__ << "A card deck style was selected instead of a game table style.");
         } else {
             TiXmlElement* itemsList = docHandle.FirstChild( "PokerTraining" ).FirstChild( "TableStyle" ).FirstChild().ToElement();
             for( ; itemsList; itemsList=itemsList->NextSiblingElement()) {

@@ -25,7 +25,6 @@
 
 #include "game_defs.h"
 #include <QtWidgets/QMessageBox>
-#include <qt/mymessagebox/mymessagebox.h>
 #include "session.h"
 
 class GuiInterface;
