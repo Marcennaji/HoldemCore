@@ -3180,24 +3180,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="MyMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1920</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuView">
-    <property name="title">
-     <string>&amp;View</string>
-    </property>
-    <addaction name="actionFullScreen"/>
-    <addaction name="actionClose"/>
-   </widget>
-   <addaction name="menuView"/>
-  </widget>
   <action name="actionNewGame">
    <property name="text">
     <string>Start Local Game ...</string>
@@ -3323,11 +3305,6 @@
    <class>MyActionButton</class>
    <extends>QPushButton</extends>
    <header>myactionbutton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>MyMenuBar</class>
-   <extends>QMenuBar</extends>
-   <header>mymenubar.h</header>
   </customwidget>
   <customwidget>
    <class>MyNameLabel</class>

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>296</width>
-    <height>380</height>
+    <width>288</width>
+    <height>256</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,6 +30,16 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Start Cash:</string>
+        </property>
+        <property name="buddy">
+         <cstring>spinBox_startCash</cstring>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="1" colspan="2">
        <widget class="QSpinBox" name="spinBox_quantityPlayers">
         <property name="minimum">
@@ -39,18 +49,63 @@
          <number>10</number>
         </property>
         <property name="value">
-         <number>10</number>
+         <number>6</number>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Start Cash:</string>
+      <item row="2" column="0" colspan="3">
+       <widget class="QGroupBox" name="groupBox_3">
+        <property name="title">
+         <string>Opponents profile</string>
         </property>
-        <property name="buddy">
-         <cstring>spinBox_startCash</cstring>
-        </property>
+        <widget class="QRadioButton" name="radioButton_opponentsRandomlyChosen">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>80</y>
+           <width>231</width>
+           <height>18</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Opponents randomly chosen</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QRadioButton" name="radioButton_opponentsLooseAggressive">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>20</y>
+           <width>241</width>
+           <height>18</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Mostly loose-aggressive opponents</string>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+        </widget>
+        <widget class="QRadioButton" name="radioButton_opponentsTightAgressive">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>50</y>
+           <width>231</width>
+           <height>18</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Mostly tight-aggressive opponents</string>
+         </property>
+        </widget>
        </widget>
       </item>
       <item row="1" column="1" colspan="2">
@@ -72,84 +127,6 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0" colspan="3">
-       <widget class="QGroupBox" name="groupBox_2">
-        <property name="title">
-         <string>Blinds</string>
-        </property>
-        <layout class="QGridLayout">
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="QRadioButton" name="radioButton_useSavedBlindsSettings">
-           <property name="text">
-            <string>Use saved blinds settings</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QRadioButton" name="radioButton_changeBlindsSettings">
-           <property name="text">
-            <string>Change blinds settings ...</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="3" column="0" colspan="3">
-       <widget class="QGroupBox" name="groupBox_3">
-        <property name="title">
-         <string>Opponents profile</string>
-        </property>
-        <widget class="QRadioButton" name="radioButton_opponentsRandomlyChosen">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>80</y>
-           <width>231</width>
-           <height>18</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Opponents randomly chosen</string>
-         </property>
-        </widget>
-        <widget class="QRadioButton" name="radioButton_opponentsLooseAggressive">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>20</y>
-           <width>241</width>
-           <height>18</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Mostly loose-aggressive opponents</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-        <widget class="QRadioButton" name="radioButton_opponentsTightAgressive">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>50</y>
-           <width>231</width>
-           <height>18</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Mostly tight-aggressive opponents</string>
-         </property>
-        </widget>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
@@ -168,7 +145,6 @@
  <tabstops>
   <tabstop>spinBox_quantityPlayers</tabstop>
   <tabstop>spinBox_startCash</tabstop>
-  <tabstop>radioButton_useSavedBlindsSettings</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>

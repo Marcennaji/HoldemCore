@@ -201,7 +201,6 @@ public:
 	void setPlayerNameLabelStyle(QLabel*);
 	void setSmallFontBoardStyle(QLabel*);
 	void setBigFontBoardStyle(QLabel*);
-	void setMenuBarStyle(QMenuBar*);
 	void setBreakButtonStyle(QPushButton*, int);
 	void setSpeedStringStyle(QLabel*);
 	void setVoteButtonStyle(QPushButton*);

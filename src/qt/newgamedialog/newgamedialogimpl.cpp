@@ -22,7 +22,6 @@ newGameDialogImpl::newGameDialogImpl(QMainWindow *parent, ConfigFile *c)
 	: QDialog(parent), myConfig(c)
 {
 	setupUi(this);
-	connect( radioButton_changeBlindsSettings, SIGNAL( clicked(bool) ), this, SLOT( callChangeBlindsDialog(bool) ) );
 
 }
 

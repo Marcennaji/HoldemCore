@@ -26,7 +26,6 @@
 #include "mycashlabel.h"
 #include "mynamelabel.h"
 #include "mychancelabel.h"
-#include "mymenubar.h"
 #include <qt/gametable/log/guilog.h>
 
 #include <engine/HumanPlayer.h>
@@ -64,8 +63,6 @@ gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
 {
 	int i;
 
-	//	this->setStyle(new QPlastiqueStyle);
-
 	//for statistic development
 	for(i=0; i<15; i++) {
 		statisticArray[i] = 0;
@@ -89,26 +86,16 @@ gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
 	pixmapLabel_card0b->setW(this);
 	pixmapLabel_card0a->setW(this);
 
-	//set myStyle to widgets wich needs it
 
-#ifdef GUI_800x480
-    //tabsDiag = new QDialog(this);
-    //tabs.setupUi(tabsDiag);
-    textLabel_handLabel->hide();
-    tabs.pushButton_settings->hide();
     label_chance->setStyle(myGameTableStyle);
-#else
-    label_chance->setStyle(myGameTableStyle);
-#endif
 
-	//Flipside festlegen;
+
 	if (myConfig->readConfigInt("FlipsideOwn") && myConfig->readConfigString("FlipsideOwnFile") != "") {
 		flipside = QPixmap::fromImage(QImage(QString::fromUtf8(myConfig->readConfigString("FlipsideOwnFile").c_str())));
 	} else {
 		flipside = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir()+"flipside.png"));
 	}
 
-	//Flipside Animation noch nicht erledigt
 	flipHolecardsAllInAlreadyDone = false;
 
 	//Toolboxen verstecken?
@@ -2498,9 +2485,7 @@ void gameTableImpl::postRiverRunAnimation5()
 
 		if (distributePotAnimCounter==0 || distributePotAnimCounter==2 || distributePotAnimCounter==4 || distributePotAnimCounter==6 || distributePotAnimCounter==8) {
 
-#ifndef GUI_800x480
 			label_Pot->setText("");
-#endif
 
 			for(it_c=activePlayerList->begin(); it_c!=activePlayerList->end(); ++it_c) {
 
@@ -2510,9 +2495,7 @@ void gameTableImpl::postRiverRunAnimation5()
 				}
 			}
 		} else {
-#ifndef GUI_800x480
 			label_Pot->setText(PotString);
-#endif
 
 			for(it_c=activePlayerList->begin(); it_c!=activePlayerList->end(); ++it_c) {
 
@@ -2987,38 +2970,6 @@ void gameTableImpl::blinkingStartButtonAnimationAction()
 //}
 
 
-void gameTableImpl::tabSwitchAction()
-{
-
-//#ifdef GUI_800x480
-//	switch(tabs.tabWidget_Left->currentIndex()) {
-//
-//	case 1: {
-//		tabs.lineEdit_ChatInput->setFocus();
-//	}
-//	break;
-//	default: {
-//		tabs.lineEdit_ChatInput->clearFocus();
-//	}
-//
-//	}
-//#else
-//	switch(tabWidget_Left->currentIndex()) {
-//
-//	case 1: {
-//		lineEdit_ChatInput->setFocus();
-//	}
-//	break;
-//	default: {
-//		lineEdit_ChatInput->clearFocus();
-//	}
-//
-//	}
-//#endif
-//
-}
-
-
 void gameTableImpl::GameModification()
 {
 
@@ -3387,7 +3338,6 @@ void gameTableImpl::refreshGameTableStyle()
 	myGameTableStyle->setCardHolderStyle(label_CardHolder3,1);
 	myGameTableStyle->setCardHolderStyle(label_CardHolder4,2);
 	myGameTableStyle->setTableBackground(this);
-	myGameTableStyle->setMenuBarStyle(menubar);
 	myGameTableStyle->setBreakButtonStyle(pushButton_break,0);
 
 	for (i=0; i<MAX_NUMBER_OF_PLAYERS; i++) {
@@ -3486,9 +3436,7 @@ void gameTableImpl::refreshGameTableStyle()
 		RiverString = myGameTableStyle->getRiverI18NString();
 	}
 
-#ifndef GUI_800x480
 	label_Pot->setText(PotString);
-#endif
 	label_Total->setText(TotalString+":");
 	label_Sets->setText(BetsString+":");
 	label_handNumber->setText(HandString+":");
@@ -3511,9 +3459,7 @@ void gameTableImpl::saveGameTableGeometry()
 void gameTableImpl::restoreGameTableGeometry()
 {
 	if(myConfig->readConfigInt("GameTableFullScreenSave")) {
-    #ifndef GUI_800x480
 		if(actionFullScreen->isEnabled()) this->showFullScreen();
-    #endif
 	} else {
 		//resize only if style size allow this and if NOT fixed windows size
 		if(!myGameTableStyle->getIfFixedWindowSize().toInt() && myConfig->readConfigInt("GameTableHeightSave") <= myGameTableStyle->getMaximumWindowHeight().toInt() && myConfig->readConfigInt("GameTableHeightSave") >= myGameTableStyle->getMinimumWindowHeight().toInt() && myConfig->readConfigInt("GameTableWidthSave") <= myGameTableStyle->getMaximumWindowWidth().toInt() && myConfig->readConfigInt("GameTableWidthSave") >= myGameTableStyle->getMinimumWindowWidth().toInt()) {
@@ -3522,47 +3468,6 @@ void gameTableImpl::restoreGameTableGeometry()
 		}
 	}
 }
-
-void gameTableImpl::registeredUserMode()
-{
-#ifdef GUI_800x480
-    //tabs.lineEdit_ChatInput->clear();
-    //tabs.lineEdit_ChatInput->setEnabled(true);
-#else
-	//lineEdit_ChatInput->clear();
-	//lineEdit_ChatInput->setEnabled(true);
-#endif
-	guestMode = false;
-}
-
-
-void gameTableImpl::guestUserMode()
-{
-#ifdef GUI_800x480
-	//tabs.lineEdit_ChatInput->setText(tr("Chat is only available to registered players."));
-	//tabs.lineEdit_ChatInput->setDisabled(true);
-#else
-	//lineEdit_ChatInput->setText(tr("Chat is only available to registered players."));
-	//lineEdit_ChatInput->setDisabled(true);
-#endif
-	guestMode = true;
-}
-
-//void gameTableImpl::showShowMyCardsButton()
-//{
-//	pushButton_showMyCards->show();
-//	pushButton_showMyCards->raise();
-//}
-
-//void gameTableImpl::sendShowMyCardsSignal()
-//{
-//	if(pushButton_showMyCards->isVisible()) {
-//
-//		myStartWindow->getSession()->showMyCards();
-//
-//		pushButton_showMyCards->hide();
-//	}
-//}
 
 void gameTableImpl::closeMessageBoxes()
 {
@@ -3608,9 +3513,6 @@ ConfigFile* gameTableImpl::getConfig() const {
 }
 GameTableStyleReader* gameTableImpl::getGameTableStyle() const {
 	return myGameTableStyle;
-}
-bool gameTableImpl::getGuestMode() const {
-	return guestMode;
 }
 
 void gameTableImpl::setStartWindow(startWindowImpl* s) {

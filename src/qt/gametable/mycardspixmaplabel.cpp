@@ -263,9 +263,5 @@ void MyCardsPixmapLabel::mouseReleaseEvent(QMouseEvent * event)
 
 void MyCardsPixmapLabel::setFront ( const QPixmap& theValue )
 {
-#ifdef GUI_800x480
-        front = theValue.scaled(width(), height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);;
-#else
         front = theValue;
-#endif
 }

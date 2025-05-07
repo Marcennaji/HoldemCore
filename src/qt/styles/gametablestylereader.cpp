@@ -1451,33 +1451,19 @@ void GameTableStyleReader::setTableBackground(gameTableImpl *gt)
 
 void GameTableStyleReader::setChatLogStyle(QTextBrowser *tb)
 {
-#ifdef GUI_800x480
-    //make the scrollbar touchable for mobile guis
-    tb->setStyleSheet("QTextBrowser { "+ font1String +" font-size: "+ChatLogTextSize+"px; color: #"+ChatLogTextColor+"; background-color: #"+ChatLogBgColor+"; border:none; } QScrollBar:vertical { border: 1px solid #"+ChatLogScrollBarBorderColor+"; background: #"+ChatLogScrollBarBgColor+"; width: 60px; margin: 0px -1px 0px 0px; } QScrollBar::handle:vertical { border-radius: 4px; border: 3px solid #"+ChatLogScrollBarHandleBorderColor+"; background: #"+ChatLogScrollBarHandleBgColor+"; min-height: 60px; } QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical, QScrollBar:up-arrow:vertical, QScrollBar::down-arrow:vertical, QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }");
-#else
     tb->setStyleSheet("QTextBrowser { "+ font1String +" font-size: "+ChatLogTextSize+"px; color: #"+ChatLogTextColor+"; background-color: #"+ChatLogBgColor+"; border:none; } QScrollBar:vertical { border: 1px solid #"+ChatLogScrollBarBorderColor+"; background: #"+ChatLogScrollBarBgColor+"; width: 15px; margin: 17px -1px 17px 0px; } QScrollBar::handle:vertical { border-radius: 1px; border: 1px solid #"+ChatLogScrollBarHandleBorderColor+"; background: #"+ChatLogScrollBarHandleBgColor+"; min-height: 20px; } QScrollBar::add-line:vertical { margin-right: 0px; margin-left: 1px; border-bottom-right-radius: 2px; border-bottom-left-radius: 2px; border-top-right-radius: 1px; border-top-left-radius: 1px; border: 1px solid #"+ChatLogScrollBarHandleBorderColor+"; background: #"+ChatLogScrollBarHandleBgColor+"; height: 15px; subcontrol-position: bottom; subcontrol-origin: margin; } QScrollBar::sub-line:vertical { margin-right: 0px; margin-left: 1px; border-bottom-right-radius: 1px; border-bottom-left-radius: 1px; border-top-right-radius: 2px; border-top-left-radius: 2px; border: 1px solid #"+ChatLogScrollBarHandleBorderColor+"; background: #"+ChatLogScrollBarHandleBgColor+"; height: 15px; subcontrol-position: top; subcontrol-origin: margin; } QScrollBar:up-arrow:vertical, QScrollBar::down-arrow:vertical { border: 1px solid #"+ChatLogScrollBarArrowBorderColor+"; height: 3px; width: 3px; background: #"+ChatLogScrollBarArrowBgColor+"; } QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }");
-#endif
 }
 
 void GameTableStyleReader::setChatLogStyle(QPlainTextEdit* pte)
 {
-#ifdef GUI_800x480
-    //make the scrollbar touchable for mobile guis
-    pte->setStyleSheet("QPlainTextEdit { "+ font1String +" font-size: "+ChatLogTextSize+"px; color: #"+ChatLogTextColor+"; background-color: #"+ChatLogBgColor+"; border:none; } QScrollBar:vertical { border: 1px solid #"+ChatLogScrollBarBorderColor+"; background: #"+ChatLogScrollBarBgColor+"; width: 60px; margin: 0px -1px 0px 0px; } QScrollBar::handle:vertical { border-radius: 4px; border: 3px solid #"+ChatLogScrollBarHandleBorderColor+"; background: #"+ChatLogScrollBarHandleBgColor+"; min-height: 60px; } QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical, QScrollBar:up-arrow:vertical, QScrollBar::down-arrow:vertical, QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }");
-#else
     pte->setStyleSheet("QPlainTextEdit { "+ font1String +" font-size: "+ChatLogTextSize+"px; color: #"+ChatLogTextColor+"; background-color: #"+ChatLogBgColor+"; border:none; } QScrollBar:vertical { border: 1px solid #"+ChatLogScrollBarBorderColor+"; background: #"+ChatLogScrollBarBgColor+"; width: 15px; margin: 17px -1px 17px 0px; } QScrollBar::handle:vertical { border-radius: 1px; border: 1px solid #"+ChatLogScrollBarHandleBorderColor+"; background: #"+ChatLogScrollBarHandleBgColor+"; min-height: 20px; } QScrollBar::add-line:vertical { margin-right: 0px; margin-left: 1px; border-bottom-right-radius: 2px; border-bottom-left-radius: 2px; border-top-right-radius: 1px; border-top-left-radius: 1px; border: 1px solid #"+ChatLogScrollBarHandleBorderColor+"; background: #"+ChatLogScrollBarHandleBgColor+"; height: 15px; subcontrol-position: bottom; subcontrol-origin: margin; } QScrollBar::sub-line:vertical { margin-right: 0px; margin-left: 1px; border-bottom-right-radius: 1px; border-bottom-left-radius: 1px; border-top-right-radius: 2px; border-top-left-radius: 2px; border: 1px solid #"+ChatLogScrollBarHandleBorderColor+"; background: #"+ChatLogScrollBarHandleBgColor+"; height: 15px; subcontrol-position: top; subcontrol-origin: margin; } QScrollBar:up-arrow:vertical, QScrollBar::down-arrow:vertical { border: 1px solid #"+ChatLogScrollBarArrowBorderColor+"; height: 3px; width: 3px; background: #"+ChatLogScrollBarArrowBgColor+"; } QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }");
-#endif
 }
 
 
 void GameTableStyleReader::setChatInputStyle(QLineEdit *ci)
 {
     QString myFontSize;
-#ifdef GUI_800x480
-    myFontSize="28";
-#else
     myFontSize=ChatLogTextSize;
-#endif
     ci->setStyleSheet("QLineEdit { "+ font1String +" font-size: "+myFontSize+"px; color: #"+ChatLogTextColor+"; background-color: #"+ChatLogBgColor+"; border-top: 2px solid #"+TabWidgetBorderColor+"; }");
 }
 
@@ -1521,40 +1507,24 @@ void GameTableStyleReader::setCardHolderStyle(QLabel *l, int BettingRound)
     }
 }
 
-void GameTableStyleReader::setMenuBarStyle(QMenuBar *mb)
-{
-    mb->setStyleSheet("QMenuBar { background-color: #"+MenuBgColor+"; font-size:12px; border-width: 0px;} QMenuBar::item { color: #"+MenuTextColor+"; }");
-}
 
 void GameTableStyleReader::setBreakButtonStyle(QPushButton *bb, int state)
 {
     switch(state) {
     // 		default
     case 0:
-#ifdef GUI_800x480
-        bb->setStyleSheet("QPushButton:enabled { padding: 10px; background-color: #"+BreakLobbyButtonBgColor+"; color: #"+BreakLobbyButtonTextColor+"; font-size: 26px} QPushButton:disabled { padding: 10px; background-color: #"+BreakLobbyButtonBgDisabledColor+"; color: #"+BreakLobbyButtonTextDisabledColor+"; font-weight: 900; font-size: 26px}");
-#else
         bb->setStyleSheet("QPushButton:enabled { background-color: #"+BreakLobbyButtonBgColor+"; color: #"+BreakLobbyButtonTextColor+";} QPushButton:disabled { background-color: #"+BreakLobbyButtonBgDisabledColor+"; color: #"+BreakLobbyButtonTextDisabledColor+"; font-weight: 900;}");
-#endif
         break;
         // 		blink
     case 1:
-#ifdef GUI_800x480
-        bb->setStyleSheet("QPushButton { padding: 10px; background-color: #"+BreakLobbyButtonBgBlinkColor+"; color: "+BreakLobbyButtonTextBlinkColor+"; font-size: 26px}");
-#else
         bb->setStyleSheet("QPushButton { background-color: #"+BreakLobbyButtonBgBlinkColor+"; color: "+BreakLobbyButtonTextBlinkColor+";}");
-#endif
         break;
     }
 }
 
 void GameTableStyleReader::setSpeedStringStyle(QLabel *l)
 {
-#ifdef GUI_800x480
-    l->setStyleSheet("QLabel { color: #"+SpeedTextColor+"; font-size: 24px}");
-#else
     l->setStyleSheet("QLabel { color: #"+SpeedTextColor+";}");
-#endif
 }
 
 void GameTableStyleReader::setVoteButtonStyle(QPushButton *b)
@@ -1759,7 +1729,6 @@ void GameTableStyleReader::setWindowsGeometry(gameTableImpl *gt)
         gt->setMaximumSize(FixedWindowWidth.toInt(), FixedWindowHeight.toInt());
         gt->resize(FixedWindowWidth.toInt(), FixedWindowHeight.toInt());
 
-#ifndef GUI_800x480
         QScreen* dw = QGuiApplication::primaryScreen();
         int availableWidth = dw->availableSize().width();
         int availableHeight = dw->availableSize().height();
@@ -1772,13 +1741,11 @@ void GameTableStyleReader::setWindowsGeometry(gameTableImpl *gt)
                 gt->move(50,50);
             }
         }
-#endif
     } else {
         gt->setMinimumSize(MinimumWindowWidth.toInt(), MinimumWindowHeight.toInt());
         gt->setMaximumSize(MaximumWindowWidth.toInt(), MaximumWindowHeight.toInt());
         gt->resize(MinimumWindowWidth.toInt(), MinimumWindowHeight.toInt());
 
-#ifndef GUI_800x480
         QScreen* dw = QGuiApplication::primaryScreen();
         int availableWidth = dw->availableSize().width();
         int availableHeight = dw->availableSize().height();
@@ -1791,7 +1758,6 @@ void GameTableStyleReader::setWindowsGeometry(gameTableImpl *gt)
                 gt->move(50,50);
             }
         }
-#endif
     }
 
 }
@@ -1801,21 +1767,8 @@ void GameTableStyleReader::setSliderStyle(QSlider *s)
 
     QString height("");
 
-#ifdef GUI_800x480
-    height = " height: 10px;";
-#else
     height = " height: 3px;";
-#endif
-
-#if QT_VERSION >= 0x040700
-#ifdef GUI_800x480
-    s->setStyleSheet("QSlider::groove:horizontal { border: 2px solid #"+BetSpeedSliderGrooveBorderColor+";"+height+" background: #"+BetSpeedSliderGrooveBgColor+"; margin: 2px 0; border-radius: 2px; } QSlider::handle:horizontal { background: #"+BetSpeedSliderHandleBgColor+"; border: 2px solid #"+BetSpeedSliderHandleBorderColor+"; width: 58px; margin: -24px 0; border-radius: 4px;}");
-#else
     s->setStyleSheet("QSlider::groove:horizontal { border: 1px solid #"+BetSpeedSliderGrooveBorderColor+";"+height+" background: #"+BetSpeedSliderGrooveBgColor+"; margin: 4px 0; border-radius: 2px; } QSlider::handle:horizontal { background: #"+BetSpeedSliderHandleBgColor+"; border: 1px solid #"+BetSpeedSliderHandleBorderColor+"; width: 12px; margin: -7px 0; border-radius: 4px;}");
-#endif
-#else
-    s->setStyleSheet("QSlider::groove:horizontal { border: 1px solid #"+BetSpeedSliderGrooveBorderColor+";"+height+" background: #"+BetSpeedSliderGrooveBgColor+"; margin: 4px 0; border-radius: 2px; } QSlider::handle:horizontal { background: #"+BetSpeedSliderHandleBgColor+"; border: 1px solid #"+BetSpeedSliderHandleBorderColor+"; width: 12px; margin: -2px 0; border-radius: 4px;}");
-#endif
 
 }
 

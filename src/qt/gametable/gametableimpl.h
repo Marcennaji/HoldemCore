@@ -253,7 +253,6 @@ public slots:
 	void switchChanceWindow();
 	void switchFullscreen();
 
-	void tabSwitchAction();
 
 	void GameModification();
 
@@ -275,9 +274,6 @@ public slots:
 	void refreshGameTableStyle();
 	void saveGameTableGeometry();
 	void restoreGameTableGeometry();
-
-	void registeredUserMode();
-	void guestUserMode();
 
 	void closeMessageBoxes();
     void hide();
