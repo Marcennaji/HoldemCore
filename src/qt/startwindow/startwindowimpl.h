@@ -35,9 +35,6 @@ class Game;
 class ConfigFile;
 class gameTableImpl;
 class newGameDialogImpl;
-class settingsDialogImpl;
-class selectAvatarDialogImpl;
-class aboutPokerTrainingImpl;
 class guiLog;
 class Log;
 
@@ -55,13 +52,6 @@ public:
 		assert(mySession.get());
 		return mySession;
 	}
-	//std::shared_ptr< GuiInterface > getServerGuiInterface() const {
-	//	return myServerGuiInterface;
-	//}
-	//connectToServerDialogImpl* getConnectToServerDialog() const {
-	//	return myConnectToServerDialog;
-	//}
-
 	void setGuiLog(guiLog* l) {
 		myGuiLog = l;
 	}
@@ -74,9 +64,6 @@ signals:
 
 public slots:
 
-	void callAboutPokerTrainingDialog();
-	void callSettingsDialog(bool);
-	void callSettingsDialogFromStartwindow();
 	void callNewGameDialog();
 
 	void startNewGame(newGameDialogImpl* =0);
@@ -91,15 +78,9 @@ private:
 	//std::shared_ptr<GuiInterface> myServerGuiInterface;
 
 	// 	Dialogs
-	aboutPokerTrainingImpl *myAboutPokerTrainingDialog;
 	newGameDialogImpl *myNewGameDialog;
-	settingsDialogImpl *mySettingsDialog;
-	selectAvatarDialogImpl *mySelectAvatarDialog;
 	startWindowImpl *myStartWindow;
-
-    MyMessageBox msgBoxOutdatedVersion;
-	bool msgBoxOutdatedVersionActive;
-
+ 
 	friend class GuiWrapper;
 };
 

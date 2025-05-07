@@ -54,7 +54,6 @@ public:
 	virtual void refreshButton() const =0;
 	virtual void refreshGameLabels(GameState state) const=0;
 
-	virtual void setPlayerAvatar(int myID, const std::string &myAvatar) const=0;
 	virtual void waitForGuiUpdateDone() const=0;
 
 	// Karten-Funktionen

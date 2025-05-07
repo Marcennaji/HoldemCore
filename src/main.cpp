@@ -30,7 +30,6 @@
 #include <qt/startwindow/startwindowimpl.h>
 #include <configfile.h>
 #include <engine/log.h>
-#include <qt/gametable/startsplash/startsplash.h>
 #include <game_defs.h>
 
 #ifdef LOG_POKER_EXEC
@@ -106,14 +105,7 @@ int main( int argc, char **argv )
 	QString font1String("QApplication, QWidget, QDialog { font-size: 12px; }");
 	a.setStyleSheet(font1String + " QDialogButtonBox, QMessageBox { dialogbuttonbox-buttons-have-icons: 1; dialog-ok-icon: url(:/gfx/dialog_ok_apply.png); dialog-cancel-icon: url(:/gfx/dialog_close.png); dialog-close-icon: url(:/gfx/dialog_close.png); dialog-yes-icon: url(:/gfx/dialog_ok_apply.png); dialog-no-icon: url(:/gfx/dialog_close.png) }");
 
-        QPixmap pixmap(myAppDataPath + "gfx/gui/misc/welcomePokerTraining.png");
-        StartSplash splash(pixmap);
-        if(!myConfig->readConfigInt("DisableSplashScreenOnStartup")) {
-            splash.show();
-			splash.showMessage(QString("Version %1").arg(POKERTRAINING_BETA_RELEASE_STRING), 0x0042, QColor(240,240,240));
-        }
-
-	qRegisterMetaType<unsigned>("unsigned");
+ 	qRegisterMetaType<unsigned>("unsigned");
 	qRegisterMetaType<std::shared_ptr<Game> >("std::shared_ptr<Game>");
 
 	startWindowImpl mainWin(myConfig,myLog);

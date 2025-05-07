@@ -39,7 +39,6 @@ class GuiInterface;
 class BoardInterface;
 class Player;
 class MyCardsPixmapLabel;
-class MyAvatarLabel;
 class MyCashLabel;
 class MyNameLabel;
 
@@ -88,7 +87,6 @@ signals:
 	void signalRefreshButton();
 	void signalRefreshGameLabels(int);
 
-	void signalSetPlayerAvatar(int, QString);
 	void signalGuiUpdateDone();
 
 	void signalMeInAction();
@@ -137,10 +135,8 @@ public slots:
 	void refreshPlayerName();
 	void refreshGameLabels(int);
 	void refreshButton();
-	void refreshPlayerAvatar();
 	void refreshPlayerStatistics();
 	void refreshActionButtonFKeyIndicator(bool =0);
-	void setPlayerAvatar(int myID, QString myAvatar);
 	void refreshCardsChance(GameState);
 	void refreshHandsRanges();
 
@@ -159,7 +155,6 @@ public slots:
 
 	void setGameSpeed(const int theValue);
 
-	void callSettingsDialog();
 	void applySettings(settingsDialogImpl*);
 
 	void pushButtonBetRaiseClicked(bool checked);
@@ -341,7 +336,6 @@ private:
 	MySetLabel *setLabelArray[MAX_NUMBER_OF_PLAYERS];
 	QLabel *actionLabelArray[MAX_NUMBER_OF_PLAYERS];
 	MyNameLabel *playerNameLabelArray[MAX_NUMBER_OF_PLAYERS];
-	MyAvatarLabel *playerAvatarLabelArray[MAX_NUMBER_OF_PLAYERS];
 	QLabel *playerStarsArray[6][MAX_NUMBER_OF_PLAYERS];
 
 	QGroupBox *groupBoxArray[MAX_NUMBER_OF_PLAYERS];
@@ -423,7 +417,6 @@ private:
 	QString TurnString;
 	QString RiverString;
 
-	friend class MyAvatarLabel;
 	friend class GuiWrapper;
 };
 

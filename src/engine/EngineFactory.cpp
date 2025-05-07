@@ -56,38 +56,6 @@ EngineFactory::createBoard(unsigned dp)
 	return std::shared_ptr<BoardInterface>(new Board(dp));
 }
 
-//std::shared_ptr<Player>
-//EngineFactory::createPlayer(int id, unsigned uniqueId, PlayerType type, 
-//								std::string name, std::string avatar, 
-//								int sC, bool aS, bool sotS, int mB)
-//{
-//	Player * player;
-//
-//	if (type == PLAYER_TYPE_HUMAN){
-//		player = new HumanPlayer(myConfig, id, type, HumanPlayerName[0], avatar, sC, aS, sotS, mB);
-//	}else{
-//
-//		int rand = 0;
-//		Tools::GetRand(1, 3, 1, &rand);
-//
-//		if (rand == 1)
-//			player = new ManiacPlayer(myConfig, id, type, ManiacPlayerName[id], avatar, sC, aS, sotS, mB);
-//		else
-//		if (rand == 2)
-//			player = new LooseAggressivePlayer(myConfig, id, type, LooseAggressivePlayerName[id], avatar, sC, aS, sotS, mB);
-//		else
-//			player = new TightAgressivePlayer(myConfig, id, type, TightAgressivePlayerName[id], avatar, sC, aS, sotS, mB);
-//	}
-//
-//	std::string avatarFile = myConfig->readConfigString("AppDataDir");
-//	avatarFile += "/gfx/avatars/";
-//	avatarFile += player->getName();
-//	avatarFile += ".png";
-//	player->setAvatar(avatarFile);
-//
-//	return std::shared_ptr<Player> (player);
-//}
-
 std::vector<std::shared_ptr<BettingRoundInterface> >
 EngineFactory::createBettingRound(HandInterface *hi, unsigned dP, int sB)
 {

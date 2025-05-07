@@ -39,9 +39,6 @@ Game::Game(GuiInterface* gui, std::shared_ptr<EngineFactory> factory,
 	  myGameID(gameId), currentSmallBlind(gameData.firstSmallBlind), currentHandID(0), dealerPosition(0),
 	  lastHandBlindsRaised(1), lastTimeBlindsRaised(0), myGameData(gameData)
 {
-
-	blindsList = myGameData.manualBlindsList;
-
 	dealerPosition = startData.startDealerPlayerId;
 
 	// determine dealer position
@@ -99,9 +96,6 @@ void Game::initHand()
 	PlayerListIterator it;
 
 	currentHandID++;
-
-	// calculate smallBlind
-	raiseBlinds();
 
 	// set player action none
 	for(it=seatsList->begin(); it!=seatsList->end(); ++it) {
@@ -212,39 +206,4 @@ std::shared_ptr<Player> Game::getPlayerByName(const std::string &name)
 		++i;
 	}
 	return tmpPlayer;
-}
-
-void Game::raiseBlinds()
-{
-
-	bool raiseBlinds = false;
-
-	if (myGameData.raiseIntervalMode == RAISE_ON_HANDNUMBER) {
-		if (lastHandBlindsRaised + myGameData.raiseSmallBlindEveryHandsValue <= currentHandID) {
-			raiseBlinds = true;
-			lastHandBlindsRaised = currentHandID;
-		}
-	}
-	if (raiseBlinds) {
-		// At this point, the blinds must be raised
-		// Now we check how the blinds should be raised
-		if (myGameData.raiseMode == DOUBLE_BLINDS) {
-			currentSmallBlind *= 2;
-		} else {
-			if(!blindsList.empty()) {
-				currentSmallBlind = blindsList.front();
-				blindsList.pop_front();
-			} else {
-				// The position exceeds the list
-				if (myGameData.afterManualBlindsMode == AFTERMB_DOUBLE_BLINDS) {
-					currentSmallBlind *= 2;
-				} else {
-					if(myGameData.afterManualBlindsMode == AFTERMB_RAISE_ABOUT) {
-						currentSmallBlind += myGameData.afterMBAlwaysRaiseValue;
-					}
-				}
-			}
-		}
-		currentSmallBlind = min(currentSmallBlind,startQuantityPlayers*startCash/2);
-	}
 }

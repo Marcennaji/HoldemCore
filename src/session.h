@@ -41,8 +41,6 @@ public:
 
 	bool init();
 
-	void addOwnAvatar(const std::string &avatarFile);
-
 	void startGame(const GameData &gameData, const StartData &startData);
 
 	std::shared_ptr<Game> getCurrentGame();

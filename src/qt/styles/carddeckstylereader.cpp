@@ -129,15 +129,8 @@ void CardDeckStyleReader::readStyleFile(QString file)
 
 			if(!leftItems.isEmpty() && myW != 0) showLeftItemsErrorMessage(StyleDescription, leftItems, StyleMaintainerEMail);
 			else {
-				if(!cardsLeft.isEmpty() && myW != 0) showCardsLeftErrorMessage(StyleDescription, cardsLeft, StyleMaintainerEMail);
-				//check for style file version
-				if(PokerTrainingStyleFileVersion != "" && PokerTrainingStyleFileVersion.toInt() != POKERTRAINING_CD_STYLE_FILE_VERSION) {
-					QString EMail;
-					if(StyleMaintainerEMail != "NULL") EMail = StyleMaintainerEMail;
-					MyMessageBox::warning(myW, tr("Card Deck Style Error"),
-										 tr("Selected card deck style \"%1\" seems to be outdated. \n The current PokerTraining card deck style version is \"%2\", but this style has version \"%3\" set. \n\nPlease contact the card deck style builder %4.").arg(StyleDescription).arg(POKERTRAINING_CD_STYLE_FILE_VERSION).arg(PokerTrainingStyleFileVersion).arg(EMail),
-										 QMessageBox::Ok);
-				}
+				if(!cardsLeft.isEmpty() && myW != 0) 
+					showCardsLeftErrorMessage(StyleDescription, cardsLeft, StyleMaintainerEMail);
 			}
 		}
 	} else {

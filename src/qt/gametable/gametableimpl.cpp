@@ -18,10 +18,8 @@
 #include "gametableimpl.h"
 #include "session.h"
 #include <qt/mymessagedialog/mymessagedialogimpl.h>
-#include <qt/settingsdialog/settingsdialogimpl.h>
 #include <qt/startwindow/startwindowimpl.h>
 
-#include <qt/gametable/startsplash/startsplash.h>
 #include "mycardspixmaplabel.h"
 #include "mysetlabel.h"
 #include "myactionbutton.h"
@@ -265,22 +263,6 @@ gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
 		playerNameLabelArray[i]->setW(this);
 	}
 
-	// playerAvatarLabelArray init
-	playerAvatarLabelArray[0] = label_Avatar0;
-	playerAvatarLabelArray[1] = label_Avatar1;
-	playerAvatarLabelArray[2] = label_Avatar2;
-	playerAvatarLabelArray[3] = label_Avatar3;
-	playerAvatarLabelArray[4] = label_Avatar4;
-	playerAvatarLabelArray[5] = label_Avatar5;
-	playerAvatarLabelArray[6] = label_Avatar6;
-	playerAvatarLabelArray[7] = label_Avatar7;
-	playerAvatarLabelArray[8] = label_Avatar8;
-	playerAvatarLabelArray[9] = label_Avatar9;
-	for (i=0; i<MAX_NUMBER_OF_PLAYERS; i++) {
-		playerAvatarLabelArray[i]->setW(this);
-		playerAvatarLabelArray[i]->setId(i);
-	}
-
 	// setLabelArray init
 	setLabelArray[0] = textLabel_Set0;
 	setLabelArray[1] = textLabel_Set1;
@@ -410,8 +392,6 @@ gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
 	connect(enableCallCheckPushButtonTimer, SIGNAL(timeout()), this, SLOT(enableCallCheckPushButton()));
 
 
-	connect( actionConfigurePokerTraining, SIGNAL( triggered() ), this, SLOT( callSettingsDialog() ) );
-
 	connect( actionClose, SIGNAL( triggered() ), this, SLOT( closeGameTable()) );
 
 	connect( actionFullScreen, SIGNAL( triggered() ), this, SLOT( switchFullscreen() ) );
@@ -448,7 +428,6 @@ gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
 	connect(this, SIGNAL(signalRefreshPlayerName()), this, SLOT(refreshPlayerName()));
 	connect(this, SIGNAL(signalRefreshButton()), this, SLOT(refreshButton()));
 	connect(this, SIGNAL(signalRefreshGameLabels(int)), this, SLOT(refreshGameLabels(int)));
-	connect(this, SIGNAL(signalSetPlayerAvatar(int, QString)), this, SLOT(setPlayerAvatar(int, QString)));
 	connect(this, SIGNAL(signalGuiUpdateDone()), this, SLOT(guiUpdateDone()));
 	connect(this, SIGNAL(signalMeInAction()), this, SLOT(meInAction()));
 	connect(this, SIGNAL(signalDisableMyButtons()), this, SLOT(disableMyButtons()));
@@ -516,17 +495,10 @@ void gameTableImpl::hideHoleCards(){
 		cashLabelArray[i]->setText("");
 		playerTipLabelArray[i]->setText("");
 		playerNameLabelArray[i]->setText("");
-		playerAvatarLabelArray[i]->setText("");
 		setLabelArray[i]->setText("");
 	}
 }
 
-
-void gameTableImpl::callSettingsDialog()
-{
-	bool iamInGame = true;
-	myStartWindow->callSettingsDialog(iamInGame);
-}
 
 void gameTableImpl::applySettings(settingsDialogImpl* mySettingsDialog)
 {
@@ -542,13 +514,8 @@ void gameTableImpl::applySettings(settingsDialogImpl* mySettingsDialog)
 		groupBox_RightToolBox->hide();
 	}
 
-	//cardschancemonitor show/hide
-	//if (!myConfig->readConfigInt("ShowCardsChanceMonitor")) {
-	//	tabWidget_Right->removeTab(2);
-	//	tabWidget_Right->setCurrentIndex(0);
-	//} else {
-		if(tabWidget_Right->widget(2) != tab_Chance)
-			tabWidget_Right->insertTab(2, tab_Chance, QString(tr("Simulation")));
+	if(tabWidget_Right->widget(2) != tab_Chance)
+		tabWidget_Right->insertTab(2, tab_Chance, QString(tr("Simulation")));
 
 	//refresh board cards if game is running
 	if(myStartWindow->getSession()->getCurrentGame()) {
@@ -773,82 +740,6 @@ void gameTableImpl::refreshPlayerName()
 			default: {
 				playerNameLabelArray[(*it_c)->getID()]->setText("");
 			}
-			}
-		}
-	}
-}
-
-void gameTableImpl::refreshPlayerAvatar()
-{
-
-	if(myStartWindow->getSession()->getCurrentGame()) {
-
-		QPixmap onePix = QPixmap::fromImage(QImage(myAppDataPath +"gfx/gui/misc/1px.png"));
-
-		std::shared_ptr<Game> currentGame = myStartWindow->getSession()->getCurrentGame();
-		int seatPlace;
-		PlayerListConstIterator it_c;
-		PlayerList seatsList = currentGame->getSeatsList();
-		for (it_c=seatsList->begin(), seatPlace=0; it_c!=seatsList->end(); ++it_c, seatPlace++) {
-
-			//get CountryString
-			//QString countryString(QString(myStartWindow->getSession()->getClientPlayerInfo((*it_c)->getID()).countryCode.c_str()).toLower());
-//			countryString = QString(":/cflags/cflags/%1.png").arg(countryString);
-
-			//get AvatarPic
-			QFile myAvatarFile(QString::fromUtf8((*it_c)->getAvatar().c_str()));
-			QPixmap avatarPic;
-			if((*it_c)->getAvatar() == "" || !myAvatarFile.exists()) {
-				avatarPic = QPixmap::fromImage(QImage(myGameTableStyle->getDefaultAvatar()));
-			} else {
-				avatarPic = QPixmap::fromImage(QImage(QString::fromUtf8((*it_c)->getAvatar().c_str())));
-			}
-
-			//check SeatStates and refresh
-			switch(getCurrentSeatState((*it_c))) {
-
-			case SEAT_ACTIVE: {
-//				qDebug() << seatPlace << "AVATAR ACTIVE";
-				playerAvatarLabelArray[(*it_c)->getID()]->setPixmapAndCountry(avatarPic, "", seatPlace);
-			}
-			break;
-			case SEAT_AUTOFOLD: {
-//				qDebug() << seatPlace << "AVATAR AUTOFOLD";
-				playerAvatarLabelArray[(*it_c)->getID()]->setPixmapAndCountry(avatarPic, "", seatPlace, true);
-			}
-			break;
-			case SEAT_STAYONTABLE: {
-//				qDebug() << seatPlace << "AVATAR STAYONTABLE";
-				playerAvatarLabelArray[(*it_c)->getID()]->setPixmapAndCountry(avatarPic, "", seatPlace, true);
-			}
-			break;
-			case SEAT_CLEAR: {
-				playerAvatarLabelArray[(*it_c)->getID()]->setPixmap(onePix);
-			}
-			break;
-			default: {
-				playerAvatarLabelArray[(*it_c)->getID()]->setPixmap(onePix);
-			}
-			}
-		}
-	}
-}
-
-void gameTableImpl::setPlayerAvatar(int myID, QString myAvatar)
-{
-
-	if(myStartWindow->getSession()->getCurrentGame()) {
-
-		std::shared_ptr<Player> tmpPlayer = myStartWindow->getSession()->getCurrentGame()->getPlayerByUniqueId(myID);
-		if (tmpPlayer.get()) {
-
-			QFile myAvatarFile(myAvatar);
-			if(myAvatarFile.exists()) {
-				playerAvatarLabelArray[tmpPlayer->getID()]->setPixmap(myAvatar);
-				tmpPlayer->setAvatar(myAvatar.toUtf8().constData());
-			} else {
-				playerAvatarLabelArray[tmpPlayer->getID()]->setPixmap(QPixmap::fromImage(QImage(myGameTableStyle->getDefaultAvatar())));
-				tmpPlayer->setAvatar("");
 			}
 		}
 	}
@@ -1148,7 +1039,6 @@ void gameTableImpl::refreshAll()
 	refreshCash();
 	refreshGroupbox();
 	refreshPlayerName();
-	refreshPlayerAvatar();
 	refreshPlayerStatistics();
 	refreshHandsRanges();
 }
@@ -3131,11 +3021,6 @@ void gameTableImpl::tabSwitchAction()
 
 void gameTableImpl::GameModification()
 {
-
-	int i;
-	for (i=0; i<MAX_NUMBER_OF_PLAYERS; i++ ) {
-		playerAvatarLabelArray[i]->setEnabledContextMenu(false);
-	}
 
 	pushButton_break->show();
 

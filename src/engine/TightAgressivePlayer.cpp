@@ -36,9 +36,8 @@
 
 using namespace std;
 
-TightAgressivePlayer::TightAgressivePlayer(ConfigFile *c, int id, PlayerType type, std::string name, 
-						std::string avatar, int sC, bool aS, bool sotS, int mB):
-	Player(c, id, type, name, avatar, sC, aS, sotS, mB){
+TightAgressivePlayer::TightAgressivePlayer(ConfigFile *c, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB):
+	Player(c, id, type, name, sC, aS, sotS, mB){
 	
 	int utgFullTableRange = 0;
 	Tools::GetRand(2, 3, 1, &utgFullTableRange);

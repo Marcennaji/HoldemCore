@@ -25,8 +25,7 @@ class UltraTightPlayer : public Player{
 
 public: 
 
-	UltraTightPlayer(ConfigFile*, int id, PlayerType type, std::string name, 
-				std::string avatar, int sC, bool aS, bool sotS, int mB);
+	UltraTightPlayer(ConfigFile*, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB);
 
 	~UltraTightPlayer();
 

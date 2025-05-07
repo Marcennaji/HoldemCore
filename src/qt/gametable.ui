@@ -83,31 +83,6 @@
         <property name="title">
          <string/>
         </property>
-        <widget class="MyAvatarLabel" name="label_Avatar3">
-         <property name="geometry">
-          <rect>
-           <x>13</x>
-           <y>13</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="scaledContents">
-          <bool>true</bool>
-         </property>
-        </widget>
         <widget class="MyNameLabel" name="label_PlayerName3">
          <property name="geometry">
           <rect>
@@ -316,31 +291,6 @@
         <property name="title">
          <string/>
         </property>
-        <widget class="MyAvatarLabel" name="label_Avatar2">
-         <property name="geometry">
-          <rect>
-           <x>13</x>
-           <y>79</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="scaledContents">
-          <bool>true</bool>
-         </property>
-        </widget>
         <widget class="MyNameLabel" name="label_PlayerName2">
          <property name="geometry">
           <rect>
@@ -556,31 +506,6 @@
         <property name="title">
          <string/>
         </property>
-        <widget class="MyAvatarLabel" name="label_Avatar4">
-         <property name="geometry">
-          <rect>
-           <x>13</x>
-           <y>13</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="scaledContents">
-          <bool>true</bool>
-         </property>
-        </widget>
         <widget class="MyNameLabel" name="label_PlayerName4">
          <property name="geometry">
           <rect>
@@ -779,31 +704,6 @@
         <property name="title">
          <string/>
         </property>
-        <widget class="MyAvatarLabel" name="label_Avatar5">
-         <property name="geometry">
-          <rect>
-           <x>13</x>
-           <y>13</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="scaledContents">
-          <bool>true</bool>
-         </property>
-        </widget>
         <widget class="MyNameLabel" name="label_PlayerName5">
          <property name="geometry">
           <rect>
@@ -999,31 +899,6 @@
         <property name="title">
          <string/>
         </property>
-        <widget class="MyAvatarLabel" name="label_Avatar6">
-         <property name="geometry">
-          <rect>
-           <x>13</x>
-           <y>13</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="scaledContents">
-          <bool>true</bool>
-         </property>
-        </widget>
         <widget class="MyNameLabel" name="label_PlayerName6">
          <property name="geometry">
           <rect>
@@ -1239,31 +1114,6 @@
         <property name="title">
          <string/>
         </property>
-        <widget class="MyAvatarLabel" name="label_Avatar7">
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>10</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="scaledContents">
-          <bool>true</bool>
-         </property>
-        </widget>
         <widget class="MyNameLabel" name="label_PlayerName7">
          <property name="geometry">
           <rect>
@@ -1472,31 +1322,6 @@
         <property name="title">
          <string/>
         </property>
-        <widget class="MyAvatarLabel" name="label_Avatar8">
-         <property name="geometry">
-          <rect>
-           <x>13</x>
-           <y>79</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="scaledContents">
-          <bool>true</bool>
-         </property>
-        </widget>
         <widget class="MyNameLabel" name="label_PlayerName8">
          <property name="geometry">
           <rect>
@@ -2167,31 +1992,6 @@
         <property name="title">
          <string/>
         </property>
-        <widget class="MyAvatarLabel" name="label_Avatar1">
-         <property name="geometry">
-          <rect>
-           <x>13</x>
-           <y>79</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="scaledContents">
-          <bool>true</bool>
-         </property>
-        </widget>
         <widget class="MyNameLabel" name="label_PlayerName1">
          <property name="geometry">
           <rect>
@@ -2387,31 +2187,6 @@
         <property name="title">
          <string/>
         </property>
-        <widget class="MyAvatarLabel" name="label_Avatar0">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>80</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="scaledContents">
-          <bool>true</bool>
-         </property>
-        </widget>
         <widget class="MyNameLabel" name="label_PlayerName0">
          <property name="geometry">
           <rect>
@@ -2607,31 +2382,6 @@
         <property name="title">
          <string/>
         </property>
-        <widget class="MyAvatarLabel" name="label_Avatar9">
-         <property name="geometry">
-          <rect>
-           <x>13</x>
-           <y>79</y>
-           <width>30</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="scaledContents">
-          <bool>true</bool>
-         </property>
-        </widget>
         <widget class="MyNameLabel" name="label_PlayerName9">
          <property name="geometry">
           <rect>
@@ -3436,7 +3186,7 @@
      <x>0</x>
      <y>0</y>
      <width>1920</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuView">
@@ -3446,21 +3196,7 @@
     <addaction name="actionFullScreen"/>
     <addaction name="actionClose"/>
    </widget>
-   <widget class="QMenu" name="menuSettings">
-    <property name="title">
-     <string>&amp;Settings</string>
-    </property>
-    <addaction name="actionConfigurePokerTraining"/>
-   </widget>
-   <widget class="QMenu" name="menuPlayers_ranking">
-    <property name="title">
-     <string>Players ranking</string>
-    </property>
-    <addaction name="actionRanking"/>
-   </widget>
    <addaction name="menuView"/>
-   <addaction name="menuSettings"/>
-   <addaction name="menuPlayers_ranking"/>
   </widget>
   <action name="actionNewGame">
    <property name="text">
@@ -3577,11 +3313,6 @@
    <class>MyCardsPixmapLabel</class>
    <extends>QLabel</extends>
    <header>mycardspixmaplabel.h</header>
-  </customwidget>
-  <customwidget>
-   <class>MyAvatarLabel</class>
-   <extends>QLabel</extends>
-   <header>myavatarlabel.h</header>
   </customwidget>
   <customwidget>
    <class>MyChanceLabel</class>

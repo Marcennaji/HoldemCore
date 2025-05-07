@@ -25,8 +25,7 @@ class HumanPlayer : public Player{
 
 public: 
 
-	HumanPlayer(ConfigFile*, int id, PlayerType type, std::string name, 
-				std::string avatar, int sC, bool aS, bool sotS, int mB);
+	HumanPlayer(ConfigFile*, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB);
 
 	~HumanPlayer();
 

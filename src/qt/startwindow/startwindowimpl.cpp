@@ -24,18 +24,14 @@
 #include <configfile.h>
 #include <qt/gametable/gametableimpl.h>
 #include <qt/newgamedialog/newgamedialogimpl.h>
-#include <qt/aboutPokerTraining/aboutPokerTrainingimpl.h>
 #include <qt/mymessagedialog/mymessagedialogimpl.h>
 #include <qt/mymessagebox/mymessagebox.h>
-#include <qt/settingsdialog/settingsdialogimpl.h>
-#include <qt/settingsdialog/selectavatardialog/selectavatardialogimpl.h>
-#include <qt/changecompleteblindsdialog/changecompleteblindsdialogimpl.h>
 #include <qt/gametable/log/guilog.h>
 
 using namespace std;
 
 startWindowImpl::startWindowImpl(ConfigFile *c, Log *l)
-	: myConfig(c), myLog(l), msgBoxOutdatedVersionActive(false)
+	: myConfig(c), myLog(l)
 {
 
 	myGuiInterface.reset(new GuiWrapper(myConfig, this));
@@ -65,16 +61,11 @@ startWindowImpl::startWindowImpl(ConfigFile *c, Log *l)
 
 	pushButtonStartGame->setStyleSheet("QPushButton { text-align:left; font-weight:bold; padding-left: 1px; padding-bottom: 3px; padding-top: 3px; padding-right: 3px; background-color: #4B4B4B; color: #F0F0F0; font-size:12px; border-width: 0px;}");
 
-    connect( actionAbout_Pokertraining, SIGNAL( triggered() ), this, SLOT( callAboutPokerTrainingDialog() ) );
-    connect( actionConfigurePokerTraining, SIGNAL( triggered() ), this, SLOT( callSettingsDialogFromStartwindow() ) );
+
 #endif
 
 	// 	Dialogs
 	myNewGameDialog = new newGameDialogImpl(this, myConfig);
-	mySelectAvatarDialog = new selectAvatarDialogImpl(this, myConfig);
-	mySettingsDialog = new settingsDialogImpl(this, myConfig, mySelectAvatarDialog, myLog);
-	myAboutPokerTrainingDialog = new aboutPokerTrainingImpl(this, myConfig);
-	mySettingsDialog->setGuiLog(myGuiLog);
 
 	connect( actionStartGame, SIGNAL( triggered() ), this, SLOT( callNewGameDialog() ) );
 	connect( pushButtonStartGame, SIGNAL( clicked() ), this, SLOT( callNewGameDialog() ) );
@@ -89,8 +80,6 @@ startWindowImpl::~startWindowImpl()
 
 void startWindowImpl::callNewGameDialog()
 {
-
-	//wenn Dialogfenster gezeigt werden soll
 	if(myConfig->readConfigInt("ShowGameSettingsDialogOnNewGame")) {
 
 		myNewGameDialog->exec();
@@ -98,7 +87,6 @@ void startWindowImpl::callNewGameDialog()
 			startNewGame(myNewGameDialog);
 		}
 	}
-	// sonst mit gespeicherten Werten starten
 	else {
 		startNewGame();
 	}
@@ -116,39 +104,7 @@ void startWindowImpl::startNewGame(newGameDialogImpl *v)
 		// Set Game Data
 		gameData.maxNumberOfPlayers = v->spinBox_quantityPlayers->value();
 		gameData.startMoney = v->spinBox_startCash->value();
-		gameData.firstSmallBlind = v->getChangeCompleteBlindsDialog()->spinBox_firstSmallBlind->value();
-
-		if(v->getChangeCompleteBlindsDialog()->radioButton_raiseBlindsAtHands->isChecked()) {
-			gameData.raiseIntervalMode = RAISE_ON_HANDNUMBER;
-			gameData.raiseSmallBlindEveryHandsValue = v->getChangeCompleteBlindsDialog()->spinBox_raiseSmallBlindEveryHands->value();
-		} else {
-			gameData.raiseIntervalMode = RAISE_ON_MINUTES;
-			gameData.raiseSmallBlindEveryMinutesValue = v->getChangeCompleteBlindsDialog()->spinBox_raiseSmallBlindEveryMinutes->value();
-		}
-
-		if(v->getChangeCompleteBlindsDialog()->radioButton_alwaysDoubleBlinds->isChecked()) {
-			gameData.raiseMode = DOUBLE_BLINDS;
-		} else {
-			gameData.raiseMode = MANUAL_BLINDS_ORDER;
-			list<int> tempBlindList;
-			int i;
-			bool ok = true;
-			for(i=0; i<v->getChangeCompleteBlindsDialog()->listWidget_blinds->count(); i++) {
-				tempBlindList.push_back(v->getChangeCompleteBlindsDialog()->listWidget_blinds->item(i)->text().toInt(&ok,10));
-			}
-			gameData.manualBlindsList = tempBlindList;
-
-			if(v->getChangeCompleteBlindsDialog()->radioButton_afterThisAlwaysDoubleBlinds->isChecked()) {
-				gameData.afterManualBlindsMode = AFTERMB_DOUBLE_BLINDS;
-			} else {
-				if(v->getChangeCompleteBlindsDialog()->radioButton_afterThisAlwaysRaiseAbout->isChecked()) {
-					gameData.afterManualBlindsMode = AFTERMB_RAISE_ABOUT;
-					gameData.afterMBAlwaysRaiseValue = v->getChangeCompleteBlindsDialog()->spinBox_afterThisAlwaysRaiseValue->value();
-				} else {
-					gameData.afterManualBlindsMode = AFTERMB_STAY_AT_LAST_BLIND;
-				}
-			}
-		}
+		gameData.firstSmallBlind = 12;
 
 		//Speeds
 		gameData.guiSpeed = 8;
@@ -170,31 +126,6 @@ void startWindowImpl::startNewGame(newGameDialogImpl *v)
 		gameData.firstSmallBlind =  myConfig->readConfigInt("FirstSmallBlind");
 		gameData.tableProfile = TIGHT_AGRESSIVE_OPPONENTS;
 
-		if(myConfig->readConfigInt("RaiseBlindsAtHands")) {
-			gameData.raiseIntervalMode = RAISE_ON_HANDNUMBER;
-			gameData.raiseSmallBlindEveryHandsValue = myConfig->readConfigInt("RaiseSmallBlindEveryHands");
-		} else {
-			gameData.raiseIntervalMode = RAISE_ON_MINUTES;
-			gameData.raiseSmallBlindEveryMinutesValue = myConfig->readConfigInt("RaiseSmallBlindEveryMinutes");
-		}
-
-		if(myConfig->readConfigInt("AlwaysDoubleBlinds")) {
-			gameData.raiseMode = DOUBLE_BLINDS;
-		} else {
-			gameData.raiseMode = MANUAL_BLINDS_ORDER;
-			gameData.manualBlindsList = myConfig->readConfigIntList("ManualBlindsList");
-
-			if(myConfig->readConfigInt("AfterMBAlwaysDoubleBlinds")) {
-				gameData.afterManualBlindsMode = AFTERMB_DOUBLE_BLINDS;
-			} else {
-				if(myConfig->readConfigInt("AfterMBAlwaysRaiseAbout")) {
-					gameData.afterManualBlindsMode = AFTERMB_RAISE_ABOUT;
-					gameData.afterMBAlwaysRaiseValue = myConfig->readConfigInt("AfterMBAlwaysRaiseValue");
-				} else {
-					gameData.afterManualBlindsMode = AFTERMB_STAY_AT_LAST_BLIND;
-				}
-			}
-		}
 		//Speeds
 		gameData.guiSpeed = myConfig->readConfigInt("GameSpeed");
 			
@@ -217,26 +148,6 @@ void startWindowImpl::startNewGame(newGameDialogImpl *v)
 	mySession->startGame(gameData, startData);
 }
 
-
-
-void startWindowImpl::callAboutPokerTrainingDialog()
-{
-	myAboutPokerTrainingDialog->exec();
-}
-
-void startWindowImpl::callSettingsDialogFromStartwindow()
-{
-	callSettingsDialog(false);
-}
-
-void startWindowImpl::callSettingsDialog(bool ingame)
-{
-	mySettingsDialog->exec(ingame);
-
-	if (mySettingsDialog->result() == QDialog::Accepted && mySettingsDialog->getSettingsCorrect()) {
-		myGuiInterface->getW()->applySettings(mySettingsDialog);
-	}
-}
 
 bool startWindowImpl::eventFilter(QObject *obj, QEvent *event)
 {

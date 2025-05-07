@@ -32,29 +32,6 @@ enum GameMode {
 	GAME_MODE_CLOSED
 };
 
-enum GameType {
-	GAME_TYPE_NORMAL = 1,
-	GAME_TYPE_REGISTERED_ONLY,
-	GAME_TYPE_INVITE_ONLY,
-	GAME_TYPE_RANKING
-};
-
-enum RaiseIntervalMode {
-	RAISE_ON_HANDNUMBER = 1,
-	RAISE_ON_MINUTES
-};
-
-enum RaiseMode {
-	DOUBLE_BLINDS = 1,
-	MANUAL_BLINDS_ORDER
-};
-
-enum AfterManualBlindsMode {
-	AFTERMB_DOUBLE_BLINDS = 1,
-	AFTERMB_RAISE_ABOUT,
-	AFTERMB_STAY_AT_LAST_BLIND
-};
-
 enum TableProfile {
 	RANDOM_OPPONENTS = 1,
 	TIGHT_AGRESSIVE_OPPONENTS,
@@ -64,24 +41,13 @@ enum TableProfile {
 
 // For the sake of simplicity, this is a struct.
 struct GameData {
-	GameData() : gameType(GAME_TYPE_NORMAL), maxNumberOfPlayers(0), startMoney(0),
-		firstSmallBlind(0), raiseIntervalMode(RAISE_ON_HANDNUMBER),
-		raiseSmallBlindEveryHandsValue(8), raiseSmallBlindEveryMinutesValue(1),
-		raiseMode(DOUBLE_BLINDS), afterManualBlindsMode(AFTERMB_DOUBLE_BLINDS),
-		afterMBAlwaysRaiseValue(0), guiSpeed(9), delayBetweenHandsSec(6),
+	GameData() : maxNumberOfPlayers(0), startMoney(0),
+		firstSmallBlind(0), guiSpeed(9), delayBetweenHandsSec(6),
 		playerActionTimeoutSec(20) {}
-	GameType gameType;
 	TableProfile tableProfile;
 	int maxNumberOfPlayers;
 	int startMoney;
 	int firstSmallBlind;
-	RaiseIntervalMode raiseIntervalMode;
-	int raiseSmallBlindEveryHandsValue;
-	int raiseSmallBlindEveryMinutesValue;
-	RaiseMode raiseMode;
-	std::list<int> manualBlindsList;
-	AfterManualBlindsMode afterManualBlindsMode;
-	int afterMBAlwaysRaiseValue;
 	int guiSpeed;
 	int delayBetweenHandsSec;
 	int playerActionTimeoutSec;

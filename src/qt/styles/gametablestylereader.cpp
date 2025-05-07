@@ -1390,18 +1390,12 @@ void GameTableStyleReader::readStyleFile(QString file)
                 myState = GT_STYLE_OK;
                 //                qDebug() << "myState of: " << StyleDescription << "is now: " << myState;
             } else {
-                //check for style file version
-                if(PokerTrainingStyleFileVersion != "" && PokerTrainingStyleFileVersion.toInt() != POKERTRAINING_GT_STYLE_FILE_VERSION) {
-                    myState = GT_STYLE_OUTDATED;
-                } else {
-                    //if one or more items are left
-                    if(!leftItems.isEmpty() && myW != 0) myState = GT_STYLE_FIELDS_EMPTY;
+ 
+                 //if one or more items are left
+                if(!leftItems.isEmpty() && myW != 0) myState = GT_STYLE_FIELDS_EMPTY;
 
-                    //if one or more pictures where not found
-                    if(!itemPicsLeft.isEmpty() && myW != 0) myState = GT_STYLE_PICTURES_MISSING;
-                }
-
-                //                qDebug() << "myState of: " << StyleDescription << "is now: " << myState;
+                //if one or more pictures where not found
+                if(!itemPicsLeft.isEmpty() && myW != 0) myState = GT_STYLE_PICTURES_MISSING;
             }
             loadedSuccessfull = 1;
         }
@@ -1421,9 +1415,6 @@ void GameTableStyleReader::showErrorMessage()
         break;
     case GT_STYLE_FIELDS_EMPTY:
         showLeftItemsErrorMessage();
-        break;
-    case GT_STYLE_OUTDATED:
-        showOutdatedErrorMessage();
         break;
     default:
         ;
@@ -1454,18 +1445,6 @@ void GameTableStyleReader::showItemPicsLeftErrorMessage()
 
     if(dialog.checkIfMesssageWillBeDisplayed(6)) {
         dialog.exec(6, tr("One or more pictures from current game table style \"%1\" were not found: \n\n%2 \n\nAnyway you can play with this style, because the missing content will be filled up by PokerTraining default style. \n\nPlease contact the game table style builder via \"%3\".").arg(StyleDescription).arg(pics).arg(EMail), tr("Game Table Style Error - Pictures missing"), QPixmap(":/gfx/emblem-important-64.png"), QDialogButtonBox::Ok, true);
-    }
-}
-
-void GameTableStyleReader::showOutdatedErrorMessage()
-{
-    QString EMail;
-    if(StyleMaintainerEMail != "NULL") EMail = StyleMaintainerEMail;
-
-    myMessageDialogImpl dialog(myConfig, myW);
-
-    if(dialog.checkIfMesssageWillBeDisplayed(7)) {
-        dialog.exec(7, tr("Selected game table style \"%1\" seems to be outdated. \nThe current PokerTraining game table style version is \"%2\", but this style has version \"%3\" set. \n\nAnyway you can play with this style, because the missing content will be filled up by PokerTraining default style. \n\nPlease contact the game table style builder  via \"%4\".").arg(StyleDescription).arg(POKERTRAINING_GT_STYLE_FILE_VERSION).arg(PokerTrainingStyleFileVersion).arg(EMail), tr("Game Table Style Error - Outdated"), QPixmap(":/gfx/emblem-important-64.png"), QDialogButtonBox::Ok, true);
     }
 }
 
@@ -1892,9 +1871,6 @@ QString GameTableStyleReader::getStateToolTipInfo()
         break;
     case GT_STYLE_FIELDS_EMPTY:
         return QString(tr("Some style fields are missing, please contact style maintainer for this issue."));
-        break;
-    case GT_STYLE_OUTDATED:
-        return QString(tr("This style is outdated, please contact style maintainer for this issue."));
         break;
     default:
         return QString("");

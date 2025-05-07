@@ -36,9 +36,8 @@
 
 using namespace std;
 
-LooseAggressivePlayer::LooseAggressivePlayer(ConfigFile *c, int id, PlayerType type, std::string name, 
-						std::string avatar, int sC, bool aS, bool sotS, int mB):
-	Player(c, id, type, name, avatar, sC, aS, sotS, mB){
+LooseAggressivePlayer::LooseAggressivePlayer(ConfigFile *c, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB):
+	Player(c, id, type, name, sC, aS, sotS, mB){
 	
 	// initialize utg starting range, in a full table 
 	int utgFullTableRange = 0;

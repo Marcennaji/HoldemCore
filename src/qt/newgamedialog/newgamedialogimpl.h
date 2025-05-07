@@ -26,7 +26,6 @@
 
 
 class ConfigFile;
-class changeCompleteBlindsDialogImpl;
 
 class newGameDialogImpl: public QDialog, public Ui::newGameDialog
 {
@@ -35,18 +34,13 @@ public:
 	newGameDialogImpl(QMainWindow *parent = 0, ConfigFile* = 0);
 
 	int exec();
-	changeCompleteBlindsDialogImpl* getChangeCompleteBlindsDialog() {
-		return myChangeCompleteBlindsDialog;
-	}
 
 public slots:
 
-	void callChangeBlindsDialog(bool);
 
 private:
 
 	ConfigFile *myConfig;
-	changeCompleteBlindsDialogImpl *myChangeCompleteBlindsDialog;
 
 };
 

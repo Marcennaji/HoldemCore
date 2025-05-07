@@ -60,8 +60,6 @@ public:
 	void refreshButton() const;
 	void refreshGameLabels(GameState state) const;
 
-	void setPlayerAvatar(int myID, const std::string &myAvatar) const;
-
 	void waitForGuiUpdateDone() const;
 
 	void dealBettingRoundCards(int myBettingRoundID);

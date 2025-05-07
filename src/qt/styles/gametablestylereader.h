@@ -32,7 +32,6 @@
 
 enum GtStyleState {
 	GT_STYLE_OK = 0,
-	GT_STYLE_OUTDATED,
 	GT_STYLE_FIELDS_EMPTY,
 	GT_STYLE_PICTURES_MISSING,
 	GT_STYLE_UNDEFINED
@@ -52,7 +51,6 @@ public:
 	void showErrorMessage();
 	void showLeftItemsErrorMessage();
 	void showItemPicsLeftErrorMessage();
-	void showOutdatedErrorMessage();
 
 	QString getStyleDescription() const {
 		return StyleDescription;

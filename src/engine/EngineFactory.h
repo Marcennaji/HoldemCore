@@ -38,7 +38,6 @@ public:
 
 	virtual std::shared_ptr<HandInterface> createHand(std::shared_ptr<EngineFactory> f, GuiInterface *g, std::shared_ptr<BoardInterface> b, Log *l, PlayerList sl, PlayerList apl, PlayerList rpl, int id, int sP, int dP, int sB,int sC);
 	virtual std::shared_ptr<BoardInterface> createBoard(unsigned dp);
-	//virtual std::shared_ptr<Player> createPlayer(int id, unsigned uniqueId, PlayerType type, std::string name, std::string avatar, int sC, bool aS, bool sotS, int mB);
 	virtual std::vector<std::shared_ptr<BettingRoundInterface> > createBettingRound(HandInterface *hi, unsigned dP, int sB);
 
 private:
