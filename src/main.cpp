@@ -19,11 +19,15 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
-#include <QtWidgets/QApplication>
 
+#include <QtWidgets/QApplication>
 #include <QtGui>
 #include <QtCore>
-
+#include <QString>
+#include <QCoreApplication>
+#include <QDir>
+#include <QStandardPaths>
+#include <filesystem>
 #include <Wincon.h>
 
 #include <session.h>
@@ -48,6 +52,34 @@ using namespace std;
 class startWindowImpl;
 class Game;
 
+
+namespace fs = std::filesystem;
+
+struct AppDirectories {
+	std::string appDataDir;
+	std::string logDir;
+	std::string userDataDir;
+
+	static AppDirectories initialize() {
+		QString basePath = QCoreApplication::instance()->applicationDirPath();
+		QString appDir = QDir::cleanPath(basePath + "/pokertraining/") + "/";
+		QString log = QDir::cleanPath(appDir + "log-files/") + "/";
+		QString data = QDir::cleanPath(appDir + "data/") + "/";
+
+		// Create if not exists
+		fs::create_directories(appDir.toStdString());
+		fs::create_directories(log.toStdString());
+		fs::create_directories(data.toStdString());
+
+		return {
+			appDir.toStdString(),
+			log.toStdString(),
+			data.toStdString()
+		};
+	}
+};
+
+
 int main( int argc, char **argv )
 {
 
@@ -63,6 +95,12 @@ int main( int argc, char **argv )
 	//create defaultconfig
 	ConfigFile *myConfig = new ConfigFile(argv[0], false);
 	Log *myLog = new Log(myConfig);
+
+	AppDirectories dirs = AppDirectories::initialize();
+
+	qDebug() << "App Data Dir:" << QString::fromStdString(dirs.appDataDir);
+	qDebug() << "Log Dir:" << QString::fromStdString(dirs.logDir);
+	qDebug() << "User Data Dir:" << QString::fromStdString(dirs.userDataDir);
 
 
 #ifdef LOG_POKER_EXEC
