@@ -31,13 +31,11 @@
 
 struct sqlite3;
 
-class ConfigFile;
-
 class Log
 {
 
 public:
-	Log(ConfigFile *c);
+	Log(const std::string &logDir);
 
 	~Log();
 
@@ -68,11 +66,11 @@ private:
 
 	sqlite3 *mySqliteLogDb;
 	std::filesystem::path mySqliteLogFileName;
-	ConfigFile *myConfig;
 	int uniqueGameID;
 	int currentHandID;
 	GameState currentRound;
 	std::string sql;
+	std::string myLogDir;
 };
 
 #endif // LOG_H

@@ -94,7 +94,7 @@ int main( int argc, char **argv )
 
 	//create defaultconfig
 	ConfigFile *myConfig = new ConfigFile(argv[0], false);
-	Log *myLog = new Log(myConfig);
+
 
 	AppDirectories dirs = AppDirectories::initialize();
 
@@ -132,8 +132,9 @@ int main( int argc, char **argv )
 #endif
 
 #endif
- 
-    QString	myAppDataPath = QString::fromUtf8(myConfig->readConfigString("AppDataDir").c_str());
+	Log *myLog = new Log(dirs.logDir);
+
+    QString	myAppDataPath = QString::fromUtf8(dirs.appDataDir.c_str());
  
 	QFontDatabase::addApplicationFont (myAppDataPath +"fonts/n019003l.pfb");
 	QFontDatabase::addApplicationFont (myAppDataPath +"fonts/VeraBd.ttf");
@@ -146,7 +147,7 @@ int main( int argc, char **argv )
  	qRegisterMetaType<unsigned>("unsigned");
 	qRegisterMetaType<std::shared_ptr<Game> >("std::shared_ptr<Game>");
 
-	startWindowImpl mainWin(myConfig,myLog);
+	startWindowImpl mainWin(myConfig, myLog);
 
 	int retVal = a.exec();
 	

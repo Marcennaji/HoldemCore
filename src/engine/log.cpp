@@ -30,7 +30,7 @@
 
 using namespace std;
 
-Log::Log(ConfigFile *c) : mySqliteLogDb(0), mySqliteLogFileName(""), myConfig(c), uniqueGameID(0), currentHandID(0), 
+Log::Log(const std::string & logDir) : mySqliteLogDb(0), mySqliteLogFileName(""), myLogDir(logDir), uniqueGameID(0), currentHandID(0), 
 						currentRound(GAME_STATE_PREFLOP), sql("")
 {
 }
@@ -50,13 +50,13 @@ Log::init()
 
 			bool dirExists;
 
-			dirExists = std::filesystem::is_directory(myConfig->readConfigString("LogDir"));
+			dirExists = std::filesystem::is_directory(myLogDir);
 
 			// check if logging path exist
-			if(myConfig->readConfigString("LogDir") != "" && dirExists) {
+			if(myLogDir != "" && dirExists) {
 
 				mySqliteLogFileName.clear();
-				mySqliteLogFileName /= myConfig->readConfigString("LogDir");
+				mySqliteLogFileName /= myLogDir;
 				mySqliteLogFileName /= string(SQL_LOG_FILE);
 
 				bool databaseExists = false;
