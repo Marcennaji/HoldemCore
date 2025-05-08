@@ -121,7 +121,7 @@ int main( int argc, char **argv )
 	time_t now = time (0);
 	sTm = gmtime (&now);
 	strftime (buff, sizeof(buff), "%Y-%m-%d %Hh%M", sTm);
-	string filename = myConfig->readConfigString("LogDir");
+	string filename = dirs.logDir;
 	filename += "/pokertraining_hands_";
 	filename += buff;
 	filename += ".log";

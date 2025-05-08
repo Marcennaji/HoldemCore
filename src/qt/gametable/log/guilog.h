@@ -23,7 +23,6 @@
 #include <sstream>
 
 #include <configfile.h>
-#include <third_party/sqlite3/sqlite3.h>
 
 #include <QtCore>
 #include <QtGui>
@@ -64,24 +63,13 @@ public slots:
 	void logPlayerJoinedMsg(QString playerName);
 	void logNewGameAdminMsg(QString playerName);
 	void logPlayerWinGame(QString playerName, int gameID);
-	void flushLogAtGame(int gameID);
-	void flushLogAtHand();
-	void exportLogPdbToHtml(QString fileStringPdb, QString exportFileString);
-	void exportLogPdbToTxt(QString fileStringPdb, QString exportFileString);
-	void showLog(QString fileStringPdb, QTextBrowser *tb);
-	int exportLog(QString fileStringPdb, int modus);
+
 
 public:
 	QStringList translateCardCode(int cardCode);
 
 	void writeLogFileStream(QString string);
 
-	void setSqliteLogFileName(std::string theValue) {
-		mySqliteLogFileName = theValue;
-	}
-	std::string getSqliteLogFileName() {
-		return mySqliteLogFileName;
-	}
 
 signals:
 	void signalLogPlayerActionMsg(QString playerName, int action, int setValue);
@@ -95,15 +83,12 @@ signals:
 	void signalLogPlayerJoinedMsg(QString playerName);
 	void signalLogNewGameAdminMsg(QString playerName);
 	void signalLogPlayerWinGame(QString playerName, int gameID);
-	void signalFlushLogAtGame(int gameID);
-	void signalFlushLogAtHand();
 
 
 private:
 
 	void writeLogFileStream(std::string log_string, QFile *LogFile);
 	void writeLog(std::string log_string, int modus);
-	void cleanUp(result_struct &results, sqlite3 *mySqliteLogDb);
 	int convertCardStringToInt(std::string val, std::string col);
 	std::string convertCardIntToString(int code, int modus);
 
@@ -120,7 +105,6 @@ private:
 	QString myAppDataPath;
 	QTextBrowser* tb;
 	GameTableStyleReader *myStyle;
-	std::string mySqliteLogFileName;
 
 	friend class GuiWrapper;
 

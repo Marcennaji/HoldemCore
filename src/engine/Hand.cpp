@@ -248,7 +248,6 @@ void Hand::start()
 	} else {
 		LOG_ERROR(__FILE__ << " (" << __LINE__ << "): Log Error: cannot find sBID or bBID");
 	}
-	myGui->flushLogAtHand();
 
 	// deal cards
 	myGui->dealHoleCards();

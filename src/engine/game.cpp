@@ -150,7 +150,6 @@ void Game::startHand()
 
 	// log new hand
 	myGui->logNewGameHandMsg(myGameID, currentHandID);
-	myGui->flushLogAtGame(myGameID);
 
 	currentHand->start();
 }

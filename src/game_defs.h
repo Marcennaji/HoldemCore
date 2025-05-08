@@ -24,7 +24,6 @@
 #define DEBUG_MODE			0
 #define SQLITE_LOG          1
 #define SQLITE_LOG_ALL      0
-#define HTML_LOG            0
 
 #define POKERTRAINING_VERSION_MAJOR	0
 #define POKERTRAINING_VERSION_MINOR	1

@@ -38,9 +38,7 @@ startWindowImpl::startWindowImpl(ConfigFile *c, Log *l)
 	mySession.reset(new Session(myGuiInterface.get(), myConfig, myLog));
 	mySession->init(); // TODO handle error
 	myLog->init();
-	// myGuiInterface->setSession(session);
 
-	myGuiInterface->getGuiLog()->setSqliteLogFileName(myLog->getSqliteLogFileName());
 
 	setupUi(this);
 	this->setWindowTitle(QString(tr("PokerTraining %1").arg(POKERTRAINING_BETA_RELEASE_STRING)));
