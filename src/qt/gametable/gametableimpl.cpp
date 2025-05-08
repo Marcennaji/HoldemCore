@@ -17,7 +17,6 @@
  *****************************************************************************/
 #include "gametableimpl.h"
 #include "session.h"
-#include <qt/mymessagedialog/mymessagedialogimpl.h>
 #include <qt/startwindow/startwindowimpl.h>
 
 #include "mycardspixmaplabel.h"
@@ -39,6 +38,8 @@
 #include <qt/styles/gametablestylereader.h>
 #include <qt/styles/carddeckstylereader.h>
 #include <gamedata.h>
+
+#include "loghelper.h"
 
 #include <QtCore/qregularexpression.h>
 
@@ -338,10 +339,6 @@ gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
 
 	this->setWindowTitle(QString(tr("PokerTraining %1").arg(POKERTRAINING_BETA_RELEASE_STRING)));
 
-	// create universal messageDialgo
-	myUniversalMessageDialog = new myMessageDialogImpl(myConfig, this);
-	myUniversalMessageDialog->setParent(this);
-
 	connect(dealFlopCards0Timer, SIGNAL(timeout()), this, SLOT( dealFlopCards1() ));
 	connect(dealFlopCards1Timer, SIGNAL(timeout()), this, SLOT( dealFlopCards2() ));
 	connect(dealFlopCards2Timer, SIGNAL(timeout()), this, SLOT( dealFlopCards3() ));
@@ -567,8 +564,11 @@ void gameTableImpl::applySettings(settingsDialogImpl* mySettingsDialog)
 	}
 
 	refreshGameTableStyle();
-	//    qDebug() << "table: " << myGameTableStyle->getStyleDescription() << myGameTableStyle->getState();
-	if(this->isVisible() && myGameTableStyle->getState() != GT_STYLE_OK) myGameTableStyle->showErrorMessage();
+
+	if(this->isVisible() && myGameTableStyle->getState() != GT_STYLE_OK) 
+	{
+		LOG_ERROR(__FILE__ << " (" << __LINE__ << "): gameTable style not ok! ");
+	}
 
 	//blind buttons refresh
 	if(myStartWindow->getSession()->getCurrentGame()) {
@@ -2987,7 +2987,8 @@ void gameTableImpl::GameModification()
 	//restore saved windows geometry
 	restoreGameTableGeometry();
 
-	if(myGameTableStyle->getState() != GT_STYLE_OK) myGameTableStyle->showErrorMessage();
+	if(myGameTableStyle->getState() != GT_STYLE_OK) 
+		LOG_ERROR(__FILE__ << " (" << __LINE__ << "):  invalid game style");
 }
 
 void gameTableImpl::mouseOverFlipCards(bool front)
@@ -3472,7 +3473,6 @@ void gameTableImpl::restoreGameTableGeometry()
 void gameTableImpl::closeMessageBoxes()
 {
 
-	myUniversalMessageDialog->close();
 }
 
 void gameTableImpl::hide()

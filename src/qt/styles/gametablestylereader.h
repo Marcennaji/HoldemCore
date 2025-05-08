@@ -21,7 +21,6 @@
 #include <third_party/tiny/tinyxml.h>
 #include <configfile.h>
 #include <qt/gametable/gametableimpl.h>
-#include <qt/mymessagedialog/mymessagedialogimpl.h>
 #include "game_defs.h"
 #include <string>
 #include <QtCore>
@@ -47,10 +46,6 @@ public:
 	~GameTableStyleReader();
 
 	void readStyleFile(QString);
-
-	void showErrorMessage();
-	void showLeftItemsErrorMessage();
-	void showItemPicsLeftErrorMessage();
 
 	QString getStyleDescription() const {
 		return StyleDescription;

@@ -44,7 +44,6 @@ class MyNameLabel;
 
 class settingsDialogImpl;
 class startWindowImpl;
-class myMessageDialogImpl;
 
 class GameTableStyleReader;
 class CardDeckStyleReader;
@@ -343,7 +342,6 @@ private:
 
 	// 	Dialogs
 	startWindowImpl *myStartWindow;
-	myMessageDialogImpl *myUniversalMessageDialog;
 
 	//Sound
 	QString myAppDataPath;

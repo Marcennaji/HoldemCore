@@ -1403,46 +1403,6 @@ void GameTableStyleReader::readStyleFile(QString file)
     }
 }
 
-void GameTableStyleReader::showErrorMessage()
-{
-    switch (myState) {
-    case GT_STYLE_PICTURES_MISSING:
-        showItemPicsLeftErrorMessage();
-        break;
-    case GT_STYLE_FIELDS_EMPTY:
-        showLeftItemsErrorMessage();
-        break;
-    default:
-        ;
-    }
-}
-
-void GameTableStyleReader::showLeftItemsErrorMessage()
-{
-    QString items = leftItems.join("\n");
-    QString EMail;
-    if(StyleMaintainerEMail != "NULL") EMail = StyleMaintainerEMail;
-
-    myMessageDialogImpl dialog(myConfig, myW);
-
-    if(dialog.checkIfMesssageWillBeDisplayed(5)) {
-        dialog.exec(5, tr("Selected game table style \"%1\" seems to be incomplete or defective. \n\nThe value(s) of: \n%2 \nis/are missing. \n\nAnyway you can play with this style, because the missing content will be filled up by PokerTraining default style. \n\nPlease contact the game table style builder via \"%3\".").arg(StyleDescription).arg(items).arg(EMail), tr("Game Table Style Error - Fields content missing"), QPixmap(":/gfx/emblem-important-64.png"), QDialogButtonBox::Ok, true);
-    }
-
-}
-
-void GameTableStyleReader::showItemPicsLeftErrorMessage()
-{
-    QString pics = itemPicsLeft.join("\n");
-    QString EMail;
-    if(StyleMaintainerEMail != "NULL") EMail = StyleMaintainerEMail;
-
-    myMessageDialogImpl dialog(myConfig, myW);
-
-    if(dialog.checkIfMesssageWillBeDisplayed(6)) {
-        dialog.exec(6, tr("One or more pictures from current game table style \"%1\" were not found: \n\n%2 \n\nAnyway you can play with this style, because the missing content will be filled up by PokerTraining default style. \n\nPlease contact the game table style builder via \"%3\".").arg(StyleDescription).arg(pics).arg(EMail), tr("Game Table Style Error - Pictures missing"), QPixmap(":/gfx/emblem-important-64.png"), QDialogButtonBox::Ok, true);
-    }
-}
 
 void GameTableStyleReader::setTableBackground(gameTableImpl *gt)
 {
