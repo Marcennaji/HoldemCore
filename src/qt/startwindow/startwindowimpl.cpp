@@ -18,6 +18,7 @@
 #include "startwindowimpl.h"
 #include <engine/Player.h>
 #include <gamedata.h>
+#include "game_defs.h"
 #include <engine/tools.h>
 #include <engine/game.h>
 #include <qt/guiwrapper.h>
@@ -86,7 +87,7 @@ void startWindowImpl::startNewGame(newGameDialogImpl *v)
 		// Set Game Data
 		gameData.maxNumberOfPlayers = v->spinBox_quantityPlayers->value();
 		gameData.startMoney = v->spinBox_startCash->value();
-		gameData.firstSmallBlind = 12;
+		gameData.firstSmallBlind = GAME_START_SBLIND;
 
 		// Speeds
 		gameData.guiSpeed = 8;
@@ -102,13 +103,13 @@ void startWindowImpl::startNewGame(newGameDialogImpl *v)
 	else
 	{
 		// Set Game Data
-		gameData.maxNumberOfPlayers = myConfig->readConfigInt("NumberOfPlayers");
-		gameData.startMoney = myConfig->readConfigInt("StartCash");
-		gameData.firstSmallBlind = myConfig->readConfigInt("FirstSmallBlind");
+		gameData.maxNumberOfPlayers = GAME_NUMBER_OF_PLAYERS;
+		gameData.startMoney = GAME_START_CASH;
+		gameData.firstSmallBlind = GAME_START_SBLIND;
 		gameData.tableProfile = TIGHT_AGRESSIVE_OPPONENTS;
 
 		// Speeds
-		gameData.guiSpeed = myConfig->readConfigInt("GameSpeed");
+		gameData.guiSpeed = GAME_SPEED;
 	}
 	// Set dealer pos.
 	StartData startData;

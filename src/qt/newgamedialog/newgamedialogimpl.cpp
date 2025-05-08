@@ -17,6 +17,7 @@
  *****************************************************************************/
 #include "newgamedialogimpl.h"
 #include <configfile.h>
+#include "game_defs.h"
 
 newGameDialogImpl::newGameDialogImpl(QMainWindow *parent, ConfigFile *c)
 	: QDialog(parent), myConfig(c)
@@ -28,8 +29,8 @@ newGameDialogImpl::newGameDialogImpl(QMainWindow *parent, ConfigFile *c)
 int newGameDialogImpl::exec()
 {
 
-	spinBox_quantityPlayers->setValue(myConfig->readConfigInt("NumberOfPlayers"));
-	spinBox_startCash->setValue(myConfig->readConfigInt("StartCash"));
+	spinBox_quantityPlayers->setValue(GAME_NUMBER_OF_PLAYERS);
+	spinBox_startCash->setValue(GAME_START_CASH);
 
     return QDialog::exec();
 }

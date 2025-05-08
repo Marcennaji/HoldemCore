@@ -96,10 +96,6 @@ ConfigFile::ConfigFile(char *argv0, bool readonly) : noWriteAccess(readonly)
 	configList.push_back(ConfigInfo("AppDataDir", CONFIG_TYPE_STRING, myQtToolsInterface->getDataPathStdString(myArgv0)));
 	configList.push_back(ConfigInfo("LogDir", CONFIG_TYPE_STRING, logDir));
 	configList.push_back(ConfigInfo("UserDataDir", CONFIG_TYPE_STRING, dataDir));
-	configList.push_back(ConfigInfo("NumberOfPlayers", CONFIG_TYPE_INT, "10"));
-	configList.push_back(ConfigInfo("StartCash", CONFIG_TYPE_INT, "5000"));
-	configList.push_back(ConfigInfo("FirstSmallBlind", CONFIG_TYPE_INT, "10"));
-	configList.push_back(ConfigInfo("GameSpeed", CONFIG_TYPE_INT, "4"));
 
 	// fill tempList firstTime
 	configBufferList = configList;
