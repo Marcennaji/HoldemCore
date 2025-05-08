@@ -49,23 +49,24 @@
 #define FORMATRIGHT(X) "(X)</p>"
 
 #ifndef max
-#define max(a,b)            (((a) > (b)) ? (a) : (b))
+#define max(a, b) (((a) > (b)) ? (a) : (b))
 #endif
 
 using namespace std;
 
 gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
 	: QMainWindow(parent), myConfig(c), gameSpeed(0), myActionIsBet(0), myActionIsRaise(0),
-	pushButtonBetRaiseIsChecked(false), pushButtonBetRaiseHalfPotIsChecked(false), 
-	pushButtonBetRaiseTwoThirdPotIsChecked(false), pushButtonBetRaisePotIsChecked(false), pushButtonCallCheckIsChecked(false),
-	pushButtonFoldIsChecked(false), pushButtonAllInIsChecked(false), myButtonsAreCheckable(false),
-	breakAfterCurrentHand(false), currentGameOver(false), betSliderChangedByInput(false),
-	guestMode(false), myLastPreActionBetValue(0)
+	  pushButtonBetRaiseIsChecked(false), pushButtonBetRaiseHalfPotIsChecked(false),
+	  pushButtonBetRaiseTwoThirdPotIsChecked(false), pushButtonBetRaisePotIsChecked(false), pushButtonCallCheckIsChecked(false),
+	  pushButtonFoldIsChecked(false), pushButtonAllInIsChecked(false), myButtonsAreCheckable(false),
+	  breakAfterCurrentHand(false), currentGameOver(false), betSliderChangedByInput(false),
+	  guestMode(false), myLastPreActionBetValue(0)
 {
 	int i;
 
-	//for statistic development
-	for(i=0; i<15; i++) {
+	// for statistic development
+	for (i = 0; i < 15; i++)
+	{
 		statisticArray[i] = 0;
 	}
 	////////////////////////////
@@ -83,31 +84,22 @@ gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
 	myCardDeckStyle = new CardDeckStyleReader(myConfig, this);
 	myCardDeckStyle->readStyleFile(QString::fromUtf8(myConfig->readConfigString("CurrentCardDeckStyle").c_str()));
 
-	//Player0 pixmapCardsLabel needs Myw
+	// Player0 pixmapCardsLabel needs Myw
 	pixmapLabel_card0b->setW(this);
 	pixmapLabel_card0a->setW(this);
 
+	label_chance->setStyle(myGameTableStyle);
 
-    label_chance->setStyle(myGameTableStyle);
-
-
-	if (myConfig->readConfigInt("FlipsideOwn") && myConfig->readConfigString("FlipsideOwnFile") != "") {
+	if (myConfig->readConfigInt("FlipsideOwn") && myConfig->readConfigString("FlipsideOwnFile") != "")
+	{
 		flipside = QPixmap::fromImage(QImage(QString::fromUtf8(myConfig->readConfigString("FlipsideOwnFile").c_str())));
-	} else {
-		flipside = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir()+"flipside.png"));
+	}
+	else
+	{
+		flipside = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + "flipside.png"));
 	}
 
 	flipHolecardsAllInAlreadyDone = false;
-
-	//Toolboxen verstecken?
-	if (!myConfig->readConfigInt("ShowRightToolBox")) {
-		groupBox_RightToolBox->hide();
-	}
-	////CardsChanceMonitor show/hide
-	//if (!myConfig->readConfigInt("ShowCardsChanceMonitor")) {
-	//	tabWidget_Right->removeTab(2);
-	//	tabWidget_Right->setCurrentIndex(0);
-	//}
 
 	// userWidgetsArray init
 	userWidgetsArray[0] = pushButton_BetRaise;
@@ -120,12 +112,13 @@ gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
 	userWidgetsArray[7] = horizontalSlider_bet;
 	userWidgetsArray[8] = pushButton_AllIn;
 
-	//hide userWidgets
-	for(i=0; i < USER_WIDGETS_NUMBER; i++) {
+	// hide userWidgets
+	for (i = 0; i < USER_WIDGETS_NUMBER; i++)
+	{
 		userWidgetsArray[i]->hide();
 	}
 
-	//Timer Objekt erstellen
+	// Timer Objekt erstellen
 	dealFlopCards0Timer = new QTimer(this);
 	dealFlopCards1Timer = new QTimer(this);
 	dealFlopCards2Timer = new QTimer(this);
@@ -161,7 +154,7 @@ gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
 	postRiverRunAnimation6Timer = new QTimer(this);
 
 	blinkingStartButtonAnimationTimer = new QTimer(this);
-//	voteOnKickTimeoutTimer = new QTimer(this);
+	//	voteOnKickTimeoutTimer = new QTimer(this);
 	enableCallCheckPushButtonTimer = new QTimer(this);
 
 	dealFlopCards0Timer->setSingleShot(true);
@@ -220,7 +213,8 @@ gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
 	cashLabelArray[7] = textLabel_Cash7;
 	cashLabelArray[8] = textLabel_Cash8;
 	cashLabelArray[9] = textLabel_Cash9;
-	for (i=0; i<MAX_NUMBER_OF_PLAYERS; i++) {
+	for (i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
+	{
 		cashLabelArray[i]->setW(this);
 	}
 
@@ -235,7 +229,6 @@ gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
 	playerTipLabelArray[8] = label_playerTip8;
 	playerTipLabelArray[9] = label_playerTip9;
 
-
 	// playerNameLabelArray init
 	playerNameLabelArray[0] = label_PlayerName0;
 	playerNameLabelArray[1] = label_PlayerName1;
@@ -247,7 +240,8 @@ gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
 	playerNameLabelArray[7] = label_PlayerName7;
 	playerNameLabelArray[8] = label_PlayerName8;
 	playerNameLabelArray[9] = label_PlayerName9;
-	for (i=0; i<MAX_NUMBER_OF_PLAYERS; i++) {
+	for (i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
+	{
 		playerNameLabelArray[i]->setW(this);
 	}
 
@@ -262,7 +256,8 @@ gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
 	setLabelArray[7] = textLabel_Set7;
 	setLabelArray[8] = textLabel_Set8;
 	setLabelArray[9] = textLabel_Set9;
-	for (i=0; i<MAX_NUMBER_OF_PLAYERS; i++) {
+	for (i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
+	{
 		setLabelArray[i]->setW(this);
 	}
 
@@ -301,106 +296,107 @@ gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
 
 	initHoleCards();
 
-	//style Game Table
+	// style Game Table
 	refreshGameTableStyle();
 
-	//raise actionLable above just inserted mypixmaplabel
-	for (i=0; i<MAX_NUMBER_OF_PLAYERS; i++) {
+	// raise actionLable above just inserted mypixmaplabel
+	for (i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
+	{
 		actionLabelArray[i]->raise();
 	}
 
-	//raise board cards
-	for (i=0; i<5; i++) {
+	// raise board cards
+	for (i = 0; i < 5; i++)
+	{
 		boardCardsArray[i]->raise();
 	}
 
-	//fix for away string bug in righttabwidget on windows
-	tabWidget_Right->setTabText(0, " "+tabWidget_Right->tabText(0)+" ");
-	tabWidget_Right->setTabText(1, " "+tabWidget_Right->tabText(1)+" ");
-	tabWidget_Right->setTabText(2, " "+tabWidget_Right->tabText(2)+" ");
+	// fix for away string bug in righttabwidget on windows
+	tabWidget_Right->setTabText(0, " " + tabWidget_Right->tabText(0) + " ");
+	tabWidget_Right->setTabText(1, " " + tabWidget_Right->tabText(1) + " ");
+	tabWidget_Right->setTabText(2, " " + tabWidget_Right->tabText(2) + " ");
 
-	//resize stop-button depending on translation
+	// resize stop-button depending on translation
 	QFontMetrics tempMetrics = this->fontMetrics();
 	int width = tempMetrics.horizontalAdvance((tr("Show cards")));
 
-	//Clear Focus
+	// Clear Focus
 
-	pushButton_break->setMinimumSize(width+10,20);
+	pushButton_break->setMinimumSize(width + 10, 20);
 	groupBox_RightToolBox->clearFocus();
 
-	//set Focus to gametable
+	// set Focus to gametable
 	this->setFocus();
 
-	//windowicon
-	// 	QString windowIconString();
-	this->setWindowIcon(QIcon(myAppDataPath+"gfx/gui/misc/windowicon.png"));
+	// windowicon
+	//  	QString windowIconString();
+	this->setWindowIcon(QIcon(myAppDataPath + "gfx/gui/misc/windowicon.png"));
 
 	this->installEventFilter(this);
 
 	this->setWindowTitle(QString(tr("PokerTraining %1").arg(POKERTRAINING_BETA_RELEASE_STRING)));
 
-	connect(dealFlopCards0Timer, SIGNAL(timeout()), this, SLOT( dealFlopCards1() ));
-	connect(dealFlopCards1Timer, SIGNAL(timeout()), this, SLOT( dealFlopCards2() ));
-	connect(dealFlopCards2Timer, SIGNAL(timeout()), this, SLOT( dealFlopCards3() ));
-	connect(dealFlopCards3Timer, SIGNAL(timeout()), this, SLOT( dealFlopCards4() ));
-	connect(dealFlopCards4Timer, SIGNAL(timeout()), this, SLOT( dealFlopCards5() ));
-	connect(dealFlopCards5Timer, SIGNAL(timeout()), this, SLOT( dealFlopCards6() ));
-	connect(dealFlopCards6Timer, SIGNAL(timeout()), this, SLOT( handSwitchRounds() ));
-	connect(dealTurnCards0Timer, SIGNAL(timeout()), this, SLOT( dealTurnCards1() ));
-	connect(dealTurnCards1Timer, SIGNAL(timeout()), this, SLOT( dealTurnCards2() ));
-	connect(dealTurnCards2Timer, SIGNAL(timeout()), this, SLOT( handSwitchRounds() ));
-	connect(dealRiverCards0Timer, SIGNAL(timeout()), this, SLOT( dealRiverCards1() ));
-	connect(dealRiverCards1Timer, SIGNAL(timeout()), this, SLOT( dealRiverCards2() ));
-	connect(dealRiverCards2Timer, SIGNAL(timeout()), this, SLOT( handSwitchRounds() ));
+	connect(dealFlopCards0Timer, SIGNAL(timeout()), this, SLOT(dealFlopCards1()));
+	connect(dealFlopCards1Timer, SIGNAL(timeout()), this, SLOT(dealFlopCards2()));
+	connect(dealFlopCards2Timer, SIGNAL(timeout()), this, SLOT(dealFlopCards3()));
+	connect(dealFlopCards3Timer, SIGNAL(timeout()), this, SLOT(dealFlopCards4()));
+	connect(dealFlopCards4Timer, SIGNAL(timeout()), this, SLOT(dealFlopCards5()));
+	connect(dealFlopCards5Timer, SIGNAL(timeout()), this, SLOT(dealFlopCards6()));
+	connect(dealFlopCards6Timer, SIGNAL(timeout()), this, SLOT(handSwitchRounds()));
+	connect(dealTurnCards0Timer, SIGNAL(timeout()), this, SLOT(dealTurnCards1()));
+	connect(dealTurnCards1Timer, SIGNAL(timeout()), this, SLOT(dealTurnCards2()));
+	connect(dealTurnCards2Timer, SIGNAL(timeout()), this, SLOT(handSwitchRounds()));
+	connect(dealRiverCards0Timer, SIGNAL(timeout()), this, SLOT(dealRiverCards1()));
+	connect(dealRiverCards1Timer, SIGNAL(timeout()), this, SLOT(dealRiverCards2()));
+	connect(dealRiverCards2Timer, SIGNAL(timeout()), this, SLOT(handSwitchRounds()));
 
-	connect(nextPlayerAnimationTimer, SIGNAL(timeout()), this, SLOT( handSwitchRounds() ));
-	connect(preflopAnimation1Timer, SIGNAL(timeout()), this, SLOT( preflopAnimation1Action() ));
-	connect(preflopAnimation2Timer, SIGNAL(timeout()), this, SLOT( preflopAnimation2Action() ));
-	connect(flopAnimation1Timer, SIGNAL(timeout()), this, SLOT( flopAnimation1Action() ));
-	connect(flopAnimation2Timer, SIGNAL(timeout()), this, SLOT( flopAnimation2Action() ));
-	connect(turnAnimation1Timer, SIGNAL(timeout()), this, SLOT( turnAnimation1Action() ));
-	connect(turnAnimation2Timer, SIGNAL(timeout()), this, SLOT( turnAnimation2Action() ));
-	connect(riverAnimation1Timer, SIGNAL(timeout()), this, SLOT( riverAnimation1Action() ));
-	connect(riverAnimation2Timer, SIGNAL(timeout()), this, SLOT( riverAnimation2Action() ));
+	connect(nextPlayerAnimationTimer, SIGNAL(timeout()), this, SLOT(handSwitchRounds()));
+	connect(preflopAnimation1Timer, SIGNAL(timeout()), this, SLOT(preflopAnimation1Action()));
+	connect(preflopAnimation2Timer, SIGNAL(timeout()), this, SLOT(preflopAnimation2Action()));
+	connect(flopAnimation1Timer, SIGNAL(timeout()), this, SLOT(flopAnimation1Action()));
+	connect(flopAnimation2Timer, SIGNAL(timeout()), this, SLOT(flopAnimation2Action()));
+	connect(turnAnimation1Timer, SIGNAL(timeout()), this, SLOT(turnAnimation1Action()));
+	connect(turnAnimation2Timer, SIGNAL(timeout()), this, SLOT(turnAnimation2Action()));
+	connect(riverAnimation1Timer, SIGNAL(timeout()), this, SLOT(riverAnimation1Action()));
+	connect(riverAnimation2Timer, SIGNAL(timeout()), this, SLOT(riverAnimation2Action()));
 
-	connect(postRiverAnimation1Timer, SIGNAL(timeout()), this, SLOT( postRiverAnimation1Action() ));
-	connect(postRiverRunAnimation1Timer, SIGNAL(timeout()), this, SLOT( postRiverRunAnimation2() ));
-	connect(postRiverRunAnimation2Timer, SIGNAL(timeout()), this, SLOT( postRiverRunAnimation3() ));
-	connect(postRiverRunAnimation3Timer, SIGNAL(timeout()), this, SLOT( postRiverRunAnimation4() ));
+	connect(postRiverAnimation1Timer, SIGNAL(timeout()), this, SLOT(postRiverAnimation1Action()));
+	connect(postRiverRunAnimation1Timer, SIGNAL(timeout()), this, SLOT(postRiverRunAnimation2()));
+	connect(postRiverRunAnimation2Timer, SIGNAL(timeout()), this, SLOT(postRiverRunAnimation3()));
+	connect(postRiverRunAnimation3Timer, SIGNAL(timeout()), this, SLOT(postRiverRunAnimation4()));
 	connect(potDistributeTimer, SIGNAL(timeout()), this, SLOT(postRiverRunAnimation5()));
-	connect(postRiverRunAnimation5Timer, SIGNAL(timeout()), this, SLOT( postRiverRunAnimation6() ));
-	connect(postRiverRunAnimation6Timer, SIGNAL(timeout()), this, SLOT( startNewHand() ));
+	connect(postRiverRunAnimation5Timer, SIGNAL(timeout()), this, SLOT(postRiverRunAnimation6()));
+	connect(postRiverRunAnimation6Timer, SIGNAL(timeout()), this, SLOT(startNewHand()));
 
-	connect(blinkingStartButtonAnimationTimer, SIGNAL(timeout()), this, SLOT( blinkingStartButtonAnimationAction()));
-	//connect(voteOnKickTimeoutTimer, SIGNAL(timeout()), this, SLOT(nextVoteOnKickTimeoutAnimationFrame()));
+	connect(blinkingStartButtonAnimationTimer, SIGNAL(timeout()), this, SLOT(blinkingStartButtonAnimationAction()));
+	// connect(voteOnKickTimeoutTimer, SIGNAL(timeout()), this, SLOT(nextVoteOnKickTimeoutAnimationFrame()));
 	connect(enableCallCheckPushButtonTimer, SIGNAL(timeout()), this, SLOT(enableCallCheckPushButton()));
 
+	connect(actionClose, SIGNAL(triggered()), this, SLOT(closeGameTable()));
 
-	connect( actionClose, SIGNAL( triggered() ), this, SLOT( closeGameTable()) );
+	connect(actionFullScreen, SIGNAL(triggered()), this, SLOT(switchFullscreen()));
 
-	connect( actionFullScreen, SIGNAL( triggered() ), this, SLOT( switchFullscreen() ) );
+	connect(actionShowHideLog, SIGNAL(triggered()), this, SLOT(switchLogWindow()));
+	connect(actionShowHideChance, SIGNAL(triggered()), this, SLOT(switchChanceWindow()));
 
-	connect( actionShowHideLog, SIGNAL( triggered() ), this, SLOT( switchLogWindow() ) );
-	connect( actionShowHideChance, SIGNAL( triggered() ), this, SLOT( switchChanceWindow() ) );
+	connect(pushButton_BetRaise, SIGNAL(clicked(bool)), this, SLOT(pushButtonBetRaiseClicked(bool)));
+	connect(pushButton_BetRaiseHalfPot, SIGNAL(clicked(bool)), this, SLOT(pushButtonBetRaiseHalfPotClicked(bool)));
+	connect(pushButton_BetRaiseTwoThirdPot, SIGNAL(clicked(bool)), this, SLOT(pushButtonBetRaiseTwoThirdPotClicked(bool)));
+	connect(pushButton_BetRaisePot, SIGNAL(clicked(bool)), this, SLOT(pushButtonBetRaisePotClicked(bool)));
 
-	connect( pushButton_BetRaise, SIGNAL( clicked(bool) ), this, SLOT( pushButtonBetRaiseClicked(bool) ) );
-	connect( pushButton_BetRaiseHalfPot, SIGNAL( clicked(bool) ), this, SLOT( pushButtonBetRaiseHalfPotClicked(bool) ) );
-	connect( pushButton_BetRaiseTwoThirdPot, SIGNAL( clicked(bool) ), this, SLOT( pushButtonBetRaiseTwoThirdPotClicked(bool) ) );
-	connect( pushButton_BetRaisePot, SIGNAL( clicked(bool) ), this, SLOT( pushButtonBetRaisePotClicked(bool) ) );
+	connect(pushButton_Fold, SIGNAL(clicked(bool)), this, SLOT(pushButtonFoldClicked(bool)));
+	connect(pushButton_CallCheck, SIGNAL(clicked(bool)), this, SLOT(pushButtonCallCheckClicked(bool)));
+	connect(pushButton_AllIn, SIGNAL(clicked(bool)), this, SLOT(pushButtonAllInClicked(bool)));
+	connect(horizontalSlider_bet, SIGNAL(valueChanged(int)), this, SLOT(changeSpinBoxBetValue(int)));
+	connect(spinBox_betValue, SIGNAL(valueChanged(int)), this, SLOT(spinBoxBetValueChanged(int)));
 
-	connect( pushButton_Fold, SIGNAL( clicked(bool) ), this, SLOT( pushButtonFoldClicked(bool) ) );
-	connect( pushButton_CallCheck, SIGNAL( clicked(bool) ), this, SLOT( pushButtonCallCheckClicked(bool) ) );
-	connect( pushButton_AllIn, SIGNAL( clicked(bool) ), this, SLOT(pushButtonAllInClicked(bool) ) );
-	connect( horizontalSlider_bet, SIGNAL( valueChanged(int)), this, SLOT ( changeSpinBoxBetValue(int) ) );
-	connect( spinBox_betValue, SIGNAL( valueChanged(int)), this, SLOT ( spinBoxBetValueChanged(int) ) );
+	connect(pushButton_break, SIGNAL(clicked()), this, SLOT(breakButtonClicked()));
 
-	connect( pushButton_break, SIGNAL( clicked()), this, SLOT ( breakButtonClicked() ) ); 
+	connect(radioButton_manualAction, SIGNAL(clicked()), this, SLOT(changePlayingMode()));
+	connect(radioButton_autoCheckFold, SIGNAL(clicked()), this, SLOT(changePlayingMode()));
+	connect(radioButton_autoCheckCallAny, SIGNAL(clicked()), this, SLOT(changePlayingMode()));
 
-	connect( radioButton_manualAction, SIGNAL( clicked() ) , this, SLOT( changePlayingMode() ) );
-	connect( radioButton_autoCheckFold, SIGNAL( clicked() ) , this, SLOT( changePlayingMode() ) );
-	connect( radioButton_autoCheckCallAny, SIGNAL( clicked() ), this, SLOT( changePlayingMode() ) );
-
-	//Nachrichten Thread-Save
+	// Nachrichten Thread-Save
 	connect(this, SIGNAL(signalInitGui(int)), this, SLOT(initGui(int)));
 	connect(this, SIGNAL(signalRefreshSet()), this, SLOT(refreshSet()));
 	connect(this, SIGNAL(signalRefreshCash()), this, SLOT(refreshCash()));
@@ -441,7 +437,8 @@ gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
 gameTableImpl::~gameTableImpl()
 {
 }
-void gameTableImpl::initHoleCards(){
+void gameTableImpl::initHoleCards()
+{
 
 	// holeCardsArray int
 	holeCardsArray[0][0] = pixmapLabel_card0a;
@@ -464,13 +461,14 @@ void gameTableImpl::initHoleCards(){
 	holeCardsArray[8][1] = pixmapLabel_card8b;
 	holeCardsArray[9][0] = pixmapLabel_card9a;
 	holeCardsArray[9][1] = pixmapLabel_card9b;
-
 }
-void gameTableImpl::hideHoleCards(){
+void gameTableImpl::hideHoleCards()
+{
 
-	QPixmap onePix = QPixmap::fromImage(QImage(myAppDataPath +"gfx/gui/misc/1px.png"));
+	QPixmap onePix = QPixmap::fromImage(QImage(myAppDataPath + "gfx/gui/misc/1px.png"));
 
-	for (int i=0; i < MAX_NUMBER_OF_PLAYERS; i++){
+	for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
+	{
 		actionLabelArray[i]->setPixmap(onePix);
 		holeCardsArray[i][0]->setPixmap(onePix, false);
 		holeCardsArray[i][1]->setPixmap(onePix, false);
@@ -483,95 +481,106 @@ void gameTableImpl::hideHoleCards(){
 	}
 }
 
-
-void gameTableImpl::applySettings(settingsDialogImpl* mySettingsDialog)
+void gameTableImpl::applySettings(settingsDialogImpl *mySettingsDialog)
 {
 
-	//apply card deck style
+	// apply card deck style
 	myCardDeckStyle->readStyleFile(QString::fromUtf8(myConfig->readConfigString("CurrentCardDeckStyle").c_str()));
-	//apply game table style
+	// apply game table style
 	myGameTableStyle->readStyleFile(QString::fromUtf8(myConfig->readConfigString("CurrentGameTableStyle").c_str()));
 
-	if (myConfig->readConfigInt("ShowRightToolBox")) {
-		groupBox_RightToolBox->show();
-	} else {
-		groupBox_RightToolBox->hide();
-	}
+	groupBox_RightToolBox->show();
 
-	if(tabWidget_Right->widget(2) != tab_Chance)
+	if (tabWidget_Right->widget(2) != tab_Chance)
 		tabWidget_Right->insertTab(2, tab_Chance, QString(tr("Simulation")));
 
-	//refresh board cards if game is running
-	if(myStartWindow->getSession()->getCurrentGame()) {
+	// refresh board cards if game is running
+	if (myStartWindow->getSession()->getCurrentGame())
+	{
 
 		int tempBoardCardsArray[5];
 		myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getBoard()->getCards(tempBoardCardsArray);
 		GameState currentState = myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getCurrentBettingRound()->getBettingRoundID();
-		if(currentState >= GAME_STATE_FLOP && currentState <= GAME_STATE_POST_RIVER)
-			for(int i=0; i<3; i++) {
-				QPixmap card = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir()+QString::number(tempBoardCardsArray[i], 10)+".png"));
+		if (currentState >= GAME_STATE_FLOP && currentState <= GAME_STATE_POST_RIVER)
+			for (int i = 0; i < 3; i++)
+			{
+				QPixmap card = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + QString::number(tempBoardCardsArray[i], 10) + ".png"));
 				boardCardsArray[i]->setPixmap(card, false);
 			}
-		if(currentState >= GAME_STATE_TURN && currentState <= GAME_STATE_POST_RIVER) {
-			QPixmap card = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir()+QString::number(tempBoardCardsArray[3], 10)+".png"));
+		if (currentState >= GAME_STATE_TURN && currentState <= GAME_STATE_POST_RIVER)
+		{
+			QPixmap card = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + QString::number(tempBoardCardsArray[3], 10) + ".png"));
 			boardCardsArray[3]->setPixmap(card, false);
 		}
-		if(currentState == GAME_STATE_RIVER || currentState == GAME_STATE_POST_RIVER) {
-			QPixmap card = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir()+QString::number(tempBoardCardsArray[4], 10)+".png"));
+		if (currentState == GAME_STATE_RIVER || currentState == GAME_STATE_POST_RIVER)
+		{
+			QPixmap card = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + QString::number(tempBoardCardsArray[4], 10) + ".png"));
 			boardCardsArray[4]->setPixmap(card, false);
 		}
 	}
 
-	//Flipside refresh
-	if (myConfig->readConfigInt("FlipsideOwn") && myConfig->readConfigString("FlipsideOwnFile") != "") {
+	// Flipside refresh
+	if (myConfig->readConfigInt("FlipsideOwn") && myConfig->readConfigString("FlipsideOwnFile") != "")
+	{
 		flipside = QPixmap::fromImage(QImage(QString::fromUtf8(myConfig->readConfigString("FlipsideOwnFile").c_str())));
-	} else {
-		flipside = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir()+"flipside.png"));
 	}
-	int j,k;
-	for (j=1; j<MAX_NUMBER_OF_PLAYERS; j++ ) {
-		for ( k=0; k<=1; k++ ) {
-			if (holeCardsArray[j][k]->getIsFlipside()) {
+	else
+	{
+		flipside = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + "flipside.png"));
+	}
+	int j, k;
+	for (j = 1; j < MAX_NUMBER_OF_PLAYERS; j++)
+	{
+		for (k = 0; k <= 1; k++)
+		{
+			if (holeCardsArray[j][k]->getIsFlipside())
+			{
 				holeCardsArray[j][k]->setPixmap(flipside, true);
 			}
 		}
 	}
 
-	//Check for anti-peek mode
-	if(myStartWindow->getSession()->getCurrentGame()) {
+	// Check for anti-peek mode
+	if (myStartWindow->getSession()->getCurrentGame())
+	{
 		// 		check if human player is already active
 		std::shared_ptr<Player> humanPlayer = myStartWindow->getSession()->getCurrentGame()->getSeatsList()->front();
-		if(humanPlayer->getActiveStatus()) {
+		if (humanPlayer->getActiveStatus())
+		{
 
 			QPixmap tempCardsPixmapArray[2];
 			int tempCardsIntArray[2];
 
 			humanPlayer->getCards(tempCardsIntArray);
-			if(myConfig->readConfigInt("AntiPeekMode")) {
+			if (myConfig->readConfigInt("AntiPeekMode"))
+			{
 				holeCardsArray[0][0]->setPixmap(flipside, true);
-				tempCardsPixmapArray[0] = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir()+QString::number(tempCardsIntArray[0], 10)+".png"));
+				tempCardsPixmapArray[0] = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + QString::number(tempCardsIntArray[0], 10) + ".png"));
 				holeCardsArray[0][0]->setHiddenFrontPixmap(tempCardsPixmapArray[0]);
 				holeCardsArray[0][1]->setPixmap(flipside, true);
-				tempCardsPixmapArray[1]= QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir()+QString::number(tempCardsIntArray[1], 10)+".png"));
+				tempCardsPixmapArray[1] = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + QString::number(tempCardsIntArray[1], 10) + ".png"));
 				holeCardsArray[0][1]->setHiddenFrontPixmap(tempCardsPixmapArray[1]);
-			} else {
-				tempCardsPixmapArray[0]= QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir()+QString::number(tempCardsIntArray[0], 10)+".png"));
-				holeCardsArray[0][0]->setPixmap(tempCardsPixmapArray[0],false);
-				tempCardsPixmapArray[1]= QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir()+QString::number(tempCardsIntArray[1], 10)+".png"));
-				holeCardsArray[0][1]->setPixmap(tempCardsPixmapArray[1],false);
+			}
+			else
+			{
+				tempCardsPixmapArray[0] = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + QString::number(tempCardsIntArray[0], 10) + ".png"));
+				holeCardsArray[0][0]->setPixmap(tempCardsPixmapArray[0], false);
+				tempCardsPixmapArray[1] = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + QString::number(tempCardsIntArray[1], 10) + ".png"));
+				holeCardsArray[0][1]->setPixmap(tempCardsPixmapArray[1], false);
 			}
 		}
 	}
 
 	refreshGameTableStyle();
 
-	if(this->isVisible() && myGameTableStyle->getState() != GT_STYLE_OK) 
+	if (this->isVisible() && myGameTableStyle->getState() != GT_STYLE_OK)
 	{
 		LOG_ERROR(__FILE__ << " (" << __LINE__ << "): gameTable style not ok! ");
 	}
 
-	//blind buttons refresh
-	if(myStartWindow->getSession()->getCurrentGame()) {
+	// blind buttons refresh
+	if (myStartWindow->getSession()->getCurrentGame())
+	{
 		refreshButton();
 		refreshGroupbox();
 		provideMyActions();
@@ -580,23 +589,23 @@ void gameTableImpl::applySettings(settingsDialogImpl* mySettingsDialog)
 
 void gameTableImpl::initGui(int speed)
 {
-	//kill running Singleshots!!!
+	// kill running Singleshots!!!
 	stopTimer();
 
 	label_Pot->setText(PotString);
 
-	label_handNumber->setText(HandString+":");
-	label_gameNumber->setText(GameString+":");
+	label_handNumber->setText(HandString + ":");
+	label_gameNumber->setText(GameString + ":");
 
-    label_Total->setText(TotalString+":");
-    label_Sets->setText(BetsString+":");
+	label_Total->setText(TotalString + ":");
+	label_Sets->setText(BetsString + ":");
 	groupBox_RightToolBox->setDisabled(false);
 
-	//show human player buttons
-	for(int i=0; i < USER_WIDGETS_NUMBER; i++) {
+	// show human player buttons
+	for (int i = 0; i < USER_WIDGETS_NUMBER; i++)
+	{
 		userWidgetsArray[i]->show();
 	}
-
 }
 
 std::shared_ptr<Session> gameTableImpl::getSession()
@@ -605,7 +614,7 @@ std::shared_ptr<Session> gameTableImpl::getSession()
 	return myStartWindow->getSession();
 }
 
-//refresh-Funktionen
+// refresh-Funktionen
 void gameTableImpl::refreshSet()
 {
 
@@ -613,11 +622,12 @@ void gameTableImpl::refreshSet()
 
 	PlayerListConstIterator it_c;
 	PlayerList seatsList = currentGame->getSeatsList();
-	for (it_c=seatsList->begin(); it_c!=seatsList->end(); ++it_c) {
-		if( (*it_c)->getSet() == 0 )
+	for (it_c = seatsList->begin(); it_c != seatsList->end(); ++it_c)
+	{
+		if ((*it_c)->getSet() == 0)
 			setLabelArray[(*it_c)->getID()]->setText("");
 		else
-			setLabelArray[(*it_c)->getID()]->setText("$"+QString("%L1").arg((*it_c)->getSet()));
+			setLabelArray[(*it_c)->getID()]->setText("$" + QString("%L1").arg((*it_c)->getSet()));
 	}
 }
 
@@ -627,30 +637,36 @@ void gameTableImpl::refreshButton()
 	QPixmap dealerButton = QPixmap::fromImage(QImage(myGameTableStyle->getDealerPuck()));
 	QPixmap smallblindButton = QPixmap::fromImage(QImage(myGameTableStyle->getSmallBlindPuck()));
 	QPixmap bigblindButton = QPixmap::fromImage(QImage(myGameTableStyle->getBigBlindPuck()));
-	QPixmap onePix = QPixmap::fromImage(QImage(myAppDataPath +"gfx/gui/misc/1px.png"));
+	QPixmap onePix = QPixmap::fromImage(QImage(myAppDataPath + "gfx/gui/misc/1px.png"));
 
 	std::shared_ptr<Game> currentGame = myStartWindow->getSession()->getCurrentGame();
 
 	PlayerListConstIterator it_c;
 	PlayerList seatsList = currentGame->getSeatsList();
 	PlayerList activePlayerList = currentGame->getActivePlayerList();
-	for (it_c=seatsList->begin(); it_c!=seatsList->end(); ++it_c) {
-		if( (*it_c)->getActiveStatus() ) {
-			if( activePlayerList->size() > 2 ) {
-				switch ( (*it_c)->getButton() ) {
+	for (it_c = seatsList->begin(); it_c != seatsList->end(); ++it_c)
+	{
+		if ((*it_c)->getActiveStatus())
+		{
+			if (activePlayerList->size() > 2)
+			{
+				switch ((*it_c)->getButton())
+				{
 
-				case 1 :
+				case 1:
 					buttonLabelArray[(*it_c)->getID()]->setPixmap(dealerButton);
 					break;
-				case 2 : {
-					if(myConfig->readConfigInt("ShowBlindButtons"))
+				case 2:
+				{
+					if (myConfig->readConfigInt("ShowBlindButtons"))
 						buttonLabelArray[(*it_c)->getID()]->setPixmap(smallblindButton);
 					else
 						buttonLabelArray[(*it_c)->getID()]->setPixmap(onePix);
 				}
 				break;
-				case 3 : {
-					if(myConfig->readConfigInt("ShowBlindButtons"))
+				case 3:
+				{
+					if (myConfig->readConfigInt("ShowBlindButtons"))
 						buttonLabelArray[(*it_c)->getID()]->setPixmap(bigblindButton);
 					else
 						buttonLabelArray[(*it_c)->getID()]->setPixmap(onePix);
@@ -658,73 +674,85 @@ void gameTableImpl::refreshButton()
 				break;
 				default:
 					buttonLabelArray[(*it_c)->getID()]->setPixmap(onePix);
-
-				}
-			} else {
-				switch ((*it_c)->getButton()) {
-
-				case 2 :
-					buttonLabelArray[(*it_c)->getID()]->setPixmap(dealerButton);
-					break;
-				case 3 : {
-					if(myConfig->readConfigInt("ShowBlindButtons"))
-						buttonLabelArray[(*it_c)->getID()]->setPixmap(bigblindButton);
-					else
-						buttonLabelArray[(*it_c)->getID()]->setPixmap(onePix);
-				}
-				break;
-				default:
-					buttonLabelArray[(*it_c)->getID()]->setPixmap(onePix);
-
 				}
 			}
-		} else {
+			else
+			{
+				switch ((*it_c)->getButton())
+				{
+
+				case 2:
+					buttonLabelArray[(*it_c)->getID()]->setPixmap(dealerButton);
+					break;
+				case 3:
+				{
+					if (myConfig->readConfigInt("ShowBlindButtons"))
+						buttonLabelArray[(*it_c)->getID()]->setPixmap(bigblindButton);
+					else
+						buttonLabelArray[(*it_c)->getID()]->setPixmap(onePix);
+				}
+				break;
+				default:
+					buttonLabelArray[(*it_c)->getID()]->setPixmap(onePix);
+				}
+			}
+		}
+		else
+		{
 			buttonLabelArray[(*it_c)->getID()]->setPixmap(onePix);
 		}
 	}
 }
 
-
 void gameTableImpl::refreshPlayerName()
 {
 
-	if(myStartWindow->getSession()->getCurrentGame()) {
+	if (myStartWindow->getSession()->getCurrentGame())
+	{
 
 		std::shared_ptr<Game> currentGame = myStartWindow->getSession()->getCurrentGame();
 		PlayerListConstIterator it_c;
 		PlayerList seatsList = currentGame->getSeatsList();
-		for (it_c=seatsList->begin(); it_c!=seatsList->end(); ++it_c) {
+		for (it_c = seatsList->begin(); it_c != seatsList->end(); ++it_c)
+		{
 
-			//collect needed infos
-			// bool guest = myStartWindow->getSession()->getClientPlayerInfo((*it_c)->getID()).isGuest;
+			// collect needed infos
+			//  bool guest = myStartWindow->getSession()->getClientPlayerInfo((*it_c)->getID()).isGuest;
 			bool guest = false;
 
 			bool computerPlayer = false;
-			if((*it_c)->getType() == PLAYER_TYPE_COMPUTER) {
+			if ((*it_c)->getType() == PLAYER_TYPE_COMPUTER)
+			{
 				computerPlayer = true;
 			}
 			QString nick = QString::fromUtf8((*it_c)->getName().c_str());
 
-			//check SeatStates and refresh
-			switch(getCurrentSeatState((*it_c))) {
+			// check SeatStates and refresh
+			switch (getCurrentSeatState((*it_c)))
+			{
 
-			case SEAT_ACTIVE: {
-				playerNameLabelArray[(*it_c)->getID()]->setText(nick, false, guest, computerPlayer );
+			case SEAT_ACTIVE:
+			{
+				playerNameLabelArray[(*it_c)->getID()]->setText(nick, false, guest, computerPlayer);
 			}
 			break;
-			case SEAT_AUTOFOLD: {
-				playerNameLabelArray[(*it_c)->getID()]->setText(nick, true, guest, computerPlayer );
+			case SEAT_AUTOFOLD:
+			{
+				playerNameLabelArray[(*it_c)->getID()]->setText(nick, true, guest, computerPlayer);
 			}
 			break;
-			case SEAT_STAYONTABLE: {
-				playerNameLabelArray[(*it_c)->getID()]->setText(nick, true, guest, computerPlayer );
+			case SEAT_STAYONTABLE:
+			{
+				playerNameLabelArray[(*it_c)->getID()]->setText(nick, true, guest, computerPlayer);
 			}
 			break;
-			case SEAT_CLEAR: {
+			case SEAT_CLEAR:
+			{
 				playerNameLabelArray[(*it_c)->getID()]->setText("");
 			}
 			break;
-			default: {
+			default:
+			{
 				playerNameLabelArray[(*it_c)->getID()]->setText("");
 			}
 			}
@@ -735,7 +763,7 @@ void gameTableImpl::refreshPlayerName()
 void gameTableImpl::refreshAction(int playerID, int playerAction)
 {
 
-	QPixmap onePix = QPixmap::fromImage(QImage(myAppDataPath +"gfx/gui/misc/1px.png"));
+	QPixmap onePix = QPixmap::fromImage(QImage(myAppDataPath + "gfx/gui/misc/1px.png"));
 	QPixmap action;
 
 	QStringList actionArray;
@@ -743,44 +771,60 @@ void gameTableImpl::refreshAction(int playerID, int playerAction)
 
 	std::shared_ptr<Game> currentGame = myStartWindow->getSession()->getCurrentGame();
 
-	if(playerID == -1 || playerAction == -1) {
+	if (playerID == -1 || playerAction == -1)
+	{
 
 		PlayerListConstIterator it_c;
 		PlayerList seatsList = currentGame->getSeatsList();
-		for (it_c=seatsList->begin(); it_c!=seatsList->end(); ++it_c) {
+		for (it_c = seatsList->begin(); it_c != seatsList->end(); ++it_c)
+		{
 
-			//if no action --> clear Pixmap
-			if( (*it_c)->getAction() == 0) {
+			// if no action --> clear Pixmap
+			if ((*it_c)->getAction() == 0)
+			{
 				actionLabelArray[(*it_c)->getID()]->setPixmap(onePix);
-			} else {
-				//paint action pixmap
+			}
+			else
+			{
+				// paint action pixmap
 				actionLabelArray[(*it_c)->getID()]->setPixmap(QPixmap::fromImage(QImage(myGameTableStyle->getActionPic((*it_c)->getAction()))));
 			}
 
-			if ((*it_c)->getAction()== PLAYER_ACTION_FOLD) {
+			if ((*it_c)->getAction() == PLAYER_ACTION_FOLD)
+			{
 
-				if((*it_c)->getID() != 0) {
+				if ((*it_c)->getID() != 0)
+				{
 					holeCardsArray[(*it_c)->getID()][0]->setPixmap(onePix, false);
 					holeCardsArray[(*it_c)->getID()][1]->setPixmap(onePix, false);
 				}
 			}
 		}
-	} else {
-		//if no action --> clear Pixmap
-		if(playerAction == 0) {
+	}
+	else
+	{
+		// if no action --> clear Pixmap
+		if (playerAction == 0)
+		{
 			actionLabelArray[playerID]->setPixmap(onePix);
-		} else {
+		}
+		else
+		{
 
 			// 		paint action pixmap and raise
 			actionLabelArray[playerID]->setPixmap(QPixmap::fromImage(QImage(myGameTableStyle->getActionPic(playerAction))));
 		}
 
-		if (playerAction == 1) { // FOLD
+		if (playerAction == 1)
+		{ // FOLD
 
-			if (playerID == 0) {
+			if (playerID == 0)
+			{
 				holeCardsArray[0][0]->startFadeOut(10);
 				holeCardsArray[0][1]->startFadeOut(10);
-			} else {
+			}
+			else
+			{
 				holeCardsArray[playerID][0]->setPixmap(onePix, false);
 				holeCardsArray[playerID][1]->setPixmap(onePix, false);
 			}
@@ -797,58 +841,59 @@ void gameTableImpl::refreshPlayerStatistics()
 	PlayerListConstIterator it_c;
 	PlayerList seatsList = currentGame->getSeatsList();
 
-	for (it_c=seatsList->begin(); it_c!=seatsList->end(); ++it_c) {
-		
+	for (it_c = seatsList->begin(); it_c != seatsList->end(); ++it_c)
+	{
+
 		playerTipLabelArray[(*it_c)->getID()]->raise();
 
-		if (! (*it_c)->getActiveStatus()){
+		if (!(*it_c)->getActiveStatus())
+		{
 			playerTipLabelArray[(*it_c)->getID()]->setText("");
 			playerTipLabelArray[(*it_c)->getID()]->setToolTip("");
 			continue;
 		}
 
-		const PlayerStatistics & stats = (*it_c)->getStatistics(nbPlayers);
-		const PreflopStatistics & preflop = stats.getPreflopStatistics();
-		const FlopStatistics & flop = stats.getFlopStatistics();
-		const TurnStatistics & turn = stats.getTurnStatistics();
-		const RiverStatistics & river = stats.getRiverStatistics();
-		
+		const PlayerStatistics &stats = (*it_c)->getStatistics(nbPlayers);
+		const PreflopStatistics &preflop = stats.getPreflopStatistics();
+		const FlopStatistics &flop = stats.getFlopStatistics();
+		const TurnStatistics &turn = stats.getTurnStatistics();
+		const RiverStatistics &river = stats.getRiverStatistics();
+
 		stringstream displayTooltip;
 		displayTooltip.precision(1);
 
-		displayTooltip << fixed 
-				<< style	<< (*it_c)->getName() 
-				<< tr(" - stats for a ").toStdString() << nbPlayers 
-				<< " " << tr("players table").toStdString() << "</span></p>"
-				<< style	<< "<br><b>" << tr("Preflop stats").toStdString() << "</b>"
-							<< " " << tr("(hands played:").toStdString() << " " << preflop.m_hands << ")</span></p>"
-				<< style	<<"VP$IP: "<< preflop.getVoluntaryPutMoneyInPot() 
-							<< "%, " << tr("raise").toStdString() << ": " << preflop.getPreflopRaise()
-							<< "%</span></p>"
-				<< style	<< "3-Bet: " << preflop.getPreflop3Bet()
-							<< "%, " << tr("Call to 3Bet:").toStdString() << " " << preflop.getPreflopCall3BetsFrequency()
-							<< "%, 4-Bet: " << preflop.getPreflop4Bet()	
-							<< "%</span></p>"
+		displayTooltip << fixed
+					   << style << (*it_c)->getName()
+					   << tr(" - stats for a ").toStdString() << nbPlayers
+					   << " " << tr("players table").toStdString() << "</span></p>"
+					   << style << "<br><b>" << tr("Preflop stats").toStdString() << "</b>"
+					   << " " << tr("(hands played:").toStdString() << " " << preflop.m_hands << ")</span></p>"
+					   << style << "VP$IP: " << preflop.getVoluntaryPutMoneyInPot()
+					   << "%, " << tr("raise").toStdString() << ": " << preflop.getPreflopRaise()
+					   << "%</span></p>"
+					   << style << "3-Bet: " << preflop.getPreflop3Bet()
+					   << "%, " << tr("Call to 3Bet:").toStdString() << " " << preflop.getPreflopCall3BetsFrequency()
+					   << "%, 4-Bet: " << preflop.getPreflop4Bet()
+					   << "%</span></p>"
 
-				<< style	<< "<br><b>" << tr("Flop stats").toStdString() << "</b> " << tr("(hands played:").toStdString() 
-							<< " " << flop.m_hands << ")</span></p>"
-				<< style	<< tr("Agression Freq:").toStdString() << " " << flop.getAgressionFrequency() 
-							<< "%, AF: " << flop.getAgressionFactor() 
-							<< "<br>Continuation Bet: " << flop.getContinuationBetFrequency() << "%</span></p>"
+					   << style << "<br><b>" << tr("Flop stats").toStdString() << "</b> " << tr("(hands played:").toStdString()
+					   << " " << flop.m_hands << ")</span></p>"
+					   << style << tr("Agression Freq:").toStdString() << " " << flop.getAgressionFrequency()
+					   << "%, AF: " << flop.getAgressionFactor()
+					   << "<br>Continuation Bet: " << flop.getContinuationBetFrequency() << "%</span></p>"
 
-				<< style	<< "<br><b>" << tr("Turn stats").toStdString() << "</b> " << tr("(hands played:").toStdString() 
-								<< " " <<  turn.m_hands << ")</span></p>"
-				<< style	<< tr("Agression Freq:").toStdString() << " " << turn.getAgressionFrequency() 
-							<< "%, AF: " << turn.getAgressionFactor() 
-							<< "</span></p>"
+					   << style << "<br><b>" << tr("Turn stats").toStdString() << "</b> " << tr("(hands played:").toStdString()
+					   << " " << turn.m_hands << ")</span></p>"
+					   << style << tr("Agression Freq:").toStdString() << " " << turn.getAgressionFrequency()
+					   << "%, AF: " << turn.getAgressionFactor()
+					   << "</span></p>"
 
-				<< style	<< "<br><b>" << tr("River stats").toStdString() << "</b> " << tr("(hands played:").toStdString() << " " 
-							<<  river.m_hands << ")</span></p>"
-				<< style	<< tr("Agression Freq:").toStdString() << " " << river.getAgressionFrequency() 
-							<< "%, AF: " << river.getAgressionFactor() 
-							<< "<br>" << tr("Went to showdown:").toStdString() << " " << stats.getWentToShowDown() 
-							<< "%</span></p>"
-							;
+					   << style << "<br><b>" << tr("River stats").toStdString() << "</b> " << tr("(hands played:").toStdString() << " "
+					   << river.m_hands << ")</span></p>"
+					   << style << tr("Agression Freq:").toStdString() << " " << river.getAgressionFrequency()
+					   << "%, AF: " << river.getAgressionFactor()
+					   << "<br>" << tr("Went to showdown:").toStdString() << " " << stats.getWentToShowDown()
+					   << "%</span></p>";
 
 		playerTipLabelArray[(*it_c)->getID()]->setToolTip(displayTooltip.str().c_str());
 	}
@@ -862,30 +907,37 @@ void gameTableImpl::refreshCash()
 	bool transparent = true;
 	PlayerListConstIterator it_c;
 	PlayerList seatsList = currentGame->getSeatsList();
-	for (it_c=seatsList->begin(); it_c!=seatsList->end(); ++it_c) {
+	for (it_c = seatsList->begin(); it_c != seatsList->end(); ++it_c)
+	{
 
-		//check SeatStates and refresh
-		switch(getCurrentSeatState((*it_c))) {
+		// check SeatStates and refresh
+		switch (getCurrentSeatState((*it_c)))
+		{
 
-		case SEAT_ACTIVE: {
-//			qDebug() << (*it_c)->getID() << "CASH ACTIVE";
-			cashLabelArray[(*it_c)->getID()]->setText("$"+QString("%L1").arg((*it_c)->getCash()));
+		case SEAT_ACTIVE:
+		{
+			//			qDebug() << (*it_c)->getID() << "CASH ACTIVE";
+			cashLabelArray[(*it_c)->getID()]->setText("$" + QString("%L1").arg((*it_c)->getCash()));
 		}
 		break;
-		case SEAT_AUTOFOLD: {
-//			qDebug() << (*it_c)->getID() << "CASH AUTOFOLD"; //TODO transparent
-			cashLabelArray[(*it_c)->getID()]->setText("$"+QString("%L1").arg((*it_c)->getCash()), transparent);
+		case SEAT_AUTOFOLD:
+		{
+			//			qDebug() << (*it_c)->getID() << "CASH AUTOFOLD"; //TODO transparent
+			cashLabelArray[(*it_c)->getID()]->setText("$" + QString("%L1").arg((*it_c)->getCash()), transparent);
 		}
 		break;
-		case SEAT_STAYONTABLE: {
+		case SEAT_STAYONTABLE:
+		{
 			cashLabelArray[(*it_c)->getID()]->setText("");
 		}
 		break;
-		case SEAT_CLEAR: {
+		case SEAT_CLEAR:
+		{
 			cashLabelArray[(*it_c)->getID()]->setText("");
 		}
 		break;
-		default: {
+		default:
+		{
 			cashLabelArray[(*it_c)->getID()]->setText("");
 		}
 		}
@@ -897,36 +949,46 @@ void gameTableImpl::refreshGroupbox(int playerID, int status)
 
 	int j;
 
-	if(playerID == -1 || status == -1) {
+	if (playerID == -1 || status == -1)
+	{
 
 		std::shared_ptr<Game> currentGame = myStartWindow->getSession()->getCurrentGame();
 		PlayerListConstIterator it_c;
 		PlayerList seatsList = currentGame->getSeatsList();
-		for (it_c=seatsList->begin(); it_c!=seatsList->end(); ++it_c) {
+		for (it_c = seatsList->begin(); it_c != seatsList->end(); ++it_c)
+		{
 
-			if((*it_c)->getTurn()) {
-				//Groupbox glow wenn der Spiele dran ist.
+			if ((*it_c)->getTurn())
+			{
+				// Groupbox glow wenn der Spiele dran ist.
 				myGameTableStyle->setPlayerSeatActiveStyle(groupBoxArray[(*it_c)->getID()]);
-			} else {
-				//Groupbox auf Hintergrundfarbe setzen wenn der Spiele nicht dran aber aktiv ist.
-				if((*it_c)->getActiveStatus()) {
-					if((*it_c)->getID()==0) {
-						//show buttons
-						for(j=0; j < USER_WIDGETS_NUMBER; j++) {
+			}
+			else
+			{
+				// Groupbox auf Hintergrundfarbe setzen wenn der Spiele nicht dran aber aktiv ist.
+				if ((*it_c)->getActiveStatus())
+				{
+					if ((*it_c)->getID() == 0)
+					{
+						// show buttons
+						for (j = 0; j < USER_WIDGETS_NUMBER; j++)
+						{
 							userWidgetsArray[j]->show();
 						}
 					}
 					myGameTableStyle->setPlayerSeatInactiveStyle(groupBoxArray[(*it_c)->getID()]);
-
 				}
-				//Groupbox verdunkeln wenn der Spiele inactive ist.
-				else {
-					if((*it_c)->getID()==0) {
-						//hide buttons
-						for(j=0; j < USER_WIDGETS_NUMBER; j++) {
+				// Groupbox verdunkeln wenn der Spiele inactive ist.
+				else
+				{
+					if ((*it_c)->getID() == 0)
+					{
+						// hide buttons
+						for (j = 0; j < USER_WIDGETS_NUMBER; j++)
+						{
 							userWidgetsArray[j]->hide();
 						}
-						//disable anti-peek front after player is out
+						// disable anti-peek front after player is out
 						holeCardsArray[0][0]->signalFastFlipCards(false);
 						holeCardsArray[0][1]->signalFastFlipCards(false);
 					}
@@ -934,46 +996,58 @@ void gameTableImpl::refreshGroupbox(int playerID, int status)
 				}
 			}
 		}
-	} else {
-		switch(status) {
+	}
+	else
+	{
+		switch (status)
+		{
 
-			//inactive
-		case 0: {
-			if (!playerID) {
-				//hide buttons
-				for(j=0; j < USER_WIDGETS_NUMBER; j++) {
+			// inactive
+		case 0:
+		{
+			if (!playerID)
+			{
+				// hide buttons
+				for (j = 0; j < USER_WIDGETS_NUMBER; j++)
+				{
 					userWidgetsArray[j]->hide();
 				}
-				//disable anti-peek front after player is out
+				// disable anti-peek front after player is out
 				holeCardsArray[0][0]->signalFastFlipCards(false);
 				holeCardsArray[0][1]->signalFastFlipCards(false);
 			}
 			myGameTableStyle->setPlayerSeatInactiveStyle(groupBoxArray[playerID]);
 		}
 		break;
-		//active but fold
-		case 1: {
-			if (!playerID) {
-				//show buttons
-				for(j=0; j < USER_WIDGETS_NUMBER; j++) {
+		// active but fold
+		case 1:
+		{
+			if (!playerID)
+			{
+				// show buttons
+				for (j = 0; j < USER_WIDGETS_NUMBER; j++)
+				{
 					userWidgetsArray[j]->show();
 				}
 			}
 			myGameTableStyle->setPlayerSeatInactiveStyle(groupBoxArray[playerID]);
 		}
 		break;
-		//active in action
-		case 2:  {
+		// active in action
+		case 2:
+		{
 			myGameTableStyle->setPlayerSeatActiveStyle(groupBoxArray[playerID]);
 		}
 		break;
-		//active not in action
-		case 3:  {
+		// active not in action
+		case 3:
+		{
 			myGameTableStyle->setPlayerSeatInactiveStyle(groupBoxArray[playerID]);
 		}
 		break;
 		default:
-		{}
+		{
+		}
 		}
 	}
 }
@@ -981,34 +1055,41 @@ void gameTableImpl::refreshGroupbox(int playerID, int status)
 void gameTableImpl::refreshGameLabels(int gameState)
 {
 
-	switch(gameState) {
-	case 0: {
+	switch (gameState)
+	{
+	case 0:
+	{
 		textLabel_handLabel->setText(PreflopString);
 	}
 	break;
-	case 1: {
+	case 1:
+	{
 		textLabel_handLabel->setText(FlopString);
 	}
 	break;
-	case 2: {
+	case 2:
+	{
 		textLabel_handLabel->setText(TurnString);
 	}
 	break;
-	case 3: {
+	case 3:
+	{
 		textLabel_handLabel->setText(RiverString);
 	}
 	break;
-	case 4: {
+	case 4:
+	{
 		textLabel_handLabel->setText("");
 	}
 	break;
-	default: {
+	default:
+	{
 		textLabel_handLabel->setText("!!! ERROR !!!");
 	}
 	}
 
-	label_handNumberValue->setText(QString::number(myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getID(),10));
-	label_gameNumberValue->setText(QString::number(myStartWindow->getSession()->getCurrentGame()->getGameID(),10));
+	label_handNumberValue->setText(QString::number(myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getID(), 10));
+	label_gameNumberValue->setText(QString::number(myStartWindow->getSession()->getCurrentGame()->getGameID(), 10));
 }
 
 void gameTableImpl::refreshAll()
@@ -1019,8 +1100,9 @@ void gameTableImpl::refreshAll()
 	std::shared_ptr<Game> currentGame = myStartWindow->getSession()->getCurrentGame();
 	PlayerListConstIterator it_c;
 	PlayerList seatsList = currentGame->getSeatsList();
-	for (it_c=seatsList->begin(); it_c!=seatsList->end(); ++it_c) {
-		refreshAction( (*it_c)->getID(), (*it_c)->getAction());
+	for (it_c = seatsList->begin(); it_c != seatsList->end(); ++it_c)
+	{
+		refreshAction((*it_c)->getID(), (*it_c)->getAction());
 	}
 
 	refreshCash();
@@ -1038,8 +1120,9 @@ void gameTableImpl::refreshChangePlayer()
 	std::shared_ptr<Game> currentGame = myStartWindow->getSession()->getCurrentGame();
 	PlayerListConstIterator it_c;
 	PlayerList seatsList = currentGame->getSeatsList();
-	for (it_c=seatsList->begin(); it_c!=seatsList->end(); ++it_c) {
-		refreshAction( (*it_c)->getID(), (*it_c)->getAction());
+	for (it_c = seatsList->begin(); it_c != seatsList->end(); ++it_c)
+	{
+		refreshAction((*it_c)->getID(), (*it_c)->getAction());
 	}
 
 	refreshCash();
@@ -1049,8 +1132,8 @@ void gameTableImpl::refreshPot()
 {
 	std::shared_ptr<HandInterface> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
 
-	textLabel_Sets->setText("$"+QString("%L1").arg(currentHand->getBoard()->getSets()));
-	textLabel_Pot->setText("$"+QString("%L1").arg(currentHand->getBoard()->getPot()));
+	textLabel_Sets->setText("$" + QString("%L1").arg(currentHand->getBoard()->getSets()));
+	textLabel_Pot->setText("$" + QString("%L1").arg(currentHand->getBoard()->getPot()));
 }
 
 void gameTableImpl::guiUpdateDone()
@@ -1066,17 +1149,19 @@ void gameTableImpl::waitForGuiUpdateDone()
 void gameTableImpl::dealHoleCards()
 {
 
-	int i,k;
-	for (i=0; i<MAX_NUMBER_OF_PLAYERS; i++ ) {
-		for ( k=0; k<=1; k++ ) {
+	int i, k;
+	for (i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
+	{
+		for (k = 0; k <= 1; k++)
+		{
 			holeCardsArray[i][k]->setFadeOutAction(false);
 			holeCardsArray[i][k]->stopFlipCardsAnimation();
 		}
 	}
 
-	QPixmap onePix = QPixmap::fromImage(QImage(myAppDataPath +"gfx/gui/misc/1px.png"));
+	QPixmap onePix = QPixmap::fromImage(QImage(myAppDataPath + "gfx/gui/misc/1px.png"));
 
-	//TempArrays
+	// TempArrays
 	QPixmap tempCardsPixmapArray[2];
 	int tempCardsIntArray[2];
 
@@ -1086,35 +1171,46 @@ void gameTableImpl::dealHoleCards()
 
 	PlayerListConstIterator it_c;
 	PlayerList seatsList = currentGame->getSeatsList();
-	for (it_c=seatsList->begin(); it_c!=seatsList->end(); ++it_c) {
+	for (it_c = seatsList->begin(); it_c != seatsList->end(); ++it_c)
+	{
 		(*it_c)->getCards(tempCardsIntArray);
-		for(j=0; j<2; j++) {
-			if((*it_c)->getActiveStatus()) {
-				if (( (*it_c)->getID() == 0)/* || DEBUG_MODE*/) {
-					tempCardsPixmapArray[j].load(myCardDeckStyle->getCurrentDir()+QString::number(tempCardsIntArray[j], 10)+".png");
-					if(myConfig->readConfigInt("AntiPeekMode")) {
+		for (j = 0; j < 2; j++)
+		{
+			if ((*it_c)->getActiveStatus())
+			{
+				if (((*it_c)->getID() == 0) /* || DEBUG_MODE*/)
+				{
+					tempCardsPixmapArray[j].load(myCardDeckStyle->getCurrentDir() + QString::number(tempCardsIntArray[j], 10) + ".png");
+					if (myConfig->readConfigInt("AntiPeekMode"))
+					{
 						holeCardsArray[(*it_c)->getID()][j]->setPixmap(flipside, true);
 						holeCardsArray[(*it_c)->getID()][j]->setFront(flipside);
 						holeCardsArray[(*it_c)->getID()][j]->setHiddenFrontPixmap(tempCardsPixmapArray[j]);
-					} else {
-						holeCardsArray[(*it_c)->getID()][j]->setPixmap(tempCardsPixmapArray[j],false);
+					}
+					else
+					{
+						holeCardsArray[(*it_c)->getID()][j]->setPixmap(tempCardsPixmapArray[j], false);
 						holeCardsArray[(*it_c)->getID()][j]->setFront(tempCardsPixmapArray[j]);
 					}
-				} else {
+				}
+				else
+				{
 					holeCardsArray[(*it_c)->getID()][j]->setPixmap(flipside, true);
 					holeCardsArray[(*it_c)->getID()][j]->setFlipsidePix(flipside);
 				}
-			} else {
+			}
+			else
+			{
 
 				holeCardsArray[(*it_c)->getID()][j]->setPixmap(onePix, false);
 			}
 		}
 	}
 
-	//fix press mouse button during bankrupt with anti-peek-mode
+	// fix press mouse button during bankrupt with anti-peek-mode
 	this->mouseOverFlipCards(false);
 
-	//refresh CardsChanceMonitor Tool
+	// refresh CardsChanceMonitor Tool
 	refreshCardsChance(GAME_STATE_PREFLOP);
 	refreshHandsRanges();
 }
@@ -1130,26 +1226,30 @@ void gameTableImpl::dealBettingRoundCards(int myBettingRoundID)
 	horizontalSlider_bet->setDisabled(true);
 	spinBox_betValue->setDisabled(true);
 
-	switch(myBettingRoundID) {
+	switch (myBettingRoundID)
+	{
 
-	case 1: {
+	case 1:
+	{
 		dealFlopCards0();
 	}
 	break;
-	case 2: {
+	case 2:
+	{
 		dealTurnCards0();
 	}
 	break;
-	case 3: {
+	case 3:
+	{
 		dealRiverCards0();
 	}
 	break;
-	default: {
+	default:
+	{
 		cout << "dealBettingRoundCards() Error" << endl;
 	}
 	}
 }
-
 
 void gameTableImpl::dealFlopCards0()
 {
@@ -1183,17 +1283,11 @@ void gameTableImpl::dealFlopCards4()
 	int tempBoardCardsArray[5];
 
 	myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getBoard()->getCards(tempBoardCardsArray);
-	QPixmap card = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir()+QString::number(tempBoardCardsArray[0], 10)+".png"));
+	QPixmap card = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + QString::number(tempBoardCardsArray[0], 10) + ".png"));
 
-	//Config? mit oder ohne Eye-Candy?
-	if(myConfig->readConfigInt("ShowFlipCardsAnimation")) {
-		//with Eye-Candy
-		boardCardsArray[0]->startFlipCards(guiGameSpeed, card, flipside);
-	} else {
-		//without Eye-Candy
-		boardCardsArray[0]->setFront(card);
-		boardCardsArray[0]->setPixmap(card, false);
-	}
+	boardCardsArray[0]->setFront(card);
+	boardCardsArray[0]->setPixmap(card, false);
+
 	dealFlopCards4Timer->start(dealCardsSpeed);
 }
 
@@ -1202,17 +1296,11 @@ void gameTableImpl::dealFlopCards5()
 
 	int tempBoardCardsArray[5];
 	myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getBoard()->getCards(tempBoardCardsArray);
-	QPixmap card = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir()+QString::number(tempBoardCardsArray[1], 10)+".png"));
+	QPixmap card = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + QString::number(tempBoardCardsArray[1], 10) + ".png"));
 
-	//Config? mit oder ohne Eye-Candy?
-	if(myConfig->readConfigInt("ShowFlipCardsAnimation")) {
-		//with Eye-Candy
-		boardCardsArray[1]->startFlipCards(guiGameSpeed, card, flipside);
-	} else {
-		//without Eye-Candy
-		boardCardsArray[1]->setFront(card);
-		boardCardsArray[1]->setPixmap(card, false);
-	}
+	boardCardsArray[1]->setFront(card);
+	boardCardsArray[1]->setPixmap(card, false);
+
 	dealFlopCards5Timer->start(dealCardsSpeed);
 }
 
@@ -1221,30 +1309,25 @@ void gameTableImpl::dealFlopCards6()
 
 	int tempBoardCardsArray[5];
 	myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getBoard()->getCards(tempBoardCardsArray);
-	QPixmap card = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir()+QString::number(tempBoardCardsArray[2], 10)+".png"));
+	QPixmap card = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + QString::number(tempBoardCardsArray[2], 10) + ".png"));
 
-	//Config? mit oder ohne Eye-Candy?
-	if(myConfig->readConfigInt("ShowFlipCardsAnimation")) {
-		//with Eye-Candy
-		boardCardsArray[2]->startFlipCards(guiGameSpeed, card, flipside);
-	} else {
-		//without Eye-Candy
-		boardCardsArray[2]->setFront(card);
-		boardCardsArray[2]->setPixmap(card, false);
-	}
+	boardCardsArray[2]->setFront(card);
+	boardCardsArray[2]->setPixmap(card, false);
 
 	// stable
 	// wenn alle All In
-	if(myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getAllInCondition()) {
+	if (myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getAllInCondition())
+	{
 		dealFlopCards6Timer->start(AllInDealCardsSpeed);
 	}
 	// sonst normale Variante
-	else {
-		updateMyButtonsState(0);  //mode 0 == called from dealBettingRoundcards
+	else
+	{
+		updateMyButtonsState(0); // mode 0 == called from dealBettingRoundcards
 		dealFlopCards6Timer->start(postDealCardsSpeed);
 	}
 
-	//refresh CardsChanceMonitor Tool
+	// refresh CardsChanceMonitor Tool
 	refreshCardsChance(GAME_STATE_FLOP);
 	refreshHandsRanges();
 }
@@ -1266,29 +1349,22 @@ void gameTableImpl::dealTurnCards2()
 
 	int tempBoardCardsArray[5];
 	myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getBoard()->getCards(tempBoardCardsArray);
-	QPixmap card = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir()+QString::number(tempBoardCardsArray[3], 10)+".png"));
+	QPixmap card = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + QString::number(tempBoardCardsArray[3], 10) + ".png"));
 
-	//Config? mit oder ohne Eye-Candy?
-	if(myConfig->readConfigInt("ShowFlipCardsAnimation")) {
-		//with Eye-Candy
-		boardCardsArray[3]->startFlipCards(guiGameSpeed, card, flipside);
-	} else {
-		//without Eye-Candy
-		boardCardsArray[3]->setFront(card);
-		boardCardsArray[3]->setPixmap(card, false);
-	}
+	boardCardsArray[3]->setFront(card);
+	boardCardsArray[3]->setPixmap(card, false);
 
-	// stable
-	// wenn alle All In
-	if(myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getAllInCondition()) {
+	if (myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getAllInCondition())
+	{
 		dealTurnCards2Timer->start(AllInDealCardsSpeed);
 	}
 	// sonst normale Variante
-	else {
-		updateMyButtonsState(0);  //mode 0 == called from dealBettingRoundcards
+	else
+	{
+		updateMyButtonsState(0); // mode 0 == called from dealBettingRoundcards
 		dealTurnCards2Timer->start(postDealCardsSpeed);
 	}
-	//refresh CardsChanceMonitor Tool
+	// refresh CardsChanceMonitor Tool
 	refreshCardsChance(GAME_STATE_TURN);
 	refreshHandsRanges();
 }
@@ -1312,29 +1388,22 @@ void gameTableImpl::dealRiverCards2()
 
 	int tempBoardCardsArray[5];
 	myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getBoard()->getCards(tempBoardCardsArray);
-	QPixmap card = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir()+QString::number(tempBoardCardsArray[4], 10)+".png"));
+	QPixmap card = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + QString::number(tempBoardCardsArray[4], 10) + ".png"));
 
-	//Config? mit oder ohne Eye-Candy?
-	if(myConfig->readConfigInt("ShowFlipCardsAnimation")) {
-		//with Eye-Candy
-		boardCardsArray[4]->startFlipCards(guiGameSpeed, card, flipside);
-	} else {
-		//without Eye-Candy
-		boardCardsArray[4]->setFront(card);
-		boardCardsArray[4]->setPixmap(card, false);
-	}
+	boardCardsArray[4]->setFront(card);
+	boardCardsArray[4]->setPixmap(card, false);
 
-	// stable
-	// wenn alle All In
-	if(myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getAllInCondition()) {
+	if (myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getAllInCondition())
+	{
 		dealRiverCards2Timer->start(AllInDealCardsSpeed);
 	}
 	// sonst normale Variante
-	else {
-		updateMyButtonsState(0);  //mode 0 == called from dealBettingRoundcards
+	else
+	{
+		updateMyButtonsState(0); // mode 0 == called from dealBettingRoundcards
 		dealRiverCards2Timer->start(postDealCardsSpeed);
 	}
-	//refresh CardsChanceMonitor Tool
+	// refresh CardsChanceMonitor Tool
 	refreshCardsChance(GAME_STATE_RIVER);
 	refreshHandsRanges();
 }
@@ -1356,11 +1425,12 @@ void gameTableImpl::provideMyActions(int mode)
 	std::shared_ptr<Player> humanPlayer = currentHand->getSeatsList()->front();
 	PlayerList activePlayerList = currentHand->getActivePlayerList();
 
-	//really disabled buttons if human player is fold/all-in or server-autofold... and not called from dealBettingRoundcards
-	if((mode != 0 && (humanPlayer->getAction() == PLAYER_ACTION_ALLIN || 
-		humanPlayer->getAction() == PLAYER_ACTION_FOLD || 
-		(humanPlayer->getSet() == currentHand->getCurrentBettingRound()->getHighestSet() && (humanPlayer->getAction() != PLAYER_ACTION_NONE)))) 
-|| !humanPlayer->isSessionActive() /*server-autofold*/) {
+	// really disabled buttons if human player is fold/all-in or server-autofold... and not called from dealBettingRoundcards
+	if ((mode != 0 && (humanPlayer->getAction() == PLAYER_ACTION_ALLIN ||
+					   humanPlayer->getAction() == PLAYER_ACTION_FOLD ||
+					   (humanPlayer->getSet() == currentHand->getCurrentBettingRound()->getHighestSet() && (humanPlayer->getAction() != PLAYER_ACTION_NONE)))) ||
+		!humanPlayer->isSessionActive() /*server-autofold*/)
+	{
 
 		pushButton_BetRaise->setText("");
 		pushButton_BetRaiseHalfPot->setText("50% pot");
@@ -1376,62 +1446,86 @@ void gameTableImpl::provideMyActions(int mode)
 		myButtonsCheckable(false);
 
 		refreshActionButtonFKeyIndicator(1);
-	} else {
+	}
+	else
+	{
 		horizontalSlider_bet->setEnabled(true);
 		spinBox_betValue->setEnabled(true);
 
-		//show available actions on buttons
-		if(currentHand->getCurrentRound() == 0) { // preflop
+		// show available actions on buttons
+		if (currentHand->getCurrentRound() == 0)
+		{ // preflop
 
-			if (humanPlayer->getCash()+humanPlayer->getSet() > currentHand->getCurrentBettingRound()->getHighestSet() && !currentHand->getCurrentBettingRound()->getFullBetRule()) {
-				pushButtonBetRaiseString = RaiseString+"\n$"+QString("%L1").arg(getBetAmount());
+			if (humanPlayer->getCash() + humanPlayer->getSet() > currentHand->getCurrentBettingRound()->getHighestSet() && !currentHand->getCurrentBettingRound()->getFullBetRule())
+			{
+				pushButtonBetRaiseString = RaiseString + "\n$" + QString("%L1").arg(getBetAmount());
 			}
 
-			if (humanPlayer->getSet()== currentHand->getCurrentBettingRound()->getHighestSet() &&  humanPlayer->getButton() == 3) {
+			if (humanPlayer->getSet() == currentHand->getCurrentBettingRound()->getHighestSet() && humanPlayer->getButton() == 3)
+			{
 				pushButtonCallCheckString = CheckString;
-			} else {
-				pushButtonCallCheckString = CallString+"\n$"+QString("%L1").arg(getCallAmount());
+			}
+			else
+			{
+				pushButtonCallCheckString = CallString + "\n$" + QString("%L1").arg(getCallAmount());
 			}
 
 			pushButtonFoldString = FoldString;
-			if(!currentHand->getCurrentBettingRound()->getFullBetRule()) {
+			if (!currentHand->getCurrentBettingRound()->getFullBetRule())
+			{
 				pushButtonAllInString = AllInString;
 			}
-		} else { // flop,turn,river
+		}
+		else
+		{ // flop,turn,river
 
-			if (currentHand->getCurrentBettingRound()->getHighestSet() == 0 && pushButton_Fold->isCheckable() ) {
-				pushButtonFoldString = CheckString+" /\n"+FoldString;
-			} else {
+			if (currentHand->getCurrentBettingRound()->getHighestSet() == 0 && pushButton_Fold->isCheckable())
+			{
+				pushButtonFoldString = CheckString + " /\n" + FoldString;
+			}
+			else
+			{
 				pushButtonFoldString = FoldString;
 			}
-			if (currentHand->getCurrentBettingRound()->getHighestSet() == 0) {
+			if (currentHand->getCurrentBettingRound()->getHighestSet() == 0)
+			{
 
 				pushButtonCallCheckString = CheckString;
-				pushButtonBetRaiseString = BetString+"\n$"+QString("%L1").arg(getBetAmount());
+				pushButtonBetRaiseString = BetString + "\n$" + QString("%L1").arg(getBetAmount());
 			}
-			if (currentHand->getCurrentBettingRound()->getHighestSet() > 0 && currentHand->getCurrentBettingRound()->getHighestSet() > humanPlayer->getSet()) {
-				pushButtonCallCheckString = CallString+"\n$"+QString("%L1").arg(getCallAmount());
-				if (humanPlayer->getCash()+humanPlayer->getSet() > currentHand->getCurrentBettingRound()->getHighestSet() && !currentHand->getCurrentBettingRound()->getFullBetRule()) {
-					pushButtonBetRaiseString = RaiseString+"\n$"+QString("%L1").arg(getBetAmount());
+			if (currentHand->getCurrentBettingRound()->getHighestSet() > 0 && currentHand->getCurrentBettingRound()->getHighestSet() > humanPlayer->getSet())
+			{
+				pushButtonCallCheckString = CallString + "\n$" + QString("%L1").arg(getCallAmount());
+				if (humanPlayer->getCash() + humanPlayer->getSet() > currentHand->getCurrentBettingRound()->getHighestSet() && !currentHand->getCurrentBettingRound()->getFullBetRule())
+				{
+					pushButtonBetRaiseString = RaiseString + "\n$" + QString("%L1").arg(getBetAmount());
 				}
 			}
-			if(!currentHand->getCurrentBettingRound()->getFullBetRule()) {
+			if (!currentHand->getCurrentBettingRound()->getFullBetRule())
+			{
 				pushButtonAllInString = AllInString;
 			}
 		}
 
-		if(mode == 0) {
-			if( humanPlayer->getAction() != PLAYER_ACTION_FOLD ) {
-				pushButtonBetRaiseString = BetString+"\n$"+QString("%L1").arg(getBetAmount());
+		if (mode == 0)
+		{
+			if (humanPlayer->getAction() != PLAYER_ACTION_FOLD)
+			{
+				pushButtonBetRaiseString = BetString + "\n$" + QString("%L1").arg(getBetAmount());
 				pushButtonCallCheckString = CheckString;
-				if( (activePlayerList->size() > 2 && humanPlayer->getButton() == BUTTON_SMALL_BLIND ) || ( activePlayerList->size() <= 2 && humanPlayer->getButton() == BUTTON_BIG_BLIND)) {
+				if ((activePlayerList->size() > 2 && humanPlayer->getButton() == BUTTON_SMALL_BLIND) || (activePlayerList->size() <= 2 && humanPlayer->getButton() == BUTTON_BIG_BLIND))
+				{
 					pushButtonFoldString = FoldString;
-				} else {
-					pushButtonFoldString = CheckString+" /\n"+FoldString;
+				}
+				else
+				{
+					pushButtonFoldString = CheckString + " /\n" + FoldString;
 				}
 
 				pushButtonAllInString = AllInString;
-			} else {
+			}
+			else
+			{
 				pushButtonBetRaiseString = "";
 				pushButtonCallCheckString = "";
 				pushButtonFoldString = "";
@@ -1440,27 +1534,29 @@ void gameTableImpl::provideMyActions(int mode)
 				spinBox_betValue->setDisabled(true);
 
 				myButtonsCheckable(false);
-
 			}
 		}
 
-		//if text changed on checked button --> do something to prevent unwanted actions
-		if(pushButtonCallCheckString != lastPushButtonCallCheckString) {
+		// if text changed on checked button --> do something to prevent unwanted actions
+		if (pushButtonCallCheckString != lastPushButtonCallCheckString)
+		{
 
-			if(pushButton_CallCheck->isChecked()) {
-				//uncheck a previous checked button to prevent unwanted action
+			if (pushButton_CallCheck->isChecked())
+			{
+				// uncheck a previous checked button to prevent unwanted action
 				uncheckMyButtons();
 				resetButtonsCheckStateMemory();
 			}
-			//disable button to prevent unwanted clicks (e.g. call allin)
-			if(myConfig->readConfigInt("AccidentallyCallBlocker")) {
+			// disable button to prevent unwanted clicks (e.g. call allin)
+			if (myConfig->readConfigInt("AccidentallyCallBlocker"))
+			{
 				pushButton_CallCheck->setEatMyEvents(true);
 				enableCallCheckPushButtonTimer->start(1000);
 			}
-
 		}
 
-		if(pushButtonBetRaiseString == "") {
+		if (pushButtonBetRaiseString == "")
+		{
 
 			horizontalSlider_bet->setDisabled(true);
 			spinBox_betValue->setDisabled(true);
@@ -1477,7 +1573,8 @@ void gameTableImpl::provideMyActions(int mode)
 		refreshActionButtonFKeyIndicator();
 		// 		myBetRaise();
 
-		if(pushButton_BetRaise->text().startsWith(RaiseString)) {
+		if (pushButton_BetRaise->text().startsWith(RaiseString))
+		{
 
 			horizontalSlider_bet->setMinimum(currentHand->getCurrentBettingRound()->getHighestSet() - humanPlayer->getSet() + currentHand->getCurrentBettingRound()->getMinimumRaise());
 			horizontalSlider_bet->setMaximum(humanPlayer->getCash());
@@ -1487,23 +1584,25 @@ void gameTableImpl::provideMyActions(int mode)
 			changeSpinBoxBetValue(horizontalSlider_bet->value());
 
 			myActionIsRaise = 1;
-		} else if(pushButton_BetRaise->text().startsWith(BetString)) {
+		}
+		else if (pushButton_BetRaise->text().startsWith(BetString))
+		{
 
-			horizontalSlider_bet->setMinimum(currentHand->getSmallBlind()*2);
+			horizontalSlider_bet->setMinimum(currentHand->getSmallBlind() * 2);
 			horizontalSlider_bet->setMaximum(humanPlayer->getCash());
 			horizontalSlider_bet->setSingleStep(10);
-			spinBox_betValue->setMinimum(currentHand->getSmallBlind()*2);
+			spinBox_betValue->setMinimum(currentHand->getSmallBlind() * 2);
 			spinBox_betValue->setMaximum(humanPlayer->getCash());
 			changeSpinBoxBetValue(horizontalSlider_bet->value());
 
 			myActionIsBet = 1;
-		} 
+		}
 
-
-		//if value changed on bet/raise button --> uncheck to prevent unwanted actions
+		// if value changed on bet/raise button --> uncheck to prevent unwanted actions
 		int lastBetValue = lastPushButtonBetRaiseString.simplified().remove(QRegularExpression("[^0-9]")).toInt();
 
-		if((lastBetValue < horizontalSlider_bet->minimum() && pushButton_BetRaise->isChecked())) {
+		if ((lastBetValue < horizontalSlider_bet->minimum() && pushButton_BetRaise->isChecked()))
+		{
 
 			uncheckMyButtons();
 			resetButtonsCheckStateMemory();
@@ -1522,7 +1621,7 @@ void gameTableImpl::meInAction()
 
 	GameState currentState = myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getCurrentBettingRound()->getBettingRoundID();
 	std::shared_ptr<HandInterface> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
-	std::shared_ptr<Player> humanPlayer = currentHand->getSeatsList()->front();	
+	std::shared_ptr<Player> humanPlayer = currentHand->getSeatsList()->front();
 	if (currentState == GAME_STATE_PREFLOP)
 		humanPlayer->setPreflopPotOdd(humanPlayer->getPotOdd());
 
@@ -1532,58 +1631,72 @@ void gameTableImpl::meInAction()
 	myActionIsRaise = 0;
 	myActionIsBet = 0;
 
-	if(myConfig->readConfigInt("ShowStatusbarMessages")) {
-		if ( myConfig->readConfigInt("AlternateFKeysUserActionMode") == 0 ) {
+	if (myConfig->readConfigInt("ShowStatusbarMessages"))
+	{
+		if (myConfig->readConfigInt("AlternateFKeysUserActionMode") == 0)
+		{
 			// // 			statusBar()->showMessage(tr("F1 - Fold | F2 - Check/Call | F3 - Bet/Raise | F4 - All-In"), 15000);
-		} else {
+		}
+		else
+		{
 			// 			statusBar()->showMessage(tr("F1 - All-In | F2 - Bet/Raise | F3 - Check/Call | F4 - Fold"), 15000);
 		}
 	}
 
 	QString lastPushButtonFoldString = pushButton_Fold->text();
 
-	//paint actions on buttons
+	// paint actions on buttons
 	provideMyActions();
 
-	//do remembered action
-	if( pushButtonBetRaiseIsChecked ) {
+	// do remembered action
+	if (pushButtonBetRaiseIsChecked)
+	{
 		pushButton_BetRaise->click();
 		pushButtonBetRaiseIsChecked = false;
 	}
-	if( pushButtonCallCheckIsChecked )  {
+	if (pushButtonCallCheckIsChecked)
+	{
 		pushButton_CallCheck->click();
 		pushButtonCallCheckIsChecked = false;
 	}
-	if( pushButtonFoldIsChecked ) {
-		if(lastPushButtonFoldString == CheckString+" /\n"+FoldString && pushButton_CallCheck->text() == CheckString) {
+	if (pushButtonFoldIsChecked)
+	{
+		if (lastPushButtonFoldString == CheckString + " /\n" + FoldString && pushButton_CallCheck->text() == CheckString)
+		{
 			pushButton_CallCheck->click();
-		} else {
+		}
+		else
+		{
 			pushButton_Fold->click();
 		}
 		pushButtonFoldIsChecked = false;
 	}
-	if( pushButtonAllInIsChecked ) {
+	if (pushButtonAllInIsChecked)
+	{
 		pushButton_AllIn->click();
 		pushButtonAllInIsChecked = false;
 	}
 
 	// automatic mode
-	switch (playingMode) {
+	switch (playingMode)
+	{
 	case 0: // Manual mode
 		break;
 	case 1: // Auto check / call all
 		myCallCheck();
 		break;
 	case 2: // Auto check / fold all
-		if (pushButton_CallCheck->text() == CheckString) {
+		if (pushButton_CallCheck->text() == CheckString)
+		{
 			myCheck();
-		} else {
+		}
+		else
+		{
 			myFold();
 		}
 		break;
 	}
 }
-
 
 void gameTableImpl::disableMyButtons()
 {
@@ -1592,7 +1705,7 @@ void gameTableImpl::disableMyButtons()
 
 	clearMyButtons();
 
-	//clear userWidgets
+	// clear userWidgets
 	horizontalSlider_bet->setDisabled(true);
 	spinBox_betValue->setDisabled(true);
 	horizontalSlider_bet->setMinimum(0);
@@ -1612,10 +1725,12 @@ void gameTableImpl::disableMyButtons()
 void gameTableImpl::myCallCheck()
 {
 
-	if(pushButton_CallCheck->text().startsWith(CallString)) {
+	if (pushButton_CallCheck->text().startsWith(CallString))
+	{
 		myCall();
 	}
-	if(pushButton_CallCheck->text() == CheckString) {
+	if (pushButton_CallCheck->text() == CheckString)
+	{
 		myCheck();
 	}
 }
@@ -1623,19 +1738,20 @@ void gameTableImpl::myCallCheck()
 void gameTableImpl::myFold()
 {
 
-	if(pushButton_Fold->text() == FoldString) {
+	if (pushButton_Fold->text() == FoldString)
+	{
 
 		std::shared_ptr<HandInterface> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
 		std::shared_ptr<Player> humanPlayer = currentHand->getSeatsList()->front();
 		humanPlayer->setAction(PLAYER_ACTION_FOLD);
 		humanPlayer->setTurn(0);
 
-		//set that i was the last active player. need this for unhighlighting groupbox
+		// set that i was the last active player. need this for unhighlighting groupbox
 		currentHand->setPreviousPlayerID(0);
 
 		// 		statusBar()->clearMessage();
 
-		//Spiel läuft weiter
+		// Spiel läuft weiter
 		myActionDone();
 	}
 }
@@ -1648,12 +1764,12 @@ void gameTableImpl::myCheck()
 	humanPlayer->setTurn(0);
 	humanPlayer->setAction(PLAYER_ACTION_CHECK);
 
-	//set that i was the last active player. need this for unhighlighting groupbox
+	// set that i was the last active player. need this for unhighlighting groupbox
 	currentHand->setPreviousPlayerID(0);
 
 	// 	statusBar()->clearMessage();
 
-	//Spiel läuft weiter
+	// Spiel läuft weiter
 	myActionDone();
 }
 
@@ -1666,10 +1782,13 @@ int gameTableImpl::getCallAmount()
 	std::shared_ptr<Player> humanPlayer = currentHand->getSeatsList()->front();
 	tempHighestSet = currentHand->getCurrentBettingRound()->getHighestSet();
 
-	if (humanPlayer->getCash() + humanPlayer->getSet() <= tempHighestSet) {
+	if (humanPlayer->getCash() + humanPlayer->getSet() <= tempHighestSet)
+	{
 
 		return humanPlayer->getCash();
-	} else {
+	}
+	else
+	{
 		return tempHighestSet - humanPlayer->getSet();
 	}
 }
@@ -1692,9 +1811,12 @@ int gameTableImpl::getBetAmount()
 
 	minimum = currentHand->getCurrentBettingRound()->getHighestSet() - humanPlayer->getSet() + currentHand->getCurrentBettingRound()->getMinimumRaise();
 
-	if(betValue < minimum) {
-		return min(minimum,humanPlayer->getCash());
-	} else {
+	if (betValue < minimum)
+	{
+		return min(minimum, humanPlayer->getCash());
+	}
+	else
+	{
 		return betValue;
 	}
 }
@@ -1708,12 +1830,15 @@ void gameTableImpl::myCall()
 
 	tempHighestSet = currentHand->getCurrentBettingRound()->getHighestSet();
 
-	if (humanPlayer->getCash() + humanPlayer->getSet() <= tempHighestSet) {
+	if (humanPlayer->getCash() + humanPlayer->getSet() <= tempHighestSet)
+	{
 
 		humanPlayer->setSet(humanPlayer->getCash());
 		humanPlayer->setCash(0);
 		humanPlayer->setAction(PLAYER_ACTION_ALLIN);
-	} else {
+	}
+	else
+	{
 		humanPlayer->setSet(tempHighestSet - humanPlayer->getSet());
 		humanPlayer->setAction(PLAYER_ACTION_CALL);
 	}
@@ -1722,12 +1847,12 @@ void gameTableImpl::myCall()
 	currentHand->getBoard()->collectSets();
 	refreshPot();
 
-	//set that i was the last active player. need this for unhighlighting groupbox
+	// set that i was the last active player. need this for unhighlighting groupbox
 	currentHand->setPreviousPlayerID(0);
 
 	// 	statusBar()->clearMessage();
 
-	//Spiel läuft weiter
+	// Spiel läuft weiter
 	myActionDone();
 }
 
@@ -1735,31 +1860,36 @@ void gameTableImpl::mySet()
 {
 	GameState currentState = myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getCurrentBettingRound()->getBettingRoundID();
 
-	if(pushButton_BetRaise->text() != "") {
+	if (pushButton_BetRaise->text() != "")
+	{
 
 		std::shared_ptr<HandInterface> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
 		std::shared_ptr<Player> humanPlayer = currentHand->getSeatsList()->front();
-	
+
 		int tempCash = humanPlayer->getCash();
 
 		// 		cout << "Set-Value " << getBetRaisePushButtonValue() << endl;
 		humanPlayer->setSet(getBetRaisePushButtonValue());
 
-		if (getBetRaisePushButtonValue() >= tempCash ) {
+		if (getBetRaisePushButtonValue() >= tempCash)
+		{
 
 			humanPlayer->setSet(humanPlayer->getCash());
 			humanPlayer->setCash(0);
 			humanPlayer->setAction(PLAYER_ACTION_ALLIN);
 
 			// full bet rule
-			if(currentHand->getCurrentBettingRound()->getHighestSet() + currentHand->getCurrentBettingRound()->getMinimumRaise() > humanPlayer->getSet()) {
+			if (currentHand->getCurrentBettingRound()->getHighestSet() + currentHand->getCurrentBettingRound()->getMinimumRaise() > humanPlayer->getSet())
+			{
 				currentHand->getCurrentBettingRound()->setFullBetRule(true);
 			}
 		}
 
-		if(myActionIsRaise) {
-			//do not if allIn
-			if(humanPlayer->getAction() != 6) {
+		if (myActionIsRaise)
+		{
+			// do not if allIn
+			if (humanPlayer->getAction() != 6)
+			{
 				humanPlayer->setAction(PLAYER_ACTION_RAISE);
 			}
 			myActionIsRaise = 0;
@@ -1767,9 +1897,11 @@ void gameTableImpl::mySet()
 			currentHand->getCurrentBettingRound()->setMinimumRaise(humanPlayer->getSet() - currentHand->getCurrentBettingRound()->getHighestSet());
 		}
 
-		if(myActionIsBet) {
-			//do not if allIn
-			if(humanPlayer->getAction() != 6) {
+		if (myActionIsBet)
+		{
+			// do not if allIn
+			if (humanPlayer->getAction() != 6)
+			{
 				humanPlayer->setAction(PLAYER_ACTION_BET);
 			}
 			myActionIsBet = 0;
@@ -1786,13 +1918,13 @@ void gameTableImpl::mySet()
 
 		// 		statusBar()->clearMessage();
 
-		//set that i was the last active player. need this for unhighlighting groupbox
+		// set that i was the last active player. need this for unhighlighting groupbox
 		currentHand->setPreviousPlayerID(0);
 
 		// lastPlayerAction für Karten umblättern reihenfolge setzrn
 		currentHand->setLastActionPlayerID(humanPlayer->getID());
 
-		//Spiel läuft weiter
+		// Spiel läuft weiter
 		myActionDone();
 	}
 }
@@ -1800,7 +1932,8 @@ void gameTableImpl::mySet()
 void gameTableImpl::myAllIn()
 {
 
-	if(pushButton_AllIn->text() == AllInString) {
+	if (pushButton_AllIn->text() == AllInString)
+	{
 
 		std::shared_ptr<HandInterface> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
 		std::shared_ptr<Player> humanPlayer = currentHand->getSeatsList()->front();
@@ -1810,18 +1943,19 @@ void gameTableImpl::myAllIn()
 		humanPlayer->setAction(PLAYER_ACTION_ALLIN);
 
 		// full bet rule
-		if(currentHand->getCurrentBettingRound()->getHighestSet() + currentHand->getCurrentBettingRound()->getMinimumRaise() > humanPlayer->getSet()) {
+		if (currentHand->getCurrentBettingRound()->getHighestSet() + currentHand->getCurrentBettingRound()->getMinimumRaise() > humanPlayer->getSet())
+		{
 			currentHand->getCurrentBettingRound()->setFullBetRule(true);
 		}
 
-		if(humanPlayer->getSet() > currentHand->getCurrentBettingRound()->getHighestSet()) {
+		if (humanPlayer->getSet() > currentHand->getCurrentBettingRound()->getHighestSet())
+		{
 			currentHand->getCurrentBettingRound()->setMinimumRaise(humanPlayer->getSet() - currentHand->getCurrentBettingRound()->getHighestSet());
 
 			currentHand->getCurrentBettingRound()->setHighestSet(humanPlayer->getSet());
 
 			// lastPlayerAction für Karten umblättern reihenfolge setzrn
 			currentHand->setLastActionPlayerID(humanPlayer->getID());
-
 		}
 
 		humanPlayer->setTurn(0);
@@ -1829,20 +1963,21 @@ void gameTableImpl::myAllIn()
 		currentHand->getBoard()->collectSets();
 		refreshPot();
 
-		//set that i was the last active player. need this for unhighlighting groupbox
+		// set that i was the last active player. need this for unhighlighting groupbox
 		currentHand->setPreviousPlayerID(0);
 
-		//Spiel läuft weiter
+		// Spiel läuft weiter
 		myActionDone();
 	}
 }
 
-
 void gameTableImpl::pushButtonBetRaiseClicked(bool checked)
 {
 
-	if (pushButton_BetRaise->isCheckable()) {
-		if(checked) {
+	if (pushButton_BetRaise->isCheckable())
+	{
+		if (checked)
+		{
 			pushButton_CallCheck->setChecked(false);
 			pushButton_Fold->setChecked(false);
 			pushButton_AllIn->setChecked(false);
@@ -1853,22 +1988,27 @@ void gameTableImpl::pushButtonBetRaiseClicked(bool checked)
 
 			pushButtonBetRaiseIsChecked = true;
 
-			if(!radioButton_manualAction->isChecked())
+			if (!radioButton_manualAction->isChecked())
 				radioButton_manualAction->click();
-
-		} else {
+		}
+		else
+		{
 			pushButtonBetRaiseIsChecked = false;
 			myLastPreActionBetValue = 0;
 		}
-	} else {
+	}
+	else
+	{
 		mySet();
 	}
 }
 void gameTableImpl::pushButtonBetRaiseHalfPotClicked(bool checked)
 {
 
-	if (pushButton_BetRaiseHalfPot->isCheckable()) {
-		if(checked) {
+	if (pushButton_BetRaiseHalfPot->isCheckable())
+	{
+		if (checked)
+		{
 			pushButton_BetRaiseTwoThirdPot->setChecked(false);
 			pushButton_BetRaisePot->setChecked(false);
 			pushButton_CallCheck->setChecked(false);
@@ -1881,14 +2021,17 @@ void gameTableImpl::pushButtonBetRaiseHalfPotClicked(bool checked)
 
 			pushButtonBetRaiseHalfPotIsChecked = true;
 
-			if(!radioButton_manualAction->isChecked())
+			if (!radioButton_manualAction->isChecked())
 				radioButton_manualAction->click();
-
-		} else {
+		}
+		else
+		{
 			pushButtonBetRaiseHalfPotIsChecked = false;
 			myLastPreActionBetValue = 0;
 		}
-	} else {
+	}
+	else
+	{
 
 		std::shared_ptr<HandInterface> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
 		int amount = currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() + currentHand->getCurrentBettingRound()->getHighestSet();
@@ -1896,16 +2039,18 @@ void gameTableImpl::pushButtonBetRaiseHalfPotClicked(bool checked)
 		amount = amount / 2;
 
 		pushButton_BetRaise->setText("");
-	    QString betRaise = currentHand->getCurrentBettingRound()->getHighestSet() == 0 ? BetString : RaiseString;
-        pushButton_BetRaise->setText(betRaise + "\n$" + QString("%L1").arg(amount));
+		QString betRaise = currentHand->getCurrentBettingRound()->getHighestSet() == 0 ? BetString : RaiseString;
+		pushButton_BetRaise->setText(betRaise + "\n$" + QString("%L1").arg(amount));
 		mySet();
 	}
 }
 void gameTableImpl::pushButtonBetRaiseTwoThirdPotClicked(bool checked)
 {
 
-	if (pushButton_BetRaiseTwoThirdPot->isCheckable()) {
-		if(checked) {
+	if (pushButton_BetRaiseTwoThirdPot->isCheckable())
+	{
+		if (checked)
+		{
 			pushButton_BetRaiseHalfPot->setChecked(false);
 			pushButton_BetRaisePot->setChecked(false);
 			pushButton_CallCheck->setChecked(false);
@@ -1918,30 +2063,35 @@ void gameTableImpl::pushButtonBetRaiseTwoThirdPotClicked(bool checked)
 
 			pushButtonBetRaiseTwoThirdPotIsChecked = true;
 
-			if(!radioButton_manualAction->isChecked())
+			if (!radioButton_manualAction->isChecked())
 				radioButton_manualAction->click();
-
-		} else {
+		}
+		else
+		{
 			pushButtonBetRaiseTwoThirdPotIsChecked = false;
 			myLastPreActionBetValue = 0;
 		}
-	} else {
+	}
+	else
+	{
 		std::shared_ptr<HandInterface> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
 		int amount = currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() + currentHand->getCurrentBettingRound()->getHighestSet();
 
 		amount = amount * 0.75;
 
 		pushButton_BetRaise->setText("");
-	    QString betRaise = currentHand->getCurrentBettingRound()->getHighestSet() == 0 ? BetString : RaiseString;
-        pushButton_BetRaise->setText(betRaise + "\n$" + QString("%L1").arg(amount));
+		QString betRaise = currentHand->getCurrentBettingRound()->getHighestSet() == 0 ? BetString : RaiseString;
+		pushButton_BetRaise->setText(betRaise + "\n$" + QString("%L1").arg(amount));
 		mySet();
 	}
 }
 void gameTableImpl::pushButtonBetRaisePotClicked(bool checked)
 {
 
-	if (pushButton_BetRaisePot->isCheckable()) {
-		if(checked) {
+	if (pushButton_BetRaisePot->isCheckable())
+	{
+		if (checked)
+		{
 			pushButton_BetRaiseHalfPot->setChecked(false);
 			pushButton_BetRaiseTwoThirdPot->setChecked(false);
 			pushButton_CallCheck->setChecked(false);
@@ -1954,29 +2104,34 @@ void gameTableImpl::pushButtonBetRaisePotClicked(bool checked)
 
 			pushButtonBetRaisePotIsChecked = true;
 
-			if(!radioButton_manualAction->isChecked())
+			if (!radioButton_manualAction->isChecked())
 				radioButton_manualAction->click();
-
-		} else {
+		}
+		else
+		{
 			pushButtonBetRaisePotIsChecked = false;
 			myLastPreActionBetValue = 0;
 		}
-	} else {
+	}
+	else
+	{
 
 		std::shared_ptr<HandInterface> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
-		int amount = currentHand->getBoard()->getPot()+ currentHand->getBoard()->getSets() + currentHand->getCurrentBettingRound()->getHighestSet();
+		int amount = currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() + currentHand->getCurrentBettingRound()->getHighestSet();
 
 		pushButton_BetRaise->setText("");
-	    QString betRaise = currentHand->getCurrentBettingRound()->getHighestSet() == 0 ? BetString : RaiseString;
-        pushButton_BetRaise->setText(betRaise + "\n$" + QString("%L1").arg(amount));
+		QString betRaise = currentHand->getCurrentBettingRound()->getHighestSet() == 0 ? BetString : RaiseString;
+		pushButton_BetRaise->setText(betRaise + "\n$" + QString("%L1").arg(amount));
 		mySet();
 	}
 }
 void gameTableImpl::pushButtonCallCheckClicked(bool checked)
 {
 
-	if (pushButton_CallCheck->isCheckable()) {
-		if(checked) {
+	if (pushButton_CallCheck->isCheckable())
+	{
+		if (checked)
+		{
 			pushButton_Fold->setChecked(false);
 			pushButton_BetRaise->setChecked(false);
 			pushButton_AllIn->setChecked(false);
@@ -1987,12 +2142,16 @@ void gameTableImpl::pushButtonCallCheckClicked(bool checked)
 
 			pushButtonCallCheckIsChecked = true;
 
-			if(!radioButton_manualAction->isChecked())
+			if (!radioButton_manualAction->isChecked())
 				radioButton_manualAction->click();
-		} else {
+		}
+		else
+		{
 			pushButtonCallCheckIsChecked = false;
 		}
-	} else {
+	}
+	else
+	{
 		myCallCheck();
 	}
 }
@@ -2000,8 +2159,10 @@ void gameTableImpl::pushButtonCallCheckClicked(bool checked)
 void gameTableImpl::pushButtonFoldClicked(bool checked)
 {
 
-	if (pushButton_Fold->isCheckable()) {
-		if(checked) {
+	if (pushButton_Fold->isCheckable())
+	{
+		if (checked)
+		{
 			pushButton_CallCheck->setChecked(false);
 			pushButton_BetRaise->setChecked(false);
 			pushButton_AllIn->setChecked(false);
@@ -2012,12 +2173,16 @@ void gameTableImpl::pushButtonFoldClicked(bool checked)
 
 			pushButtonFoldIsChecked = true;
 
-			if(!radioButton_manualAction->isChecked())
+			if (!radioButton_manualAction->isChecked())
 				radioButton_manualAction->click();
-		} else {
+		}
+		else
+		{
 			pushButtonFoldIsChecked = false;
 		}
-	} else {
+	}
+	else
+	{
 		myFold();
 	}
 }
@@ -2025,8 +2190,10 @@ void gameTableImpl::pushButtonFoldClicked(bool checked)
 void gameTableImpl::pushButtonAllInClicked(bool checked)
 {
 
-	if (pushButton_AllIn->isCheckable()) {
-		if(checked) {
+	if (pushButton_AllIn->isCheckable())
+	{
+		if (checked)
+		{
 			pushButton_CallCheck->setChecked(false);
 			pushButton_BetRaise->setChecked(false);
 			pushButton_Fold->setChecked(false);
@@ -2037,12 +2204,16 @@ void gameTableImpl::pushButtonAllInClicked(bool checked)
 
 			pushButtonAllInIsChecked = true;
 
-			if(!radioButton_manualAction->isChecked())
+			if (!radioButton_manualAction->isChecked())
 				radioButton_manualAction->click();
-		} else {
+		}
+		else
+		{
 			pushButtonAllInIsChecked = false;
 		}
-	} else {
+	}
+	else
+	{
 		myAllIn();
 	}
 }
@@ -2052,20 +2223,23 @@ void gameTableImpl::myActionDone()
 	std::shared_ptr<Player> humanPlayer = myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getSeatsList()->front();
 	GameState currentState = myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getCurrentBettingRound()->getBettingRoundID();
 	std::shared_ptr<HandInterface> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
-	const int nbPlayers = currentHand->getActivePlayerList()->size(); 
+	const int nbPlayers = currentHand->getActivePlayerList()->size();
 
 #ifdef LOG_POKER_EXEC
 
-	cout << endl << "\t" << humanPlayer->getPositionLabel(humanPlayer->getPosition()) 
-		<< "\tHuman player" 
-		<< "\t" << humanPlayer->getCardsValueString()   
-		<< "\t" <<  "stack = " << humanPlayer->getCash() 
-		<< ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
-		<< "\tPFR : " << humanPlayer->getStatistics(nbPlayers).getPreflopStatistics().getPreflopRaise() << endl << endl;
+	cout << endl
+		 << "\t" << humanPlayer->getPositionLabel(humanPlayer->getPosition())
+		 << "\tHuman player"
+		 << "\t" << humanPlayer->getCardsValueString()
+		 << "\t" << "stack = " << humanPlayer->getCash()
+		 << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
+		 << "\tPFR : " << humanPlayer->getStatistics(nbPlayers).getPreflopStatistics().getPreflopRaise() << endl
+		 << endl;
 
 #endif
 
-	if (currentState == GAME_STATE_PREFLOP){
+	if (currentState == GAME_STATE_PREFLOP)
+	{
 		humanPlayer->getCurrentHandActions().getPreflopActions().push_back(humanPlayer->getAction());
 		if (humanPlayer->getAction() == PLAYER_ACTION_RAISE || humanPlayer->getAction() == PLAYER_ACTION_ALLIN)
 			currentHand->setPreflopLastRaiserID(humanPlayer->getID());
@@ -2073,31 +2247,30 @@ void gameTableImpl::myActionDone()
 		if (humanPlayer->getAction() != PLAYER_ACTION_FOLD)
 			humanPlayer->updateUnplausibleRangesGivenPreflopActions();
 	}
-	else
-	if (currentState == GAME_STATE_FLOP){
+	else if (currentState == GAME_STATE_FLOP)
+	{
 		humanPlayer->getCurrentHandActions().getFlopActions().push_back(humanPlayer->getAction());
 		humanPlayer->updateFlopStatistics();
 		humanPlayer->updateUnplausibleRangesGivenFlopActions();
 	}
-	else
-	if (currentState == GAME_STATE_TURN){
+	else if (currentState == GAME_STATE_TURN)
+	{
 		humanPlayer->getCurrentHandActions().getTurnActions().push_back(humanPlayer->getAction());
 		humanPlayer->updateTurnStatistics();
 		humanPlayer->updateUnplausibleRangesGivenTurnActions();
 	}
-	else
-	if (currentState == GAME_STATE_RIVER){
+	else if (currentState == GAME_STATE_RIVER)
+	{
 		humanPlayer->getCurrentHandActions().getRiverActions().push_back(humanPlayer->getAction());
 		humanPlayer->updateRiverStatistics();
 		humanPlayer->updateUnplausibleRangesGivenRiverActions();
 	}
 
-
 	disableMyButtons();
 
 	nextPlayerAnimation();
 
-	//prevent escape button working while allIn
+	// prevent escape button working while allIn
 	myActionIsRaise = 0;
 	myActionIsBet = 0;
 
@@ -2107,28 +2280,25 @@ void gameTableImpl::myActionDone()
 
 	if (myAction == PLAYER_ACTION_FOLD)
 		cout << "FOLD";
-	else
-	if (myAction == PLAYER_ACTION_BET)
+	else if (myAction == PLAYER_ACTION_BET)
 		cout << "BET ";
-	else
-	if (myAction == PLAYER_ACTION_RAISE)
+	else if (myAction == PLAYER_ACTION_RAISE)
 		cout << "RAISE ";
-	else
-	if (myAction == PLAYER_ACTION_CALL)
+	else if (myAction == PLAYER_ACTION_CALL)
 		cout << "CALL ";
-	else
-	if (myAction == PLAYER_ACTION_CHECK)
+	else if (myAction == PLAYER_ACTION_CHECK)
 		cout << "CHECK";
-	else
-	if (myAction == PLAYER_ACTION_ALLIN)
+	else if (myAction == PLAYER_ACTION_ALLIN)
 		cout << "ALLIN ";
-	else
-	if (myAction == PLAYER_ACTION_NONE)
+	else if (myAction == PLAYER_ACTION_NONE)
 		cout << "NONE";
 	else
 		cout << "undefined ?";
 
-	cout << endl << endl << "---------------------------------------------------------------------------------" << endl << endl;
+	cout << endl
+		 << endl
+		 << "---------------------------------------------------------------------------------" << endl
+		 << endl;
 #endif
 }
 
@@ -2137,23 +2307,26 @@ void gameTableImpl::nextPlayerAnimation()
 
 	std::shared_ptr<HandInterface> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
 
-	//refresh Change Player
+	// refresh Change Player
 	refreshSet();
 
 	PlayerListConstIterator it_c;
 	PlayerList seatsList = currentHand->getSeatsList();
-	for (it_c=seatsList->begin(); it_c!=seatsList->end(); ++it_c) {
-		if((*it_c)->getID() == currentHand->getPreviousPlayerID()) break;
+	for (it_c = seatsList->begin(); it_c != seatsList->end(); ++it_c)
+	{
+		if ((*it_c)->getID() == currentHand->getPreviousPlayerID())
+			break;
 	}
 
-	if(currentHand->getPreviousPlayerID() != -1) {
+	if (currentHand->getPreviousPlayerID() != -1)
+	{
 		refreshAction(currentHand->getPreviousPlayerID(), (*it_c)->getAction());
 	}
 	refreshCash();
 
 	refreshHandsRanges();
 
-	//refresh actions for human player
+	// refresh actions for human player
 	updateMyButtonsState();
 
 	nextPlayerAnimationTimer->start(nextPlayerSpeed1);
@@ -2162,30 +2335,35 @@ void gameTableImpl::nextPlayerAnimation()
 void gameTableImpl::beRoAnimation2(int myBettingRoundID)
 {
 
-	switch(myBettingRoundID) {
+	switch (myBettingRoundID)
+	{
 
-	case 0: {
+	case 0:
+	{
 		preflopAnimation2();
 	}
 	break;
-	case 1: {
+	case 1:
+	{
 		flopAnimation2();
 	}
 	break;
-	case 2: {
+	case 2:
+	{
 		turnAnimation2();
 	}
 	break;
-	case 3: {
+	case 3:
+	{
 		riverAnimation2();
 	}
 	break;
-	default: {
+	default:
+	{
 		cout << "beRoAnimation2() Error" << endl;
 	}
 	}
 }
-
 
 void gameTableImpl::preflopAnimation1()
 {
@@ -2204,7 +2382,6 @@ void gameTableImpl::preflopAnimation2Action()
 {
 	myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getCurrentBettingRound()->nextPlayer();
 }
-
 
 void gameTableImpl::flopAnimation1()
 {
@@ -2290,37 +2467,47 @@ void gameTableImpl::postRiverRunAnimation2()
 	int nonfoldPlayersCounter = 0;
 	PlayerListConstIterator it_c;
 	PlayerList activePlayerList = currentGame->getActivePlayerList();
-	for (it_c=activePlayerList->begin(); it_c!=activePlayerList->end(); ++it_c) {
+	for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+	{
 		if ((*it_c)->getAction() != PLAYER_ACTION_FOLD)
 			nonfoldPlayersCounter++;
 	}
 
-	if(nonfoldPlayersCounter!=1) {
+	if (nonfoldPlayersCounter != 1)
+	{
 
-		if(!flipHolecardsAllInAlreadyDone) {
+		if (!flipHolecardsAllInAlreadyDone)
+		{
 
-			for (it_c=activePlayerList->begin(); it_c!=activePlayerList->end(); ++it_c) {
-				if((*it_c)->getAction() != PLAYER_ACTION_FOLD && (*it_c)->checkIfINeedToShowCards()) {
+			for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+			{
+				if ((*it_c)->getAction() != PLAYER_ACTION_FOLD && (*it_c)->checkIfINeedToShowCards())
+				{
 
 					showHoleCards((*it_c)->getID());
 				}
 			}
-			//Wenn einmal umgedreht dann fertig!!
+			// Wenn einmal umgedreht dann fertig!!
 			flipHolecardsAllInAlreadyDone = true;
-		} else {
-			for (it_c=activePlayerList->begin(); it_c!=activePlayerList->end(); ++it_c) {
-				if((*it_c)->getAction() != PLAYER_ACTION_FOLD) {
-					//set Player value (logging) for all in already shown cards
-					(*it_c)->setCardsFlip(1,3);
+		}
+		else
+		{
+			for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+			{
+				if ((*it_c)->getAction() != PLAYER_ACTION_FOLD)
+				{
+					// set Player value (logging) for all in already shown cards
+					(*it_c)->setCardsFlip(1, 3);
 				}
 			}
 		}
 		postRiverRunAnimation2Timer->start(postRiverRunAnimationSpeed);
-	} else {
+	}
+	else
+	{
 
 		postRiverRunAnimation3();
 	}
-
 }
 
 void gameTableImpl::postRiverRunAnimation3()
@@ -2332,110 +2519,137 @@ void gameTableImpl::postRiverRunAnimation3()
 	PlayerListConstIterator it_c;
 
 	PlayerList activePlayerList = currentHand->getActivePlayerList();
-	for(it_c=activePlayerList->begin(); it_c!=activePlayerList->end(); ++it_c) {
-		if((*it_c)->getAction() != PLAYER_ACTION_FOLD) {
+	for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+	{
+		if ((*it_c)->getAction() != PLAYER_ACTION_FOLD)
+		{
 			nonfoldPlayerCounter++;
 		}
 	}
 
 	list<unsigned> winners = currentHand->getBoard()->getWinners();
 
-	for(it_c=activePlayerList->begin(); it_c!=activePlayerList->end(); ++it_c) {
-		if((*it_c)->getAction() != PLAYER_ACTION_FOLD && (*it_c)->getCardsValueInt() == currentHand->getCurrentBettingRound()->getHighestCardsValue() ) {
+	for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+	{
+		if ((*it_c)->getAction() != PLAYER_ACTION_FOLD && (*it_c)->getCardsValueInt() == currentHand->getCurrentBettingRound()->getHighestCardsValue())
+		{
 
-			//Show "Winner" label
+			// Show "Winner" label
 			actionLabelArray[(*it_c)->getID()]->setPixmap(QPixmap::fromImage(QImage(myGameTableStyle->getActionPic(7))));
 
-			//show winnercards if more than one player is active TODO
-			if ( nonfoldPlayerCounter != 1 && myConfig->readConfigInt("ShowFadeOutCardsAnimation")) {
+			// show winnercards if more than one player is active TODO
+			if (nonfoldPlayerCounter != 1 && myConfig->readConfigInt("ShowFadeOutCardsAnimation"))
+			{
 
 				int j;
 				int bestHandPos[5];
 				(*it_c)->getBestHandPosition(bestHandPos);
 
 				bool index0 = true;
-				for(j=0; j<5; j++) {
-					if (bestHandPos[j] == 0 ) {
+				for (j = 0; j < 5; j++)
+				{
+					if (bestHandPos[j] == 0)
+					{
 						index0 = false;
 					}
 				}
-				if (index0) {
+				if (index0)
+				{
 					holeCardsArray[(*it_c)->getID()][0]->startFadeOut(guiGameSpeed); /*cout << "Fade Out index0" << endl;*/
 				}
-				//index 1 testen
+				// index 1 testen
 				bool index1 = true;
-				for(j=0; j<5; j++) {
-					if (bestHandPos[j] == 1 ) {
+				for (j = 0; j < 5; j++)
+				{
+					if (bestHandPos[j] == 1)
+					{
 						index1 = false;
 					}
 				}
-				if (index1) {
+				if (index1)
+				{
 					holeCardsArray[(*it_c)->getID()][1]->startFadeOut(guiGameSpeed); /*cout << "Fade Out index1" << endl;*/
 				}
-				//index 2 testen
+				// index 2 testen
 				bool index2 = true;
-				for(j=0; j<5; j++) {
-					if (bestHandPos[j] == 2 ) {
+				for (j = 0; j < 5; j++)
+				{
+					if (bestHandPos[j] == 2)
+					{
 						index2 = false;
 					}
 				}
-				if (index2) {
+				if (index2)
+				{
 					boardCardsArray[0]->startFadeOut(guiGameSpeed); /*cout << "Fade Out index2" << endl;*/
 				}
-				//index 3 testen
+				// index 3 testen
 				bool index3 = true;
-				for(j=0; j<5; j++) {
-					if (bestHandPos[j] == 3 ) {
+				for (j = 0; j < 5; j++)
+				{
+					if (bestHandPos[j] == 3)
+					{
 						index3 = false;
 					}
 				}
-				if (index3) {
+				if (index3)
+				{
 					boardCardsArray[1]->startFadeOut(guiGameSpeed); /*cout << "Fade Out index3" << endl;*/
 				}
-				//index 4 testen
+				// index 4 testen
 				bool index4 = true;
-				for(j=0; j<5; j++) {
-					if (bestHandPos[j] == 4 ) {
+				for (j = 0; j < 5; j++)
+				{
+					if (bestHandPos[j] == 4)
+					{
 						index4 = false;
 					}
 				}
-				if (index4) {
+				if (index4)
+				{
 					boardCardsArray[2]->startFadeOut(guiGameSpeed); /*cout << "Fade Out index4" << endl;*/
 				}
-				//index 5 testen
+				// index 5 testen
 				bool index5 = true;
-				for(j=0; j<5; j++) {
-					if (bestHandPos[j] == 5 ) {
+				for (j = 0; j < 5; j++)
+				{
+					if (bestHandPos[j] == 5)
+					{
 						index5 = false;
 					}
 				}
-				if (index5) {
+				if (index5)
+				{
 					boardCardsArray[3]->startFadeOut(guiGameSpeed); /*cout << "Fade Out index5" << endl;*/
 				}
-				//index 6 testen
+				// index 6 testen
 				bool index6 = true;
-				for(j=0; j<5; j++) {
-					if (bestHandPos[j] == 6 ) {
+				for (j = 0; j < 5; j++)
+				{
+					if (bestHandPos[j] == 6)
+					{
 						index6 = false;
 					}
 				}
-				if (index6) {
+				if (index6)
+				{
 					boardCardsArray[4]->startFadeOut(guiGameSpeed); /*cout << "Fade Out index6" << endl;*/
 				}
 			}
-			//Pot-Verteilung Loggen
-			//Wenn River dann auch das Blatt loggen!
-			// 			if (textLabel_handLabel->text() == "River") {
+			// Pot-Verteilung Loggen
+			// Wenn River dann auch das Blatt loggen!
+			//  			if (textLabel_handLabel->text() == "River") {
 
-			//set Player value (logging)
-			myGuiLog->logPlayerWinsMsg(QString::fromUtf8((*it_c)->getName().c_str()),(*it_c)->getLastMoneyWon(),true);
+			// set Player value (logging)
+			myGuiLog->logPlayerWinsMsg(QString::fromUtf8((*it_c)->getName().c_str()), (*it_c)->getLastMoneyWon(), true);
+		}
+		else
+		{
 
-		} else {
+			if (activePlayerList->size() != 1 && (*it_c)->getAction() != PLAYER_ACTION_FOLD && myConfig->readConfigInt("ShowFadeOutCardsAnimation"))
+			{
 
-			if( activePlayerList->size() != 1 && (*it_c)->getAction() != PLAYER_ACTION_FOLD && myConfig->readConfigInt("ShowFadeOutCardsAnimation")
-			  ) {
-
-				//aufgedeckte Gegner auch ausblenden
+				// aufgedeckte Gegner auch ausblenden
 				holeCardsArray[(*it_c)->getID()][0]->startFadeOut(guiGameSpeed);
 				holeCardsArray[(*it_c)->getID()][1]->startFadeOut(guiGameSpeed);
 			}
@@ -2444,33 +2658,38 @@ void gameTableImpl::postRiverRunAnimation3()
 
 	// log side pot winners -> TODO
 	list<unsigned>::iterator it_int;
-	for(it_c=activePlayerList->begin(); it_c!=activePlayerList->end(); ++it_c) {
-		if((*it_c)->getAction() != PLAYER_ACTION_FOLD && (*it_c)->getCardsValueInt() != currentHand->getCurrentBettingRound()->getHighestCardsValue() ) {
+	for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+	{
+		if ((*it_c)->getAction() != PLAYER_ACTION_FOLD && (*it_c)->getCardsValueInt() != currentHand->getCurrentBettingRound()->getHighestCardsValue())
+		{
 
-			for(it_int = winners.begin(); it_int != winners.end(); ++it_int) {
-				if((*it_int) == (*it_c)->getID()) {
+			for (it_int = winners.begin(); it_int != winners.end(); ++it_int)
+			{
+				if ((*it_int) == (*it_c)->getID())
+				{
 					myGuiLog->logPlayerWinsMsg(QString::fromUtf8((*it_c)->getName().c_str()), (*it_c)->getLastMoneyWon(), false);
 				}
 			}
-
 		}
 	}
 
-	for(it_c=activePlayerList->begin(); it_c!=activePlayerList->end(); ++it_c) {
-		if((*it_c)->getCash() == 0) {
-//			currentHand->getGuiInterface()->logPlayerSitsOut((*it_c)->getName());
+	for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+	{
+		if ((*it_c)->getCash() == 0)
+		{
+			//			currentHand->getGuiInterface()->logPlayerSitsOut((*it_c)->getName());
 		}
 	}
 
-//	textBrowser_Log->append("");
+	//	textBrowser_Log->append("");
 
-	postRiverRunAnimation3Timer->start(postRiverRunAnimationSpeed/2);
+	postRiverRunAnimation3Timer->start(postRiverRunAnimationSpeed / 2);
 }
 
 void gameTableImpl::postRiverRunAnimation4()
 {
 
-	distributePotAnimCounter=0;
+	distributePotAnimCounter = 0;
 	potDistributeTimer->start(winnerBlinkSpeed);
 }
 
@@ -2481,25 +2700,33 @@ void gameTableImpl::postRiverRunAnimation5()
 	PlayerList activePlayerList = currentHand->getActivePlayerList();
 	PlayerListConstIterator it_c;
 
-	if (distributePotAnimCounter<10) {
+	if (distributePotAnimCounter < 10)
+	{
 
-		if (distributePotAnimCounter==0 || distributePotAnimCounter==2 || distributePotAnimCounter==4 || distributePotAnimCounter==6 || distributePotAnimCounter==8) {
+		if (distributePotAnimCounter == 0 || distributePotAnimCounter == 2 || distributePotAnimCounter == 4 || distributePotAnimCounter == 6 || distributePotAnimCounter == 8)
+		{
 
 			label_Pot->setText("");
 
-			for(it_c=activePlayerList->begin(); it_c!=activePlayerList->end(); ++it_c) {
+			for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+			{
 
-				if((*it_c)->getAction() != PLAYER_ACTION_FOLD && (*it_c)->getCardsValueInt() == currentHand->getCurrentBettingRound()->getHighestCardsValue() ) {
+				if ((*it_c)->getAction() != PLAYER_ACTION_FOLD && (*it_c)->getCardsValueInt() == currentHand->getCurrentBettingRound()->getHighestCardsValue())
+				{
 
 					playerNameLabelArray[(*it_c)->getID()]->hide();
 				}
 			}
-		} else {
+		}
+		else
+		{
 			label_Pot->setText(PotString);
 
-			for(it_c=activePlayerList->begin(); it_c!=activePlayerList->end(); ++it_c) {
+			for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+			{
 
-				if((*it_c)->getAction() != PLAYER_ACTION_FOLD && (*it_c)->getCardsValueInt() == currentHand->getCurrentBettingRound()->getHighestCardsValue() ) {
+				if ((*it_c)->getAction() != PLAYER_ACTION_FOLD && (*it_c)->getCardsValueInt() == currentHand->getCurrentBettingRound()->getHighestCardsValue())
+				{
 
 					playerNameLabelArray[(*it_c)->getID()]->show();
 				}
@@ -2507,7 +2734,9 @@ void gameTableImpl::postRiverRunAnimation5()
 		}
 
 		distributePotAnimCounter++;
-	} else {
+	}
+	else
+	{
 		potDistributeTimer->stop();
 		postRiverRunAnimation5Timer->start(gameSpeed);
 	}
@@ -2516,7 +2745,8 @@ void gameTableImpl::postRiverRunAnimation5()
 void gameTableImpl::postRiverRunAnimation6()
 {
 	int i;
-	for (i=0; i<MAX_NUMBER_OF_PLAYERS; i++) {
+	for (i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
+	{
 		playerNameLabelArray[i]->show();
 	}
 
@@ -2530,18 +2760,23 @@ void gameTableImpl::postRiverRunAnimation6()
 
 	PlayerListConstIterator it_c;
 	PlayerList activePlayerList = currentHand->getActivePlayerList();
-	for (it_c=activePlayerList->begin(); it_c!=activePlayerList->end(); ++it_c) {
+	for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+	{
 
-		if ((*it_c)->getCash() > 0) playersPositiveCashCounter++;
+		if ((*it_c)->getCash() > 0)
+			playersPositiveCashCounter++;
 	}
 
-	if (playersPositiveCashCounter==1) {
+	if (playersPositiveCashCounter == 1)
+	{
 
-		for (it_c=activePlayerList->begin(); it_c!=activePlayerList->end(); ++it_c) {
+		for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+		{
 
-			if ((*it_c)->getCash() > 0) {
-				currentHand->getGuiInterface()->logPlayerWinGame((*it_c)->getName(),  
-					myStartWindow->getSession()->getCurrentGame()->getGameID());
+			if ((*it_c)->getCash() > 0)
+			{
+				currentHand->getGuiInterface()->logPlayerWinGame((*it_c)->getName(),
+																 myStartWindow->getSession()->getCurrentGame()->getGameID());
 			}
 		}
 
@@ -2551,7 +2786,7 @@ void gameTableImpl::postRiverRunAnimation6()
 		QFontMetrics tempMetrics = this->fontMetrics();
 		int width = tempMetrics.horizontalAdvance(tr("Start"));
 
-		pushButton_break->setMinimumSize(width+10,20);
+		pushButton_break->setMinimumSize(width + 10, 20);
 		pushButton_break->setText(tr("Start"));
 		blinkingStartButtonAnimationTimer->start(500);
 
@@ -2559,38 +2794,38 @@ void gameTableImpl::postRiverRunAnimation6()
 	}
 
 	postRiverRunAnimation6Timer->start(newRoundSpeed);
-
 }
 
 void gameTableImpl::showHoleCards(unsigned playerId, bool allIn)
 {
 	std::shared_ptr<HandInterface> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
-	//TempArrays
+	// TempArrays
 	QPixmap tempCardsPixmapArray[2];
 	int tempCardsIntArray[2];
-	int showFlipcardAnimation = myConfig->readConfigInt("ShowFlipCardsAnimation");
 	int j;
 	PlayerListConstIterator it_c;
 	PlayerList activePlayerList = currentHand->getActivePlayerList();
-	for (it_c=activePlayerList->begin(); it_c!=activePlayerList->end(); ++it_c) {
+	for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+	{
 
-		if((*it_c)->getID() == playerId) {
+		if ((*it_c)->getID() == playerId)
+		{
 
 			(*it_c)->getCards(tempCardsIntArray);
-			for(j=0; j<2; j++) {
+			for (j = 0; j < 2; j++)
+			{
 
-				if(showFlipcardAnimation) { // with Eye-Candy
-					holeCardsArray[(*it_c)->getID()][j]->startFlipCards(guiGameSpeed, QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir()+QString::number(tempCardsIntArray[j], 10)+".png")), flipside);
-				} else { //without Eye-Candy
-					tempCardsPixmapArray[j] = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir()+QString::number(tempCardsIntArray[j], 10)+".png"));
-					holeCardsArray[(*it_c)->getID()][j]->setPixmap(tempCardsPixmapArray[j], false);
-				}
+				tempCardsPixmapArray[j] = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + QString::number(tempCardsIntArray[j], 10) + ".png"));
+				holeCardsArray[(*it_c)->getID()][j]->setPixmap(tempCardsPixmapArray[j], false);
 			}
-			//set Player value (logging)
-			if(currentHand->getCurrentRound() < GAME_STATE_RIVER || allIn) {
-				(*it_c)->setCardsFlip(1,2); //for BettingRound before postriver or allin just log the hole cards
-			} else {
-				(*it_c)->setCardsFlip(1,1); //for postriver log the value
+			// set Player value (logging)
+			if (currentHand->getCurrentRound() < GAME_STATE_RIVER || allIn)
+			{
+				(*it_c)->setCardsFlip(1, 2); // for BettingRound before postriver or allin just log the hole cards
+			}
+			else
+			{
+				(*it_c)->setCardsFlip(1, 1); // for postriver log the value
 			}
 		}
 	}
@@ -2601,44 +2836,52 @@ void gameTableImpl::flipHolecardsAllIn()
 
 	std::shared_ptr<Game> currentGame = myStartWindow->getSession()->getCurrentGame();
 
-	if(!flipHolecardsAllInAlreadyDone && currentGame->getCurrentHand()->getCurrentRound() < GAME_STATE_RIVER) {
-		//Aktive Spieler zählen --> wenn nur noch einer nicht-folded dann keine Karten umdrehen
+	if (!flipHolecardsAllInAlreadyDone && currentGame->getCurrentHand()->getCurrentRound() < GAME_STATE_RIVER)
+	{
+		// Aktive Spieler zählen --> wenn nur noch einer nicht-folded dann keine Karten umdrehen
 		int nonfoldPlayersCounter = 0;
 		PlayerListConstIterator it_c;
 		PlayerList activePlayerList = currentGame->getActivePlayerList();
-		for (it_c=activePlayerList->begin(); it_c!=activePlayerList->end(); ++it_c) {
-			if ((*it_c)->getAction() != PLAYER_ACTION_FOLD) nonfoldPlayersCounter++;
+		for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+		{
+			if ((*it_c)->getAction() != PLAYER_ACTION_FOLD)
+				nonfoldPlayersCounter++;
 		}
 
-		if(nonfoldPlayersCounter!=1) {
-			for (it_c=activePlayerList->begin(); it_c!=activePlayerList->end(); ++it_c) {
-				if((*it_c)->getAction() != PLAYER_ACTION_FOLD) {
+		if (nonfoldPlayersCounter != 1)
+		{
+			for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+			{
+				if ((*it_c)->getAction() != PLAYER_ACTION_FOLD)
+				{
 
 					showHoleCards((*it_c)->getID());
 				}
 			}
 		}
 
-		//Wenn einmal umgedreht dann fertig!!
+		// Wenn einmal umgedreht dann fertig!!
 		flipHolecardsAllInAlreadyDone = true;
 	}
 }
 
-
 void gameTableImpl::startNewHand()
 {
-	if( !breakAfterCurrentHand) {
+	if (!breakAfterCurrentHand)
+	{
 		myStartWindow->getSession()->getCurrentGame()->initHand();
 		myStartWindow->getSession()->getCurrentGame()->startHand();
-	} else {
+	}
+	else
+	{
 
 		pushButton_break->setDisabled(false);
 
 		QFontMetrics tempMetrics = this->fontMetrics();
 		int width = tempMetrics.horizontalAdvance(tr("Start"));
-		pushButton_break->setMinimumSize(width+10,20);
+		pushButton_break->setMinimumSize(width + 10, 20);
 		pushButton_break->setText(tr("Start"));
-		breakAfterCurrentHand=false;
+		breakAfterCurrentHand = false;
 		blinkingStartButtonAnimationTimer->start(500);
 	}
 }
@@ -2651,25 +2894,28 @@ void gameTableImpl::handSwitchRounds()
 void gameTableImpl::nextRoundCleanGui()
 {
 
-	int i,j;
+	int i, j;
 
 	// GUI bereinigen - Bilder löschen, Animationen unterbrechen
-	QPixmap onePix = QPixmap::fromImage(QImage(myAppDataPath +"gfx/gui/misc/1px.png"));
-	for (i=0; i<5; i++ ) {
+	QPixmap onePix = QPixmap::fromImage(QImage(myAppDataPath + "gfx/gui/misc/1px.png"));
+	for (i = 0; i < 5; i++)
+	{
 		boardCardsArray[i]->setPixmap(onePix, false);
 		boardCardsArray[i]->setFadeOutAction(false);
 		boardCardsArray[i]->stopFlipCardsAnimation();
-
 	}
-	for (i=0; i<MAX_NUMBER_OF_PLAYERS; i++ ) {
-		for ( j=0; j<=1; j++ ) {
+	for (i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
+	{
+		for (j = 0; j <= 1; j++)
+		{
 			holeCardsArray[i][j]->setFadeOutAction(false);
 			holeCardsArray[i][j]->stopFlipCardsAnimation();
 		}
 	}
 
 	// for startNewGame during human player is active
-	if(myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getSeatsList()->front()->getActiveStatus() == 1) {
+	if (myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getSeatsList()->front()->getActiveStatus() == 1)
+	{
 		disableMyButtons();
 	}
 
@@ -2680,31 +2926,33 @@ void gameTableImpl::nextRoundCleanGui()
 	flipHolecardsAllInAlreadyDone = false;
 
 	// pause between hands and show opponents cards
-	if (myConfig->readConfigInt("PauseBetweenHands") ) {
+	if (myConfig->readConfigInt("PauseBetweenHands"))
+	{
 
 		pushButton_break->click();
-
-	} else {
-		//FIX STRG+N Bug
+	}
+	else
+	{
+		// FIX STRG+N Bug
 
 		pushButton_break->setEnabled(true);
-		breakAfterCurrentHand=false;
+		breakAfterCurrentHand = false;
 	}
 
-	//Clean breakbutton
+	// Clean breakbutton
 	blinkingStartButtonAnimationTimer->stop();
-	myGameTableStyle->setBreakButtonStyle(pushButton_break,0);
+	myGameTableStyle->setBreakButtonStyle(pushButton_break, 0);
 
 	blinkingStartButtonAnimationTimer->stop();
 	QFontMetrics tempMetrics = this->fontMetrics();
 	int width = tempMetrics.horizontalAdvance(tr("Show cards"));
-	pushButton_break->setMinimumSize(width+10,20);
+	pushButton_break->setMinimumSize(width + 10, 20);
 	pushButton_break->setText(tr("Show cards"));
 
-	//Clear Statusbarmessage
-	// 	statusBar()->clearMessage();
+	// Clear Statusbarmessage
+	//  	statusBar()->clearMessage();
 
-	//fix press mouse button during bankrupt with anti-peek-mode
+	// fix press mouse button during bankrupt with anti-peek-mode
 	this->mouseOverFlipCards(false);
 
 	horizontalSlider_bet->setDisabled(true);
@@ -2755,98 +3003,119 @@ void gameTableImpl::stopTimer()
 void gameTableImpl::setSpeeds()
 {
 
-	gameSpeed = (11-guiGameSpeed)*10;
-	dealCardsSpeed = (gameSpeed/2)*10; //milliseconds
-	preDealCardsSpeed = dealCardsSpeed*2; //Zeit for Karten aufdecken auf dem Board (Flop, Turn, River)
-	postDealCardsSpeed = dealCardsSpeed*3; //Zeit nach Karten aufdecken auf dem Board (Flop, Turn, River)
-	AllInDealCardsSpeed = dealCardsSpeed*4; //Zeit nach Karten aufdecken auf dem Board (Flop, Turn, River) bei AllIn
-	postRiverRunAnimationSpeed = gameSpeed*18;
-	winnerBlinkSpeed = gameSpeed*3; //milliseconds
-	newRoundSpeed = gameSpeed*35;
-	nextPlayerSpeed1 = gameSpeed*10; // Zeit zwischen dem Setzen des Spielers und dem Verdunkeln
-	nextPlayerSpeed2 = gameSpeed*4; // Zeit zwischen Verdunkeln des einen und aufhellen des anderen Spielers
-	nextPlayerSpeed3 = gameSpeed*7; // Zeit bis zwischen Aufhellen und Aktion
-	preflopNextPlayerSpeed = gameSpeed*10; // Zeit bis zwischen Aufhellen und Aktion im Preflop (etwas langsamer da nicht gerechnet wird. )
+	gameSpeed = (11 - guiGameSpeed) * 10;
+	dealCardsSpeed = (gameSpeed / 2) * 10;	  // milliseconds
+	preDealCardsSpeed = dealCardsSpeed * 2;	  // Zeit for Karten aufdecken auf dem Board (Flop, Turn, River)
+	postDealCardsSpeed = dealCardsSpeed * 3;  // Zeit nach Karten aufdecken auf dem Board (Flop, Turn, River)
+	AllInDealCardsSpeed = dealCardsSpeed * 4; // Zeit nach Karten aufdecken auf dem Board (Flop, Turn, River) bei AllIn
+	postRiverRunAnimationSpeed = gameSpeed * 18;
+	winnerBlinkSpeed = gameSpeed * 3; // milliseconds
+	newRoundSpeed = gameSpeed * 35;
+	nextPlayerSpeed1 = gameSpeed * 10;		 // Zeit zwischen dem Setzen des Spielers und dem Verdunkeln
+	nextPlayerSpeed2 = gameSpeed * 4;		 // Zeit zwischen Verdunkeln des einen und aufhellen des anderen Spielers
+	nextPlayerSpeed3 = gameSpeed * 7;		 // Zeit bis zwischen Aufhellen und Aktion
+	preflopNextPlayerSpeed = gameSpeed * 10; // Zeit bis zwischen Aufhellen und Aktion im Preflop (etwas langsamer da nicht gerechnet wird. )
 }
 
 void gameTableImpl::breakButtonClicked()
 {
 
-	if (pushButton_break->text() == tr("Show cards")) {
-		
-		pushButton_break->setDisabled(true);
-		breakAfterCurrentHand=true;
-		myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->setCardsShown(true);
+	if (pushButton_break->text() == tr("Show cards"))
+	{
 
-	} else if (pushButton_break->text() == tr("Start")) {
+		pushButton_break->setDisabled(true);
+		breakAfterCurrentHand = true;
+		myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->setCardsShown(true);
+	}
+	else if (pushButton_break->text() == tr("Start"))
+	{
 
 		myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->setCardsShown(false);
 
 		blinkingStartButtonAnimationTimer->stop();
-		//Set default Color
-		myGameTableStyle->setBreakButtonStyle(pushButton_break,0);
+		// Set default Color
+		myGameTableStyle->setBreakButtonStyle(pushButton_break, 0);
 		QFontMetrics tempMetrics = this->fontMetrics();
 		int width = tempMetrics.horizontalAdvance(tr("Show cards"));
-		pushButton_break->setMinimumSize(width+10,20);
+		pushButton_break->setMinimumSize(width + 10, 20);
 
 		pushButton_break->setText(tr("Show cards"));
 
-		if(currentGameOver) {
+		if (currentGameOver)
+		{
 			currentGameOver = false;
 			myStartWindow->callNewGameDialog();
-			
-		} else {
+		}
+		else
+		{
 			startNewHand();
 		}
 	}
 }
 
-void gameTableImpl::keyPressEvent ( QKeyEvent * event )
+void gameTableImpl::keyPressEvent(QKeyEvent *event)
 {
 
 	// 	cout << event->key() << endl;
 
-	//bool ctrlPressed = false;
+	// bool ctrlPressed = false;
 
-	if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return ) { /*ENTER*/
-		if(spinBox_betValue->hasFocus()) {
+	if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+	{ /*ENTER*/
+		if (spinBox_betValue->hasFocus())
+		{
 			pushButton_BetRaise->click();
 		}
 	}
-	if (event->key() == Qt::Key_F1) {
-		if (myConfig->readConfigInt("AlternateFKeysUserActionMode") == 0) {
+	if (event->key() == Qt::Key_F1)
+	{
+		if (myConfig->readConfigInt("AlternateFKeysUserActionMode") == 0)
+		{
 			pushButton_Fold->click();
-		} else {
+		}
+		else
+		{
 			pushButton_AllIn->click();
 		}
 	}
-	if (event->key() == Qt::Key_F2) {
-		if (myConfig->readConfigInt("AlternateFKeysUserActionMode") == 0) {
-			pushButton_CallCheck->click();
-		} else {
-			pushButton_BetRaise->click();
-		}
-
-	}
-	if (event->key() == Qt::Key_F3 ) {
-		if (myConfig->readConfigInt("AlternateFKeysUserActionMode") == 0) {
-			pushButton_BetRaise->click();
-		} else {
+	if (event->key() == Qt::Key_F2)
+	{
+		if (myConfig->readConfigInt("AlternateFKeysUserActionMode") == 0)
+		{
 			pushButton_CallCheck->click();
 		}
+		else
+		{
+			pushButton_BetRaise->click();
+		}
 	}
-	if (event->key() == Qt::Key_F6) {
+	if (event->key() == Qt::Key_F3)
+	{
+		if (myConfig->readConfigInt("AlternateFKeysUserActionMode") == 0)
+		{
+			pushButton_BetRaise->click();
+		}
+		else
+		{
+			pushButton_CallCheck->click();
+		}
+	}
+	if (event->key() == Qt::Key_F6)
+	{
 		radioButton_manualAction->click();
 	}
-	if (event->key() == Qt::Key_F7) {
-//		radioButton_autoCheckFold->click();
+	if (event->key() == Qt::Key_F7)
+	{
+		//		radioButton_autoCheckFold->click();
 	}
-	if (event->key() == Qt::Key_F8) {
-	//	radioButton_autoCheckCallAny->click();
+	if (event->key() == Qt::Key_F8)
+	{
+		//	radioButton_autoCheckCallAny->click();
 	}
-	if (event->key() == Qt::Key_Shift) {
+	if (event->key() == Qt::Key_Shift)
+	{
 		pushButton_break->click();
-			//ctrlPressed = true;
+		// ctrlPressed = true;
 	}
 }
 
@@ -2855,14 +3124,17 @@ void gameTableImpl::changePlayingMode()
 
 	int mode = -1;
 
-	if(radioButton_manualAction->isChecked()) {
-		mode=0;
+	if (radioButton_manualAction->isChecked())
+	{
+		mode = 0;
 	}
-	if(radioButton_autoCheckFold->isChecked()) {
-		mode=2;
+	if (radioButton_autoCheckFold->isChecked())
+	{
+		mode = 2;
 	}
-	if(radioButton_autoCheckCallAny->isChecked()) {
-		mode=1;
+	if (radioButton_autoCheckCallAny->isChecked())
+	{
+		mode = 1;
 	}
 
 	playingMode = mode;
@@ -2870,20 +3142,25 @@ void gameTableImpl::changePlayingMode()
 
 bool gameTableImpl::eventFilter(QObject *obj, QEvent *event)
 {
-	QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+	QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
-	if (/*obj == lineEdit_ChatInput && lineEdit_ChatInput->text() != "" && */event->type() == QEvent::KeyPress && keyEvent->key() == Qt::Key_Tab) {
-		//myChat->nickAutoCompletition();
+	if (/*obj == lineEdit_ChatInput && lineEdit_ChatInput->text() != "" && */ event->type() == QEvent::KeyPress && keyEvent->key() == Qt::Key_Tab)
+	{
+		// myChat->nickAutoCompletition();
 		return true;
-//    CURRENTLY not possible in Android :(  -->     } else if (event->type() == QEvent::KeyPress && keyEvent->key() == Qt::Key_Back) {
-//            event->ignore();
-//            closeGameTable();
-//            return true;
-        } else if (event->type() == QEvent::Close) {
+		//    CURRENTLY not possible in Android :(  -->     } else if (event->type() == QEvent::KeyPress && keyEvent->key() == Qt::Key_Back) {
+		//            event->ignore();
+		//            closeGameTable();
+		//            return true;
+	}
+	else if (event->type() == QEvent::Close)
+	{
 		event->ignore();
 		closeGameTable();
 		return true;
-	} else {
+	}
+	else
+	{
 		// pass the event on to the parent class
 		return QMainWindow::eventFilter(obj, event);
 	}
@@ -2893,13 +3170,19 @@ void gameTableImpl::switchLogWindow()
 {
 
 	int tab = 0;
-	if (groupBox_RightToolBox->isHidden()) {
+	if (groupBox_RightToolBox->isHidden())
+	{
 		tabWidget_Right->setCurrentIndex(tab);
 		groupBox_RightToolBox->show();
-	}	else {
-		if (tabWidget_Right->currentIndex() == tab) {
+	}
+	else
+	{
+		if (tabWidget_Right->currentIndex() == tab)
+		{
 			groupBox_RightToolBox->hide();
-		} else {
+		}
+		else
+		{
 			tabWidget_Right->setCurrentIndex(tab);
 		}
 	}
@@ -2909,13 +3192,19 @@ void gameTableImpl::switchAwayWindow()
 {
 
 	int tab = 1;
-	if (groupBox_RightToolBox->isHidden()) {
+	if (groupBox_RightToolBox->isHidden())
+	{
 		tabWidget_Right->setCurrentIndex(tab);
 		groupBox_RightToolBox->show();
-	}	else {
-		if (tabWidget_Right->currentIndex() == tab) {
+	}
+	else
+	{
+		if (tabWidget_Right->currentIndex() == tab)
+		{
 			groupBox_RightToolBox->hide();
-		} else {
+		}
+		else
+		{
 			tabWidget_Right->setCurrentIndex(tab);
 		}
 	}
@@ -2926,25 +3215,33 @@ void gameTableImpl::switchChanceWindow()
 
 	int tab = 2;
 
-	if (groupBox_RightToolBox->isHidden()) {
+	if (groupBox_RightToolBox->isHidden())
+	{
 		tabWidget_Right->setCurrentIndex(tab);
 		groupBox_RightToolBox->show();
-	}	else {
-		if (tabWidget_Right->currentIndex() == tab) {
+	}
+	else
+	{
+		if (tabWidget_Right->currentIndex() == tab)
+		{
 			groupBox_RightToolBox->hide();
-		} else {
+		}
+		else
+		{
 			tabWidget_Right->setCurrentIndex(tab);
 		}
 	}
-
 }
 
 void gameTableImpl::switchFullscreen()
 {
 
-	if (this->isFullScreen()) {
+	if (this->isFullScreen())
+	{
 		this->showNormal();
-	} else {
+	}
+	else
+	{
 		this->showFullScreen();
 	}
 }
@@ -2953,22 +3250,24 @@ void gameTableImpl::blinkingStartButtonAnimationAction()
 {
 
 	QString style = pushButton_break->styleSheet();
-	if(style.contains("QPushButton:enabled { background-color: #"+myGameTableStyle->getBreakLobbyButtonBgColor())) {
-		myGameTableStyle->setBreakButtonStyle(pushButton_break,1);
-	} else {
-		myGameTableStyle->setBreakButtonStyle(pushButton_break,0);
+	if (style.contains("QPushButton:enabled { background-color: #" + myGameTableStyle->getBreakLobbyButtonBgColor()))
+	{
+		myGameTableStyle->setBreakButtonStyle(pushButton_break, 1);
+	}
+	else
+	{
+		myGameTableStyle->setBreakButtonStyle(pushButton_break, 0);
 	}
 }
 
-//void gameTableImpl::sendChatMessage()
+// void gameTableImpl::sendChatMessage()
 //{
 //	myChat->sendMessage();
-//}
-//void gameTableImpl::checkChatInputLength(QString string)
+// }
+// void gameTableImpl::checkChatInputLength(QString string)
 //{
 //	myChat->checkInputLength(string);
-//}
-
+// }
 
 void gameTableImpl::GameModification()
 {
@@ -2979,23 +3278,25 @@ void gameTableImpl::GameModification()
 	int width = tempMetrics.horizontalAdvance(tr("Show cards"));
 
 	pushButton_break->setText(tr("Show cards"));
-	pushButton_break->setMinimumSize(width+10,20);
+	pushButton_break->setMinimumSize(width + 10, 20);
 
-	//Set the playing mode to "manual"
+	// Set the playing mode to "manual"
 	radioButton_manualAction->click();
 
-	//restore saved windows geometry
+	// restore saved windows geometry
 	restoreGameTableGeometry();
 
-	if(myGameTableStyle->getState() != GT_STYLE_OK) 
+	if (myGameTableStyle->getState() != GT_STYLE_OK)
 		LOG_ERROR(__FILE__ << " (" << __LINE__ << "):  invalid game style");
 }
 
 void gameTableImpl::mouseOverFlipCards(bool front)
 {
 
-	if(myStartWindow->getSession()->getCurrentGame()) {
-		if(myConfig->readConfigInt("AntiPeekMode") && myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getSeatsList()->front()->getActiveStatus()/* && myStartWindow->getSession()->getCurrentGame()->getSeatsList()->front()->getAction() != PLAYER_ACTION_FOLD*/) {
+	if (myStartWindow->getSession()->getCurrentGame())
+	{
+		if (myConfig->readConfigInt("AntiPeekMode") && myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getSeatsList()->front()->getActiveStatus() /* && myStartWindow->getSession()->getCurrentGame()->getSeatsList()->front()->getAction() != PLAYER_ACTION_FOLD*/)
+		{
 			holeCardsArray[0][0]->signalFastFlipCards(front);
 			holeCardsArray[0][1]->signalFastFlipCards(front);
 		}
@@ -3007,11 +3308,15 @@ void gameTableImpl::updateMyButtonsState(int mode)
 
 	std::shared_ptr<HandInterface> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
 
-	if(currentHand->getPreviousPlayerID() == 0) {
+	if (currentHand->getPreviousPlayerID() == 0)
+	{
 		myButtonsCheckable(false);
 		clearMyButtons();
-	} else {
-		if(currentHand->getSeatsList()->front()->getAction() != PLAYER_ACTION_ALLIN) { // dont show pre-actions after flip cards when allin
+	}
+	else
+	{
+		if (currentHand->getSeatsList()->front()->getAction() != PLAYER_ACTION_ALLIN)
+		{ // dont show pre-actions after flip cards when allin
 			myButtonsCheckable(true);
 			provideMyActions(mode);
 		}
@@ -3025,7 +3330,6 @@ void gameTableImpl::uncheckMyButtons()
 	pushButton_CallCheck->setChecked(false);
 	pushButton_Fold->setChecked(false);
 	pushButton_AllIn->setChecked(false);
-
 }
 
 void gameTableImpl::resetButtonsCheckStateMemory()
@@ -3053,11 +3357,13 @@ void gameTableImpl::myButtonsCheckable(bool state)
 
 	std::shared_ptr<HandInterface> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
 
-	if(state) {
-		//checkable
+	if (state)
+	{
+		// checkable
 
 		// exception: full bet rule
-		if(!currentHand->getCurrentBettingRound()->getFullBetRule()) {
+		if (!currentHand->getCurrentBettingRound()->getFullBetRule())
+		{
 			pushButton_BetRaise->setCheckable(true);
 			pushButton_BetRaiseHalfPot->setCheckable(true);
 			pushButton_BetRaiseTwoThirdPot->setCheckable(true);
@@ -3067,13 +3373,15 @@ void gameTableImpl::myButtonsCheckable(bool state)
 		pushButton_Fold->setCheckable(true);
 		pushButton_AllIn->setCheckable(true);
 
-		//design
-		myGameTableStyle->setButtonsStyle(pushButton_BetRaise,pushButton_BetRaiseHalfPot, pushButton_BetRaiseTwoThirdPot, pushButton_BetRaisePot, 
-			pushButton_CallCheck, pushButton_Fold, pushButton_AllIn, 2);
+		// design
+		myGameTableStyle->setButtonsStyle(pushButton_BetRaise, pushButton_BetRaiseHalfPot, pushButton_BetRaiseTwoThirdPot, pushButton_BetRaisePot,
+										  pushButton_CallCheck, pushButton_Fold, pushButton_AllIn, 2);
 
 		myButtonsAreCheckable = true;
-	} else {
-		//not checkable
+	}
+	else
+	{
+		// not checkable
 
 		pushButton_BetRaise->setCheckable(false);
 		pushButton_BetRaiseHalfPot->setCheckable(false);
@@ -3084,21 +3392,24 @@ void gameTableImpl::myButtonsCheckable(bool state)
 		pushButton_AllIn->setCheckable(false);
 
 		QString hover;
-		if(pushButton_AllIn->text()==AllInString) {
-			myGameTableStyle->setButtonsStyle(pushButton_BetRaise,pushButton_BetRaiseHalfPot, pushButton_BetRaiseTwoThirdPot, pushButton_BetRaisePot, 
-					pushButton_CallCheck, pushButton_Fold, pushButton_AllIn, 0);
-		} else {
-			myGameTableStyle->setButtonsStyle(pushButton_BetRaise,pushButton_BetRaiseHalfPot, pushButton_BetRaiseTwoThirdPot, pushButton_BetRaisePot, 
-					pushButton_CallCheck, pushButton_Fold, pushButton_AllIn, 1);
+		if (pushButton_AllIn->text() == AllInString)
+		{
+			myGameTableStyle->setButtonsStyle(pushButton_BetRaise, pushButton_BetRaiseHalfPot, pushButton_BetRaiseTwoThirdPot, pushButton_BetRaisePot,
+											  pushButton_CallCheck, pushButton_Fold, pushButton_AllIn, 0);
+		}
+		else
+		{
+			myGameTableStyle->setButtonsStyle(pushButton_BetRaise, pushButton_BetRaiseHalfPot, pushButton_BetRaiseTwoThirdPot, pushButton_BetRaisePot,
+											  pushButton_CallCheck, pushButton_Fold, pushButton_AllIn, 1);
 		}
 
 		myButtonsAreCheckable = false;
 	}
 }
 
-void gameTableImpl::showMaximized ()
+void gameTableImpl::showMaximized()
 {
-	this->showFullScreen ();
+	this->showFullScreen();
 }
 
 void gameTableImpl::closeGameTable()
@@ -3106,83 +3417,100 @@ void gameTableImpl::closeGameTable()
 
 	bool close = true;
 
-	if(close) {
-		//now really close the table
-//		myStartWindow->getSession()->terminateNetworkClient();
+	if (close)
+	{
+		// now really close the table
+		//		myStartWindow->getSession()->terminateNetworkClient();
 		stopTimer();
 		saveGameTableGeometry();
 		myStartWindow->show();
 		this->hide();
 	}
-
 }
 
 void gameTableImpl::changeSpinBoxBetValue(int value)
 {
-        if(betSliderChangedByInput) {
-                //prevent interval cutting of spinBox_betValue input from code below
-                betSliderChangedByInput = false;
-        }
-        else {
+	if (betSliderChangedByInput)
+	{
+		// prevent interval cutting of spinBox_betValue input from code below
+		betSliderChangedByInput = false;
+	}
+	else
+	{
 
-            if(horizontalSlider_bet->value() == horizontalSlider_bet->maximum()) {
+		if (horizontalSlider_bet->value() == horizontalSlider_bet->maximum())
+		{
 
-                spinBox_betValue->setValue(horizontalSlider_bet->value());
-            }
-            else {
+			spinBox_betValue->setValue(horizontalSlider_bet->value());
+		}
+		else
+		{
 
-                int temp;
-                if(horizontalSlider_bet->maximum() <= 1000 ) {
-                        temp = (int)((value/10)*10);
-                } else if(horizontalSlider_bet->maximum() > 1000 && horizontalSlider_bet->maximum() <= 10000) {
-                        temp = (int)((value/50)*50);
-                } else if(horizontalSlider_bet->maximum() > 10000 && horizontalSlider_bet->maximum() <= 100000) {
-                        temp = (int)((value/500)*500);
-                } else {
-                        temp = (int)((value/5000)*5000);
-                }
+			int temp;
+			if (horizontalSlider_bet->maximum() <= 1000)
+			{
+				temp = (int)((value / 10) * 10);
+			}
+			else if (horizontalSlider_bet->maximum() > 1000 && horizontalSlider_bet->maximum() <= 10000)
+			{
+				temp = (int)((value / 50) * 50);
+			}
+			else if (horizontalSlider_bet->maximum() > 10000 && horizontalSlider_bet->maximum() <= 100000)
+			{
+				temp = (int)((value / 500) * 500);
+			}
+			else
+			{
+				temp = (int)((value / 5000) * 5000);
+			}
 
-                if(temp < horizontalSlider_bet->minimum())
-                        spinBox_betValue->setValue(horizontalSlider_bet->minimum());
-                else
-                        spinBox_betValue->setValue(temp);
-            }
-        }
+			if (temp < horizontalSlider_bet->minimum())
+				spinBox_betValue->setValue(horizontalSlider_bet->minimum());
+			else
+				spinBox_betValue->setValue(temp);
+		}
+	}
 }
 
 void gameTableImpl::spinBoxBetValueChanged(int value)
 {
 
-    if(horizontalSlider_bet->isEnabled()) {
+	if (horizontalSlider_bet->isEnabled())
+	{
 
-        QString betRaise = pushButton_BetRaise->text().section("\n",0 ,0);
+		QString betRaise = pushButton_BetRaise->text().section("\n", 0, 0);
 
-        if(value >= horizontalSlider_bet->minimum()) {
+		if (value >= horizontalSlider_bet->minimum())
+		{
 
-            if(value > horizontalSlider_bet->maximum()) { // print the maximum
-                pushButton_BetRaise->setText(betRaise + "\n$" + QString("%L1").arg(horizontalSlider_bet->maximum()));
-                betSliderChangedByInput = true;
-                horizontalSlider_bet->setValue(horizontalSlider_bet->maximum());
-            } else { // really print the value
-                pushButton_BetRaise->setText(betRaise + "\n$" + QString("%L1").arg(value));
-                betSliderChangedByInput = true;
-                horizontalSlider_bet->setValue(value);
-            }
-        } else { // print the minimum
-            pushButton_BetRaise->setText(betRaise + "\n$" + QString("%L1").arg(horizontalSlider_bet->minimum()));
-            betSliderChangedByInput = true;
-            horizontalSlider_bet->setValue(horizontalSlider_bet->minimum());
-        }
-    }
+			if (value > horizontalSlider_bet->maximum())
+			{ // print the maximum
+				pushButton_BetRaise->setText(betRaise + "\n$" + QString("%L1").arg(horizontalSlider_bet->maximum()));
+				betSliderChangedByInput = true;
+				horizontalSlider_bet->setValue(horizontalSlider_bet->maximum());
+			}
+			else
+			{ // really print the value
+				pushButton_BetRaise->setText(betRaise + "\n$" + QString("%L1").arg(value));
+				betSliderChangedByInput = true;
+				horizontalSlider_bet->setValue(value);
+			}
+		}
+		else
+		{ // print the minimum
+			pushButton_BetRaise->setText(betRaise + "\n$" + QString("%L1").arg(horizontalSlider_bet->minimum()));
+			betSliderChangedByInput = true;
+			horizontalSlider_bet->setValue(horizontalSlider_bet->minimum());
+		}
+	}
 }
-
 
 void gameTableImpl::refreshHandsRanges()
 {
 	const string style = "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Ubuntu';  font-size:8pt; font-weight:400; color:#000000;\">";
 	stringstream displayText;
 
-	static map<char,string> colors;
+	static map<char, string> colors;
 	colors['d'] = "<font size=+1 color=#FF0000><b><>&diams;</b></font>";
 	colors['h'] = "<font size=+1 color=#FF0000><b>&hearts;</b></font>";
 	colors['s'] = "<font size=+1><b>&spades;</b></font>";
@@ -3193,35 +3521,34 @@ void gameTableImpl::refreshHandsRanges()
 	PlayerList players = currentHand->getActivePlayerList();
 
 	PlayerListConstIterator it_c;
-	
-	for (it_c=players->begin(); it_c != players->end(); ++it_c) {
+
+	for (it_c = players->begin(); it_c != players->end(); ++it_c)
+	{
 
 		// display ranges for every player who didn't fold preflop
 		if ((*it_c)->getCurrentHandActions().getPreflopActions().size() > 0 &&
-			(*it_c)->getCurrentHandActions().getPreflopActions().front() != PLAYER_ACTION_FOLD){
+			(*it_c)->getCurrentHandActions().getPreflopActions().front() != PLAYER_ACTION_FOLD)
+		{
 
 			displayText << style << "<b>" << ((*it_c)->getName() == " " ? "Human" : (*it_c)->getName()) << "</b> : ";
-			
+
 			std::istringstream oss((*it_c)->getEstimatedRange());
 			std::string singleRange;
 
-			while(getline(oss, singleRange, ',')) {
+			while (getline(oss, singleRange, ','))
+			{
 
-				if (singleRange.size() != 4 || singleRange.find('+') != string::npos){
+				if (singleRange.size() != 4 || singleRange.find('+') != string::npos)
+				{
 					displayText << "," << singleRange;
 					continue;
 				}
 
 				// display a real hand with graphical symbols for clubs, spade, heart and diamonds
-				displayText << ","  <<	singleRange.at(0) << 
-										colors[singleRange.at(1)] <<
-										singleRange.at(2) << 
-										colors[singleRange.at(3)];
+				displayText << "," << singleRange.at(0) << colors[singleRange.at(1)] << singleRange.at(2) << colors[singleRange.at(3)];
 			}
 
 			displayText << "<BR>";
-
-
 		}
 	}
 
@@ -3236,51 +3563,55 @@ void gameTableImpl::refreshCardsChance(GameState BettingRound)
 	std::shared_ptr<HumanPlayer> humanPlayer = std::static_pointer_cast<HumanPlayer>(player);
 
 	const string style = "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Ubuntu';  font-size:8pt; font-weight:400; color:#ffffff;\">";
-	
+
 	stringstream displayText;
 	displayText.precision(0);
 
-	
-	if(humanPlayer->getActiveStatus()) {
+	if (humanPlayer->getActiveStatus())
+	{
 
 		std::shared_ptr<HandInterface> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
 		PlayerList players = currentHand->getActivePlayerList();
 
-		if(humanPlayer->getAction() == PLAYER_ACTION_FOLD || currentHand->getCurrentRound() == GAME_STATE_PREFLOP) {	
+		if (humanPlayer->getAction() == PLAYER_ACTION_FOLD || currentHand->getCurrentRound() == GAME_STATE_PREFLOP)
+		{
 			label_chance->setText("");
-
-		} else {
+		}
+		else
+		{
 
 			string state = "Flop";
 			if (currentHand->getCurrentRound() == GAME_STATE_TURN)
 				state = "Turn";
 			if (currentHand->getCurrentRound() == GAME_STATE_RIVER)
 				state = "River";
-			 
-			displayText << style << state << " :";
-	
-			const int nbOpponents = max(1, currentHand->getRunningPlayerList()->size() - 1); 
 
-			if (nbOpponents > 0){
+			displayText << style << state << " :";
+
+			const int nbOpponents = max(1, currentHand->getRunningPlayerList()->size() - 1);
+
+			if (nbOpponents > 0)
+			{
 
 				SimResults r = humanPlayer->getHandSimulation();
 
 				displayText << style << "<br>" << tr("Against ").toStdString() << nbOpponents << tr(" opponent(s) with random hands :").toStdString();
 
 				displayText << style << fixed
-					<< tr("I have ").toStdString() << r.win * 100 << tr("% chances to win right now<br>").toStdString() 
-					<< tr("I have ").toStdString() << r.winSd * 100 << tr("% chances to win at showdown<br>").toStdString() 
-					<< tr("I have ").toStdString() << r.tieSd * 100<< tr("% chances to tie at showdown").toStdString();
+							<< tr("I have ").toStdString() << r.win * 100 << tr("% chances to win right now<br>").toStdString()
+							<< tr("I have ").toStdString() << r.winSd * 100 << tr("% chances to win at showdown<br>").toStdString()
+							<< tr("I have ").toStdString() << r.tieSd * 100 << tr("% chances to tie at showdown").toStdString();
 			}
 
-			label_chance->setText(QApplication::translate("gametableimpl",displayText.str().c_str(), 0));
+			label_chance->setText(QApplication::translate("gametableimpl", displayText.str().c_str(), 0));
 		}
-	} 
+	}
 }
 
 void gameTableImpl::refreshActionButtonFKeyIndicator(bool clear)
 {
-	if(clear) {
+	if (clear)
+	{
 		pushButton_AllIn->setFKeyText("");
 		pushButton_BetRaise->setFKeyText("");
 		pushButton_BetRaiseHalfPot->setFKeyText("");
@@ -3288,23 +3619,42 @@ void gameTableImpl::refreshActionButtonFKeyIndicator(bool clear)
 		pushButton_BetRaisePot->setFKeyText("");
 		pushButton_CallCheck->setFKeyText("");
 		pushButton_Fold->setFKeyText("");
-	} else {
-		if(myConfig->readConfigInt("AlternateFKeysUserActionMode") == 0 ) {
-			if(!pushButton_AllIn->text().isEmpty()) pushButton_AllIn->setFKeyText("");
-			if(!pushButton_BetRaise->text().isEmpty()) pushButton_BetRaise->setFKeyText("F3");
-			if(!pushButton_BetRaiseHalfPot->text().isEmpty()) pushButton_BetRaiseHalfPot->setFKeyText("");
-			if(!pushButton_BetRaiseTwoThirdPot->text().isEmpty()) pushButton_BetRaiseTwoThirdPot->setFKeyText("");
-			if(!pushButton_BetRaisePot->text().isEmpty()) pushButton_BetRaisePot->setFKeyText("");
-			if(!pushButton_CallCheck->text().isEmpty()) pushButton_CallCheck->setFKeyText("F2");
-			if(!pushButton_Fold->text().isEmpty()) pushButton_Fold->setFKeyText("F1");
-		} else {
-			if(!pushButton_AllIn->text().isEmpty()) pushButton_AllIn->setFKeyText("F1");
-			if(!pushButton_BetRaise->text().isEmpty()) pushButton_BetRaise->setFKeyText("F2");
-			if(!pushButton_BetRaiseHalfPot->text().isEmpty()) pushButton_BetRaiseHalfPot->setFKeyText("");
-			if(!pushButton_BetRaiseTwoThirdPot->text().isEmpty()) pushButton_BetRaiseTwoThirdPot->setFKeyText("");
-			if(!pushButton_BetRaisePot->text().isEmpty()) pushButton_BetRaisePot->setFKeyText("");
-			if(!pushButton_CallCheck->text().isEmpty()) pushButton_CallCheck->setFKeyText("F3");
-			if(!pushButton_Fold->text().isEmpty()) pushButton_Fold->setFKeyText("");
+	}
+	else
+	{
+		if (myConfig->readConfigInt("AlternateFKeysUserActionMode") == 0)
+		{
+			if (!pushButton_AllIn->text().isEmpty())
+				pushButton_AllIn->setFKeyText("");
+			if (!pushButton_BetRaise->text().isEmpty())
+				pushButton_BetRaise->setFKeyText("F3");
+			if (!pushButton_BetRaiseHalfPot->text().isEmpty())
+				pushButton_BetRaiseHalfPot->setFKeyText("");
+			if (!pushButton_BetRaiseTwoThirdPot->text().isEmpty())
+				pushButton_BetRaiseTwoThirdPot->setFKeyText("");
+			if (!pushButton_BetRaisePot->text().isEmpty())
+				pushButton_BetRaisePot->setFKeyText("");
+			if (!pushButton_CallCheck->text().isEmpty())
+				pushButton_CallCheck->setFKeyText("F2");
+			if (!pushButton_Fold->text().isEmpty())
+				pushButton_Fold->setFKeyText("F1");
+		}
+		else
+		{
+			if (!pushButton_AllIn->text().isEmpty())
+				pushButton_AllIn->setFKeyText("F1");
+			if (!pushButton_BetRaise->text().isEmpty())
+				pushButton_BetRaise->setFKeyText("F2");
+			if (!pushButton_BetRaiseHalfPot->text().isEmpty())
+				pushButton_BetRaiseHalfPot->setFKeyText("");
+			if (!pushButton_BetRaiseTwoThirdPot->text().isEmpty())
+				pushButton_BetRaiseTwoThirdPot->setFKeyText("");
+			if (!pushButton_BetRaisePot->text().isEmpty())
+				pushButton_BetRaisePot->setFKeyText("");
+			if (!pushButton_CallCheck->text().isEmpty())
+				pushButton_CallCheck->setFKeyText("F3");
+			if (!pushButton_Fold->text().isEmpty())
+				pushButton_Fold->setFKeyText("");
 		}
 	}
 }
@@ -3314,17 +3664,17 @@ void gameTableImpl::refreshGameTableStyle()
 	myGameTableStyle->setWindowsGeometry(this);
 	myGameTableStyle->setChatLogStyle(textBrowser_Log);
 
-
 	int i;
-	for (i=0; i<MAX_NUMBER_OF_PLAYERS; i++) {
+	for (i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
+	{
 
 		myGameTableStyle->setCashLabelStyle(cashLabelArray[i]);
 		myGameTableStyle->setSetLabelStyle(setLabelArray[i]);
 		myGameTableStyle->setPlayerNameLabelStyle(playerNameLabelArray[i]);
 	}
 
-    myGameTableStyle->setSmallFontBoardStyle(label_Sets);
-    myGameTableStyle->setSmallFontBoardStyle(label_Total);
+	myGameTableStyle->setSmallFontBoardStyle(label_Sets);
+	myGameTableStyle->setSmallFontBoardStyle(label_Total);
 	myGameTableStyle->setSmallFontBoardStyle(textLabel_Sets);
 	myGameTableStyle->setSmallFontBoardStyle(textLabel_Pot);
 	myGameTableStyle->setSmallFontBoardStyle(label_handNumber);
@@ -3333,21 +3683,22 @@ void gameTableImpl::refreshGameTableStyle()
 	myGameTableStyle->setSmallFontBoardStyle(label_gameNumberValue);
 	myGameTableStyle->setBigFontBoardStyle(textLabel_handLabel);
 	myGameTableStyle->setBigFontBoardStyle(label_Pot);
-	myGameTableStyle->setCardHolderStyle(label_CardHolder0,0);
-	myGameTableStyle->setCardHolderStyle(label_CardHolder1,0);
-	myGameTableStyle->setCardHolderStyle(label_CardHolder2,0);
-	myGameTableStyle->setCardHolderStyle(label_CardHolder3,1);
-	myGameTableStyle->setCardHolderStyle(label_CardHolder4,2);
+	myGameTableStyle->setCardHolderStyle(label_CardHolder0, 0);
+	myGameTableStyle->setCardHolderStyle(label_CardHolder1, 0);
+	myGameTableStyle->setCardHolderStyle(label_CardHolder2, 0);
+	myGameTableStyle->setCardHolderStyle(label_CardHolder3, 1);
+	myGameTableStyle->setCardHolderStyle(label_CardHolder4, 2);
 	myGameTableStyle->setTableBackground(this);
-	myGameTableStyle->setBreakButtonStyle(pushButton_break,0);
+	myGameTableStyle->setBreakButtonStyle(pushButton_break, 0);
 
-	for (i=0; i<MAX_NUMBER_OF_PLAYERS; i++) {
+	for (i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
+	{
 
 		myGameTableStyle->setPlayerSeatInactiveStyle(groupBoxArray[i]);
 	}
-	//Human player button
-	myGameTableStyle->setButtonsStyle(pushButton_BetRaise,pushButton_BetRaiseHalfPot, pushButton_BetRaiseTwoThirdPot, pushButton_BetRaisePot, 
-			pushButton_CallCheck, pushButton_Fold, pushButton_AllIn, 0);
+	// Human player button
+	myGameTableStyle->setButtonsStyle(pushButton_BetRaise, pushButton_BetRaiseHalfPot, pushButton_BetRaiseTwoThirdPot, pushButton_BetRaisePot,
+									  pushButton_CallCheck, pushButton_Fold, pushButton_AllIn, 0);
 
 	myGameTableStyle->setBetValueInputStyle(spinBox_betValue);
 	myGameTableStyle->setSliderStyle(horizontalSlider_bet);
@@ -3361,95 +3712,142 @@ void gameTableImpl::refreshGameTableStyle()
 
 	myGameTableStyle->setTabWidgetStyle(tabWidget_Right, tabWidget_Right->getTabBar());
 
-	if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getActionCallI18NString() == "NULL") {
+	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getActionCallI18NString() == "NULL")
+	{
 		CallString = "Call";
-	} else {
+	}
+	else
+	{
 		CallString = myGameTableStyle->getActionCallI18NString();
 	}
-	if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getActionCheckI18NString() == "NULL") {
+	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getActionCheckI18NString() == "NULL")
+	{
 		CheckString = "Check";
-	} else {
+	}
+	else
+	{
 		CheckString = myGameTableStyle->getActionCheckI18NString();
 	}
-	if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getActionBetI18NString() == "NULL") {
+	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getActionBetI18NString() == "NULL")
+	{
 		BetString = "Bet";
-	} else {
+	}
+	else
+	{
 		BetString = myGameTableStyle->getActionBetI18NString();
 	}
-	if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getActionRaiseI18NString() == "NULL") {
+	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getActionRaiseI18NString() == "NULL")
+	{
 		RaiseString = "Raise";
-	} else {
+	}
+	else
+	{
 		RaiseString = myGameTableStyle->getActionRaiseI18NString();
 	}
-	if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getActionFoldI18NString() == "NULL") {
+	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getActionFoldI18NString() == "NULL")
+	{
 		FoldString = "Fold";
-	} else {
+	}
+	else
+	{
 		FoldString = myGameTableStyle->getActionFoldI18NString();
 	}
-	if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getActionAllInI18NString() == "NULL") {
+	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getActionAllInI18NString() == "NULL")
+	{
 		AllInString = "All-In";
-	} else {
+	}
+	else
+	{
 		AllInString = myGameTableStyle->getActionAllInI18NString();
 	}
-	if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getPotI18NString() == "NULL") {
+	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getPotI18NString() == "NULL")
+	{
 		PotString = "Pot";
-	} else {
+	}
+	else
+	{
 		PotString = myGameTableStyle->getPotI18NString();
 	}
-	if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getTotalI18NString() == "NULL") {
+	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getTotalI18NString() == "NULL")
+	{
 		TotalString = "Total";
-	} else {
+	}
+	else
+	{
 		TotalString = myGameTableStyle->getTotalI18NString();
 	}
-	if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getBetsI18NString() == "NULL") {
+	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getBetsI18NString() == "NULL")
+	{
 		BetsString = "Bets";
-	} else {
+	}
+	else
+	{
 		BetsString = myGameTableStyle->getBetsI18NString();
 	}
-	if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getGameI18NString() == "NULL") {
+	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getGameI18NString() == "NULL")
+	{
 		GameString = "Game";
-	} else {
+	}
+	else
+	{
 		GameString = myGameTableStyle->getGameI18NString();
 	}
-	if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getHandI18NString() == "NULL") {
+	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getHandI18NString() == "NULL")
+	{
 		HandString = "Hand";
-	} else {
+	}
+	else
+	{
 		HandString = myGameTableStyle->getHandI18NString();
 	}
-	if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getPreflopI18NString() == "NULL") {
+	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getPreflopI18NString() == "NULL")
+	{
 		PreflopString = "Preflop";
-	} else {
+	}
+	else
+	{
 		PreflopString = myGameTableStyle->getPreflopI18NString();
 	}
-	if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getFlopI18NString() == "NULL") {
+	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getFlopI18NString() == "NULL")
+	{
 		FlopString = "Flop";
-	} else {
+	}
+	else
+	{
 		FlopString = myGameTableStyle->getFlopI18NString();
 	}
-	if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getTurnI18NString() == "NULL") {
+	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getTurnI18NString() == "NULL")
+	{
 		TurnString = "Turn";
-	} else {
+	}
+	else
+	{
 		TurnString = myGameTableStyle->getTurnI18NString();
 	}
-	if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getRiverI18NString() == "NULL") {
+	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getRiverI18NString() == "NULL")
+	{
 		RiverString = "River";
-	} else {
+	}
+	else
+	{
 		RiverString = myGameTableStyle->getRiverI18NString();
 	}
 
 	label_Pot->setText(PotString);
-	label_Total->setText(TotalString+":");
-	label_Sets->setText(BetsString+":");
-	label_handNumber->setText(HandString+":");
-	label_gameNumber->setText(GameString+":");
-
+	label_Total->setText(TotalString + ":");
+	label_Sets->setText(BetsString + ":");
+	label_handNumber->setText(HandString + ":");
+	label_gameNumber->setText(GameString + ":");
 }
 
 void gameTableImpl::saveGameTableGeometry()
 {
-	if(this->isFullScreen()) {
+	if (this->isFullScreen())
+	{
 		myConfig->writeConfigInt("GameTableFullScreenSave", 1);
-	} else {
+	}
+	else
+	{
 		myConfig->writeConfigInt("GameTableFullScreenSave", 0);
 		myConfig->writeConfigInt("GameTableHeightSave", this->height());
 		myConfig->writeConfigInt("GameTableWidthSave", this->width());
@@ -3459,11 +3857,16 @@ void gameTableImpl::saveGameTableGeometry()
 
 void gameTableImpl::restoreGameTableGeometry()
 {
-	if(myConfig->readConfigInt("GameTableFullScreenSave")) {
-		if(actionFullScreen->isEnabled()) this->showFullScreen();
-	} else {
-		//resize only if style size allow this and if NOT fixed windows size
-		if(!myGameTableStyle->getIfFixedWindowSize().toInt() && myConfig->readConfigInt("GameTableHeightSave") <= myGameTableStyle->getMaximumWindowHeight().toInt() && myConfig->readConfigInt("GameTableHeightSave") >= myGameTableStyle->getMinimumWindowHeight().toInt() && myConfig->readConfigInt("GameTableWidthSave") <= myGameTableStyle->getMaximumWindowWidth().toInt() && myConfig->readConfigInt("GameTableWidthSave") >= myGameTableStyle->getMinimumWindowWidth().toInt()) {
+	if (myConfig->readConfigInt("GameTableFullScreenSave"))
+	{
+		if (actionFullScreen->isEnabled())
+			this->showFullScreen();
+	}
+	else
+	{
+		// resize only if style size allow this and if NOT fixed windows size
+		if (!myGameTableStyle->getIfFixedWindowSize().toInt() && myConfig->readConfigInt("GameTableHeightSave") <= myGameTableStyle->getMaximumWindowHeight().toInt() && myConfig->readConfigInt("GameTableHeightSave") >= myGameTableStyle->getMinimumWindowHeight().toInt() && myConfig->readConfigInt("GameTableWidthSave") <= myGameTableStyle->getMaximumWindowWidth().toInt() && myConfig->readConfigInt("GameTableWidthSave") >= myGameTableStyle->getMinimumWindowWidth().toInt())
+		{
 
 			this->resize(myConfig->readConfigInt("GameTableWidthSave"), myConfig->readConfigInt("GameTableHeightSave"));
 		}
@@ -3472,28 +3875,33 @@ void gameTableImpl::restoreGameTableGeometry()
 
 void gameTableImpl::closeMessageBoxes()
 {
-
 }
 
 void gameTableImpl::hide()
 {
-	//clear log
+	// clear log
 
 	textBrowser_Log->clear();
-	//textBrowser_ranges->clear();
+	// textBrowser_ranges->clear();
 	QWidget::hide();
 }
 
 SeatState gameTableImpl::getCurrentSeatState(std::shared_ptr<Player> player)
 {
 
-	if(player->getActiveStatus()) {
-		if(player->isSessionActive()) {
+	if (player->getActiveStatus())
+	{
+		if (player->isSessionActive())
+		{
 			return SEAT_ACTIVE;
-		} else {
+		}
+		else
+		{
 			return SEAT_AUTOFOLD;
 		}
-	} else {
+	}
+	else
+	{
 		return SEAT_CLEAR;
 	}
 	return SEAT_UNDEFINED;
@@ -3504,21 +3912,25 @@ void gameTableImpl::enableCallCheckPushButton()
 	pushButton_CallCheck->setEatMyEvents(false);
 }
 
-void gameTableImpl::setGameSpeed(const int theValue) {
-	guiGameSpeed = theValue;   
+void gameTableImpl::setGameSpeed(const int theValue)
+{
+	guiGameSpeed = theValue;
 	setSpeeds();
 }
-ConfigFile* gameTableImpl::getConfig() const {
+ConfigFile *gameTableImpl::getConfig() const
+{
 	return myConfig;
 }
-GameTableStyleReader* gameTableImpl::getGameTableStyle() const {
+GameTableStyleReader *gameTableImpl::getGameTableStyle() const
+{
 	return myGameTableStyle;
 }
 
-void gameTableImpl::setStartWindow(startWindowImpl* s) {
+void gameTableImpl::setStartWindow(startWindowImpl *s)
+{
 	myStartWindow = s;
 }
-void gameTableImpl::setGuiLog(guiLog* l) {
+void gameTableImpl::setGuiLog(guiLog *l)
+{
 	myGuiLog = l;
 }
-

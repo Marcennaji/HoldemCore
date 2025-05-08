@@ -91,11 +91,8 @@ ConfigFile::ConfigFile(char* argv0, bool readonly) : noWriteAccess(readonly)
 	_mkdir(dataDir.c_str());
 
 	configList.push_back(ConfigInfo("AppDataDir", CONFIG_TYPE_STRING, myQtToolsInterface->getDataPathStdString(myArgv0)));
-	configList.push_back(ConfigInfo("ShowRightToolBox", CONFIG_TYPE_INT, "1"));
 	configList.push_back(ConfigInfo("ShowFadeOutCardsAnimation", CONFIG_TYPE_INT, "1"));
-	configList.push_back(ConfigInfo("ShowFlipCardsAnimation", CONFIG_TYPE_INT, "1"));
 	configList.push_back(ConfigInfo("ShowBlindButtons", CONFIG_TYPE_INT, "1"));
-	configList.push_back(ConfigInfo("PlayGameActions", CONFIG_TYPE_INT, "1"));
 	configList.push_back(ConfigInfo("NumberOfPlayers", CONFIG_TYPE_INT, "10"));
 	configList.push_back(ConfigInfo("StartCash", CONFIG_TYPE_INT, "5000"));
 	configList.push_back(ConfigInfo("FirstSmallBlind", CONFIG_TYPE_INT, "10"));
