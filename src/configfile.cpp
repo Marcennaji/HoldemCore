@@ -84,15 +84,11 @@ ConfigFile::ConfigFile(char* argv0, bool readonly) : noWriteAccess(readonly)
 	////define data-dir
 	dataDir = configFileName;
 	dataDir += "data\\";
-	////define cache-dir
-	cacheDir = configFileName;
-	cacheDir += "cache\\";
 
 	//create directories on first start of app
 	_mkdir(configFileName.c_str());
 	_mkdir(logDir.c_str());
 	_mkdir(dataDir.c_str());
-	_mkdir(cacheDir.c_str());
 
 	configList.push_back(ConfigInfo("AppDataDir", CONFIG_TYPE_STRING, myQtToolsInterface->getDataPathStdString(myArgv0)));
 	configList.push_back(ConfigInfo("ShowRightToolBox", CONFIG_TYPE_INT, "1"));
@@ -105,7 +101,6 @@ ConfigFile::ConfigFile(char* argv0, bool readonly) : noWriteAccess(readonly)
 	configList.push_back(ConfigInfo("FirstSmallBlind", CONFIG_TYPE_INT, "10"));
 	configList.push_back(ConfigInfo("GameSpeed", CONFIG_TYPE_INT, "4"));
 	configList.push_back(ConfigInfo("ShowGameSettingsDialogOnNewGame", CONFIG_TYPE_INT, "1"));
-	configList.push_back(ConfigInfo("LogOnOff", CONFIG_TYPE_INT, logOnOffDefault));
 	configList.push_back(ConfigInfo("LogDir", CONFIG_TYPE_STRING, logDir));
 	configList.push_back(ConfigInfo("UserDataDir", CONFIG_TYPE_STRING, dataDir));
 

@@ -28,7 +28,7 @@
 
 using namespace std;
 
-guiLog::guiLog(gameTableImpl* w, ConfigFile *c) : myW(w), myConfig(c), myLogDir(0), myHtmlLogFile(0), myHtmlLogFile_old(0), myTxtLogFile(0), tb(0)
+guiLog::guiLog(gameTableImpl *w, ConfigFile *c) : myW(w), myConfig(c), myLogDir(0), myHtmlLogFile(0), myHtmlLogFile_old(0), myTxtLogFile(0), tb(0)
 {
 
 	myW->setGuiLog(this);
@@ -40,7 +40,7 @@ guiLog::guiLog(gameTableImpl* w, ConfigFile *c) : myW(w), myConfig(c), myLogDir(
 	connect(this, SIGNAL(signalLogNewGameHandMsg(int, int)), this, SLOT(logNewGameHandMsg(int, int)));
 	connect(this, SIGNAL(signalLogNewBlindsSetsMsg(int, int, QString, QString)), this, SLOT(logNewBlindsSetsMsg(int, int, QString, QString)));
 	connect(this, SIGNAL(signalLogPlayerWinsMsg(QString, int, bool)), this, SLOT(logPlayerWinsMsg(QString, int, bool)));
-//	connect(this, SIGNAL(signalLogPlayerSitsOut(QString)), this, SLOT(logPlayerSitsOut(QString)));
+	//	connect(this, SIGNAL(signalLogPlayerSitsOut(QString)), this, SLOT(logPlayerSitsOut(QString)));
 	connect(this, SIGNAL(signalLogDealBoardCardsMsg(int, int, int, int, int, int)), this, SLOT(logDealBoardCardsMsg(int, int, int, int, int, int)));
 	connect(this, SIGNAL(signalLogFlipHoleCardsMsg(QString, int, int, int, QString)), this, SLOT(logFlipHoleCardsMsg(QString, int, int, int, QString)));
 	connect(this, SIGNAL(signalLogPlayerLeftMsg(QString, int)), this, SLOT(logPlayerLeftMsg(QString, int)));
@@ -50,52 +50,53 @@ guiLog::guiLog(gameTableImpl* w, ConfigFile *c) : myW(w), myConfig(c), myLogDir(
 	connect(this, SIGNAL(signalFlushLogAtGame(int)), this, SLOT(flushLogAtGame(int)));
 	connect(this, SIGNAL(signalFlushLogAtHand()), this, SLOT(flushLogAtHand()));
 
-
 	logFileStreamString = "";
 	lastGameID = 0;
 
-	if(myConfig->readConfigInt("LogOnOff")) {
-		//if write logfiles is enabled
+	QDir logDir(QString::fromUtf8(myConfig->readConfigString("LogDir").c_str()));
 
-		QDir logDir(QString::fromUtf8(myConfig->readConfigString("LogDir").c_str()));
+	if (myConfig->readConfigString("LogDir") != "" && logDir.exists())
+	{
 
-		if(myConfig->readConfigString("LogDir") != "" && logDir.exists()) {
+		int i;
 
-			int i;
+		myLogDir = new QDir(QString::fromUtf8(myConfig->readConfigString("LogDir").c_str()));
 
-			myLogDir = new QDir(QString::fromUtf8(myConfig->readConfigString("LogDir").c_str()));
+		if (HTML_LOG)
+		{
 
-			if(HTML_LOG) {
-
-				QDateTime currentTime = QDateTime::currentDateTime();
-				if(SQLITE_LOG) {
-					myHtmlLogFile_old = new QFile(myLogDir->absolutePath()+"/PokerTraining-log-"+currentTime.toString("yyyy-MM-dd_hh.mm.ss")+"_old.html");
-				} else {
-					myHtmlLogFile_old = new QFile(myLogDir->absolutePath()+"/PokerTraining-log-"+currentTime.toString("yyyy-MM-dd_hh.mm.ss")+".html");
-				}
-
-				//Logo-Pixmap extrahieren
-				QPixmap logoChipPixmapFile(":/gfx/logoChip3D.png");
-				logoChipPixmapFile.save(myLogDir->absolutePath()+"/logo.png");
-
-//                myW->textBrowser_Log->append(myHtmlLogFile_old->fileName());
-
-				// erstelle html-Datei
-				myHtmlLogFile_old->open( QIODevice::WriteOnly );
-				QTextStream stream_old( myHtmlLogFile_old );
-				stream_old << "<html>\n";
-				stream_old << "<head>\n";
-				stream_old << "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf8\">";
-				stream_old << "</head>\n";
-				stream_old << "<body>\n";
-				stream_old << "<img src='logo.png'>\n";
-				stream_old << QString("<h3><b>Log-File for PokerTraining %1 Session started on ").arg(POKERTRAINING_BETA_RELEASE_STRING)+QDate::currentDate().toString("yyyy-MM-dd")+" at "+QTime::currentTime().toString("hh:mm:ss")+"</b></h3>\n";
-				myHtmlLogFile_old->close();
-
+			QDateTime currentTime = QDateTime::currentDateTime();
+			if (SQLITE_LOG)
+			{
+				myHtmlLogFile_old = new QFile(myLogDir->absolutePath() + "/PokerTraining-log-" + currentTime.toString("yyyy-MM-dd_hh.mm.ss") + "_old.html");
 			}
-		} else {
-			cout << "Log directory doesn't exist. Cannot create log files";
+			else
+			{
+				myHtmlLogFile_old = new QFile(myLogDir->absolutePath() + "/PokerTraining-log-" + currentTime.toString("yyyy-MM-dd_hh.mm.ss") + ".html");
+			}
+
+			// Logo-Pixmap extrahieren
+			QPixmap logoChipPixmapFile(":/gfx/logoChip3D.png");
+			logoChipPixmapFile.save(myLogDir->absolutePath() + "/logo.png");
+
+			//                myW->textBrowser_Log->append(myHtmlLogFile_old->fileName());
+
+			// erstelle html-Datei
+			myHtmlLogFile_old->open(QIODevice::WriteOnly);
+			QTextStream stream_old(myHtmlLogFile_old);
+			stream_old << "<html>\n";
+			stream_old << "<head>\n";
+			stream_old << "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf8\">";
+			stream_old << "</head>\n";
+			stream_old << "<body>\n";
+			stream_old << "<img src='logo.png'>\n";
+			stream_old << QString("<h3><b>Log-File for PokerTraining %1 Session started on ").arg(POKERTRAINING_BETA_RELEASE_STRING) + QDate::currentDate().toString("yyyy-MM-dd") + " at " + QTime::currentTime().toString("hh:mm:ss") + "</b></h3>\n";
+			myHtmlLogFile_old->close();
 		}
+	}
+	else
+	{
+		cout << "Log directory doesn't exist. Cannot create log files";
 	}
 }
 
@@ -104,13 +105,13 @@ guiLog::~guiLog()
 	delete myLogDir;
 	delete myHtmlLogFile;
 	delete myHtmlLogFile_old;
-
 }
 
 void guiLog::logPlayerActionMsg(QString msg, int action, int setValue)
 {
 
-	switch (action) {
+	switch (action)
+	{
 
 	case 1:
 		msg += " folds.";
@@ -134,26 +135,23 @@ void guiLog::logPlayerActionMsg(QString msg, int action, int setValue)
 		msg += "ERROR";
 	}
 
-	if (action >= 3) {
-		msg += "$"+QString::number(setValue,10)+".";
+	if (action >= 3)
+	{
+		msg += "$" + QString::number(setValue, 10) + ".";
 	}
 
-	myW->textBrowser_Log->append("<span style=\"color:#"+myStyle->getChatLogTextColor()+";\">"+msg+"</span>");
+	myW->textBrowser_Log->append("<span style=\"color:#" + myStyle->getChatLogTextColor() + ";\">" + msg + "</span>");
 
-	if(HTML_LOG) {
+	if (HTML_LOG)
+	{
 
-		if(myConfig->readConfigInt("LogOnOff")) {
-			//if write logfiles is enabled
+		logFileStreamString += msg + "</br>\n";
 
-			logFileStreamString += msg+"</br>\n";
-
-			if(myConfig->readConfigInt("LogInterval") == 0) {
-				writeLogFileStream(logFileStreamString);
-				logFileStreamString = "";
-			}
-
+		if (myConfig->readConfigInt("LogInterval") == 0)
+		{
+			writeLogFileStream(logFileStreamString);
+			logFileStreamString = "";
 		}
-
 	}
 }
 
@@ -165,159 +163,151 @@ void guiLog::logNewGameHandMsg(int gameID, int handID)
 
 	PlayerList activePlayerList = currentHand->getActivePlayerList();
 
-	myW->textBrowser_Log->append("<span style=\"color:#"+myStyle->getChatLogTextColor()+"; font-size:large; font-weight:bold\">## Game: "+QString::number(gameID,10)+" | Hand: "+QString::number(handID,10)+" ##</span>");
+	myW->textBrowser_Log->append("<span style=\"color:#" + myStyle->getChatLogTextColor() + "; font-size:large; font-weight:bold\">## Game: " + QString::number(gameID, 10) + " | Hand: " + QString::number(handID, 10) + " ##</span>");
 
-	if(HTML_LOG) {
+	if (HTML_LOG)
+	{
 
-		if(myConfig->readConfigInt("LogOnOff")) {
-			//if write logfiles is enabled
+		logFileStreamString += "<table><tr><td width=\"600\" align=\"center\"><hr noshade size=\"3\"><b>Game: " + QString::number(gameID, 10) + " | Hand: " + QString::number(handID, 10) + "</b></td><td></td></tr></table>";
+		logFileStreamString += "BLIND LEVEL: $" + QString::number(currentHand->getSmallBlind()) + " / $" + QString::number(currentHand->getSmallBlind() * 2) + "</br>";
 
-			logFileStreamString += "<table><tr><td width=\"600\" align=\"center\"><hr noshade size=\"3\"><b>Game: "+QString::number(gameID,10)+" | Hand: "+QString::number(handID,10)+"</b></td><td></td></tr></table>";
-			logFileStreamString += "BLIND LEVEL: $"+QString::number(currentHand->getSmallBlind())+" / $"+QString::number(currentHand->getSmallBlind()*2)+"</br>";
+		// print cash only for active players
+		for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+		{
 
-			//print cash only for active players
-			for(it_c=activePlayerList->begin(); it_c!=activePlayerList->end(); ++it_c) {
-
-				logFileStreamString += "Seat " + QString::number((*it_c)->getID()+1,10) + ": <b>" +  QString::fromUtf8((*it_c)->getName().c_str()) + "</b> ($" + QString::number((*it_c)->getCash()+(*it_c)->getSet(),10)+")</br>";
-
-			}
-
+			logFileStreamString += "Seat " + QString::number((*it_c)->getID() + 1, 10) + ": <b>" + QString::fromUtf8((*it_c)->getName().c_str()) + "</b> ($" + QString::number((*it_c)->getCash() + (*it_c)->getSet(), 10) + ")</br>";
 		}
-
 	}
-
 }
 
 void guiLog::logNewBlindsSetsMsg(int sbSet, int bbSet, QString sbName, QString bbName)
 {
 
 	// log blinds
-	myW->textBrowser_Log->append("<span style=\"color:#"+myStyle->getChatLogTextColor()+";\">"+sbName+" posts small blind ($"+QString::number(sbSet,10)+")</span>");
-	myW->textBrowser_Log->append("<span style=\"color:#"+myStyle->getChatLogTextColor()+";\">"+bbName+" posts big blind ($"+QString::number(bbSet,10)+")</span>");
+	myW->textBrowser_Log->append("<span style=\"color:#" + myStyle->getChatLogTextColor() + ";\">" + sbName + " posts small blind ($" + QString::number(sbSet, 10) + ")</span>");
+	myW->textBrowser_Log->append("<span style=\"color:#" + myStyle->getChatLogTextColor() + ";\">" + bbName + " posts big blind ($" + QString::number(bbSet, 10) + ")</span>");
 
-	if(HTML_LOG) {
+	if (HTML_LOG)
+	{
 
-		if(myConfig->readConfigInt("LogOnOff")) {
-			//if write logfiles is enabled
+		logFileStreamString += "BLINDS: ";
 
-			logFileStreamString += "BLINDS: ";
+		logFileStreamString += sbName + " ($" + QString::number(sbSet, 10) + "), ";
+		logFileStreamString += bbName + " ($" + QString::number(bbSet, 10) + ")";
 
-			logFileStreamString += sbName+" ($"+QString::number(sbSet,10)+"), ";
-			logFileStreamString += bbName+" ($"+QString::number(bbSet,10)+")";
+		PlayerListConstIterator it_c;
+		std::shared_ptr<Game> currentGame = myW->getSession()->getCurrentGame();
+		PlayerList activePlayerList = currentGame->getActivePlayerList();
 
-			PlayerListConstIterator it_c;
-			std::shared_ptr<Game> currentGame = myW->getSession()->getCurrentGame();
-			PlayerList activePlayerList = currentGame->getActivePlayerList();
+		for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+		{
 
-			for(it_c=activePlayerList->begin(); it_c!=activePlayerList->end(); ++it_c) {
+			if (activePlayerList->size() > 2)
+			{
+				if ((*it_c)->getButton() == BUTTON_DEALER)
+				{
 
-				if(activePlayerList->size() > 2) {
-					if((*it_c)->getButton() == BUTTON_DEALER) {
-
-						logFileStreamString += "</br>" + QString::fromUtf8((*it_c)->getName().c_str()) + " starts as dealer.";
-						break;
-					}
-				} else {
-					if((*it_c)->getButton() == BUTTON_SMALL_BLIND) {
-
-						logFileStreamString += "</br>" + QString::fromUtf8((*it_c)->getName().c_str()) + " starts as dealer.";
-						break;
-					}
+					logFileStreamString += "</br>" + QString::fromUtf8((*it_c)->getName().c_str()) + " starts as dealer.";
+					break;
 				}
 			}
+			else
+			{
+				if ((*it_c)->getButton() == BUTTON_SMALL_BLIND)
+				{
 
-			logFileStreamString += "</br></br><b>PREFLOP</b>";
-			logFileStreamString += "</br>\n";
-
+					logFileStreamString += "</br>" + QString::fromUtf8((*it_c)->getName().c_str()) + " starts as dealer.";
+					break;
+				}
+			}
 		}
 
+		logFileStreamString += "</br></br><b>PREFLOP</b>";
+		logFileStreamString += "</br>\n";
 	}
-
 }
 
 void guiLog::logPlayerWinsMsg(QString playerName, int pot, bool main)
 {
 
-	if(main) {
-		myW->textBrowser_Log->append("<span style=\"color:#"+myStyle->getLogWinnerMainPotColor()+";\">"+playerName+" wins $"+QString::number(pot,10)+"</span>");
-	} else {
-		myW->textBrowser_Log->append("<span style=\"color:#"+myStyle->getLogWinnerSidePotColor()+";\">"+playerName+" wins $"+QString::number(pot,10)+" (side pot)</span>");
+	if (main)
+	{
+		myW->textBrowser_Log->append("<span style=\"color:#" + myStyle->getLogWinnerMainPotColor() + ";\">" + playerName + " wins $" + QString::number(pot, 10) + "</span>");
+	}
+	else
+	{
+		myW->textBrowser_Log->append("<span style=\"color:#" + myStyle->getLogWinnerSidePotColor() + ";\">" + playerName + " wins $" + QString::number(pot, 10) + " (side pot)</span>");
 	}
 
-	if(HTML_LOG) {
+	if (HTML_LOG)
+	{
 
-		if(myConfig->readConfigInt("LogOnOff")) {
-			//if write logfiles is enabled
-
-			logFileStreamString += "</br><i>"+playerName+" wins $"+QString::number(pot,10);
-			if(!main) {
-				logFileStreamString += " (side pot)";
-			}
-			logFileStreamString += "</i>\n";
-
-			if(myConfig->readConfigInt("LogInterval") == 0) {
-				writeLogFileStream(logFileStreamString);
-				logFileStreamString = "";
-			}
+		logFileStreamString += "</br><i>" + playerName + " wins $" + QString::number(pot, 10);
+		if (!main)
+		{
+			logFileStreamString += " (side pot)";
 		}
+		logFileStreamString += "</i>\n";
 
+		if (myConfig->readConfigInt("LogInterval") == 0)
+		{
+			writeLogFileStream(logFileStreamString);
+			logFileStreamString = "";
+		}
 	}
 }
-
 
 void guiLog::logDealBoardCardsMsg(int roundID, int card1, int card2, int card3, int card4, int card5)
 {
 
 	QString round;
 
-	switch (roundID) {
+	switch (roundID)
+	{
 
 	case 1:
 		round = "Flop";
-		myW->textBrowser_Log->append("<span style=\"color:#"+myStyle->getLogPlayerSitsOutColor()+";\">--- "+round+" --- "+"["+translateCardCode(card1).at(0)+translateCardCode(card1).at(1)+","+translateCardCode(card2).at(0)+translateCardCode(card2).at(1)+","+translateCardCode(card3).at(0)+translateCardCode(card3).at(1)+"]</span>");
+		myW->textBrowser_Log->append("<span style=\"color:#" + myStyle->getLogPlayerSitsOutColor() + ";\">--- " + round + " --- " + "[" + translateCardCode(card1).at(0) + translateCardCode(card1).at(1) + "," + translateCardCode(card2).at(0) + translateCardCode(card2).at(1) + "," + translateCardCode(card3).at(0) + translateCardCode(card3).at(1) + "]</span>");
 		break;
 	case 2:
 		round = "Turn";
-		myW->textBrowser_Log->append("<span style=\"color:#"+myStyle->getLogPlayerSitsOutColor()+";\">--- "+round+" --- "+"["+translateCardCode(card1).at(0)+translateCardCode(card1).at(1)+","+translateCardCode(card2).at(0)+translateCardCode(card2).at(1)+","+translateCardCode(card3).at(0)+translateCardCode(card3).at(1)+","+translateCardCode(card4).at(0)+translateCardCode(card4).at(1)+"]</span>");
+		myW->textBrowser_Log->append("<span style=\"color:#" + myStyle->getLogPlayerSitsOutColor() + ";\">--- " + round + " --- " + "[" + translateCardCode(card1).at(0) + translateCardCode(card1).at(1) + "," + translateCardCode(card2).at(0) + translateCardCode(card2).at(1) + "," + translateCardCode(card3).at(0) + translateCardCode(card3).at(1) + "," + translateCardCode(card4).at(0) + translateCardCode(card4).at(1) + "]</span>");
 		break;
 	case 3:
 		round = "River";
-		myW->textBrowser_Log->append("<span style=\"color:#"+myStyle->getLogPlayerSitsOutColor()+";\">--- "+round+" --- "+"["+translateCardCode(card1).at(0)+translateCardCode(card1).at(1)+","+translateCardCode(card2).at(0)+translateCardCode(card2).at(1)+","+translateCardCode(card3).at(0)+translateCardCode(card3).at(1)+","+translateCardCode(card4).at(0)+translateCardCode(card4).at(1)+","+translateCardCode(card5).at(0)+translateCardCode(card5).at(1)+"]</span>");
+		myW->textBrowser_Log->append("<span style=\"color:#" + myStyle->getLogPlayerSitsOutColor() + ";\">--- " + round + " --- " + "[" + translateCardCode(card1).at(0) + translateCardCode(card1).at(1) + "," + translateCardCode(card2).at(0) + translateCardCode(card2).at(1) + "," + translateCardCode(card3).at(0) + translateCardCode(card3).at(1) + "," + translateCardCode(card4).at(0) + translateCardCode(card4).at(1) + "," + translateCardCode(card5).at(0) + translateCardCode(card5).at(1) + "]</span>");
 		break;
 	default:
 		round = "ERROR";
 	}
 
-	if(HTML_LOG) {
+	if (HTML_LOG)
+	{
 
-		if(myConfig->readConfigInt("LogOnOff")) {
-			//if write logfiles is enabled
+		switch (roundID)
+		{
 
-			switch (roundID) {
-
-			case 1:
-				round = "Flop";
-				logFileStreamString += "</br><b>"+round.toUpper()+"</b> [board cards <b>"+translateCardCode(card1).at(0)+"</b>"+translateCardCode(card1).at(1)+",<b>"+translateCardCode(card2).at(0)+"</b>"+translateCardCode(card2).at(1)+",<b>"+translateCardCode(card3).at(0)+"</b>"+translateCardCode(card3).at(1)+"]"+"</br>\n";
-				break;
-			case 2:
-				round = "Turn";
-				logFileStreamString += "</br><b>"+round.toUpper()+"</b> [board cards <b>"+translateCardCode(card1).at(0)+"</b>"+translateCardCode(card1).at(1)+",<b>"+translateCardCode(card2).at(0)+"</b>"+translateCardCode(card2).at(1)+",<b>"+translateCardCode(card3).at(0)+"</b>"+translateCardCode(card3).at(1)+",<b>"+translateCardCode(card4).at(0)+"</b>"+translateCardCode(card4).at(1)+"]"+"</br>\n";
-				break;
-			case 3:
-				round = "River";
-				logFileStreamString += "</br><b>"+round.toUpper()+"</b> [board cards <b>"+translateCardCode(card1).at(0)+"</b>"+translateCardCode(card1).at(1)+",<b>"+translateCardCode(card2).at(0)+"</b>"+translateCardCode(card2).at(1)+",<b>"+translateCardCode(card3).at(0)+"</b>"+translateCardCode(card3).at(1)+",<b>"+translateCardCode(card4).at(0)+"</b>"+translateCardCode(card4).at(1)+",<b>"+translateCardCode(card5).at(0)+"</b>"+translateCardCode(card5).at(1)+"]"+"</br>\n";
-				break;
-			default:
-				round = "ERROR";
-			}
-
-			if(myConfig->readConfigInt("LogInterval") == 0) {
-				writeLogFileStream(logFileStreamString);
-				logFileStreamString = "";
-			}
-
+		case 1:
+			round = "Flop";
+			logFileStreamString += "</br><b>" + round.toUpper() + "</b> [board cards <b>" + translateCardCode(card1).at(0) + "</b>" + translateCardCode(card1).at(1) + ",<b>" + translateCardCode(card2).at(0) + "</b>" + translateCardCode(card2).at(1) + ",<b>" + translateCardCode(card3).at(0) + "</b>" + translateCardCode(card3).at(1) + "]" + "</br>\n";
+			break;
+		case 2:
+			round = "Turn";
+			logFileStreamString += "</br><b>" + round.toUpper() + "</b> [board cards <b>" + translateCardCode(card1).at(0) + "</b>" + translateCardCode(card1).at(1) + ",<b>" + translateCardCode(card2).at(0) + "</b>" + translateCardCode(card2).at(1) + ",<b>" + translateCardCode(card3).at(0) + "</b>" + translateCardCode(card3).at(1) + ",<b>" + translateCardCode(card4).at(0) + "</b>" + translateCardCode(card4).at(1) + "]" + "</br>\n";
+			break;
+		case 3:
+			round = "River";
+			logFileStreamString += "</br><b>" + round.toUpper() + "</b> [board cards <b>" + translateCardCode(card1).at(0) + "</b>" + translateCardCode(card1).at(1) + ",<b>" + translateCardCode(card2).at(0) + "</b>" + translateCardCode(card2).at(1) + ",<b>" + translateCardCode(card3).at(0) + "</b>" + translateCardCode(card3).at(1) + ",<b>" + translateCardCode(card4).at(0) + "</b>" + translateCardCode(card4).at(1) + ",<b>" + translateCardCode(card5).at(0) + "</b>" + translateCardCode(card5).at(1) + "]" + "</br>\n";
+			break;
+		default:
+			round = "ERROR";
 		}
 
+		if (myConfig->readConfigInt("LogInterval") == 0)
+		{
+			writeLogFileStream(logFileStreamString);
+			logFileStreamString = "";
+		}
 	}
 }
 
@@ -326,124 +316,120 @@ void guiLog::logFlipHoleCardsMsg(QString playerName, int card1, int card2, int c
 
 	QString tempHandName;
 
-	if (cardsValueInt != -1) {
+	if (cardsValueInt != -1)
+	{
 
-		tempHandName = CardsValue::determineHandName(cardsValueInt,myW->getSession()->getCurrentGame()->getActivePlayerList()).c_str();
-		myW->textBrowser_Log->append("<span style=\"color:#"+myStyle->getChatLogTextColor()+";\">"+playerName+" "+showHas+" ["+translateCardCode(card1).at(0)+translateCardCode(card1).at(1)+","+translateCardCode(card2).at(0)+translateCardCode(card2).at(1)+"] - \""+tempHandName+"\"</span>");
-
-	} else {
-		myW->textBrowser_Log->append("<span style=\"color:#"+myStyle->getChatLogTextColor()+";\">"+playerName+" "+showHas+" ["+translateCardCode(card1).at(0)+translateCardCode(card1).at(1)+","+translateCardCode(card2).at(0)+translateCardCode(card2).at(1)+"]</span>");
+		tempHandName = CardsValue::determineHandName(cardsValueInt, myW->getSession()->getCurrentGame()->getActivePlayerList()).c_str();
+		myW->textBrowser_Log->append("<span style=\"color:#" + myStyle->getChatLogTextColor() + ";\">" + playerName + " " + showHas + " [" + translateCardCode(card1).at(0) + translateCardCode(card1).at(1) + "," + translateCardCode(card2).at(0) + translateCardCode(card2).at(1) + "] - \"" + tempHandName + "\"</span>");
+	}
+	else
+	{
+		myW->textBrowser_Log->append("<span style=\"color:#" + myStyle->getChatLogTextColor() + ";\">" + playerName + " " + showHas + " [" + translateCardCode(card1).at(0) + translateCardCode(card1).at(1) + "," + translateCardCode(card2).at(0) + translateCardCode(card2).at(1) + "]</span>");
 	}
 
-	if(HTML_LOG) {
+	if (HTML_LOG)
+	{
 
-		if(myConfig->readConfigInt("LogOnOff")) {
-			//if write logfiles is enabled
+		if (cardsValueInt != -1)
+		{
 
-			if (cardsValueInt != -1) {
+			tempHandName.fromStdString(CardsValue::determineHandName(cardsValueInt, myW->getSession()->getCurrentGame()->getActivePlayerList()));
 
-				tempHandName.fromStdString(CardsValue::determineHandName(cardsValueInt,myW->getSession()->getCurrentGame()->getActivePlayerList()));
+			logFileStreamString += playerName + " " + showHas + " [ <b>" + translateCardCode(card1).at(0) + "</b>" + translateCardCode(card1).at(1) + ",<b>" + translateCardCode(card2).at(0) + "</b>" + translateCardCode(card2).at(1) + "] - " + tempHandName + "</br>\n";
 
-				logFileStreamString += playerName+" "+showHas+" [ <b>"+translateCardCode(card1).at(0)+"</b>"+translateCardCode(card1).at(1)+",<b>"+translateCardCode(card2).at(0)+"</b>"+translateCardCode(card2).at(1)+"] - "+tempHandName+"</br>\n";
-
-				if(myConfig->readConfigInt("LogInterval") == 0) {
-					writeLogFileStream(logFileStreamString);
-					logFileStreamString = "";
-				}
-
-			} else {
-
-				logFileStreamString += playerName+" "+showHas+" [<b>"+translateCardCode(card1).at(0)+"</b>"+translateCardCode(card1).at(1)+",<b>"+translateCardCode(card2).at(0)+"</b>"+translateCardCode(card2).at(1)+"]"+"</br>\n";
-				if(myConfig->readConfigInt("LogInterval") == 0) {
-					writeLogFileStream(logFileStreamString);
-					logFileStreamString = "";
-				}
+			if (myConfig->readConfigInt("LogInterval") == 0)
+			{
+				writeLogFileStream(logFileStreamString);
+				logFileStreamString = "";
 			}
 		}
+		else
+		{
 
+			logFileStreamString += playerName + " " + showHas + " [<b>" + translateCardCode(card1).at(0) + "</b>" + translateCardCode(card1).at(1) + ",<b>" + translateCardCode(card2).at(0) + "</b>" + translateCardCode(card2).at(1) + "]" + "</br>\n";
+			if (myConfig->readConfigInt("LogInterval") == 0)
+			{
+				writeLogFileStream(logFileStreamString);
+				logFileStreamString = "";
+			}
+		}
 	}
-
 }
 
 void guiLog::logPlayerLeftMsg(QString playerName, int wasKicked)
 {
 
 	QString action;
-	if(wasKicked) action = "was kicked from";
-	else action = "has left";
+	if (wasKicked)
+		action = "was kicked from";
+	else
+		action = "has left";
 
-	myW->textBrowser_Log->append( "<span style=\"color:#"+myStyle->getChatLogTextColor()+";\"><i>"+playerName+" "+action+" the game!</i></span>");
+	myW->textBrowser_Log->append("<span style=\"color:#" + myStyle->getChatLogTextColor() + ";\"><i>" + playerName + " " + action + " the game!</i></span>");
 
-	if(HTML_LOG) {
+	if (HTML_LOG)
+	{
 
-		if(myConfig->readConfigInt("LogOnOff")) {
+		logFileStreamString += "<i>" + playerName + " " + action + " the game!</i><br>\n";
 
-			logFileStreamString += "<i>"+playerName+" "+action+" the game!</i><br>\n";
-
-			if(myConfig->readConfigInt("LogInterval") == 0) {
-				writeLogFileStream(logFileStreamString);
-				logFileStreamString = "";
-			}
+		if (myConfig->readConfigInt("LogInterval") == 0)
+		{
+			writeLogFileStream(logFileStreamString);
+			logFileStreamString = "";
 		}
-
 	}
 }
 
 void guiLog::logNewGameAdminMsg(QString playerName)
 {
-	myW->textBrowser_Log->append( "<i><span style=\"color:#"+myStyle->getLogNewGameAdminColor()+";\">"+playerName+" is game admin now!</span></i>");
+	myW->textBrowser_Log->append("<i><span style=\"color:#" + myStyle->getLogNewGameAdminColor() + ";\">" + playerName + " is game admin now!</span></i>");
 
-	if(HTML_LOG) {
+	if (HTML_LOG)
+	{
 
-		if(myConfig->readConfigInt("LogOnOff")) {
+		logFileStreamString += "<i>" + playerName + " is game admin now!</i><br>\n";
 
-			logFileStreamString += "<i>"+playerName+" is game admin now!</i><br>\n";
-
-			if(myConfig->readConfigInt("LogInterval") == 0) {
-				writeLogFileStream(logFileStreamString);
-				logFileStreamString = "";
-			}
+		if (myConfig->readConfigInt("LogInterval") == 0)
+		{
+			writeLogFileStream(logFileStreamString);
+			logFileStreamString = "";
 		}
-
 	}
 }
 
 void guiLog::logPlayerJoinedMsg(QString playerName)
 {
-	myW->textBrowser_Log->append("<span style=\"color:#"+myStyle->getChatLogTextColor()+";\"><i>"+playerName+" has joined the game!</i></span>");
+	myW->textBrowser_Log->append("<span style=\"color:#" + myStyle->getChatLogTextColor() + ";\"><i>" + playerName + " has joined the game!</i></span>");
 }
-
 
 void guiLog::logPlayerWinGame(QString playerName, int gameID)
 {
 
-	myW->textBrowser_Log->append( "<i><b>"+playerName+" wins game " + QString::number(gameID,10)  +"!</i></b><br>");
+	myW->textBrowser_Log->append("<i><b>" + playerName + " wins game " + QString::number(gameID, 10) + "!</i></b><br>");
 
-	if(HTML_LOG) {
+	if (HTML_LOG)
+	{
 
-		if(myConfig->readConfigInt("LogOnOff")) {
+		logFileStreamString += "</br></br><i><b>" + playerName + " wins game " + QString::number(gameID, 10) + "!</i></b></br>\n";
 
-			logFileStreamString += "</br></br><i><b>"+playerName+" wins game " + QString::number(gameID,10)  +"!</i></b></br>\n";
-
-			if(myConfig->readConfigInt("LogInterval") == 0) {
-				writeLogFileStream(logFileStreamString);
-				logFileStreamString = "";
-			}
+		if (myConfig->readConfigInt("LogInterval") == 0)
+		{
+			writeLogFileStream(logFileStreamString);
+			logFileStreamString = "";
 		}
-
 	}
-
 }
 
 QStringList guiLog::translateCardCode(int cardCode)
 {
 
-	int value = cardCode%13;
-	int color = cardCode/13;
+	int value = cardCode % 13;
+	int color = cardCode / 13;
 
 	QStringList cardString;
 
-	switch (value) {
+	switch (value)
+	{
 
 	case 0:
 		cardString << "2";
@@ -488,7 +474,8 @@ QStringList guiLog::translateCardCode(int cardCode)
 		cardString << "ERROR";
 	}
 
-	switch (color) {
+	switch (color)
+	{
 
 	case 0:
 		cardString << "<font size=+1><b>&diams;</b></font>";
@@ -512,16 +499,22 @@ QStringList guiLog::translateCardCode(int cardCode)
 void guiLog::writeLogFileStream(QString streamString)
 {
 
-	if(myHtmlLogFile_old) {
-		if(myHtmlLogFile_old->open( QIODevice::ReadWrite )) {
-			QTextStream stream_old( myHtmlLogFile_old );
+	if (myHtmlLogFile_old)
+	{
+		if (myHtmlLogFile_old->open(QIODevice::ReadWrite))
+		{
+			QTextStream stream_old(myHtmlLogFile_old);
 			stream_old.readAll();
 			stream_old << streamString;
 			myHtmlLogFile_old->close();
-		} else {
+		}
+		else
+		{
 			cout << "Could not open log-file to write log-messages!" << endl;
 		}
-	} else {
+	}
+	else
+	{
 		cout << "Could not find log-file to write log-messages!" << endl;
 	}
 }
@@ -529,61 +522,52 @@ void guiLog::writeLogFileStream(QString streamString)
 void guiLog::writeLogFileStream(string log_string, QFile *LogFile)
 {
 
-	QTextStream stream( LogFile );
+	QTextStream stream(LogFile);
 	stream.readAll();
 	stream << log_string.c_str();
-
 }
 
 void guiLog::writeLog(string log_string, int modus)
 {
 
-	switch(modus) {
+	switch (modus)
+	{
 	case 1:
-		writeLogFileStream(log_string,myHtmlLogFile);
+		writeLogFileStream(log_string, myHtmlLogFile);
 		break;
 	case 2:
-		writeLogFileStream(log_string,myTxtLogFile);
+		writeLogFileStream(log_string, myTxtLogFile);
 		break;
 	case 3:
 		tb->append(log_string.c_str());
 		break;
-	default:
-		;
+	default:;
 	}
-
 }
 
 void guiLog::flushLogAtHand()
 {
 
-	if(HTML_LOG) {
-
-		if(myConfig->readConfigInt("LogOnOff")) {
-			if(myConfig->readConfigInt("LogInterval") < 2) {
-				// 	write for log after every action and after every hand
-				writeLogFileStream(logFileStreamString);
-				logFileStreamString = "";
-			}
-		}
-
+	if (HTML_LOG)
+	{
+		writeLogFileStream(logFileStreamString);
+		logFileStreamString = "";
 	}
 }
 
 void guiLog::flushLogAtGame(int gameID)
 {
 
-	if(HTML_LOG) {
+	if (HTML_LOG)
+	{
 
-		if(myConfig->readConfigInt("LogOnOff")) {
-			//	write for log after every game
-			if(gameID > lastGameID) {
-				writeLogFileStream(logFileStreamString);
-				logFileStreamString = "";
-				lastGameID = gameID;
-			}
+		//	write for log after every game
+		if (gameID > lastGameID)
+		{
+			writeLogFileStream(logFileStreamString);
+			logFileStreamString = "";
+			lastGameID = gameID;
 		}
-
 	}
 }
 
@@ -592,19 +576,18 @@ void guiLog::exportLogPdbToHtml(QString fileStringPdb, QString exportFileString)
 
 	myHtmlLogFile = new QFile(exportFileString);
 
-	myHtmlLogFile->open( QIODevice::ReadWrite | QFile::Truncate);
+	myHtmlLogFile->open(QIODevice::ReadWrite | QFile::Truncate);
 
 	string log_string = "<html>\n";
 	log_string += "<head>\n";
 	log_string += "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf8\">";
 	log_string += "</head>\n";
 	log_string += "<body style=\"font-size:smaller\">\n";
-	writeLog(log_string,1);
+	writeLog(log_string, 1);
 
-	exportLog(fileStringPdb,1);
+	exportLog(fileStringPdb, 1);
 
 	myHtmlLogFile->close();
-
 }
 
 void guiLog::exportLogPdbToTxt(QString fileStringPdb, QString exportFileString)
@@ -612,23 +595,21 @@ void guiLog::exportLogPdbToTxt(QString fileStringPdb, QString exportFileString)
 
 	myTxtLogFile = new QFile(exportFileString);
 
-	myTxtLogFile->open( QIODevice::ReadWrite | QFile::Truncate );
+	myTxtLogFile->open(QIODevice::ReadWrite | QFile::Truncate);
 
-	exportLog(fileStringPdb,2);
+	exportLog(fileStringPdb, 2);
 
 	myTxtLogFile->close();
-
 }
 
 void guiLog::showLog(QString fileStringPdb, QTextBrowser *tb_tmp)
 {
 	tb = tb_tmp;
 	tb->clear();
-	exportLog(fileStringPdb,3);
-
+	exportLog(fileStringPdb, 3);
 }
 
-int guiLog::exportLog(QString fileStringPdb,int modus)
+int guiLog::exportLog(QString fileStringPdb, int modus)
 {
 	bool neu = false;
 
@@ -645,8 +626,8 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 	string round_string = "";
 	string action_string = "";
 	bool data_found = false;
-	int nRow_Session=0, nRow_Game=0, nRow_Player=0, nRow_Hand=0, nRow_Hand_ID=0, nRow_Action=0;
-	int nCol_Session=0, nCol_Game=0, nCol_Player=0, nCol_Hand=0, nCol_Action=0;
+	int nRow_Session = 0, nRow_Game = 0, nRow_Player = 0, nRow_Hand = 0, nRow_Hand_ID = 0, nRow_Action = 0;
+	int nCol_Session = 0, nCol_Game = 0, nCol_Player = 0, nCol_Hand = 0, nCol_Action = 0;
 	char *errmsg = 0;
 	int game_ctr = 0, hand_ctr = 0, round_ctr = 0, action_ctr = 0;
 	int i = 0, j = 0;
@@ -654,23 +635,27 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 	int uniqueGameID = 0;
 	string cmpString = "", string_tmp = "";
 	string player[MAX_NUMBER_OF_PLAYERS];
-	for(i=1; i<=MAX_NUMBER_OF_PLAYERS; i++) {
-		player[i-1] = "";
+	for (i = 1; i <= MAX_NUMBER_OF_PLAYERS; i++)
+	{
+		player[i - 1] = "";
 	}
 
 	// open sqlite log-db
 	sqlite3 *mySqliteLogDb;
 	sqlite3_open(fileStringPdb.toStdString().c_str(), &mySqliteLogDb);
-	if( mySqliteLogDb != 0 ) {
+	if (mySqliteLogDb != 0)
+	{
 
 		// read session
 		sql = "SELECT * FROM Session";
-		if(sqlite3_get_table(mySqliteLogDb,sql.c_str(),&results.result_Session,&nRow_Session,&nCol_Session,&errmsg) != SQLITE_OK) {
+		if (sqlite3_get_table(mySqliteLogDb, sql.c_str(), &results.result_Session, &nRow_Session, &nCol_Session, &errmsg) != SQLITE_OK)
+		{
 			cout << "Error in statement: " << sql.c_str() << "[" << errmsg << "]." << endl;
 			cleanUp(results, mySqliteLogDb);
 			return 1;
 		}
-		if(nRow_Session != 1) {
+		if (nRow_Session != 1)
+		{
 			cout << "Number of Sessions implausible!" << endl;
 			cleanUp(results, mySqliteLogDb);
 			return 1;
@@ -680,13 +665,16 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 
 		// PokerTraining version
 		data_found = false;
-		for(i=0; i<nCol_Session; i++) {
-			if(strcmp(results.result_Session[i], "PokerTraining_Version") == 0) {
-				log_string += results.result_Session[i+nCol_Session];
+		for (i = 0; i < nCol_Session; i++)
+		{
+			if (strcmp(results.result_Session[i], "PokerTraining_Version") == 0)
+			{
+				log_string += results.result_Session[i + nCol_Session];
 				data_found = true;
 			}
 		}
-		if(!data_found) {
+		if (!data_found)
+		{
 			cout << "Missing PokerTraining version information!" << endl;
 			cleanUp(results, mySqliteLogDb);
 			return 1;
@@ -696,13 +684,16 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 
 		// logging date
 		data_found = false;
-		for(i=0; i<nCol_Session; i++) {
-			if(strcmp(results.result_Session[i], "Date") == 0) {
-				log_string += results.result_Session[i+nCol_Session];
+		for (i = 0; i < nCol_Session; i++)
+		{
+			if (strcmp(results.result_Session[i], "Date") == 0)
+			{
+				log_string += results.result_Session[i + nCol_Session];
 				data_found = true;
 			}
 		}
-		if(!data_found) {
+		if (!data_found)
+		{
 			cout << "Missing date information!" << endl;
 			cleanUp(results, mySqliteLogDb);
 			return 1;
@@ -712,19 +703,23 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 
 		// logging time
 		data_found = false;
-		for(i=0; i<nCol_Session; i++) {
-			if(strcmp(results.result_Session[i], "Time") == 0) {
-				log_string += results.result_Session[i+nCol_Session];
+		for (i = 0; i < nCol_Session; i++)
+		{
+			if (strcmp(results.result_Session[i], "Time") == 0)
+			{
+				log_string += results.result_Session[i + nCol_Session];
 				data_found = true;
 			}
 		}
-		if(!data_found) {
+		if (!data_found)
+		{
 			cout << "Missing time information!" << endl;
 			cleanUp(results, mySqliteLogDb);
 			return 1;
 		}
 
-		switch(modus) {
+		switch (modus)
+		{
 		case 1:
 			log_string = "<h3><b>" + log_string + "</b></h3>\n";
 			// if(!neu) log_string = "<img src='logo.png'>\n" + log_string;
@@ -735,75 +730,86 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 		case 3:
 			log_string = "<h4><b>" + log_string + "</b></h4>";
 			break;
-		default:
-			;
+		default:;
 		}
-		writeLog(log_string,modus);
+		writeLog(log_string, modus);
 		log_string = "";
 
 		// read game
 		sql = "SELECT * FROM Game";
-		if(sqlite3_get_table(mySqliteLogDb,sql.c_str(),&results.result_Game,&nRow_Game,&nCol_Game,&errmsg) != SQLITE_OK) {
+		if (sqlite3_get_table(mySqliteLogDb, sql.c_str(), &results.result_Game, &nRow_Game, &nCol_Game, &errmsg) != SQLITE_OK)
+		{
 			cout << "Error in statement: " << sql.c_str() << "[" << errmsg << "]." << endl;
 			cleanUp(results, mySqliteLogDb);
 			return 1;
 		}
 
 		// run through all games
-		for(game_ctr=1; game_ctr<=nRow_Game; game_ctr++) {
+		for (game_ctr = 1; game_ctr <= nRow_Game; game_ctr++)
+		{
 
 			// unique game id
 			data_found = false;
-			for(i=0; i<nCol_Game; i++) {
-				if(strcmp(results.result_Game[i], "UniqueGameID") == 0) {
-					uniqueGameID = atoi(results.result_Game[i+nCol_Game*game_ctr]);
+			for (i = 0; i < nCol_Game; i++)
+			{
+				if (strcmp(results.result_Game[i], "UniqueGameID") == 0)
+				{
+					uniqueGameID = atoi(results.result_Game[i + nCol_Game * game_ctr]);
 					data_found = true;
 				}
 			}
 
-			if(!data_found) {
+			if (!data_found)
+			{
 				cleanUp(results, mySqliteLogDb);
 				return 1;
 			}
 
 			// game id
 			data_found = false;
-			for(i=0; i<nCol_Game; i++) {
-				if(strcmp(results.result_Game[i] ,"GameID") == 0) {
-					gameID = atoi(results.result_Game[i+nCol_Game*game_ctr]);
+			for (i = 0; i < nCol_Game; i++)
+			{
+				if (strcmp(results.result_Game[i], "GameID") == 0)
+				{
+					gameID = atoi(results.result_Game[i + nCol_Game * game_ctr]);
 					data_found = true;
 				}
 			}
 
-			if(!data_found) {
+			if (!data_found)
+			{
 				cleanUp(results, mySqliteLogDb);
 				return 1;
 			}
 
 			// read player
-			sql  = "SELECT Player,Seat FROM Player WHERE UniqueGameID=";
+			sql = "SELECT Player,Seat FROM Player WHERE UniqueGameID=";
 			sql += std::to_string(uniqueGameID);
 			sql += " ORDER BY Seat;";
-			if(sqlite3_get_table(mySqliteLogDb,sql.c_str(),&results.result_Player,&nRow_Player,&nCol_Player,&errmsg) != SQLITE_OK) {
+			if (sqlite3_get_table(mySqliteLogDb, sql.c_str(), &results.result_Player, &nRow_Player, &nCol_Player, &errmsg) != SQLITE_OK)
+			{
 				cout << "Error in statement: " << sql.c_str() << "[" << errmsg << "]." << endl;
 				cleanUp(results, mySqliteLogDb);
 				return 1;
 			}
-			for(i=1; i<=nRow_Player; i++) {
-				player[i-1] = results.result_Player[nCol_Player*i];
+			for (i = 1; i <= nRow_Player; i++)
+			{
+				player[i - 1] = results.result_Player[nCol_Player * i];
 			}
 
 			// read all hand id
 			sql = "SELECT HandID FROM Hand WHERE UniqueGameID=";
-			sql+= std::to_string(uniqueGameID);
-			if(sqlite3_get_table(mySqliteLogDb,sql.c_str(),&results.result_Hand_ID,&nRow_Hand_ID,&nCol_Hand,&errmsg) != SQLITE_OK) {
+			sql += std::to_string(uniqueGameID);
+			if (sqlite3_get_table(mySqliteLogDb, sql.c_str(), &results.result_Hand_ID, &nRow_Hand_ID, &nCol_Hand, &errmsg) != SQLITE_OK)
+			{
 				cout << "Error in statement: " << sql.c_str() << "[" << errmsg << "]." << endl;
 				cleanUp(results, mySqliteLogDb);
 				return 1;
 			}
 
 			// run through all hands
-			for(hand_ctr=1; hand_ctr<=nRow_Hand_ID; hand_ctr++) {
+			for (hand_ctr = 1; hand_ctr <= nRow_Hand_ID; hand_ctr++)
+			{
 
 				// log game and hand id
 				log_string += "Game: ";
@@ -811,11 +817,14 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 				log_string += " | Hand: ";
 				log_string += results.result_Hand_ID[hand_ctr];
 
-				switch(modus) {
+				switch (modus)
+				{
 				case 1:
 					log_string = "<table><tr><td width=\"600\" align=\"center\"><hr noshade size=\"3\"><b>" + log_string;
-					if(!neu) log_string += "</b></td><td></td></tr></table>";
-					else log_string += "</b></td></tr></table>";
+					if (!neu)
+						log_string += "</b></td><td></td></tr></table>";
+					else
+						log_string += "</b></td></tr></table>";
 					break;
 				case 2:
 					log_string = "\n\n----------- " + log_string;
@@ -825,34 +834,36 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 					log_string = "----------- <b>" + log_string;
 					log_string += "</b> -----------<br />";
 					break;
-				default:
-					;
+				default:;
 				}
 
 				// read current hand
 				sql = "SELECT * FROM Hand WHERE UniqueGameID=";
-				sql+= std::to_string(uniqueGameID);
-				sql+= " AND HandID=";
-				sql+= results.result_Hand_ID[hand_ctr];
-				if(sqlite3_get_table(mySqliteLogDb,sql.c_str(),&results.result_Hand,&nRow_Hand,&nCol_Hand,&errmsg) != SQLITE_OK) {
+				sql += std::to_string(uniqueGameID);
+				sql += " AND HandID=";
+				sql += results.result_Hand_ID[hand_ctr];
+				if (sqlite3_get_table(mySqliteLogDb, sql.c_str(), &results.result_Hand, &nRow_Hand, &nCol_Hand, &errmsg) != SQLITE_OK)
+				{
 					cout << "Error in statement: " << sql.c_str() << "[" << errmsg << "]." << endl;
 					cleanUp(results, mySqliteLogDb);
 					return 1;
 				}
-
 
 				// log blind level
 				log_string += "BLIND LEVEL: $";
 
 				// read small blind amount
 				data_found = false;
-				for(i=0; i<nCol_Hand; i++) {
-					if(strcmp(results.result_Hand[i], "Sb_Amount") == 0) {
-						log_string += results.result_Hand[i+nCol_Hand];
+				for (i = 0; i < nCol_Hand; i++)
+				{
+					if (strcmp(results.result_Hand[i], "Sb_Amount") == 0)
+					{
+						log_string += results.result_Hand[i + nCol_Hand];
 						data_found = true;
 					}
 				}
-				if(!data_found) {
+				if (!data_found)
+				{
 					cout << "Missing small blind information!" << endl;
 					cleanUp(results, mySqliteLogDb);
 					return 1;
@@ -862,22 +873,28 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 
 				// read big blind amount
 				data_found = false;
-				for(i=0; i<nCol_Hand; i++) {
-					if(strcmp(results.result_Hand[i], "Bb_Amount") == 0) {
-						log_string += results.result_Hand[i+nCol_Hand];
+				for (i = 0; i < nCol_Hand; i++)
+				{
+					if (strcmp(results.result_Hand[i], "Bb_Amount") == 0)
+					{
+						log_string += results.result_Hand[i + nCol_Hand];
 						data_found = true;
 					}
 				}
-				if(!data_found) {
+				if (!data_found)
+				{
 					cout << "Missing big blind information!" << endl;
 					cleanUp(results, mySqliteLogDb);
 					return 1;
 				}
 
-				switch(modus) {
+				switch (modus)
+				{
 				case 1:
-					if(!neu) log_string += "</br>";
-					else log_string += "<br />";
+					if (!neu)
+						log_string += "</br>";
+					else
+						log_string += "<br />";
 					break;
 				case 2:
 					log_string += "\n";
@@ -885,37 +902,45 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 				case 3:
 					log_string += "<br />";
 					break;
-				default:
-					;
+				default:;
 				}
 
 				// read seat cash
-				for(i=1; i<=MAX_NUMBER_OF_PLAYERS; i++) {
+				for (i = 1; i <= MAX_NUMBER_OF_PLAYERS; i++)
+				{
 
 					data_found = false;
-					for(j=0; j<nCol_Hand; j++) {
+					for (j = 0; j < nCol_Hand; j++)
+					{
 						cmpString = "Seat_";
-						cmpString+= std::to_string(i);
-						cmpString+= "_Cash";
-						if(strcmp(results.result_Hand[j], cmpString.c_str()) == 0) { // seat found
-							if(results.result_Hand[j+nCol_Hand]) { // player has cash > 0
+						cmpString += std::to_string(i);
+						cmpString += "_Cash";
+						if (strcmp(results.result_Hand[j], cmpString.c_str()) == 0)
+						{ // seat found
+							if (results.result_Hand[j + nCol_Hand])
+							{ // player has cash > 0
 								log_string += "Seat ";
 								log_string += std::to_string(i);
 								log_string += ": ";
-								if(modus == 1 || modus == 3) {
+								if (modus == 1 || modus == 3)
+								{
 									log_string += "<b>";
 								}
-								log_string += player[i-1];
-								if(modus == 1 || modus == 3) {
+								log_string += player[i - 1];
+								if (modus == 1 || modus == 3)
+								{
 									log_string += "</b>";
 								}
 								log_string += " ($";
-								log_string += results.result_Hand[j+nCol_Hand];
+								log_string += results.result_Hand[j + nCol_Hand];
 								log_string += ")";
-								switch(modus) {
+								switch (modus)
+								{
 								case 1:
-									if(!neu) log_string += "</br>";
-									else log_string += "<br />";
+									if (!neu)
+										log_string += "</br>";
+									else
+										log_string += "<br />";
 									break;
 								case 2:
 									log_string += "\n";
@@ -923,23 +948,25 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 								case 3:
 									log_string += "<br />";
 									break;
-								default:
-									;
+								default:;
 								}
 							}
 							data_found = true;
 						}
 					}
-					if(!data_found) {
+					if (!data_found)
+					{
 						cout << "Missing seat information in uniqueGame " << uniqueGameID << " and hand " << results.result_Hand_ID[hand_ctr] << "!" << endl;
 						cleanUp(results, mySqliteLogDb);
 						return 1;
 					}
 				}
 
-				if(neu) {
+				if (neu)
+				{
 
-					if(modus == 1) log_string += "<br />";
+					if (modus == 1)
+						log_string += "<br />";
 
 					// read dealer and blinds
 					sql = "SELECT Player,Action,Amount FROM Action WHERE UniqueGameID=";
@@ -950,28 +977,33 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 					sql += std::to_string(GAME_STATE_PREFLOP);
 					sql += " AND (Action='posts small blind' OR Action='posts big blind' OR Action='starts as dealer')";
 
-					if(sqlite3_get_table(mySqliteLogDb,sql.c_str(),&results.result_Action,&nRow_Action,&nCol_Action,&errmsg) != SQLITE_OK) {
+					if (sqlite3_get_table(mySqliteLogDb, sql.c_str(), &results.result_Action, &nRow_Action, &nCol_Action, &errmsg) != SQLITE_OK)
+					{
 						cout << "Error in statement: " << sql.c_str() << "[" << errmsg << "]." << endl;
 						cleanUp(results, mySqliteLogDb);
 						return 1;
 					}
-					if(nRow_Action<1) {
+					if (nRow_Action < 1)
+					{
 						cout << "Missing information about dealer and blinds in uniqueGame " << uniqueGameID << " hand " << results.result_Hand_ID[hand_ctr] << "!" << endl;
 						cleanUp(results, mySqliteLogDb);
 						return 1;
 					}
 					// log dealer and blind setting
-					for(i=1; i<=nRow_Action; i++) {
-						log_string += player[atoi(results.result_Action[3*i])-1];
+					for (i = 1; i <= nRow_Action; i++)
+					{
+						log_string += player[atoi(results.result_Action[3 * i]) - 1];
 						log_string += " ";
-						log_string += results.result_Action[3*i+1];
-						if(results.result_Action[3*i+2]) {
+						log_string += results.result_Action[3 * i + 1];
+						if (results.result_Action[3 * i + 2])
+						{
 							// with amount
-							log_string +=  " $";
-							log_string += results.result_Action[3*i+2];
+							log_string += " $";
+							log_string += results.result_Action[3 * i + 2];
 						}
 						log_string += ".";
-						switch(modus) {
+						switch (modus)
+						{
 						case 1:
 							log_string += "<br />";
 							break;
@@ -981,12 +1013,12 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 						case 3:
 							log_string += "<br />";
 							break;
-						default:
-							;
+						default:;
 						}
 					}
-
-				} else {
+				}
+				else
+				{
 
 					log_string += "BLINDS: ";
 
@@ -997,19 +1029,21 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 					sql += results.result_Hand_ID[hand_ctr];
 					sql += " AND BettingRound=0 AND Action='posts small blind'";
 
-					if(sqlite3_get_table(mySqliteLogDb,sql.c_str(),&results.result_Action,&nRow_Action,&nCol_Action,&errmsg) != SQLITE_OK) {
+					if (sqlite3_get_table(mySqliteLogDb, sql.c_str(), &results.result_Action, &nRow_Action, &nCol_Action, &errmsg) != SQLITE_OK)
+					{
 						cout << "Error in statement: " << sql.c_str() << "[" << errmsg << "]." << endl;
 						cleanUp(results, mySqliteLogDb);
 						return 1;
 					}
-					if(nRow_Action<1 || nRow_Action>1) {
+					if (nRow_Action < 1 || nRow_Action > 1)
+					{
 						cout << "Wrong information about small blind in uniqueGame " << uniqueGameID << " hand " << results.result_Hand_ID[hand_ctr] << "!" << endl;
 						cleanUp(results, mySqliteLogDb);
 						return 1;
 					}
 
 					// log small blind
-					log_string += player[atoi(results.result_Action[2])-1];
+					log_string += player[atoi(results.result_Action[2]) - 1];
 					log_string += " ($";
 					log_string += results.result_Action[3];
 					log_string += "), ";
@@ -1021,19 +1055,21 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 					sql += results.result_Hand_ID[hand_ctr];
 					sql += " AND BettingRound=0 AND Action='posts big blind'";
 
-					if(sqlite3_get_table(mySqliteLogDb,sql.c_str(),&results.result_Action,&nRow_Action,&nCol_Action,&errmsg) != SQLITE_OK) {
+					if (sqlite3_get_table(mySqliteLogDb, sql.c_str(), &results.result_Action, &nRow_Action, &nCol_Action, &errmsg) != SQLITE_OK)
+					{
 						cout << "Error in statement: " << sql.c_str() << "[" << errmsg << "]." << endl;
 						cleanUp(results, mySqliteLogDb);
 						return 1;
 					}
-					if(nRow_Action<1 || nRow_Action>1) {
+					if (nRow_Action < 1 || nRow_Action > 1)
+					{
 						cout << "Wrong information about big blind in uniqueGame " << uniqueGameID << " hand " << results.result_Hand_ID[hand_ctr] << "!" << endl;
 						cleanUp(results, mySqliteLogDb);
 						return 1;
 					}
 
 					// log big blind
-					log_string += player[atoi(results.result_Action[2])-1];
+					log_string += player[atoi(results.result_Action[2]) - 1];
 					log_string += " ($";
 					log_string += results.result_Action[3];
 					log_string += ")";
@@ -1045,22 +1081,28 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 					sql += results.result_Hand_ID[hand_ctr];
 					sql += " AND BettingRound=0 AND Action='starts as dealer'";
 
-					if(sqlite3_get_table(mySqliteLogDb,sql.c_str(),&results.result_Action,&nRow_Action,&nCol_Action,&errmsg) != SQLITE_OK) {
+					if (sqlite3_get_table(mySqliteLogDb, sql.c_str(), &results.result_Action, &nRow_Action, &nCol_Action, &errmsg) != SQLITE_OK)
+					{
 						cout << "Error in statement: " << sql.c_str() << "[" << errmsg << "]." << endl;
 						cleanUp(results, mySqliteLogDb);
 						return 1;
 					}
-					if(nRow_Action>1) {
+					if (nRow_Action > 1)
+					{
 						cout << "Implausible information about dealer in uniqueGame " << uniqueGameID << " hand " << results.result_Hand_ID[hand_ctr] << "!" << endl;
 						cleanUp(results, mySqliteLogDb);
 						return 1;
 					}
 
-					if(nRow_Action == 1) {
-						switch(modus) {
+					if (nRow_Action == 1)
+					{
+						switch (modus)
+						{
 						case 1:
-							if(!neu) log_string += "</br>";
-							else log_string += "<br />";
+							if (!neu)
+								log_string += "</br>";
+							else
+								log_string += "<br />";
 							break;
 						case 2:
 							log_string += "\n";
@@ -1068,26 +1110,28 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 						case 3:
 							log_string += "<br />";
 							break;
-						default:
-							;
+						default:;
 						}
-						log_string += player[atoi(results.result_Action[2])-1];
+						log_string += player[atoi(results.result_Action[2]) - 1];
 						log_string += " starts as dealer.";
 					}
-
 				}
 
-				if(!neu && modus==1) log_string += "</br>";
+				if (!neu && modus == 1)
+					log_string += "</br>";
 
-				writeLog(log_string,modus);
+				writeLog(log_string, modus);
 				log_string = "";
 
-				for(round_ctr=GAME_STATE_PREFLOP; round_ctr<=GAME_STATE_POST_RIVER; round_ctr++) {
+				for (round_ctr = GAME_STATE_PREFLOP; round_ctr <= GAME_STATE_POST_RIVER; round_ctr++)
+				{
 
 					round_string = "";
 					// write round name and board cards
-					if(round_ctr<=GAME_STATE_RIVER) {
-						switch(round_ctr) {
+					if (round_ctr <= GAME_STATE_RIVER)
+					{
+						switch (round_ctr)
+						{
 						case GAME_STATE_PREFLOP:
 							round_string += "PREFLOP";
 							break;
@@ -1100,16 +1144,21 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 						case GAME_STATE_RIVER:
 							round_string += "RIVER";
 							break;
-						default:
-							;
+						default:;
 						}
-						switch(modus) {
+						switch (modus)
+						{
 						case 1:
-							if(!neu) round_string = "</br><b>" + round_string + "</b>";
-							else round_string = "<br /><b>" + round_string + "</b>";
-							if(round_ctr >= GAME_STATE_FLOP) {
-								if(!neu) round_string = "</br>\n" + round_string;
-								else round_string = "<br />\n" + round_string;
+							if (!neu)
+								round_string = "</br><b>" + round_string + "</b>";
+							else
+								round_string = "<br /><b>" + round_string + "</b>";
+							if (round_ctr >= GAME_STATE_FLOP)
+							{
+								if (!neu)
+									round_string = "</br>\n" + round_string;
+								else
+									round_string = "<br />\n" + round_string;
 							}
 							break;
 						case 2:
@@ -1117,32 +1166,41 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 							break;
 						case 3:
 							round_string = "<b>" + round_string + "</b>";
-							if(round_ctr >= GAME_STATE_FLOP) {
+							if (round_ctr >= GAME_STATE_FLOP)
+							{
 								round_string = "<br /><br />" + round_string;
 							}
 							break;
-						default:
-							;
+						default:;
 						}
-						if(round_ctr >= GAME_STATE_FLOP) {
+						if (round_ctr >= GAME_STATE_FLOP)
+						{
 							round_string += " [board cards ";
-							for(i=1; i<=round_ctr+2; i++) {
+							for (i = 1; i <= round_ctr + 2; i++)
+							{
 								data_found = false;
 								std::string boardCard = "BoardCard_" + std::to_string(i);
-								for(j=0; j<nCol_Hand; j++) {
-									if(strcmp(results.result_Hand[j], boardCard.c_str()) == 0) {
-										if(results.result_Hand[j+nCol_Hand]) {
-											if(modus == 1 || modus == 3) round_string += "<b>";
-											string_tmp = convertCardIntToString(atoi(results.result_Hand[j+nCol_Hand]),modus);
-											if(string_tmp == "") {
+								for (j = 0; j < nCol_Hand; j++)
+								{
+									if (strcmp(results.result_Hand[j], boardCard.c_str()) == 0)
+									{
+										if (results.result_Hand[j + nCol_Hand])
+										{
+											if (modus == 1 || modus == 3)
+												round_string += "<b>";
+											string_tmp = convertCardIntToString(atoi(results.result_Hand[j + nCol_Hand]), modus);
+											if (string_tmp == "")
+											{
 												cout << "Implausible board card in uniqueGame " << uniqueGameID << " hand " << results.result_Hand_ID[hand_ctr] << "!" << endl;
 												cleanUp(results, mySqliteLogDb);
 												return 1;
 											}
 											round_string += std::to_string(string_tmp.at(0));
-											if(modus==1 || modus == 3) round_string += "</b>";
-											round_string += string_tmp.erase(0,1);
-											if(round_ctr+2-i > 0) round_string += ",";
+											if (modus == 1 || modus == 3)
+												round_string += "</b>";
+											round_string += string_tmp.erase(0, 1);
+											if (round_ctr + 2 - i > 0)
+												round_string += ",";
 
 											data_found = true;
 										}
@@ -1151,9 +1209,12 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 							}
 							round_string += "]";
 						}
-						if(data_found) {
+						if (data_found)
+						{
 							log_string += round_string;
-						} else {
+						}
+						else
+						{
 							continue;
 						}
 					}
@@ -1167,23 +1228,29 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 					sql += std::to_string(round_ctr);
 					sql += " AND Action<>'starts as dealer' AND Action<>'posts big blind' AND Action<>'posts small blind'";
 
-					if(sqlite3_get_table(mySqliteLogDb,sql.c_str(),&results.result_Action,&nRow_Action,&nCol_Action,&errmsg) != SQLITE_OK) {
+					if (sqlite3_get_table(mySqliteLogDb, sql.c_str(), &results.result_Action, &nRow_Action, &nCol_Action, &errmsg) != SQLITE_OK)
+					{
 						cout << "Error in statement: " << sql.c_str() << "[" << errmsg << "]." << endl;
 						cleanUp(results, mySqliteLogDb);
 						return 1;
 					}
 
-					for(action_ctr=1; action_ctr<=nRow_Action; action_ctr++) {
-						switch(modus) {
+					for (action_ctr = 1; action_ctr <= nRow_Action; action_ctr++)
+					{
+						switch (modus)
+						{
 						case 1:
-							if(!neu) {
-								if(action_ctr>1 && (strcmp(results.result_Action[3*(action_ctr-1)+1],  "wins") == 0) || 
-									strcmp(results.result_Action[3*(action_ctr-1)+1], "sits out") == 0 || 
-									strcmp(results.result_Action[3*(action_ctr-1)+1], "wins (side pot)") == 0)
+							if (!neu)
+							{
+								if (action_ctr > 1 && (strcmp(results.result_Action[3 * (action_ctr - 1) + 1], "wins") == 0) ||
+									strcmp(results.result_Action[3 * (action_ctr - 1) + 1], "sits out") == 0 ||
+									strcmp(results.result_Action[3 * (action_ctr - 1) + 1], "wins (side pot)") == 0)
 									log_string += "\n";
 								else
 									log_string += "</br>\n";
-							} else {
+							}
+							else
+							{
 								log_string += "<br />\n";
 							}
 							break;
@@ -1193,31 +1260,38 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 						case 3:
 							log_string += "<br />";
 							break;
-						default:
-							;
+						default:;
 						}
-						if(!neu && strcmp(results.result_Action[3*action_ctr+1], "wins (side pot)") == 0) {
-							action_string += player[atoi(results.result_Action[3*action_ctr])-1];
+						if (!neu && strcmp(results.result_Action[3 * action_ctr + 1], "wins (side pot)") == 0)
+						{
+							action_string += player[atoi(results.result_Action[3 * action_ctr]) - 1];
 							action_string += " wins $";
-							action_string += results.result_Action[3*action_ctr+2];
+							action_string += results.result_Action[3 * action_ctr + 2];
 							action_string += " (side pot)";
-						} else {
-							action_string += player[atoi(results.result_Action[3*action_ctr])-1];
+						}
+						else
+						{
+							action_string += player[atoi(results.result_Action[3 * action_ctr]) - 1];
 							action_string += " ";
-							action_string += results.result_Action[3*action_ctr+1];
-							if(results.result_Action[3*action_ctr+2]) {
+							action_string += results.result_Action[3 * action_ctr + 1];
+							if (results.result_Action[3 * action_ctr + 2])
+							{
 								// with amount
 								action_string += " $";
-								action_string += results.result_Action[3*action_ctr+2];
+								action_string += results.result_Action[3 * action_ctr + 2];
 							}
 						}
 
 						// wins game
-						if(strcmp(results.result_Action[3*action_ctr+1], "wins game") == 0) {
-							switch(modus) {
+						if (strcmp(results.result_Action[3 * action_ctr + 1], "wins game") == 0)
+						{
+							switch (modus)
+							{
 							case 1:
-								if(!neu) action_string = "</br></br><i><b>" + action_string + " " + std::to_string(gameID) + "!</i></b></br>";
-								else action_string = "</br><i><b>" + action_string + " " + std::to_string(gameID) + "!</b></i>";
+								if (!neu)
+									action_string = "</br></br><i><b>" + action_string + " " + std::to_string(gameID) + "!</i></b></br>";
+								else
+									action_string = "</br><i><b>" + action_string + " " + std::to_string(gameID) + "!</b></i>";
 								break;
 							case 2:
 								action_string += action_string + " " + std::to_string(gameID) + "!";
@@ -1225,57 +1299,62 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 							case 3:
 								action_string = "<i><b>" + action_string + " " + std::to_string(gameID) + "!</b></i>";
 								break;
-							default:
-								;
+							default:;
 							}
 						}
 
 						// wins
-						if(strcmp(results.result_Action[3*action_ctr+1], "wins") == 0 ||
-							strcmp(results.result_Action[3*action_ctr+1], "wins (side pot)") == 0) {
-							switch(modus) {
+						if (strcmp(results.result_Action[3 * action_ctr + 1], "wins") == 0 ||
+							strcmp(results.result_Action[3 * action_ctr + 1], "wins (side pot)") == 0)
+						{
+							switch (modus)
+							{
 							case 1:
-								if(!neu) action_string = "</br><i>" + action_string + "</i>";
-								else action_string = "<i>" + action_string + "</i>";
+								if (!neu)
+									action_string = "</br><i>" + action_string + "</i>";
+								else
+									action_string = "<i>" + action_string + "</i>";
 								break;
 							case 3:
 								action_string = "<i>" + action_string + "</i>";
 								break;
-							default:
-								;
+							default:;
 							}
 						}
 
 						// network actions
-						if(strcmp(results.result_Action[3*action_ctr+1], "has left the game") == 0 
-							|| strcmp(results.result_Action[3*action_ctr+1], "was kicked from the game") == 0 
-							|| strcmp(results.result_Action[3*action_ctr+1], "is game admin now") == 0
-							|| strcmp(results.result_Action[3*action_ctr+1], "has joined the game") == 0) {
-							switch(modus) {
+						if (strcmp(results.result_Action[3 * action_ctr + 1], "has left the game") == 0 || strcmp(results.result_Action[3 * action_ctr + 1], "was kicked from the game") == 0 || strcmp(results.result_Action[3 * action_ctr + 1], "is game admin now") == 0 || strcmp(results.result_Action[3 * action_ctr + 1], "has joined the game") == 0)
+						{
+							switch (modus)
+							{
 							case 1:
-								if(!neu) action_string = "<i>" + action_string + "!</i>";
-								else action_string = "<i>" + action_string + "</i>";
+								if (!neu)
+									action_string = "<i>" + action_string + "!</i>";
+								else
+									action_string = "<i>" + action_string + "</i>";
 								break;
 							case 3:
 								action_string = "<i>" + action_string + "</i>";
 								break;
-							default:
-								;
+							default:;
 							}
 						}
 
 						// sits out
-						if(strcmp(results.result_Action[3*action_ctr+1], "sits out") == 0) {
-							switch(modus) {
+						if (strcmp(results.result_Action[3 * action_ctr + 1], "sits out") == 0)
+						{
+							switch (modus)
+							{
 							case 1:
-								if(!neu) action_string = "</br><i><span style=\"font-size:smaller;\">" + action_string + "</span></i>";
-								else action_string = "<i><span style=\"font-size:smaller;\">" + action_string + "</span></i>";
+								if (!neu)
+									action_string = "</br><i><span style=\"font-size:smaller;\">" + action_string + "</span></i>";
+								else
+									action_string = "<i><span style=\"font-size:smaller;\">" + action_string + "</span></i>";
 								break;
 							case 3:
 								action_string = "<i><span style=\"font-size:smaller;\">" + action_string + "</span></i>";
 								break;
-							default:
-								;
+							default:;
 							}
 						}
 
@@ -1283,35 +1362,45 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 						action_string = "";
 
 						// show cards
-						if(strcmp(results.result_Action[3*action_ctr+1], "shows") == 0 || 
-							strcmp(results.result_Action[3*action_ctr+1],"has") == 0) {
+						if (strcmp(results.result_Action[3 * action_ctr + 1], "shows") == 0 ||
+							strcmp(results.result_Action[3 * action_ctr + 1], "has") == 0)
+						{
 							// log cards
-							if(!neu && round_ctr == GAME_STATE_POST_RIVER) log_string += " [ ";
-							else log_string += " [";
-							if(modus == 1 || modus == 3) log_string += "<b>";
+							if (!neu && round_ctr == GAME_STATE_POST_RIVER)
+								log_string += " [ ";
+							else
+								log_string += " [";
+							if (modus == 1 || modus == 3)
+								log_string += "<b>";
 
 							// find hole card 1
 							data_found = false;
-							for(i=0; i<nCol_Hand; i++) {
+							for (i = 0; i < nCol_Hand; i++)
+							{
 								cmpString = "Seat_";
-								cmpString += results.result_Action[3*action_ctr];
+								cmpString += results.result_Action[3 * action_ctr];
 								cmpString += "_Card_1";
-								if(strcmp(results.result_Hand[i], cmpString.c_str()) == 0) {
-									string_tmp = convertCardIntToString(atoi(results.result_Hand[i+nCol_Hand]),modus);
-									if(string_tmp == "") {
+								if (strcmp(results.result_Hand[i], cmpString.c_str()) == 0)
+								{
+									string_tmp = convertCardIntToString(atoi(results.result_Hand[i + nCol_Hand]), modus);
+									if (string_tmp == "")
+									{
 										cout << "Hole card information implausible in uniqueGame " << uniqueGameID << " hand " << results.result_Hand_ID[hand_ctr] << "!" << endl;
 										cleanUp(results, mySqliteLogDb);
 										return 1;
 									}
 									log_string += std::to_string(string_tmp.at(0));
-									if(modus == 1 || modus == 3) log_string += "</b>";
-									log_string += string_tmp.erase(0,1);
+									if (modus == 1 || modus == 3)
+										log_string += "</b>";
+									log_string += string_tmp.erase(0, 1);
 									log_string += ",";
-									if(modus == 1 || modus == 3) log_string += "<b>";
+									if (modus == 1 || modus == 3)
+										log_string += "<b>";
 									data_found = true;
 								}
 							}
-							if(!data_found) {
+							if (!data_found)
+							{
 								cout << "Missing hole card information in uniqueGame " << uniqueGameID << " hand " << results.result_Hand_ID[hand_ctr] << "!" << endl;
 								cleanUp(results, mySqliteLogDb);
 								return 1;
@@ -1319,84 +1408,85 @@ int guiLog::exportLog(QString fileStringPdb,int modus)
 
 							// find hole card 2
 							data_found = false;
-							for(i=0; i<nCol_Hand; i++) {
+							for (i = 0; i < nCol_Hand; i++)
+							{
 								cmpString = "Seat_";
-								cmpString += results.result_Action[3*action_ctr];
+								cmpString += results.result_Action[3 * action_ctr];
 								cmpString += "_Card_2";
-								if(strcmp(results.result_Hand[i], cmpString.c_str()) == 0) {
-									string_tmp = convertCardIntToString(atoi(results.result_Hand[i+nCol_Hand]),modus);
-									if(string_tmp == "") {
+								if (strcmp(results.result_Hand[i], cmpString.c_str()) == 0)
+								{
+									string_tmp = convertCardIntToString(atoi(results.result_Hand[i + nCol_Hand]), modus);
+									if (string_tmp == "")
+									{
 										cout << "Hole card information implausible in uniqueGame " << uniqueGameID << " hand " << results.result_Hand_ID[hand_ctr] << "!" << endl;
 										cleanUp(results, mySqliteLogDb);
 										return 1;
 									}
 									log_string += std::to_string(string_tmp.at(0));
-									if(modus == 1 || modus == 3) log_string += "</b>";
-									log_string += string_tmp.erase(0,1);
+									if (modus == 1 || modus == 3)
+										log_string += "</b>";
+									log_string += string_tmp.erase(0, 1);
 									log_string += "]";
 									data_found = true;
 								}
 							}
-							if(!data_found) {
+							if (!data_found)
+							{
 								cout << "Missing hole card information in uniqueGame " << uniqueGameID << " hand " << results.result_Hand_ID[hand_ctr] << "!" << endl;
 								cleanUp(results, mySqliteLogDb);
 								return 1;
 							}
 
-							if(round_ctr == GAME_STATE_POST_RIVER) {
+							if (round_ctr == GAME_STATE_POST_RIVER)
+							{
 								// find hand name
-								for(i=0; i<nCol_Hand; i++) {
+								for (i = 0; i < nCol_Hand; i++)
+								{
 									cmpString = "Seat_";
 									cmpString += results.result_Action[3 * action_ctr];
 									cmpString += "_Hand_text";
-									if(strcmp(results.result_Hand[i], cmpString.c_str()) == 0 && results.result_Hand[i+nCol_Hand]) {
+									if (strcmp(results.result_Hand[i], cmpString.c_str()) == 0 && results.result_Hand[i + nCol_Hand])
+									{
 										log_string += " - ";
 										log_string += results.result_Hand[i + nCol_Hand];
 									}
 								}
 							}
-
 						}
 
-						if(!neu && strcmp(results.result_Action[3*action_ctr+1], "wins") == 0 && 
-							strcmp(results.result_Action[3*action_ctr+1], "shows") != 0 && 
-							strcmp(results.result_Action[3*action_ctr+1],"has") != 0 && 
-							strcmp(results.result_Action[3*action_ctr+1], "sits out") != 0 &&
-							strcmp(results.result_Action[3*action_ctr+1], "wins (side pot)") != 0 &&
-							strcmp(results.result_Action[3*action_ctr+1], "wins game") &&
-							strcmp(results.result_Action[3*action_ctr+1], "has left the game") != 0 &&
-							strcmp(results.result_Action[3*action_ctr+1], "was kicked from the game") != 0 &&
-							strcmp(results.result_Action[3*action_ctr+1], "is game admin now") != 0 &&
-							strcmp(results.result_Action[3*action_ctr+1], "has joined the game") != 0) {
+						if (!neu && strcmp(results.result_Action[3 * action_ctr + 1], "wins") == 0 &&
+							strcmp(results.result_Action[3 * action_ctr + 1], "shows") != 0 &&
+							strcmp(results.result_Action[3 * action_ctr + 1], "has") != 0 &&
+							strcmp(results.result_Action[3 * action_ctr + 1], "sits out") != 0 &&
+							strcmp(results.result_Action[3 * action_ctr + 1], "wins (side pot)") != 0 &&
+							strcmp(results.result_Action[3 * action_ctr + 1], "wins game") &&
+							strcmp(results.result_Action[3 * action_ctr + 1], "has left the game") != 0 &&
+							strcmp(results.result_Action[3 * action_ctr + 1], "was kicked from the game") != 0 &&
+							strcmp(results.result_Action[3 * action_ctr + 1], "is game admin now") != 0 &&
+							strcmp(results.result_Action[3 * action_ctr + 1], "has joined the game") != 0)
+						{
 							log_string += ".";
 						}
-						if(neu && strcmp(results.result_Action[3*action_ctr+1], "wins game") != 0 &&
-							strcmp(results.result_Action[3*action_ctr+1], "has left the game") != 0 &&
-							strcmp(results.result_Action[3*action_ctr+1], "was kicked from the game") != 0 &&
-							strcmp(results.result_Action[3*action_ctr+1], "is game admin now") != 0 &&
-							strcmp(results.result_Action[3*action_ctr+1], "has joined the game") != 0)
+						if (neu && strcmp(results.result_Action[3 * action_ctr + 1], "wins game") != 0 &&
+							strcmp(results.result_Action[3 * action_ctr + 1], "has left the game") != 0 &&
+							strcmp(results.result_Action[3 * action_ctr + 1], "was kicked from the game") != 0 &&
+							strcmp(results.result_Action[3 * action_ctr + 1], "is game admin now") != 0 &&
+							strcmp(results.result_Action[3 * action_ctr + 1], "has joined the game") != 0)
 							log_string += ".";
-
 					}
-
 				}
 
-				if(modus == 1) log_string += "\n";
-				writeLog(log_string,modus);
+				if (modus == 1)
+					log_string += "\n";
+				writeLog(log_string, modus);
 				log_string = "";
-
-
-
 			}
-
 		}
-
 	}
 
 	cleanUp(results, mySqliteLogDb);
 
 	return 0;
-
 }
 
 void guiLog::cleanUp(result_struct &results, sqlite3 *mySqliteLogDb)
@@ -1415,7 +1505,8 @@ int guiLog::convertCardStringToInt(string val, string col)
 
 	int tmp;
 
-	switch(*col.c_str()) {
+	switch (*col.c_str())
+	{
 	case 'd':
 		tmp = 0;
 		break;
@@ -1432,7 +1523,8 @@ int guiLog::convertCardStringToInt(string val, string col)
 		return -1;
 	}
 
-	switch(*val.c_str()) {
+	switch (*val.c_str())
+	{
 	case '2':
 		tmp += 0;
 		break;
@@ -1477,7 +1569,6 @@ int guiLog::convertCardStringToInt(string val, string col)
 	}
 
 	return tmp;
-
 }
 
 string guiLog::convertCardIntToString(int code, int modus)
@@ -1485,7 +1576,8 @@ string guiLog::convertCardIntToString(int code, int modus)
 
 	string tmp;
 
-	switch(code%13) {
+	switch (code % 13)
+	{
 	case 0:
 		tmp = "2";
 		break;
@@ -1529,44 +1621,47 @@ string guiLog::convertCardIntToString(int code, int modus)
 		return "";
 	}
 
-	if(modus==2) {
+	if (modus == 2)
+	{
 
-		switch(code/13) {
+		switch (code / 13)
+		{
 		case 0:
-			tmp+= "d";
+			tmp += "d";
 			break;
 		case 1:
-			tmp+= "h";
+			tmp += "h";
 			break;
 		case 2:
-			tmp+= "s";
+			tmp += "s";
 			break;
 		case 3:
-			tmp+= "c";
+			tmp += "c";
 			break;
 		default:
 			return "";
 		}
+	}
+	else
+	{
 
-	} else {
-
-		switch(code/13) {
+		switch (code / 13)
+		{
 		case 0:
-			tmp+= "<font size=+1><b>&diams;</b></font>";
+			tmp += "<font size=+1><b>&diams;</b></font>";
 			break;
 		case 1:
-			tmp+= "<font size=+1><b>&hearts;</b></font>";
+			tmp += "<font size=+1><b>&hearts;</b></font>";
 			break;
 		case 2:
-			tmp+= "<font size=+1><b>&spades;</b></font>";
+			tmp += "<font size=+1><b>&spades;</b></font>";
 			break;
 		case 3:
-			tmp+= "<font size=+1><b>&clubs;</b></font>";
+			tmp += "<font size=+1><b>&clubs;</b></font>";
 			break;
 		default:
 			return "";
 		}
-
 	}
 
 	return tmp;

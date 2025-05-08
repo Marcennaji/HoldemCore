@@ -72,7 +72,6 @@ private:
 	std::string configFileName;
 	std::string logDir;
 	std::string dataDir;
-	std::string cacheDir;
 	std::string defaultGameTableStyle;
 	std::string defaultCardDeck;
 

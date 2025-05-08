@@ -48,9 +48,6 @@ Log::init()
 
 	if(SQLITE_LOG) {
 
-		// logging activated
-		if(myConfig->readConfigInt("LogOnOff")) {
-
 			bool dirExists;
 
 			dirExists = std::filesystem::is_directory(myConfig->readConfigString("LogDir"));
@@ -81,7 +78,7 @@ Log::init()
 						createDatabase();
 				}
 			}
-		}
+
 	}
 }
 
