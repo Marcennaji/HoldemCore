@@ -90,14 +90,7 @@ gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
 
 	label_chance->setStyle(myGameTableStyle);
 
-	if (myConfig->readConfigInt("FlipsideOwn") && myConfig->readConfigString("FlipsideOwnFile") != "")
-	{
-		flipside = QPixmap::fromImage(QImage(QString::fromUtf8(myConfig->readConfigString("FlipsideOwnFile").c_str())));
-	}
-	else
-	{
-		flipside = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + "flipside.png"));
-	}
+	flipside = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + "flipside.png"));
 
 	flipHolecardsAllInAlreadyDone = false;
 
@@ -519,15 +512,8 @@ void gameTableImpl::applySettings(settingsDialogImpl *mySettingsDialog)
 		}
 	}
 
-	// Flipside refresh
-	if (myConfig->readConfigInt("FlipsideOwn") && myConfig->readConfigString("FlipsideOwnFile") != "")
-	{
-		flipside = QPixmap::fromImage(QImage(QString::fromUtf8(myConfig->readConfigString("FlipsideOwnFile").c_str())));
-	}
-	else
-	{
-		flipside = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + "flipside.png"));
-	}
+	flipside = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + "flipside.png"));
+
 	int j, k;
 	for (j = 1; j < MAX_NUMBER_OF_PLAYERS; j++)
 	{
@@ -658,18 +644,12 @@ void gameTableImpl::refreshButton()
 					break;
 				case 2:
 				{
-					if (myConfig->readConfigInt("ShowBlindButtons"))
-						buttonLabelArray[(*it_c)->getID()]->setPixmap(smallblindButton);
-					else
-						buttonLabelArray[(*it_c)->getID()]->setPixmap(onePix);
+					buttonLabelArray[(*it_c)->getID()]->setPixmap(smallblindButton);
 				}
 				break;
 				case 3:
 				{
-					if (myConfig->readConfigInt("ShowBlindButtons"))
-						buttonLabelArray[(*it_c)->getID()]->setPixmap(bigblindButton);
-					else
-						buttonLabelArray[(*it_c)->getID()]->setPixmap(onePix);
+					buttonLabelArray[(*it_c)->getID()]->setPixmap(bigblindButton);
 				}
 				break;
 				default:
@@ -686,10 +666,7 @@ void gameTableImpl::refreshButton()
 					break;
 				case 3:
 				{
-					if (myConfig->readConfigInt("ShowBlindButtons"))
-						buttonLabelArray[(*it_c)->getID()]->setPixmap(bigblindButton);
-					else
-						buttonLabelArray[(*it_c)->getID()]->setPixmap(onePix);
+					buttonLabelArray[(*it_c)->getID()]->setPixmap(bigblindButton);
 				}
 				break;
 				default:
@@ -2537,122 +2514,8 @@ void gameTableImpl::postRiverRunAnimation3()
 			// Show "Winner" label
 			actionLabelArray[(*it_c)->getID()]->setPixmap(QPixmap::fromImage(QImage(myGameTableStyle->getActionPic(7))));
 
-			// show winnercards if more than one player is active TODO
-			if (nonfoldPlayerCounter != 1 && myConfig->readConfigInt("ShowFadeOutCardsAnimation"))
-			{
-
-				int j;
-				int bestHandPos[5];
-				(*it_c)->getBestHandPosition(bestHandPos);
-
-				bool index0 = true;
-				for (j = 0; j < 5; j++)
-				{
-					if (bestHandPos[j] == 0)
-					{
-						index0 = false;
-					}
-				}
-				if (index0)
-				{
-					holeCardsArray[(*it_c)->getID()][0]->startFadeOut(guiGameSpeed); /*cout << "Fade Out index0" << endl;*/
-				}
-				// index 1 testen
-				bool index1 = true;
-				for (j = 0; j < 5; j++)
-				{
-					if (bestHandPos[j] == 1)
-					{
-						index1 = false;
-					}
-				}
-				if (index1)
-				{
-					holeCardsArray[(*it_c)->getID()][1]->startFadeOut(guiGameSpeed); /*cout << "Fade Out index1" << endl;*/
-				}
-				// index 2 testen
-				bool index2 = true;
-				for (j = 0; j < 5; j++)
-				{
-					if (bestHandPos[j] == 2)
-					{
-						index2 = false;
-					}
-				}
-				if (index2)
-				{
-					boardCardsArray[0]->startFadeOut(guiGameSpeed); /*cout << "Fade Out index2" << endl;*/
-				}
-				// index 3 testen
-				bool index3 = true;
-				for (j = 0; j < 5; j++)
-				{
-					if (bestHandPos[j] == 3)
-					{
-						index3 = false;
-					}
-				}
-				if (index3)
-				{
-					boardCardsArray[1]->startFadeOut(guiGameSpeed); /*cout << "Fade Out index3" << endl;*/
-				}
-				// index 4 testen
-				bool index4 = true;
-				for (j = 0; j < 5; j++)
-				{
-					if (bestHandPos[j] == 4)
-					{
-						index4 = false;
-					}
-				}
-				if (index4)
-				{
-					boardCardsArray[2]->startFadeOut(guiGameSpeed); /*cout << "Fade Out index4" << endl;*/
-				}
-				// index 5 testen
-				bool index5 = true;
-				for (j = 0; j < 5; j++)
-				{
-					if (bestHandPos[j] == 5)
-					{
-						index5 = false;
-					}
-				}
-				if (index5)
-				{
-					boardCardsArray[3]->startFadeOut(guiGameSpeed); /*cout << "Fade Out index5" << endl;*/
-				}
-				// index 6 testen
-				bool index6 = true;
-				for (j = 0; j < 5; j++)
-				{
-					if (bestHandPos[j] == 6)
-					{
-						index6 = false;
-					}
-				}
-				if (index6)
-				{
-					boardCardsArray[4]->startFadeOut(guiGameSpeed); /*cout << "Fade Out index6" << endl;*/
-				}
-			}
-			// Pot-Verteilung Loggen
-			// Wenn River dann auch das Blatt loggen!
-			//  			if (textLabel_handLabel->text() == "River") {
-
 			// set Player value (logging)
 			myGuiLog->logPlayerWinsMsg(QString::fromUtf8((*it_c)->getName().c_str()), (*it_c)->getLastMoneyWon(), true);
-		}
-		else
-		{
-
-			if (activePlayerList->size() != 1 && (*it_c)->getAction() != PLAYER_ACTION_FOLD && myConfig->readConfigInt("ShowFadeOutCardsAnimation"))
-			{
-
-				// aufgedeckte Gegner auch ausblenden
-				holeCardsArray[(*it_c)->getID()][0]->startFadeOut(guiGameSpeed);
-				holeCardsArray[(*it_c)->getID()][1]->startFadeOut(guiGameSpeed);
-			}
 		}
 	}
 

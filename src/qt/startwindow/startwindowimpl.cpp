@@ -45,20 +45,19 @@ startWindowImpl::startWindowImpl(ConfigFile *c, Log *l)
 	this->setWindowTitle(QString(tr("PokerTraining %1").arg(POKERTRAINING_BETA_RELEASE_STRING)));
 	this->installEventFilter(this);
 
-	//Widgets Grafiken per Stylesheets setzen
+	// Widgets Grafiken per Stylesheets setzen
 	QString myAppDataPath = QString::fromUtf8(myConfig->readConfigString("AppDataDir").c_str());
-	this->setWindowIcon(QIcon(myAppDataPath+"gfx/gui/misc/windowicon.png"));
+	this->setWindowIcon(QIcon(myAppDataPath + "gfx/gui/misc/windowicon.png"));
 
 	this->setStatusBar(0);
 
 	// 	Dialogs
 	myNewGameDialog = new newGameDialogImpl(this, myConfig);
 
-	connect( actionStartGame, SIGNAL( triggered() ), this, SLOT( callNewGameDialog() ) );
-	connect( pushButtonStartGame, SIGNAL( clicked() ), this, SLOT( callNewGameDialog() ) );
+	connect(actionStartGame, SIGNAL(triggered()), this, SLOT(callNewGameDialog()));
+	connect(pushButtonStartGame, SIGNAL(clicked()), this, SLOT(callNewGameDialog()));
 
 	this->show();
-
 }
 
 startWindowImpl::~startWindowImpl()
@@ -67,15 +66,10 @@ startWindowImpl::~startWindowImpl()
 
 void startWindowImpl::callNewGameDialog()
 {
-	if(myConfig->readConfigInt("ShowGameSettingsDialogOnNewGame")) {
-
-		myNewGameDialog->exec();
-		if (myNewGameDialog->result() == QDialog::Accepted ) {
-			startNewGame(myNewGameDialog);
-		}
-	}
-	else {
-		startNewGame();
+	myNewGameDialog->exec();
+	if (myNewGameDialog->result() == QDialog::Accepted)
+	{
+		startNewGame(myNewGameDialog);
 	}
 }
 
@@ -85,64 +79,65 @@ void startWindowImpl::startNewGame(newGameDialogImpl *v)
 	this->hide();
 	myGuiInterface->getW()->show();
 
-	//get values from  game dialog
+	// get values from  game dialog
 	GameData gameData;
-	if(v) {
+	if (v)
+	{
 		// Set Game Data
 		gameData.maxNumberOfPlayers = v->spinBox_quantityPlayers->value();
 		gameData.startMoney = v->spinBox_startCash->value();
 		gameData.firstSmallBlind = 12;
 
-		//Speeds
+		// Speeds
 		gameData.guiSpeed = 8;
 
 		if (v->radioButton_opponentsLooseAggressive->isChecked())
 			gameData.tableProfile = LARGE_AGRESSIVE_OPPONENTS;
-		else
-		if (v->radioButton_opponentsTightAgressive->isChecked())
+		else if (v->radioButton_opponentsTightAgressive->isChecked())
 			gameData.tableProfile = TIGHT_AGRESSIVE_OPPONENTS;
 		else
 			gameData.tableProfile = RANDOM_OPPONENTS;
-
 	}
 	// start with default values
-	else {
+	else
+	{
 		// Set Game Data
 		gameData.maxNumberOfPlayers = myConfig->readConfigInt("NumberOfPlayers");
 		gameData.startMoney = myConfig->readConfigInt("StartCash");
-		gameData.firstSmallBlind =  myConfig->readConfigInt("FirstSmallBlind");
+		gameData.firstSmallBlind = myConfig->readConfigInt("FirstSmallBlind");
 		gameData.tableProfile = TIGHT_AGRESSIVE_OPPONENTS;
 
-		//Speeds
+		// Speeds
 		gameData.guiSpeed = myConfig->readConfigInt("GameSpeed");
-			
 	}
 	// Set dealer pos.
 	StartData startData;
 	int tmpDealerPos = 0;
 	startData.numberOfPlayers = gameData.maxNumberOfPlayers;
 
-	Tools::GetRand(0, startData.numberOfPlayers-1, 1, &tmpDealerPos);
-	//if(DEBUG_MODE) {
-	//    tmpDealerPos = 4;
-	//}
+	Tools::GetRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
+	// if(DEBUG_MODE) {
+	//     tmpDealerPos = 4;
+	// }
 	startData.startDealerPlayerId = static_cast<unsigned>(tmpDealerPos);
 
-	//some gui modifications
+	// some gui modifications
 	myGuiInterface->getW()->GameModification();
 
-	//Start Game!!!
+	// Start Game!!!
 	mySession->startGame(gameData, startData);
 }
 
-
 bool startWindowImpl::eventFilter(QObject *obj, QEvent *event)
 {
-	if (event->type() == QEvent::Close) {
+	if (event->type() == QEvent::Close)
+	{
 		event->ignore();
 		//        mySession->getLog()->closeLogDbAtExit();
 		return QMainWindow::eventFilter(obj, event);
-	} else {
+	}
+	else
+	{
 		// pass the event on to the parent class
 		return QMainWindow::eventFilter(obj, event);
 	}
