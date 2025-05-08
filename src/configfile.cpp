@@ -94,78 +94,20 @@ ConfigFile::ConfigFile(char* argv0, bool readonly) : noWriteAccess(readonly)
 	_mkdir(dataDir.c_str());
 	_mkdir(cacheDir.c_str());
 
-
-	ostringstream tempIntToString;
-	tempIntToString << configRev;
-	configList.push_back(ConfigInfo("ConfigRevision", CONFIG_TYPE_INT, tempIntToString.str()));
 	configList.push_back(ConfigInfo("AppDataDir", CONFIG_TYPE_STRING, myQtToolsInterface->getDataPathStdString(myArgv0)));
-	configList.push_back(ConfigInfo("Language", CONFIG_TYPE_INT, myQtToolsInterface->getDefaultLanguage()));
-	configList.push_back(ConfigInfo("ShowLeftToolBox", CONFIG_TYPE_INT, "1"));
 	configList.push_back(ConfigInfo("ShowRightToolBox", CONFIG_TYPE_INT, "1"));
 	configList.push_back(ConfigInfo("ShowFadeOutCardsAnimation", CONFIG_TYPE_INT, "1"));
 	configList.push_back(ConfigInfo("ShowFlipCardsAnimation", CONFIG_TYPE_INT, "1"));
 	configList.push_back(ConfigInfo("ShowBlindButtons", CONFIG_TYPE_INT, "1"));
-	configList.push_back(ConfigInfo("DontTranslateInternationalPokerStringsFromStyle", CONFIG_TYPE_INT, "0"));
-	configList.push_back(ConfigInfo("AccidentallyCallBlocker", CONFIG_TYPE_INT, "1"));
-	configList.push_back(ConfigInfo("AntiPeekMode", CONFIG_TYPE_INT, "0"));
-	configList.push_back(ConfigInfo("AlternateFKeysUserActionMode", CONFIG_TYPE_INT, "0"));
-	configList.push_back(ConfigInfo("EnableBetInputFocusSwitch", CONFIG_TYPE_INT, "0"));
-	configList.push_back(ConfigInfo("FlipsideTux", CONFIG_TYPE_INT, "1"));
-	configList.push_back(ConfigInfo("FlipsideOwn", CONFIG_TYPE_INT, "0"));
-	configList.push_back(ConfigInfo("FlipsideOwnFile", CONFIG_TYPE_STRING, ""));
-	configList.push_back(ConfigInfo("GameTableStylesList", CONFIG_TYPE_STRING_LIST, "GameTableStyles"));
-	configList.push_back(ConfigInfo("CurrentGameTableStyle", CONFIG_TYPE_STRING, ""));
-	configList.push_back(ConfigInfo("CardDeckStylesList", CONFIG_TYPE_STRING_LIST, "CardDeckStyles"));
-	configList.push_back(ConfigInfo("PlayerTooltips", CONFIG_TYPE_STRING_LIST, "PlayerTooltips"));
-	configList.push_back(ConfigInfo("CurrentCardDeckStyle", CONFIG_TYPE_STRING, ""));
-	configList.push_back(ConfigInfo("LastGameTableStyleDir", CONFIG_TYPE_STRING, ""));
-	configList.push_back(ConfigInfo("LastCardDeckStyleDir", CONFIG_TYPE_STRING, ""));
-	configList.push_back(ConfigInfo("PlaySoundEffects", CONFIG_TYPE_INT, "1"));
 	configList.push_back(ConfigInfo("PlayGameActions", CONFIG_TYPE_INT, "1"));
-	configList.push_back(ConfigInfo("PlayLobbyChatNotification", CONFIG_TYPE_INT, "1"));
-	configList.push_back(ConfigInfo("PlayNetworkGameNotification", CONFIG_TYPE_INT, "1"));
-	configList.push_back(ConfigInfo("PlayBlindRaiseNotification", CONFIG_TYPE_INT, "1"));
 	configList.push_back(ConfigInfo("NumberOfPlayers", CONFIG_TYPE_INT, "10"));
 	configList.push_back(ConfigInfo("StartCash", CONFIG_TYPE_INT, "5000"));
 	configList.push_back(ConfigInfo("FirstSmallBlind", CONFIG_TYPE_INT, "10"));
 	configList.push_back(ConfigInfo("GameSpeed", CONFIG_TYPE_INT, "4"));
-	configList.push_back(ConfigInfo("PauseBetweenHands", CONFIG_TYPE_INT, "0"));
 	configList.push_back(ConfigInfo("ShowGameSettingsDialogOnNewGame", CONFIG_TYPE_INT, "1"));
-	configList.push_back(ConfigInfo("MyName", CONFIG_TYPE_STRING, "Human Player"));
-	configList.push_back(ConfigInfo("MyAvatar", CONFIG_TYPE_STRING, ""));
-	configList.push_back(ConfigInfo("Opponent1Name", CONFIG_TYPE_STRING, "Player 1"));
-	configList.push_back(ConfigInfo("Opponent1Avatar", CONFIG_TYPE_STRING, ""));
-	configList.push_back(ConfigInfo("Opponent2Name", CONFIG_TYPE_STRING, "Player 2"));
-	configList.push_back(ConfigInfo("Opponent2Avatar", CONFIG_TYPE_STRING, ""));
-	configList.push_back(ConfigInfo("Opponent3Name", CONFIG_TYPE_STRING, "Player 3"));
-	configList.push_back(ConfigInfo("Opponent3Avatar", CONFIG_TYPE_STRING, ""));
-	configList.push_back(ConfigInfo("Opponent4Name", CONFIG_TYPE_STRING, "Player 4"));
-	configList.push_back(ConfigInfo("Opponent4Avatar", CONFIG_TYPE_STRING, ""));
-	configList.push_back(ConfigInfo("Opponent5Name", CONFIG_TYPE_STRING, "Player 5"));
-	configList.push_back(ConfigInfo("Opponent5Avatar", CONFIG_TYPE_STRING, ""));
-	configList.push_back(ConfigInfo("Opponent6Name", CONFIG_TYPE_STRING, "Player 6"));
-	configList.push_back(ConfigInfo("Opponent6Avatar", CONFIG_TYPE_STRING, ""));
-	configList.push_back(ConfigInfo("Opponent7Name", CONFIG_TYPE_STRING, "Player 7"));
-	configList.push_back(ConfigInfo("Opponent7Avatar", CONFIG_TYPE_STRING, ""));
-	configList.push_back(ConfigInfo("Opponent8Name", CONFIG_TYPE_STRING, "Player 8"));
-	configList.push_back(ConfigInfo("Opponent8Avatar", CONFIG_TYPE_STRING, ""));
-	configList.push_back(ConfigInfo("Opponent9Name", CONFIG_TYPE_STRING, "Player 9"));
-	configList.push_back(ConfigInfo("Opponent9Avatar", CONFIG_TYPE_STRING, ""));
 	configList.push_back(ConfigInfo("LogOnOff", CONFIG_TYPE_INT, logOnOffDefault));
 	configList.push_back(ConfigInfo("LogDir", CONFIG_TYPE_STRING, logDir));
-	configList.push_back(ConfigInfo("LogStoreDuration", CONFIG_TYPE_INT, "2"));
-	configList.push_back(ConfigInfo("LogInterval", CONFIG_TYPE_INT, "1"));
 	configList.push_back(ConfigInfo("UserDataDir", CONFIG_TYPE_STRING, dataDir));
-	configList.push_back(ConfigInfo("CacheDir", CONFIG_TYPE_STRING, cacheDir));
-	configList.push_back(ConfigInfo("CLA_NoWriteAccess", CONFIG_TYPE_INT, "0"));
-	configList.push_back(ConfigInfo("DisableBackToLobbyWarning", CONFIG_TYPE_INT, "0"));
-	configList.push_back(ConfigInfo("DlgGameLobbyGameListSortingSection", CONFIG_TYPE_INT, "2"));
-	configList.push_back(ConfigInfo("DlgGameLobbyGameListSortingOrder", CONFIG_TYPE_INT, "1"));
-	configList.push_back(ConfigInfo("DlgGameLobbyGameListFilterIndex", CONFIG_TYPE_INT, "0"));
-	configList.push_back(ConfigInfo("DlgGameLobbyNickListSortFilterIndex", CONFIG_TYPE_INT, "0"));
-	configList.push_back(ConfigInfo("GameTableFullScreenSave", CONFIG_TYPE_INT, "0"));
-	configList.push_back(ConfigInfo("GameTableHeightSave", CONFIG_TYPE_INT, "600"));
-	configList.push_back(ConfigInfo("GameTableWidthSave", CONFIG_TYPE_INT, "1024"));
 
 	//fill tempList firstTime
 	configBufferList = configList;
@@ -175,38 +117,25 @@ ConfigFile::ConfigFile(char* argv0, bool readonly) : noWriteAccess(readonly)
 	if (!noWriteAccess) {
 		configFileName += "config.xml";
 
-		//Prüfen ob Configfile existiert --> sonst anlegen
 		TiXmlDocument doc(configFileName);
 		if (!doc.LoadFile()) {
 			myConfigState = NONEXISTING;
 			updateConfig(myConfigState);
 		}
 		else {
-			//Check if config revision and AppDataDir is ok. Otherwise --> update()
-			int tempRevision = 0;
 			string tempAppDataPath("");
-
 			TiXmlHandle docHandle(&doc);
-			TiXmlElement* confRevision = docHandle.FirstChild("PokerTraining").FirstChild("Configuration").FirstChild("ConfigRevision").ToElement();
-			if (confRevision) {
-				confRevision->QueryIntAttribute("value", &tempRevision);
-			}
 			TiXmlElement* confAppDataPath = docHandle.FirstChild("PokerTraining").FirstChild("Configuration").FirstChild("AppDataDir").ToElement();
 			if (confAppDataPath) {
 				const char* tmpStr = confAppDataPath->Attribute("value");
-				if (tmpStr) tempAppDataPath = tmpStr;
-				//if appdatapath changes directly update it here not in UpdateConfig()
-
+				if (tmpStr) 
+					tempAppDataPath = tmpStr;
 				if (tempAppDataPath != myQtToolsInterface->getDataPathStdString(myArgv0)) {
 					confAppDataPath->SetAttribute("value", myQtToolsInterface->stringToUtf8(myQtToolsInterface->getDataPathStdString(myArgv0)));
 					doc.SaveFile(configFileName);
 				}
-				}
-			if (tempRevision < configRev) {
-				myConfigState = OLD;
-				updateConfig(myConfigState);
 			}
-			}
+		}
 
 		fillBuffer();
 		checkAndCorrectBuffer();
@@ -406,11 +335,6 @@ void ConfigFile::updateConfig(ConfigState myConfigState)
 
 			//change configRev and AppDataPath
 			std::list<std::string> noUpdateElemtsList;
-
-			TiXmlElement* confElement0 = new TiXmlElement("ConfigRevision");
-			config->LinkEndChild(confElement0);
-			confElement0->SetAttribute("value", configRev);
-			noUpdateElemtsList.push_back("ConfigRevision");
 
 			TiXmlElement* confElement1 = new TiXmlElement("AppDataDir");
 			config->LinkEndChild(confElement1);
