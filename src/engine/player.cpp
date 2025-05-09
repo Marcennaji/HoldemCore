@@ -57,9 +57,9 @@ std::vector<PlayerAction> & CurrentHandActions::getRiverActions() {
 	return m_riverActions;
 }
 
-Player::Player(Log * log_,ConfigFile *c, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB)
+Player::Player(Log * log_, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB)
 	: 
-	myConfig(c), myLog(log_), currentHand(0), myID(id), myType(type), myName(name), 
+	  myLog(log_), currentHand(0), myID(id), myType(type), myName(name), 
 	  myCardsValueInt(0), logHoleCardsDone(false), myCash(sC), mySet(0), myLastRelativeSet(0), myAction(PLAYER_ACTION_NONE),
 	  myButton(mB), myActiveStatus(aS), myStayOnTableStatus(sotS), myTurn(0), myCardsFlip(0), myRoundStartCash(0), lastMoneyWon(0),
 	  m_isSessionActive(false)

@@ -24,8 +24,8 @@
 
 using namespace std;
 
-HumanPlayer::HumanPlayer(Log * l, ConfigFile *c, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB):
-	Player(l, c, id, type, name, sC, aS, sotS, mB){
+HumanPlayer::HumanPlayer(Log * l, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB):
+	Player(l, id, type, name, sC, aS, sotS, mB){
 
 }
 

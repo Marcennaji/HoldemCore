@@ -36,8 +36,8 @@
 
 using namespace std;
 
-UltraTightPlayer::UltraTightPlayer(Log * l, ConfigFile *c, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB):
-	Player(l, c, id, type, name, sC, aS, sotS, mB){
+UltraTightPlayer::UltraTightPlayer(Log * l, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB):
+	Player(l, id, type, name, sC, aS, sotS, mB){
 	
 	int utgFullTableRange = 0;
 	Tools::GetRand(1, 2, 1, &utgFullTableRange);

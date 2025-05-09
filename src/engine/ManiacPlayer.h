@@ -25,7 +25,7 @@ class ManiacPlayer : public Player{
 
 public: 
 
-	ManiacPlayer(Log * l, ConfigFile*, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB);
+	ManiacPlayer(Log * l, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB);
 
 	~ManiacPlayer();
 

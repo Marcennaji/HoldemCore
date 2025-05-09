@@ -84,7 +84,7 @@ void Session::startGame(const GameData &gameData, const StartData &startData)
 		Player * player;
 
 		if (i == 0){
-			player = new HumanPlayer(myLog, myConfig, i, PLAYER_TYPE_HUMAN, HumanPlayerName[0],  gameData.startMoney, startData.numberOfPlayers > i, 
+			player = new HumanPlayer(myLog, i, PLAYER_TYPE_HUMAN, HumanPlayerName[0],  gameData.startMoney, startData.numberOfPlayers > i, 
 											i == 0 ? true : false, 0);
 		}else{
 
@@ -93,10 +93,10 @@ void Session::startGame(const GameData &gameData, const StartData &startData)
 				Tools::GetRand(1, 3, 1, &rand);
 
 				if (rand == 1)
-					player = new TightAgressivePlayer(myLog, myConfig, i, PLAYER_TYPE_COMPUTER, TightAgressivePlayerName[i],  
+					player = new TightAgressivePlayer(myLog, i, PLAYER_TYPE_COMPUTER, TightAgressivePlayerName[i],  
 											gameData.startMoney, startData.numberOfPlayers > i, i == 0 ? true : false, 0);
 				else
-					player = new UltraTightPlayer(myLog, myConfig, i, PLAYER_TYPE_COMPUTER, UltraTightPlayerName[i],  
+					player = new UltraTightPlayer(myLog, i, PLAYER_TYPE_COMPUTER, UltraTightPlayerName[i],  
 											gameData.startMoney, startData.numberOfPlayers > i, i == 0 ? true : false, 0);
 
 
@@ -104,13 +104,13 @@ void Session::startGame(const GameData &gameData, const StartData &startData)
 
 			if (tableProfile == LARGE_AGRESSIVE_OPPONENTS){
 
-				player = new LooseAggressivePlayer(myLog, myConfig, i, PLAYER_TYPE_COMPUTER, LooseAggressivePlayerName[i],  
+				player = new LooseAggressivePlayer(myLog, i, PLAYER_TYPE_COMPUTER, LooseAggressivePlayerName[i],  
 										gameData.startMoney, startData.numberOfPlayers > i, i == 0 ? true : false, 0);
 			}
 
 			if (tableProfile == MANIAC_OPPONENTS){
 
-				player = new ManiacPlayer(myLog, myConfig, i, PLAYER_TYPE_COMPUTER, ManiacPlayerName[i],  
+				player = new ManiacPlayer(myLog, i, PLAYER_TYPE_COMPUTER, ManiacPlayerName[i],  
 										gameData.startMoney, startData.numberOfPlayers > i, i == 0 ? true : false, 0);
 			}
 
@@ -119,30 +119,30 @@ void Session::startGame(const GameData &gameData, const StartData &startData)
 				Tools::GetRand(1, 12, 1, &rand);
 
 				if (rand < 3 && nbManiac < startData.numberOfPlayers / 3){
-					player = new ManiacPlayer(myLog, myConfig, i, PLAYER_TYPE_COMPUTER, ManiacPlayerName[i],  
+					player = new ManiacPlayer(myLog, i, PLAYER_TYPE_COMPUTER, ManiacPlayerName[i],  
 										gameData.startMoney, startData.numberOfPlayers > i, i == 0 ? true : false, 0);
 					nbManiac++;
 				}
 				else
 				if (rand < 5 && nbUltraTight < startData.numberOfPlayers / 3){
-					player = new UltraTightPlayer(myLog, myConfig, i, PLAYER_TYPE_COMPUTER, UltraTightPlayerName[i],  
+					player = new UltraTightPlayer(myLog, i, PLAYER_TYPE_COMPUTER, UltraTightPlayerName[i],  
 										gameData.startMoney, startData.numberOfPlayers > i, i == 0 ? true : false, 0);
 					nbUltraTight++;
 				}
 				else
 				if (rand < 9 && nbLoose < startData.numberOfPlayers / 3){
-					player = new LooseAggressivePlayer(myLog, myConfig, i, PLAYER_TYPE_COMPUTER, LooseAggressivePlayerName[i],  
+					player = new LooseAggressivePlayer(myLog, i, PLAYER_TYPE_COMPUTER, LooseAggressivePlayerName[i],  
 										gameData.startMoney, startData.numberOfPlayers > i, i == 0 ? true : false, 0);
 					nbLoose++;
 				}
 				else
 				if (nbTight < startData.numberOfPlayers / 3){
-					player = new TightAgressivePlayer(myLog, myConfig, i, PLAYER_TYPE_COMPUTER, TightAgressivePlayerName[i],  
+					player = new TightAgressivePlayer(myLog, i, PLAYER_TYPE_COMPUTER, TightAgressivePlayerName[i],  
 											gameData.startMoney, startData.numberOfPlayers > i, i == 0 ? true : false, 0);
 					nbTight++;
 				}else
 				// default
-				player = new UltraTightPlayer(myLog, myConfig, i, PLAYER_TYPE_COMPUTER, UltraTightPlayerName[i],  
+				player = new UltraTightPlayer(myLog, i, PLAYER_TYPE_COMPUTER, UltraTightPlayerName[i],  
 										gameData.startMoney, startData.numberOfPlayers > i, i == 0 ? true : false, 0);
 
 			}

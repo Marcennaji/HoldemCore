@@ -37,8 +37,8 @@
 
 using namespace std;
 
-ManiacPlayer::ManiacPlayer(Log * l, ConfigFile *c, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB):
-	Player(l, c, id, type, name, sC, aS, sotS, mB){
+ManiacPlayer::ManiacPlayer(Log * l, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB):
+	Player(l, id, type, name, sC, aS, sotS, mB){
 	
 	// initialize utg starting range, in a full table 
 	int utgFullTableRange = 0;

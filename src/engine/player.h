@@ -99,7 +99,7 @@ static int outsOddsTwoCard[] = { 0, 4, 8,  13, 17, 20,	 /* 0 to 5 outs */
 class Player
 {
 public:
-    Player(Log *, ConfigFile*, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB);
+    Player(Log *, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB);
 
     ~Player();
 
