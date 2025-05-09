@@ -41,7 +41,6 @@ enum PlayerType {
     PLAYER_TYPE_HUMAN
 };
 
-class ConfigFile;
 class Log;
 class HandInterface;
 
@@ -299,7 +298,6 @@ protected:
     std::vector<int> BB_STARTING_RANGE;
 
     Log *myLog;
-    ConfigFile *myConfig;
     HandInterface *currentHand;
 
     PostFlopState myFlopState;

@@ -19,7 +19,6 @@
 #define GAMETABLESTYLEREADER_H
 
 #include <third_party/tiny/tinyxml.h>
-#include <configfile.h>
 #include <qt/gametable/gametableimpl.h>
 #include "game_defs.h"
 #include <string>

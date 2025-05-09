@@ -22,20 +22,19 @@
 #include <engine/tools.h>
 #include <engine/game.h>
 #include <qt/guiwrapper.h>
-#include <configfile.h>
 #include <qt/gametable/gametableimpl.h>
 #include <qt/newgamedialog/newgamedialogimpl.h>
 #include <qt/gametable/GuiDisplayGameActions.h>
 
 using namespace std;
 
-startWindowImpl::startWindowImpl(QString appDataPath_ , QString logPath_,	QString userDataPath_, Log *l, ConfigFile *myConfig)
+startWindowImpl::startWindowImpl(QString appDataPath_ , QString logPath_,	QString userDataPath_, Log *l)
 	: myAppDataPath(appDataPath_) , myLogPath (logPath_), myUserDataPath(userDataPath_), myLog(l)
 {
 
 	myGuiInterface.reset(new GuiWrapper(userDataPath_.toStdString(), this));
 
-	mySession.reset(new Session(myGuiInterface.get(), myConfig, myLog));
+	mySession.reset(new Session(myGuiInterface.get(), myLog));
 	mySession->init(); 
 	myLog->init();
 

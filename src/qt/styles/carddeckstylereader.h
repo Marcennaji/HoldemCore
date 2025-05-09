@@ -19,7 +19,6 @@
 #define CARDDECKSTYLEREADER_H
 
 #include <third_party/tiny/tinyxml.h>
-#include <configfile.h>
 #include <string>
 #include <QtCore>
 #include <QtGui>

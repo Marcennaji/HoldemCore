@@ -23,7 +23,6 @@
 #include <engine/log.h>
 #include <qt/gametable/gametableimpl.h>
 #include <qt/startwindow/startwindowimpl.h>
-#include <configfile.h>
 
 using namespace std;
 

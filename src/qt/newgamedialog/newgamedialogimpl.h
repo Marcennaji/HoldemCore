@@ -25,8 +25,6 @@
 #include <QtWidgets/QMainWindow>
 
 
-class ConfigFile;
-
 class newGameDialogImpl: public QDialog, public Ui::newGameDialog
 {
 	Q_OBJECT

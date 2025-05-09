@@ -20,7 +20,6 @@
 #include <engine/game.h>
 #include <engine/log.h>
 #include <qt/guiinterface.h>
-#include <configfile.h>
 #include <qt/qttoolsinterface.h>
 #include <engine/enginefactory.h>
 #include <engine/TightAgressivePlayer.h>
@@ -36,8 +35,8 @@
 
 using namespace std;
 
-Session::Session(GuiInterface *g, ConfigFile *c, Log *l)
-	: currentGameNum(0), myGui(g), myConfig(c), myLog(l)
+Session::Session(GuiInterface *g, Log *l)
+	: currentGameNum(0), myGui(g), myLog(l)
 {
 	myQtToolsInterface = CreateQtToolsWrapper();
 }
@@ -65,7 +64,7 @@ void Session::startGame(const GameData &gameData, const StartData &startData)
 	myGui->hideHoleCards();
 	myGui->initGui(gameData.guiSpeed);
 
-	std::shared_ptr<EngineFactory> factory(new EngineFactory(myConfig)); 
+	std::shared_ptr<EngineFactory> factory(new EngineFactory()); 
 
 
 	PlayerList playerList;

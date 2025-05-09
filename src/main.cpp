@@ -32,7 +32,6 @@
 
 #include <session.h>
 #include <qt/startwindow/startwindowimpl.h>
-#include <configfile.h>
 #include <engine/log.h>
 #include <game_defs.h>
 
@@ -144,9 +143,7 @@ int main( int argc, char **argv )
  	qRegisterMetaType<unsigned>("unsigned");
 	qRegisterMetaType<std::shared_ptr<Game> >("std::shared_ptr<Game>");
 
-	ConfigFile *myConfig = new ConfigFile(argv[0], false);
-
-	startWindowImpl mainWin(myAppDataPath, myLogPath, myUserDataPath , myLog, myConfig);
+	startWindowImpl mainWin(myAppDataPath, myLogPath, myUserDataPath , myLog);
 
 	int retVal = application.exec();
 	

@@ -27,7 +27,6 @@
 
 class GuiInterface;
 class Game;
-class ConfigFile;
 class Log;
 class QtToolsInterface;
 
@@ -35,7 +34,7 @@ class Session
 {
 public:
 
-	Session(GuiInterface*, ConfigFile*, Log*);
+	Session(GuiInterface*, Log*);
 
 	~Session();
 
@@ -65,7 +64,6 @@ private:
 
 	std::shared_ptr<Game> currentGame;
 	GuiInterface *myGui;
-	ConfigFile *myConfig;
 	Log *myLog;
 	QtToolsInterface *myQtToolsInterface;
 };

@@ -31,10 +31,8 @@
 #include "ManiacPlayer.h"
 #include "HumanPlayer.h"
 
-#include <configfile.h>
 
-EngineFactory::EngineFactory(ConfigFile *c)
-	: myConfig(c)
+EngineFactory::EngineFactory()
 {
 }
 

@@ -20,7 +20,6 @@
 #include <engine/handinterface.h>
 #include "tools.h"
 #include "cardsvalue.h"
-#include <configfile.h>
 #include "log.h"
 #include <loghelper.h>
 #include <third_party/sqlite3/sqlite3.h>

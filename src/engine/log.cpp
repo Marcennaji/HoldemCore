@@ -20,7 +20,6 @@
 
 #include "log.h"
 
-#include "configfile.h"
 #include "cardsvalue.h"
 
 #include <third_party/sqlite3/sqlite3.h>

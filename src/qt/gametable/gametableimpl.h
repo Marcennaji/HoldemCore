@@ -32,7 +32,6 @@
 #define USER_WIDGETS_NUMBER 9
 
 class GuiDisplayGameActions;
-class ConfigFile;
 class Game;
 
 class GuiInterface;
@@ -61,7 +60,6 @@ public:
 
 	std::shared_ptr<Session> getSession();
 
-	ConfigFile* getConfig() const ;
 	GameTableStyleReader* getGameTableStyle() const ;
 	bool getGuestMode() const ;
 

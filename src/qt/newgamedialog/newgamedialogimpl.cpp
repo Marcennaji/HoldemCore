@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 #include "newgamedialogimpl.h"
-#include <configfile.h>
 #include "game_defs.h"
 
 newGameDialogImpl::newGameDialogImpl(QMainWindow *parent)

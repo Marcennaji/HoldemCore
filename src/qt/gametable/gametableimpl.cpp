@@ -34,7 +34,6 @@
 #include <engine/cardsvalue.h>
 #include <engine/ranges.h>
 
-#include <configfile.h>
 #include <qt/styles/gametablestylereader.h>
 #include <qt/styles/carddeckstylereader.h>
 #include <gamedata.h>

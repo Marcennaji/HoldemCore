@@ -20,7 +20,6 @@
 #include <engine/handinterface.h>
 #include <engine/tools.h>
 #include <engine/cardsvalue.h>
-#include <configfile.h>
 #include "log.h"
 #include <loghelper.h>
 //#include <engine/psim/simulate.hpp>
