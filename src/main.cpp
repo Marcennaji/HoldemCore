@@ -62,7 +62,7 @@ struct AppDirectories {
 
 	static AppDirectories initialize() {
 		QString basePath = QCoreApplication::instance()->applicationDirPath();
-		QString appDir = QDir::cleanPath(basePath + "/pokertraining/") + "/";
+		QString appDir = QDir::cleanPath(basePath) + "/";
 		QString log = QDir::cleanPath(appDir + "log-files/") + "/";
 		QString data = QDir::cleanPath(appDir + "data/") + "/";
 

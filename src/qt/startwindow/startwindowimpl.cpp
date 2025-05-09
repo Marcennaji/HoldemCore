@@ -29,11 +29,11 @@
 
 using namespace std;
 
-startWindowImpl::startWindowImpl(QString appDataPath_ , QString logPath_,	QString _userDataPath, Log *l, ConfigFile *myConfig)
-	: myAppDataPath(appDataPath_) , myLogPath (logPath_), myUserDataPath(_userDataPath), myLog(l)
+startWindowImpl::startWindowImpl(QString appDataPath_ , QString logPath_,	QString userDataPath_, Log *l, ConfigFile *myConfig)
+	: myAppDataPath(appDataPath_) , myLogPath (logPath_), myUserDataPath(userDataPath_), myLog(l)
 {
 
-	myGuiInterface.reset(new GuiWrapper(myConfig, this));
+	myGuiInterface.reset(new GuiWrapper(userDataPath_.toStdString(), this));
 
 	mySession.reset(new Session(myGuiInterface.get(), myConfig, myLog));
 	mySession->init(); 

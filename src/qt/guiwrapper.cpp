@@ -28,11 +28,11 @@
 using namespace std;
 
 
-GuiWrapper::GuiWrapper(ConfigFile *c, startWindowImpl *s) : myGuiLog(NULL), myW(NULL), myConfig(c), myStartWindow(s)
+GuiWrapper::GuiWrapper(const std::string & appDataDir, startWindowImpl *s) : myGuiLog(NULL), myW(NULL), myStartWindow(s)
 {
 
 
-	myW = new gameTableImpl(myConfig);
+	myW = new gameTableImpl(appDataDir);
 	myGuiLog = new GuiDisplayGameActions(myW);
 
 	myStartWindow->setGuiLog(myGuiLog);

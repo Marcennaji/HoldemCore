@@ -55,7 +55,7 @@ class gameTableImpl: public QMainWindow, public Ui::gameTable
 	Q_OBJECT
 
 public:
-	gameTableImpl(ConfigFile *c = 0, QMainWindow *parent = 0);
+	gameTableImpl(const std::string & appDataDir, QMainWindow *parent = 0);
 
 	~gameTableImpl();
 
@@ -135,7 +135,6 @@ public slots:
 	void refreshGameLabels(int);
 	void refreshButton();
 	void refreshPlayerStatistics();
-	void refreshActionButtonFKeyIndicator(bool =0);
 	void refreshCardsChance(GameState);
 	void refreshHandsRanges();
 
@@ -242,7 +241,6 @@ public slots:
 
 	void breakButtonClicked();
 
-	void keyPressEvent ( QKeyEvent*);
 	bool eventFilter(QObject *obj, QEvent *event);
 
 	void switchLogWindow();
@@ -253,7 +251,6 @@ public slots:
 
 	void GameModification();
 
-	void mouseOverFlipCards(bool front);
 
 	void updateMyButtonsState(int mode = -1); //mode 0 == called from dealBettingRoundcards
 	void uncheckMyButtons();
@@ -269,8 +266,6 @@ public slots:
 	void closeGameTable();
 
 	void refreshGameTableStyle();
-	void saveGameTableGeometry();
-	void restoreGameTableGeometry();
 
 	void closeMessageBoxes();
     void hide();
@@ -281,7 +276,6 @@ private:
 	void initHoleCards();
 
 	GuiDisplayGameActions *myGuiLog;
-	ConfigFile *myConfig;
 
 	//Timer
 	QTimer *potDistributeTimer;
@@ -341,8 +335,7 @@ private:
 	// 	Dialogs
 	startWindowImpl *myStartWindow;
 
-	//Sound
-	QString myAppDataPath;
+	QString myAppDataDir;
 
 	int distributePotAnimCounter;
 	int playingMode;

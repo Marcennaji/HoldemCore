@@ -37,7 +37,6 @@ void MyStatusLabel::mousePressEvent(QMouseEvent * event)
 
 	if (!mousePress && objectName().contains("textLabel_Status0")) {
 		mousePress = true;
-		myW->mouseOverFlipCards(true);
 
 	}
 
@@ -49,7 +48,6 @@ void MyStatusLabel::mouseReleaseEvent(QMouseEvent * event)
 
 	if (mousePress && objectName().contains("textLabel_Status0")) {
 		mousePress = false;
-		myW->mouseOverFlipCards(false);
 	}
 
 	QLabel::mouseReleaseEvent(event);

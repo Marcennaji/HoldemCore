@@ -243,7 +243,6 @@ void MyCardsPixmapLabel::mousePressEvent(QMouseEvent * event)
 
 	if (!mousePress && objectName().contains("pixmapLabel_card0")) {
 		mousePress = true;
-		myW->mouseOverFlipCards(true);
 
 	}
 
@@ -255,7 +254,6 @@ void MyCardsPixmapLabel::mouseReleaseEvent(QMouseEvent * event)
 
 	if (mousePress && objectName().contains("pixmapLabel_card0")) {
 		mousePress = false;
-		myW->mouseOverFlipCards(false);
 	}
 
 	QLabel::mouseReleaseEvent(event);

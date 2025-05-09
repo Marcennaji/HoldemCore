@@ -26,14 +26,13 @@ class Session;
 class gameTableImpl;
 class startWindowImpl;
 class GuiDisplayGameActions;
-class ConfigFile;
 class Game;
 
 
 class GuiWrapper : public GuiInterface
 {
 public:
-	GuiWrapper(ConfigFile*, startWindowImpl*);
+	GuiWrapper(const std::string & appDataDir, startWindowImpl*);
 
 	~GuiWrapper();
 
@@ -111,7 +110,6 @@ private:
 
 	GuiDisplayGameActions *myGuiLog;
 	gameTableImpl *myW;
-	ConfigFile *myConfig;
 	startWindowImpl *myStartWindow;
 
 };

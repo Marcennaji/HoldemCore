@@ -54,8 +54,8 @@
 
 using namespace std;
 
-gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
-	: QMainWindow(parent), myConfig(c), gameSpeed(0), myActionIsBet(0), myActionIsRaise(0),
+gameTableImpl::gameTableImpl(const std::string & appDataDir, QMainWindow *parent)
+	: QMainWindow(parent), gameSpeed(0), myActionIsBet(0), myActionIsRaise(0),
 	  pushButtonBetRaiseIsChecked(false), pushButtonBetRaiseHalfPotIsChecked(false),
 	  pushButtonBetRaiseTwoThirdPotIsChecked(false), pushButtonBetRaisePotIsChecked(false), pushButtonCallCheckIsChecked(false),
 	  pushButtonFoldIsChecked(false), pushButtonAllInIsChecked(false), myButtonsAreCheckable(false),
@@ -71,20 +71,18 @@ gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
 	}
 	////////////////////////////
 
-	myAppDataPath = QString::fromUtf8(myConfig->readConfigString("AppDataDir").c_str());
-
-	const string appDataPath = myConfig->readConfigString("AppDataDir").c_str();
+	myAppDataDir = QString::fromStdString(appDataDir);
 
 	setupUi(this);
 	setGameSpeed(10);
 
 	// 	Init game table style
-	myGameTableStyle = new GameTableStyleReader(this, myAppDataPath);
-	myGameTableStyle->readStyleFile(QString::fromUtf8(myConfig->readConfigString("CurrentGameTableStyle").c_str()));
+	myGameTableStyle = new GameTableStyleReader(this, myAppDataDir);
+	myGameTableStyle->readStyleFile("");
 
 	// 	Init card deck style
 	myCardDeckStyle = new CardDeckStyleReader(this);
-	myCardDeckStyle->readStyleFile(	QString::fromUtf8(myConfig->readConfigString("CurrentCardDeckStyle").c_str()), appDataPath);
+	myCardDeckStyle->readStyleFile("", appDataDir);
 
 	// Player0 pixmapCardsLabel needs Myw
 	pixmapLabel_card0b->setW(this);
@@ -325,7 +323,7 @@ gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
 
 	// windowicon
 	//  	QString windowIconString();
-	this->setWindowIcon(QIcon(myAppDataPath + "gfx/gui/misc/windowicon.png"));
+	this->setWindowIcon(QIcon(myAppDataDir + "gfx/gui/misc/windowicon.png"));
 
 	this->installEventFilter(this);
 
@@ -460,7 +458,7 @@ void gameTableImpl::initHoleCards()
 void gameTableImpl::hideHoleCards()
 {
 
-	QPixmap onePix = QPixmap::fromImage(QImage(myAppDataPath + "gfx/gui/misc/1px.png"));
+	QPixmap onePix = QPixmap::fromImage(QImage(myAppDataDir + "gfx/gui/misc/1px.png"));
 
 	for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
 	{
@@ -526,7 +524,7 @@ void gameTableImpl::refreshButton()
 	QPixmap dealerButton = QPixmap::fromImage(QImage(myGameTableStyle->getDealerPuck()));
 	QPixmap smallblindButton = QPixmap::fromImage(QImage(myGameTableStyle->getSmallBlindPuck()));
 	QPixmap bigblindButton = QPixmap::fromImage(QImage(myGameTableStyle->getBigBlindPuck()));
-	QPixmap onePix = QPixmap::fromImage(QImage(myAppDataPath + "gfx/gui/misc/1px.png"));
+	QPixmap onePix = QPixmap::fromImage(QImage(myAppDataDir + "gfx/gui/misc/1px.png"));
 
 	std::shared_ptr<Game> currentGame = myStartWindow->getSession()->getCurrentGame();
 
@@ -643,7 +641,7 @@ void gameTableImpl::refreshPlayerName()
 void gameTableImpl::refreshAction(int playerID, int playerAction)
 {
 
-	QPixmap onePix = QPixmap::fromImage(QImage(myAppDataPath + "gfx/gui/misc/1px.png"));
+	QPixmap onePix = QPixmap::fromImage(QImage(myAppDataDir + "gfx/gui/misc/1px.png"));
 	QPixmap action;
 
 	QStringList actionArray;
@@ -1039,7 +1037,7 @@ void gameTableImpl::dealHoleCards()
 		}
 	}
 
-	QPixmap onePix = QPixmap::fromImage(QImage(myAppDataPath + "gfx/gui/misc/1px.png"));
+	QPixmap onePix = QPixmap::fromImage(QImage(myAppDataDir + "gfx/gui/misc/1px.png"));
 
 	// TempArrays
 	QPixmap tempCardsPixmapArray[2];
@@ -1061,17 +1059,9 @@ void gameTableImpl::dealHoleCards()
 				if (((*it_c)->getID() == 0) /* || DEBUG_MODE*/)
 				{
 					tempCardsPixmapArray[j].load(myCardDeckStyle->getCurrentDir() + QString::number(tempCardsIntArray[j], 10) + ".png");
-					if (myConfig->readConfigInt("AntiPeekMode"))
-					{
-						holeCardsArray[(*it_c)->getID()][j]->setPixmap(flipside, true);
-						holeCardsArray[(*it_c)->getID()][j]->setFront(flipside);
-						holeCardsArray[(*it_c)->getID()][j]->setHiddenFrontPixmap(tempCardsPixmapArray[j]);
-					}
-					else
-					{
+
 						holeCardsArray[(*it_c)->getID()][j]->setPixmap(tempCardsPixmapArray[j], false);
 						holeCardsArray[(*it_c)->getID()][j]->setFront(tempCardsPixmapArray[j]);
-					}
 				}
 				else
 				{
@@ -1087,8 +1077,6 @@ void gameTableImpl::dealHoleCards()
 		}
 	}
 
-	// fix press mouse button during bankrupt with anti-peek-mode
-	this->mouseOverFlipCards(false);
 
 	// refresh CardsChanceMonitor Tool
 	refreshCardsChance(GAME_STATE_PREFLOP);
@@ -1325,7 +1313,6 @@ void gameTableImpl::provideMyActions(int mode)
 
 		myButtonsCheckable(false);
 
-		refreshActionButtonFKeyIndicator(1);
 	}
 	else
 	{
@@ -1427,12 +1414,6 @@ void gameTableImpl::provideMyActions(int mode)
 				uncheckMyButtons();
 				resetButtonsCheckStateMemory();
 			}
-			// disable button to prevent unwanted clicks (e.g. call allin)
-			if (myConfig->readConfigInt("AccidentallyCallBlocker"))
-			{
-				pushButton_CallCheck->setEatMyEvents(true);
-				enableCallCheckPushButtonTimer->start(1000);
-			}
 		}
 
 		if (pushButtonBetRaiseString == "")
@@ -1449,9 +1430,6 @@ void gameTableImpl::provideMyActions(int mode)
 		pushButton_BetRaisePot->setText("100% pot");
 		pushButton_CallCheck->setText(pushButtonCallCheckString);
 		pushButton_AllIn->setText(pushButtonAllInString);
-
-		refreshActionButtonFKeyIndicator();
-		// 		myBetRaise();
 
 		if (pushButton_BetRaise->text().startsWith(RaiseString))
 		{
@@ -1510,18 +1488,6 @@ void gameTableImpl::meInAction()
 
 	myActionIsRaise = 0;
 	myActionIsBet = 0;
-
-	if (myConfig->readConfigInt("ShowStatusbarMessages"))
-	{
-		if (myConfig->readConfigInt("AlternateFKeysUserActionMode") == 0)
-		{
-			// // 			statusBar()->showMessage(tr("F1 - Fold | F2 - Check/Call | F3 - Bet/Raise | F4 - All-In"), 15000);
-		}
-		else
-		{
-			// 			statusBar()->showMessage(tr("F1 - All-In | F2 - Bet/Raise | F3 - Check/Call | F4 - Fold"), 15000);
-		}
-	}
 
 	QString lastPushButtonFoldString = pushButton_Fold->text();
 
@@ -2663,7 +2629,7 @@ void gameTableImpl::nextRoundCleanGui()
 	int i, j;
 
 	// GUI bereinigen - Bilder löschen, Animationen unterbrechen
-	QPixmap onePix = QPixmap::fromImage(QImage(myAppDataPath + "gfx/gui/misc/1px.png"));
+	QPixmap onePix = QPixmap::fromImage(QImage(myAppDataDir + "gfx/gui/misc/1px.png"));
 	for (i = 0; i < 5; i++)
 	{
 		boardCardsArray[i]->setPixmap(onePix, false);
@@ -2691,19 +2657,9 @@ void gameTableImpl::nextRoundCleanGui()
 
 	flipHolecardsAllInAlreadyDone = false;
 
-	// pause between hands and show opponents cards
-	if (myConfig->readConfigInt("PauseBetweenHands"))
-	{
-
-		pushButton_break->click();
-	}
-	else
-	{
-		// FIX STRG+N Bug
 
 		pushButton_break->setEnabled(true);
 		breakAfterCurrentHand = false;
-	}
 
 	// Clean breakbutton
 	blinkingStartButtonAnimationTimer->stop();
@@ -2717,9 +2673,6 @@ void gameTableImpl::nextRoundCleanGui()
 
 	// Clear Statusbarmessage
 	//  	statusBar()->clearMessage();
-
-	// fix press mouse button during bankrupt with anti-peek-mode
-	this->mouseOverFlipCards(false);
 
 	horizontalSlider_bet->setDisabled(true);
 	spinBox_betValue->setDisabled(true);
@@ -2816,72 +2769,6 @@ void gameTableImpl::breakButtonClicked()
 		{
 			startNewHand();
 		}
-	}
-}
-
-void gameTableImpl::keyPressEvent(QKeyEvent *event)
-{
-
-	// 	cout << event->key() << endl;
-
-	// bool ctrlPressed = false;
-
-	if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
-	{ /*ENTER*/
-		if (spinBox_betValue->hasFocus())
-		{
-			pushButton_BetRaise->click();
-		}
-	}
-	if (event->key() == Qt::Key_F1)
-	{
-		if (myConfig->readConfigInt("AlternateFKeysUserActionMode") == 0)
-		{
-			pushButton_Fold->click();
-		}
-		else
-		{
-			pushButton_AllIn->click();
-		}
-	}
-	if (event->key() == Qt::Key_F2)
-	{
-		if (myConfig->readConfigInt("AlternateFKeysUserActionMode") == 0)
-		{
-			pushButton_CallCheck->click();
-		}
-		else
-		{
-			pushButton_BetRaise->click();
-		}
-	}
-	if (event->key() == Qt::Key_F3)
-	{
-		if (myConfig->readConfigInt("AlternateFKeysUserActionMode") == 0)
-		{
-			pushButton_BetRaise->click();
-		}
-		else
-		{
-			pushButton_CallCheck->click();
-		}
-	}
-	if (event->key() == Qt::Key_F6)
-	{
-		radioButton_manualAction->click();
-	}
-	if (event->key() == Qt::Key_F7)
-	{
-		//		radioButton_autoCheckFold->click();
-	}
-	if (event->key() == Qt::Key_F8)
-	{
-		//	radioButton_autoCheckCallAny->click();
-	}
-	if (event->key() == Qt::Key_Shift)
-	{
-		pushButton_break->click();
-		// ctrlPressed = true;
 	}
 }
 
@@ -3040,25 +2927,10 @@ void gameTableImpl::GameModification()
 	// Set the playing mode to "manual"
 	radioButton_manualAction->click();
 
-	// restore saved windows geometry
-	restoreGameTableGeometry();
-
 	if (myGameTableStyle->getState() != GT_STYLE_OK)
 		LOG_ERROR(__FILE__ << " (" << __LINE__ << "):  invalid game style");
 }
 
-void gameTableImpl::mouseOverFlipCards(bool front)
-{
-
-	if (myStartWindow->getSession()->getCurrentGame())
-	{
-		if (myConfig->readConfigInt("AntiPeekMode") && myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getSeatsList()->front()->getActiveStatus() /* && myStartWindow->getSession()->getCurrentGame()->getSeatsList()->front()->getAction() != PLAYER_ACTION_FOLD*/)
-		{
-			holeCardsArray[0][0]->signalFastFlipCards(front);
-			holeCardsArray[0][1]->signalFastFlipCards(front);
-		}
-	}
-}
 
 void gameTableImpl::updateMyButtonsState(int mode)
 {
@@ -3100,8 +2972,6 @@ void gameTableImpl::resetButtonsCheckStateMemory()
 
 void gameTableImpl::clearMyButtons()
 {
-
-	refreshActionButtonFKeyIndicator(1);
 
 	pushButton_BetRaise->setText("");
 	pushButton_CallCheck->setText("");
@@ -3176,10 +3046,7 @@ void gameTableImpl::closeGameTable()
 
 	if (close)
 	{
-		// now really close the table
-		//		myStartWindow->getSession()->terminateNetworkClient();
 		stopTimer();
-		saveGameTableGeometry();
 		myStartWindow->show();
 		this->hide();
 	}
@@ -3365,56 +3232,6 @@ void gameTableImpl::refreshCardsChance(GameState BettingRound)
 	}
 }
 
-void gameTableImpl::refreshActionButtonFKeyIndicator(bool clear)
-{
-	if (clear)
-	{
-		pushButton_AllIn->setFKeyText("");
-		pushButton_BetRaise->setFKeyText("");
-		pushButton_BetRaiseHalfPot->setFKeyText("");
-		pushButton_BetRaiseTwoThirdPot->setFKeyText("");
-		pushButton_BetRaisePot->setFKeyText("");
-		pushButton_CallCheck->setFKeyText("");
-		pushButton_Fold->setFKeyText("");
-	}
-	else
-	{
-		if (myConfig->readConfigInt("AlternateFKeysUserActionMode") == 0)
-		{
-			if (!pushButton_AllIn->text().isEmpty())
-				pushButton_AllIn->setFKeyText("");
-			if (!pushButton_BetRaise->text().isEmpty())
-				pushButton_BetRaise->setFKeyText("F3");
-			if (!pushButton_BetRaiseHalfPot->text().isEmpty())
-				pushButton_BetRaiseHalfPot->setFKeyText("");
-			if (!pushButton_BetRaiseTwoThirdPot->text().isEmpty())
-				pushButton_BetRaiseTwoThirdPot->setFKeyText("");
-			if (!pushButton_BetRaisePot->text().isEmpty())
-				pushButton_BetRaisePot->setFKeyText("");
-			if (!pushButton_CallCheck->text().isEmpty())
-				pushButton_CallCheck->setFKeyText("F2");
-			if (!pushButton_Fold->text().isEmpty())
-				pushButton_Fold->setFKeyText("F1");
-		}
-		else
-		{
-			if (!pushButton_AllIn->text().isEmpty())
-				pushButton_AllIn->setFKeyText("F1");
-			if (!pushButton_BetRaise->text().isEmpty())
-				pushButton_BetRaise->setFKeyText("F2");
-			if (!pushButton_BetRaiseHalfPot->text().isEmpty())
-				pushButton_BetRaiseHalfPot->setFKeyText("");
-			if (!pushButton_BetRaiseTwoThirdPot->text().isEmpty())
-				pushButton_BetRaiseTwoThirdPot->setFKeyText("");
-			if (!pushButton_BetRaisePot->text().isEmpty())
-				pushButton_BetRaisePot->setFKeyText("");
-			if (!pushButton_CallCheck->text().isEmpty())
-				pushButton_CallCheck->setFKeyText("F3");
-			if (!pushButton_Fold->text().isEmpty())
-				pushButton_Fold->setFKeyText("");
-		}
-	}
-}
 
 void gameTableImpl::refreshGameTableStyle()
 {
@@ -3469,7 +3286,7 @@ void gameTableImpl::refreshGameTableStyle()
 
 	myGameTableStyle->setTabWidgetStyle(tabWidget_Right, tabWidget_Right->getTabBar());
 
-	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getActionCallI18NString() == "NULL")
+	if (myGameTableStyle->getActionCallI18NString() == "NULL")
 	{
 		CallString = "Call";
 	}
@@ -3477,7 +3294,7 @@ void gameTableImpl::refreshGameTableStyle()
 	{
 		CallString = myGameTableStyle->getActionCallI18NString();
 	}
-	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getActionCheckI18NString() == "NULL")
+	if (myGameTableStyle->getActionCheckI18NString() == "NULL")
 	{
 		CheckString = "Check";
 	}
@@ -3485,7 +3302,7 @@ void gameTableImpl::refreshGameTableStyle()
 	{
 		CheckString = myGameTableStyle->getActionCheckI18NString();
 	}
-	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getActionBetI18NString() == "NULL")
+	if (myGameTableStyle->getActionBetI18NString() == "NULL")
 	{
 		BetString = "Bet";
 	}
@@ -3493,7 +3310,7 @@ void gameTableImpl::refreshGameTableStyle()
 	{
 		BetString = myGameTableStyle->getActionBetI18NString();
 	}
-	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getActionRaiseI18NString() == "NULL")
+	if (myGameTableStyle->getActionRaiseI18NString() == "NULL")
 	{
 		RaiseString = "Raise";
 	}
@@ -3501,7 +3318,7 @@ void gameTableImpl::refreshGameTableStyle()
 	{
 		RaiseString = myGameTableStyle->getActionRaiseI18NString();
 	}
-	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getActionFoldI18NString() == "NULL")
+	if (myGameTableStyle->getActionFoldI18NString() == "NULL")
 	{
 		FoldString = "Fold";
 	}
@@ -3509,7 +3326,7 @@ void gameTableImpl::refreshGameTableStyle()
 	{
 		FoldString = myGameTableStyle->getActionFoldI18NString();
 	}
-	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getActionAllInI18NString() == "NULL")
+	if (myGameTableStyle->getActionAllInI18NString() == "NULL")
 	{
 		AllInString = "All-In";
 	}
@@ -3517,7 +3334,7 @@ void gameTableImpl::refreshGameTableStyle()
 	{
 		AllInString = myGameTableStyle->getActionAllInI18NString();
 	}
-	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getPotI18NString() == "NULL")
+	if (myGameTableStyle->getPotI18NString() == "NULL")
 	{
 		PotString = "Pot";
 	}
@@ -3525,7 +3342,7 @@ void gameTableImpl::refreshGameTableStyle()
 	{
 		PotString = myGameTableStyle->getPotI18NString();
 	}
-	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getTotalI18NString() == "NULL")
+	if (myGameTableStyle->getTotalI18NString() == "NULL")
 	{
 		TotalString = "Total";
 	}
@@ -3533,7 +3350,7 @@ void gameTableImpl::refreshGameTableStyle()
 	{
 		TotalString = myGameTableStyle->getTotalI18NString();
 	}
-	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getBetsI18NString() == "NULL")
+	if (myGameTableStyle->getBetsI18NString() == "NULL")
 	{
 		BetsString = "Bets";
 	}
@@ -3541,7 +3358,7 @@ void gameTableImpl::refreshGameTableStyle()
 	{
 		BetsString = myGameTableStyle->getBetsI18NString();
 	}
-	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getGameI18NString() == "NULL")
+	if (myGameTableStyle->getGameI18NString() == "NULL")
 	{
 		GameString = "Game";
 	}
@@ -3549,7 +3366,7 @@ void gameTableImpl::refreshGameTableStyle()
 	{
 		GameString = myGameTableStyle->getGameI18NString();
 	}
-	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getHandI18NString() == "NULL")
+	if (myGameTableStyle->getHandI18NString() == "NULL")
 	{
 		HandString = "Hand";
 	}
@@ -3557,7 +3374,7 @@ void gameTableImpl::refreshGameTableStyle()
 	{
 		HandString = myGameTableStyle->getHandI18NString();
 	}
-	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getPreflopI18NString() == "NULL")
+	if (myGameTableStyle->getPreflopI18NString() == "NULL")
 	{
 		PreflopString = "Preflop";
 	}
@@ -3565,7 +3382,7 @@ void gameTableImpl::refreshGameTableStyle()
 	{
 		PreflopString = myGameTableStyle->getPreflopI18NString();
 	}
-	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getFlopI18NString() == "NULL")
+	if (myGameTableStyle->getFlopI18NString() == "NULL")
 	{
 		FlopString = "Flop";
 	}
@@ -3573,7 +3390,7 @@ void gameTableImpl::refreshGameTableStyle()
 	{
 		FlopString = myGameTableStyle->getFlopI18NString();
 	}
-	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getTurnI18NString() == "NULL")
+	if (myGameTableStyle->getTurnI18NString() == "NULL")
 	{
 		TurnString = "Turn";
 	}
@@ -3581,7 +3398,7 @@ void gameTableImpl::refreshGameTableStyle()
 	{
 		TurnString = myGameTableStyle->getTurnI18NString();
 	}
-	if (myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || myGameTableStyle->getRiverI18NString() == "NULL")
+	if (myGameTableStyle->getRiverI18NString() == "NULL")
 	{
 		RiverString = "River";
 	}
@@ -3597,38 +3414,6 @@ void gameTableImpl::refreshGameTableStyle()
 	label_gameNumber->setText(GameString + ":");
 }
 
-void gameTableImpl::saveGameTableGeometry()
-{
-	if (this->isFullScreen())
-	{
-		myConfig->writeConfigInt("GameTableFullScreenSave", 1);
-	}
-	else
-	{
-		myConfig->writeConfigInt("GameTableFullScreenSave", 0);
-		myConfig->writeConfigInt("GameTableHeightSave", this->height());
-		myConfig->writeConfigInt("GameTableWidthSave", this->width());
-	}
-	myConfig->writeBuffer();
-}
-
-void gameTableImpl::restoreGameTableGeometry()
-{
-	if (myConfig->readConfigInt("GameTableFullScreenSave"))
-	{
-		if (actionFullScreen->isEnabled())
-			this->showFullScreen();
-	}
-	else
-	{
-		// resize only if style size allow this and if NOT fixed windows size
-		if (!myGameTableStyle->getIfFixedWindowSize().toInt() && myConfig->readConfigInt("GameTableHeightSave") <= myGameTableStyle->getMaximumWindowHeight().toInt() && myConfig->readConfigInt("GameTableHeightSave") >= myGameTableStyle->getMinimumWindowHeight().toInt() && myConfig->readConfigInt("GameTableWidthSave") <= myGameTableStyle->getMaximumWindowWidth().toInt() && myConfig->readConfigInt("GameTableWidthSave") >= myGameTableStyle->getMinimumWindowWidth().toInt())
-		{
-
-			this->resize(myConfig->readConfigInt("GameTableWidthSave"), myConfig->readConfigInt("GameTableHeightSave"));
-		}
-	}
-}
 
 void gameTableImpl::closeMessageBoxes()
 {
@@ -3674,10 +3459,7 @@ void gameTableImpl::setGameSpeed(const int theValue)
 	guiGameSpeed = theValue;
 	setSpeeds();
 }
-ConfigFile *gameTableImpl::getConfig() const
-{
-	return myConfig;
-}
+
 GameTableStyleReader *gameTableImpl::getGameTableStyle() const
 {
 	return myGameTableStyle;
