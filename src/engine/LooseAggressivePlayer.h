@@ -25,7 +25,7 @@ class LooseAggressivePlayer : public Player{
 
 public: 
 
-	LooseAggressivePlayer(ConfigFile*, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB);
+	LooseAggressivePlayer(Log * l, ConfigFile*, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB);
 
 	~LooseAggressivePlayer();
 

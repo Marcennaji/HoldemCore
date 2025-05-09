@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 #include <engine/HumanPlayer.h>
+#include "log.h"
 
 #ifndef max
 #define max(a,b)            (((a) > (b)) ? (a) : (b))
@@ -23,8 +24,8 @@
 
 using namespace std;
 
-HumanPlayer::HumanPlayer(ConfigFile *c, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB):
-	Player(c, id, type, name, sC, aS, sotS, mB){
+HumanPlayer::HumanPlayer(Log * l, ConfigFile *c, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB):
+	Player(l, c, id, type, name, sC, aS, sotS, mB){
 
 }
 

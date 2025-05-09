@@ -131,6 +131,7 @@ public:
 
 protected :
 
+	friend class Log;
 	friend class Player;
 
 	long m_toTalHands;

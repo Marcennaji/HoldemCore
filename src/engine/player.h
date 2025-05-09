@@ -19,6 +19,7 @@
 #pragma once
 
 #include <assert.h>
+#include <array>
 
 #include <engine/handinterface.h>
 #include <engine/cardsvalue.h>
@@ -41,6 +42,7 @@ enum PlayerType {
 };
 
 class ConfigFile;
+class Log;
 class HandInterface;
 
 class CurrentHandActions
@@ -97,7 +99,7 @@ static int outsOddsTwoCard[] = { 0, 4, 8,  13, 17, 20,	 /* 0 to 5 outs */
 class Player
 {
 public:
-    Player(ConfigFile*, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB);
+    Player(Log *, ConfigFile*, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB);
 
     ~Player();
 
@@ -296,6 +298,7 @@ protected:
     std::vector<int> SB_STARTING_RANGE;
     std::vector<int> BB_STARTING_RANGE;
 
+    Log *myLog;
     ConfigFile *myConfig;
     HandInterface *currentHand;
 
@@ -318,7 +321,7 @@ protected:
 
     // vars
     PlayerPosition myPosition;
-    PlayerStatistics myStatistics[MAX_NUMBER_OF_PLAYERS+1];
+    std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS+1> myStatistics;
     int myCardsValueInt;
     int myBestHandPosition[5];
     bool logHoleCardsDone;

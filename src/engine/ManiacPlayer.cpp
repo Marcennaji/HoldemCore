@@ -21,6 +21,7 @@
 #include <engine/tools.h>
 #include <engine/cardsvalue.h>
 #include <configfile.h>
+#include "log.h"
 #include <loghelper.h>
 //#include <engine/psim/simulate.hpp>
 #include "Exception.h"
@@ -36,8 +37,8 @@
 
 using namespace std;
 
-ManiacPlayer::ManiacPlayer(ConfigFile *c, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB):
-	Player(c, id, type, name, sC, aS, sotS, mB){
+ManiacPlayer::ManiacPlayer(Log * l, ConfigFile *c, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB):
+	Player(l, c, id, type, name, sC, aS, sotS, mB){
 	
 	// initialize utg starting range, in a full table 
 	int utgFullTableRange = 0;

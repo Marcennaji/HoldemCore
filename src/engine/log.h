@@ -26,6 +26,7 @@
 
 #include "engine.h"
 #include "game_defs.h"
+#include "PlayerStatistics.h"
 
 #define SQL_LOG_FILE "pokerTraining-log-v0.9.pdb"
 
@@ -47,6 +48,7 @@ public:
 				const char bettingRound, const int nbPlayers);
 	void logPlayersStatistics(PlayerList activePlayerList);
 	void InitializePlayersStatistics(const std::string playerName, const int nbPlayers);
+	std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> getPlayerStatistics(const std::string & playerName);
 	void createDatabase();
 
 	void setCurrentRound(GameState theValue) {
