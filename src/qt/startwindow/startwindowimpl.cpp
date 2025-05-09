@@ -25,7 +25,7 @@
 #include <configfile.h>
 #include <qt/gametable/gametableimpl.h>
 #include <qt/newgamedialog/newgamedialogimpl.h>
-#include <qt/gametable/log/guilog.h>
+#include <qt/gametable/GuiDisplayGameActions.h>
 
 using namespace std;
 

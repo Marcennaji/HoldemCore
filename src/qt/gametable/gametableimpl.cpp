@@ -25,7 +25,7 @@
 #include "mycashlabel.h"
 #include "mynamelabel.h"
 #include "mychancelabel.h"
-#include <qt/gametable/log/guilog.h>
+#include <qt/gametable/GuiDisplayGameActions.h>
 
 #include <engine/HumanPlayer.h>
 #include <engine/boardinterface.h>
@@ -3793,7 +3793,7 @@ void gameTableImpl::setStartWindow(startWindowImpl *s)
 {
 	myStartWindow = s;
 }
-void gameTableImpl::setGuiLog(guiLog *l)
+void gameTableImpl::setGuiLog(GuiDisplayGameActions *l)
 {
 	myGuiLog = l;
 }

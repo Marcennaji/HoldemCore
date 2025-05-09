@@ -25,7 +25,7 @@
 class Session;
 class gameTableImpl;
 class startWindowImpl;
-class guiLog;
+class GuiDisplayGameActions;
 class ConfigFile;
 class Game;
 
@@ -45,7 +45,7 @@ public:
 	gameTableImpl* getW() const {
 		return myW;
 	}
-	guiLog* getGuiLog() const {
+	GuiDisplayGameActions* getGuiLog() const {
 		return myGuiLog;
 	}
 
@@ -109,7 +109,7 @@ public:
 
 private:
 
-	guiLog *myGuiLog;
+	GuiDisplayGameActions *myGuiLog;
 	gameTableImpl *myW;
 	ConfigFile *myConfig;
 	startWindowImpl *myStartWindow;

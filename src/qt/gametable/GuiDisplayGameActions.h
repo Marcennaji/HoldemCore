@@ -25,14 +25,14 @@
 class gameTableImpl;
 class GameTableStyleReader;
 
-class guiLog : public QObject
+class GuiDisplayGameActions : public QObject
 {
 	Q_OBJECT
 
 public:
-	guiLog(gameTableImpl*);
+	GuiDisplayGameActions(gameTableImpl*);
 
-	~guiLog();
+	~GuiDisplayGameActions();
 
 public slots:
 

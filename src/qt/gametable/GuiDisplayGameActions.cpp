@@ -15,20 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
-#include "guilog.h"
+#include "GuiDisplayGameActions.h"
 
 #include <qt/gametable/gametableimpl.h>
 #include <engine/handinterface.h>
-#include <session.h>
 #include <engine/game.h>
-#include <engine/cardsvalue.h>
-#include <game_defs.h>
 #include <qt/styles/gametablestylereader.h>
-#include <engine/Player.h>
 
 using namespace std;
 
-guiLog::guiLog(gameTableImpl *w): myW(w)
+GuiDisplayGameActions::GuiDisplayGameActions(gameTableImpl *w): myW(w)
 {
 
 	myW->setGuiLog(this);
@@ -40,16 +36,15 @@ guiLog::guiLog(gameTableImpl *w): myW(w)
 	connect(this, SIGNAL(signalLogPlayerWinsMsg(QString, int, bool)), this, SLOT(logPlayerWinsMsg(QString, int, bool)));
 	connect(this, SIGNAL(signalLogDealBoardCardsMsg(int, int, int, int, int, int)), this, SLOT(logDealBoardCardsMsg(int, int, int, int, int, int)));
 	connect(this, SIGNAL(signalLogFlipHoleCardsMsg(QString, int, int, int, QString)), this, SLOT(logFlipHoleCardsMsg(QString, int, int, int, QString)));
-	connect(this, SIGNAL(signalLogPlayerLeftMsg(QString, int)), this, SLOT(logPlayerLeftMsg(QString, int)));
 
 }
 
-guiLog::~guiLog()
+GuiDisplayGameActions::~GuiDisplayGameActions()
 {
 
 }
 
-void guiLog::logPlayerActionMsg(QString msg, int action, int setValue)
+void GuiDisplayGameActions::logPlayerActionMsg(QString msg, int action, int setValue)
 {
 
 	switch (action)
@@ -85,7 +80,7 @@ void guiLog::logPlayerActionMsg(QString msg, int action, int setValue)
 	myW->textBrowser_Log->append("<span style=\"color:#" + myStyle->getChatLogTextColor() + ";\">" + msg + "</span>");
 }
 
-void guiLog::logNewGameHandMsg(int gameID, int handID)
+void GuiDisplayGameActions::logNewGameHandMsg(int gameID, int handID)
 {
 
 	PlayerListConstIterator it_c;
@@ -96,7 +91,7 @@ void guiLog::logNewGameHandMsg(int gameID, int handID)
 	myW->textBrowser_Log->append("<span style=\"color:#" + myStyle->getChatLogTextColor() + "; font-size:large; font-weight:bold\">## Game: " + QString::number(gameID, 10) + " | Hand: " + QString::number(handID, 10) + " ##</span>");
 }
 
-void guiLog::logNewBlindsSetsMsg(int sbSet, int bbSet, QString sbName, QString bbName)
+void GuiDisplayGameActions::logNewBlindsSetsMsg(int sbSet, int bbSet, QString sbName, QString bbName)
 {
 
 	// log blinds
@@ -104,7 +99,7 @@ void guiLog::logNewBlindsSetsMsg(int sbSet, int bbSet, QString sbName, QString b
 	myW->textBrowser_Log->append("<span style=\"color:#" + myStyle->getChatLogTextColor() + ";\">" + bbName + " posts big blind ($" + QString::number(bbSet, 10) + ")</span>");
 }
 
-void guiLog::logPlayerWinsMsg(QString playerName, int pot, bool main)
+void GuiDisplayGameActions::logPlayerWinsMsg(QString playerName, int pot, bool main)
 {
 
 	if (main)
@@ -117,7 +112,7 @@ void guiLog::logPlayerWinsMsg(QString playerName, int pot, bool main)
 	}
 }
 
-void guiLog::logDealBoardCardsMsg(int roundID, int card1, int card2, int card3, int card4, int card5)
+void GuiDisplayGameActions::logDealBoardCardsMsg(int roundID, int card1, int card2, int card3, int card4, int card5)
 {
 
 	QString round;
@@ -142,7 +137,7 @@ void guiLog::logDealBoardCardsMsg(int roundID, int card1, int card2, int card3, 
 	}
 }
 
-void guiLog::logFlipHoleCardsMsg(QString playerName, int card1, int card2, int cardsValueInt, QString showHas)
+void GuiDisplayGameActions::logFlipHoleCardsMsg(QString playerName, int card1, int card2, int cardsValueInt, QString showHas)
 {
 
 	QString tempHandName;
@@ -159,13 +154,13 @@ void guiLog::logFlipHoleCardsMsg(QString playerName, int card1, int card2, int c
 	}
 }
 
-void guiLog::logPlayerWinGame(QString playerName, int gameID)
+void GuiDisplayGameActions::logPlayerWinGame(QString playerName, int gameID)
 {
 
 	myW->textBrowser_Log->append("<i><b>" + playerName + " wins game " + QString::number(gameID, 10) + "!</i></b><br>");
 }
 
-QStringList guiLog::translateCardCode(int cardCode)
+QStringList GuiDisplayGameActions::translateCardCode(int cardCode)
 {
 
 	int value = cardCode % 13;
@@ -241,7 +236,7 @@ QStringList guiLog::translateCardCode(int cardCode)
 	return cardString;
 }
 
-int guiLog::convertCardStringToInt(string val, string col)
+int GuiDisplayGameActions::convertCardStringToInt(string val, string col)
 {
 
 	int tmp;
@@ -312,7 +307,7 @@ int guiLog::convertCardStringToInt(string val, string col)
 	return tmp;
 }
 
-string guiLog::convertCardIntToString(int code, int modus)
+string GuiDisplayGameActions::convertCardIntToString(int code, int modus)
 {
 
 	string tmp;

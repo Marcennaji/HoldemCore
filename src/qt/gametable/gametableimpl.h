@@ -31,7 +31,7 @@
 
 #define USER_WIDGETS_NUMBER 9
 
-class guiLog;
+class GuiDisplayGameActions;
 class ConfigFile;
 class Game;
 
@@ -66,7 +66,7 @@ public:
 	bool getGuestMode() const ;
 
 	void setStartWindow(startWindowImpl* s) ;
-	void setGuiLog(guiLog* l) ;
+	void setGuiLog(GuiDisplayGameActions* l) ;
 
 	void setSpeeds();
 
@@ -282,7 +282,7 @@ private:
 
 	void initHoleCards();
 
-	guiLog *myGuiLog;
+	GuiDisplayGameActions *myGuiLog;
 	ConfigFile *myConfig;
 
 	//Timer

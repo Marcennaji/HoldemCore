@@ -19,7 +19,7 @@
 #include <session.h>
 #include <engine/game.h>
 #include <engine/Player.h>
-#include <qt/gametable/log/guilog.h>
+#include <qt/gametable/GuiDisplayGameActions.h>
 #include <engine/log.h>
 #include <qt/gametable/gametableimpl.h>
 #include <qt/startwindow/startwindowimpl.h>
@@ -33,7 +33,7 @@ GuiWrapper::GuiWrapper(ConfigFile *c, startWindowImpl *s) : myGuiLog(NULL), myW(
 
 
 	myW = new gameTableImpl(myConfig);
-	myGuiLog = new guiLog(myW);
+	myGuiLog = new GuiDisplayGameActions(myW);
 
 	myStartWindow->setGuiLog(myGuiLog);
 	myW->setStartWindow(myStartWindow);

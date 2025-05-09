@@ -34,7 +34,7 @@ class Game;
 class ConfigFile;
 class gameTableImpl;
 class newGameDialogImpl;
-class guiLog;
+class GuiDisplayGameActions;
 class Log;
 
 class startWindowImpl: public QMainWindow, public Ui::startWindow
@@ -51,7 +51,7 @@ public:
 		assert(mySession.get());
 		return mySession;
 	}
-	void setGuiLog(guiLog* l) {
+	void setGuiLog(GuiDisplayGameActions* l) {
 		myGuiLog = l;
 	}
 
@@ -69,7 +69,7 @@ public slots:
 
 private:
 	ConfigFile *myConfig;
-	guiLog *myGuiLog;
+	GuiDisplayGameActions *myGuiLog;
 	Log *myLog;
 
 	std::shared_ptr<GuiInterface> myGuiInterface;

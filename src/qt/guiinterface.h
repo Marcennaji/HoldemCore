@@ -22,7 +22,7 @@
 #include <string>
 #include <memory>
 
-class guiLog;
+class GuiDisplayGameActions;
 class Session;
 class gameTableImpl;
 
@@ -39,7 +39,7 @@ public:
 	virtual void setSession(std::shared_ptr<Session> session) =0;
 
 	virtual gameTableImpl *getW() const=0;
-	virtual guiLog* getGuiLog() const=0;
+	virtual GuiDisplayGameActions* getGuiLog() const=0;
 
 	virtual void hideHoleCards()=0;
 
