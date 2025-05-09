@@ -18,25 +18,9 @@
 #ifndef GUILOG_H
 #define GUILOG_H
 
-#include <fstream>
-#include <iostream>
-#include <sstream>
+#include <QStringList>
+#include <QObject>
 
-#include <configfile.h>
-
-#include <QtCore>
-#include <QtGui>
-#include <QtSql>
-#include <QtWidgets/QTextBrowser>
-
-struct result_struct {
-	char **result_Session;
-	char **result_Game;
-	char **result_Player;
-	char **result_Hand;
-	char **result_Hand_ID;
-	char **result_Action;
-};
 
 class gameTableImpl;
 class GameTableStyleReader;
@@ -46,7 +30,7 @@ class guiLog : public QObject
 	Q_OBJECT
 
 public:
-	guiLog(gameTableImpl*, ConfigFile *c);
+	guiLog(gameTableImpl*);
 
 	~guiLog();
 
@@ -56,19 +40,9 @@ public slots:
 	void logNewGameHandMsg(int gameID, int handID);
 	void logNewBlindsSetsMsg(int sbSet, int bbSet, QString sbName, QString bbName);
 	void logPlayerWinsMsg(QString playerName, int pot, bool main);
-//	void logPlayerSitsOut(QString playerName);
 	void logDealBoardCardsMsg(int roundID, int card1, int card2, int card3, int card4 = -1, int card5 = -1);
 	void logFlipHoleCardsMsg(QString playerName, int card1, int card2, int cardsValueInt = -1, QString showHas = "shows");
-	void logPlayerLeftMsg(QString playerName, int wasKicked);
-	void logPlayerJoinedMsg(QString playerName);
-	void logNewGameAdminMsg(QString playerName);
 	void logPlayerWinGame(QString playerName, int gameID);
-
-
-public:
-	QStringList translateCardCode(int cardCode);
-
-	void writeLogFileStream(QString string);
 
 
 signals:
@@ -76,34 +50,18 @@ signals:
 	void signalLogNewGameHandMsg(int gameID, int handID);
 	void signalLogNewBlindsSetsMsg(int sbSet, int bbSet, QString sbName, QString bbName);
 	void signalLogPlayerWinsMsg(QString playerName, int pot, bool main);
-//	void signalLogPlayerSitsOut(QString playerName);
 	void signalLogDealBoardCardsMsg(int roundID, int card1, int card2, int card3, int card4 = -1, int card5 = -1);
 	void signalLogFlipHoleCardsMsg(QString playerName, int card1, int card2, int cardsValueInt = -1, QString showHas = "shows");
-	void signalLogPlayerLeftMsg(QString playerName, int wasKicked);
-	void signalLogPlayerJoinedMsg(QString playerName);
-	void signalLogNewGameAdminMsg(QString playerName);
 	void signalLogPlayerWinGame(QString playerName, int gameID);
 
 
 private:
 
-	void writeLogFileStream(std::string log_string, QFile *LogFile);
-	void writeLog(std::string log_string, int modus);
 	int convertCardStringToInt(std::string val, std::string col);
 	std::string convertCardIntToString(int code, int modus);
-
-	int lastGameID;
+	QStringList translateCardCode(int cardCode);
 
 	gameTableImpl *myW;
-	ConfigFile *myConfig;
-	QTextStream stream_old;
-	QDir *myLogDir;
-	QFile *myHtmlLogFile;
-	QFile *myHtmlLogFile_old;
-	QFile *myTxtLogFile;
-	QString logFileStreamString;
-	QString myAppDataPath;
-	QTextBrowser* tb;
 	GameTableStyleReader *myStyle;
 
 	friend class GuiWrapper;

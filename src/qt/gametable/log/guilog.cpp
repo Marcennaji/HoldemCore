@@ -28,49 +28,25 @@
 
 using namespace std;
 
-guiLog::guiLog(gameTableImpl *w, ConfigFile *c) : myW(w), myConfig(c), myLogDir(0), myHtmlLogFile(0), myHtmlLogFile_old(0), myTxtLogFile(0), tb(0)
+guiLog::guiLog(gameTableImpl *w): myW(w)
 {
 
 	myW->setGuiLog(this);
 	myStyle = myW->getGameTableStyle();
 
-	myAppDataPath = QString::fromUtf8(myConfig->readConfigString("AppDataDir").c_str());
-
 	connect(this, SIGNAL(signalLogPlayerActionMsg(QString, int, int)), this, SLOT(logPlayerActionMsg(QString, int, int)));
 	connect(this, SIGNAL(signalLogNewGameHandMsg(int, int)), this, SLOT(logNewGameHandMsg(int, int)));
 	connect(this, SIGNAL(signalLogNewBlindsSetsMsg(int, int, QString, QString)), this, SLOT(logNewBlindsSetsMsg(int, int, QString, QString)));
 	connect(this, SIGNAL(signalLogPlayerWinsMsg(QString, int, bool)), this, SLOT(logPlayerWinsMsg(QString, int, bool)));
-	//	connect(this, SIGNAL(signalLogPlayerSitsOut(QString)), this, SLOT(logPlayerSitsOut(QString)));
 	connect(this, SIGNAL(signalLogDealBoardCardsMsg(int, int, int, int, int, int)), this, SLOT(logDealBoardCardsMsg(int, int, int, int, int, int)));
 	connect(this, SIGNAL(signalLogFlipHoleCardsMsg(QString, int, int, int, QString)), this, SLOT(logFlipHoleCardsMsg(QString, int, int, int, QString)));
 	connect(this, SIGNAL(signalLogPlayerLeftMsg(QString, int)), this, SLOT(logPlayerLeftMsg(QString, int)));
-	connect(this, SIGNAL(signalLogPlayerJoinedMsg(QString)), this, SLOT(logPlayerJoinedMsg(QString)));
-	connect(this, SIGNAL(signalLogNewGameAdminMsg(QString)), this, SLOT(logNewGameAdminMsg(QString)));
-	connect(this, SIGNAL(signalLogPlayerWinGame(QString, int)), this, SLOT(logPlayerWinGame(QString, int)));
 
-	logFileStreamString = "";
-	lastGameID = 0;
-
-	QDir logDir(QString::fromUtf8(myConfig->readConfigString("LogDir").c_str()));
-
-	if (myConfig->readConfigString("LogDir") != "" && logDir.exists())
-	{
-
-		int i;
-
-		myLogDir = new QDir(QString::fromUtf8(myConfig->readConfigString("LogDir").c_str()));
-	}
-	else
-	{
-		cout << "Log directory doesn't exist. Cannot create log files";
-	}
 }
 
 guiLog::~guiLog()
 {
-	delete myLogDir;
-	delete myHtmlLogFile;
-	delete myHtmlLogFile_old;
+
 }
 
 void guiLog::logPlayerActionMsg(QString msg, int action, int setValue)
@@ -183,28 +159,6 @@ void guiLog::logFlipHoleCardsMsg(QString playerName, int card1, int card2, int c
 	}
 }
 
-void guiLog::logPlayerLeftMsg(QString playerName, int wasKicked)
-{
-
-	QString action;
-	if (wasKicked)
-		action = "was kicked from";
-	else
-		action = "has left";
-
-	myW->textBrowser_Log->append("<span style=\"color:#" + myStyle->getChatLogTextColor() + ";\"><i>" + playerName + " " + action + " the game!</i></span>");
-}
-
-void guiLog::logNewGameAdminMsg(QString playerName)
-{
-	myW->textBrowser_Log->append("<i><span style=\"color:#" + myStyle->getLogNewGameAdminColor() + ";\">" + playerName + " is game admin now!</span></i>");
-}
-
-void guiLog::logPlayerJoinedMsg(QString playerName)
-{
-	myW->textBrowser_Log->append("<span style=\"color:#" + myStyle->getChatLogTextColor() + ";\"><i>" + playerName + " has joined the game!</i></span>");
-}
-
 void guiLog::logPlayerWinGame(QString playerName, int gameID)
 {
 
@@ -285,55 +239,6 @@ QStringList guiLog::translateCardCode(int cardCode)
 	}
 
 	return cardString;
-}
-
-void guiLog::writeLogFileStream(QString streamString)
-{
-
-	if (myHtmlLogFile_old)
-	{
-		if (myHtmlLogFile_old->open(QIODevice::ReadWrite))
-		{
-			QTextStream stream_old(myHtmlLogFile_old);
-			stream_old.readAll();
-			stream_old << streamString;
-			myHtmlLogFile_old->close();
-		}
-		else
-		{
-			cout << "Could not open log-file to write log-messages!" << endl;
-		}
-	}
-	else
-	{
-		cout << "Could not find log-file to write log-messages!" << endl;
-	}
-}
-
-void guiLog::writeLogFileStream(string log_string, QFile *LogFile)
-{
-
-	QTextStream stream(LogFile);
-	stream.readAll();
-	stream << log_string.c_str();
-}
-
-void guiLog::writeLog(string log_string, int modus)
-{
-
-	switch (modus)
-	{
-	case 1:
-		writeLogFileStream(log_string, myHtmlLogFile);
-		break;
-	case 2:
-		writeLogFileStream(log_string, myTxtLogFile);
-		break;
-	case 3:
-		tb->append(log_string.c_str());
-		break;
-	default:;
-	}
 }
 
 int guiLog::convertCardStringToInt(string val, string col)

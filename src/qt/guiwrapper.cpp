@@ -33,7 +33,7 @@ GuiWrapper::GuiWrapper(ConfigFile *c, startWindowImpl *s) : myGuiLog(NULL), myW(
 
 
 	myW = new gameTableImpl(myConfig);
-	myGuiLog = new guiLog(myW, myConfig);
+	myGuiLog = new guiLog(myW);
 
 	myStartWindow->setGuiLog(myGuiLog);
 	myW->setStartWindow(myStartWindow);
