@@ -31,7 +31,7 @@ class newGameDialogImpl: public QDialog, public Ui::newGameDialog
 {
 	Q_OBJECT
 public:
-	newGameDialogImpl(QMainWindow *parent = 0, ConfigFile* = 0);
+	newGameDialogImpl(QMainWindow *parent = 0);
 
 	int exec();
 
@@ -39,8 +39,6 @@ public slots:
 
 
 private:
-
-	ConfigFile *myConfig;
 
 };
 

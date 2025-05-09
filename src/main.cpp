@@ -90,11 +90,7 @@ int main( int argc, char **argv )
 	/////// can be removed for non-qt-guis ////////////
 	//QtSingleApplication a( argc, argv );
 
-	QApplication a( argc, argv );
-
-	//create defaultconfig
-	ConfigFile *myConfig = new ConfigFile(argv[0], false);
-
+	QApplication application( argc, argv );
 
 	AppDirectories dirs = AppDirectories::initialize();
 
@@ -132,9 +128,10 @@ int main( int argc, char **argv )
 #endif
 
 #endif
-	Log *myLog = new Log(dirs.logDir);
-
+	Log *myLog = new Log(dirs.logDir);	
     QString	myAppDataPath = QString::fromUtf8(dirs.appDataDir.c_str());
+	QString myLogPath = QString::fromUtf8(dirs.logDir.c_str());
+	QString myUserDataPath = QString::fromUtf8(dirs.userDataDir.c_str());
  
 	QFontDatabase::addApplicationFont (myAppDataPath +"fonts/n019003l.pfb");
 	QFontDatabase::addApplicationFont (myAppDataPath +"fonts/VeraBd.ttf");
@@ -142,14 +139,16 @@ int main( int argc, char **argv )
 	QFontDatabase::addApplicationFont (myAppDataPath +"fonts/DejaVuSans-Bold.ttf");
 
 	QString font1String("QApplication, QWidget, QDialog { font-size: 12px; }");
-	a.setStyleSheet(font1String + " QDialogButtonBox, QMessageBox { dialogbuttonbox-buttons-have-icons: 1; dialog-ok-icon: url(:/gfx/dialog_ok_apply.png); dialog-cancel-icon: url(:/gfx/dialog_close.png); dialog-close-icon: url(:/gfx/dialog_close.png); dialog-yes-icon: url(:/gfx/dialog_ok_apply.png); dialog-no-icon: url(:/gfx/dialog_close.png) }");
+	application.setStyleSheet(font1String + " QDialogButtonBox, QMessageBox { dialogbuttonbox-buttons-have-icons: 1; dialog-ok-icon: url(:/gfx/dialog_ok_apply.png); dialog-cancel-icon: url(:/gfx/dialog_close.png); dialog-close-icon: url(:/gfx/dialog_close.png); dialog-yes-icon: url(:/gfx/dialog_ok_apply.png); dialog-no-icon: url(:/gfx/dialog_close.png) }");
 
  	qRegisterMetaType<unsigned>("unsigned");
 	qRegisterMetaType<std::shared_ptr<Game> >("std::shared_ptr<Game>");
 
-	startWindowImpl mainWin(myConfig, myLog);
+	ConfigFile *myConfig = new ConfigFile(argv[0], false);
 
-	int retVal = a.exec();
+	startWindowImpl mainWin(myAppDataPath, myLogPath, myUserDataPath , myLog, myConfig);
+
+	int retVal = application.exec();
 	
 	//_CrtCheckMemory();
 

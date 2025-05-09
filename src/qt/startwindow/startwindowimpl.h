@@ -41,7 +41,7 @@ class startWindowImpl: public QMainWindow, public Ui::startWindow
 {
 	Q_OBJECT
 public:
-	startWindowImpl(ConfigFile *c, Log *l);
+	startWindowImpl(QString	appDataPath , QString logPath,	QString userDataPath, Log *l, ConfigFile *myConfig);
 	~startWindowImpl();
 
 	void setSession(std::shared_ptr<Session> session) {
@@ -68,7 +68,10 @@ public slots:
 	void startNewGame(newGameDialogImpl* =0);
 
 private:
-	ConfigFile *myConfig;
+	QString	myAppDataPath;
+	QString myLogPath;
+	QString myUserDataPath;
+
 	GuiDisplayGameActions *myGuiLog;
 	Log *myLog;
 

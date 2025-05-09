@@ -19,8 +19,8 @@
 #include <configfile.h>
 #include "game_defs.h"
 
-newGameDialogImpl::newGameDialogImpl(QMainWindow *parent, ConfigFile *c)
-	: QDialog(parent), myConfig(c)
+newGameDialogImpl::newGameDialogImpl(QMainWindow *parent)
+	: QDialog(parent)
 {
 	setupUi(this);
 

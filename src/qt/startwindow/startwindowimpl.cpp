@@ -29,14 +29,14 @@
 
 using namespace std;
 
-startWindowImpl::startWindowImpl(ConfigFile *c, Log *l)
-	: myConfig(c), myLog(l)
+startWindowImpl::startWindowImpl(QString appDataPath_ , QString logPath_,	QString _userDataPath, Log *l, ConfigFile *myConfig)
+	: myAppDataPath(appDataPath_) , myLogPath (logPath_), myUserDataPath(_userDataPath), myLog(l)
 {
 
 	myGuiInterface.reset(new GuiWrapper(myConfig, this));
 
 	mySession.reset(new Session(myGuiInterface.get(), myConfig, myLog));
-	mySession->init(); // TODO handle error
+	mySession->init(); 
 	myLog->init();
 
 
@@ -44,14 +44,12 @@ startWindowImpl::startWindowImpl(ConfigFile *c, Log *l)
 	this->setWindowTitle(QString(tr("PokerTraining %1").arg(POKERTRAINING_BETA_RELEASE_STRING)));
 	this->installEventFilter(this);
 
-	// Widgets Grafiken per Stylesheets setzen
-	QString myAppDataPath = QString::fromUtf8(myConfig->readConfigString("AppDataDir").c_str());
 	this->setWindowIcon(QIcon(myAppDataPath + "gfx/gui/misc/windowicon.png"));
 
 	this->setStatusBar(0);
 
 	// 	Dialogs
-	myNewGameDialog = new newGameDialogImpl(this, myConfig);
+	myNewGameDialog = new newGameDialogImpl(this);
 
 	connect(actionStartGame, SIGNAL(triggered()), this, SLOT(callNewGameDialog()));
 	connect(pushButtonStartGame, SIGNAL(clicked()), this, SLOT(callNewGameDialog()));
