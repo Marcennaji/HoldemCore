@@ -22,8 +22,8 @@
 
 using namespace std;
 
-GameTableStyleReader::GameTableStyleReader(ConfigFile *c, QWidget *w)
-    : myConfig(c), myW(w), fallBack(0), loadedSuccessfull(0), myState(GT_STYLE_UNDEFINED)
+GameTableStyleReader::GameTableStyleReader(QWidget *w, QString appDataDir_)
+    : myAppDataDir(appDataDir_), myW(w), fallBack(0), loadedSuccessfull(0), myState(GT_STYLE_UNDEFINED)
 {
 
     //set fonts and font sizes
@@ -51,7 +51,7 @@ void GameTableStyleReader::readStyleFile(QString file)
     if(QFile(file).exists()) {
         currentFileName = QFile(file).fileName();
     } else {
-        currentFileName = QFile(QString::fromUtf8(myConfig->readConfigString("AppDataDir").c_str())+"gfx/gui/table/default/defaulttablestyle.xml").fileName();
+        currentFileName = QFile(myAppDataDir+"gfx/gui/table/default/defaulttablestyle.xml").fileName();
         fallBack = 1;
     }
 
@@ -1530,55 +1530,53 @@ void GameTableStyleReader::setAwayRadioButtonsStyle(QRadioButton *rb)
 
 QString GameTableStyleReader::getActionPic(int action)
 {
-    QString myAppDataPath = QString::fromUtf8(myConfig->readConfigString("AppDataDir").c_str());
-
     // 	1 = fold, 2 = check, 3 = call, 4 = bet, 5 = raise, 6 = allin, 7 = winner
     switch(action) {
     case 1: {
-        if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || ActionFoldI18NPic.endsWith("NULL"))
-            return myAppDataPath+"gfx/gui/misc/actionpics/action_fold.png";
+        if(ActionFoldI18NPic.endsWith("NULL"))
+            return myAppDataDir+"gfx/gui/misc/actionpics/action_fold.png";
         else
             return ActionFoldI18NPic;
     }
         break;
     case 2: {
-        if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || ActionCheckI18NPic.endsWith("NULL"))
-            return myAppDataPath+"gfx/gui/misc/actionpics/action_check.png";
+        if(ActionCheckI18NPic.endsWith("NULL"))
+            return myAppDataDir+"gfx/gui/misc/actionpics/action_check.png";
         else
             return ActionCheckI18NPic;
     }
         break;
     case 3: {
-        if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || ActionCallI18NPic.endsWith("NULL"))
-            return myAppDataPath+"gfx/gui/misc/actionpics/action_call.png";
+        if(ActionCallI18NPic.endsWith("NULL"))
+            return myAppDataDir+"gfx/gui/misc/actionpics/action_call.png";
         else
             return ActionCallI18NPic;
     }
         break;
     case 4: {
-        if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || ActionBetI18NPic.endsWith("NULL"))
-            return myAppDataPath+"gfx/gui/misc/actionpics/action_bet.png";
+        if(ActionBetI18NPic.endsWith("NULL"))
+            return myAppDataDir+"gfx/gui/misc/actionpics/action_bet.png";
         else
             return ActionBetI18NPic;
     }
         break;
     case 5: {
-        if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || ActionRaiseI18NPic.endsWith("NULL"))
-            return myAppDataPath+"gfx/gui/misc/actionpics/action_raise.png";
+        if(ActionRaiseI18NPic.endsWith("NULL"))
+            return myAppDataDir+"gfx/gui/misc/actionpics/action_raise.png";
         else
             return ActionRaiseI18NPic;
     }
         break;
     case 6: {
-        if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || ActionAllInI18NPic.endsWith("NULL"))
-            return myAppDataPath+"gfx/gui/misc/actionpics/action_allin.png";
+        if(ActionAllInI18NPic.endsWith("NULL"))
+            return myAppDataDir+"gfx/gui/misc/actionpics/action_allin.png";
         else
             return ActionAllInI18NPic;
     }
         break;
     case 7: {
-        if(myConfig->readConfigInt("DontTranslateInternationalPokerStringsFromStyle") || ActionWinnerI18NPic.endsWith("NULL"))
-            return myAppDataPath+"gfx/gui/misc/actionpics/action_winner.png";
+        if(ActionWinnerI18NPic.endsWith("NULL"))
+            return myAppDataDir+"gfx/gui/misc/actionpics/action_winner.png";
         else
             return ActionWinnerI18NPic;
     }
@@ -1734,7 +1732,7 @@ void GameTableStyleReader::setSliderStyle(QSlider *s)
 
 QString GameTableStyleReader::getFallBackFieldContent(QString field, int type)
 {
-    QFile myFile(QFile(QString::fromUtf8(myConfig->readConfigString("AppDataDir").c_str())+"gfx/gui/table/default/defaulttablestyle.xml").fileName());
+    QFile myFile(myAppDataDir+"gfx/gui/table/default/defaulttablestyle.xml");
     myFile.open(QIODevice::ReadOnly);
     QByteArray thisContent = myFile.readAll();
 
@@ -1756,7 +1754,7 @@ QString GameTableStyleReader::getFallBackFieldContent(QString field, int type)
                 if (tmpStr1) {
                     tempString1 = tmpStr1;
                     if(itemsList->ValueStr() == field.toStdString()) {
-                        if(type == 1) return QString(QString::fromUtf8(myConfig->readConfigString("AppDataDir").c_str())+"gfx/gui/table/default/"+QString::fromUtf8(tempString1.c_str()));
+                        if(type == 1) return myAppDataDir+"gfx/gui/table/default/"+QString::fromUtf8(tempString1.c_str());
                         else return QString::fromUtf8(tempString1.c_str());
                     }
                 }

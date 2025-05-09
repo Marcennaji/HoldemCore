@@ -23,6 +23,7 @@
 #include <string>
 #include <QtCore>
 #include <QtGui>
+#include <string>
 
 #define POKERTRAINING_CD_STYLE_FILE_VERSION	1
 
@@ -37,10 +38,10 @@ class CardDeckStyleReader : public QObject
 {
 	Q_OBJECT
 public:
-	CardDeckStyleReader(ConfigFile *c, QWidget *w );
+	CardDeckStyleReader(QWidget *w );
 	~CardDeckStyleReader();
 
-	void readStyleFile(QString);
+	void readStyleFile(QString, const std::string & appDataDir);
 
 	QString getStyleDescription() const {
 		return StyleDescription;
@@ -92,7 +93,6 @@ private:
 	QStringList cardsLeft;
 	QStringList leftItems;
 
-	ConfigFile *myConfig;
 	QWidget *myW;
 
 	bool fallBack;

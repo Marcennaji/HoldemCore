@@ -73,16 +73,18 @@ gameTableImpl::gameTableImpl(ConfigFile *c, QMainWindow *parent)
 
 	myAppDataPath = QString::fromUtf8(myConfig->readConfigString("AppDataDir").c_str());
 
+	const string appDataPath = myConfig->readConfigString("AppDataDir").c_str();
+
 	setupUi(this);
 	setGameSpeed(10);
 
 	// 	Init game table style
-	myGameTableStyle = new GameTableStyleReader(myConfig, this);
+	myGameTableStyle = new GameTableStyleReader(this, myAppDataPath);
 	myGameTableStyle->readStyleFile(QString::fromUtf8(myConfig->readConfigString("CurrentGameTableStyle").c_str()));
 
 	// 	Init card deck style
-	myCardDeckStyle = new CardDeckStyleReader(myConfig, this);
-	myCardDeckStyle->readStyleFile(QString::fromUtf8(myConfig->readConfigString("CurrentCardDeckStyle").c_str()));
+	myCardDeckStyle = new CardDeckStyleReader(this);
+	myCardDeckStyle->readStyleFile(	QString::fromUtf8(myConfig->readConfigString("CurrentCardDeckStyle").c_str()), appDataPath);
 
 	// Player0 pixmapCardsLabel needs Myw
 	pixmapLabel_card0b->setW(this);
@@ -471,105 +473,6 @@ void gameTableImpl::hideHoleCards()
 		playerTipLabelArray[i]->setText("");
 		playerNameLabelArray[i]->setText("");
 		setLabelArray[i]->setText("");
-	}
-}
-
-void gameTableImpl::applySettings(settingsDialogImpl *mySettingsDialog)
-{
-
-	// apply card deck style
-	myCardDeckStyle->readStyleFile(QString::fromUtf8(myConfig->readConfigString("CurrentCardDeckStyle").c_str()));
-	// apply game table style
-	myGameTableStyle->readStyleFile(QString::fromUtf8(myConfig->readConfigString("CurrentGameTableStyle").c_str()));
-
-	groupBox_RightToolBox->show();
-
-	if (tabWidget_Right->widget(2) != tab_Chance)
-		tabWidget_Right->insertTab(2, tab_Chance, QString(tr("Simulation")));
-
-	// refresh board cards if game is running
-	if (myStartWindow->getSession()->getCurrentGame())
-	{
-
-		int tempBoardCardsArray[5];
-		myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getBoard()->getCards(tempBoardCardsArray);
-		GameState currentState = myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getCurrentBettingRound()->getBettingRoundID();
-		if (currentState >= GAME_STATE_FLOP && currentState <= GAME_STATE_POST_RIVER)
-			for (int i = 0; i < 3; i++)
-			{
-				QPixmap card = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + QString::number(tempBoardCardsArray[i], 10) + ".png"));
-				boardCardsArray[i]->setPixmap(card, false);
-			}
-		if (currentState >= GAME_STATE_TURN && currentState <= GAME_STATE_POST_RIVER)
-		{
-			QPixmap card = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + QString::number(tempBoardCardsArray[3], 10) + ".png"));
-			boardCardsArray[3]->setPixmap(card, false);
-		}
-		if (currentState == GAME_STATE_RIVER || currentState == GAME_STATE_POST_RIVER)
-		{
-			QPixmap card = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + QString::number(tempBoardCardsArray[4], 10) + ".png"));
-			boardCardsArray[4]->setPixmap(card, false);
-		}
-	}
-
-	flipside = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + "flipside.png"));
-
-	int j, k;
-	for (j = 1; j < MAX_NUMBER_OF_PLAYERS; j++)
-	{
-		for (k = 0; k <= 1; k++)
-		{
-			if (holeCardsArray[j][k]->getIsFlipside())
-			{
-				holeCardsArray[j][k]->setPixmap(flipside, true);
-			}
-		}
-	}
-
-	// Check for anti-peek mode
-	if (myStartWindow->getSession()->getCurrentGame())
-	{
-		// 		check if human player is already active
-		std::shared_ptr<Player> humanPlayer = myStartWindow->getSession()->getCurrentGame()->getSeatsList()->front();
-		if (humanPlayer->getActiveStatus())
-		{
-
-			QPixmap tempCardsPixmapArray[2];
-			int tempCardsIntArray[2];
-
-			humanPlayer->getCards(tempCardsIntArray);
-			if (myConfig->readConfigInt("AntiPeekMode"))
-			{
-				holeCardsArray[0][0]->setPixmap(flipside, true);
-				tempCardsPixmapArray[0] = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + QString::number(tempCardsIntArray[0], 10) + ".png"));
-				holeCardsArray[0][0]->setHiddenFrontPixmap(tempCardsPixmapArray[0]);
-				holeCardsArray[0][1]->setPixmap(flipside, true);
-				tempCardsPixmapArray[1] = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + QString::number(tempCardsIntArray[1], 10) + ".png"));
-				holeCardsArray[0][1]->setHiddenFrontPixmap(tempCardsPixmapArray[1]);
-			}
-			else
-			{
-				tempCardsPixmapArray[0] = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + QString::number(tempCardsIntArray[0], 10) + ".png"));
-				holeCardsArray[0][0]->setPixmap(tempCardsPixmapArray[0], false);
-				tempCardsPixmapArray[1] = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + QString::number(tempCardsIntArray[1], 10) + ".png"));
-				holeCardsArray[0][1]->setPixmap(tempCardsPixmapArray[1], false);
-			}
-		}
-	}
-
-	refreshGameTableStyle();
-
-	if (this->isVisible() && myGameTableStyle->getState() != GT_STYLE_OK)
-	{
-		LOG_ERROR(__FILE__ << " (" << __LINE__ << "): gameTable style not ok! ");
-	}
-
-	// blind buttons refresh
-	if (myStartWindow->getSession()->getCurrentGame())
-	{
-		refreshButton();
-		refreshGroupbox();
-		provideMyActions();
 	}
 }
 
@@ -3122,15 +3025,6 @@ void gameTableImpl::blinkingStartButtonAnimationAction()
 		myGameTableStyle->setBreakButtonStyle(pushButton_break, 0);
 	}
 }
-
-// void gameTableImpl::sendChatMessage()
-//{
-//	myChat->sendMessage();
-// }
-// void gameTableImpl::checkChatInputLength(QString string)
-//{
-//	myChat->checkInputLength(string);
-// }
 
 void gameTableImpl::GameModification()
 {

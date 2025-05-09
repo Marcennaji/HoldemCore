@@ -25,7 +25,7 @@
 
 using namespace std;
 
-CardDeckStyleReader::CardDeckStyleReader(ConfigFile *c, QWidget *w) : myConfig(c), myW(w), fallBack(0), loadedSuccessfull(0)
+CardDeckStyleReader::CardDeckStyleReader(QWidget *w) : myW(w), fallBack(0), loadedSuccessfull(0)
 {
 
 }
@@ -35,13 +35,13 @@ CardDeckStyleReader::~CardDeckStyleReader()
 {
 }
 
-void CardDeckStyleReader::readStyleFile(QString file)
+void CardDeckStyleReader::readStyleFile(QString file, const string & appDataDir)
 {
 	//if style file failed --> default style fallback
 	if(QFile(file).exists()) {
 		currentFileName = file;
 	} else {
-		currentFileName = QString::fromUtf8(myConfig->readConfigString("AppDataDir").c_str())+"gfx/cards/default/defaultdeckstyle.xml";
+		currentFileName = QString::fromUtf8(appDataDir)+"gfx/cards/default/defaultdeckstyle.xml";
 		fallBack = 1;
 	}
 

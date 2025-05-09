@@ -154,8 +154,6 @@ public slots:
 
 	void setGameSpeed(const int theValue);
 
-	void applySettings(settingsDialogImpl*);
-
 	void pushButtonBetRaiseClicked(bool checked);
 	void pushButtonBetRaiseHalfPotClicked(bool checked);
 	void pushButtonBetRaiseTwoThirdPotClicked(bool checked);

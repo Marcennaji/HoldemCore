@@ -42,7 +42,7 @@ class GameTableStyleReader : public QObject
 {
 	Q_OBJECT
 public:
-	GameTableStyleReader(ConfigFile *c, QWidget *w);
+	GameTableStyleReader(QWidget *w, QString appDataDir_);
 	~GameTableStyleReader();
 
 	void readStyleFile(QString);
@@ -438,6 +438,8 @@ private:
 	QString humanPlayerButtonFontSize;
 	QString betValueFontSize;
 
+	QString myAppDataDir;
+
 	QString tabBarPaddingTop;
 	QString tabBarPaddingSide;
 
@@ -448,7 +450,6 @@ private:
 	QStringList leftItems;
 	QStringList itemPicsLeft;
 
-	ConfigFile *myConfig;
 	QWidget *myW;
 
 	bool fallBack;
