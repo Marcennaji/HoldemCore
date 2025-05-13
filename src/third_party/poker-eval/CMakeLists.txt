@@ -12,4 +12,4 @@ file(GLOB_RECURSE INCLUDE_HEADERS
 add_library(poker_eval STATIC ${LIB_SOURCES} ${INCLUDE_HEADERS})
 
 # Include the include directory for this library
-target_include_directories(poker_eval PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(poker_eval PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/lib)

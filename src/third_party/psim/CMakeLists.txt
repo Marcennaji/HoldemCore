@@ -11,3 +11,9 @@ file(GLOB_RECURSE INCLUDE_HEADERS
 # Create a static library for poker-eval
 add_library(psim STATIC ${LIB_SOURCES} ${INCLUDE_HEADERS})
 
+# Link psim to poker-eval
+target_link_libraries(psim PUBLIC poker_eval)
+
+target_include_directories(psim PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+                                        ${CMAKE_SOURCE_DIR}/src)
+
