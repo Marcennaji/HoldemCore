@@ -26,8 +26,8 @@
 class GuiDisplayGameActions;
 class Session;
 class gameTableImpl;
+class startWindowImpl;
 
-// class GuiInterface : public ClientCallback, public ServerCallback, public IrcCallback
 
 class GuiInterface
 {
@@ -43,7 +43,7 @@ public:
 	virtual GuiDisplayGameActions* getGuiLog() const=0;
 
 	virtual void hideHoleCards()=0;
-
+	virtual void setStartWindow(startWindowImpl* w)=0;
 	virtual void refreshSet() const=0;
 	virtual void refreshCash() const=0;
 	virtual void refreshAction(int =-1, int =-1) const=0;

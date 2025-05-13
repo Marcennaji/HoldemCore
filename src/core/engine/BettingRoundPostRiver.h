@@ -28,7 +28,7 @@ class HandInterface;
 class BettingRoundPostRiver : public BettingRound
 {
 public:
-	BettingRoundPostRiver(HandInterface*, int, int);
+	BettingRoundPostRiver(EngineServices& services, HandInterface*, int, int);
 	~BettingRoundPostRiver();
 
 	void setHighestCardsValue(int theValue);

@@ -23,7 +23,8 @@
 
 using namespace std;
 
-BettingRoundTurn::BettingRoundTurn(HandInterface* hi, unsigned dP, int sB) : BettingRound(hi, dP, sB, GAME_STATE_TURN)
+BettingRoundTurn::BettingRoundTurn(EngineServices& services, HandInterface* hi, unsigned dP, int sB) : 
+    BettingRound(services, hi, dP, sB, GAME_STATE_TURN)
 {
 }
 

@@ -29,6 +29,7 @@
 #include <core/player/UltraTightPlayer.h>
 #include <core/player/HumanPlayer.h>
 #include <core/engine/Tools.h>
+#include <core/engine/EngineServices.h>
 
 #include <sstream>
 #include <random>
@@ -36,8 +37,8 @@
 
 using namespace std;
 
-Session::Session(GuiInterface *g, Log *l)
-	: currentGameNum(0), myGui(g), myLog(l)
+Session::Session(EngineServices& services, GuiInterface *g, Log *l)
+	: myEngineServices(services), currentGameNum(0), myGui(g), myLog(l)
 {
 	myQtToolsInterface = CreateQtToolsWrapper();
 }
@@ -46,9 +47,6 @@ Session::Session(GuiInterface *g, Log *l)
 Session::~Session()
 {
 	delete myQtToolsInterface;
-	myQtToolsInterface = 0;
-	delete myLog;
-	myLog = 0;
 }
 
 bool Session::init()
@@ -65,7 +63,7 @@ void Session::startGame(const GameData &gameData, const StartData &startData)
 	myGui->hideHoleCards();
 	myGui->initGui(gameData.guiSpeed);
 
-	std::shared_ptr<EngineFactory> factory(new EngineFactory()); 
+	std::shared_ptr<EngineFactory> factory(new EngineFactory(myEngineServices)); 
 
 
 	PlayerList playerList;

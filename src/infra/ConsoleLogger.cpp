@@ -1,0 +1,20 @@
+#include "ConsoleLogger.h"
+
+#include <iostream>
+
+ConsoleLogger::ConsoleLogger(int level)
+    : logLevel(level) {}
+
+void ConsoleLogger::error(const std::string& msg) {
+    std::cerr << "[ERROR] " << msg << std::endl;
+}
+
+void ConsoleLogger::info(const std::string& msg) {
+    if (logLevel >= 1)
+        std::cout << "[INFO] " << msg << std::endl;
+}
+
+void ConsoleLogger::verbose(const std::string& msg, int level) {
+    if (logLevel >= level)
+        std::cout << "[VERBOSE] " << msg << std::endl;
+}

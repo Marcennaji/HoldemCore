@@ -27,7 +27,8 @@
 
 using namespace std;
 
-BettingRoundPreflop::BettingRoundPreflop(HandInterface* hi, unsigned dP, int sB) : BettingRound(hi, dP, sB, GAME_STATE_PREFLOP)
+BettingRoundPreflop::BettingRoundPreflop(EngineServices& services, HandInterface* hi, unsigned dP, int sB) : 
+	BettingRound(services, hi, dP, sB, GAME_STATE_PREFLOP)
 {
 	setHighestSet(2*getSmallBlind());
 }

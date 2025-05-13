@@ -28,7 +28,7 @@ class BettingRoundFlop : public BettingRound
 {
 
 public:
-	BettingRoundFlop(HandInterface*, unsigned, int);
+	BettingRoundFlop(EngineServices& services, HandInterface*, unsigned, int);
 	~BettingRoundFlop();
 
 };

@@ -21,7 +21,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <core/engine/EngineDefs.h>
-#include <infra/LogHelper.h>
+#include <core/engine/EngineServices.h>
 
 using namespace std;
 
@@ -63,7 +63,7 @@ void CardDeckStyleReader::readStyleFile(QString file, const string & appDataDir)
 
 		TiXmlElement *GameTableElement = docHandle.FirstChild( "PokerTraining" ).FirstChild( "TableStyle" ).ToElement();
 		if(GameTableElement) {
-			LOG_ERROR(__FILE__ << " (" << __LINE__ << "A game table style was selected instead of a card deck style.\nPlease select a card deck style and try again!");
+			//LOG_ERROR(__FILE__ << " (" << __LINE__ << "A game table style was selected instead of a card deck style.\nPlease select a card deck style and try again!");
 		} else {
 
 			TiXmlElement* itemsList = docHandle.FirstChild( "PokerTraining" ).FirstChild( "CardDeck" ).FirstChild().ToElement();
@@ -133,7 +133,7 @@ void CardDeckStyleReader::readStyleFile(QString file, const string & appDataDir)
 		}
 	} else {
 		loadedSuccessfull = 0;
-		LOG_ERROR(__FILE__ << " (" << __LINE__ <<"Cannot load card deck style file: \n\nPlease check the style file or choose another style!");
+		//LOG_ERROR(__FILE__ << " (" << __LINE__ <<"Cannot load card deck style file: \n\nPlease check the style file or choose another style!");
 	}
 
 }
@@ -144,7 +144,7 @@ void CardDeckStyleReader::showLeftItemsErrorMessage(QString style, QStringList f
 	QString EMail;
 	if(email != "NULL") EMail = email;
 
-	LOG_ERROR(__FILE__ << " (" << __LINE__ << "Selected card deck style seems to be incomplete or defective.");
+	//LOG_ERROR(__FILE__ << " (" << __LINE__ << "Selected card deck style seems to be incomplete or defective.");
 }
 
 void CardDeckStyleReader::showCardsLeftErrorMessage(QString style, QStringList failedItems, QString email)
@@ -153,5 +153,5 @@ void CardDeckStyleReader::showCardsLeftErrorMessage(QString style, QStringList f
 	QString EMail;
 	if(email != "NULL") EMail = email;
 
-	LOG_ERROR(__FILE__ << " (" << __LINE__ << "Selected card deck style seems to be incomplete or defective");
+	//LOG_ERROR(__FILE__ << " (" << __LINE__ << "Selected card deck style seems to be incomplete or defective");
 }

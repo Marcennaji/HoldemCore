@@ -31,34 +31,25 @@
 
 using namespace std;
 
-startWindowImpl::startWindowImpl(QString appDataPath_ , QString logPath_,	QString userDataPath_, Log *l)
-	: myAppDataPath(appDataPath_) , myLogPath (logPath_), myUserDataPath(userDataPath_), myLog(l)
+startWindowImpl::startWindowImpl(const QString& appDataPath, GuiInterface* gui, Session* session, QWidget* parent)
+    : QMainWindow(parent),
+      myAppDataPath(appDataPath),
+      myGuiInterface(gui),
+      mySession(session)
 {
+    setupUi(this);
+	myGuiInterface->setStartWindow(this);
+    setWindowTitle(QString(tr("PokerTraining %1").arg(POKERTRAINING_BETA_RELEASE_STRING)));
+    setWindowIcon(QIcon(myAppDataPath + "gfx/gui/misc/windowicon.png"));
+    setStatusBar(nullptr);
+    installEventFilter(this);
 
-	myGuiInterface.reset(new GuiWrapper(userDataPath_.toStdString(), this));
+    myNewGameDialog = new newGameDialogImpl(this);
+    connect(actionStartGame, &QAction::triggered, this, &startWindowImpl::callNewGameDialog);
+    connect(pushButtonStartGame, &QPushButton::clicked, this, &startWindowImpl::callNewGameDialog);
 
-	mySession.reset(new Session(myGuiInterface.get(), myLog));
-	mySession->init(); 
-	myLog->init();
-
-
-	setupUi(this);
-	this->setWindowTitle(QString(tr("PokerTraining %1").arg(POKERTRAINING_BETA_RELEASE_STRING)));
-	this->installEventFilter(this);
-
-	this->setWindowIcon(QIcon(myAppDataPath + "gfx/gui/misc/windowicon.png"));
-
-	this->setStatusBar(0);
-
-	// 	Dialogs
-	myNewGameDialog = new newGameDialogImpl(this);
-
-	connect(actionStartGame, SIGNAL(triggered()), this, SLOT(callNewGameDialog()));
-	connect(pushButtonStartGame, SIGNAL(clicked()), this, SLOT(callNewGameDialog()));
-
-	this->show();
+    show();
 }
-
 startWindowImpl::~startWindowImpl()
 {
 }

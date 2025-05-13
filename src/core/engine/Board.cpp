@@ -20,7 +20,7 @@
 
 #include "HandInterface.h"
 
-#include <infra/LogHelper.h>
+#include <core/engine/EngineServices.h>
 #include "exception.h"
 #include "EngineError.h"
 #include "Player.h"

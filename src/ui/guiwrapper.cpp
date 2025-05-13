@@ -33,9 +33,6 @@ GuiWrapper::GuiWrapper(const std::string & appDataDir, startWindowImpl *s) : myG
 
 	myW = new gameTableImpl(appDataDir);
 	myGuiLog = new GuiDisplayGameActions(myW);
-
-	myStartWindow->setGuiLog(myGuiLog);
-	myW->setStartWindow(myStartWindow);
 }
 
 
@@ -43,6 +40,13 @@ GuiWrapper::~GuiWrapper()
 {
 	delete myGuiLog;
 
+}
+void GuiWrapper::setStartWindow(startWindowImpl* w) {
+    myStartWindow = w;
+    if (myGuiLog)
+        myStartWindow->setGuiLog(myGuiLog);
+    if (myW)
+        myW->setStartWindow(myStartWindow);
 }
 
 void GuiWrapper::initGui(int speed)

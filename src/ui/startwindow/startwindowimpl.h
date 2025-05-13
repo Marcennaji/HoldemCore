@@ -40,7 +40,7 @@ class startWindowImpl: public QMainWindow, public Ui::startWindow
 {
 	Q_OBJECT
 public:
-	startWindowImpl(QString	appDataPath , QString logPath,	QString userDataPath, Log *l);
+	startWindowImpl(const QString& appDataPath, GuiInterface* gui, Session* session, QWidget* parent);
 	~startWindowImpl();
 
 	void setSession(std::shared_ptr<Session> session) {
@@ -76,7 +76,6 @@ private:
 
 	std::shared_ptr<GuiInterface> myGuiInterface;
 	std::shared_ptr<Session> mySession;
-	//std::shared_ptr<GuiInterface> myServerGuiInterface;
 
 	// 	Dialogs
 	newGameDialogImpl *myNewGameDialog;

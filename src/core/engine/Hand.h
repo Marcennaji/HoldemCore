@@ -23,6 +23,7 @@
 #include "Player.h"
 #include "HandInterface.h"
 #include "BettingRoundInterface.h"
+#include <core/engine/EngineServices.h>
 
 #include <vector>
 
@@ -32,7 +33,7 @@ class GuiInterface;
 class Hand : public HandInterface
 {
 public:
-	Hand(std::shared_ptr<EngineFactory> f, GuiInterface*, std::shared_ptr<BoardInterface>, Log*, PlayerList, PlayerList, PlayerList, int, int, unsigned, int, int);
+	Hand(EngineServices& services, std::shared_ptr<EngineFactory> f, GuiInterface*, std::shared_ptr<BoardInterface>, Log*, PlayerList, PlayerList, PlayerList, int, int, unsigned, int, int);
 	~Hand();
 
 	void start();
@@ -179,6 +180,7 @@ private:
 	GuiInterface *myGui;
 	std::shared_ptr<BoardInterface> myBoard;
 	Log *myLog;
+	EngineServices& myEngineServices;
 
 	PlayerList seatsList; // all player
 	PlayerList activePlayerList; // all player who are not out

@@ -28,7 +28,7 @@ class HandInterface;
 class BettingRoundRiver : public BettingRound
 {
 public:
-	BettingRoundRiver(HandInterface*, unsigned, int);
+	BettingRoundRiver(EngineServices& services, HandInterface*, unsigned, int);
 	~BettingRoundRiver();
 };
 

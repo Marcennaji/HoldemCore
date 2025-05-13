@@ -18,7 +18,7 @@
 #include <ui/styles/gametablestylereader.h>
 #include <cstdlib>
 #include <QtWidgets/QLineEdit>
-#include <infra/LogHelper.h>
+#include <core/engine/EngineServices.h>
 
 using namespace std;
 
@@ -72,7 +72,7 @@ void GameTableStyleReader::readStyleFile(QString file)
 
         TiXmlElement *CardDeckElement = docHandle.FirstChild( "PokerTraining" ).FirstChild( "CardDeck" ).ToElement();
         if(CardDeckElement) {
-            LOG_ERROR(__FILE__ << " (" << __LINE__ << "A card deck style was selected instead of a game table style");
+            //LOG_ERROR(__FILE__ << " (" << __LINE__ << "A card deck style was selected instead of a game table style");
         } else {
             //in case of rereading clear old variables:
             StyleDescription.clear();
@@ -1399,7 +1399,7 @@ void GameTableStyleReader::readStyleFile(QString file)
         }
     } else {
         loadedSuccessfull = 0;
-        LOG_ERROR(__FILE__ << " (" << __LINE__ << "Cannot load game table style file");
+        //LOG_ERROR(__FILE__ << " (" << __LINE__ << "Cannot load game table style file");
     }
 }
 
@@ -1746,7 +1746,7 @@ QString GameTableStyleReader::getFallBackFieldContent(QString field, int type)
 
         TiXmlElement *CardDeckElement = docHandle.FirstChild( "PokerTraining" ).FirstChild( "CardDeck" ).ToElement();
         if(CardDeckElement) {
-            LOG_ERROR(__FILE__ << " (" << __LINE__ << "A card deck style was selected instead of a game table style.");
+            //LOG_ERROR(__FILE__ << " (" << __LINE__ << "A card deck style was selected instead of a game table style.");
         } else {
             TiXmlElement* itemsList = docHandle.FirstChild( "PokerTraining" ).FirstChild( "TableStyle" ).FirstChild().ToElement();
             for( ; itemsList; itemsList=itemsList->NextSiblingElement()) {

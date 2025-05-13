@@ -19,7 +19,7 @@
 #define NOMINMAX // for Windows
 
 #include "tools.h"
-#include <infra/LogHelper.h>
+#include <core/engine/EngineServices.h>
 #pragma message("Included LogHelper.h successfully")
 
 #include <memory>

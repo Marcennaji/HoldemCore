@@ -36,7 +36,8 @@ public:
 	GuiWrapper(const std::string & appDataDir, startWindowImpl*);
 
 	~GuiWrapper();
-
+	
+	void setStartWindow(startWindowImpl* w);
 	void initGui(int speed);
 
 	std::shared_ptr<Session> getSession();

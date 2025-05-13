@@ -12,8 +12,8 @@ target_include_directories(PokerTraining PUBLIC
 
 target_link_libraries(PokerTraining
     engine  
-    infra
     player  
+    infra
     qt_gui
     psim
     sqlite

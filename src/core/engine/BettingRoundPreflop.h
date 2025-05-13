@@ -29,7 +29,7 @@ class BettingRoundPreflop : public BettingRound
 {
 
 public:
-	BettingRoundPreflop(HandInterface*, unsigned, int);
+	BettingRoundPreflop(EngineServices& services, HandInterface*, unsigned, int);
 	~BettingRoundPreflop();
 
 	void run();

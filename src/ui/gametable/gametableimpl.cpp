@@ -38,7 +38,7 @@
 #include <ui/styles/gametablestylereader.h>
 #include <ui/styles/carddeckstylereader.h>
 
-#include <infra/LogHelper.h>
+#include <core/engine/EngineServices.h>
 
 #include <QtCore/qregularexpression.h>
 
@@ -2926,8 +2926,6 @@ void gameTableImpl::GameModification()
 	// Set the playing mode to "manual"
 	radioButton_manualAction->click();
 
-	if (myGameTableStyle->getState() != GT_STYLE_OK)
-		LOG_ERROR(__FILE__ << " (" << __LINE__ << "):  invalid game style");
 }
 
 

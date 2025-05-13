@@ -26,6 +26,7 @@
 #include <core/engine/GameInfo.h>
 #include <core/engine/StartData.h>
 #include <core/engine/GameData.h>
+#include <core/engine/EngineServices.h>
 
 class GuiInterface;
 class Game;
@@ -36,7 +37,7 @@ class Session
 {
 public:
 
-	Session(GuiInterface*, Log*);
+	Session(EngineServices&, GuiInterface*, Log*);
 
 	~Session();
 
@@ -64,6 +65,7 @@ private:
 
 	std::shared_ptr<Game> currentGame;
 	GuiInterface *myGui;
+	EngineServices& myEngineServices;
 	Log *myLog;
 	QtToolsInterface *myQtToolsInterface;
 };

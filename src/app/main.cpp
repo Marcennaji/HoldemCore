@@ -26,15 +26,13 @@
 #include <QtGui>
 #include <QtCore>
 #include <QString>
-#include <QCoreApplication>
-#include <QDir>
-#include <QStandardPaths>
-#include <filesystem>
+
 #include <Wincon.h>
 
 #include <ui/startwindow/startwindowimpl.h>
-#include <core/engine/Log.h>
-
+#include <ui/controller/GuiAppController.h>
+#include <infra/AppDirectories.h>
+#include <infra/ConsoleLogger.h>
 
 #ifdef LOG_POKER_EXEC
 #define _CRTDBG_MAP_ALLOC
@@ -50,34 +48,7 @@
 using namespace std;
 
 class startWindowImpl;
-class Game;
 
-
-namespace fs = std::filesystem;
-
-struct AppDirectories {
-	std::string appDataDir;
-	std::string logDir;
-	std::string userDataDir;
-
-	static AppDirectories initialize() {
-		QString basePath = QCoreApplication::instance()->applicationDirPath();
-		QString appDir = QDir::cleanPath(basePath) + "/";
-		QString log = QDir::cleanPath(appDir + "log-files/") + "/";
-		QString data = QDir::cleanPath(appDir + "data/") + "/";
-
-		// Create if not exists
-		fs::create_directories(appDir.toStdString());
-		fs::create_directories(log.toStdString());
-		fs::create_directories(data.toStdString());
-
-		return {
-			appDir.toStdString(),
-			log.toStdString(),
-			data.toStdString()
-		};
-	}
-};
 
 int main( int argc, char **argv )
 {
@@ -88,15 +59,6 @@ int main( int argc, char **argv )
 
 	/////// can be removed for non-qt-guis ////////////
 	//QtSingleApplication a( argc, argv );
-
-	QApplication application( argc, argv );
-
-	AppDirectories dirs = AppDirectories::initialize();
-
-	qDebug() << "App Data Dir:" << QString::fromStdString(dirs.appDataDir);
-	qDebug() << "Log Dir:" << QString::fromStdString(dirs.logDir);
-	qDebug() << "User Data Dir:" << QString::fromStdString(dirs.userDataDir);
-
 
 #ifdef LOG_POKER_EXEC
 
@@ -127,30 +89,20 @@ int main( int argc, char **argv )
 #endif
 
 #endif
-	Log *myLog = new Log(dirs.logDir);	
-    QString	myAppDataPath = QString::fromUtf8(dirs.appDataDir.c_str());
-	QString myLogPath = QString::fromUtf8(dirs.logDir.c_str());
-	QString myUserDataPath = QString::fromUtf8(dirs.userDataDir.c_str());
- 
-	QFontDatabase::addApplicationFont (myAppDataPath +"fonts/n019003l.pfb");
-	QFontDatabase::addApplicationFont (myAppDataPath +"fonts/VeraBd.ttf");
-	QFontDatabase::addApplicationFont (myAppDataPath +"fonts/c059013l.pfb");
-	QFontDatabase::addApplicationFont (myAppDataPath +"fonts/DejaVuSans-Bold.ttf");
 
-	QString font1String("QApplication, QWidget, QDialog { font-size: 12px; }");
-	application.setStyleSheet(font1String + " QDialogButtonBox, QMessageBox { dialogbuttonbox-buttons-have-icons: 1; dialog-ok-icon: url(:/gfx/dialog_ok_apply.png); dialog-cancel-icon: url(:/gfx/dialog_close.png); dialog-close-icon: url(:/gfx/dialog_close.png); dialog-yes-icon: url(:/gfx/dialog_ok_apply.png); dialog-no-icon: url(:/gfx/dialog_close.png) }");
+    QApplication app(argc, argv);
 
- 	qRegisterMetaType<unsigned>("unsigned");
-	qRegisterMetaType<std::shared_ptr<Game> >("std::shared_ptr<Game>");
+    AppDirectories dirs = AppDirectories::initialize(); 
+    QString appPath = QString::fromStdString(dirs.appDataDir);
+    QString logPath = QString::fromStdString(dirs.logDir);
+    QString userPath = QString::fromStdString(dirs.userDataDir);
 
-	startWindowImpl mainWin(myAppDataPath, myLogPath, myUserDataPath , myLog);
+	auto logger = std::make_unique<ConsoleLogger>();
+	EngineServices services { logger.get() };
 
-	int retVal = application.exec();
-	
-	//_CrtCheckMemory();
+    GuiAppController controller(services, appPath, logPath, userPath);
+    startWindowImpl* mainWindow = controller.createMainWindow();
 
-	//_CrtDumpMemoryLeaks();
-
-	return retVal;
-
+    return app.exec();
 }
+

@@ -10,4 +10,10 @@ file(GLOB INFRA_SOURCES
 add_library(infra ${INFRA_SOURCES})
 
 # Include directories for infra
-target_include_directories(infra PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(infra 
+            PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+            PRIVATE ${CMAKE_SOURCE_DIR}/src/core/engine
+            )
+
+# Link infra to engine so it can use engine interfaces
+target_link_libraries(infra PUBLIC engine)
