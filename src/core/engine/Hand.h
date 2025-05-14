@@ -23,7 +23,7 @@
 #include "Player.h"
 #include "HandInterface.h"
 #include "BettingRoundInterface.h"
-#include <core/interfaces/persistence/ILogger.h>
+#include <core/interfaces/ILogger.h>
 
 #include <vector>
 

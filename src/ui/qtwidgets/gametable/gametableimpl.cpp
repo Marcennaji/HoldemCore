@@ -38,7 +38,7 @@
 #include <ui/qtwidgets/styles/gametablestylereader.h>
 #include <ui/qtwidgets/styles/carddeckstylereader.h>
 
-#include <core/interfaces/persistence/ILogger.h>
+#include <core/interfaces/ILogger.h>
 
 #include <QtCore/qregularexpression.h>
 

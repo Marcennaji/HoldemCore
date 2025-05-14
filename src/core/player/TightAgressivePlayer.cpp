@@ -23,7 +23,7 @@
 #include <core/engine/EngineError.h>
 #include <core/engine/Ranges.h>
 #include <core/engine/Exception.h>
-#include <core/interfaces/persistence/ILogger.h>
+#include <core/interfaces/ILogger.h>
 #include <ui/qtwidgets/guiwrapper.h>
 
 #include <fstream>

@@ -1,5 +1,5 @@
 #pragma once
-#include <core/interfaces/persistence/ILogger.h>
+#include <core/interfaces/ILogger.h>
 #include <iostream>
 #include <string>
 

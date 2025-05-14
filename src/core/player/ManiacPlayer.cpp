@@ -21,7 +21,7 @@
 #include <core/engine/tools.h>
 #include <core/engine/CardsValue.h>
 #include "infra/persistence/SqliteLogStore.h"
-#include <core/interfaces/persistence/ILogger.h>
+#include <core/interfaces/ILogger.h>
 //#include <core/engine/psim/simulate.hpp>
 #include "Exception.h"
 #include <core/engine/EngineError.h>

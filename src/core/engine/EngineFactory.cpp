@@ -26,7 +26,7 @@
 #include "BettingRoundriver.h"
 #include "BettingRoundpostriver.h"
 #include "tools.h"
-#include <core/interfaces/persistence/ILogger.h>
+#include <core/interfaces/ILogger.h>
 
 #include "TightAgressivePlayer.h"
 #include "LooseAggressivePlayer.h"

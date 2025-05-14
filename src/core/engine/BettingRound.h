@@ -22,7 +22,7 @@
 
 #include "BettingRoundinterface.h"
 #include "HandInterface.h"
-#include <core/interfaces/persistence/ILogger.h>
+#include <core/interfaces/ILogger.h>
 
 class BettingRound : public BettingRoundInterface
 {
