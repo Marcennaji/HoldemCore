@@ -25,7 +25,7 @@ class UltraTightPlayer : public Player{
 
 public: 
 
-	UltraTightPlayer(Log * l, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB);
+	UltraTightPlayer(SqliteLogStore * l, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB);
 
 	~UltraTightPlayer();
 

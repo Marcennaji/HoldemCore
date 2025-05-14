@@ -17,7 +17,7 @@
  *****************************************************************************/
 #include "HumanPlayer.h"
 
-#include <core/engine/Log.h>
+#include <infra/persistence/SqliteLogStore.h>
 
 #ifndef max
 #define max(a,b)            (((a) > (b)) ? (a) : (b))
@@ -25,7 +25,7 @@
 
 using namespace std;
 
-HumanPlayer::HumanPlayer(Log * l, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB):
+HumanPlayer::HumanPlayer(SqliteLogStore * l, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB):
 	Player(l, id, type, name, sC, aS, sotS, mB){
 
 }

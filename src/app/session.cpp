@@ -18,7 +18,7 @@
 
 #include "session.h"
 #include <core/engine/game.h>
-#include <core/engine/Log.h>
+#include <infra/persistence/SqliteLogStore.h>
 #include <ui/interfaces/guiinterface.h>
 #include <ui/interfaces/qttoolsinterface.h>
 
@@ -37,7 +37,7 @@
 
 using namespace std;
 
-Session::Session(ILogger * logger, GuiInterface *g, Log *l)
+Session::Session(ILogger * logger, GuiInterface *g, SqliteLogStore *l)
 	: myLogger(logger), currentGameNum(0), myGui(g), myLog(l)
 {
 	myQtToolsInterface = CreateQtToolsWrapper();

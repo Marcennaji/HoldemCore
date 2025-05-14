@@ -21,7 +21,7 @@
 #include "PlayerPosition.h"
 #include "BoardInterface.h"
 #include "BettingRoundinterface.h"
-#include "Log.h"
+#include "infra/persistence/SqliteLogStore.h"
 
 #include <ui/interfaces/guiinterface.h>
 
@@ -45,7 +45,7 @@ public:
 	virtual std::shared_ptr<BettingRoundInterface> getRiver() const =0;
 	virtual GuiInterface* getGuiInterface() const =0;
 	virtual std::shared_ptr<BettingRoundInterface> getCurrentBettingRound() const =0;
-	virtual Log* getLog() const =0;
+	virtual SqliteLogStore *getLog() const =0;
 
 	virtual void setID(int theValue) =0;
 	virtual int getID() const =0;

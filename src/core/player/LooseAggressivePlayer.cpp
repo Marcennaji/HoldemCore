@@ -20,7 +20,7 @@
 #include <core/engine/HandInterface.h>
 #include <core/engine/tools.h>
 #include <core/engine/CardsValue.h>
-#include "log.h"
+#include "infra/persistence/SqliteLogStore.h"
 #include <core/interfaces/persistence/ILogger.h>
 //#include <core/engine/psim/simulate.hpp>
 #include "Exception.h"
@@ -36,7 +36,7 @@
 
 using namespace std;
 
-LooseAggressivePlayer::LooseAggressivePlayer(Log * l, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB):
+LooseAggressivePlayer::LooseAggressivePlayer(SqliteLogStore * l, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB):
 	Player(l, id, type, name, sC, aS, sotS, mB){
 	
 	// initialize utg starting range, in a full table 

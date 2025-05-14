@@ -16,30 +16,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 
-#ifndef LOG_H
-#define LOG_H
+#pragma once
 
 #define SQLLITE_COMPLETE_LOG
 
-#include "GameState.h"
-#include "EngineDefs.h"
-#include "PlayerStatistics.h"
+#include "core/engine/GameState.h"
+#include "core/engine/EngineDefs.h"
+#include "core/engine/PlayerStatistics.h"
 
 #include <string>
 #include <filesystem>
-
 
 #define SQL_LOG_FILE "pokerTraining-log-v0.9.pdb"
 
 struct sqlite3;
 
-class Log
+class SqliteLogStore
 {
 
 public:
-	Log(const std::string &logDir);
+	SqliteLogStore(const std::string &logDir);
 
-	~Log();
+	~SqliteLogStore();
 
 	void init();
 	void logGameLosers(PlayerList activePlayerList);
@@ -76,4 +74,3 @@ private:
 	std::string myLogDir;
 };
 
-#endif // LOG_H

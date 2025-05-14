@@ -34,7 +34,7 @@ Hand::Hand(
 	std::shared_ptr<EngineFactory> f,
 	GuiInterface *g,
 	std::shared_ptr<BoardInterface> b,
-	Log *l,
+	SqliteLogStore *l,
 	PlayerList sl,
 	PlayerList apl,
 	PlayerList rpl,

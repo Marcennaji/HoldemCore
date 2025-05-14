@@ -21,7 +21,7 @@
 #include <core/engine/HandInterface.h>
 #include <core/engine/Tools.h>
 #include <core/engine/CardsValue.h>
-#include <core/engine/Log.h>
+#include <infra/persistence/SqliteLogStore.h>
 #include <core/engine/Ranges.h>
 #include <core/interfaces/persistence/ILogger.h>
 #include <third_party/sqlite3/sqlite3.h>
@@ -57,7 +57,7 @@ std::vector<PlayerAction> & CurrentHandActions::getRiverActions() {
 	return m_riverActions;
 }
 
-Player::Player(Log * log_, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB)
+Player::Player(SqliteLogStore * log_, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB)
 	: 
 	  myLog(log_), currentHand(0), myID(id), myType(type), myName(name), 
 	  myCardsValueInt(0), logHoleCardsDone(false), myCash(sC), mySet(0), myLastRelativeSet(0), myAction(PLAYER_ACTION_NONE),

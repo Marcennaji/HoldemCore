@@ -20,7 +20,7 @@
 #include <core/engine/game.h>
 #include <core/player/Player.h>
 #include <ui/qtwidgets/gametable/GuiDisplayGameActions.h>
-#include <core/engine/Log.h>
+#include <infra/persistence/SqliteLogStore.h>
 #include <ui/qtwidgets/gametable/gametableimpl.h>
 #include <ui/qtwidgets/startwindow/startwindowimpl.h>
 

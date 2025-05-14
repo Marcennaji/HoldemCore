@@ -27,13 +27,13 @@
 
 #include <vector>
 
-class Log;
+class SqliteLogStore;
 class GuiInterface;
 
 class Hand : public HandInterface
 {
 public:
-	Hand(ILogger * logger, std::shared_ptr<EngineFactory> f, GuiInterface*, std::shared_ptr<BoardInterface>, Log*, PlayerList, PlayerList, PlayerList, int, int, unsigned, int, int);
+	Hand(ILogger * logger, std::shared_ptr<EngineFactory> f, GuiInterface*, std::shared_ptr<BoardInterface>, SqliteLogStore *, PlayerList, PlayerList, PlayerList, int, int, unsigned, int, int);
 	~Hand();
 
 	void start();
@@ -70,7 +70,7 @@ public:
 		return myBettingRound[currentRound];
 	}
 
-	Log* getLog() const {
+	SqliteLogStore *getLog() const {
 		return myLog;
 	}
 
@@ -179,7 +179,7 @@ private:
 	std::shared_ptr<EngineFactory> myFactory;
 	GuiInterface *myGui;
 	std::shared_ptr<BoardInterface> myBoard;
-	Log *myLog;
+	SqliteLogStore *myLog;
 	ILogger * myLogger;
 
 	PlayerList seatsList; // all player

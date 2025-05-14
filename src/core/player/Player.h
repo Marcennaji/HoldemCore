@@ -40,7 +40,7 @@ enum PlayerType {
     PLAYER_TYPE_HUMAN
 };
 
-class Log;
+class SqliteLogStore;
 class HandInterface;
 
 class CurrentHandActions
@@ -97,7 +97,7 @@ static int outsOddsTwoCard[] = { 0, 4, 8,  13, 17, 20,	 /* 0 to 5 outs */
 class Player
 {
 public:
-    Player(Log *, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB);
+    Player(SqliteLogStore *, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB);
 
     ~Player();
 
@@ -296,7 +296,7 @@ protected:
     std::vector<int> SB_STARTING_RANGE;
     std::vector<int> BB_STARTING_RANGE;
 
-    Log *myLog;
+    SqliteLogStore *myLog;
     HandInterface *currentHand;
 
     PostFlopState myFlopState;

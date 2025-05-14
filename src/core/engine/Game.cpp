@@ -24,7 +24,7 @@
 #include "StartData.h"
 
 #include <ui/interfaces/guiinterface.h>
-#include "Log.h"
+#include "infra/persistence/SqliteLogStore.h"
 
 
 #include <iostream>
@@ -33,7 +33,7 @@ using namespace std;
 
 Game::Game(GuiInterface* gui, std::shared_ptr<EngineFactory> factory,
 		   const PlayerList &playerList, const GameData &gameData,
-		   const StartData &startData, int gameId, Log* log)
+		   const StartData &startData, int gameId, SqliteLogStore *log)
 	: myFactory(factory), myGui(gui), myLog(log), startQuantityPlayers(startData.numberOfPlayers),
 	  startCash(gameData.startMoney), startSmallBlind(gameData.firstSmallBlind),
 	  myGameID(gameId), currentSmallBlind(gameData.firstSmallBlind), currentHandID(0), dealerPosition(0),

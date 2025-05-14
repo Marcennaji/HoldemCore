@@ -30,14 +30,14 @@
 
 class GuiInterface;
 class Game;
-class Log;
+class SqliteLogStore;
 class QtToolsInterface;
 
 class Session
 {
 public:
 
-	Session(ILogger *, GuiInterface*, Log*);
+	Session(ILogger *, GuiInterface*, SqliteLogStore *);
 
 	~Session();
 
@@ -49,7 +49,7 @@ public:
 
 	GuiInterface *getGui();
 
-	Log* getLog() {
+	SqliteLogStore *getLog() {
 		return myLog;
 	}
 
@@ -66,7 +66,7 @@ private:
 	std::shared_ptr<Game> currentGame;
 	GuiInterface *myGui;
 	ILogger * myLogger;
-	Log *myLog;
+	SqliteLogStore *myLog;
 	QtToolsInterface *myQtToolsInterface;
 };
 

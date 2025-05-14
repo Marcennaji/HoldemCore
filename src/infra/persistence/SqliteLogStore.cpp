@@ -15,31 +15,29 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
-#include <sys/types.h>
-#include <array>
 
-#include "Log.h"
-#include "EngineDefs.h"
-#include "CardsValue.h"
-#include "PlayerStatistics.h"
+#include "SqliteLogStore.h"
+#include "core/engine/EngineDefs.h"
+#include "core/engine/CardsValue.h"
+#include "core/engine/PlayerStatistics.h"
+#include "core/player/Player.h"
 
-
-#include <core/player/Player.h>
 #include <third_party/sqlite3/sqlite3.h>
 
 #include <sstream>
-
+#include <sys/types.h>
+#include <array>
 
 
 
 using namespace std;
 
-Log::Log(const std::string & logDir) : mySqliteLogDb(0), mySqliteLogFileName(""), myLogDir(logDir), uniqueGameID(0), currentHandID(0), 
+SqliteLogStore::SqliteLogStore(const std::string & logDir) : mySqliteLogDb(0), mySqliteLogFileName(""), myLogDir(logDir), uniqueGameID(0), currentHandID(0), 
 						currentRound(GAME_STATE_PREFLOP), sql("")
 {
 }
 
-Log::~Log()
+SqliteLogStore::~SqliteLogStore()
 {
 	if(SQLITE_LOG) {
 		sqlite3_close(mySqliteLogDb);
@@ -47,7 +45,7 @@ Log::~Log()
 }
 
 void
-Log::init()
+SqliteLogStore::init()
 {
 
 	if(SQLITE_LOG) {
@@ -86,7 +84,7 @@ Log::init()
 	}
 }
 
-void Log::createDatabase(){
+void SqliteLogStore::createDatabase(){
 
 	createRankingTable();
 	createUnplausibleHandsTable();
@@ -154,7 +152,7 @@ void Log::createDatabase(){
 	}
 }
 
-void Log::InitializePlayersStatistics(const string playerName, const int nbPlayers){
+void SqliteLogStore::InitializePlayersStatistics(const string playerName, const int nbPlayers){
 
 	sql += "INSERT OR REPLACE INTO PlayersStatistics (";
 	sql += "player_name,nb_players";
@@ -173,7 +171,7 @@ void Log::InitializePlayersStatistics(const string playerName, const int nbPlaye
 }
 
 void
-Log::logGameLosers(PlayerList activePlayerList)
+SqliteLogStore::logGameLosers(PlayerList activePlayerList)
 {
 	createRankingTable();
 
@@ -192,7 +190,7 @@ Log::logGameLosers(PlayerList activePlayerList)
 
 }
 void
-Log::logGameWinner(PlayerList activePlayerList)
+SqliteLogStore::logGameWinner(PlayerList activePlayerList)
 {
 	createRankingTable();
 
@@ -216,7 +214,7 @@ Log::logGameWinner(PlayerList activePlayerList)
 
 }
 void
-Log::logPlayedGames(PlayerList activePlayerList)
+SqliteLogStore::logPlayedGames(PlayerList activePlayerList)
 {
 	createRankingTable();
 
@@ -232,7 +230,7 @@ Log::logPlayedGames(PlayerList activePlayerList)
 	exec_transaction();
 
 }
-int Log::getIntegerValue(const std::string playerName, const std::string tableName, const std::string attributeName){
+int SqliteLogStore::getIntegerValue(const std::string playerName, const std::string tableName, const std::string attributeName){
 
 	int result = 0;
 
@@ -261,7 +259,7 @@ int Log::getIntegerValue(const std::string playerName, const std::string tableNa
 }
 
 
-void Log::createRankingTable(){
+void SqliteLogStore::createRankingTable(){
 
 	// create table if doesn't exist
 	sql = "CREATE TABLE IF NOT EXISTS Ranking (";
@@ -273,7 +271,7 @@ void Log::createRankingTable(){
 	exec_transaction();
 }
 void
-Log::logUnplausibleHand(const std::string card1, const std::string card2, const bool human, 
+SqliteLogStore::logUnplausibleHand(const std::string card1, const std::string card2, const bool human, 
 						const char bettingRound, const int nbPlayers)
 {
 	createUnplausibleHandsTable();
@@ -339,7 +337,7 @@ Log::logUnplausibleHand(const std::string card1, const std::string card2, const 
 
 	exec_transaction();
 }
-void Log::createUnplausibleHandsTable(){
+void SqliteLogStore::createUnplausibleHandsTable(){
 
 	// create table if doesn't exist
 	sql = "CREATE TABLE IF NOT EXISTS UnplausibleHands (";
@@ -353,7 +351,7 @@ void Log::createUnplausibleHandsTable(){
 }
 
 void
-Log::exec_transaction()
+SqliteLogStore::exec_transaction()
 {
 	char *errmsg = NULL;
 
@@ -368,7 +366,7 @@ Log::exec_transaction()
 }
 
 void
-Log::logPlayersStatistics(PlayerList activePlayerList)
+SqliteLogStore::logPlayersStatistics(PlayerList activePlayerList)
 {
 
 	PlayerListConstIterator it_c;
@@ -431,7 +429,7 @@ Log::logPlayersStatistics(PlayerList activePlayerList)
 }
 
 std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1>
- Log::getPlayerStatistics(const string & playerName){
+ SqliteLogStore::getPlayerStatistics(const string & playerName){
 
 	std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> playerStatistics{};
 

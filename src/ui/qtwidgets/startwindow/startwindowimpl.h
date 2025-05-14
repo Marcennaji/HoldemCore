@@ -34,7 +34,7 @@ class Game;
 class gameTableImpl;
 class newGameDialogImpl;
 class GuiDisplayGameActions;
-class Log;
+class SqliteLogStore;
 
 class startWindowImpl: public QMainWindow, public Ui::startWindow
 {
@@ -72,7 +72,7 @@ private:
 	QString myUserDataPath;
 
 	GuiDisplayGameActions *myGuiLog;
-	Log *myLog;
+	SqliteLogStore *myLog;
 
 	std::shared_ptr<GuiInterface> myGuiInterface;
 	std::shared_ptr<Session> mySession;

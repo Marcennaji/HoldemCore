@@ -25,7 +25,7 @@ class HumanPlayer : public Player{
 
 public: 
 
-	HumanPlayer(Log *, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB);
+	HumanPlayer(SqliteLogStore *, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB);
 
 	~HumanPlayer();
 

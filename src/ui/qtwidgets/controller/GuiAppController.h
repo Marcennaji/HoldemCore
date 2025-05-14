@@ -7,7 +7,7 @@
 #include <QString>
 
 class startWindowImpl;
-class Log;
+class SqliteLogStore;
 class Session;
 class GuiWrapper;
 
@@ -20,7 +20,7 @@ public:
 
 private:
     QString appDataPath, logPath, userDataPath;
-    std::unique_ptr<Log> gameActionslogger;
+    std::unique_ptr<SqliteLogStore> gameActionslogger;
     std::unique_ptr<GuiWrapper> gui;
     std::unique_ptr<Session> session;
 };

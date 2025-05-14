@@ -25,7 +25,7 @@ class LooseAggressivePlayer : public Player{
 
 public: 
 
-	LooseAggressivePlayer(Log * l, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB);
+	LooseAggressivePlayer(SqliteLogStore * l, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB);
 
 	~LooseAggressivePlayer();
 

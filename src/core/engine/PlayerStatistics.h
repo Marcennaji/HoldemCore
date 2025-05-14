@@ -132,7 +132,7 @@ public:
 
 protected :
 
-	friend class Log;
+	friend class SqliteLogStore;
 	friend class Player;
 
 	long m_toTalHands;

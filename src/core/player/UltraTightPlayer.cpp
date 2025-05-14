@@ -35,7 +35,7 @@
 
 using namespace std;
 
-UltraTightPlayer::UltraTightPlayer(Log * l, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB):
+UltraTightPlayer::UltraTightPlayer(SqliteLogStore * l, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB):
 	Player(l, id, type, name, sC, aS, sotS, mB){
 	
 	int utgFullTableRange = 0;

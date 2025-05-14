@@ -25,7 +25,7 @@
 #include <string>
 
 class GuiInterface;
-class Log;
+class SqliteLogStore;
 class HandInterface;
 class BoardInterface;
 class EngineFactory;
@@ -39,7 +39,7 @@ class Game
 public:
 	Game(GuiInterface *gui, std::shared_ptr<EngineFactory> factory,
 		 const PlayerList &playerList, const GameData &gameData,
-		 const StartData &startData, int gameId, Log *myLog);
+		 const StartData &startData, int gameId, SqliteLogStore *myLog);
 
 	~Game();
 
@@ -118,7 +118,7 @@ private:
 	std::shared_ptr<EngineFactory> myFactory;
 
 	GuiInterface *myGui;
-	Log *myLog;
+	SqliteLogStore *myLog;
 	std::shared_ptr<HandInterface> currentHand;
 	std::shared_ptr<BoardInterface> currentBoard;
 
