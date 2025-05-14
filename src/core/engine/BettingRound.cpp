@@ -22,13 +22,13 @@
 #include "EngineError.h"
 #include "ButtonState.h"
 
-#include <core/engine/EngineServices.h>
+#include <core/engine/ILogger.h>
 #include <core/player/Player.h>
 
 using namespace std;
 
-BettingRound::BettingRound(EngineServices& services, HandInterface* hi, unsigned dP, int sB, GameState gS)
-	: myEngineServices(services), BettingRoundInterface(), myHand(hi), myBettingRoundID(gS), dealerPosition(dP), smallBlindPosition(0), 
+BettingRound::BettingRound(ILogger * logger, HandInterface* hi, unsigned dP, int sB, GameState gS)
+	: myLogger(logger), BettingRoundInterface(), myHand(hi), myBettingRoundID(gS), dealerPosition(dP), smallBlindPosition(0), 
 	dealerPositionId(dP), smallBlindPositionId(0), bigBlindPositionId(0), smallBlind(sB), 
 	highestSet(0), minimumRaise(2*sB), fullBetRule(false), firstRun(true), firstRunGui(true), 
 	firstRound(true), firstHeadsUpRound(true), currentPlayersTurnId(0), 
@@ -47,7 +47,7 @@ BettingRound::BettingRound(EngineServices& services, HandInterface* hi, unsigned
 		}
 	}
 	if(it_c == myHand->getActivePlayerList()->end()) {
-		myEngineServices.logger->error("ACTIVE_PLAYER_NOT_FOUND");
+		myLogger->error("ACTIVE_PLAYER_NOT_FOUND");
 	}
 
 	// determine smallBlindPosition
@@ -58,7 +58,7 @@ BettingRound::BettingRound(EngineServices& services, HandInterface* hi, unsigned
 		}
 	}
 	if(it_c == myHand->getActivePlayerList()->end()) {
-		myEngineServices.logger->error("ACTIVE_PLAYER_NOT_FOUND");
+		myLogger->error("ACTIVE_PLAYER_NOT_FOUND");
 	}
 
 }
@@ -70,7 +70,7 @@ BettingRound::~BettingRound()
 
 int BettingRound::getHighestCardsValue() const
 {
-	myEngineServices.logger->error("getHighestCardsValue() in wrong BettingRound");
+	myLogger->error("getHighestCardsValue() in wrong BettingRound");
 	return 0;
 }
 
@@ -79,7 +79,7 @@ void BettingRound::nextPlayer()
 
 	PlayerListConstIterator currentPlayersTurnConstIt = myHand->getRunningPlayerIt(currentPlayersTurnId);
 	if(currentPlayersTurnConstIt == myHand->getRunningPlayerList()->end()) {
-		myEngineServices.logger->error("RUNNING_PLAYER_NOT_FOUND");
+		myLogger->error("RUNNING_PLAYER_NOT_FOUND");
 	}
 
 	(*currentPlayersTurnConstIt)->action();
@@ -109,7 +109,7 @@ void BettingRound::run()
 
 					it_1 = myHand->getActivePlayerIt(smallBlindPositionId);
 					if(it_1 == myHand->getActivePlayerList()->end()) {
-						myEngineServices.logger->error("ACTIVE_PLAYER_NOT_FOUND");
+						myLogger->error("ACTIVE_PLAYER_NOT_FOUND");
 					}
 
 					for(size_t i=0; i<myHand->getActivePlayerList()->size(); i++) {
@@ -126,7 +126,7 @@ void BettingRound::run()
 						}
 					}
 					if(!formerRunningPlayerFound) {
-						myEngineServices.logger->error("FORMER_RUNNING_PLAYER_NOT_FOUND");
+						myLogger->error("FORMER_RUNNING_PLAYER_NOT_FOUND");
 					}
 				}
 				// heads up: bigBlind begins -> dealer/smallBlind is running player before bigBlind
@@ -180,7 +180,7 @@ void BettingRound::run()
 
 				break;
 			default: 
-				myEngineServices.logger->error("wrong myBettingRoundID");
+				myLogger->error("wrong myBettingRoundID");
 			
 			}
 			logBoardCardsDone = true;
@@ -224,7 +224,7 @@ void BettingRound::run()
 			// determine next running player
 			PlayerListConstIterator currentPlayersTurnIt = myHand->getRunningPlayerIt( currentPlayersTurnId );
 			if(currentPlayersTurnIt == myHand->getRunningPlayerList()->end()) {
-				myEngineServices.logger->error("RUNNING_PLAYER_NOT_FOUND");
+				myLogger->error("RUNNING_PLAYER_NOT_FOUND");
 			}
 
 			++currentPlayersTurnIt;
@@ -239,7 +239,7 @@ void BettingRound::run()
 
 			currentPlayersTurnIt = myHand->getRunningPlayerIt( currentPlayersTurnId );
 			if(currentPlayersTurnIt == myHand->getRunningPlayerList()->end()) {
-				myEngineServices.logger->error("RUNNING_PLAYER_NOT_FOUND");
+				myLogger->error("RUNNING_PLAYER_NOT_FOUND");
 			}
 
 			(*currentPlayersTurnIt)->setTurn(true);

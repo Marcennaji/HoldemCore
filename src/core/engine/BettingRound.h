@@ -22,12 +22,12 @@
 
 #include "BettingRoundinterface.h"
 #include "HandInterface.h"
-#include "EngineServices.h"
+#include "ILogger.h"
 
 class BettingRound : public BettingRoundInterface
 {
 public:
-	BettingRound(EngineServices& services, HandInterface* hi, unsigned dP, int sB, GameState gS);
+	BettingRound(ILogger * logger, HandInterface* hi, unsigned dP, int sB, GameState gS);
 	~BettingRound();
 
 	GameState getBettingRoundID() const ;
@@ -89,7 +89,7 @@ protected:
 private:
 
 	HandInterface* myHand;
-	EngineServices& myEngineServices;
+	ILogger * myLogger;
 
 	const GameState myBettingRoundID;
 	int dealerPosition;

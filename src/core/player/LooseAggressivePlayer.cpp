@@ -21,7 +21,7 @@
 #include <core/engine/tools.h>
 #include <core/engine/CardsValue.h>
 #include "log.h"
-#include <core/engine/EngineServices.h>
+#include <core/engine/ILogger.h>
 //#include <core/engine/psim/simulate.hpp>
 #include "Exception.h"
 #include <core/engine/EngineError.h>

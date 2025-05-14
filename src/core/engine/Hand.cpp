@@ -20,7 +20,7 @@
 #include "tools.h"
 #include "CardsValue.h"
 #include "ButtonState.h"
-#include "EngineServices.h"
+#include "ILogger.h"
 
 #include "exception.h"
 #include "EngineError.h"
@@ -30,7 +30,7 @@
 using namespace std;
 
 Hand::Hand(
-	EngineServices &svc,
+	ILogger * logger,
 	std::shared_ptr<EngineFactory> f,
 	GuiInterface *g,
 	std::shared_ptr<BoardInterface> b,
@@ -43,7 +43,7 @@ Hand::Hand(
 	unsigned dP,
 	int sB,
 	int sC)
-	: myEngineServices(svc), myFactory(f), myGui(g), myBoard(b), myLog(l), seatsList(sl), activePlayerList(apl), runningPlayerList(rpl), myBettingRound(0), myID(id), startQuantityPlayers(sP), dealerPosition(dP), smallBlindPosition(dP), bigBlindPosition(dP), currentRound(GAME_STATE_PREFLOP), roundBeforePostRiver(GAME_STATE_PREFLOP), smallBlind(sB), startCash(sC), previousPlayerID(-1), lastActionPlayerID(0), allInCondition(false),
+	: myLogger(logger), myFactory(f), myGui(g), myBoard(b), myLog(l), seatsList(sl), activePlayerList(apl), runningPlayerList(rpl), myBettingRound(0), myID(id), startQuantityPlayers(sP), dealerPosition(dP), smallBlindPosition(dP), bigBlindPosition(dP), currentRound(GAME_STATE_PREFLOP), roundBeforePostRiver(GAME_STATE_PREFLOP), smallBlind(sB), startCash(sC), previousPlayerID(-1), lastActionPlayerID(0), allInCondition(false),
 	  cardsShown(false)
 {
 
@@ -232,7 +232,7 @@ Hand::Hand(
 		{
 			if (bestHandPos[j] == -1)
 			{
-				myEngineServices.logger->error("ERROR getBestHandPosition");
+				myLogger->error("ERROR getBestHandPosition");
 			}
 		}
 	}
@@ -265,7 +265,7 @@ void Hand::start()
 	}
 	else
 	{
-		myEngineServices.logger->error("cannot find sBID or bBID");
+		myLogger->error("cannot find sBID or bBID");
 	}
 
 	// deal cards

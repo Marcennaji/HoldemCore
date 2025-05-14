@@ -5,14 +5,14 @@
 #include <core/engine/Log.h>
 #include <app/session.h>
 
-GuiAppController::GuiAppController(EngineServices& svc,const QString& app, const QString& log, const QString& user)
+GuiAppController::GuiAppController(ILogger * logger,const QString& app, const QString& log, const QString& user)
     : appDataPath(app), logPath(log), userDataPath(user)
 {
-    logger = std::make_unique<Log>(logPath.toStdString());
+    gameActionslogger = std::make_unique<Log>(logPath.toStdString());
     gui = std::make_unique<GuiWrapper>(userDataPath.toStdString(), nullptr);
-    session = std::make_unique<Session>(svc, gui.get(), logger.get());
+    session = std::make_unique<Session>(logger, gui.get(), gameActionslogger.get());
     session->init();
-    logger->init();
+    gameActionslogger->init();
 }
 
 startWindowImpl* GuiAppController::createMainWindow() {

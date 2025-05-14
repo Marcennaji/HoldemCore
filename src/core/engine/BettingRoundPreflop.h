@@ -29,7 +29,7 @@ class BettingRoundPreflop : public BettingRound
 {
 
 public:
-	BettingRoundPreflop(EngineServices& services, HandInterface*, unsigned, int);
+	BettingRoundPreflop(ILogger * logger, HandInterface*, unsigned, int);
 	~BettingRoundPreflop();
 
 	void run();

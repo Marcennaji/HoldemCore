@@ -26,7 +26,7 @@
 #include "BettingRoundriver.h"
 #include "BettingRoundpostriver.h"
 #include "tools.h"
-#include "EngineServices.h"
+#include "ILogger.h"
 
 #include "TightAgressivePlayer.h"
 #include "LooseAggressivePlayer.h"
@@ -34,8 +34,8 @@
 #include "HumanPlayer.h"
 
 
-EngineFactory::EngineFactory(EngineServices & services)
-	: myServices(services)
+EngineFactory::EngineFactory(ILogger * logger)
+	: myLogger(logger)
 {
 }
 
@@ -48,7 +48,7 @@ EngineFactory::~EngineFactory()
 std::shared_ptr<HandInterface>
 EngineFactory::createHand(std::shared_ptr<EngineFactory> f, GuiInterface *g, std::shared_ptr<BoardInterface> b, Log *l, PlayerList sl, PlayerList apl, PlayerList rpl, int id, int sP, int dP, int sB,int sC)
 {
-	return std::shared_ptr<HandInterface>(new Hand(myServices, f, g, b, l, sl, apl, rpl, id, sP, dP, sB, sC));
+	return std::shared_ptr<HandInterface>(new Hand(myLogger, f, g, b, l, sl, apl, rpl, id, sP, dP, sB, sC));
 }
 
 std::shared_ptr<BoardInterface>
@@ -62,15 +62,15 @@ EngineFactory::createBettingRound(HandInterface *hi, unsigned dP, int sB)
 {
 	std::vector<std::shared_ptr<BettingRoundInterface> > myBettingRound;
 
-	myBettingRound.push_back(std::shared_ptr<BettingRoundInterface>(new BettingRoundPreflop(myServices, hi, dP, sB)));
+	myBettingRound.push_back(std::shared_ptr<BettingRoundInterface>(new BettingRoundPreflop(myLogger, hi, dP, sB)));
 
-	myBettingRound.push_back(std::shared_ptr<BettingRoundInterface>(new BettingRoundFlop(myServices,hi, dP, sB)));
+	myBettingRound.push_back(std::shared_ptr<BettingRoundInterface>(new BettingRoundFlop(myLogger,hi, dP, sB)));
 
-	myBettingRound.push_back(std::shared_ptr<BettingRoundInterface>(new BettingRoundTurn(myServices,hi, dP, sB)));
+	myBettingRound.push_back(std::shared_ptr<BettingRoundInterface>(new BettingRoundTurn(myLogger,hi, dP, sB)));
 
-	myBettingRound.push_back(std::shared_ptr<BettingRoundInterface>(new BettingRoundRiver(myServices,hi, dP, sB)));
+	myBettingRound.push_back(std::shared_ptr<BettingRoundInterface>(new BettingRoundRiver(myLogger,hi, dP, sB)));
 
-	myBettingRound.push_back(std::shared_ptr<BettingRoundInterface>(new BettingRoundPostRiver(myServices,hi, dP, sB)));
+	myBettingRound.push_back(std::shared_ptr<BettingRoundInterface>(new BettingRoundPostRiver(myLogger,hi, dP, sB)));
 
 	return myBettingRound;
 

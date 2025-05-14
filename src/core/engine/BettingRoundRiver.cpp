@@ -24,8 +24,8 @@
 
 using namespace std;
 
-BettingRoundRiver::BettingRoundRiver(EngineServices& services, HandInterface* hi, unsigned dP, int sB) : 
-        BettingRound(services, hi, dP, sB, GAME_STATE_RIVER)
+BettingRoundRiver::BettingRoundRiver(ILogger * logger, HandInterface* hi, unsigned dP, int sB) : 
+        BettingRound(logger, hi, dP, sB, GAME_STATE_RIVER)
 {
 }
 

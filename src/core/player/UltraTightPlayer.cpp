@@ -20,7 +20,7 @@
 #include <core/engine/HandInterface.h>
 #include <core/engine/Tools.h>
 #include <core/engine/CardsValue.h>
-#include <core/engine/EngineServices.h>
+#include <core/engine/ILogger.h>
 
 #include "Exception.h"
 #include <core/engine/EngineError.h>

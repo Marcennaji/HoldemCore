@@ -23,7 +23,7 @@
 #include <core/engine/EngineError.h>
 #include <core/engine/Ranges.h>
 #include <core/engine/Exception.h>
-#include <core/engine/EngineServices.h>
+#include <core/engine/ILogger.h>
 #include <ui/guiwrapper.h>
 
 #include <fstream>
