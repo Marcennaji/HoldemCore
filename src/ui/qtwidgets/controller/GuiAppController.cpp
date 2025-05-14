@@ -1,7 +1,7 @@
 // GuiAppController.cpp
 #include "GuiAppController.h"
-#include <ui/startwindow/startwindowimpl.h>
-#include <ui/guiwrapper.h>
+#include <ui/qtwidgets/startwindow/startwindowimpl.h>
+#include <ui/qtwidgets/guiwrapper.h>
 #include <core/engine/Log.h>
 #include <app/session.h>
 

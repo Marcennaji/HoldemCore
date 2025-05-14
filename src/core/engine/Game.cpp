@@ -23,7 +23,7 @@
 #include "EngineError.h"
 #include "StartData.h"
 
-#include <ui/guiinterface.h>
+#include <ui/qtwidgets/guiinterface.h>
 #include "Log.h"
 
 

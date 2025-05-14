@@ -15,24 +15,44 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
-#include "mynamelabel.h"
-#include "gametableimpl.h"
-#include <app/session.h>
-#include <core/engine/game.h>
-#include <core/player/Player.h>
-#include <ui/styles/gametablestylereader.h>
+#include "qttoolswrapper.h"
+#include "ui/qtwidgets/qttools/qthelper/qthelper.h"
 
-MyNameLabel::MyNameLabel(QGroupBox* parent)
-	: QLabel(parent), myW(0)
+using namespace std;
+
+
+QtToolsInterface *CreateQtToolsWrapper()
 {
+	return new QtToolsWrapper;
+}
+
+QtToolsWrapper::QtToolsWrapper() : myQtHelper(0)
+{
+
+	myQtHelper = new QtHelper();
 }
 
 
-MyNameLabel::~MyNameLabel()
+QtToolsWrapper::~QtToolsWrapper()
 {
+	delete myQtHelper;
+	myQtHelper = 0;
 }
 
-void MyNameLabel::setText ( const QString &t, bool trans, bool guest, bool computerplayer)
+std::string QtToolsWrapper::stringToUtf8(const std::string &myString)
 {
-	QLabel::setText(t);
+	return myQtHelper->stringToUtf8(myString);
 }
+std::string QtToolsWrapper::stringFromUtf8(const std::string &myString)
+{
+	return myQtHelper->stringFromUtf8(myString);
+}
+std::string QtToolsWrapper::getDefaultLanguage()
+{
+	return myQtHelper->getDefaultLanguage();
+}
+std::string QtToolsWrapper::getDataPathStdString(const char * argv0)
+{
+	return myQtHelper->getDataPathStdString(argv0);
+}
+

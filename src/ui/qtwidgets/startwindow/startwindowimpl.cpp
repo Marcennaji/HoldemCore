@@ -17,10 +17,10 @@
  *****************************************************************************/
 #include "startwindowimpl.h"
 
-#include <ui/guiwrapper.h>
-#include <ui/gametable/gametableimpl.h>
-#include <ui/newgamedialog/newgamedialogimpl.h>
-#include <ui/gametable/GuiDisplayGameActions.h>
+#include <ui/qtwidgets/guiwrapper.h>
+#include <ui/qtwidgets/gametable/gametableimpl.h>
+#include <ui/qtwidgets/newgamedialog/newgamedialogimpl.h>
+#include <ui/qtwidgets/gametable/GuiDisplayGameActions.h>
 
 #include <core/player/Player.h>
 #include <core/engine/Gamedata.h>

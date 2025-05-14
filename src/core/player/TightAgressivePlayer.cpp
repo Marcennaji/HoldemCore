@@ -24,7 +24,7 @@
 #include <core/engine/Ranges.h>
 #include <core/engine/Exception.h>
 #include <core/engine/ILogger.h>
-#include <ui/guiwrapper.h>
+#include <ui/qtwidgets/guiwrapper.h>
 
 #include <fstream>
 #include <sstream>

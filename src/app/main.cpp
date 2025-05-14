@@ -29,8 +29,8 @@
 
 #include <Wincon.h>
 
-#include <ui/startwindow/startwindowimpl.h>
-#include <ui/controller/GuiAppController.h>
+#include <ui/qtwidgets/startwindow/startwindowimpl.h>
+#include <ui/qtwidgets/controller/GuiAppController.h>
 #include <infra/AppDirectories.h>
 #include <infra/ConsoleLogger.h>
 #include "core/engine/EngineServices.h"

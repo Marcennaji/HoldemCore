@@ -96,8 +96,6 @@ public:
 	void showCards(unsigned playerId);
 	void disableMyButtons();
 	void updateMyButtonsState();
-	void startTimeoutAnimation(int playerNum, int timeoutSec);
-	void stopTimeoutAnimation(int playerNum);
 	void logPlayerActionMsg(std::string playerName, int action, int setValue) ;
 	void logNewGameHandMsg(int gameID, int handID) ;
 	void logNewBlindsSetsMsg(int sbSet, int bbSet, std::string sbName, std::string bbName);

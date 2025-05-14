@@ -17,7 +17,7 @@
  *****************************************************************************/
 #include "mycashlabel.h"
 #include "gametableimpl.h"
-#include <ui/styles/gametablestylereader.h>
+#include <ui/qtwidgets/styles/gametablestylereader.h>
 
 MyCashLabel::MyCashLabel(QGroupBox* parent)
 	: QLabel(parent), myW(0)

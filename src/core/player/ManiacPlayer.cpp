@@ -27,7 +27,7 @@
 #include <core/engine/EngineError.h>
 #include <core/engine/Ranges.h>
 
-#include <ui/guiwrapper.h>
+#include <ui/qtwidgets/guiwrapper.h>
 
 #include <fstream>
 #include <sstream>

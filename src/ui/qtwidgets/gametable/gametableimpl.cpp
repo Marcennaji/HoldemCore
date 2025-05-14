@@ -17,7 +17,7 @@
  *****************************************************************************/
 #include "gametableimpl.h"
 #include <app/session.h>
-#include <ui/startwindow/startwindowimpl.h>
+#include <ui/qtwidgets/startwindow/startwindowimpl.h>
 
 #include "mycardspixmaplabel.h"
 #include "mysetlabel.h"
@@ -25,7 +25,7 @@
 #include "mycashlabel.h"
 #include "mynamelabel.h"
 #include "mychancelabel.h"
-#include <ui/gametable/GuiDisplayGameActions.h>
+#include <ui/qtwidgets/gametable/GuiDisplayGameActions.h>
 
 #include <core/player/HumanPlayer.h>
 #include <core/engine/BoardInterface.h>
@@ -35,8 +35,8 @@
 #include <core/engine/Ranges.h>
 #include <core/engine/ButtonState.h>
 
-#include <ui/styles/gametablestylereader.h>
-#include <ui/styles/carddeckstylereader.h>
+#include <ui/qtwidgets/styles/gametablestylereader.h>
+#include <ui/qtwidgets/styles/carddeckstylereader.h>
 
 #include <core/engine/ILogger.h>
 

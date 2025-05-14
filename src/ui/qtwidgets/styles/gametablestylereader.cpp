@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
-#include <ui/styles/gametablestylereader.h>
+#include <ui/qtwidgets/styles/gametablestylereader.h>
 #include <cstdlib>
 #include <QtWidgets/QLineEdit>
 #include <core/engine/ILogger.h>

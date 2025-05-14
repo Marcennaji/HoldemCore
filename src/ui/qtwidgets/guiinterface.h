@@ -32,7 +32,7 @@ class startWindowImpl;
 class GuiInterface
 {
 public:
-	virtual ~GuiInterface();
+	virtual ~GuiInterface(){};
 
 	virtual void initGui(int speed) =0;
 

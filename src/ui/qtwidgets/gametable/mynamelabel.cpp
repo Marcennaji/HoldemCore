@@ -15,18 +15,24 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
-#include "mychancelabel.h"
+#include "mynamelabel.h"
 #include "gametableimpl.h"
-#include <ui/styles/gametablestylereader.h>
+#include <app/session.h>
+#include <core/engine/game.h>
+#include <core/player/Player.h>
+#include <ui/qtwidgets/styles/gametablestylereader.h>
 
-using namespace std;
-
-MyChanceLabel::MyChanceLabel(QWidget* parent)
-	: QLabel(parent), myW(0), myStyle(0)
+MyNameLabel::MyNameLabel(QGroupBox* parent)
+	: QLabel(parent), myW(0)
 {
 }
 
-MyChanceLabel::~MyChanceLabel()
+
+MyNameLabel::~MyNameLabel()
 {
 }
 
+void MyNameLabel::setText ( const QString &t, bool trans, bool guest, bool computerplayer)
+{
+	QLabel::setText(t);
+}

@@ -17,8 +17,8 @@
  *****************************************************************************/
 #include "GuiDisplayGameActions.h"
 
-#include <ui/gametable/gametableimpl.h>
-#include <ui/styles/gametablestylereader.h>
+#include <ui/qtwidgets/gametable/gametableimpl.h>
+#include <ui/qtwidgets/styles/gametablestylereader.h>
 
 #include <core/engine/HandInterface.h>
 #include <core/engine/Game.h>

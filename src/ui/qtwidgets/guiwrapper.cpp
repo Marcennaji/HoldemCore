@@ -19,10 +19,10 @@
 #include <app/session.h>
 #include <core/engine/game.h>
 #include <core/player/Player.h>
-#include <ui/gametable/GuiDisplayGameActions.h>
+#include <ui/qtwidgets/gametable/GuiDisplayGameActions.h>
 #include <core/engine/Log.h>
-#include <ui/gametable/gametableimpl.h>
-#include <ui/startwindow/startwindowimpl.h>
+#include <ui/qtwidgets/gametable/gametableimpl.h>
+#include <ui/qtwidgets/startwindow/startwindowimpl.h>
 
 using namespace std;
 

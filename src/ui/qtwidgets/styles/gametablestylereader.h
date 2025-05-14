@@ -19,7 +19,7 @@
 #define GAMETABLESTYLEREADER_H
 
 #include <third_party/tiny/tinyxml.h>
-#include <ui/gametable/gametableimpl.h>
+#include <ui/qtwidgets/gametable/gametableimpl.h>
 #include <core/engine/EngineDefs.h>
 #include <string>
 #include <QtCore>
