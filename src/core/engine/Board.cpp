@@ -20,7 +20,7 @@
 
 #include "HandInterface.h"
 
-#include <core/engine/ILogger.h>
+#include <core/interfaces/persistence/ILogger.h>
 #include "exception.h"
 #include "EngineError.h"
 #include "Player.h"

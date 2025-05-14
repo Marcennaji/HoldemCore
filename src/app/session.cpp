@@ -29,7 +29,7 @@
 #include <core/player/UltraTightPlayer.h>
 #include <core/player/HumanPlayer.h>
 #include <core/engine/Tools.h>
-#include <core/engine/ILogger.h>
+#include <core/interfaces/persistence/ILogger.h>
 
 #include <sstream>
 #include <random>

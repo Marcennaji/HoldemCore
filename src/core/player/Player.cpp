@@ -23,7 +23,7 @@
 #include <core/engine/CardsValue.h>
 #include <core/engine/Log.h>
 #include <core/engine/Ranges.h>
-#include <core/engine/ILogger.h>
+#include <core/interfaces/persistence/ILogger.h>
 #include <third_party/sqlite3/sqlite3.h>
 
 #include <fstream>

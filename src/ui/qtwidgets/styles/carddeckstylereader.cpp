@@ -21,7 +21,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <core/engine/EngineDefs.h>
-#include <core/engine/ILogger.h>
+#include <core/interfaces/persistence/ILogger.h>
 
 using namespace std;
 

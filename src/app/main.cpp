@@ -33,7 +33,6 @@
 #include <ui/qtwidgets/controller/GuiAppController.h>
 #include <infra/AppDirectories.h>
 #include <infra/ConsoleLogger.h>
-#include "core/engine/EngineServices.h"
 
 #ifdef LOG_POKER_EXEC
 #define _CRTDBG_MAP_ALLOC
@@ -99,9 +98,7 @@ int main( int argc, char **argv )
     QString userPath = QString::fromStdString(dirs.userDataDir);
 
 	auto logger = std::make_unique<ConsoleLogger>();
-	EngineServices services { logger.get() };
-
-    GuiAppController controller(services.logger, appPath, logPath, userPath);
+    GuiAppController controller(logger.get(), appPath, logPath, userPath);
     startWindowImpl* mainWindow = controller.createMainWindow();
 
     return app.exec();

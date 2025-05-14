@@ -22,7 +22,7 @@
 #include "EngineError.h"
 #include "ButtonState.h"
 
-#include <core/engine/ILogger.h>
+#include <core/interfaces/persistence/ILogger.h>
 #include <core/player/Player.h>
 
 using namespace std;

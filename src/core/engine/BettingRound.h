@@ -22,7 +22,7 @@
 
 #include "BettingRoundinterface.h"
 #include "HandInterface.h"
-#include "ILogger.h"
+#include <core/interfaces/persistence/ILogger.h>
 
 class BettingRound : public BettingRoundInterface
 {
@@ -32,10 +32,10 @@ public:
 
 	GameState getBettingRoundID() const ;
 	int getHighestCardsValue() const;
-	void setHighestCardsValue(int /*theValue*/);
-	void setMinimumRaise ( int theValue ) ;
+	void setHighestCardsValue(int);
+	void setMinimumRaise ( int ) ;
 	int getMinimumRaise() const;
-	void setFullBetRule ( bool theValue );
+	void setFullBetRule ( bool );
 	bool getFullBetRule() const;
 	void skipFirstRunGui();
 	void nextPlayer();

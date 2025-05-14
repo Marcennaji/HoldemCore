@@ -23,7 +23,7 @@
 
 #include "HandInterface.h"
 #include "BoardInterface.h"
-#include "ILogger.h"
+#include <core/interfaces/persistence/ILogger.h>
 
 
 #include <core/player/Player.h>

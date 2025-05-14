@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "ILogger.h"
+#include <core/interfaces/persistence/ILogger.h>
 
 struct EngineServices {
     ILogger* logger;

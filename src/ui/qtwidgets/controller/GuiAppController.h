@@ -1,7 +1,7 @@
 // GuiAppController.h
 #pragma once
 
-#include <core/engine/ILogger.h>
+#include <core/interfaces/persistence/ILogger.h>
 
 #include <memory>
 #include <QString>

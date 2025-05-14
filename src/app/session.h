@@ -26,7 +26,7 @@
 #include <core/engine/GameInfo.h>
 #include <core/engine/StartData.h>
 #include <core/engine/GameData.h>
-#include <core/engine/ILogger.h>
+#include <core/interfaces/persistence/ILogger.h>
 
 class GuiInterface;
 class Game;

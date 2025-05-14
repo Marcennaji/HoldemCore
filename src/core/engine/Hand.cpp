@@ -20,7 +20,7 @@
 #include "tools.h"
 #include "CardsValue.h"
 #include "ButtonState.h"
-#include "ILogger.h"
+#include <core/interfaces/persistence/ILogger.h>
 
 #include "exception.h"
 #include "EngineError.h"

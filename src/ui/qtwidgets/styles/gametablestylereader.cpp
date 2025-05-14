@@ -18,7 +18,7 @@
 #include <ui/qtwidgets/styles/gametablestylereader.h>
 #include <cstdlib>
 #include <QtWidgets/QLineEdit>
-#include <core/engine/ILogger.h>
+#include <core/interfaces/persistence/ILogger.h>
 
 using namespace std;
 
