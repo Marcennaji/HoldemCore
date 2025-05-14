@@ -73,9 +73,9 @@ void BettingRoundPostRiver::postRiverRun()
 	}
 
 	if(getHand()->getLog()) {
-		getHand()->getLog()->logGameLosers(getHand()->getActivePlayerList());
-		getHand()->getLog()->logGameWinner(getHand()->getActivePlayerList());		
-		getHand()->getLog()->logPlayersStatistics(getHand()->getActivePlayerList());
+		getHand()->getLog()->updateRankingGameLosers(getHand()->getActivePlayerList());
+		getHand()->getLog()->updateRankingGameWinner(getHand()->getActivePlayerList());		
+		getHand()->getLog()->updatePlayersStatistics(getHand()->getActivePlayerList());
 	}
 
 	getHand()->getGuiInterface()->postRiverRunAnimation1();

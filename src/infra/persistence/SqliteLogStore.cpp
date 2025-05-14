@@ -32,8 +32,7 @@
 
 using namespace std;
 
-SqliteLogStore::SqliteLogStore(const std::string & logDir) : mySqliteLogDb(0), mySqliteLogFileName(""), myLogDir(logDir), uniqueGameID(0), currentHandID(0), 
-						currentRound(GAME_STATE_PREFLOP), sql("")
+SqliteLogStore::SqliteLogStore(const std::string & logDir) : mySqliteLogDb(0), mySqliteLogFileName(""), myLogDir(logDir), uniqueGameID(0), currentHandID(0), sql("")
 {
 }
 
@@ -171,7 +170,7 @@ void SqliteLogStore::InitializePlayersStatistics(const string playerName, const 
 }
 
 void
-SqliteLogStore::logGameLosers(PlayerList activePlayerList)
+SqliteLogStore::updateRankingGameLosers(PlayerList activePlayerList)
 {
 	createRankingTable();
 
@@ -190,7 +189,7 @@ SqliteLogStore::logGameLosers(PlayerList activePlayerList)
 
 }
 void
-SqliteLogStore::logGameWinner(PlayerList activePlayerList)
+SqliteLogStore::updateRankingGameWinner(PlayerList activePlayerList)
 {
 	createRankingTable();
 
@@ -214,7 +213,7 @@ SqliteLogStore::logGameWinner(PlayerList activePlayerList)
 
 }
 void
-SqliteLogStore::logPlayedGames(PlayerList activePlayerList)
+SqliteLogStore::updateRankingPlayedGames(PlayerList activePlayerList)
 {
 	createRankingTable();
 
@@ -271,7 +270,7 @@ void SqliteLogStore::createRankingTable(){
 	exec_transaction();
 }
 void
-SqliteLogStore::logUnplausibleHand(const std::string card1, const std::string card2, const bool human, 
+SqliteLogStore::updateUnplausibleHand(const std::string card1, const std::string card2, const bool human, 
 						const char bettingRound, const int nbPlayers)
 {
 	createUnplausibleHandsTable();
@@ -366,7 +365,7 @@ SqliteLogStore::exec_transaction()
 }
 
 void
-SqliteLogStore::logPlayersStatistics(PlayerList activePlayerList)
+SqliteLogStore::updatePlayersStatistics(PlayerList activePlayerList)
 {
 
 	PlayerListConstIterator it_c;

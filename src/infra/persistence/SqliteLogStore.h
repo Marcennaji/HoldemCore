@@ -40,19 +40,15 @@ public:
 	~SqliteLogStore();
 
 	void init();
-	void logGameLosers(PlayerList activePlayerList);
-	void logGameWinner(PlayerList activePlayerList);
-	void logPlayedGames(PlayerList activePlayerList);
-	void logUnplausibleHand(const std::string card1, const std::string card2, const bool human, 
+	void updateRankingGameLosers(PlayerList activePlayerList);
+	void updateRankingGameWinner(PlayerList activePlayerList);
+	void updateRankingPlayedGames(PlayerList activePlayerList);
+	void updateUnplausibleHand(const std::string card1, const std::string card2, const bool human, 
 				const char bettingRound, const int nbPlayers);
-	void logPlayersStatistics(PlayerList activePlayerList);
+	void updatePlayersStatistics(PlayerList activePlayerList);
 	void InitializePlayersStatistics(const std::string playerName, const int nbPlayers);
 	std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> getPlayerStatistics(const std::string & playerName);
 	void createDatabase();
-
-	void setCurrentRound(GameState theValue) {
-		currentRound = theValue;
-	}
 
 	std::string getSqliteLogFileName() {
 		return mySqliteLogFileName.string();
@@ -69,7 +65,6 @@ private:
 	std::filesystem::path mySqliteLogFileName;
 	int uniqueGameID;
 	int currentHandID;
-	GameState currentRound;
 	std::string sql;
 	std::string myLogDir;
 };

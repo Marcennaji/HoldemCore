@@ -2839,7 +2839,7 @@ void Player::displayPlausibleRange(GameState g){
 
 	if (! isCardsInRange(myCard1, myCard2, myEstimatedRange)){
 		std::cout << endl << "\t" << myCard1 << " " << myCard2 << " isn't part of the plausible " << label << " range :\t" << myEstimatedRange << endl;
-		currentHand->getLog()->logUnplausibleHand(myCard1, myCard2, (myID == 0 ? true : false), bettingRound, nbPlayers);
+		currentHand->getLog()->updateUnplausibleHand(myCard1, myCard2, (myID == 0 ? true : false), bettingRound, nbPlayers);
 	}
 	else
 		std::cout << endl << "\t" << myCard1 << " " << myCard2 << " is part of the plausible " << label << " range :\t" << myEstimatedRange << endl;

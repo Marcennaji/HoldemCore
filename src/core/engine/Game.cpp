@@ -68,7 +68,7 @@ Game::Game(GuiInterface* gui, std::shared_ptr<EngineFactory> factory,
 	currentBoard->setPlayerLists(seatsList, activePlayerList, runningPlayerList);
 	
 	if(myLog) 
-		myLog->logPlayedGames(activePlayerList);
+		myLog->updateRankingPlayedGames(activePlayerList);
 }
 
 Game::~Game()

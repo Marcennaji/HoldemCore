@@ -90,7 +90,6 @@ public:
 
 	void setCurrentRound(GameState theValue) {
 		currentRound = theValue;
-		if(myLog) myLog->setCurrentRound(currentRound);
 	}
 	GameState getCurrentRound() const {
 		return currentRound;
