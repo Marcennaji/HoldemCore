@@ -23,7 +23,7 @@
 class QtToolsInterface
 {
 public:
-	virtual ~QtToolsInterface();
+	virtual ~QtToolsInterface(){};
 
 	//qthelper.cpp
 	virtual std::string stringToUtf8(const std::string &) =0;

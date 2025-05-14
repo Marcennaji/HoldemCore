@@ -18,8 +18,8 @@
 #ifndef GUIWRAPPER_H
 #define GUIWRAPPER_H
 
-#include "guiinterface.h"
-#include <core/engine/GameData.h>
+#include "ui/interfaces/GuiInterface.h"
+#include "core/engine/GameData.h"
 
 #include <string>
 

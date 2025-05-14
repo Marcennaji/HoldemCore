@@ -23,7 +23,7 @@
 #include "BettingRoundinterface.h"
 #include "Log.h"
 
-#include <ui/qtwidgets/guiinterface.h>
+#include <ui/interfaces/guiinterface.h>
 
 
 class HandInterface

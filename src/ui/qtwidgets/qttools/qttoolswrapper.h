@@ -18,7 +18,7 @@
 #ifndef QTTOOLSWRAPPER_H
 #define QTTOOLSWRAPPER_H
 
-#include <qttoolsinterface.h>
+#include <ui/interfaces/qttoolsinterface.h>
 
 #include <string>
 

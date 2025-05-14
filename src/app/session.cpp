@@ -19,8 +19,8 @@
 #include "session.h"
 #include <core/engine/game.h>
 #include <core/engine/Log.h>
-#include <ui/qtwidgets/guiinterface.h>
-#include <ui/qtwidgets/qttoolsinterface.h>
+#include <ui/interfaces/guiinterface.h>
+#include <ui/interfaces/qttoolsinterface.h>
 
 #include <core/engine/EngineFactory.h>
 #include <core/player/TightAgressivePlayer.h>

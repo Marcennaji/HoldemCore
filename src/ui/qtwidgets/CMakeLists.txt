@@ -24,14 +24,14 @@ qt_wrap_ui(UI_GENERATED_FILES ${UI_FILES})
 set(CMAKE_AUTOMOC ON)
 
 # Create a static library
-add_library(qt_gui STATIC ${LIB_SOURCES} ${INCLUDE_HEADERS} ${UI_GENERATED_FILES})
+add_library(qtwidgets STATIC ${LIB_SOURCES} ${INCLUDE_HEADERS} ${UI_GENERATED_FILES})
 
 # Include directories
-target_include_directories(qt_gui PUBLIC 
+target_include_directories(qtwidgets PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR} 
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_SOURCE_DIR}/src
 )
 
 # Link Qt libraries
-target_link_libraries(qt_gui PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Sql)
+target_link_libraries(qtwidgets PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Sql)

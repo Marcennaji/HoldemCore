@@ -14,7 +14,7 @@ target_link_libraries(PokerTraining
     engine  
     player  
     infra
-    qt_gui
+    qtwidgets
     psim
     sqlite
     tiny
