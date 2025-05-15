@@ -19,106 +19,99 @@
 #ifndef BERO_H
 #define BERO_H
 
-
-#include "BettingRoundinterface.h"
-#include "HandInterface.h"
 #include <core/interfaces/ILogger.h>
+#include "core/interfaces/IBettingRound.h"
+#include "core/interfaces/IHand.h"
 
-class BettingRound : public BettingRoundInterface
+class BettingRound : public IBettingRound
 {
-public:
-	BettingRound(ILogger * logger, HandInterface* hi, unsigned dP, int sB, GameState gS);
-	~BettingRound();
+  public:
+    BettingRound(ILogger* logger, IHand* hi, unsigned dP, int sB, GameState gS);
+    ~BettingRound();
 
-	GameState getBettingRoundID() const ;
-	int getHighestCardsValue() const;
-	void setHighestCardsValue(int);
-	void setMinimumRaise ( int ) ;
-	int getMinimumRaise() const;
-	void setFullBetRule ( bool );
-	bool getFullBetRule() const;
-	void skipFirstRunGui();
-	void nextPlayer();
-	void run();
-	void postRiverRun();
+    GameState getBettingRoundID() const;
+    int getHighestCardsValue() const;
+    void setHighestCardsValue(int);
+    void setMinimumRaise(int);
+    int getMinimumRaise() const;
+    void setFullBetRule(bool);
+    bool getFullBetRule() const;
+    void skipFirstRunGui();
+    void nextPlayer();
+    void run();
+    void postRiverRun();
 
-protected:
+  protected:
+    IHand* getHand() const;
 
-	HandInterface* getHand() const;
+    int getDealerPosition() const;
+    void setDealerPosition(int theValue);
 
-	int getDealerPosition() const;
-	void setDealerPosition(int theValue);
+    void setCurrentPlayersTurnId(unsigned theValue);
+    unsigned getCurrentPlayersTurnId() const;
 
-	void setCurrentPlayersTurnId(unsigned theValue);
-	unsigned getCurrentPlayersTurnId() const;
+    void setFirstRoundLastPlayersTurnId(unsigned theValue);
+    unsigned getFirstRoundLastPlayersTurnId() const;
 
-	void setFirstRoundLastPlayersTurnId(unsigned theValue);
-	unsigned getFirstRoundLastPlayersTurnId() const ;
+    void setCurrentPlayersTurnIt(PlayerListIterator theValue);
+    PlayerListIterator getCurrentPlayersTurnIt() const;
 
-	void setCurrentPlayersTurnIt(PlayerListIterator theValue);
-	PlayerListIterator getCurrentPlayersTurnIt() const;
+    void setLastPlayersTurnIt(PlayerListIterator theValue);
+    PlayerListIterator getLastPlayersTurnIt() const;
 
-	void setLastPlayersTurnIt(PlayerListIterator theValue);
-	PlayerListIterator getLastPlayersTurnIt() const;
+    void setHighestSet(int theValue);
+    int getHighestSet() const;
 
-	void setHighestSet(int theValue);
-	int getHighestSet() const;
+    void setFirstRun(bool theValue);
+    bool getFirstRun() const;
 
-	void setFirstRun(bool theValue) ;
-	bool getFirstRun() const ;
+    void setFirstRound(bool theValue);
+    bool getFirstRound() const;
 
-	void setFirstRound(bool theValue) ;
-	bool getFirstRound() const ;
+    void setDealerPositionId(unsigned theValue);
+    unsigned getDealerPositionId() const;
 
+    void setSmallBlindPositionId(unsigned theValue);
+    unsigned getSmallBlindPositionId() const;
 
-	void setDealerPositionId(unsigned theValue);
-	unsigned getDealerPositionId() const;
+    void setBigBlindPositionId(unsigned theValue);
+    unsigned getBigBlindPositionId() const;
 
-	void setSmallBlindPositionId(unsigned theValue) ;
-	unsigned getSmallBlindPositionId() const ;
+    void setSmallBlindPosition(int theValue);
+    int getSmallBlindPosition() const;
 
-	void setBigBlindPositionId(unsigned theValue);
-	unsigned getBigBlindPositionId() const ;
+    void setSmallBlind(int theValue);
+    int getSmallBlind() const;
 
-	void setSmallBlindPosition(int theValue);
-	int getSmallBlindPosition() const ;
+  private:
+    IHand* myHand;
+    ILogger* myLogger;
 
-	void setSmallBlind(int theValue);
-	int getSmallBlind() const ;
+    const GameState myBettingRoundID;
+    int dealerPosition;
+    int smallBlindPosition;
 
-private:
+    unsigned dealerPositionId;
+    unsigned smallBlindPositionId;
+    unsigned bigBlindPositionId;
 
-	HandInterface* myHand;
-	ILogger * myLogger;
+    int smallBlind;
+    int highestSet;
+    int minimumRaise;
+    bool fullBetRule;
 
-	const GameState myBettingRoundID;
-	int dealerPosition;
-	int smallBlindPosition;
+    bool firstRun;
+    bool firstRunGui; // HACK
+    bool firstRound;
+    bool firstHeadsUpRound;
 
-	unsigned dealerPositionId;
-	unsigned smallBlindPositionId;
-	unsigned bigBlindPositionId;
+    PlayerListIterator currentPlayersTurnIt; // iterator for runningPlayerList
+    PlayerListIterator lastPlayersTurnIt;    // iterator for runningPlayerList
 
+    unsigned currentPlayersTurnId;
+    unsigned firstRoundLastPlayersTurnId;
 
-	int smallBlind;
-	int highestSet;
-	int minimumRaise;
-	bool fullBetRule;
-
-	bool firstRun;
-	bool firstRunGui; // HACK
-	bool firstRound;
-	bool firstHeadsUpRound;
-
-	PlayerListIterator currentPlayersTurnIt; // iterator for runningPlayerList
-	PlayerListIterator lastPlayersTurnIt; // iterator for runningPlayerList
-
-	unsigned currentPlayersTurnId;
-	unsigned firstRoundLastPlayersTurnId;
-
-	bool logBoardCardsDone;
-
-
+    bool logBoardCardsDone;
 };
 
 #endif

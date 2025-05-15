@@ -18,50 +18,46 @@
 
 #pragma once
 
+#include "core/engine/EngineDefs.h"
+#include "core/engine/GameState.h"
 
-#include "EngineDefs.h"
-#include "GameState.h"
-
-class BettingRoundInterface
+class IBettingRound
 {
-public:
+  public:
+    virtual ~IBettingRound() {};
 
-	virtual ~BettingRoundInterface();
+    virtual GameState getBettingRoundID() const = 0;
 
-	virtual GameState getBettingRoundID() const =0;
+    virtual void setCurrentPlayersTurnId(unsigned) = 0;
+    virtual unsigned getCurrentPlayersTurnId() const = 0;
 
-	virtual void setCurrentPlayersTurnId(unsigned) =0;
-	virtual unsigned getCurrentPlayersTurnId() const =0;
+    virtual void setCurrentPlayersTurnIt(PlayerListIterator) = 0;
+    virtual PlayerListIterator getCurrentPlayersTurnIt() const = 0;
 
-	virtual void setCurrentPlayersTurnIt(PlayerListIterator) =0;
-	virtual PlayerListIterator getCurrentPlayersTurnIt() const =0;
+    virtual void setSmallBlindPositionId(unsigned) = 0;
+    virtual unsigned getSmallBlindPositionId() const = 0;
 
-	virtual void setSmallBlindPositionId(unsigned) =0;
-	virtual unsigned getSmallBlindPositionId() const =0;
+    virtual void setBigBlindPositionId(unsigned) = 0;
+    virtual unsigned getBigBlindPositionId() const = 0;
 
-	virtual void setBigBlindPositionId(unsigned) =0;
-	virtual unsigned getBigBlindPositionId() const =0;
+    virtual void setHighestSet(int) = 0;
+    virtual int getHighestSet() const = 0;
 
-	virtual void setHighestSet(int) =0;
-	virtual int getHighestSet() const =0;
+    virtual void setHighestCardsValue(int theValue) = 0;
+    virtual int getHighestCardsValue() const = 0;
 
-	virtual void setHighestCardsValue(int theValue) =0;
-	virtual int getHighestCardsValue() const =0;
+    virtual void setMinimumRaise(int) = 0;
+    virtual int getMinimumRaise() const = 0;
 
-	virtual void setMinimumRaise (int) =0;
-	virtual int getMinimumRaise() const =0;
+    virtual void setFullBetRule(bool) = 0;
+    virtual bool getFullBetRule() const = 0;
 
-	virtual void setFullBetRule (bool) =0;
-	virtual bool getFullBetRule() const =0;
+    virtual bool getFirstRound() const = 0;
 
-	virtual bool getFirstRound() const =0;
+    virtual void skipFirstRunGui() = 0;
 
-	virtual void skipFirstRunGui() =0;
+    virtual void nextPlayer() = 0;
+    virtual void run() = 0;
 
-	virtual void nextPlayer() =0;
-	virtual void run() =0;
-
-	virtual void postRiverRun() =0;
-
+    virtual void postRiverRun() = 0;
 };
-

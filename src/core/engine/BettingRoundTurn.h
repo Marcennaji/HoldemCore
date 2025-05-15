@@ -19,17 +19,16 @@
 #ifndef BEROTURN_H
 #define BEROTURN_H
 
-#include "BettingRound.h"
 #include <iostream>
+#include "BettingRound.h"
 
-class HandInterface;
+class IHand;
 
 class BettingRoundTurn : public BettingRound
 {
-public:
-	BettingRoundTurn(ILogger * logger, HandInterface*, unsigned, int);
-	~BettingRoundTurn();
-
+  public:
+    BettingRoundTurn(ILogger* logger, IHand*, unsigned, int);
+    ~BettingRoundTurn();
 };
 
 #endif

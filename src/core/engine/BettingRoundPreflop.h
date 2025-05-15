@@ -22,20 +22,18 @@
 
 #include <iostream>
 
-
-class HandInterface;
+class IHand;
 
 class BettingRoundPreflop : public BettingRound
 {
 
-public:
-	BettingRoundPreflop(ILogger * logger, HandInterface*, unsigned, int);
-	~BettingRoundPreflop();
+  public:
+    BettingRoundPreflop(ILogger* logger, IHand*, unsigned, int);
+    ~BettingRoundPreflop();
 
-	void run();
+    void run();
 
-private:
-// 	PlayerListIterator bigBlindPositionIt; // iterator for activePlayerList
-// 	unsigned bigBlindPositionId;
+  private:
+    // 	PlayerListIterator bigBlindPositionIt; // iterator for activePlayerList
+    // 	unsigned bigBlindPositionId;
 };
-

@@ -25,121 +25,95 @@
 #include <string>
 
 class GuiInterface;
-class SqliteLogStore;
-class HandInterface;
-class BoardInterface;
+class IRankingStore;
+class IPlayersStatisticsStore;
+class IHandAuditStore;
+class IHand;
+class IBoard;
 class EngineFactory;
 struct GameData;
 struct StartData;
 
-
 class Game
 {
 
-public:
-	Game(GuiInterface *gui, std::shared_ptr<EngineFactory> factory,
-		 const PlayerList &playerList, const GameData &gameData,
-		 const StartData &startData, int gameId, SqliteLogStore *myLog);
+  public:
+    Game(GuiInterface* gui, std::shared_ptr<EngineFactory> factory, const PlayerList& playerList,
+         const GameData& gameData, const StartData& startData, int gameId, IRankingStore* rankingStore,
+         IPlayersStatisticsStore* playersStatisticsStore, IHandAuditStore* handAuditStore);
 
-	~Game();
+    ~Game();
 
-	void initHand();
-	void startHand();
+    void initHand();
+    void startHand();
 
-	std::shared_ptr<HandInterface> getCurrentHand();
-	const std::shared_ptr<HandInterface> getCurrentHand() const;
+    std::shared_ptr<IHand> getCurrentHand();
+    const std::shared_ptr<IHand> getCurrentHand() const;
 
-	PlayerList getSeatsList() const {
-		return seatsList;
-	}
-	PlayerList getActivePlayerList() const {
-		return activePlayerList;
-	}
-	PlayerList getRunningPlayerList() const {
-		return runningPlayerList;
-	}
+    PlayerList getSeatsList() const { return seatsList; }
+    PlayerList getActivePlayerList() const { return activePlayerList; }
+    PlayerList getRunningPlayerList() const { return runningPlayerList; }
 
-	void setStartQuantityPlayers(int theValue) {
-		startQuantityPlayers = theValue;
-	}
-	int getStartQuantityPlayers() const {
-		return startQuantityPlayers;
-	}
+    void setStartQuantityPlayers(int theValue) { startQuantityPlayers = theValue; }
+    int getStartQuantityPlayers() const { return startQuantityPlayers; }
 
-	void setStartSmallBlind(int theValue) {
-		startSmallBlind = theValue;
-	}
-	int getStartSmallBlind() const {
-		return startSmallBlind;
-	}
+    void setStartSmallBlind(int theValue) { startSmallBlind = theValue; }
+    int getStartSmallBlind() const { return startSmallBlind; }
 
-	void setStartCash(int theValue)	{
-		startCash = theValue;
-	}
-	int getStartCash() const {
-		return startCash;
-	}
+    void setStartCash(int theValue) { startCash = theValue; }
+    int getStartCash() const { return startCash; }
 
-	int getGameID() const	{
-		return myGameID;
-	}
+    int getGameID() const { return myGameID; }
 
-	void setCurrentSmallBlind(int theValue) {
-		currentSmallBlind = theValue;
-	}
-	int getCurrentSmallBlind() const {
-		return currentSmallBlind;
-	}
+    void setCurrentSmallBlind(int theValue) { currentSmallBlind = theValue; }
+    int getCurrentSmallBlind() const { return currentSmallBlind; }
 
-	void setCurrentHandID(int theValue) {
-		currentHandID = theValue;
-	}
-	int getCurrentHandID() const {
-		return currentHandID;
-	}
+    void setCurrentHandID(int theValue) { currentHandID = theValue; }
+    int getCurrentHandID() const { return currentHandID; }
 
-	unsigned getDealerPosition() const {
-		return dealerPosition;
-	}
+    unsigned getDealerPosition() const { return dealerPosition; }
 
-	void replaceDealer(unsigned oldDealer, unsigned newDealer) {
-		if (dealerPosition == oldDealer)
-			dealerPosition = newDealer;
-	}
+    void replaceDealer(unsigned oldDealer, unsigned newDealer)
+    {
+        if (dealerPosition == oldDealer)
+            dealerPosition = newDealer;
+    }
 
-	std::shared_ptr<Player> getPlayerByUniqueId(unsigned id);
-	std::shared_ptr<Player> getPlayerByNumber(int number);
-	std::shared_ptr<Player> getPlayerByName(const std::string &name);
-	std::shared_ptr<Player> getCurrentPlayer();
+    std::shared_ptr<Player> getPlayerByUniqueId(unsigned id);
+    std::shared_ptr<Player> getPlayerByNumber(int number);
+    std::shared_ptr<Player> getPlayerByName(const std::string& name);
+    std::shared_ptr<Player> getCurrentPlayer();
 
-	void raiseBlinds();
+    void raiseBlinds();
 
-private:
-	std::shared_ptr<EngineFactory> myFactory;
+  private:
+    std::shared_ptr<EngineFactory> myFactory;
 
-	GuiInterface *myGui;
-	SqliteLogStore *myLog;
-	std::shared_ptr<HandInterface> currentHand;
-	std::shared_ptr<BoardInterface> currentBoard;
+    GuiInterface* myGui;
+    IRankingStore* myRankingStore;
+    IPlayersStatisticsStore* myPlayersStatisticsStore;
+    IHandAuditStore* myHandAuditStore;
+    std::shared_ptr<IHand> currentHand;
+    std::shared_ptr<IBoard> currentBoard;
 
-	PlayerList seatsList;
-	PlayerList activePlayerList; // used seats
-	PlayerList runningPlayerList; // nonfolded and nonallin active players
+    PlayerList seatsList;
+    PlayerList activePlayerList;  // used seats
+    PlayerList runningPlayerList; // nonfolded and nonallin active players
 
-	// start variables
-	int startQuantityPlayers;
-	int startCash;
-	int startSmallBlind;
-	int myGameID;
+    // start variables
+    int startQuantityPlayers;
+    int startCash;
+    int startSmallBlind;
+    int myGameID;
 
-	// running variables
-	int currentSmallBlind;
-	int currentHandID;
-	unsigned dealerPosition;
-	int lastHandBlindsRaised;
-	int lastTimeBlindsRaised;
-	const GameData myGameData;
-	std::list<int> blindsList;
+    // running variables
+    int currentSmallBlind;
+    int currentHandID;
+    unsigned dealerPosition;
+    int lastHandBlindsRaised;
+    int lastTimeBlindsRaised;
+    const GameData myGameData;
+    std::list<int> blindsList;
 };
 
 #endif

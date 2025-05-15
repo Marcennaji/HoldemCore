@@ -22,14 +22,13 @@
 #include <iostream>
 #include "BettingRound.h"
 
-class HandInterface;
-
+class IHand;
 
 class BettingRoundRiver : public BettingRound
 {
-public:
-	BettingRoundRiver(ILogger * logger, HandInterface*, unsigned, int);
-	~BettingRoundRiver();
+  public:
+    BettingRoundRiver(ILogger* logger, IHand*, unsigned, int);
+    ~BettingRoundRiver();
 };
 
 #endif

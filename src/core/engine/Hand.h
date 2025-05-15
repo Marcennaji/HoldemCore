@@ -18,194 +18,134 @@
 
 #pragma once
 
-#include "EngineFactory.h"
-#include "BoardInterface.h"
-#include "Player.h"
-#include "HandInterface.h"
-#include "BettingRoundInterface.h"
 #include <core/interfaces/ILogger.h>
+#include "EngineFactory.h"
+#include "Player.h"
+#include "core/interfaces/IBettingRound.h"
+#include "core/interfaces/IBoard.h"
+#include "core/interfaces/IHand.h"
 
 #include <vector>
 
-class SqliteLogStore;
+class IRankingStore;
+class IPlayersStatisticsStore;
+class IHandAuditStore;
 class GuiInterface;
 
-class Hand : public HandInterface
+class Hand : public IHand
 {
-public:
-	Hand(ILogger * logger, std::shared_ptr<EngineFactory> f, GuiInterface*, std::shared_ptr<BoardInterface>, SqliteLogStore *, PlayerList, PlayerList, PlayerList, int, int, unsigned, int, int);
-	~Hand();
+  public:
+    Hand(ILogger* logger, std::shared_ptr<EngineFactory> f, GuiInterface*, std::shared_ptr<IBoard>, IRankingStore*,
+         IPlayersStatisticsStore*, IHandAuditStore*, PlayerList, PlayerList, PlayerList, int, int, unsigned, int, int);
+    ~Hand();
 
-	void start();
+    void start();
 
-	PlayerList getSeatsList() const {
-		return seatsList;
-	}
-	PlayerList getActivePlayerList() const {
-		return activePlayerList;
-	}
-	PlayerList getRunningPlayerList() const {
-		return runningPlayerList;
-	}
+    PlayerList getSeatsList() const { return seatsList; }
+    PlayerList getActivePlayerList() const { return activePlayerList; }
+    PlayerList getRunningPlayerList() const { return runningPlayerList; }
 
-	std::shared_ptr<BoardInterface> getBoard() const {
-		return myBoard;
-	}
-	std::shared_ptr<BettingRoundInterface> getPreflop() const {
-		return myBettingRound[GAME_STATE_PREFLOP];
-	}
-	std::shared_ptr<BettingRoundInterface> getFlop() const {
-		return myBettingRound[GAME_STATE_FLOP];
-	}
-	std::shared_ptr<BettingRoundInterface> getTurn() const {
-		return myBettingRound[GAME_STATE_TURN];
-	}
-	std::shared_ptr<BettingRoundInterface> getRiver() const {
-		return myBettingRound[GAME_STATE_RIVER];
-	}
-	GuiInterface* getGuiInterface() const {
-		return myGui;
-	}
-	std::shared_ptr<BettingRoundInterface> getCurrentBettingRound() const {
-		return myBettingRound[currentRound];
-	}
+    std::shared_ptr<IBoard> getBoard() const { return myBoard; }
+    std::shared_ptr<IBettingRound> getPreflop() const { return myBettingRound[GAME_STATE_PREFLOP]; }
+    std::shared_ptr<IBettingRound> getFlop() const { return myBettingRound[GAME_STATE_FLOP]; }
+    std::shared_ptr<IBettingRound> getTurn() const { return myBettingRound[GAME_STATE_TURN]; }
+    std::shared_ptr<IBettingRound> getRiver() const { return myBettingRound[GAME_STATE_RIVER]; }
+    GuiInterface* getGuiInterface() const { return myGui; }
+    std::shared_ptr<IBettingRound> getCurrentBettingRound() const { return myBettingRound[currentRound]; }
 
-	SqliteLogStore *getLog() const {
-		return myLog;
-	}
+    IRankingStore* getRankingStore() const { return myRankingStore; }
+    IPlayersStatisticsStore* getPlayersStatisticsStore() const { return myPlayersStatisticsStore; }
+    IHandAuditStore* getHandAuditStore() const { return myHandAuditStore; }
 
-	void setID(int theValue) {
-		myID = theValue;
-	}
-	int getID() const {
-		return myID;
-	}
+    void setID(int theValue) { myID = theValue; }
+    int getID() const { return myID; }
 
-	void setStartQuantityPlayers(int theValue) {
-		startQuantityPlayers = theValue;
-	}
-	int getStartQuantityPlayers() const {
-		return startQuantityPlayers;
-	}
+    void setStartQuantityPlayers(int theValue) { startQuantityPlayers = theValue; }
+    int getStartQuantityPlayers() const { return startQuantityPlayers; }
 
-	void setCurrentRound(GameState theValue) {
-		currentRound = theValue;
-	}
-	GameState getCurrentRound() const {
-		return currentRound;
-	}
-	GameState getRoundBeforePostRiver() const {
-		return roundBeforePostRiver;
-	}
+    void setCurrentRound(GameState theValue) { currentRound = theValue; }
+    GameState getCurrentRound() const { return currentRound; }
+    GameState getRoundBeforePostRiver() const { return roundBeforePostRiver; }
 
-	void setDealerPosition(int theValue) {
-		dealerPosition = theValue;
-	}
-	int getDealerPosition() const {
-		return dealerPosition;
-	}
+    void setDealerPosition(int theValue) { dealerPosition = theValue; }
+    int getDealerPosition() const { return dealerPosition; }
 
-	void setSmallBlind(int theValue) {
-		smallBlind = theValue;
-	}
-	int getSmallBlind() const {
-		return smallBlind;
-	}
+    void setSmallBlind(int theValue) { smallBlind = theValue; }
+    int getSmallBlind() const { return smallBlind; }
 
-	void setAllInCondition(bool theValue) {
-		allInCondition = theValue;
-	}
-	bool getAllInCondition() const {
-		return allInCondition;
-	}
+    void setAllInCondition(bool theValue) { allInCondition = theValue; }
+    bool getAllInCondition() const { return allInCondition; }
 
-	void setStartCash(int theValue)	{
-		startCash = theValue;
-	}
-	int getStartCash() const {
-		return startCash;
-	}
+    void setStartCash(int theValue) { startCash = theValue; }
+    int getStartCash() const { return startCash; }
 
-	void setPreviousPlayerID(int theValue) {
-		previousPlayerID = theValue;
-	}
-	int getPreviousPlayerID() const {
-		return previousPlayerID;
-	}
+    void setPreviousPlayerID(int theValue) { previousPlayerID = theValue; }
+    int getPreviousPlayerID() const { return previousPlayerID; }
 
-	void setLastActionPlayerID ( unsigned theValue );
+    void setLastActionPlayerID(unsigned theValue);
 
-	unsigned getLastActionPlayerID() const {
-		return lastActionPlayerID;
-	}
+    unsigned getLastActionPlayerID() const { return lastActionPlayerID; }
 
-	void setCardsShown(bool theValue) {
-		cardsShown = theValue;
-	}
-	bool getCardsShown() const {
-		return cardsShown;
-	}
+    void setCardsShown(bool theValue) { cardsShown = theValue; }
+    bool getCardsShown() const { return cardsShown; }
 
-	void assignButtons();
-	void setBlinds();
+    void assignButtons();
+    void setBlinds();
 
-	void switchRounds();
+    void switchRounds();
 
-	int getPreflopCallsNumber();
-	int getPreflopRaisesNumber();
-	int getFlopBetsOrRaisesNumber();
-	int getTurnBetsOrRaisesNumber();
-	int getRiverBetsOrRaisesNumber();
+    int getPreflopCallsNumber();
+    int getPreflopRaisesNumber();
+    int getFlopBetsOrRaisesNumber();
+    int getTurnBetsOrRaisesNumber();
+    int getRiverBetsOrRaisesNumber();
 
-	std::vector<PlayerPosition> getRaisersPositions();
-	std::vector<PlayerPosition> getCallersPositions();
-	int getLastRaiserID();
-	int getPreflopLastRaiserID();
-	void setPreflopLastRaiserID(int id);
-	int getFlopLastRaiserID();
-	void setFlopLastRaiserID(int id);
-	int getTurnLastRaiserID();
-	void setTurnLastRaiserID(int id);
+    std::vector<PlayerPosition> getRaisersPositions();
+    std::vector<PlayerPosition> getCallersPositions();
+    int getLastRaiserID();
+    int getPreflopLastRaiserID();
+    void setPreflopLastRaiserID(int id);
+    int getFlopLastRaiserID();
+    void setFlopLastRaiserID(int id);
+    int getTurnLastRaiserID();
+    void setTurnLastRaiserID(int id);
 
-protected:
+  protected:
+    PlayerListIterator getSeatIt(unsigned) const;
+    PlayerListIterator getActivePlayerIt(unsigned) const;
+    PlayerListIterator getRunningPlayerIt(unsigned) const;
 
-	PlayerListIterator getSeatIt(unsigned) const;
-	PlayerListIterator getActivePlayerIt(unsigned) const;
-	PlayerListIterator getRunningPlayerIt(unsigned) const;
+  private:
+    std::shared_ptr<EngineFactory> myFactory;
+    GuiInterface* myGui;
+    std::shared_ptr<IBoard> myBoard;
+    IRankingStore* myRankingStore;
+    IPlayersStatisticsStore* myPlayersStatisticsStore;
+    IHandAuditStore* myHandAuditStore;
+    ILogger* myLogger;
 
-private:
+    PlayerList seatsList;         // all player
+    PlayerList activePlayerList;  // all player who are not out
+    PlayerList runningPlayerList; // all player who are not folded, not all in and not out
 
-	std::shared_ptr<EngineFactory> myFactory;
-	GuiInterface *myGui;
-	std::shared_ptr<BoardInterface> myBoard;
-	SqliteLogStore *myLog;
-	ILogger * myLogger;
+    std::vector<std::shared_ptr<IBettingRound>> myBettingRound;
 
-	PlayerList seatsList; // all player
-	PlayerList activePlayerList; // all player who are not out
-	PlayerList runningPlayerList; // all player who are not folded, not all in and not out
+    int myID;
+    int startQuantityPlayers;
+    unsigned dealerPosition;
+    unsigned smallBlindPosition;
+    unsigned bigBlindPosition;
+    GameState currentRound;
+    GameState roundBeforePostRiver;
+    int smallBlind;
+    int startCash;
 
-	std::vector<std::shared_ptr<BettingRoundInterface> > myBettingRound;
+    int previousPlayerID;
+    int preflopLastRaiserID;
+    int flopLastRaiserID;
+    int turnLastRaiserID;
+    unsigned lastActionPlayerID;
 
-	int myID;
-	int startQuantityPlayers;
-	unsigned dealerPosition;
-	unsigned smallBlindPosition;
-	unsigned bigBlindPosition;
-	GameState currentRound;
-	GameState roundBeforePostRiver;
-	int smallBlind;
-	int startCash;
-
-	int previousPlayerID;
-	int preflopLastRaiserID;
-	int flopLastRaiserID;
-	int turnLastRaiserID;
-	unsigned lastActionPlayerID;
-
-	bool allInCondition;
-	bool cardsShown;
+    bool allInCondition;
+    bool cardsShown;
 };
-
-
-

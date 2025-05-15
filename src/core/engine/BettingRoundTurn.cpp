@@ -17,14 +17,12 @@
  *****************************************************************************/
 
 #include "BettingRoundturn.h"
-#include "HandInterface.h"
-
-
+#include "core/interfaces/IHand.h"
 
 using namespace std;
 
-BettingRoundTurn::BettingRoundTurn(ILogger * logger, HandInterface* hi, unsigned dP, int sB) : 
-    BettingRound(logger, hi, dP, sB, GAME_STATE_TURN)
+BettingRoundTurn::BettingRoundTurn(ILogger* logger, IHand* hi, unsigned dP, int sB)
+    : BettingRound(logger, hi, dP, sB, GAME_STATE_TURN)
 {
 }
 

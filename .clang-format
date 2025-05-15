@@ -1,0 +1,47 @@
+BasedOnStyle: LLVM
+Language: Cpp
+
+# Indentation
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+
+# Braces & control flow
+BreakBeforeBraces: Allman         # More readable, Qt-style compatible
+AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+
+# Spaces
+SpaceBeforeParens: ControlStatements
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+SpacesInAngles: false
+SpaceAfterCStyleCast: true
+
+# Includes
+IncludeBlocks: Preserve
+SortIncludes: true
+IncludeCategories:
+  - Regex:           '^<Q.*>'
+    Priority:        1
+    SortPriority:    0
+  - Regex:           '^<.*>'
+    Priority:        2
+    SortPriority:    1
+  - Regex:           '.*'
+    Priority:        3
+    SortPriority:    2
+
+# Pointer/reference alignment
+PointerAlignment: Left            # Qt-style: QString* p;
+DerivePointerAlignment: false
+
+# Constructor init
+BreakConstructorInitializers: BeforeColon
+
+# Comment style
+AlignTrailingComments: true
+
+# Line length (optional)
+ColumnLimit: 120

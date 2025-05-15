@@ -18,19 +18,19 @@
 
 #include "BettingRoundPreflop.h"
 
-#include "exception.h"
 #include "EngineError.h"
+#include "exception.h"
 
-#include "HandInterface.h"
+#include "core/interfaces/IHand.h"
 
 #include "Player.h"
 
 using namespace std;
 
-BettingRoundPreflop::BettingRoundPreflop(ILogger * logger, HandInterface* hi, unsigned dP, int sB) : 
-	BettingRound(logger, hi, dP, sB, GAME_STATE_PREFLOP)
+BettingRoundPreflop::BettingRoundPreflop(ILogger* logger, IHand* hi, unsigned dP, int sB)
+    : BettingRound(logger, hi, dP, sB, GAME_STATE_PREFLOP)
 {
-	setHighestSet(2*getSmallBlind());
+    setHighestSet(2 * getSmallBlind());
 }
 
 BettingRoundPreflop::~BettingRoundPreflop()
@@ -40,147 +40,174 @@ BettingRoundPreflop::~BettingRoundPreflop()
 void BettingRoundPreflop::run()
 {
 
-	if(getFirstRun()) {
+    if (getFirstRun())
+    {
 #ifdef LOG_POKER_EXEC
-		cout << endl << endl << "************************* PREFLOP *************************" << endl << endl;
+        cout << endl << endl << "************************* PREFLOP *************************" << endl << endl;
 #endif
-		PlayerListIterator it;
+        PlayerListIterator it;
 
-		// search bigBlindPosition in runningPlayerList
-		PlayerListIterator bigBlindPositionIt = getHand()->getRunningPlayerIt(getBigBlindPositionId());
+        // search bigBlindPosition in runningPlayerList
+        PlayerListIterator bigBlindPositionIt = getHand()->getRunningPlayerIt(getBigBlindPositionId());
 
-		// more than 2 players are still active -> runningPlayerList is not empty
-		if(getHand()->getActivePlayerList()->size() > 2) {
+        // more than 2 players are still active -> runningPlayerList is not empty
+        if (getHand()->getActivePlayerList()->size() > 2)
+        {
 
-			// bigBlindPlayer not found in runningPlayerList (he is all in) -> bigBlindPlayer is not the running player before first action player
-			if(bigBlindPositionIt == getHand()->getRunningPlayerList()->end()) {
+            // bigBlindPlayer not found in runningPlayerList (he is all in) -> bigBlindPlayer is not the running player
+            // before first action player
+            if (bigBlindPositionIt == getHand()->getRunningPlayerList()->end())
+            {
 
-				// search smallBlindPosition in runningPlayerList
-				PlayerListIterator smallBlindPositionIt = getHand()->getRunningPlayerIt(getSmallBlindPositionId());
+                // search smallBlindPosition in runningPlayerList
+                PlayerListIterator smallBlindPositionIt = getHand()->getRunningPlayerIt(getSmallBlindPositionId());
 
-				// smallBlindPlayer not found in runningPlayerList (he is all in) -> next active player before smallBlindPlayer is running player before first action player
-				if(smallBlindPositionIt == getHand()->getRunningPlayerList()->end()) {
+                // smallBlindPlayer not found in runningPlayerList (he is all in) -> next active player before
+                // smallBlindPlayer is running player before first action player
+                if (smallBlindPositionIt == getHand()->getRunningPlayerList()->end())
+                {
 
-					it = getHand()->getActivePlayerIt(getSmallBlindPositionId());
-					if(it == getHand()->getActivePlayerList()->end()) {
-						throw Exception(__FILE__, __LINE__, EngineError::ACTIVE_PLAYER_NOT_FOUND);
-					}
+                    it = getHand()->getActivePlayerIt(getSmallBlindPositionId());
+                    if (it == getHand()->getActivePlayerList()->end())
+                    {
+                        throw Exception(__FILE__, __LINE__, EngineError::ACTIVE_PLAYER_NOT_FOUND);
+                    }
 
-					if(it == getHand()->getActivePlayerList()->begin()) it = getHand()->getActivePlayerList()->end();
-					--it;
+                    if (it == getHand()->getActivePlayerList()->begin())
+                        it = getHand()->getActivePlayerList()->end();
+                    --it;
 
-					setFirstRoundLastPlayersTurnId( (*it)->getID() );
+                    setFirstRoundLastPlayersTurnId((*it)->getID());
+                }
+                // smallBlindPlayer found in runningPlayerList -> running player before first action player
+                else
+                {
+                    setFirstRoundLastPlayersTurnId(getSmallBlindPositionId());
+                }
+            }
+            // bigBlindPlayer found in runningPlayerList -> player before first action player
+            else
+            {
+                setFirstRoundLastPlayersTurnId(getBigBlindPositionId());
+            }
+        }
+        // heads up -> dealer/smallBlindPlayer is first action player and bigBlindPlayer is player before
+        else
+        {
 
-				}
-				// smallBlindPlayer found in runningPlayerList -> running player before first action player
-				else {
-					setFirstRoundLastPlayersTurnId( getSmallBlindPositionId() );
-				}
-			}
-			// bigBlindPlayer found in runningPlayerList -> player before first action player
-			else {
-				setFirstRoundLastPlayersTurnId( getBigBlindPositionId() );
-			}
-		}
-		// heads up -> dealer/smallBlindPlayer is first action player and bigBlindPlayer is player before
-		else {
+            // bigBlindPlayer not found in runningPlayerList (he is all in) -> only smallBlind has to choose fold or
+            // call the bigBlindAmount
+            if (bigBlindPositionIt == getHand()->getRunningPlayerList()->end())
+            {
 
-			// bigBlindPlayer not found in runningPlayerList (he is all in) -> only smallBlind has to choose fold or call the bigBlindAmount
-			if(bigBlindPositionIt == getHand()->getRunningPlayerList()->end()) {
+                // search smallBlindPosition in runningPlayerList
+                PlayerListIterator smallBlindPositionIt = getHand()->getRunningPlayerIt(getSmallBlindPositionId());
 
-				// search smallBlindPosition in runningPlayerList
-				PlayerListIterator smallBlindPositionIt = getHand()->getRunningPlayerIt(getSmallBlindPositionId());
+                // smallBlindPlayer not found in runningPlayerList (he is all in) -> no running player -> showdown and
+                // no firstRoundLastPlayersTurnId is used
+                if (smallBlindPositionIt == getHand()->getRunningPlayerList()->end())
+                {
+                }
+                // smallBlindPlayer found in runningPlayerList -> running player before first action player (himself)
+                else
+                {
+                    setFirstRoundLastPlayersTurnId(getSmallBlindPositionId());
+                }
+            }
+            else
+            {
+                setFirstRoundLastPlayersTurnId(getBigBlindPositionId());
+            }
+        }
 
-				// smallBlindPlayer not found in runningPlayerList (he is all in) -> no running player -> showdown and no firstRoundLastPlayersTurnId is used
-				if(smallBlindPositionIt == getHand()->getRunningPlayerList()->end()) {
+        setCurrentPlayersTurnId(getFirstRoundLastPlayersTurnId());
 
-				}
-				// smallBlindPlayer found in runningPlayerList -> running player before first action player (himself)
-				else {
-					setFirstRoundLastPlayersTurnId( getSmallBlindPositionId() );
-				}
+        setFirstRun(false);
+    }
 
+    bool allHighestSet = true;
+    PlayerListConstIterator it_c;
 
-			} else {
-				setFirstRoundLastPlayersTurnId( getBigBlindPositionId() );
-			}
-		}
+    // check if all running players have same sets (else allHighestSet = false)
+    for (it_c = getHand()->getRunningPlayerList()->begin(); it_c != getHand()->getRunningPlayerList()->end(); ++it_c)
+    {
+        if (getHighestSet() != (*it_c)->getSet())
+        {
+            allHighestSet = false;
+            break;
+        }
+    }
 
-		setCurrentPlayersTurnId( getFirstRoundLastPlayersTurnId() );
+    // determine next player
+    PlayerListConstIterator currentPlayersTurnIt = getHand()->getRunningPlayerIt(getCurrentPlayersTurnId());
+    if (currentPlayersTurnIt == getHand()->getRunningPlayerList()->end())
+    {
+        throw Exception(__FILE__, __LINE__, EngineError::RUNNING_PLAYER_NOT_FOUND);
+    }
 
-		setFirstRun(false);
+    ++currentPlayersTurnIt;
+    if (currentPlayersTurnIt == getHand()->getRunningPlayerList()->end())
+        currentPlayersTurnIt = getHand()->getRunningPlayerList()->begin();
 
-	}
+    setCurrentPlayersTurnId((*currentPlayersTurnIt)->getID());
 
-	bool allHighestSet = true;
-	PlayerListConstIterator it_c;
+    // prfen, ob Preflop wirklich dran ist
+    if (!getFirstRound() && allHighestSet && getHand()->getRunningPlayerList()->size() != 1)
+    {
 
-	// check if all running players have same sets (else allHighestSet = false)
-	for(it_c=getHand()->getRunningPlayerList()->begin(); it_c!=getHand()->getRunningPlayerList()->end(); ++it_c) {
-		if(getHighestSet() != (*it_c)->getSet()) {
-			allHighestSet = false;
-			break;
-		}
-	}
-	
-	// determine next player
-	PlayerListConstIterator currentPlayersTurnIt = getHand()->getRunningPlayerIt( getCurrentPlayersTurnId() );
-	if(currentPlayersTurnIt == getHand()->getRunningPlayerList()->end()) {
-		throw Exception(__FILE__, __LINE__, EngineError::RUNNING_PLAYER_NOT_FOUND);
-	}
+        // Preflop nicht dran, weil wir nicht mehr in erster PreflopRunde und alle Sets gleich sind
+        // also gehe in Flop
+        getHand()->setCurrentRound(GAME_STATE_FLOP);
 
-	++currentPlayersTurnIt;
-	if(currentPlayersTurnIt == getHand()->getRunningPlayerList()->end()) currentPlayersTurnIt = getHand()->getRunningPlayerList()->begin();
+        // Action loeschen und ActionButtons refresh
+        for (it_c = getHand()->getRunningPlayerList()->begin(); it_c != getHand()->getRunningPlayerList()->end();
+             ++it_c)
+        {
+            (*it_c)->setAction(PLAYER_ACTION_NONE);
+        }
 
-	setCurrentPlayersTurnId( (*currentPlayersTurnIt)->getID() );
+        // Sets in den Pot verschieben und Sets = 0 und Pot-refresh
+        getHand()->getBoard()->collectSets();
+        getHand()->getBoard()->collectPot();
+        getHand()->getGuiInterface()->refreshPot();
 
-	// prfen, ob Preflop wirklich dran ist
-	if(!getFirstRound() && allHighestSet && getHand()->getRunningPlayerList()->size() != 1) {
+        getHand()->getGuiInterface()->refreshSet();
+        getHand()->getGuiInterface()->refreshCash();
+        for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
+        {
+            getHand()->getGuiInterface()->refreshAction(i, PLAYER_ACTION_NONE);
+        }
 
-		// Preflop nicht dran, weil wir nicht mehr in erster PreflopRunde und alle Sets gleich sind
-		//also gehe in Flop
-		getHand()->setCurrentRound(GAME_STATE_FLOP);
+        getHand()->switchRounds();
+    }
+    else
+    {
+        // lastPlayersTurn -> PreflopFirstRound is over
+        if (getCurrentPlayersTurnId() == getFirstRoundLastPlayersTurnId())
+        {
+            setFirstRound(false);
+        }
 
-		//Action loeschen und ActionButtons refresh
-		for(it_c=getHand()->getRunningPlayerList()->begin(); it_c!=getHand()->getRunningPlayerList()->end(); ++it_c) {
-			(*it_c)->setAction(PLAYER_ACTION_NONE);
-		}
+        currentPlayersTurnIt = getHand()->getRunningPlayerIt(getCurrentPlayersTurnId());
+        if (currentPlayersTurnIt == getHand()->getRunningPlayerList()->end())
+        {
+            throw Exception(__FILE__, __LINE__, EngineError::RUNNING_PLAYER_NOT_FOUND);
+        }
+        (*currentPlayersTurnIt)->setTurn(true);
 
-		//Sets in den Pot verschieben und Sets = 0 und Pot-refresh
-		getHand()->getBoard()->collectSets();
-		getHand()->getBoard()->collectPot();
-		getHand()->getGuiInterface()->refreshPot();
+        // highlight active players groupbox and clear action
+        getHand()->getGuiInterface()->refreshGroupbox(getCurrentPlayersTurnId(), 2);
+        getHand()->getGuiInterface()->refreshAction(getCurrentPlayersTurnId(), PLAYER_ACTION_NONE);
 
-		getHand()->getGuiInterface()->refreshSet();
-		getHand()->getGuiInterface()->refreshCash();
-		for(int i=0; i<MAX_NUMBER_OF_PLAYERS; i++) {
-			getHand()->getGuiInterface()->refreshAction(i,PLAYER_ACTION_NONE);
-		}
-
-		getHand()->switchRounds();
-	} else {
-		// lastPlayersTurn -> PreflopFirstRound is over
-		if( getCurrentPlayersTurnId() == getFirstRoundLastPlayersTurnId() ) {
-			setFirstRound(false);
-		}
-
-		currentPlayersTurnIt = getHand()->getRunningPlayerIt( getCurrentPlayersTurnId() );
-		if(currentPlayersTurnIt == getHand()->getRunningPlayerList()->end()) {
-			throw Exception(__FILE__, __LINE__, EngineError::RUNNING_PLAYER_NOT_FOUND);
-		}
-		(*currentPlayersTurnIt)->setTurn(true);
-
-		//highlight active players groupbox and clear action
-		getHand()->getGuiInterface()->refreshGroupbox( getCurrentPlayersTurnId() , 2 );
-		getHand()->getGuiInterface()->refreshAction( getCurrentPlayersTurnId() , PLAYER_ACTION_NONE );
-
-
-		if( getCurrentPlayersTurnId() == 0) {
-			// Wir sind dran
-			getHand()->getGuiInterface()->meInAction();
-		} else {
-			//Gegner sind dran
-			getHand()->getGuiInterface()->beRoAnimation2(getBettingRoundID());
-		}
-	}
+        if (getCurrentPlayersTurnId() == 0)
+        {
+            // Wir sind dran
+            getHand()->getGuiInterface()->meInAction();
+        }
+        else
+        {
+            // Gegner sind dran
+            getHand()->getGuiInterface()->beRoAnimation2(getBettingRoundID());
+        }
+    }
 }

@@ -18,191 +18,209 @@
 
 #include "game.h"
 
+#include "EngineError.h"
 #include "EngineFactory.h"
 #include "Exception.h"
-#include "EngineError.h"
 #include "StartData.h"
 
 #include <ui/interfaces/guiinterface.h>
 #include "infra/persistence/SqliteLogStore.h"
 
-
 #include <iostream>
 
 using namespace std;
 
-Game::Game(GuiInterface* gui, std::shared_ptr<EngineFactory> factory,
-		   const PlayerList &playerList, const GameData &gameData,
-		   const StartData &startData, int gameId, SqliteLogStore *log)
-	: myFactory(factory), myGui(gui), myLog(log), startQuantityPlayers(startData.numberOfPlayers),
-	  startCash(gameData.startMoney), startSmallBlind(gameData.firstSmallBlind),
-	  myGameID(gameId), currentSmallBlind(gameData.firstSmallBlind), currentHandID(0), dealerPosition(0),
-	  lastHandBlindsRaised(1), lastTimeBlindsRaised(0), myGameData(gameData)
+Game::Game(GuiInterface* gui, std::shared_ptr<EngineFactory> factory, const PlayerList& playerList,
+           const GameData& gameData, const StartData& startData, int gameId, IRankingStore* l,
+           IPlayersStatisticsStore* ps, IHandAuditStore* handAuditStore)
+    : myFactory(factory), myGui(gui), myRankingStore(l), myPlayersStatisticsStore(ps), myHandAuditStore(handAuditStore),
+      startQuantityPlayers(startData.numberOfPlayers), startCash(gameData.startMoney),
+      startSmallBlind(gameData.firstSmallBlind), myGameID(gameId), currentSmallBlind(gameData.firstSmallBlind),
+      currentHandID(0), dealerPosition(0), lastHandBlindsRaised(1), lastTimeBlindsRaised(0), myGameData(gameData)
 {
-	dealerPosition = startData.startDealerPlayerId;
+    dealerPosition = startData.startDealerPlayerId;
 
-	// determine dealer position
-	PlayerListConstIterator player_i = playerList->begin();
-	PlayerListConstIterator player_end = playerList->end();
+    // determine dealer position
+    PlayerListConstIterator player_i = playerList->begin();
+    PlayerListConstIterator player_end = playerList->end();
 
-	while (player_i != player_end) {
-		if ((*player_i)->getID() == dealerPosition)
-			break;
-		++player_i;
-	}
-	if (player_i == player_end)
-		throw Exception(__FILE__, __LINE__, EngineError::DEALER_NOT_FOUND);
+    while (player_i != player_end)
+    {
+        if ((*player_i)->getID() == dealerPosition)
+            break;
+        ++player_i;
+    }
+    if (player_i == player_end)
+        throw Exception(__FILE__, __LINE__, EngineError::DEALER_NOT_FOUND);
 
-	// create board
-	currentBoard = myFactory->createBoard(dealerPosition);
+    // create board
+    currentBoard = myFactory->createBoard(dealerPosition);
 
-	// create player lists
-	seatsList.reset(new std::list<std::shared_ptr<Player> >);
-	activePlayerList.reset(new std::list<std::shared_ptr<Player> >);
-	runningPlayerList.reset(new std::list<std::shared_ptr<Player> >);
+    // create player lists
+    seatsList.reset(new std::list<std::shared_ptr<Player>>);
+    activePlayerList.reset(new std::list<std::shared_ptr<Player>>);
+    runningPlayerList.reset(new std::list<std::shared_ptr<Player>>);
 
-	(*runningPlayerList) = (*playerList);
-	(*activePlayerList) = (*playerList);
-	(*seatsList) = (*playerList);
+    (*runningPlayerList) = (*playerList);
+    (*activePlayerList) = (*playerList);
+    (*seatsList) = (*playerList);
 
-	currentBoard->setPlayerLists(seatsList, activePlayerList, runningPlayerList);
-	
-	if(myLog) 
-		myLog->updateRankingPlayedGames(activePlayerList);
+    currentBoard->setPlayerLists(seatsList, activePlayerList, runningPlayerList);
+
+    myRankingStore->updateRankingPlayedGames(activePlayerList);
 }
 
 Game::~Game()
 {
-	runningPlayerList->clear();
-	activePlayerList->clear();
-	seatsList->clear();
+    runningPlayerList->clear();
+    activePlayerList->clear();
+    seatsList->clear();
 }
 
-std::shared_ptr<HandInterface> Game::getCurrentHand()
+std::shared_ptr<IHand> Game::getCurrentHand()
 {
-	return currentHand;
+    return currentHand;
 }
 
-const std::shared_ptr<HandInterface> Game::getCurrentHand() const
+const std::shared_ptr<IHand> Game::getCurrentHand() const
 {
-	return currentHand;
+    return currentHand;
 }
 
 void Game::initHand()
 {
 
-	size_t i;
-	PlayerListConstIterator it_c;
-	PlayerListIterator it;
+    size_t i;
+    PlayerListConstIterator it_c;
+    PlayerListIterator it;
 
-	currentHandID++;
+    currentHandID++;
 
-	// set player action none
-	for(it=seatsList->begin(); it!=seatsList->end(); ++it) {
-		(*it)->setAction(PLAYER_ACTION_NONE);
-	}
+    // set player action none
+    for (it = seatsList->begin(); it != seatsList->end(); ++it)
+    {
+        (*it)->setAction(PLAYER_ACTION_NONE);
+    }
 
-	// set player with empty cash inactive
-	it = activePlayerList->begin();
-	while( it!=activePlayerList->end() ) {
+    // set player with empty cash inactive
+    it = activePlayerList->begin();
+    while (it != activePlayerList->end())
+    {
 
-		if((*it)->getCash() == 0) {
-			(*it)->setActiveStatus(false);
-			it = activePlayerList->erase(it);
-		} else {
-			++it;
-		}
-	}
+        if ((*it)->getCash() == 0)
+        {
+            (*it)->setActiveStatus(false);
+            it = activePlayerList->erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
 
-	runningPlayerList->clear();
-	(*runningPlayerList) = (*activePlayerList);
+    runningPlayerList->clear();
+    (*runningPlayerList) = (*activePlayerList);
 
-	// create Hand
-	currentHand = myFactory->createHand(myFactory, myGui, currentBoard, myLog, seatsList, activePlayerList, runningPlayerList, currentHandID, startQuantityPlayers, dealerPosition, currentSmallBlind, startCash);
+    // create Hand
+    currentHand = myFactory->createHand(myFactory, myGui, currentBoard, myRankingStore, myPlayersStatisticsStore,
+                                        myHandAuditStore, seatsList, activePlayerList, runningPlayerList, currentHandID,
+                                        startQuantityPlayers, dealerPosition, currentSmallBlind, startCash);
 
-	// shifting dealer button -> TODO exception-rule !!!
-	bool nextDealerFound = false;
-	PlayerListConstIterator dealerPositionIt = currentHand->getSeatIt(dealerPosition);
-	if(dealerPositionIt == seatsList->end()) {
-		throw Exception(__FILE__, __LINE__, EngineError::SEAT_NOT_FOUND);
-	}
+    // shifting dealer button -> TODO exception-rule !!!
+    bool nextDealerFound = false;
+    PlayerListConstIterator dealerPositionIt = currentHand->getSeatIt(dealerPosition);
+    if (dealerPositionIt == seatsList->end())
+    {
+        throw Exception(__FILE__, __LINE__, EngineError::SEAT_NOT_FOUND);
+    }
 
-	for(i=0; i<seatsList->size(); i++) {
+    for (i = 0; i < seatsList->size(); i++)
+    {
 
-		++dealerPositionIt;
-		if(dealerPositionIt == seatsList->end()) dealerPositionIt = seatsList->begin();
+        ++dealerPositionIt;
+        if (dealerPositionIt == seatsList->end())
+            dealerPositionIt = seatsList->begin();
 
-		it_c = currentHand->getActivePlayerIt( (*dealerPositionIt)->getID() );
-		if(it_c != activePlayerList->end() ) {
-			nextDealerFound = true;
-			dealerPosition = (*it_c)->getID();
-			break;
-		}
-	}
-	if(!nextDealerFound) {
-		throw Exception(__FILE__, __LINE__, EngineError::NEXT_DEALER_NOT_FOUND);
-	}
+        it_c = currentHand->getActivePlayerIt((*dealerPositionIt)->getID());
+        if (it_c != activePlayerList->end())
+        {
+            nextDealerFound = true;
+            dealerPosition = (*it_c)->getID();
+            break;
+        }
+    }
+    if (!nextDealerFound)
+    {
+        throw Exception(__FILE__, __LINE__, EngineError::NEXT_DEALER_NOT_FOUND);
+    }
 }
 
 void Game::startHand()
 {
-	myGui->nextRoundCleanGui();
+    myGui->nextRoundCleanGui();
 
-	// log new hand
-	myGui->logNewGameHandMsg(myGameID, currentHandID);
+    // log new hand
+    myGui->logNewGameHandMsg(myGameID, currentHandID);
 
-	currentHand->start();
+    currentHand->start();
 }
 
 std::shared_ptr<Player> Game::getPlayerByUniqueId(unsigned id)
 {
-	std::shared_ptr<Player> tmpPlayer;
-	PlayerListIterator i = getSeatsList()->begin();
-	PlayerListIterator end = getSeatsList()->end();
-	while (i != end) {
-		if ((*i)->getID() == id) {
-			tmpPlayer = *i;
-			break;
-		}
-		++i;
-	}
-	return tmpPlayer;
+    std::shared_ptr<Player> tmpPlayer;
+    PlayerListIterator i = getSeatsList()->begin();
+    PlayerListIterator end = getSeatsList()->end();
+    while (i != end)
+    {
+        if ((*i)->getID() == id)
+        {
+            tmpPlayer = *i;
+            break;
+        }
+        ++i;
+    }
+    return tmpPlayer;
 }
 
 std::shared_ptr<Player> Game::getPlayerByNumber(int number)
 {
-	std::shared_ptr<Player> tmpPlayer;
-	PlayerListIterator i = getSeatsList()->begin();
-	PlayerListIterator end = getSeatsList()->end();
-	while (i != end) {
-		if ((*i)->getID() == number) {
-			tmpPlayer = *i;
-			break;
-		}
-		++i;
-	}
-	return tmpPlayer;
+    std::shared_ptr<Player> tmpPlayer;
+    PlayerListIterator i = getSeatsList()->begin();
+    PlayerListIterator end = getSeatsList()->end();
+    while (i != end)
+    {
+        if ((*i)->getID() == number)
+        {
+            tmpPlayer = *i;
+            break;
+        }
+        ++i;
+    }
+    return tmpPlayer;
 }
 
 std::shared_ptr<Player> Game::getCurrentPlayer()
 {
-	std::shared_ptr<Player> tmpPlayer = getPlayerByUniqueId(getCurrentHand()->getCurrentBettingRound()->getCurrentPlayersTurnId());
-	if (!tmpPlayer.get())
-		throw Exception(__FILE__, __LINE__, EngineError::CURRENT_PLAYER_NOT_FOUND);
-	return tmpPlayer;
+    std::shared_ptr<Player> tmpPlayer =
+        getPlayerByUniqueId(getCurrentHand()->getCurrentBettingRound()->getCurrentPlayersTurnId());
+    if (!tmpPlayer.get())
+        throw Exception(__FILE__, __LINE__, EngineError::CURRENT_PLAYER_NOT_FOUND);
+    return tmpPlayer;
 }
 
-std::shared_ptr<Player> Game::getPlayerByName(const std::string &name)
+std::shared_ptr<Player> Game::getPlayerByName(const std::string& name)
 {
-	std::shared_ptr<Player> tmpPlayer;
-	PlayerListIterator i = getSeatsList()->begin();
-	PlayerListIterator end = getSeatsList()->end();
-	while (i != end) {
-		if ((*i)->getName() == name) {
-			tmpPlayer = *i;
-			break;
-		}
-		++i;
-	}
-	return tmpPlayer;
+    std::shared_ptr<Player> tmpPlayer;
+    PlayerListIterator i = getSeatsList()->begin();
+    PlayerListIterator end = getSeatsList()->end();
+    while (i != end)
+    {
+        if ((*i)->getName() == name)
+        {
+            tmpPlayer = *i;
+            break;
+        }
+        ++i;
+    }
+    return tmpPlayer;
 }

@@ -20,62 +20,59 @@
 #define BOARD_H
 
 #include <iostream>
-#include <vector>
 #include <memory>
+#include <vector>
 
-#include "BoardInterface.h"
+#include "core/interfaces/IBoard.h"
 
 class Player;
-class HandInterface;
+class IHand;
 
-
-class Board : public BoardInterface
+class Board : public IBoard
 {
-public:
-	Board(unsigned dealerPosition);
-	~Board();
+  public:
+    Board(unsigned dealerPosition);
+    ~Board();
 
-	void setPlayerLists(PlayerList, PlayerList, PlayerList);
+    void setPlayerLists(PlayerList, PlayerList, PlayerList);
 
-	void setCards(int* theValue);
-	void getCards(int* theValue) ;
+    void setCards(int* theValue);
+    void getCards(int* theValue);
 
-	void setAllInCondition(bool theValue) ;
-	void setLastActionPlayerID(unsigned theValue);
+    void setAllInCondition(bool theValue);
+    void setLastActionPlayerID(unsigned theValue);
 
-	int getPot() const ;
-	void setPot(int theValue) ;
-	int getSets() const ;
-	void setSets(int theValue) ;
+    int getPot() const;
+    void setPot(int theValue);
+    int getSets() const;
+    void setSets(int theValue);
 
-	void collectSets() ;
-	void collectPot() ;
+    void collectSets();
+    void collectPot();
 
-	void distributePot();
-	void determinePlayerNeedToShowCards();
+    void distributePot();
+    void determinePlayerNeedToShowCards();
 
-	std::list<unsigned> getWinners() const ;
-	void setWinners(const std::list<unsigned> &w);
+    std::list<unsigned> getWinners() const;
+    void setWinners(const std::list<unsigned>& w);
 
-	std::list<unsigned> getPlayerNeedToShowCards() const;
-	void setPlayerNeedToShowCards(const std::list<unsigned> &p);
+    std::list<unsigned> getPlayerNeedToShowCards() const;
+    void setPlayerNeedToShowCards(const std::list<unsigned>& p);
 
+  private:
+    PlayerList seatsList;
+    PlayerList activePlayerList;
+    PlayerList runningPlayerList;
 
-private:
-	PlayerList seatsList;
-	PlayerList activePlayerList;
-	PlayerList runningPlayerList;
+    std::list<unsigned> winners;
+    std::list<unsigned> playerNeedToShowCards;
 
-	std::list<unsigned> winners;
-	std::list<unsigned> playerNeedToShowCards;
-
-	int myCards[5];
-	int pot;
-	int sets;
-	unsigned dealerPosition;
-	bool allInCondition;
-	unsigned lastActionPlayerID;
-
+    int myCards[5];
+    int pot;
+    int sets;
+    unsigned dealerPosition;
+    bool allInCondition;
+    unsigned lastActionPlayerID;
 };
 
 #endif

@@ -21,53 +21,53 @@
 #include <memory>
 #include <string>
 
-#include <core/engine/GameData.h>
 #include <core/engine/EngineDefs.h>
+#include <core/engine/GameData.h>
 #include <core/engine/GameInfo.h>
 #include <core/engine/StartData.h>
-#include <core/engine/GameData.h>
 #include <core/interfaces/ILogger.h>
 
 class GuiInterface;
 class Game;
-class SqliteLogStore;
+class IRankingStore;
+class IPlayersStatisticsStore;
+class IHandAuditStore;
 class QtToolsInterface;
 
 class Session
 {
-public:
+  public:
+    Session(ILogger*, GuiInterface*, IRankingStore*, IPlayersStatisticsStore*, IHandAuditStore*);
 
-	Session(ILogger *, GuiInterface*, SqliteLogStore *);
+    ~Session();
 
-	~Session();
+    bool init();
 
-	bool init();
+    void startGame(const GameData& gameData, const StartData& startData);
 
-	void startGame(const GameData &gameData, const StartData &startData);
+    std::shared_ptr<Game> getCurrentGame();
 
-	std::shared_ptr<Game> getCurrentGame();
+    GuiInterface* getGui();
 
-	GuiInterface *getGui();
+    IRankingStore* getRankingStore() { return myRankingStore; }
+    IPlayersStatisticsStore* getPlayersStatisticsStore() { return myPlayersStatisticsStore; }
+    IHandAuditStore* getHandAuditStore() { return myHandAuditStore; }
 
-	SqliteLogStore *getLog() {
-		return myLog;
-	}
+    GameInfo getClientGameInfo(unsigned gameId) const;
+    unsigned getGameIdOfPlayer(unsigned playerId) const;
+    unsigned getClientCurrentGameId() const;
+    unsigned getClientUniquePlayerId() const;
 
+  private:
+    int currentGameNum;
 
-	GameInfo getClientGameInfo(unsigned gameId) const;
-	unsigned getGameIdOfPlayer(unsigned playerId) const;
-	unsigned getClientCurrentGameId() const;
-	unsigned getClientUniquePlayerId() const;
-
-private:
-
-	int currentGameNum;
-
-	std::shared_ptr<Game> currentGame;
-	GuiInterface *myGui;
-	ILogger * myLogger;
-	SqliteLogStore *myLog;
-	QtToolsInterface *myQtToolsInterface;
+    std::shared_ptr<Game> currentGame;
+    GuiInterface* myGui;
+    ILogger* myLogger;
+    IRankingStore* myRankingStore;
+    IPlayersStatisticsStore* myPlayersStatisticsStore;
+    IHandAuditStore* myHandAuditStore;
+    QtToolsInterface* myQtToolsInterface;
 };
 
 #endif

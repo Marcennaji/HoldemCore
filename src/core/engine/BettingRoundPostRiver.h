@@ -22,24 +22,21 @@
 #include <iostream>
 #include "BettingRound.h"
 
-class HandInterface;
-
+class IHand;
 
 class BettingRoundPostRiver : public BettingRound
 {
-public:
-	BettingRoundPostRiver(ILogger * logger, HandInterface*, int, int);
-	~BettingRoundPostRiver();
+  public:
+    BettingRoundPostRiver(ILogger* logger, IHand*, int, int);
+    ~BettingRoundPostRiver();
 
-	void setHighestCardsValue(int theValue);
-	int getHighestCardsValue() const ;
-	void run();
-	void postRiverRun();
+    void setHighestCardsValue(int theValue);
+    int getHighestCardsValue() const;
+    void run();
+    void postRiverRun();
 
-private:
-
-	int highestCardsValue;
-
+  private:
+    int highestCardsValue;
 };
 
 #endif

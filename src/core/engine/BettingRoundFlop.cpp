@@ -18,18 +18,15 @@
 
 #include "BettingRoundflop.h"
 
-
-#include "HandInterface.h"
+#include "core/interfaces/IHand.h"
 
 using namespace std;
 
-BettingRoundFlop::BettingRoundFlop(ILogger * logger, HandInterface* hi, unsigned dP, int sB) : 
-        BettingRound(logger, hi, dP, sB, GAME_STATE_FLOP)
+BettingRoundFlop::BettingRoundFlop(ILogger* logger, IHand* hi, unsigned dP, int sB)
+    : BettingRound(logger, hi, dP, sB, GAME_STATE_FLOP)
 {
 }
 
 BettingRoundFlop::~BettingRoundFlop()
 {
 }
-
-

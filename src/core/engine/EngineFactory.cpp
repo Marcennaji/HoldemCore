@@ -18,60 +18,55 @@
 
 #include "enginefactory.h"
 
-#include "hand.h"
-#include "board.h"
-#include "BettingRoundpreflop.h"
-#include "BettingRoundflop.h"
-#include "BettingRoundturn.h"
-#include "BettingRoundriver.h"
-#include "BettingRoundpostriver.h"
-#include "tools.h"
 #include <core/interfaces/ILogger.h>
+#include "BettingRoundflop.h"
+#include "BettingRoundpostriver.h"
+#include "BettingRoundpreflop.h"
+#include "BettingRoundriver.h"
+#include "BettingRoundturn.h"
+#include "board.h"
+#include "hand.h"
+#include "tools.h"
 
-#include "TightAgressivePlayer.h"
+#include "HumanPlayer.h"
 #include "LooseAggressivePlayer.h"
 #include "ManiacPlayer.h"
-#include "HumanPlayer.h"
+#include "TightAgressivePlayer.h"
 
-
-EngineFactory::EngineFactory(ILogger * logger)
-	: myLogger(logger)
+EngineFactory::EngineFactory(ILogger* logger) : myLogger(logger)
 {
 }
-
 
 EngineFactory::~EngineFactory()
 {
 }
 
-
-std::shared_ptr<HandInterface>
-EngineFactory::createHand(std::shared_ptr<EngineFactory> f, GuiInterface *g, std::shared_ptr<BoardInterface> b, SqliteLogStore *l, PlayerList sl, PlayerList apl, PlayerList rpl, int id, int sP, int dP, int sB,int sC)
+std::shared_ptr<IHand> EngineFactory::createHand(std::shared_ptr<EngineFactory> f, GuiInterface* g,
+                                                 std::shared_ptr<IBoard> b, IRankingStore* l,
+                                                 IPlayersStatisticsStore* ps, IHandAuditStore* hs, PlayerList sl,
+                                                 PlayerList apl, PlayerList rpl, int id, int sP, int dP, int sB, int sC)
 {
-	return std::shared_ptr<HandInterface>(new Hand(myLogger, f, g, b, l, sl, apl, rpl, id, sP, dP, sB, sC));
+    return std::shared_ptr<IHand>(new Hand(myLogger, f, g, b, l, ps, hs, sl, apl, rpl, id, sP, dP, sB, sC));
 }
 
-std::shared_ptr<BoardInterface>
-EngineFactory::createBoard(unsigned dp)
+std::shared_ptr<IBoard> EngineFactory::createBoard(unsigned dp)
 {
-	return std::shared_ptr<BoardInterface>(new Board(dp));
+    return std::shared_ptr<IBoard>(new Board(dp));
 }
 
-std::vector<std::shared_ptr<BettingRoundInterface> >
-EngineFactory::createBettingRound(HandInterface *hi, unsigned dP, int sB)
+std::vector<std::shared_ptr<IBettingRound>> EngineFactory::createBettingRound(IHand* hi, unsigned dP, int sB)
 {
-	std::vector<std::shared_ptr<BettingRoundInterface> > myBettingRound;
+    std::vector<std::shared_ptr<IBettingRound>> myBettingRound;
 
-	myBettingRound.push_back(std::shared_ptr<BettingRoundInterface>(new BettingRoundPreflop(myLogger, hi, dP, sB)));
+    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundPreflop(myLogger, hi, dP, sB)));
 
-	myBettingRound.push_back(std::shared_ptr<BettingRoundInterface>(new BettingRoundFlop(myLogger,hi, dP, sB)));
+    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundFlop(myLogger, hi, dP, sB)));
 
-	myBettingRound.push_back(std::shared_ptr<BettingRoundInterface>(new BettingRoundTurn(myLogger,hi, dP, sB)));
+    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundTurn(myLogger, hi, dP, sB)));
 
-	myBettingRound.push_back(std::shared_ptr<BettingRoundInterface>(new BettingRoundRiver(myLogger,hi, dP, sB)));
+    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundRiver(myLogger, hi, dP, sB)));
 
-	myBettingRound.push_back(std::shared_ptr<BettingRoundInterface>(new BettingRoundPostRiver(myLogger,hi, dP, sB)));
+    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundPostRiver(myLogger, hi, dP, sB)));
 
-	return myBettingRound;
-
+    return myBettingRound;
 }

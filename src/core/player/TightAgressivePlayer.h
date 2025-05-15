@@ -20,31 +20,29 @@
 
 #include "player.h"
 
+class TightAgressivePlayer : public Player
+{
 
-class TightAgressivePlayer : public Player{
+  public:
+    TightAgressivePlayer(IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type, std::string name, int sC,
+                         bool aS, bool sotS, int mB);
 
-public: 
+    ~TightAgressivePlayer();
 
-	TightAgressivePlayer(SqliteLogStore * l, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB);
+  protected:
+    bool preflopShouldCall();
+    bool flopShouldCall();
+    bool turnShouldCall();
+    bool riverShouldCall();
 
-	~TightAgressivePlayer();
+    bool preflopShouldRaise();
+    bool flopShouldRaise();
+    bool turnShouldRaise();
+    bool riverShouldRaise();
 
-
-protected :
-
-	bool preflopShouldCall();
-	bool flopShouldCall();
-	bool turnShouldCall();
-	bool riverShouldCall();
-
-	bool preflopShouldRaise();
-	bool flopShouldRaise();
-	bool turnShouldRaise();
-	bool riverShouldRaise();
-
-	bool flopShouldBet();
-	bool turnShouldBet();
-	bool riverShouldBet();
+    bool flopShouldBet();
+    bool turnShouldBet();
+    bool riverShouldBet();
 };
 
 #endif

@@ -20,33 +20,31 @@
 
 #include "player.h"
 
+class HumanPlayer : public Player
+{
 
-class HumanPlayer : public Player{
+  public:
+    HumanPlayer(IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type, std::string name, int sC, bool aS,
+                bool sotS, int mB);
 
-public: 
+    ~HumanPlayer();
 
-	HumanPlayer(SqliteLogStore *, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB);
+    const SimResults getHandSimulation() const;
 
-	~HumanPlayer();
+  protected:
+    bool preflopShouldCall() { return false; }
+    bool flopShouldCall() { return false; }
+    bool turnShouldCall() { return false; }
+    bool riverShouldCall() { return false; }
 
-	const SimResults getHandSimulation() const;
+    bool preflopShouldRaise() { return false; }
+    bool flopShouldRaise() { return false; }
+    bool turnShouldRaise() { return false; }
+    bool riverShouldRaise() { return false; }
 
-
-protected :
-
-	bool preflopShouldCall(){return false;}
-	bool flopShouldCall(){return false;}
-	bool turnShouldCall(){return false;}
-	bool riverShouldCall(){return false;}
-
-	bool preflopShouldRaise(){return false;}
-	bool flopShouldRaise(){return false;}
-	bool turnShouldRaise(){return false;}
-	bool riverShouldRaise(){return false;}
-
-	bool flopShouldBet(){return false;}
-	bool turnShouldBet(){return false;}
-	bool riverShouldBet(){return false;}
+    bool flopShouldBet() { return false; }
+    bool turnShouldBet() { return false; }
+    bool riverShouldBet() { return false; }
 };
 
 #endif

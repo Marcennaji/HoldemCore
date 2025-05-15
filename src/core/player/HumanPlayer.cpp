@@ -20,35 +20,34 @@
 #include <infra/persistence/SqliteLogStore.h>
 
 #ifndef max
-#define max(a,b)            (((a) > (b)) ? (a) : (b))
+#define max(a, b) (((a) > (b)) ? (a) : (b))
 #endif
 
 using namespace std;
 
-HumanPlayer::HumanPlayer(SqliteLogStore * l, int id, PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB):
-	Player(l, id, type, name, sC, aS, sotS, mB){
-
+HumanPlayer::HumanPlayer(IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id, PlayerType type, std::string name,
+                         int sC, bool aS, bool sotS, int mB)
+    : Player(ha, ps, id, type, name, sC, aS, sotS, mB)
+{
 }
 
-	
-HumanPlayer::~HumanPlayer(){
-
+HumanPlayer::~HumanPlayer()
+{
 }
 
-const SimResults HumanPlayer::getHandSimulation() const{
+const SimResults HumanPlayer::getHandSimulation() const
+{
 
-	SimResults r;
-	const string cards = (getCardsValueString() + getStringBoard()).c_str();
+    SimResults r;
+    const string cards = (getCardsValueString() + getStringBoard()).c_str();
 
-	SimulateHand(cards.c_str() , &r, 0, 1, 0);
-	float win = r.win; //save the value
-	
-	const int nbOpponents = max(1, currentHand->getRunningPlayerList()->size() - 1); // note that allin opponents are not "running" any more
-	SimulateHandMulti(cards.c_str() , &r, 1300, 350, nbOpponents); 
-	r.win = win; // because SimulateHandMulti doesn't compute 'win'
+    SimulateHand(cards.c_str(), &r, 0, 1, 0);
+    float win = r.win; // save the value
 
-	return r;
+    const int nbOpponents =
+        max(1, currentHand->getRunningPlayerList()->size() - 1); // note that allin opponents are not "running" any more
+    SimulateHandMulti(cards.c_str(), &r, 1300, 350, nbOpponents);
+    r.win = win; // because SimulateHandMulti doesn't compute 'win'
+
+    return r;
 }
-
-
-

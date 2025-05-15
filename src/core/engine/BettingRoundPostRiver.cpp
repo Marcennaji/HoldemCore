@@ -17,7 +17,7 @@
  *****************************************************************************/
 
 #include "BettingRoundpostriver.h"
-#include "HandInterface.h"
+#include "core/interfaces/IHand.h"
 
 #include "Player.h"
 
@@ -25,8 +25,8 @@
 
 using namespace std;
 
-BettingRoundPostRiver::BettingRoundPostRiver(ILogger * logger, HandInterface* hi, int dP, int sB) : 
-	BettingRound(logger, hi, dP, sB, GAME_STATE_POST_RIVER), highestCardsValue(0)
+BettingRoundPostRiver::BettingRoundPostRiver(ILogger* logger, IHand* hi, int dP, int sB)
+    : BettingRound(logger, hi, dP, sB, GAME_STATE_POST_RIVER), highestCardsValue(0)
 {
 }
 
@@ -41,59 +41,72 @@ void BettingRoundPostRiver::run()
 void BettingRoundPostRiver::postRiverRun()
 {
 
-	PlayerListConstIterator it_c;
-	PlayerListIterator it;
+    PlayerListConstIterator it_c;
+    PlayerListIterator it;
 
-	// who is the winner
-	for(it_c=getHand()->getActivePlayerList()->begin(); it_c!=getHand()->getActivePlayerList()->end(); ++it_c) {
+    // who is the winner
+    for (it_c = getHand()->getActivePlayerList()->begin(); it_c != getHand()->getActivePlayerList()->end(); ++it_c)
+    {
 
-		if( (*it_c)->getAction() != PLAYER_ACTION_FOLD && (*it_c)->getCardsValueInt() > highestCardsValue ) {
-			highestCardsValue = (*it_c)->getCardsValueInt();
-		}
-	}
+        if ((*it_c)->getAction() != PLAYER_ACTION_FOLD && (*it_c)->getCardsValueInt() > highestCardsValue)
+        {
+            highestCardsValue = (*it_c)->getCardsValueInt();
+        }
+    }
 
-	int potPlayers = 0;
+    int potPlayers = 0;
 
-	for(it_c=getHand()->getActivePlayerList()->begin(); it_c!=getHand()->getActivePlayerList()->end(); ++it_c) {
-		if( (*it_c)->getAction() != PLAYER_ACTION_FOLD) {
-			potPlayers++;
-		}
-	}
+    for (it_c = getHand()->getActivePlayerList()->begin(); it_c != getHand()->getActivePlayerList()->end(); ++it_c)
+    {
+        if ((*it_c)->getAction() != PLAYER_ACTION_FOLD)
+        {
+            potPlayers++;
+        }
+    }
 
-	getHand()->getBoard()->determinePlayerNeedToShowCards();
+    getHand()->getBoard()->determinePlayerNeedToShowCards();
 
-	getHand()->getBoard()->distributePot();
+    getHand()->getBoard()->distributePot();
 
-	getHand()->getBoard()->setPot(0);
+    getHand()->getBoard()->setPot(0);
 
-	// logging
-	int nonfoldPlayersCounter = 0;
-	for (it_c=getHand()->getActivePlayerList()->begin(); it_c!=getHand()->getActivePlayerList()->end(); ++it_c) {
-		if ((*it_c)->getAction() != PLAYER_ACTION_FOLD) nonfoldPlayersCounter++;
-	}
+    // logging
+    int nonfoldPlayersCounter = 0;
+    for (it_c = getHand()->getActivePlayerList()->begin(); it_c != getHand()->getActivePlayerList()->end(); ++it_c)
+    {
+        if ((*it_c)->getAction() != PLAYER_ACTION_FOLD)
+            nonfoldPlayersCounter++;
+    }
 
-	if(getHand()->getLog()) {
-		getHand()->getLog()->updateRankingGameLosers(getHand()->getActivePlayerList());
-		getHand()->getLog()->updateRankingGameWinner(getHand()->getActivePlayerList());		
-		getHand()->getLog()->updatePlayersStatistics(getHand()->getActivePlayerList());
-	}
+    if (getHand()->getRankingStore())
+    {
+        getHand()->getRankingStore()->updateRankingGameLosers(getHand()->getActivePlayerList());
+        getHand()->getRankingStore()->updateRankingGameWinner(getHand()->getActivePlayerList());
+    }
+    if (getHand()->getPlayersStatisticsStore())
+    {
+        getHand()->getPlayersStatisticsStore()->updatePlayersStatistics(getHand()->getActivePlayerList());
+    }
+    getHand()->getGuiInterface()->postRiverRunAnimation1();
 
-	getHand()->getGuiInterface()->postRiverRunAnimation1();
+    if (getHand()->getCardsShown())
+    {
 
-	if (getHand()->getCardsShown()) {
-		
-		// show cards for players who didn't fold preflop
-		for (it_c=getHand()->getActivePlayerList()->begin(); it_c!=getHand()->getActivePlayerList()->end(); ++it_c) {	
+        // show cards for players who didn't fold preflop
+        for (it_c = getHand()->getActivePlayerList()->begin(); it_c != getHand()->getActivePlayerList()->end(); ++it_c)
+        {
 
-			if ((*it_c)->getCurrentHandActions().getPreflopActions().size() > 0 && 
-				(*it_c)->getCurrentHandActions().getPreflopActions().at(0) != PLAYER_ACTION_FOLD)
-				getHand()->getGuiInterface()->showCards((*it_c)->getID());
-		}
-	}
+            if ((*it_c)->getCurrentHandActions().getPreflopActions().size() > 0 &&
+                (*it_c)->getCurrentHandActions().getPreflopActions().at(0) != PLAYER_ACTION_FOLD)
+                getHand()->getGuiInterface()->showCards((*it_c)->getID());
+        }
+    }
 }
-void BettingRoundPostRiver::setHighestCardsValue(int theValue) {
-	highestCardsValue = theValue;
+void BettingRoundPostRiver::setHighestCardsValue(int theValue)
+{
+    highestCardsValue = theValue;
 }
-int BettingRoundPostRiver::getHighestCardsValue() const {
-	return highestCardsValue;
+int BettingRoundPostRiver::getHighestCardsValue() const
+{
+    return highestCardsValue;
 }

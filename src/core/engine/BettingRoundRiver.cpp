@@ -17,15 +17,14 @@
  *****************************************************************************/
 
 #include "BettingRoundriver.h"
-#include "HandInterface.h"
-
+#include "core/interfaces/IHand.h"
 
 #include <iostream>
 
 using namespace std;
 
-BettingRoundRiver::BettingRoundRiver(ILogger * logger, HandInterface* hi, unsigned dP, int sB) : 
-        BettingRound(logger, hi, dP, sB, GAME_STATE_RIVER)
+BettingRoundRiver::BettingRoundRiver(ILogger* logger, IHand* hi, unsigned dP, int sB)
+    : BettingRound(logger, hi, dP, sB, GAME_STATE_RIVER)
 {
 }
 

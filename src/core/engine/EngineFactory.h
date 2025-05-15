@@ -21,28 +21,30 @@
 
 #include "EngineFactory.h"
 
-#include "HandInterface.h"
-#include "BoardInterface.h"
 #include <core/interfaces/ILogger.h>
-
+#include "core/interfaces/IBoard.h"
+#include "core/interfaces/IHand.h"
 
 #include <core/player/Player.h>
 
 #include <memory>
 #include <vector>
 
-class EngineFactory 
+class EngineFactory
 {
-public:
-	EngineFactory(ILogger *);
-	~EngineFactory();
+  public:
+    EngineFactory(ILogger*);
+    ~EngineFactory();
 
-	virtual std::shared_ptr<HandInterface> createHand(std::shared_ptr<EngineFactory> f, GuiInterface *g, std::shared_ptr<BoardInterface> b, SqliteLogStore *l, PlayerList sl, PlayerList apl, PlayerList rpl, int id, int sP, int dP, int sB,int sC);
-	virtual std::shared_ptr<BoardInterface> createBoard(unsigned dp);
-	virtual std::vector<std::shared_ptr<BettingRoundInterface> > createBettingRound(HandInterface *hi, unsigned dP, int sB);
+    virtual std::shared_ptr<IHand> createHand(std::shared_ptr<EngineFactory> f, GuiInterface* g,
+                                              std::shared_ptr<IBoard> b, IRankingStore* l, IPlayersStatisticsStore* ps,
+                                              IHandAuditStore* hs, PlayerList sl, PlayerList apl, PlayerList rpl,
+                                              int id, int sP, int dP, int sB, int sC);
+    virtual std::shared_ptr<IBoard> createBoard(unsigned dp);
+    virtual std::vector<std::shared_ptr<IBettingRound>> createBettingRound(IHand* hi, unsigned dP, int sB);
 
-private:
-	ILogger * myLogger;
+  private:
+    ILogger* myLogger;
 };
 
 #endif

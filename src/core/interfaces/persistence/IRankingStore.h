@@ -1,16 +1,13 @@
 #pragma once
-#include <string>
-#include <vector>
 
-struct PlayerRanking {
-    std::string playerName;
-    int efficiencyScore;
-};
+#include "core/engine/EngineDefs.h"
 
-class IRankingStore {
-public:
+class IRankingStore
+{
+  public:
     virtual ~IRankingStore() = default;
 
-    virtual void updateRanking(const std::string& playerName, int score) = 0;
-    virtual std::vector<PlayerRanking> loadRankings() const = 0;
+    virtual void updateRankingGameLosers(PlayerList activePlayerList) = 0;
+    virtual void updateRankingGameWinner(PlayerList activePlayerList) = 0;
+    virtual void updateRankingPlayedGames(PlayerList activePlayerList) = 0;
 };

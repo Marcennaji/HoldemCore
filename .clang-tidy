@@ -1,0 +1,20 @@
+Checks: >
+  clang-analyzer-*,bugprone-*,modernize-*,
+  performance-*,readability-*,
+  cppcoreguidelines-*,misc-*,qt-*,
+  -modernize-use-trailing-return-type,
+  -readability-identifier-naming,
+  -cppcoreguidelines-pro-type-vararg,
+  -cppcoreguidelines-owning-memory,
+  -bugprone-exception-escape
+
+WarningsAsErrors: ''
+
+HeaderFilterRegex: '.*'
+FormatStyle: file
+
+CheckOptions:
+  - key: modernize-use-nullptr.NullMacros
+    value: 'NULL'
+  - key: readability-function-size.LineThreshold
+    value: '80'

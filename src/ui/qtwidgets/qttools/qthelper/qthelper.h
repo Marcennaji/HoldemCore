@@ -23,9 +23,7 @@
 #endif
 
 #include <string>
-/**
-	@author FThauer FHammer <webmaster@PokerTraining.net>
-*/
+
 class QtHelper
 {
 
