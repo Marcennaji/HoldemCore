@@ -18,20 +18,16 @@
 #include "newgamedialogimpl.h"
 #include <core/engine/EngineDefs.h>
 
-newGameDialogImpl::newGameDialogImpl(QMainWindow *parent)
-	: QDialog(parent)
+newGameDialogImpl::newGameDialogImpl(QMainWindow* parent) : QDialog(parent)
 {
-	setupUi(this);
-
+    setupUi(this);
 }
 
 int newGameDialogImpl::exec()
 {
 
-	spinBox_quantityPlayers->setValue(GAME_NUMBER_OF_PLAYERS);
-	spinBox_startCash->setValue(GAME_START_CASH);
+    spinBox_quantityPlayers->setValue(GAME_NUMBER_OF_PLAYERS);
+    spinBox_startCash->setValue(GAME_START_CASH);
 
     return QDialog::exec();
 }
-
-

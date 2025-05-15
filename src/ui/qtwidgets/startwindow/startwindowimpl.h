@@ -64,18 +64,13 @@ class startWindowImpl : public QMainWindow, public Ui::startWindow
 
   private:
     QString myAppDataPath;
-    QString myLogPath;
-    QString myUserDataPath;
 
     GuiDisplayGameActions* myGuiLog;
-    SqliteLogStore* myLog;
 
     std::shared_ptr<IGui> myGuiInterface;
     std::shared_ptr<Session> mySession;
 
-    // 	Dialogs
     newGameDialogImpl* myNewGameDialog;
-    startWindowImpl* myStartWindow;
 
     friend class GuiWrapper;
 };

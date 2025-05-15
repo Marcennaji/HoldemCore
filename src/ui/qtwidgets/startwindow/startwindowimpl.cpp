@@ -110,7 +110,6 @@ void startWindowImpl::startNewGame(newGameDialogImpl* v)
     // some gui modifications
     myGuiInterface->getW()->GameModification();
 
-    // Start Game!!!
     mySession->startGame(gameData, startData);
 }
 
