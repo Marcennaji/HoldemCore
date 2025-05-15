@@ -39,7 +39,6 @@ startWindowImpl::startWindowImpl(const QString& appDataPath, IGui* gui, Session*
     setStatusBar(nullptr);
     installEventFilter(this);
 
-    connect(actionStartGame, &QAction::triggered, this, &startWindowImpl::callNewGameDialog);
     connect(pushButtonStartGame, &QPushButton::clicked, this, &startWindowImpl::callNewGameDialog);
 
     show();
@@ -63,8 +62,8 @@ void startWindowImpl::startNewGame()
 
     gameData.maxNumberOfPlayers = spinBox_quantityPlayers->value();
     gameData.startMoney = spinBox_startCash->value();
+    gameData.firstSmallBlind = spinBox_smallBlind->value();
 
-    gameData.firstSmallBlind = GAME_START_SBLIND;
     if (radioButton_opponentsLooseAggressive->isChecked())
         gameData.tableProfile = LARGE_AGRESSIVE_OPPONENTS;
     else if (radioButton_opponentsTightAgressive->isChecked())
