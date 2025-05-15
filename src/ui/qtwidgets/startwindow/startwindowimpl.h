@@ -32,7 +32,6 @@ class GuiWrapper;
 class Game;
 
 class gameTableImpl;
-class newGameDialogImpl;
 class GuiDisplayGameActions;
 class SqliteLogStore;
 
@@ -60,7 +59,7 @@ class startWindowImpl : public QMainWindow, public Ui::startWindow
 
     void callNewGameDialog();
 
-    void startNewGame(newGameDialogImpl* = 0);
+    void startNewGame();
 
   private:
     QString myAppDataPath;
@@ -69,8 +68,6 @@ class startWindowImpl : public QMainWindow, public Ui::startWindow
 
     std::shared_ptr<IGui> myGuiInterface;
     std::shared_ptr<Session> mySession;
-
-    newGameDialogImpl* myNewGameDialog;
 
     friend class GuiWrapper;
 };

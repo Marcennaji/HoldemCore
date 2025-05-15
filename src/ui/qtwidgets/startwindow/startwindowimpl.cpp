@@ -20,7 +20,6 @@
 #include <ui/qtwidgets/gametable/GuiDisplayGameActions.h>
 #include <ui/qtwidgets/gametable/gametableimpl.h>
 #include <ui/qtwidgets/guiwrapper.h>
-#include <ui/qtwidgets/newgamedialog/newgamedialogimpl.h>
 
 #include <core/engine/EngineDefs.h>
 #include <core/engine/Randomizer.h>
@@ -40,7 +39,6 @@ startWindowImpl::startWindowImpl(const QString& appDataPath, IGui* gui, Session*
     setStatusBar(nullptr);
     installEventFilter(this);
 
-    myNewGameDialog = new newGameDialogImpl(this);
     connect(actionStartGame, &QAction::triggered, this, &startWindowImpl::callNewGameDialog);
     connect(pushButtonStartGame, &QPushButton::clicked, this, &startWindowImpl::callNewGameDialog);
 
@@ -52,62 +50,38 @@ startWindowImpl::~startWindowImpl()
 
 void startWindowImpl::callNewGameDialog()
 {
-    myNewGameDialog->exec();
-    if (myNewGameDialog->result() == QDialog::Accepted)
-    {
-        startNewGame(myNewGameDialog);
-    }
+    startNewGame();
 }
 
-void startWindowImpl::startNewGame(newGameDialogImpl* v)
+void startWindowImpl::startNewGame()
 {
 
     this->hide();
     myGuiInterface->getW()->show();
 
-    // get values from  game dialog
     GameData gameData;
-    if (v)
-    {
-        // Set Game Data
-        gameData.maxNumberOfPlayers = v->spinBox_quantityPlayers->value();
-        gameData.startMoney = v->spinBox_startCash->value();
-        gameData.firstSmallBlind = GAME_START_SBLIND;
 
-        // Speeds
-        gameData.guiSpeed = 8;
+    gameData.maxNumberOfPlayers = spinBox_quantityPlayers->value();
+    gameData.startMoney = spinBox_startCash->value();
 
-        if (v->radioButton_opponentsLooseAggressive->isChecked())
-            gameData.tableProfile = LARGE_AGRESSIVE_OPPONENTS;
-        else if (v->radioButton_opponentsTightAgressive->isChecked())
-            gameData.tableProfile = TIGHT_AGRESSIVE_OPPONENTS;
-        else
-            gameData.tableProfile = RANDOM_OPPONENTS;
-    }
-    // start with default values
-    else
-    {
-        // Set Game Data
-        gameData.maxNumberOfPlayers = GAME_NUMBER_OF_PLAYERS;
-        gameData.startMoney = GAME_START_CASH;
-        gameData.firstSmallBlind = GAME_START_SBLIND;
+    gameData.firstSmallBlind = GAME_START_SBLIND;
+    if (radioButton_opponentsLooseAggressive->isChecked())
+        gameData.tableProfile = LARGE_AGRESSIVE_OPPONENTS;
+    else if (radioButton_opponentsTightAgressive->isChecked())
         gameData.tableProfile = TIGHT_AGRESSIVE_OPPONENTS;
+    else
+        gameData.tableProfile = RANDOM_OPPONENTS;
 
-        // Speeds
-        gameData.guiSpeed = GAME_SPEED;
-    }
+    gameData.guiSpeed = GAME_SPEED;
+
     // Set dealer pos.
     StartData startData;
     int tmpDealerPos = 0;
     startData.numberOfPlayers = gameData.maxNumberOfPlayers;
 
     Randomizer::GetRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
-    // if(DEBUG_MODE) {
-    //     tmpDealerPos = 4;
-    // }
     startData.startDealerPlayerId = static_cast<unsigned>(tmpDealerPos);
 
-    // some gui modifications
     myGuiInterface->getW()->GameModification();
 
     mySession->startGame(gameData, startData);
