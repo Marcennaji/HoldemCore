@@ -65,7 +65,6 @@ class Session
     IRankingStore* myRankingStore;
     IPlayersStatisticsStore* myPlayersStatisticsStore;
     IHandAuditStore* myHandAuditStore;
-    QtToolsInterface* myQtToolsInterface;
 };
 
 #endif

@@ -20,7 +20,6 @@
 #include <core/engine/game.h>
 #include <infra/persistence/SqliteLogStore.h>
 #include <ui/interfaces/IGui.h>
-#include <ui/interfaces/qttoolsinterface.h>
 
 #include <core/engine/EngineFactory.h>
 #include <core/engine/Randomizer.h>
@@ -41,12 +40,10 @@ Session::Session(ILogger* logger, IGui* g, IRankingStore* rs, IPlayersStatistics
     : myLogger(logger), currentGameNum(0), myGui(g), myRankingStore(rs), myPlayersStatisticsStore(ps),
       myHandAuditStore(ha)
 {
-    myQtToolsInterface = CreateQtToolsWrapper();
 }
 
 Session::~Session()
 {
-    delete myQtToolsInterface;
 }
 
 bool Session::init()
