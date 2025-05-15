@@ -24,8 +24,8 @@
 #include <core/interfaces/persistence/IPlayersStatisticsStore.h>
 #include <core/interfaces/persistence/IRankingStore.h>
 #include "core/engine/EngineDefs.h"
-#include "core/engine/GameState.h"
-#include "core/engine/PlayerStatistics.h"
+#include "core/engine/model/GameState.h"
+#include "core/engine/model/PlayerStatistics.h"
 
 #include <filesystem>
 #include <string>

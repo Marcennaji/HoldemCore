@@ -18,8 +18,8 @@
 
 #include "BettingRoundPreflop.h"
 
-#include "EngineError.h"
 #include "exception.h"
+#include "model/EngineError.h"
 
 #include "core/interfaces/IHand.h"
 

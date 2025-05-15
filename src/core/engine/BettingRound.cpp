@@ -18,9 +18,9 @@
 
 #include "BettingRound.h"
 
-#include "ButtonState.h"
-#include "EngineError.h"
 #include "Exception.h"
+#include "model/ButtonState.h"
+#include "model/EngineError.h"
 
 #include <core/interfaces/ILogger.h>
 #include <core/player/Player.h>

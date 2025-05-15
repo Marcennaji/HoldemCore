@@ -24,9 +24,9 @@
 #include "BettingRoundpreflop.h"
 #include "BettingRoundriver.h"
 #include "BettingRoundturn.h"
+#include "Randomizer.h"
 #include "board.h"
 #include "hand.h"
-#include "tools.h"
 
 #include "HumanPlayer.h"
 #include "LooseAggressivePlayer.h"

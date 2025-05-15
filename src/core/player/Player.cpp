@@ -19,8 +19,8 @@
 #include "Player.h"
 
 #include <core/engine/CardsValue.h>
-#include <core/engine/Ranges.h>
-#include <core/engine/Tools.h>
+#include <core/engine/Randomizer.h>
+#include <core/engine/model/Ranges.h>
 #include <core/interfaces/IHand.h>
 #include <core/interfaces/ILogger.h>
 #include <core/interfaces/persistence/IHandAuditStore.h>
@@ -4371,7 +4371,7 @@ float Player::getPreflopRaisingRange() const
         {
 
             int rand = 0;
-            Tools::GetRand(1, 3, 1, &rand);
+            Randomizer::GetRand(1, 3, 1, &rand);
             if (rand == 2)
             {
                 raisingRange = 100;

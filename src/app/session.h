@@ -22,9 +22,8 @@
 #include <string>
 
 #include <core/engine/EngineDefs.h>
-#include <core/engine/GameData.h>
-#include <core/engine/GameInfo.h>
-#include <core/engine/StartData.h>
+#include <core/engine/model/GameData.h>
+#include <core/engine/model/StartData.h>
 #include <core/interfaces/ILogger.h>
 
 class GuiInterface;
@@ -53,7 +52,6 @@ class Session
     IPlayersStatisticsStore* getPlayersStatisticsStore() { return myPlayersStatisticsStore; }
     IHandAuditStore* getHandAuditStore() { return myHandAuditStore; }
 
-    GameInfo getClientGameInfo(unsigned gameId) const;
     unsigned getGameIdOfPlayer(unsigned playerId) const;
     unsigned getClientCurrentGameId() const;
     unsigned getClientUniquePlayerId() const;

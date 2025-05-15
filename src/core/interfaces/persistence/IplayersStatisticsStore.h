@@ -2,7 +2,7 @@
 #include <string>
 
 #include "core/engine/EngineDefs.h"
-#include "core/engine/PlayerStatistics.h"
+#include "core/engine/model/PlayerStatistics.h"
 
 class IPlayersStatisticsStore
 {

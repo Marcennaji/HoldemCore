@@ -23,7 +23,7 @@
 #include <ui/interfaces/qttoolsinterface.h>
 
 #include <core/engine/EngineFactory.h>
-#include <core/engine/Tools.h>
+#include <core/engine/Randomizer.h>
 #include <core/interfaces/ILogger.h>
 #include <core/player/HumanPlayer.h>
 #include <core/player/LooseAggressivePlayer.h>
@@ -93,7 +93,7 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
             if (tableProfile == TIGHT_AGRESSIVE_OPPONENTS)
             {
 
-                Tools::GetRand(1, 3, 1, &rand);
+                Randomizer::GetRand(1, 3, 1, &rand);
 
                 if (rand == 1)
                     player =
@@ -125,7 +125,7 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
             if (tableProfile == RANDOM_OPPONENTS)
             {
 
-                Tools::GetRand(1, 12, 1, &rand);
+                Randomizer::GetRand(1, 12, 1, &rand);
 
                 if (rand < 3 && nbManiac < startData.numberOfPlayers / 3)
                 {

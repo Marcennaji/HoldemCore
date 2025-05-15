@@ -18,12 +18,12 @@
 
 #include "hand.h"
 #include <core/interfaces/ILogger.h>
-#include "ButtonState.h"
 #include "CardsValue.h"
-#include "tools.h"
+#include "Randomizer.h"
+#include "model/ButtonState.h"
 
-#include "EngineError.h"
 #include "exception.h"
+#include "model/EngineError.h"
 
 #include <iostream>
 
@@ -65,7 +65,7 @@ Hand::Hand(ILogger* logger, std::shared_ptr<EngineFactory> f, GuiInterface* g, s
     39 to 51 --> 2c to Ac
     */
 
-    Tools::ShuffleArrayNonDeterministic(cardsArray);
+    Randomizer::ShuffleArrayNonDeterministic(cardsArray);
 
 #ifdef LOG_POKER_EXEC
 

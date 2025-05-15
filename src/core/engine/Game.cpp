@@ -18,10 +18,10 @@
 
 #include "game.h"
 
-#include "EngineError.h"
 #include "EngineFactory.h"
 #include "Exception.h"
-#include "StartData.h"
+#include "model/EngineError.h"
+#include "model/StartData.h"
 
 #include <ui/interfaces/guiinterface.h>
 #include "infra/persistence/SqliteLogStore.h"

@@ -15,24 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
-/* Game data. */
 
 #pragma once
+#include <vector>
 
-#include "TableProfile.h"
-
-struct GameData {
-	GameData() : maxNumberOfPlayers(0), startMoney(0),
-		firstSmallBlind(0), guiSpeed(9), delayBetweenHandsSec(6),
-		playerActionTimeoutSec(20) {}
-	TableProfile tableProfile;
-	int maxNumberOfPlayers;
-	int startMoney;
-	int firstSmallBlind;
-	int guiSpeed;
-	int delayBetweenHandsSec;
-	int playerActionTimeoutSec;
+class Randomizer
+{
+  public:
+    static void ShuffleArrayNonDeterministic(std::vector<int>&);
+    static void GetRand(int minValue, int maxValue, unsigned count, int* out);
 };
-
-
-

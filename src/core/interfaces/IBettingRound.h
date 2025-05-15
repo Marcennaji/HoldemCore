@@ -19,7 +19,7 @@
 #pragma once
 
 #include "core/engine/EngineDefs.h"
-#include "core/engine/GameState.h"
+#include "core/engine/model/GameState.h"
 
 class IBettingRound
 {

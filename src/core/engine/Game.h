@@ -20,7 +20,8 @@
 #define GAME_H
 
 #include "EngineDefs.h"
-#include "gamedata.h"
+#include "model/GameData.h"
+#include "model/StartData.h"
 
 #include <string>
 
@@ -31,8 +32,6 @@ class IHandAuditStore;
 class IHand;
 class IBoard;
 class EngineFactory;
-struct GameData;
-struct StartData;
 
 class Game
 {

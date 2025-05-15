@@ -27,11 +27,11 @@
 #include "mynamelabel.h"
 #include "mysetlabel.h"
 
-#include <core/engine/ButtonState.h>
 #include <core/engine/CardsValue.h>
 #include <core/engine/Game.h>
+#include <core/engine/model/ButtonState.h>
 
-#include <core/engine/Ranges.h>
+#include <core/engine/model/Ranges.h>
 
 #include <core/interfaces/IBoard.h>
 #include <core/interfaces/IHand.h>

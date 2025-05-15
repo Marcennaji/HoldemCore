@@ -18,13 +18,13 @@
 #include <core/player/ManiacPlayer.h>
 
 #include <core/engine/CardsValue.h>
-#include <core/engine/tools.h>
+#include <core/engine/Randomizer.h>
 #include <core/interfaces/IHand.h>
 #include <core/interfaces/ILogger.h>
 #include "infra/persistence/SqliteLogStore.h"
 // #include <core/engine/psim/simulate.hpp>
-#include <core/engine/EngineError.h>
-#include <core/engine/Ranges.h>
+#include <core/engine/model/EngineError.h>
+#include <core/engine/model/Ranges.h>
 #include "Exception.h"
 
 #include <ui/qtwidgets/guiwrapper.h>
@@ -43,7 +43,7 @@ ManiacPlayer::ManiacPlayer(IHandAuditStore* ha, IPlayersStatisticsStore* ps, int
 
     // initialize utg starting range, in a full table
     int utgFullTableRange = 0;
-    Tools::GetRand(30, 35, 1, &utgFullTableRange);
+    Randomizer::GetRand(30, 35, 1, &utgFullTableRange);
     initializeRanges(50, utgFullTableRange);
 }
 
@@ -121,7 +121,7 @@ bool ManiacPlayer::preflopShouldCall()
     {
 
         int rand = 0;
-        Tools::GetRand(1, 3, 1, &rand);
+        Randomizer::GetRand(1, 3, 1, &rand);
         if (rand == 1)
         {
 
@@ -223,7 +223,7 @@ bool ManiacPlayer::preflopShouldRaise()
                     {
 
                         int rand = 0;
-                        Tools::GetRand(1, 3, 1, &rand);
+                        Randomizer::GetRand(1, 3, 1, &rand);
                         if (rand == 1)
                         {
                             speculativeHandedAdded = true;
@@ -257,7 +257,7 @@ bool ManiacPlayer::preflopShouldRaise()
             {
 
                 int rand = 0;
-                Tools::GetRand(1, 5, 1, &rand);
+                Randomizer::GetRand(1, 5, 1, &rand);
                 if (rand == 1)
                 {
                     speculativeHandedAdded = true;
@@ -281,7 +281,7 @@ bool ManiacPlayer::preflopShouldRaise()
     {
 
         int rand = 0;
-        Tools::GetRand(1, 10, 1, &rand);
+        Randomizer::GetRand(1, 10, 1, &rand);
         if (rand == 1)
         {
 #ifdef LOG_POKER_EXEC
@@ -329,7 +329,7 @@ bool ManiacPlayer::flopShouldBet()
             if (getDrawingProbability() > 25)
             {
                 int rand = 0;
-                Tools::GetRand(1, 2, 1, &rand);
+                Randomizer::GetRand(1, 2, 1, &rand);
                 if (rand == 1)
                 {
                     myBetAmount = pot * 0.6;
@@ -350,7 +350,7 @@ bool ManiacPlayer::flopShouldBet()
             {
 
                 int rand = 0;
-                Tools::GetRand(1, 2, 1, &rand);
+                Randomizer::GetRand(1, 2, 1, &rand);
                 if (rand == 1)
                 {
                     myBetAmount = pot * 0.6;
@@ -462,7 +462,7 @@ bool ManiacPlayer::flopShouldRaise()
     {
 
         int rand = 0;
-        Tools::GetRand(1, 3, 1, &rand);
+        Randomizer::GetRand(1, 3, 1, &rand);
         if (rand == 2)
         {
             myRaiseAmount = pot * 2;
@@ -484,7 +484,7 @@ bool ManiacPlayer::flopShouldRaise()
     {
 
         int rand = 0;
-        Tools::GetRand(1, 2, 1, &rand);
+        Randomizer::GetRand(1, 2, 1, &rand);
         if (rand == 2)
         {
             myRaiseAmount = pot;
@@ -697,7 +697,7 @@ bool ManiacPlayer::riverShouldBet()
         myRiverHandSimulation.winSd > 0.4)
     {
         int rand = 0;
-        Tools::GetRand(1, 2, 1, &rand);
+        Randomizer::GetRand(1, 2, 1, &rand);
         if (rand == 1)
         {
             myBetAmount = pot * 0.33;
@@ -714,7 +714,7 @@ bool ManiacPlayer::riverShouldBet()
         {
 
             int rand = 0;
-            Tools::GetRand(1, 4, 1, &rand);
+            Randomizer::GetRand(1, 4, 1, &rand);
             if (rand == 1)
             {
                 myBetAmount = pot * 0.8;
@@ -724,13 +724,13 @@ bool ManiacPlayer::riverShouldBet()
     }
 
     int rand = 0;
-    Tools::GetRand(40, 90, 1, &rand);
+    Randomizer::GetRand(40, 90, 1, &rand);
     float coeff = (float) rand / (float) 100;
 
     if (myRiverHandSimulation.winSd > .9 || (bHavePosition && myRiverHandSimulation.winSd > .85))
     {
         int rand = 0;
-        Tools::GetRand(1, 5, 1, &rand);
+        Randomizer::GetRand(1, 5, 1, &rand);
         if (rand != 1 || bHavePosition)
         {
             myBetAmount = pot * coeff;
@@ -741,7 +741,7 @@ bool ManiacPlayer::riverShouldBet()
         (myRiverHandSimulation.winRanged > .8 || (bHavePosition && myRiverHandSimulation.winRanged > .7)))
     {
         int rand = 0;
-        Tools::GetRand(1, 3, 1, &rand);
+        Randomizer::GetRand(1, 3, 1, &rand);
         if (rand == 1 || bHavePosition)
         {
             myBetAmount = pot * coeff;

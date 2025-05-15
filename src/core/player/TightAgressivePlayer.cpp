@@ -18,10 +18,10 @@
 #include "TightAgressivePlayer.h"
 
 #include <core/engine/CardsValue.h>
-#include <core/engine/EngineError.h>
 #include <core/engine/Exception.h>
-#include <core/engine/Ranges.h>
-#include <core/engine/Tools.h>
+#include <core/engine/Randomizer.h>
+#include <core/engine/model/EngineError.h>
+#include <core/engine/model/Ranges.h>
 #include <core/interfaces/IHand.h>
 #include <core/interfaces/ILogger.h>
 #include <ui/qtwidgets/guiwrapper.h>
@@ -39,7 +39,7 @@ TightAgressivePlayer::TightAgressivePlayer(IHandAuditStore* ha, IPlayersStatisti
 {
 
     int utgFullTableRange = 0;
-    Tools::GetRand(2, 3, 1, &utgFullTableRange);
+    Randomizer::GetRand(2, 3, 1, &utgFullTableRange);
     initializeRanges(45, utgFullTableRange);
 }
 
@@ -97,7 +97,7 @@ bool TightAgressivePlayer::preflopShouldCall()
     {
 
         int rand = 0;
-        Tools::GetRand(1, 4, 1, &rand);
+        Randomizer::GetRand(1, 4, 1, &rand);
         if (rand == 1)
         {
 
@@ -175,7 +175,7 @@ bool TightAgressivePlayer::preflopShouldRaise()
             {
 
                 int rand = 0;
-                Tools::GetRand(1, 2, 1, &rand);
+                Randomizer::GetRand(1, 2, 1, &rand);
                 if (rand == 2)
                 {
                     speculativeHandedAdded = true;
@@ -211,7 +211,7 @@ bool TightAgressivePlayer::preflopShouldRaise()
     {
 
         int rand = 0;
-        Tools::GetRand(1, 8, 1, &rand);
+        Randomizer::GetRand(1, 8, 1, &rand);
         if (rand == 1)
         {
 #ifdef LOG_POKER_EXEC
@@ -259,7 +259,7 @@ bool TightAgressivePlayer::flopShouldBet()
             if (getDrawingProbability() > 25)
             {
                 int rand = 0;
-                Tools::GetRand(1, 2, 1, &rand);
+                Randomizer::GetRand(1, 2, 1, &rand);
                 if (rand == 1)
                 {
                     myBetAmount = pot * 0.6;
@@ -280,7 +280,7 @@ bool TightAgressivePlayer::flopShouldBet()
             {
 
                 int rand = 0;
-                Tools::GetRand(1, 3, 1, &rand);
+                Randomizer::GetRand(1, 3, 1, &rand);
                 if (rand == 1)
                 {
                     myBetAmount = pot * 0.6;
@@ -306,7 +306,7 @@ bool TightAgressivePlayer::flopShouldBet()
         }
 
         int rand = 0;
-        Tools::GetRand(1, 7, 1, &rand);
+        Randomizer::GetRand(1, 7, 1, &rand);
         if (rand == 3 && !bHavePosition && lastRaiserID != myID)
             return false; // may check-raise or check-call
 
@@ -412,7 +412,7 @@ bool TightAgressivePlayer::flopShouldRaise()
     {
 
         int rand = 0;
-        Tools::GetRand(1, 4, 1, &rand);
+        Randomizer::GetRand(1, 4, 1, &rand);
         if (rand == 2)
         {
             myRaiseAmount = pot;
@@ -427,7 +427,7 @@ bool TightAgressivePlayer::flopShouldRaise()
         {
 
             int rand = 0;
-            Tools::GetRand(1, 6, 1, &rand);
+            Randomizer::GetRand(1, 6, 1, &rand);
             if (rand == 2 && myFlopHandSimulation.winRanged > 0.3 && myFlopHandSimulation.win > 0.3)
             {
                 myRaiseAmount = pot;
@@ -475,7 +475,7 @@ bool TightAgressivePlayer::turnShouldBet()
     {
 
         int rand = 0;
-        Tools::GetRand(1, 2, 1, &rand);
+        Randomizer::GetRand(1, 2, 1, &rand);
         if (rand == 1)
         {
             myBetAmount = pot * 0.6;
@@ -498,7 +498,7 @@ bool TightAgressivePlayer::turnShouldBet()
     if (getDrawingProbability() > 15 && !bHavePosition)
     {
         int rand = 0;
-        Tools::GetRand(1, 3, 1, &rand);
+        Randomizer::GetRand(1, 3, 1, &rand);
         if (rand == 1)
         {
             myBetAmount = pot * 0.6;
@@ -511,7 +511,7 @@ bool TightAgressivePlayer::turnShouldBet()
         if (bHavePosition && canBluff(GAME_STATE_TURN))
         {
             int rand = 0;
-            Tools::GetRand(1, 3, 1, &rand);
+            Randomizer::GetRand(1, 3, 1, &rand);
             if (rand == 2)
             {
                 myBetAmount = pot * 0.6;
@@ -614,7 +614,7 @@ bool TightAgressivePlayer::turnShouldRaise()
     if (myTurnHandSimulation.winRanged > 0.98 && myTurnHandSimulation.win > 0.98 && myTurnHandSimulation.winSd > 0.9)
     {
         int rand = 0;
-        Tools::GetRand(1, 3, 1, &rand);
+        Randomizer::GetRand(1, 3, 1, &rand);
         if (rand == 1)
             return false; // very strong hand, slow play, just call
     }
@@ -663,7 +663,7 @@ bool TightAgressivePlayer::riverShouldBet()
         myRiverHandSimulation.winSd > 0.4)
     {
         int rand = 0;
-        Tools::GetRand(1, 2, 1, &rand);
+        Randomizer::GetRand(1, 2, 1, &rand);
         if (rand == 1)
         {
             myBetAmount = pot * 0.33;
@@ -680,7 +680,7 @@ bool TightAgressivePlayer::riverShouldBet()
         {
 
             int rand = 0;
-            Tools::GetRand(1, 4, 1, &rand);
+            Randomizer::GetRand(1, 4, 1, &rand);
             if (rand == 1)
             {
                 myBetAmount = pot * 0.8;
@@ -694,14 +694,14 @@ bool TightAgressivePlayer::riverShouldBet()
         return false;
 
     int rand = 0;
-    Tools::GetRand(40, 80, 1, &rand);
+    Randomizer::GetRand(40, 80, 1, &rand);
     float coeff = (float) rand / (float) 100;
 
     if (myRiverHandSimulation.winSd > .94 || (bHavePosition && myRiverHandSimulation.winSd > .9))
     {
 
         int rand = 0;
-        Tools::GetRand(1, 6, 1, &rand);
+        Randomizer::GetRand(1, 6, 1, &rand);
         if (rand != 1 || bHavePosition)
         {
             myBetAmount = pot * coeff;
@@ -712,7 +712,7 @@ bool TightAgressivePlayer::riverShouldBet()
         (myRiverHandSimulation.winRanged > .9 || (bHavePosition && myRiverHandSimulation.winRanged > .8)))
     {
         int rand = 0;
-        Tools::GetRand(1, 3, 1, &rand);
+        Randomizer::GetRand(1, 3, 1, &rand);
         if (rand == 1 || bHavePosition)
         {
             myBetAmount = pot * coeff;
@@ -724,7 +724,7 @@ bool TightAgressivePlayer::riverShouldBet()
         currentHand->getTurnBetsOrRaisesNumber() == 0)
     {
         int rand = 0;
-        Tools::GetRand(1, 6, 1, &rand);
+        Randomizer::GetRand(1, 6, 1, &rand);
         if (rand == 1)
         {
             myBetAmount = pot * coeff;
@@ -735,7 +735,7 @@ bool TightAgressivePlayer::riverShouldBet()
         currentHand->getTurnBetsOrRaisesNumber() == 0)
     {
         int rand = 0;
-        Tools::GetRand(1, 3, 1, &rand);
+        Randomizer::GetRand(1, 3, 1, &rand);
         if (rand != 1)
         {
             myBetAmount = pot * coeff;

@@ -19,9 +19,9 @@
 #define GAMETABLEIMPL_H
 
 #include <core/engine/EngineDefs.h>
-#include <core/engine/GameData.h>
-#include <core/engine/GameState.h>
-#include <core/engine/StartData.h>
+#include <core/engine/model/GameData.h>
+#include <core/engine/model/GameState.h>
+#include <core/engine/model/StartData.h>
 #include "ui_gametable.h"
 
 #include <app/session.h>

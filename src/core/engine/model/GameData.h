@@ -15,37 +15,24 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
+/* Game data. */
 
-#define NOMINMAX // for Windows
+#pragma once
 
-#include "tools.h"
-#include <core/interfaces/ILogger.h>
-#pragma message("Included LogHelper.h successfully")
+#include "TableProfile.h"
 
-#include <memory>
-#include <random>
-#include <algorithm>
-
-using namespace std;
-
-std::random_device g_rand_device;
-std::mt19937 g_rand_engine(g_rand_device());
-
-static inline void InitRandState() {
-    // No need for shared_ptr in this case
-}
-
-void Tools::ShuffleArrayNonDeterministic(vector<int>& inout) {
-    InitRandState();
-    shuffle(inout.begin(), inout.end(), g_rand_engine);
-}
-
-void Tools::GetRand(int minValue, int maxValue, unsigned count, int* out) {
-    InitRandState();
-    uniform_int_distribution<int> dist(minValue, maxValue);
-
-    int* startPtr = out;
-    for (unsigned i = 0; i < count; i++) {
-        *startPtr++ = dist(g_rand_engine);
+struct GameData
+{
+    GameData()
+        : maxNumberOfPlayers(0), startMoney(0), firstSmallBlind(0), guiSpeed(9), delayBetweenHandsSec(6),
+          playerActionTimeoutSec(20)
+    {
     }
-}
+    TableProfile tableProfile;
+    int maxNumberOfPlayers;
+    int startMoney;
+    int firstSmallBlind;
+    int guiSpeed;
+    int delayBetweenHandsSec;
+    int playerActionTimeoutSec;
+};

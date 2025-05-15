@@ -18,8 +18,8 @@
 #ifndef GUIWRAPPER_H
 #define GUIWRAPPER_H
 
+#include "core/engine/model/GameData.h"
 #include "ui/interfaces/GuiInterface.h"
-#include "core/engine/GameData.h"
 
 #include <string>
 
@@ -29,89 +29,82 @@ class startWindowImpl;
 class GuiDisplayGameActions;
 class Game;
 
-
 class GuiWrapper : public GuiInterface
 {
-public:
-	GuiWrapper(const std::string & appDataDir, startWindowImpl*);
+  public:
+    GuiWrapper(const std::string& appDataDir, startWindowImpl*);
 
-	~GuiWrapper();
-	
-	void setStartWindow(startWindowImpl* w);
-	void initGui(int speed);
+    ~GuiWrapper();
 
-	std::shared_ptr<Session> getSession();
-	void setSession(std::shared_ptr<Session> session);
+    void setStartWindow(startWindowImpl* w);
+    void initGui(int speed);
 
-	gameTableImpl* getW() const {
-		return myW;
-	}
-	GuiDisplayGameActions* getGuiLog() const {
-		return myGuiLog;
-	}
+    std::shared_ptr<Session> getSession();
+    void setSession(std::shared_ptr<Session> session);
 
-	void refreshSet() const;
-	void refreshCash() const;
-	void refreshAction(int =-1, int =-1) const;
-	void refreshChangePlayer() const;
-	void refreshPot() const;
-	void refreshGroupbox(int =-1, int =-1) const;
-	void refreshAll() const;
-	void refreshPlayerName() const;
-	void refreshButton() const;
-	void refreshGameLabels(GameState state) const;
+    gameTableImpl* getW() const { return myW; }
+    GuiDisplayGameActions* getGuiLog() const { return myGuiLog; }
 
-	void waitForGuiUpdateDone() const;
+    void refreshSet() const;
+    void refreshCash() const;
+    void refreshAction(int = -1, int = -1) const;
+    void refreshChangePlayer() const;
+    void refreshPot() const;
+    void refreshGroupbox(int = -1, int = -1) const;
+    void refreshAll() const;
+    void refreshPlayerName() const;
+    void refreshButton() const;
+    void refreshGameLabels(GameState state) const;
 
-	void dealBettingRoundCards(int myBettingRoundID);
-	void dealHoleCards();
-	void dealFlopCards();
-	void dealTurnCard();
-	void dealRiverCard();
+    void waitForGuiUpdateDone() const;
 
-	void nextPlayerAnimation();
+    void dealBettingRoundCards(int myBettingRoundID);
+    void dealHoleCards();
+    void dealFlopCards();
+    void dealTurnCard();
+    void dealRiverCard();
 
-	void beRoAnimation2(int);
+    void nextPlayerAnimation();
 
-	void preflopAnimation1();
-	void preflopAnimation2();
+    void beRoAnimation2(int);
 
-	void flopAnimation1();
-	void flopAnimation2();
+    void preflopAnimation1();
+    void preflopAnimation2();
 
-	void turnAnimation1();
-	void turnAnimation2();
+    void flopAnimation1();
+    void flopAnimation2();
 
-	void riverAnimation1();
-	void riverAnimation2();
+    void turnAnimation1();
+    void turnAnimation2();
 
-	void postRiverAnimation1();
-	void postRiverRunAnimation1();
+    void riverAnimation1();
+    void riverAnimation2();
 
-	void flipHolecardsAllIn();
+    void postRiverAnimation1();
+    void postRiverRunAnimation1();
 
-	void nextRoundCleanGui();
+    void flipHolecardsAllIn();
 
-	void meInAction();
-	void showCards(unsigned playerId);
-	void disableMyButtons();
-	void updateMyButtonsState();
-	void logPlayerActionMsg(std::string playerName, int action, int setValue) ;
-	void logNewGameHandMsg(int gameID, int handID) ;
-	void logNewBlindsSetsMsg(int sbSet, int bbSet, std::string sbName, std::string bbName);
-	void logPlayerWinsMsg(std::string playerName, int pot, bool main);
-	void logDealBoardCardsMsg(int roundID, int card1, int card2, int card3, int card4 = -1, int card5 = -1);
-	void logFlipHoleCardsMsg(std::string playerName, int card1, int card2, int cardsValueInt = -1, std::string showHas = "shows");
-	void logPlayerWinGame(std::string playerName, int gameID);
-	void hideHoleCards();
+    void nextRoundCleanGui();
 
+    void meInAction();
+    void showCards(unsigned playerId);
+    void disableMyButtons();
+    void updateMyButtonsState();
+    void logPlayerActionMsg(std::string playerName, int action, int setValue);
+    void logNewGameHandMsg(int gameID, int handID);
+    void logNewBlindsSetsMsg(int sbSet, int bbSet, std::string sbName, std::string bbName);
+    void logPlayerWinsMsg(std::string playerName, int pot, bool main);
+    void logDealBoardCardsMsg(int roundID, int card1, int card2, int card3, int card4 = -1, int card5 = -1);
+    void logFlipHoleCardsMsg(std::string playerName, int card1, int card2, int cardsValueInt = -1,
+                             std::string showHas = "shows");
+    void logPlayerWinGame(std::string playerName, int gameID);
+    void hideHoleCards();
 
-private:
-
-	GuiDisplayGameActions *myGuiLog;
-	gameTableImpl *myW;
-	startWindowImpl *myStartWindow;
-
+  private:
+    GuiDisplayGameActions* myGuiLog;
+    gameTableImpl* myW;
+    startWindowImpl* myStartWindow;
 };
 
 #endif

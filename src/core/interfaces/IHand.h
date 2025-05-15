@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "core/engine/PlayerPosition.h"
+#include "core/engine/model/PlayerPosition.h"
 #include "core/interfaces/IBettingRound.h"
 #include "core/interfaces/IBoard.h"
 #include "infra/persistence/SqliteLogStore.h"

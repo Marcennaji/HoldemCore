@@ -20,7 +20,7 @@
 
 #include <core/engine/CardsValue.h>
 #include <core/engine/EngineDefs.h>
-#include <core/engine/PlayerStatistics.h>
+#include <core/engine/model/PlayerStatistics.h>
 #include <core/interfaces/IHand.h>
 
 #include <third_party/psim/psim.hpp>

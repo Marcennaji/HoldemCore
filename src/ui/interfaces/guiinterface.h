@@ -18,89 +18,86 @@
 #ifndef GUIINTERFACE_H
 #define GUIINTERFACE_H
 
-#include <core/engine/GameState.h>
+#include <core/engine/model/GameState.h>
 
-#include <string>
 #include <memory>
+#include <string>
 
 class GuiDisplayGameActions;
 class Session;
 class gameTableImpl;
 class startWindowImpl;
 
-
 class GuiInterface
 {
-public:
-	virtual ~GuiInterface(){};
+  public:
+    virtual ~GuiInterface() {};
 
-	virtual void initGui(int speed) =0;
+    virtual void initGui(int speed) = 0;
 
-	virtual std::shared_ptr<Session> getSession() =0;
-	virtual void setSession(std::shared_ptr<Session> session) =0;
+    virtual std::shared_ptr<Session> getSession() = 0;
+    virtual void setSession(std::shared_ptr<Session> session) = 0;
 
-	virtual gameTableImpl *getW() const=0;
-	virtual GuiDisplayGameActions* getGuiLog() const=0;
+    virtual gameTableImpl* getW() const = 0;
+    virtual GuiDisplayGameActions* getGuiLog() const = 0;
 
-	virtual void hideHoleCards()=0;
-	virtual void setStartWindow(startWindowImpl* w)=0;
-	virtual void refreshSet() const=0;
-	virtual void refreshCash() const=0;
-	virtual void refreshAction(int =-1, int =-1) const=0;
-	virtual void refreshChangePlayer() const=0;
-	virtual void refreshPot() const=0;
-	virtual void refreshGroupbox(int =-1, int =-1) const=0;
-	virtual void refreshAll() const=0;
-	virtual void refreshPlayerName() const=0;
-	virtual void refreshButton() const =0;
-	virtual void refreshGameLabels(GameState state) const=0;
+    virtual void hideHoleCards() = 0;
+    virtual void setStartWindow(startWindowImpl* w) = 0;
+    virtual void refreshSet() const = 0;
+    virtual void refreshCash() const = 0;
+    virtual void refreshAction(int = -1, int = -1) const = 0;
+    virtual void refreshChangePlayer() const = 0;
+    virtual void refreshPot() const = 0;
+    virtual void refreshGroupbox(int = -1, int = -1) const = 0;
+    virtual void refreshAll() const = 0;
+    virtual void refreshPlayerName() const = 0;
+    virtual void refreshButton() const = 0;
+    virtual void refreshGameLabels(GameState state) const = 0;
 
-	virtual void waitForGuiUpdateDone() const=0;
+    virtual void waitForGuiUpdateDone() const = 0;
 
-	// Karten-Funktionen
-	virtual void dealBettingRoundCards(int) =0;
-	virtual void dealHoleCards()=0;
-	virtual void dealFlopCards()=0;
-	virtual void dealTurnCard()=0;
-	virtual void dealRiverCard()=0;
+    // Karten-Funktionen
+    virtual void dealBettingRoundCards(int) = 0;
+    virtual void dealHoleCards() = 0;
+    virtual void dealFlopCards() = 0;
+    virtual void dealTurnCard() = 0;
+    virtual void dealRiverCard() = 0;
 
-	virtual void nextPlayerAnimation()=0;
+    virtual void nextPlayerAnimation() = 0;
 
-	virtual void beRoAnimation2(int)=0;
+    virtual void beRoAnimation2(int) = 0;
 
-	virtual void preflopAnimation1()=0;
-	virtual void preflopAnimation2()=0;
+    virtual void preflopAnimation1() = 0;
+    virtual void preflopAnimation2() = 0;
 
-	virtual void flopAnimation1()=0;
-	virtual void flopAnimation2()=0;
+    virtual void flopAnimation1() = 0;
+    virtual void flopAnimation2() = 0;
 
-	virtual void turnAnimation1()=0;
-	virtual void turnAnimation2()=0;
+    virtual void turnAnimation1() = 0;
+    virtual void turnAnimation2() = 0;
 
-	virtual void riverAnimation1()=0;
-	virtual void riverAnimation2()=0;
+    virtual void riverAnimation1() = 0;
+    virtual void riverAnimation2() = 0;
 
-	virtual void postRiverAnimation1()=0;
-	virtual void postRiverRunAnimation1()=0;
-	virtual void flipHolecardsAllIn()=0;
+    virtual void postRiverAnimation1() = 0;
+    virtual void postRiverRunAnimation1() = 0;
+    virtual void flipHolecardsAllIn() = 0;
 
-	virtual void nextRoundCleanGui()=0;
-	virtual void meInAction()=0;
-	virtual void showCards(unsigned playerId)=0;
-	virtual void updateMyButtonsState()=0;
-	virtual void disableMyButtons()=0;
+    virtual void nextRoundCleanGui() = 0;
+    virtual void meInAction() = 0;
+    virtual void showCards(unsigned playerId) = 0;
+    virtual void updateMyButtonsState() = 0;
+    virtual void disableMyButtons() = 0;
 
-	//log.cpp
-	virtual void logPlayerActionMsg(std::string playName, int action, int setValue) =0;
-	virtual void logNewGameHandMsg(int gameID, int HandID) =0;
-	virtual	void logPlayerWinsMsg(std::string playerName, int pot, bool main) = 0;
-	virtual void logNewBlindsSetsMsg(int sbSet, int bbSet, std::string sbName, std::string bbName) =0;
-	virtual void logDealBoardCardsMsg(int roundID, int card1, int card2, int card3, int card4 = -1, int card5 = -1) = 0;
-	virtual void logFlipHoleCardsMsg(std::string playerName, int card1, int card2, int cardsValueInt = -1, std::string showHas = "shows") = 0;
-	virtual void logPlayerWinGame(std::string playerName, int gameID) =0;
-
-
-
+    // log.cpp
+    virtual void logPlayerActionMsg(std::string playName, int action, int setValue) = 0;
+    virtual void logNewGameHandMsg(int gameID, int HandID) = 0;
+    virtual void logPlayerWinsMsg(std::string playerName, int pot, bool main) = 0;
+    virtual void logNewBlindsSetsMsg(int sbSet, int bbSet, std::string sbName, std::string bbName) = 0;
+    virtual void logDealBoardCardsMsg(int roundID, int card1, int card2, int card3, int card4 = -1, int card5 = -1) = 0;
+    virtual void logFlipHoleCardsMsg(std::string playerName, int card1, int card2, int cardsValueInt = -1,
+                                     std::string showHas = "shows") = 0;
+    virtual void logPlayerWinGame(std::string playerName, int gameID) = 0;
 };
 
 #endif

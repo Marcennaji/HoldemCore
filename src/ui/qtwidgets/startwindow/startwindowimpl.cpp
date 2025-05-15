@@ -17,28 +17,24 @@
  *****************************************************************************/
 #include "startwindowimpl.h"
 
-#include <ui/qtwidgets/guiwrapper.h>
-#include <ui/qtwidgets/gametable/gametableimpl.h>
-#include <ui/qtwidgets/newgamedialog/newgamedialogimpl.h>
 #include <ui/qtwidgets/gametable/GuiDisplayGameActions.h>
+#include <ui/qtwidgets/gametable/gametableimpl.h>
+#include <ui/qtwidgets/guiwrapper.h>
+#include <ui/qtwidgets/newgamedialog/newgamedialogimpl.h>
 
-#include <core/player/Player.h>
-#include <core/engine/Gamedata.h>
 #include <core/engine/EngineDefs.h>
-#include <core/engine/tools.h>
+#include <core/engine/Randomizer.h>
 #include <core/engine/game.h>
-
+#include <core/engine/model/Gamedata.h>
+#include <core/player/Player.h>
 
 using namespace std;
 
 startWindowImpl::startWindowImpl(const QString& appDataPath, GuiInterface* gui, Session* session, QWidget* parent)
-    : QMainWindow(parent),
-      myAppDataPath(appDataPath),
-      myGuiInterface(gui),
-      mySession(session)
+    : QMainWindow(parent), myAppDataPath(appDataPath), myGuiInterface(gui), mySession(session)
 {
     setupUi(this);
-	myGuiInterface->setStartWindow(this);
+    myGuiInterface->setStartWindow(this);
     setWindowTitle(QString(tr("PokerTraining %1").arg(POKERTRAINING_BETA_RELEASE_STRING)));
     setWindowIcon(QIcon(myAppDataPath + "gfx/gui/misc/windowicon.png"));
     setStatusBar(nullptr);
@@ -56,79 +52,79 @@ startWindowImpl::~startWindowImpl()
 
 void startWindowImpl::callNewGameDialog()
 {
-	myNewGameDialog->exec();
-	if (myNewGameDialog->result() == QDialog::Accepted)
-	{
-		startNewGame(myNewGameDialog);
-	}
+    myNewGameDialog->exec();
+    if (myNewGameDialog->result() == QDialog::Accepted)
+    {
+        startNewGame(myNewGameDialog);
+    }
 }
 
-void startWindowImpl::startNewGame(newGameDialogImpl *v)
+void startWindowImpl::startNewGame(newGameDialogImpl* v)
 {
 
-	this->hide();
-	myGuiInterface->getW()->show();
+    this->hide();
+    myGuiInterface->getW()->show();
 
-	// get values from  game dialog
-	GameData gameData;
-	if (v)
-	{
-		// Set Game Data
-		gameData.maxNumberOfPlayers = v->spinBox_quantityPlayers->value();
-		gameData.startMoney = v->spinBox_startCash->value();
-		gameData.firstSmallBlind = GAME_START_SBLIND;
+    // get values from  game dialog
+    GameData gameData;
+    if (v)
+    {
+        // Set Game Data
+        gameData.maxNumberOfPlayers = v->spinBox_quantityPlayers->value();
+        gameData.startMoney = v->spinBox_startCash->value();
+        gameData.firstSmallBlind = GAME_START_SBLIND;
 
-		// Speeds
-		gameData.guiSpeed = 8;
+        // Speeds
+        gameData.guiSpeed = 8;
 
-		if (v->radioButton_opponentsLooseAggressive->isChecked())
-			gameData.tableProfile = LARGE_AGRESSIVE_OPPONENTS;
-		else if (v->radioButton_opponentsTightAgressive->isChecked())
-			gameData.tableProfile = TIGHT_AGRESSIVE_OPPONENTS;
-		else
-			gameData.tableProfile = RANDOM_OPPONENTS;
-	}
-	// start with default values
-	else
-	{
-		// Set Game Data
-		gameData.maxNumberOfPlayers = GAME_NUMBER_OF_PLAYERS;
-		gameData.startMoney = GAME_START_CASH;
-		gameData.firstSmallBlind = GAME_START_SBLIND;
-		gameData.tableProfile = TIGHT_AGRESSIVE_OPPONENTS;
+        if (v->radioButton_opponentsLooseAggressive->isChecked())
+            gameData.tableProfile = LARGE_AGRESSIVE_OPPONENTS;
+        else if (v->radioButton_opponentsTightAgressive->isChecked())
+            gameData.tableProfile = TIGHT_AGRESSIVE_OPPONENTS;
+        else
+            gameData.tableProfile = RANDOM_OPPONENTS;
+    }
+    // start with default values
+    else
+    {
+        // Set Game Data
+        gameData.maxNumberOfPlayers = GAME_NUMBER_OF_PLAYERS;
+        gameData.startMoney = GAME_START_CASH;
+        gameData.firstSmallBlind = GAME_START_SBLIND;
+        gameData.tableProfile = TIGHT_AGRESSIVE_OPPONENTS;
 
-		// Speeds
-		gameData.guiSpeed = GAME_SPEED;
-	}
-	// Set dealer pos.
-	StartData startData;
-	int tmpDealerPos = 0;
-	startData.numberOfPlayers = gameData.maxNumberOfPlayers;
+        // Speeds
+        gameData.guiSpeed = GAME_SPEED;
+    }
+    // Set dealer pos.
+    StartData startData;
+    int tmpDealerPos = 0;
+    startData.numberOfPlayers = gameData.maxNumberOfPlayers;
 
-	Tools::GetRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
-	// if(DEBUG_MODE) {
-	//     tmpDealerPos = 4;
-	// }
-	startData.startDealerPlayerId = static_cast<unsigned>(tmpDealerPos);
+    Randomizer::GetRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
+    // if(DEBUG_MODE) {
+    //     tmpDealerPos = 4;
+    // }
+    startData.startDealerPlayerId = static_cast<unsigned>(tmpDealerPos);
 
-	// some gui modifications
-	myGuiInterface->getW()->GameModification();
+    // some gui modifications
+    myGuiInterface->getW()->GameModification();
 
-	// Start Game!!!
-	mySession->startGame(gameData, startData);
+    // Start Game!!!
+    mySession->startGame(gameData, startData);
 }
 
-bool startWindowImpl::eventFilter(QObject *obj, QEvent *event)
+bool startWindowImpl::eventFilter(QObject* obj, QEvent* event)
 {
-	if (event->type() == QEvent::Close)
-	{
-		event->ignore();
-		//        mySession->getLog()->closeLogDbAtExit();
-		return QMainWindow::eventFilter(obj, event);
-	}
-	else
-	{
-		// pass the event on to the parent class
-		return QMainWindow::eventFilter(obj, event);
-	}
+    if (event->type() == QEvent::Close)
+    {
+        event->ignore();
+        //        mySession->getLog()->closeLogDbAtExit();
+        return QMainWindow::eventFilter(obj, event);
+    }
+    else
+    {
+        // pass the event on to the parent class
+        return QMainWindow::eventFilter(obj, event);
+    }
 }
