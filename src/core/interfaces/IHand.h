@@ -23,7 +23,7 @@
 #include "core/interfaces/IBoard.h"
 #include "infra/persistence/SqliteLogStore.h"
 
-#include <ui/interfaces/guiinterface.h>
+#include <ui/interfaces/IGui.h>
 
 class IHand
 {
@@ -41,7 +41,7 @@ class IHand
     virtual std::shared_ptr<IBettingRound> getFlop() const = 0;
     virtual std::shared_ptr<IBettingRound> getTurn() const = 0;
     virtual std::shared_ptr<IBettingRound> getRiver() const = 0;
-    virtual GuiInterface* getGuiInterface() const = 0;
+    virtual IGui* getGuiInterface() const = 0;
     virtual std::shared_ptr<IBettingRound> getCurrentBettingRound() const = 0;
     virtual IRankingStore* getRankingStore() const = 0;
     virtual IPlayersStatisticsStore* getPlayersStatisticsStore() const = 0;

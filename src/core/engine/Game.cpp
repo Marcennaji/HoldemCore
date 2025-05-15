@@ -23,16 +23,16 @@
 #include "model/EngineError.h"
 #include "model/StartData.h"
 
-#include <ui/interfaces/guiinterface.h>
+#include <ui/interfaces/IGui.h>
 #include "infra/persistence/SqliteLogStore.h"
 
 #include <iostream>
 
 using namespace std;
 
-Game::Game(GuiInterface* gui, std::shared_ptr<EngineFactory> factory, const PlayerList& playerList,
-           const GameData& gameData, const StartData& startData, int gameId, IRankingStore* l,
-           IPlayersStatisticsStore* ps, IHandAuditStore* handAuditStore)
+Game::Game(IGui* gui, std::shared_ptr<EngineFactory> factory, const PlayerList& playerList, const GameData& gameData,
+           const StartData& startData, int gameId, IRankingStore* l, IPlayersStatisticsStore* ps,
+           IHandAuditStore* handAuditStore)
     : myFactory(factory), myGui(gui), myRankingStore(l), myPlayersStatisticsStore(ps), myHandAuditStore(handAuditStore),
       startQuantityPlayers(startData.numberOfPlayers), startCash(gameData.startMoney),
       startSmallBlind(gameData.firstSmallBlind), myGameID(gameId), currentSmallBlind(gameData.firstSmallBlind),

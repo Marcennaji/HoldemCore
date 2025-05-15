@@ -37,7 +37,7 @@
 class GuiDisplayGameActions;
 class Game;
 
-class GuiInterface;
+class IGui;
 class IBoard;
 class Player;
 class MyCardsPixmapLabel;

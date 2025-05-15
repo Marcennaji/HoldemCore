@@ -30,12 +30,12 @@
 class IRankingStore;
 class IPlayersStatisticsStore;
 class IHandAuditStore;
-class GuiInterface;
+class IGui;
 
 class Hand : public IHand
 {
   public:
-    Hand(ILogger* logger, std::shared_ptr<EngineFactory> f, GuiInterface*, std::shared_ptr<IBoard>, IRankingStore*,
+    Hand(ILogger* logger, std::shared_ptr<EngineFactory> f, IGui*, std::shared_ptr<IBoard>, IRankingStore*,
          IPlayersStatisticsStore*, IHandAuditStore*, PlayerList, PlayerList, PlayerList, int, int, unsigned, int, int);
     ~Hand();
 
@@ -50,7 +50,7 @@ class Hand : public IHand
     std::shared_ptr<IBettingRound> getFlop() const { return myBettingRound[GAME_STATE_FLOP]; }
     std::shared_ptr<IBettingRound> getTurn() const { return myBettingRound[GAME_STATE_TURN]; }
     std::shared_ptr<IBettingRound> getRiver() const { return myBettingRound[GAME_STATE_RIVER]; }
-    GuiInterface* getGuiInterface() const { return myGui; }
+    IGui* getGuiInterface() const { return myGui; }
     std::shared_ptr<IBettingRound> getCurrentBettingRound() const { return myBettingRound[currentRound]; }
 
     IRankingStore* getRankingStore() const { return myRankingStore; }
@@ -117,7 +117,7 @@ class Hand : public IHand
 
   private:
     std::shared_ptr<EngineFactory> myFactory;
-    GuiInterface* myGui;
+    IGui* myGui;
     std::shared_ptr<IBoard> myBoard;
     IRankingStore* myRankingStore;
     IPlayersStatisticsStore* myPlayersStatisticsStore;

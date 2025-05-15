@@ -30,7 +30,7 @@
 
 using namespace std;
 
-startWindowImpl::startWindowImpl(const QString& appDataPath, GuiInterface* gui, Session* session, QWidget* parent)
+startWindowImpl::startWindowImpl(const QString& appDataPath, IGui* gui, Session* session, QWidget* parent)
     : QMainWindow(parent), myAppDataPath(appDataPath), myGuiInterface(gui), mySession(session)
 {
     setupUi(this);

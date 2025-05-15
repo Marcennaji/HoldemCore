@@ -19,7 +19,7 @@
 #define GUIWRAPPER_H
 
 #include "core/engine/model/GameData.h"
-#include "ui/interfaces/GuiInterface.h"
+#include "ui/interfaces/IGui.h"
 
 #include <string>
 
@@ -29,7 +29,7 @@ class startWindowImpl;
 class GuiDisplayGameActions;
 class Game;
 
-class GuiWrapper : public GuiInterface
+class GuiWrapper : public IGui
 {
   public:
     GuiWrapper(const std::string& appDataDir, startWindowImpl*);

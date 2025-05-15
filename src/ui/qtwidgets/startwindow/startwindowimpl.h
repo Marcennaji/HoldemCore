@@ -18,16 +18,16 @@
 #ifndef STARTWINDOWIMPL_H
 #define STARTWINDOWIMPL_H
 
-#include <memory>
 #include <assert.h>
+#include <memory>
 
 #include "ui_startwindow.h"
 
-#include <core/engine/EngineDefs.h>
 #include <QtWidgets/QMessageBox>
 #include <app/session.h>
+#include <core/engine/EngineDefs.h>
 
-class GuiInterface;
+class IGui;
 class GuiWrapper;
 class Game;
 
@@ -36,52 +36,48 @@ class newGameDialogImpl;
 class GuiDisplayGameActions;
 class SqliteLogStore;
 
-class startWindowImpl: public QMainWindow, public Ui::startWindow
+class startWindowImpl : public QMainWindow, public Ui::startWindow
 {
-	Q_OBJECT
-public:
-	startWindowImpl(const QString& appDataPath, GuiInterface* gui, Session* session, QWidget* parent);
-	~startWindowImpl();
+    Q_OBJECT
+  public:
+    startWindowImpl(const QString& appDataPath, IGui* gui, Session* session, QWidget* parent);
+    ~startWindowImpl();
 
-	void setSession(std::shared_ptr<Session> session) {
-		mySession = session;
-	}
-	std::shared_ptr<Session> getSession() {
-		assert(mySession.get());
-		return mySession;
-	}
-	void setGuiLog(GuiDisplayGameActions* l) {
-		myGuiLog = l;
-	}
+    void setSession(std::shared_ptr<Session> session) { mySession = session; }
+    std::shared_ptr<Session> getSession()
+    {
+        assert(mySession.get());
+        return mySession;
+    }
+    void setGuiLog(GuiDisplayGameActions* l) { myGuiLog = l; }
 
-	//	void keyPressEvent( QKeyEvent *);
-	bool eventFilter(QObject *obj, QEvent *event);
+    //	void keyPressEvent( QKeyEvent *);
+    bool eventFilter(QObject* obj, QEvent* event);
 
-signals:
+  signals:
 
+  public slots:
 
-public slots:
+    void callNewGameDialog();
 
-	void callNewGameDialog();
+    void startNewGame(newGameDialogImpl* = 0);
 
-	void startNewGame(newGameDialogImpl* =0);
+  private:
+    QString myAppDataPath;
+    QString myLogPath;
+    QString myUserDataPath;
 
-private:
-	QString	myAppDataPath;
-	QString myLogPath;
-	QString myUserDataPath;
+    GuiDisplayGameActions* myGuiLog;
+    SqliteLogStore* myLog;
 
-	GuiDisplayGameActions *myGuiLog;
-	SqliteLogStore *myLog;
+    std::shared_ptr<IGui> myGuiInterface;
+    std::shared_ptr<Session> mySession;
 
-	std::shared_ptr<GuiInterface> myGuiInterface;
-	std::shared_ptr<Session> mySession;
+    // 	Dialogs
+    newGameDialogImpl* myNewGameDialog;
+    startWindowImpl* myStartWindow;
 
-	// 	Dialogs
-	newGameDialogImpl *myNewGameDialog;
-	startWindowImpl *myStartWindow;
- 
-	friend class GuiWrapper;
+    friend class GuiWrapper;
 };
 
 #endif

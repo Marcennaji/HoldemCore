@@ -28,10 +28,10 @@ class Session;
 class gameTableImpl;
 class startWindowImpl;
 
-class GuiInterface
+class IGui
 {
   public:
-    virtual ~GuiInterface() {};
+    virtual ~IGui() {};
 
     virtual void initGui(int speed) = 0;
 

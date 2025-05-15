@@ -19,7 +19,7 @@
 #include "session.h"
 #include <core/engine/game.h>
 #include <infra/persistence/SqliteLogStore.h>
-#include <ui/interfaces/guiinterface.h>
+#include <ui/interfaces/IGui.h>
 #include <ui/interfaces/qttoolsinterface.h>
 
 #include <core/engine/EngineFactory.h>
@@ -37,7 +37,7 @@
 
 using namespace std;
 
-Session::Session(ILogger* logger, GuiInterface* g, IRankingStore* rs, IPlayersStatisticsStore* ps, IHandAuditStore* ha)
+Session::Session(ILogger* logger, IGui* g, IRankingStore* rs, IPlayersStatisticsStore* ps, IHandAuditStore* ha)
     : myLogger(logger), currentGameNum(0), myGui(g), myRankingStore(rs), myPlayersStatisticsStore(ps),
       myHandAuditStore(ha)
 {
@@ -200,7 +200,7 @@ std::shared_ptr<Game> Session::getCurrentGame()
     return currentGame;
 }
 
-GuiInterface* Session::getGui()
+IGui* Session::getGui()
 {
     return myGui;
 }

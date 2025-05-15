@@ -29,9 +29,9 @@
 
 using namespace std;
 
-Hand::Hand(ILogger* logger, std::shared_ptr<EngineFactory> f, GuiInterface* g, std::shared_ptr<IBoard> b,
-           IRankingStore* l, IPlayersStatisticsStore* ps, IHandAuditStore* ha, PlayerList sl, PlayerList apl,
-           PlayerList rpl, int id, int sP, unsigned dP, int sB, int sC)
+Hand::Hand(ILogger* logger, std::shared_ptr<EngineFactory> f, IGui* g, std::shared_ptr<IBoard> b, IRankingStore* l,
+           IPlayersStatisticsStore* ps, IHandAuditStore* ha, PlayerList sl, PlayerList apl, PlayerList rpl, int id,
+           int sP, unsigned dP, int sB, int sC)
     : myLogger(logger), myFactory(f), myGui(g), myBoard(b), myRankingStore(l), myPlayersStatisticsStore(ps),
       myHandAuditStore(ha), seatsList(sl), activePlayerList(apl), runningPlayerList(rpl), myBettingRound(0), myID(id),
       startQuantityPlayers(sP), dealerPosition(dP), smallBlindPosition(dP), bigBlindPosition(dP),
