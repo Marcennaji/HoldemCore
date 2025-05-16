@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 
-#include "BettingRoundpostriver.h"
+#include "BettingRoundPostRiver.h"
 #include "core/interfaces/IHand.h"
 
 #include "Player.h"

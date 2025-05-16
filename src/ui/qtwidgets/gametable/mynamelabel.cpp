@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 #include "mynamelabel.h"
-#include <app/session.h>
 #include <core/engine/game.h>
 #include <core/player/Player.h>
+#include <core/session/Session.h>
 #include <ui/qtwidgets/styles/gametablestylereader.h>
 #include "GameTableWindow.h"
 

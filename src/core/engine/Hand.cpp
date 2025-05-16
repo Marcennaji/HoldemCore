@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 
-#include "hand.h"
+#include "Hand.h"
 #include <core/interfaces/ILogger.h>
 #include "CardsValue.h"
 #include "Randomizer.h"

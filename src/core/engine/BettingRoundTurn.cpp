@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 
-#include "BettingRoundturn.h"
+#include "BettingRoundTurn.h"
 #include "core/interfaces/IHand.h"
 
 using namespace std;

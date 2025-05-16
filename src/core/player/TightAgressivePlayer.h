@@ -18,7 +18,7 @@
 #ifndef PLAYING_STYLE_TAG_H
 #define PLAYING_STYLE_TAG_H
 
-#include "player.h"
+#include "Player.h"
 
 class TightAgressivePlayer : public Player
 {

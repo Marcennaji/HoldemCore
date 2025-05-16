@@ -24,7 +24,7 @@
 #include <core/engine/model/StartData.h>
 #include "ui_gametable.h"
 
-#include <app/session.h>
+#include <core/session/Session.h>
 
 #include <memory>
 #include <string>

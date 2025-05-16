@@ -1,12 +1,18 @@
+#include "QmlAppController.h"
+
 #include <QDir>
 #include <QFile>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QQmlContext>
 
 int main(int argc, char* argv[])
 {
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
+
+    QmlAppController* controller = new QmlAppController();
+    engine.rootContext()->setContextProperty("backend", controller);
 
 #ifdef QT_NO_DEBUG
     // Release: load from resource

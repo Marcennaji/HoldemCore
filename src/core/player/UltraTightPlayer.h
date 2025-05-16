@@ -18,7 +18,7 @@
 #ifndef PLAYING_STYLE_ULTRA_TIGHT_H
 #define PLAYING_STYLE_ULTRA_TIGHT_H
 
-#include "player.h"
+#include "Player.h"
 
 class UltraTightPlayer : public Player
 {

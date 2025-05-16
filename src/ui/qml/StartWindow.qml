@@ -62,7 +62,7 @@ Item {
                 let profile = looseAggressive.checked ? "LARGE_AGRESSIVE_OPPONENTS"
                              : tightAggressive.checked ? "TIGHT_AGRESSIVE_OPPONENTS"
                              : "RANDOM_OPPONENTS";
-                startGame(playerCount.value, chipCount.value, profile);
+                backend.startGame(playerCount.value, chipCount.value, profile);
             }
         }
     }

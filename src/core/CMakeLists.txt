@@ -3,6 +3,7 @@
 # Add subdirectories
 add_subdirectory(engine)
 add_subdirectory(player)
+add_subdirectory(session)
 
 # Create a library for core
 add_library(core INTERFACE)

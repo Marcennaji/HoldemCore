@@ -14,19 +14,13 @@ ApplicationWindow {
     }
 
     Component {
-        id: startWindow
-        StartWindow {
-            onStartGame: (players, chips, profile) => {
-                console.log("StartGame called with:", players, chips, profile)
-                nav.push(gameTable)
-            }
-        }
-    }
-
-    Component {
         id: gameTable
         GameTable {
             onBackToStart: nav.pop()
         }
     }
+
+    Component.onCompleted: backend.gameStarted.connect(() => {
+        nav.push(gameTable)
+    });    
 }

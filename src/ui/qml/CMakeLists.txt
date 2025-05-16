@@ -1,7 +1,12 @@
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick)
 
+file(GLOB_RECURSE QML_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.h
+)
+
 qt_add_executable(pokertraining_qml
-    main.cpp
+    ${QML_SOURCES}
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -11,6 +16,12 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
         GameTable.qml
     )
 endif()
+
+target_include_directories(pokertraining_qml PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_SOURCE_DIR}/src
+)
 
 target_link_libraries(pokertraining_qml
     PRIVATE Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick

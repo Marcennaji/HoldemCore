@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 #include "guiwrapper.h"
-#include <app/session.h>
 #include <core/engine/game.h>
 #include <core/player/Player.h>
+#include <core/session/Session.h>
 #include <infra/persistence/SqliteLogStore.h>
 #include <ui/qtwidgets/gametable/GameTableWindow.h>
 #include <ui/qtwidgets/gametable/GuiDisplayGameActions.h>

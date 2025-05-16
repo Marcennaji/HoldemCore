@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 
-#include "board.h"
+#include "Board.h"
 
 #include "core/interfaces/IHand.h"
 

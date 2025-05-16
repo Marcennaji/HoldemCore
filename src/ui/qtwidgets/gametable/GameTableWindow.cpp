@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 #include "GameTableWindow.h"
-#include <app/session.h>
+#include <core/session/Session.h>
 #include <ui/qtwidgets/startwindow/StartWindow.h>
 
 #include <ui/qtwidgets/gametable/GuiDisplayGameActions.h>

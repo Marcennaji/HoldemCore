@@ -19,14 +19,14 @@
 #include "enginefactory.h"
 
 #include <core/interfaces/ILogger.h>
+#include "BettingRoundPostRiver.h"
+#include "BettingRoundPreflop.h"
+#include "BettingRoundRiver.h"
+#include "BettingRoundTurn.h"
 #include "BettingRoundflop.h"
-#include "BettingRoundpostriver.h"
-#include "BettingRoundpreflop.h"
-#include "BettingRoundriver.h"
-#include "BettingRoundturn.h"
+#include "Board.h"
+#include "Hand.h"
 #include "Randomizer.h"
-#include "board.h"
-#include "hand.h"
 
 #include "HumanPlayer.h"
 #include "LooseAggressivePlayer.h"

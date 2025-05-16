@@ -23,8 +23,8 @@
 
 #include "ui_startwindow.h"
 
-#include <app/session.h>
 #include <core/engine/EngineDefs.h>
+#include <core/session/Session.h>
 
 #include <QtWidgets/QMainWindow>
 

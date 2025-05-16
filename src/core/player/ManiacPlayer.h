@@ -18,7 +18,7 @@
 #ifndef MANIAC_PLAYER_H
 #define MANIAC_PLAYER_H
 
-#include "player.h"
+#include "Player.h"
 
 class ManiacPlayer : public Player
 {

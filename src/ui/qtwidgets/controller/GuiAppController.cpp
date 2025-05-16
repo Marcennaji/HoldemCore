@@ -1,6 +1,6 @@
 // GuiAppController.cpp
 #include "GuiAppController.h"
-#include <app/session.h>
+#include <core/session/Session.h>
 #include <infra/persistence/SqliteLogStore.h>
 #include <ui/qtwidgets/guiwrapper.h>
 #include <ui/qtwidgets/startwindow/StartWindow.h>

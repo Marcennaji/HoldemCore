@@ -26,8 +26,6 @@
 #include <core/engine/model/Ranges.h>
 #include "Exception.h"
 
-#include <ui/qtwidgets/guiwrapper.h>
-
 #include <fstream>
 #include <iostream>
 #include <map>

@@ -24,7 +24,6 @@
 #include <core/engine/model/Ranges.h>
 #include <core/interfaces/IHand.h>
 #include <core/interfaces/ILogger.h>
-#include <ui/qtwidgets/guiwrapper.h>
 
 #include <fstream>
 #include <iostream>

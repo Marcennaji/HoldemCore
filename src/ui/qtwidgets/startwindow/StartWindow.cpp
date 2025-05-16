@@ -69,7 +69,6 @@ void StartWindow::startNewGame()
 
     gameData.guiSpeed = GAME_SPEED;
 
-    // Set dealer pos.
     StartData startData;
     int tmpDealerPos = 0;
     startData.numberOfPlayers = gameData.maxNumberOfPlayers;

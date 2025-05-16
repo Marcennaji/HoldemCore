@@ -20,7 +20,7 @@
 #include <ctime>
 #include <iostream>
 
-#include "session.h"
+#include "core/session/Session.h"
 
 #include <QString>
 #include <QtCore>

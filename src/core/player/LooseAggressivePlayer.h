@@ -18,7 +18,7 @@
 #ifndef LARGE_AGRESSIVE_PLAYER_H
 #define LARGE_AGRESSIVE_PLAYER_H
 
-#include "player.h"
+#include "Player.h"
 
 class LooseAggressivePlayer : public Player
 {

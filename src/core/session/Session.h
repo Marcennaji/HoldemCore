@@ -52,10 +52,6 @@ class Session
     IPlayersStatisticsStore* getPlayersStatisticsStore() { return myPlayersStatisticsStore; }
     IHandAuditStore* getHandAuditStore() { return myHandAuditStore; }
 
-    unsigned getGameIdOfPlayer(unsigned playerId) const;
-    unsigned getClientCurrentGameId() const;
-    unsigned getClientUniquePlayerId() const;
-
   private:
     int currentGameNum;
 
