@@ -1,9 +1,9 @@
 #include "QmlAppController.h"
 
-#include <app/Session.h>
 #include <core/engine/model/GameData.h>
 #include <core/engine/model/StartData.h>
 #include <core/engine/model/TableProfile.h>
+#include <core/session/Session.h>
 #include <infra/ConsoleLogger.h>
 #include <infra/persistence/SqliteLogStore.h>
 #include "core/engine/Randomizer.h"

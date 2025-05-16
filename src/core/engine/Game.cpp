@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 
-#include "game.h"
+#include "Game.h"
 
 #include "EngineFactory.h"
 #include "Exception.h"

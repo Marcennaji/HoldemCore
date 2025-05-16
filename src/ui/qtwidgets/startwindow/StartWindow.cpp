@@ -22,8 +22,8 @@
 #include <ui/qtwidgets/guiwrapper.h>
 
 #include <core/engine/EngineDefs.h>
+#include <core/engine/Game.h>
 #include <core/engine/Randomizer.h>
-#include <core/engine/game.h>
 #include <core/engine/model/Gamedata.h>
 #include <core/player/Player.h>
 

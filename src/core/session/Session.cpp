@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 
-#include "session.h"
-#include <core/engine/game.h>
+#include "Session.h"
+#include <core/engine/Game.h>
 #include <infra/persistence/SqliteLogStore.h>
 #include <ui/interfaces/IGui.h>
 
