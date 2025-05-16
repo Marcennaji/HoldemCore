@@ -35,7 +35,7 @@ class MyChanceLabel : public QLabel
 
     ~MyChanceLabel();
 
-    void setW(GameTableWindow* theValue) { myW = theValue; }
+    void setGameTableWindow(GameTableWindow* theValue) { myW = theValue; }
     void setStyle(GameTableStyleReader* theValue) { myStyle = theValue; }
 
   private:

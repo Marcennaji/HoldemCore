@@ -35,7 +35,7 @@ class MyCardsPixmapLabel : public QLabel
 
     ~MyCardsPixmapLabel();
 
-    void setW(GameTableWindow* theValue) { myW = theValue; }
+    void setGameTableWindow(GameTableWindow* theValue) { myW = theValue; }
 
     void setIsFlipside(bool theValue) { isFlipside = theValue; }
     bool getIsFlipside() const { return isFlipside; }

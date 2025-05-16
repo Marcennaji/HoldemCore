@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
+#include "GameTableWindow.h"
 #include <app/session.h>
 #include <ui/qtwidgets/startwindow/StartWindow.h>
-#include "GameTableWindow.h"
 
 #include <ui/qtwidgets/gametable/GuiDisplayGameActions.h>
 #include "myactionbutton.h"
@@ -86,8 +86,8 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     myCardDeckStyle->readStyleFile("", appDataDir);
 
     // Player0 pixmapCardsLabel needs Myw
-    pixmapLabel_card0b->setW(this);
-    pixmapLabel_card0a->setW(this);
+    pixmapLabel_card0b->setGameTableWindow(this);
+    pixmapLabel_card0a->setGameTableWindow(this);
 
     label_chance->setStyle(myGameTableStyle);
 
@@ -209,7 +209,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     cashLabelArray[9] = textLabel_Cash9;
     for (i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
     {
-        cashLabelArray[i]->setW(this);
+        cashLabelArray[i]->setGameTableWindow(this);
     }
 
     playerTipLabelArray[0] = label_playerTip0;
@@ -236,7 +236,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     playerNameLabelArray[9] = label_PlayerName9;
     for (i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
     {
-        playerNameLabelArray[i]->setW(this);
+        playerNameLabelArray[i]->setGameTableWindow(this);
     }
 
     // setLabelArray init
@@ -252,7 +252,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     setLabelArray[9] = textLabel_Set9;
     for (i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
     {
-        setLabelArray[i]->setW(this);
+        setLabelArray[i]->setGameTableWindow(this);
     }
 
     // statusLabelArray init
@@ -267,7 +267,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     actionLabelArray[8] = textLabel_Status8;
     actionLabelArray[9] = textLabel_Status9;
 
-    textLabel_Status0->setW(this);
+    textLabel_Status0->setGameTableWindow(this);
 
     // GroupBoxArray init
     groupBoxArray[0] = groupBox0;

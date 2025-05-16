@@ -51,7 +51,7 @@ void StartWindow::startNewGame()
 {
 
     this->hide();
-    auto gameTableWindow = static_cast<GameTableWindow*>(myGuiInterface->getW());
+    auto gameTableWindow = static_cast<GameTableWindow*>(myGuiInterface->getGameTableWindow());
     gameTableWindow->show();
 
     GameData gameData;

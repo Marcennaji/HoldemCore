@@ -36,7 +36,7 @@ class IGui
     virtual std::shared_ptr<Session> getSession() = 0;
     virtual void setSession(std::shared_ptr<Session> session) = 0;
 
-    virtual void* getW() const = 0;
+    virtual void* getGameTableWindow() const = 0;
     virtual GuiDisplayGameActions* getGuiLog() const = 0;
 
     virtual void hideHoleCards() = 0;

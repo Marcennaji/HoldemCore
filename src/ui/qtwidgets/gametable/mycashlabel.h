@@ -34,7 +34,7 @@ class MyCashLabel : public QLabel
     MyCashLabel(QGroupBox*);
     ~MyCashLabel();
 
-    void setW(GameTableWindow* theValue) { myW = theValue; }
+    void setGameTableWindow(GameTableWindow* theValue) { myW = theValue; }
 
   public slots:
 

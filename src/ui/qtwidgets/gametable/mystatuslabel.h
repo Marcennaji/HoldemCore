@@ -35,7 +35,7 @@ class MyStatusLabel : public QLabel
 
     ~MyStatusLabel();
 
-    void setW(GameTableWindow* theValue) { myW = theValue; }
+    void setGameTableWindow(GameTableWindow* theValue) { myW = theValue; }
 
     void mousePressEvent(QMouseEvent*);
     void mouseReleaseEvent(QMouseEvent*);

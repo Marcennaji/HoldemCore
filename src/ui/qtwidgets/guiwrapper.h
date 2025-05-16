@@ -42,7 +42,7 @@ class GuiWrapper : public IGui
     std::shared_ptr<Session> getSession();
     void setSession(std::shared_ptr<Session> session);
 
-    void* getW() const override { return static_cast<void*>(myW); }
+    void* getGameTableWindow() const override { return static_cast<void*>(myW); }
     GuiDisplayGameActions* getGuiLog() const { return myGuiLog; }
 
     void refreshSet() const;

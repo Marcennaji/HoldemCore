@@ -34,7 +34,7 @@ class MyNameLabel : public QLabel
     MyNameLabel(QGroupBox*);
     ~MyNameLabel();
 
-    void setW(GameTableWindow* theValue) { myW = theValue; }
+    void setGameTableWindow(GameTableWindow* theValue) { myW = theValue; }
 
   public slots:
 

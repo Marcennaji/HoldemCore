@@ -36,7 +36,7 @@ class MySetLabel : public QLabel
 
     ~MySetLabel();
 
-    void setW(GameTableWindow* theValue) { myW = theValue; }
+    void setGameTableWindow(GameTableWindow* theValue) { myW = theValue; }
     void paintEvent(QPaintEvent* event);
 
   public slots:
