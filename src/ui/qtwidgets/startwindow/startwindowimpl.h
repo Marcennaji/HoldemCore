@@ -23,6 +23,7 @@
 
 #include "ui_startwindow.h"
 
+#include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMessageBox>
 #include <app/session.h>
 #include <core/engine/EngineDefs.h>
@@ -56,8 +57,6 @@ class startWindowImpl : public QMainWindow, public Ui::startWindow
   signals:
 
   public slots:
-
-    void callNewGameDialog();
 
     void startNewGame();
 

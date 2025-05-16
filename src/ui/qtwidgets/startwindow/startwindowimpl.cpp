@@ -39,7 +39,7 @@ startWindowImpl::startWindowImpl(const QString& appDataPath, IGui* gui, Session*
     setStatusBar(nullptr);
     installEventFilter(this);
 
-    connect(pushButtonStartGame, &QPushButton::clicked, this, &startWindowImpl::callNewGameDialog);
+    connect(pushButtonStartGame, &QPushButton::clicked, this, &startWindowImpl::startNewGame);
 
     show();
 }
@@ -47,16 +47,12 @@ startWindowImpl::~startWindowImpl()
 {
 }
 
-void startWindowImpl::callNewGameDialog()
-{
-    startNewGame();
-}
-
 void startWindowImpl::startNewGame()
 {
 
     this->hide();
-    myGuiInterface->getW()->show();
+    auto gameTableWindow = static_cast<gameTableImpl*>(myGuiInterface->getW());
+    gameTableWindow->show();
 
     GameData gameData;
 
@@ -81,7 +77,7 @@ void startWindowImpl::startNewGame()
     Randomizer::GetRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
     startData.startDealerPlayerId = static_cast<unsigned>(tmpDealerPos);
 
-    myGuiInterface->getW()->GameModification();
+    gameTableWindow->GameModification();
 
     mySession->startGame(gameData, startData);
 }

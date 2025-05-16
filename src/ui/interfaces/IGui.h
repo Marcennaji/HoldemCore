@@ -25,8 +25,6 @@
 
 class GuiDisplayGameActions;
 class Session;
-class gameTableImpl;
-class startWindowImpl;
 
 class IGui
 {
@@ -38,11 +36,11 @@ class IGui
     virtual std::shared_ptr<Session> getSession() = 0;
     virtual void setSession(std::shared_ptr<Session> session) = 0;
 
-    virtual gameTableImpl* getW() const = 0;
+    virtual void* getW() const = 0;
     virtual GuiDisplayGameActions* getGuiLog() const = 0;
 
     virtual void hideHoleCards() = 0;
-    virtual void setStartWindow(startWindowImpl* w) = 0;
+    virtual void setStartWindow(void*) = 0;
     virtual void refreshSet() const = 0;
     virtual void refreshCash() const = 0;
     virtual void refreshAction(int = -1, int = -1) const = 0;

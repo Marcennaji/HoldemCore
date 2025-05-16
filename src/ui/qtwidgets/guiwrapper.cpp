@@ -19,30 +19,27 @@
 #include <app/session.h>
 #include <core/engine/game.h>
 #include <core/player/Player.h>
-#include <ui/qtwidgets/gametable/GuiDisplayGameActions.h>
 #include <infra/persistence/SqliteLogStore.h>
+#include <ui/qtwidgets/gametable/GuiDisplayGameActions.h>
 #include <ui/qtwidgets/gametable/gametableimpl.h>
 #include <ui/qtwidgets/startwindow/startwindowimpl.h>
 
 using namespace std;
 
-
-GuiWrapper::GuiWrapper(const std::string & appDataDir, startWindowImpl *s) : myGuiLog(NULL), myW(NULL), myStartWindow(s)
+GuiWrapper::GuiWrapper(const std::string& appDataDir, startWindowImpl* s) : myGuiLog(NULL), myW(NULL), myStartWindow(s)
 {
 
-
-	myW = new gameTableImpl(appDataDir);
-	myGuiLog = new GuiDisplayGameActions(myW);
+    myW = new gameTableImpl(appDataDir);
+    myGuiLog = new GuiDisplayGameActions(myW);
 }
-
 
 GuiWrapper::~GuiWrapper()
 {
-	delete myGuiLog;
-
+    delete myGuiLog;
 }
-void GuiWrapper::setStartWindow(startWindowImpl* w) {
-    myStartWindow = w;
+void GuiWrapper::setStartWindow(void* w)
+{
+    myStartWindow = static_cast<startWindowImpl*>(w);
     if (myGuiLog)
         myStartWindow->setGuiLog(myGuiLog);
     if (myW)
@@ -51,199 +48,200 @@ void GuiWrapper::setStartWindow(startWindowImpl* w) {
 
 void GuiWrapper::initGui(int speed)
 {
-	myW->signalInitGui(speed);
+    myW->signalInitGui(speed);
 }
 
-void GuiWrapper::hideHoleCards(){
-	myW->hideHoleCards();
+void GuiWrapper::hideHoleCards()
+{
+    myW->hideHoleCards();
 }
 
 std::shared_ptr<Session> GuiWrapper::getSession()
 {
-	return myStartWindow->getSession();
+    return myStartWindow->getSession();
 }
 void GuiWrapper::setSession(std::shared_ptr<Session> /*session*/)
 {
-	//myStartWindow->setSession(session);
+    // myStartWindow->setSession(session);
 }
 
 void GuiWrapper::refreshSet() const
 {
-	myW->signalRefreshSet();
+    myW->signalRefreshSet();
 }
 void GuiWrapper::refreshCash() const
 {
-	myW->signalRefreshCash();
+    myW->signalRefreshCash();
 }
 void GuiWrapper::refreshAction(int playerID, int playerAction) const
 {
-	myW->signalRefreshAction(playerID, playerAction);
+    myW->signalRefreshAction(playerID, playerAction);
 }
 void GuiWrapper::refreshChangePlayer() const
 {
-	myW->signalRefreshChangePlayer();
+    myW->signalRefreshChangePlayer();
 }
 void GuiWrapper::refreshAll() const
 {
-	myW->signalRefreshAll();
+    myW->signalRefreshAll();
 }
 void GuiWrapper::refreshPot() const
 {
-	myW->signalRefreshPot();
+    myW->signalRefreshPot();
 }
 void GuiWrapper::refreshGroupbox(int playerID, int status) const
 {
-	myW->signalRefreshGroupbox(playerID, status);
+    myW->signalRefreshGroupbox(playerID, status);
 }
 void GuiWrapper::refreshPlayerName() const
 {
-	myW->signalRefreshPlayerName();
+    myW->signalRefreshPlayerName();
 }
 void GuiWrapper::refreshButton() const
 {
-	myW->signalRefreshButton();
+    myW->signalRefreshButton();
 }
 void GuiWrapper::refreshGameLabels(GameState state) const
 {
-	myW->signalRefreshGameLabels(state);
+    myW->signalRefreshGameLabels(state);
 }
 
 void GuiWrapper::waitForGuiUpdateDone() const
 {
-	myW->signalGuiUpdateDone();
-	myW->waitForGuiUpdateDone();
+    myW->signalGuiUpdateDone();
+    myW->waitForGuiUpdateDone();
 }
 
 void GuiWrapper::dealBettingRoundCards(int myBettingRoundID)
 {
-	myW->signalDealBettingRoundCards(myBettingRoundID);
+    myW->signalDealBettingRoundCards(myBettingRoundID);
 }
 
 void GuiWrapper::dealHoleCards()
 {
-	myW->signalDealHoleCards();
+    myW->signalDealHoleCards();
 }
 void GuiWrapper::dealFlopCards()
 {
-	myW->signalDealFlopCards0();
+    myW->signalDealFlopCards0();
 }
 void GuiWrapper::dealTurnCard()
 {
-	myW->signalDealTurnCards0();
+    myW->signalDealTurnCards0();
 }
 void GuiWrapper::dealRiverCard()
 {
-	myW->signalDealRiverCards0();
+    myW->signalDealRiverCards0();
 }
 
 void GuiWrapper::nextPlayerAnimation()
 {
-	myW->signalNextPlayerAnimation();
+    myW->signalNextPlayerAnimation();
 }
 
 void GuiWrapper::beRoAnimation2(int myBettingRoundID)
 {
-	myW->signalBettingRoundAnimation2(myBettingRoundID);
+    myW->signalBettingRoundAnimation2(myBettingRoundID);
 }
 
 void GuiWrapper::preflopAnimation1()
 {
-	myW->signalPreflopAnimation1();
+    myW->signalPreflopAnimation1();
 }
 void GuiWrapper::preflopAnimation2()
 {
-	myW->signalPreflopAnimation2();
+    myW->signalPreflopAnimation2();
 }
 
 void GuiWrapper::flopAnimation1()
 {
-	myW->signalFlopAnimation1();
+    myW->signalFlopAnimation1();
 }
 void GuiWrapper::flopAnimation2()
 {
-	myW->signalFlopAnimation2();
+    myW->signalFlopAnimation2();
 }
 
 void GuiWrapper::turnAnimation1()
 {
-	myW->signalTurnAnimation1();
+    myW->signalTurnAnimation1();
 }
 void GuiWrapper::turnAnimation2()
 {
-	myW->signalTurnAnimation2();
+    myW->signalTurnAnimation2();
 }
 
 void GuiWrapper::riverAnimation1()
 {
-	myW->signalRiverAnimation1();
+    myW->signalRiverAnimation1();
 }
 void GuiWrapper::riverAnimation2()
 {
-	myW->signalRiverAnimation2();
+    myW->signalRiverAnimation2();
 }
 
 void GuiWrapper::postRiverAnimation1()
 {
-	myW->signalPostRiverAnimation1();
+    myW->signalPostRiverAnimation1();
 }
 void GuiWrapper::postRiverRunAnimation1()
 {
-	myW->signalPostRiverRunAnimation1();
+    myW->signalPostRiverRunAnimation1();
 }
 
 void GuiWrapper::flipHolecardsAllIn()
 {
-	myW->signalFlipHolecardsAllIn();
+    myW->signalFlipHolecardsAllIn();
 }
 
 void GuiWrapper::nextRoundCleanGui()
 {
-	myW->signalNextRoundCleanGui();
+    myW->signalNextRoundCleanGui();
 }
 
 void GuiWrapper::meInAction()
 {
-	myW->signalMeInAction();
+    myW->signalMeInAction();
 }
 void GuiWrapper::showCards(unsigned playerId)
 {
-	myW->signalPostRiverShowCards(playerId);
+    myW->signalPostRiverShowCards(playerId);
 }
 void GuiWrapper::updateMyButtonsState()
 {
-	myW->signalUpdateMyButtonsState();
+    myW->signalUpdateMyButtonsState();
 }
 void GuiWrapper::disableMyButtons()
 {
-	myW->signalDisableMyButtons();
+    myW->signalDisableMyButtons();
 }
 void GuiWrapper::logPlayerActionMsg(string playerName, int action, int setValue)
 {
-	myGuiLog->signalLogPlayerActionMsg(QString::fromUtf8(playerName.c_str()), action, setValue);
+    myGuiLog->signalLogPlayerActionMsg(QString::fromUtf8(playerName.c_str()), action, setValue);
 }
 void GuiWrapper::logNewGameHandMsg(int gameID, int handID)
 {
-	myGuiLog->signalLogNewGameHandMsg(gameID, handID);
+    myGuiLog->signalLogNewGameHandMsg(gameID, handID);
 }
 void GuiWrapper::logNewBlindsSetsMsg(int sbSet, int bbSet, std::string sbName, std::string bbName)
 {
-	myGuiLog->signalLogNewBlindsSetsMsg(sbSet, bbSet, QString::fromUtf8(sbName.c_str()), QString::fromUtf8(bbName.c_str()));
-
+    myGuiLog->signalLogNewBlindsSetsMsg(sbSet, bbSet, QString::fromUtf8(sbName.c_str()),
+                                        QString::fromUtf8(bbName.c_str()));
 }
 void GuiWrapper::logPlayerWinsMsg(std::string playerName, int pot, bool main)
 {
-	myGuiLog->signalLogPlayerWinsMsg(QString::fromUtf8(playerName.c_str()), pot, main);
+    myGuiLog->signalLogPlayerWinsMsg(QString::fromUtf8(playerName.c_str()), pot, main);
 }
 void GuiWrapper::logDealBoardCardsMsg(int roundID, int card1, int card2, int card3, int card4, int card5)
 {
-	myGuiLog->signalLogDealBoardCardsMsg(roundID, card1, card2, card3, card4, card5);
+    myGuiLog->signalLogDealBoardCardsMsg(roundID, card1, card2, card3, card4, card5);
 }
 void GuiWrapper::logFlipHoleCardsMsg(string playerName, int card1, int card2, int cardsValueInt, string showHas)
 {
-	myGuiLog->signalLogFlipHoleCardsMsg(QString::fromUtf8(playerName.c_str()), card1, card2, cardsValueInt, QString::fromUtf8(showHas.c_str()));
+    myGuiLog->signalLogFlipHoleCardsMsg(QString::fromUtf8(playerName.c_str()), card1, card2, cardsValueInt,
+                                        QString::fromUtf8(showHas.c_str()));
 }
 void GuiWrapper::logPlayerWinGame(std::string playerName, int gameID)
 {
-	myGuiLog->signalLogPlayerWinGame(QString::fromUtf8(playerName.c_str()), gameID);
+    myGuiLog->signalLogPlayerWinGame(QString::fromUtf8(playerName.c_str()), gameID);
 }
-

@@ -2803,7 +2803,7 @@ void gameTableImpl::breakButtonClicked()
         if (currentGameOver)
         {
             currentGameOver = false;
-            myStartWindow->callNewGameDialog();
+            myStartWindow->startNewGame();
         }
         else
         {
