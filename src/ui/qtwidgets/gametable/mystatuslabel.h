@@ -20,35 +20,29 @@
 
 #include <iostream>
 
-#include <QtGui>
 #include <QtCore>
-#include <QtWidgets/QLabel>
+#include <QtGui>
 #include <QtWidgets/QGroupBox>
+#include <QtWidgets/QLabel>
 
-class gameTableImpl;
+class GameTableWindow;
 
 class MyStatusLabel : public QLabel
 {
-	Q_OBJECT
-public:
-	MyStatusLabel(QGroupBox*);
+    Q_OBJECT
+  public:
+    MyStatusLabel(QGroupBox*);
 
-	~MyStatusLabel();
+    ~MyStatusLabel();
 
+    void setW(GameTableWindow* theValue) { myW = theValue; }
 
-	void setW ( gameTableImpl* theValue ) {
-		myW = theValue;
-	}
+    void mousePressEvent(QMouseEvent*);
+    void mouseReleaseEvent(QMouseEvent*);
 
-	void mousePressEvent ( QMouseEvent *);
-	void mouseReleaseEvent ( QMouseEvent *);
-
-
-private:
-
-	gameTableImpl *myW;
-	bool mousePress;
-
+  private:
+    GameTableWindow* myW;
+    bool mousePress;
 };
 
 #endif

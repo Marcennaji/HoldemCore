@@ -16,33 +16,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 #include "mycashlabel.h"
-#include "gametableimpl.h"
 #include <ui/qtwidgets/styles/gametablestylereader.h>
+#include "GameTableWindow.h"
 
-MyCashLabel::MyCashLabel(QGroupBox* parent)
-	: QLabel(parent), myW(0)
+MyCashLabel::MyCashLabel(QGroupBox* parent) : QLabel(parent), myW(0)
 {
 }
-
 
 MyCashLabel::~MyCashLabel()
 {
 }
 
-void MyCashLabel::setText ( const QString &t, bool trans)
+void MyCashLabel::setText(const QString& t, bool trans)
 {
-	QColor transColor;
-	transColor.setNamedColor("#"+myW->getGameTableStyle()->getPlayerCashTextColor());
-	QString red = QString::number(transColor.red());
-	QString green = QString::number(transColor.green());
-	QString blue = QString::number(transColor.blue());
+    QColor transColor;
+    transColor.setNamedColor("#" + myW->getGameTableStyle()->getPlayerCashTextColor());
+    QString red = QString::number(transColor.red());
+    QString green = QString::number(transColor.green());
+    QString blue = QString::number(transColor.blue());
 
-	if(trans) {
-		this->setStyleSheet("QLabel { "+ myW->getGameTableStyle()->getFont2String() +" font-size: "+myW->getGameTableStyle()->getPlayerCashLabelFontSize()+"px; font-weight: bold; color: rgba("+red+", "+green+", "+blue+", 80); }");
-	} else {
-		this->setStyleSheet("QLabel { "+ myW->getGameTableStyle()->getFont2String() +" font-size: "+myW->getGameTableStyle()->getPlayerCashLabelFontSize()+"px; font-weight: bold; color: #"+myW->getGameTableStyle()->getPlayerCashTextColor()+"; }");
-	}
+    if (trans)
+    {
+        this->setStyleSheet("QLabel { " + myW->getGameTableStyle()->getFont2String() +
+                            " font-size: " + myW->getGameTableStyle()->getPlayerCashLabelFontSize() +
+                            "px; font-weight: bold; color: rgba(" + red + ", " + green + ", " + blue + ", 80); }");
+    }
+    else
+    {
+        this->setStyleSheet("QLabel { " + myW->getGameTableStyle()->getFont2String() + " font-size: " +
+                            myW->getGameTableStyle()->getPlayerCashLabelFontSize() + "px; font-weight: bold; color: #" +
+                            myW->getGameTableStyle()->getPlayerCashTextColor() + "; }");
+    }
 
-	QLabel::setText(t);
-
+    QLabel::setText(t);
 }

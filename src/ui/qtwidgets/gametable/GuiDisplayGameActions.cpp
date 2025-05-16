@@ -17,7 +17,7 @@
  *****************************************************************************/
 #include "GuiDisplayGameActions.h"
 
-#include <ui/qtwidgets/gametable/gametableimpl.h>
+#include <ui/qtwidgets/gametable/GameTableWindow.h>
 #include <ui/qtwidgets/styles/gametablestylereader.h>
 
 #include <core/engine/CardsValue.h>
@@ -26,7 +26,7 @@
 
 using namespace std;
 
-GuiDisplayGameActions::GuiDisplayGameActions(gameTableImpl* w) : myW(w)
+GuiDisplayGameActions::GuiDisplayGameActions(GameTableWindow* w) : myW(w)
 {
 
     myW->setGuiLog(this);

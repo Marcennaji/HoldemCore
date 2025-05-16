@@ -20,33 +20,27 @@
 
 #include <vector>
 
-#include <QtGui>
 #include <QtCore>
+#include <QtGui>
 #include <QtWidgets/QLabel>
 
-class gameTableImpl;
+class GameTableWindow;
 class GameTableStyleReader;
 
 class MyChanceLabel : public QLabel
 {
-	Q_OBJECT
-public:
-	MyChanceLabel(QWidget*);
+    Q_OBJECT
+  public:
+    MyChanceLabel(QWidget*);
 
-	~MyChanceLabel();
+    ~MyChanceLabel();
 
-	void setW ( gameTableImpl* theValue ) {
-		myW = theValue;
-	}
-	void setStyle ( GameTableStyleReader* theValue ) {
-		myStyle = theValue;
-	}
+    void setW(GameTableWindow* theValue) { myW = theValue; }
+    void setStyle(GameTableStyleReader* theValue) { myStyle = theValue; }
 
-private:
-
-	gameTableImpl *myW;
-	GameTableStyleReader *myStyle;
-
+  private:
+    GameTableWindow* myW;
+    GameTableStyleReader* myStyle;
 };
 
 #endif

@@ -20,100 +20,85 @@
 
 #include <iostream>
 
-#include <QtGui>
 #include <QtCore>
-#include <QtWidgets/QLabel>
+#include <QtGui>
 #include <QtWidgets/QGroupBox>
+#include <QtWidgets/QLabel>
 
-class gameTableImpl;
+class GameTableWindow;
 
 class MyCardsPixmapLabel : public QLabel
 {
-	Q_OBJECT
-public:
-	MyCardsPixmapLabel(QGroupBox*);
+    Q_OBJECT
+  public:
+    MyCardsPixmapLabel(QGroupBox*);
 
-	~MyCardsPixmapLabel();
+    ~MyCardsPixmapLabel();
 
-	void setW ( gameTableImpl* theValue ) {
-		myW = theValue;
-	}
+    void setW(GameTableWindow* theValue) { myW = theValue; }
 
-	void setIsFlipside(bool theValue) {
-		isFlipside = theValue;
-	}
-	bool getIsFlipside() const {
-		return isFlipside;
-	}
+    void setIsFlipside(bool theValue) { isFlipside = theValue; }
+    bool getIsFlipside() const { return isFlipside; }
 
-	void setFadeOutAction(bool theValue) {
-		fadeOutAction = theValue;
-	}
-	bool getFadeOutAction() const {
-		return fadeOutAction;
-	}
+    void setFadeOutAction(bool theValue) { fadeOutAction = theValue; }
+    bool getFadeOutAction() const { return fadeOutAction; }
 
-	void startFadeOut(int);
-	void stopFadeOut();
-	void startFlipCards(int, const QPixmap & , const QPixmap &);
-	void stopFlipCardsAnimation();
+    void startFadeOut(int);
+    void stopFadeOut();
+    void startFlipCards(int, const QPixmap&, const QPixmap&);
+    void stopFlipCardsAnimation();
 
-	void setFlipsidePix(QPixmap p) {
-		flipside = p;
-	}
+    void setFlipsidePix(QPixmap p) { flipside = p; }
 
-	void paintEvent(QPaintEvent * event);
+    void paintEvent(QPaintEvent* event);
 
-signals:
-	void signalFastFlipCards(bool);
+  signals:
+    void signalFastFlipCards(bool);
 
+  public slots:
 
-public slots:
+    void setPixmap(const QPixmap&, const bool);
+    void setHiddenFrontPixmap(const QPixmap&);
 
-	void setPixmap ( const QPixmap &, const bool );
-	void setHiddenFrontPixmap ( const QPixmap &);
+    void nextFadeOutFrame();
+    void nextFlipCardsFrame();
 
-	void nextFadeOutFrame();
-	void nextFlipCardsFrame();
+    void fastFlipCards(bool front);
 
-	void fastFlipCards(bool front);
+    // 	void mouseMoveEvent ( QMouseEvent *);
 
-// 	void mouseMoveEvent ( QMouseEvent *);
+    void mousePressEvent(QMouseEvent*);
+    void mouseReleaseEvent(QMouseEvent*);
 
-	void mousePressEvent ( QMouseEvent *);
-	void mouseReleaseEvent ( QMouseEvent *);
+    void setFront(const QPixmap& theValue);
 
-        void setFront ( const QPixmap& theValue );
+  private:
+    GameTableWindow* myW;
 
+    qreal frameOpacity;
+    qreal opacityRaiseInterval;
 
-private:
+    qreal flipCardsScaleIntervall;
+    qreal frameFlipCardsAction1Size;
+    qreal frameFlipCardsAction2Size;
 
-	gameTableImpl* myW;
+    QTimer* fadeOutTimer;
+    QTimer* flipCardsTimer;
 
-	qreal frameOpacity;
-	qreal opacityRaiseInterval;
+    bool isFlipside;
+    bool fadeOutAction;
+    bool flipCardsAction1;
+    bool flipCardsAction2;
+    bool stopFlipCards;
 
-	qreal flipCardsScaleIntervall;
-	qreal frameFlipCardsAction1Size;
-	qreal frameFlipCardsAction2Size;
+    bool mousePress;
+    bool fastFlipCardsFront;
 
-	QTimer *fadeOutTimer;
-	QTimer *flipCardsTimer;
+    QPixmap front;
+    QPixmap flipside;
+    QPixmap myHiddenFront;
 
-	bool isFlipside;
-	bool fadeOutAction;
-	bool flipCardsAction1;
-	bool flipCardsAction2;
-	bool stopFlipCards;
-
-	bool mousePress;
-	bool fastFlipCardsFront;
-
-	QPixmap front;
-	QPixmap flipside;
-	QPixmap myHiddenFront;
-
-	friend class gameTableImpl;
+    friend class GameTableWindow;
 };
 
 #endif

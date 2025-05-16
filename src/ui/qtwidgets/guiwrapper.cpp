@@ -20,16 +20,16 @@
 #include <core/engine/game.h>
 #include <core/player/Player.h>
 #include <infra/persistence/SqliteLogStore.h>
+#include <ui/qtwidgets/gametable/GameTableWindow.h>
 #include <ui/qtwidgets/gametable/GuiDisplayGameActions.h>
-#include <ui/qtwidgets/gametable/gametableimpl.h>
-#include <ui/qtwidgets/startwindow/startwindowimpl.h>
+#include <ui/qtwidgets/startwindow/StartWindow.h>
 
 using namespace std;
 
-GuiWrapper::GuiWrapper(const std::string& appDataDir, startWindowImpl* s) : myGuiLog(NULL), myW(NULL), myStartWindow(s)
+GuiWrapper::GuiWrapper(const std::string& appDataDir, StartWindow* s) : myGuiLog(NULL), myW(NULL), myStartWindow(s)
 {
 
-    myW = new gameTableImpl(appDataDir);
+    myW = new GameTableWindow(appDataDir);
     myGuiLog = new GuiDisplayGameActions(myW);
 }
 
@@ -39,7 +39,7 @@ GuiWrapper::~GuiWrapper()
 }
 void GuiWrapper::setStartWindow(void* w)
 {
-    myStartWindow = static_cast<startWindowImpl*>(w);
+    myStartWindow = static_cast<StartWindow*>(w);
     if (myGuiLog)
         myStartWindow->setGuiLog(myGuiLog);
     if (myW)
@@ -139,7 +139,7 @@ void GuiWrapper::nextPlayerAnimation()
     myW->signalNextPlayerAnimation();
 }
 
-void GuiWrapper::beRoAnimation2(int myBettingRoundID)
+void GuiWrapper::bettingRoundAnimation(int myBettingRoundID)
 {
     myW->signalBettingRoundAnimation2(myBettingRoundID);
 }

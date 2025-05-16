@@ -24,15 +24,15 @@
 #include <string>
 
 class Session;
-class gameTableImpl;
-class startWindowImpl;
+class GameTableWindow;
+class StartWindow;
 class GuiDisplayGameActions;
 class Game;
 
 class GuiWrapper : public IGui
 {
   public:
-    GuiWrapper(const std::string& appDataDir, startWindowImpl*);
+    GuiWrapper(const std::string& appDataDir, StartWindow*);
 
     ~GuiWrapper();
 
@@ -66,7 +66,7 @@ class GuiWrapper : public IGui
 
     void nextPlayerAnimation();
 
-    void beRoAnimation2(int);
+    void bettingRoundAnimation(int);
 
     void preflopAnimation1();
     void preflopAnimation2();
@@ -103,8 +103,8 @@ class GuiWrapper : public IGui
 
   private:
     GuiDisplayGameActions* myGuiLog;
-    gameTableImpl* myW;
-    startWindowImpl* myStartWindow;
+    GameTableWindow* myW;
+    StartWindow* myStartWindow;
 };
 
 #endif

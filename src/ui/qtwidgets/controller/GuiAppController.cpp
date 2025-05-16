@@ -3,7 +3,7 @@
 #include <app/session.h>
 #include <infra/persistence/SqliteLogStore.h>
 #include <ui/qtwidgets/guiwrapper.h>
-#include <ui/qtwidgets/startwindow/startwindowimpl.h>
+#include <ui/qtwidgets/startwindow/StartWindow.h>
 
 GuiAppController::GuiAppController(ILogger* logger, const QString& app, const QString& log, const QString& user)
     : appDataPath(app), logPath(log), userDataPath(user)
@@ -16,9 +16,9 @@ GuiAppController::GuiAppController(ILogger* logger, const QString& app, const QS
     gameActionslogger->init();
 }
 
-startWindowImpl* GuiAppController::createMainWindow()
+StartWindow* GuiAppController::createMainWindow()
 {
-    return new startWindowImpl(appDataPath, gui.get(), session.get(), nullptr);
+    return new StartWindow(appDataPath, gui.get(), session.get(), nullptr);
 }
 
 GuiAppController::~GuiAppController() = default;

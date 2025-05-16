@@ -20,34 +20,29 @@
 
 #include <iostream>
 
-#include <QtGui>
 #include <QtCore>
-#include <QtWidgets/QTabWidget>
+#include <QtGui>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QTabWidget>
 
-class gameTableImpl;
+class GameTableWindow;
 
 class MySetLabel : public QLabel
 {
-	Q_OBJECT
-public:
-	MySetLabel(QGroupBox*);
+    Q_OBJECT
+  public:
+    MySetLabel(QGroupBox*);
 
-	~MySetLabel();
+    ~MySetLabel();
 
+    void setW(GameTableWindow* theValue) { myW = theValue; }
+    void paintEvent(QPaintEvent* event);
 
-	void setW ( gameTableImpl* theValue ) {
-		myW = theValue;
-	}
-	void paintEvent(QPaintEvent * event);
+  public slots:
 
-public slots:
-
-private:
-
-	gameTableImpl *myW;
-
+  private:
+    GameTableWindow* myW;
 };
 
 #endif

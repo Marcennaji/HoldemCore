@@ -16,17 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 #include "mychancelabel.h"
-#include "gametableimpl.h"
 #include <ui/qtwidgets/styles/gametablestylereader.h>
+#include "GameTableWindow.h"
 
 using namespace std;
 
-MyChanceLabel::MyChanceLabel(QWidget* parent)
-	: QLabel(parent), myW(0), myStyle(0)
+MyChanceLabel::MyChanceLabel(QWidget* parent) : QLabel(parent), myW(0), myStyle(0)
 {
 }
 
 MyChanceLabel::~MyChanceLabel()
 {
 }
-

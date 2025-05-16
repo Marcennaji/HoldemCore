@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
-#include "startwindowimpl.h"
+#include "StartWindow.h"
 
+#include <ui/qtwidgets/gametable/GameTableWindow.h>
 #include <ui/qtwidgets/gametable/GuiDisplayGameActions.h>
-#include <ui/qtwidgets/gametable/gametableimpl.h>
 #include <ui/qtwidgets/guiwrapper.h>
 
 #include <core/engine/EngineDefs.h>
@@ -29,7 +29,7 @@
 
 using namespace std;
 
-startWindowImpl::startWindowImpl(const QString& appDataPath, IGui* gui, Session* session, QWidget* parent)
+StartWindow::StartWindow(const QString& appDataPath, IGui* gui, Session* session, QWidget* parent)
     : QMainWindow(parent), myAppDataPath(appDataPath), myGuiInterface(gui), mySession(session)
 {
     setupUi(this);
@@ -39,19 +39,19 @@ startWindowImpl::startWindowImpl(const QString& appDataPath, IGui* gui, Session*
     setStatusBar(nullptr);
     installEventFilter(this);
 
-    connect(pushButtonStartGame, &QPushButton::clicked, this, &startWindowImpl::startNewGame);
+    connect(pushButtonStartGame, &QPushButton::clicked, this, &StartWindow::startNewGame);
 
     show();
 }
-startWindowImpl::~startWindowImpl()
+StartWindow::~StartWindow()
 {
 }
 
-void startWindowImpl::startNewGame()
+void StartWindow::startNewGame()
 {
 
     this->hide();
-    auto gameTableWindow = static_cast<gameTableImpl*>(myGuiInterface->getW());
+    auto gameTableWindow = static_cast<GameTableWindow*>(myGuiInterface->getW());
     gameTableWindow->show();
 
     GameData gameData;
@@ -82,7 +82,7 @@ void startWindowImpl::startNewGame()
     mySession->startGame(gameData, startData);
 }
 
-bool startWindowImpl::eventFilter(QObject* obj, QEvent* event)
+bool StartWindow::eventFilter(QObject* obj, QEvent* event)
 {
     if (event->type() == QEvent::Close)
     {

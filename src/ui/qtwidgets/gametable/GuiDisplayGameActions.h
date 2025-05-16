@@ -18,54 +18,51 @@
 #ifndef GUILOG_H
 #define GUILOG_H
 
-#include <QStringList>
 #include <QObject>
+#include <QStringList>
 
-
-class gameTableImpl;
+class GameTableWindow;
 class GameTableStyleReader;
 
 class GuiDisplayGameActions : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
-public:
-	GuiDisplayGameActions(gameTableImpl*);
+  public:
+    GuiDisplayGameActions(GameTableWindow*);
 
-	~GuiDisplayGameActions();
+    ~GuiDisplayGameActions();
 
-public slots:
+  public slots:
 
-	void logPlayerActionMsg(QString playerName, int action, int setValue);
-	void logNewGameHandMsg(int gameID, int handID);
-	void logNewBlindsSetsMsg(int sbSet, int bbSet, QString sbName, QString bbName);
-	void logPlayerWinsMsg(QString playerName, int pot, bool main);
-	void logDealBoardCardsMsg(int roundID, int card1, int card2, int card3, int card4 = -1, int card5 = -1);
-	void logFlipHoleCardsMsg(QString playerName, int card1, int card2, int cardsValueInt = -1, QString showHas = "shows");
-	void logPlayerWinGame(QString playerName, int gameID);
+    void logPlayerActionMsg(QString playerName, int action, int setValue);
+    void logNewGameHandMsg(int gameID, int handID);
+    void logNewBlindsSetsMsg(int sbSet, int bbSet, QString sbName, QString bbName);
+    void logPlayerWinsMsg(QString playerName, int pot, bool main);
+    void logDealBoardCardsMsg(int roundID, int card1, int card2, int card3, int card4 = -1, int card5 = -1);
+    void logFlipHoleCardsMsg(QString playerName, int card1, int card2, int cardsValueInt = -1,
+                             QString showHas = "shows");
+    void logPlayerWinGame(QString playerName, int gameID);
 
+  signals:
+    void signalLogPlayerActionMsg(QString playerName, int action, int setValue);
+    void signalLogNewGameHandMsg(int gameID, int handID);
+    void signalLogNewBlindsSetsMsg(int sbSet, int bbSet, QString sbName, QString bbName);
+    void signalLogPlayerWinsMsg(QString playerName, int pot, bool main);
+    void signalLogDealBoardCardsMsg(int roundID, int card1, int card2, int card3, int card4 = -1, int card5 = -1);
+    void signalLogFlipHoleCardsMsg(QString playerName, int card1, int card2, int cardsValueInt = -1,
+                                   QString showHas = "shows");
+    void signalLogPlayerWinGame(QString playerName, int gameID);
 
-signals:
-	void signalLogPlayerActionMsg(QString playerName, int action, int setValue);
-	void signalLogNewGameHandMsg(int gameID, int handID);
-	void signalLogNewBlindsSetsMsg(int sbSet, int bbSet, QString sbName, QString bbName);
-	void signalLogPlayerWinsMsg(QString playerName, int pot, bool main);
-	void signalLogDealBoardCardsMsg(int roundID, int card1, int card2, int card3, int card4 = -1, int card5 = -1);
-	void signalLogFlipHoleCardsMsg(QString playerName, int card1, int card2, int cardsValueInt = -1, QString showHas = "shows");
-	void signalLogPlayerWinGame(QString playerName, int gameID);
+  private:
+    int convertCardStringToInt(std::string val, std::string col);
+    std::string convertCardIntToString(int code, int modus);
+    QStringList translateCardCode(int cardCode);
 
+    GameTableWindow* myW;
+    GameTableStyleReader* myStyle;
 
-private:
-
-	int convertCardStringToInt(std::string val, std::string col);
-	std::string convertCardIntToString(int code, int modus);
-	QStringList translateCardCode(int cardCode);
-
-	gameTableImpl *myW;
-	GameTableStyleReader *myStyle;
-
-	friend class GuiWrapper;
-
+    friend class GuiWrapper;
 };
 
 #endif

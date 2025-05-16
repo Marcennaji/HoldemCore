@@ -207,7 +207,7 @@ void BettingRoundPreflop::run()
         else
         {
             // Gegner sind dran
-            getHand()->getGuiInterface()->beRoAnimation2(getBettingRoundID());
+            getHand()->getGuiInterface()->bettingRoundAnimation(getBettingRoundID());
         }
     }
 }

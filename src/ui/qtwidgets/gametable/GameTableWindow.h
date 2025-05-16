@@ -45,7 +45,7 @@ class MyCashLabel;
 class MyNameLabel;
 
 class settingsDialogImpl;
-class startWindowImpl;
+class StartWindow;
 
 class GameTableStyleReader;
 class CardDeckStyleReader;
@@ -59,21 +59,21 @@ enum SeatState
     SEAT_CLEAR
 };
 
-class gameTableImpl : public QMainWindow, public Ui::gameTable
+class GameTableWindow : public QMainWindow, public Ui::gameTable
 {
     Q_OBJECT
 
   public:
-    gameTableImpl(const std::string& appDataDir, QMainWindow* parent = 0);
+    GameTableWindow(const std::string& appDataDir, QMainWindow* parent = 0);
 
-    ~gameTableImpl();
+    ~GameTableWindow();
 
     std::shared_ptr<Session> getSession();
 
     GameTableStyleReader* getGameTableStyle() const;
     bool getGuestMode() const;
 
-    void setStartWindow(startWindowImpl* s);
+    void setStartWindow(StartWindow* s);
     void setGuiLog(GuiDisplayGameActions* l);
 
     void setSpeeds();
@@ -202,7 +202,7 @@ class gameTableImpl : public QMainWindow, public Ui::gameTable
 
     void nextPlayerAnimation();
 
-    void beRoAnimation2(int);
+    void bettingRoundAnimation(int);
 
     void preflopAnimation1();
     void preflopAnimation1Action();
@@ -338,7 +338,7 @@ class gameTableImpl : public QMainWindow, public Ui::gameTable
     QPixmap flipside;
 
     // 	Dialogs
-    startWindowImpl* myStartWindow;
+    StartWindow* myStartWindow;
 
     QString myAppDataDir;
 

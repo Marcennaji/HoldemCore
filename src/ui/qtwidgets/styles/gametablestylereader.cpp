@@ -15,18 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
-#include <ui/qtwidgets/styles/gametablestylereader.h>
-#include <cstdlib>
 #include <QtWidgets/QLineEdit>
 #include <core/interfaces/ILogger.h>
+#include <cstdlib>
+#include <ui/qtwidgets/styles/gametablestylereader.h>
 
 using namespace std;
 
-GameTableStyleReader::GameTableStyleReader(QWidget *w, QString appDataDir_)
+GameTableStyleReader::GameTableStyleReader(QWidget* w, QString appDataDir_)
     : myAppDataDir(appDataDir_), myW(w), fallBack(0), loadedSuccessfull(0), myState(GT_STYLE_UNDEFINED)
 {
 
-    //set fonts and font sizes
+    // set fonts and font sizes
     font1String = "font-family: \"Arial\";";
     font2String = "font-family: \"Nimbus Sans L\";";
     cashFontSize = "11";
@@ -40,41 +40,48 @@ GameTableStyleReader::GameTableStyleReader(QWidget *w, QString appDataDir_)
     tabBarPaddingSide = "10";
 }
 
-
 GameTableStyleReader::~GameTableStyleReader()
 {
 }
 
 void GameTableStyleReader::readStyleFile(QString file)
 {
-    //if style file failed --> default style fallback
-    if(QFile(file).exists()) {
+    // if style file failed --> default style fallback
+    if (QFile(file).exists())
+    {
         currentFileName = QFile(file).fileName();
-    } else {
-        currentFileName = QFile(myAppDataDir+"gfx/gui/table/default/defaulttablestyle.xml").fileName();
+    }
+    else
+    {
+        currentFileName = QFile(myAppDataDir + "gfx/gui/table/default/defaulttablestyle.xml").fileName();
         fallBack = 1;
     }
 
     QFileInfo info(currentFileName);
-    currentDir = info.absolutePath()+"/";
+    currentDir = info.absolutePath() + "/";
 
     QFile myFile(currentFileName);
     myFile.open(QIODevice::ReadOnly);
     fileContent = myFile.readAll();
 
-    //start reading the file and fill vars
+    // start reading the file and fill vars
     string tempString1("");
     TiXmlDocument doc;
     doc.Parse(fileContent.constData());
 
-    if(doc.RootElement()) {
-        TiXmlHandle docHandle( &doc );
+    if (doc.RootElement())
+    {
+        TiXmlHandle docHandle(&doc);
 
-        TiXmlElement *CardDeckElement = docHandle.FirstChild( "PokerTraining" ).FirstChild( "CardDeck" ).ToElement();
-        if(CardDeckElement) {
-            //LOG_ERROR(__FILE__ << " (" << __LINE__ << "A card deck style was selected instead of a game table style");
-        } else {
-            //in case of rereading clear old variables:
+        TiXmlElement* CardDeckElement = docHandle.FirstChild("PokerTraining").FirstChild("CardDeck").ToElement();
+        if (CardDeckElement)
+        {
+            // LOG_ERROR(__FILE__ << " (" << __LINE__ << "A card deck style was selected instead of a game table
+            // style");
+        }
+        else
+        {
+            // in case of rereading clear old variables:
             StyleDescription.clear();
             StyleMaintainerName.clear();
             StyleMaintainerEMail.clear();
@@ -112,9 +119,9 @@ void GameTableStyleReader::readStyleFile(QString file)
             CheckCallButtonCheckedHover.clear();
             BetRaiseButtonDefault.clear();
 
-			BetRaiseHalfPotButtonDefault.clear();
-			BetRaiseTwoThirdPotButtonDefault.clear();
-			BetRaisePotButtonDefault.clear();
+            BetRaiseHalfPotButtonDefault.clear();
+            BetRaiseTwoThirdPotButtonDefault.clear();
+            BetRaisePotButtonDefault.clear();
 
             BetRaiseButtonHover.clear();
             BetRaiseButtonChecked.clear();
@@ -210,14 +217,14 @@ void GameTableStyleReader::readStyleFile(QString file)
             CheckCallButtonCheckableTextColor.clear();
             BetRaiseButtonTextColor.clear();
 
-			BetRaiseHalfPotButtonTextColor.clear();
-			BetRaiseTwoThirdPotButtonTextColor.clear();
-			BetRaisePotButtonTextColor.clear();
+            BetRaiseHalfPotButtonTextColor.clear();
+            BetRaiseTwoThirdPotButtonTextColor.clear();
+            BetRaisePotButtonTextColor.clear();
 
             BetRaiseButtonCheckableTextColor.clear();
-			BetRaiseHalfPotButtonCheckableTextColor.clear();
-			BetRaiseTwoThirdPotButtonCheckableTextColor.clear();
-			BetRaisePotButtonCheckableTextColor.clear();
+            BetRaiseHalfPotButtonCheckableTextColor.clear();
+            BetRaiseTwoThirdPotButtonCheckableTextColor.clear();
+            BetRaisePotButtonCheckableTextColor.clear();
 
             AllInButtonTextColor.clear();
             AllInButtonCheckableTextColor.clear();
@@ -230,1231 +237,1837 @@ void GameTableStyleReader::readStyleFile(QString file)
             PlayerInfoHintTextColor.clear();
             ChatLogTextSize.clear();
 
-            //now reading!
-            TiXmlElement* itemsList = docHandle.FirstChild( "PokerTraining" ).FirstChild( "TableStyle" ).FirstChild().ToElement();
-            for( ; itemsList; itemsList=itemsList->NextSiblingElement()) {
-                const char *tmpStr1 = itemsList->Attribute("value");
-                if (tmpStr1) {
+            // now reading!
+            TiXmlElement* itemsList =
+                docHandle.FirstChild("PokerTraining").FirstChild("TableStyle").FirstChild().ToElement();
+            for (; itemsList; itemsList = itemsList->NextSiblingElement())
+            {
+                const char* tmpStr1 = itemsList->Attribute("value");
+                if (tmpStr1)
+                {
                     tempString1 = tmpStr1;
 
                     // 				INFOS
-                    if(itemsList->ValueStr() == "StyleDescription") {
+                    if (itemsList->ValueStr() == "StyleDescription")
+                    {
                         StyleDescription = QString::fromUtf8(tempString1.c_str());
-                    } else if(itemsList->ValueStr() == "StyleMaintainerName") {
+                    }
+                    else if (itemsList->ValueStr() == "StyleMaintainerName")
+                    {
                         StyleMaintainerName = QString::fromUtf8(tempString1.c_str());
-                    } else if(itemsList->ValueStr() == "StyleMaintainerEMail") {
+                    }
+                    else if (itemsList->ValueStr() == "StyleMaintainerEMail")
+                    {
                         StyleMaintainerEMail = QString::fromUtf8(tempString1.c_str());
-                    } else if(itemsList->ValueStr() == "StyleCreateDate") {
+                    }
+                    else if (itemsList->ValueStr() == "StyleCreateDate")
+                    {
                         StyleCreateDate = QString::fromUtf8(tempString1.c_str());
-                    } else if(itemsList->ValueStr() == "PokerTrainingStyleFileVersion") {
+                    }
+                    else if (itemsList->ValueStr() == "PokerTrainingStyleFileVersion")
+                    {
                         PokerTrainingStyleFileVersion = QString::fromUtf8(tempString1.c_str());
                     }
                     // 				WINDOWS SETTINGS
-                    else if (itemsList->ValueStr() == "IfFixedWindowSize") {
+                    else if (itemsList->ValueStr() == "IfFixedWindowSize")
+                    {
                         IfFixedWindowSize = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "FixedWindowWidth") {
+                    }
+                    else if (itemsList->ValueStr() == "FixedWindowWidth")
+                    {
                         FixedWindowWidth = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "FixedWindowHeight") {
+                    }
+                    else if (itemsList->ValueStr() == "FixedWindowHeight")
+                    {
                         FixedWindowHeight = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "MinimumWindowWidth") {
+                    }
+                    else if (itemsList->ValueStr() == "MinimumWindowWidth")
+                    {
                         MinimumWindowWidth = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "MinimumWindowHeight") {
+                    }
+                    else if (itemsList->ValueStr() == "MinimumWindowHeight")
+                    {
                         MinimumWindowHeight = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "MaximumWindowWidth") {
+                    }
+                    else if (itemsList->ValueStr() == "MaximumWindowWidth")
+                    {
                         MaximumWindowWidth = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "MaximumWindowHeight") {
+                    }
+                    else if (itemsList->ValueStr() == "MaximumWindowHeight")
+                    {
                         MaximumWindowHeight = QString::fromUtf8(tempString1.c_str());
                     }
                     // 				PICS
-                    else if (itemsList->ValueStr() == "Preview") {
-                        Preview = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ActionAllInI18NPic") {
-                        ActionAllInI18NPic = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ActionRaiseI18NPic") {
-                        ActionRaiseI18NPic = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ActionBetI18NPic") {
-                        ActionBetI18NPic = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ActionCallI18NPic") {
-                        ActionCallI18NPic = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ActionCheckI18NPic") {
-                        ActionCheckI18NPic = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ActionFoldI18NPic") {
-                        ActionFoldI18NPic = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ActionWinnerI18NPic") {
-                        ActionWinnerI18NPic = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BigBlindPuck") {
-                        BigBlindPuck = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "SmallBlindPuck") {
-                        SmallBlindPuck = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "DealerPuck") {
-                        DealerPuck = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "DefaultAvatar") {
-                        DefaultAvatar = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "CardHolderFlop") {
-                        CardHolderFlop = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "CardHolderTurn") {
-                        CardHolderTurn = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "CardHolderRiver") {
-                        CardHolderRiver = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "FoldButtonDefault") {
-                        FoldButtonDefault = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "FoldButtonHover") {
-                        FoldButtonHover = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "FoldButtonChecked") {
-                        FoldButtonChecked = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "FoldButtonCheckedHover") {
-                        FoldButtonCheckedHover = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "CheckCallButtonDefault") {
-                        CheckCallButtonDefault = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "CheckCallButtonHover") {
-                        CheckCallButtonHover = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "CheckCallButtonChecked") {
-                        CheckCallButtonChecked = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "CheckCallButtonCheckedHover") {
-                        CheckCallButtonCheckedHover = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetRaiseButtonDefault") {
-                        BetRaiseButtonDefault = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetRaiseButtonHover") {
-                        BetRaiseButtonHover = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetRaiseButtonChecked") {
-                        BetRaiseButtonChecked = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetRaiseButtonCheckedHover") {
-                        BetRaiseButtonCheckedHover = currentDir+QString::fromUtf8(tempString1.c_str());
-
-                    } else if (itemsList->ValueStr() == "BetRaiseHalfPotButtonDefault") {
-                        BetRaiseHalfPotButtonDefault = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetRaiseHalfPotButtonHover") {
-                        BetRaiseHalfPotButtonHover = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetRaiseHalfPotButtonChecked") {
-                        BetRaiseHalfPotButtonChecked = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetRaiseHalfPotButtonCheckedHover") {
-                        BetRaiseHalfPotButtonCheckedHover = currentDir+QString::fromUtf8(tempString1.c_str());
-
-                   } else if (itemsList->ValueStr() == "BetRaiseTwoThirdPotButtonDefault") {
-                        BetRaiseTwoThirdPotButtonDefault = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetRaiseTwoThirdPotButtonHover") {
-                        BetRaiseTwoThirdPotButtonHover = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetRaiseTwoThirdPotButtonChecked") {
-                        BetRaiseTwoThirdPotButtonChecked = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetRaiseTwoThirdPotButtonCheckedHover") {
-                        BetRaiseTwoThirdPotButtonCheckedHover = currentDir+QString::fromUtf8(tempString1.c_str());
-
-                    } else if (itemsList->ValueStr() == "BetRaisePotButtonDefault") {
-                        BetRaisePotButtonDefault = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetRaisePotButtonHover") {
-                        BetRaisePotButtonHover = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetRaisePotButtonChecked") {
-                        BetRaisePotButtonChecked = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetRaisePotButtonCheckedHover") {
-                        BetRaisePotButtonCheckedHover = currentDir+QString::fromUtf8(tempString1.c_str());
-
-                    } else if (itemsList->ValueStr() == "AllInButtonDefault") {
-                        AllInButtonDefault = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "AllInButtonHover") {
-                        AllInButtonHover = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "AllInButtonChecked") {
-                        AllInButtonChecked = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "AllInButtonCheckedHover") {
-                        AllInButtonCheckedHover = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "RadioButtonPressed") {
-                        RadioButtonPressed = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "RadioButtonChecked") {
-                        RadioButtonChecked = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "RadioButtonCheckedHover") {
-                        RadioButtonCheckedHover = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "RadioButtonUnchecked") {
-                        RadioButtonUnchecked = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "RadioButtonUncheckedHover") {
-                        RadioButtonUncheckedHover = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "PlayerTopSeatInactive") {
-                        PlayerTopSeatInactive = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "PlayerTopSeatActive") {
-                        PlayerTopSeatActive = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "PlayerBottomSeatInactive") {
-                        PlayerBottomSeatInactive = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "PlayerBottomSeatActive") {
-                        PlayerBottomSeatActive = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "Table") {
-                        Table = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "HandRanking") {
-                        HandRanking = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ToolBoxBackground") {
-                        ToolBoxBackground = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ShowMyCardsButtonDefault") {
-                        ShowMyCardsButtonDefault = currentDir+QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ShowMyCardsButtonHover") {
-                        ShowMyCardsButtonHover = currentDir+QString::fromUtf8(tempString1.c_str());
+                    else if (itemsList->ValueStr() == "Preview")
+                    {
+                        Preview = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "ActionAllInI18NPic")
+                    {
+                        ActionAllInI18NPic = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "ActionRaiseI18NPic")
+                    {
+                        ActionRaiseI18NPic = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "ActionBetI18NPic")
+                    {
+                        ActionBetI18NPic = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "ActionCallI18NPic")
+                    {
+                        ActionCallI18NPic = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "ActionCheckI18NPic")
+                    {
+                        ActionCheckI18NPic = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "ActionFoldI18NPic")
+                    {
+                        ActionFoldI18NPic = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "ActionWinnerI18NPic")
+                    {
+                        ActionWinnerI18NPic = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "BigBlindPuck")
+                    {
+                        BigBlindPuck = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "SmallBlindPuck")
+                    {
+                        SmallBlindPuck = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "DealerPuck")
+                    {
+                        DealerPuck = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "DefaultAvatar")
+                    {
+                        DefaultAvatar = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "CardHolderFlop")
+                    {
+                        CardHolderFlop = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "CardHolderTurn")
+                    {
+                        CardHolderTurn = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "CardHolderRiver")
+                    {
+                        CardHolderRiver = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "FoldButtonDefault")
+                    {
+                        FoldButtonDefault = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "FoldButtonHover")
+                    {
+                        FoldButtonHover = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "FoldButtonChecked")
+                    {
+                        FoldButtonChecked = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "FoldButtonCheckedHover")
+                    {
+                        FoldButtonCheckedHover = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "CheckCallButtonDefault")
+                    {
+                        CheckCallButtonDefault = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "CheckCallButtonHover")
+                    {
+                        CheckCallButtonHover = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "CheckCallButtonChecked")
+                    {
+                        CheckCallButtonChecked = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "CheckCallButtonCheckedHover")
+                    {
+                        CheckCallButtonCheckedHover = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "BetRaiseButtonDefault")
+                    {
+                        BetRaiseButtonDefault = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "BetRaiseButtonHover")
+                    {
+                        BetRaiseButtonHover = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "BetRaiseButtonChecked")
+                    {
+                        BetRaiseButtonChecked = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "BetRaiseButtonCheckedHover")
+                    {
+                        BetRaiseButtonCheckedHover = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "BetRaiseHalfPotButtonDefault")
+                    {
+                        BetRaiseHalfPotButtonDefault = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "BetRaiseHalfPotButtonHover")
+                    {
+                        BetRaiseHalfPotButtonHover = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "BetRaiseHalfPotButtonChecked")
+                    {
+                        BetRaiseHalfPotButtonChecked = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "BetRaiseHalfPotButtonCheckedHover")
+                    {
+                        BetRaiseHalfPotButtonCheckedHover = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "BetRaiseTwoThirdPotButtonDefault")
+                    {
+                        BetRaiseTwoThirdPotButtonDefault = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "BetRaiseTwoThirdPotButtonHover")
+                    {
+                        BetRaiseTwoThirdPotButtonHover = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "BetRaiseTwoThirdPotButtonChecked")
+                    {
+                        BetRaiseTwoThirdPotButtonChecked = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "BetRaiseTwoThirdPotButtonCheckedHover")
+                    {
+                        BetRaiseTwoThirdPotButtonCheckedHover = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "BetRaisePotButtonDefault")
+                    {
+                        BetRaisePotButtonDefault = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "BetRaisePotButtonHover")
+                    {
+                        BetRaisePotButtonHover = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "BetRaisePotButtonChecked")
+                    {
+                        BetRaisePotButtonChecked = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "BetRaisePotButtonCheckedHover")
+                    {
+                        BetRaisePotButtonCheckedHover = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "AllInButtonDefault")
+                    {
+                        AllInButtonDefault = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "AllInButtonHover")
+                    {
+                        AllInButtonHover = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "AllInButtonChecked")
+                    {
+                        AllInButtonChecked = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "AllInButtonCheckedHover")
+                    {
+                        AllInButtonCheckedHover = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "RadioButtonPressed")
+                    {
+                        RadioButtonPressed = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "RadioButtonChecked")
+                    {
+                        RadioButtonChecked = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "RadioButtonCheckedHover")
+                    {
+                        RadioButtonCheckedHover = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "RadioButtonUnchecked")
+                    {
+                        RadioButtonUnchecked = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "RadioButtonUncheckedHover")
+                    {
+                        RadioButtonUncheckedHover = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "PlayerTopSeatInactive")
+                    {
+                        PlayerTopSeatInactive = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "PlayerTopSeatActive")
+                    {
+                        PlayerTopSeatActive = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "PlayerBottomSeatInactive")
+                    {
+                        PlayerBottomSeatInactive = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "PlayerBottomSeatActive")
+                    {
+                        PlayerBottomSeatActive = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "Table")
+                    {
+                        Table = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "HandRanking")
+                    {
+                        HandRanking = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "ToolBoxBackground")
+                    {
+                        ToolBoxBackground = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "ShowMyCardsButtonDefault")
+                    {
+                        ShowMyCardsButtonDefault = currentDir + QString::fromUtf8(tempString1.c_str());
+                    }
+                    else if (itemsList->ValueStr() == "ShowMyCardsButtonHover")
+                    {
+                        ShowMyCardsButtonHover = currentDir + QString::fromUtf8(tempString1.c_str());
                     }
 
-                    //I18N ACTION STRINGS
-                    else if (itemsList->ValueStr() == "ActionAllInI18NString") {
+                    // I18N ACTION STRINGS
+                    else if (itemsList->ValueStr() == "ActionAllInI18NString")
+                    {
                         ActionAllInI18NString = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ActionRaiseI18NString") {
+                    }
+                    else if (itemsList->ValueStr() == "ActionRaiseI18NString")
+                    {
                         ActionRaiseI18NString = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ActionBetI18NString") {
+                    }
+                    else if (itemsList->ValueStr() == "ActionBetI18NString")
+                    {
                         ActionBetI18NString = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ActionCallI18NString") {
+                    }
+                    else if (itemsList->ValueStr() == "ActionCallI18NString")
+                    {
                         ActionCallI18NString = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ActionCheckI18NString") {
+                    }
+                    else if (itemsList->ValueStr() == "ActionCheckI18NString")
+                    {
                         ActionCheckI18NString = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ActionFoldI18NString") {
+                    }
+                    else if (itemsList->ValueStr() == "ActionFoldI18NString")
+                    {
                         ActionFoldI18NString = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "PotI18NString") {
+                    }
+                    else if (itemsList->ValueStr() == "PotI18NString")
+                    {
                         PotI18NString = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "TotalI18NString") {
+                    }
+                    else if (itemsList->ValueStr() == "TotalI18NString")
+                    {
                         TotalI18NString = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetsI18NString") {
+                    }
+                    else if (itemsList->ValueStr() == "BetsI18NString")
+                    {
                         BetsI18NString = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "GameI18NString") {
+                    }
+                    else if (itemsList->ValueStr() == "GameI18NString")
+                    {
                         GameI18NString = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "HandI18NString") {
+                    }
+                    else if (itemsList->ValueStr() == "HandI18NString")
+                    {
                         HandI18NString = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "PreflopI18NString") {
+                    }
+                    else if (itemsList->ValueStr() == "PreflopI18NString")
+                    {
                         PreflopI18NString = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "FlopI18NString") {
+                    }
+                    else if (itemsList->ValueStr() == "FlopI18NString")
+                    {
                         FlopI18NString = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "TurnI18NString") {
+                    }
+                    else if (itemsList->ValueStr() == "TurnI18NString")
+                    {
                         TurnI18NString = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "RiverI18NString") {
+                    }
+                    else if (itemsList->ValueStr() == "RiverI18NString")
+                    {
                         RiverI18NString = QString::fromUtf8(tempString1.c_str());
                     }
 
                     // 				COLORS
-                    if (itemsList->ValueStr() == "FKeyIndicatorColor") {
+                    if (itemsList->ValueStr() == "FKeyIndicatorColor")
+                    {
                         FKeyIndicatorColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ChanceLabelPossibleColor") {
+                    }
+                    else if (itemsList->ValueStr() == "ChanceLabelPossibleColor")
+                    {
                         ChanceLabelPossibleColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ChanceLabelImpossibleColor") {
+                    }
+                    else if (itemsList->ValueStr() == "ChanceLabelImpossibleColor")
+                    {
                         ChanceLabelImpossibleColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ChatTextNickNotifyColor") {
+                    }
+                    else if (itemsList->ValueStr() == "ChatTextNickNotifyColor")
+                    {
                         ChatTextNickNotifyColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ChatLogTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "ChatLogTextColor")
+                    {
                         ChatLogTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ChatLogBgColor") {
+                    }
+                    else if (itemsList->ValueStr() == "ChatLogBgColor")
+                    {
                         ChatLogBgColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ChatLogScrollBarBorderColor") {
+                    }
+                    else if (itemsList->ValueStr() == "ChatLogScrollBarBorderColor")
+                    {
                         ChatLogScrollBarBorderColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ChatLogScrollBarBgColor") {
+                    }
+                    else if (itemsList->ValueStr() == "ChatLogScrollBarBgColor")
+                    {
                         ChatLogScrollBarBgColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ChatLogScrollBarHandleBorderColor") {
+                    }
+                    else if (itemsList->ValueStr() == "ChatLogScrollBarHandleBorderColor")
+                    {
                         ChatLogScrollBarHandleBorderColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ChatLogScrollBarHandleBgColor") {
+                    }
+                    else if (itemsList->ValueStr() == "ChatLogScrollBarHandleBgColor")
+                    {
                         ChatLogScrollBarHandleBgColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ChatLogScrollBarArrowBorderColor") {
+                    }
+                    else if (itemsList->ValueStr() == "ChatLogScrollBarArrowBorderColor")
+                    {
                         ChatLogScrollBarArrowBorderColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ChatLogScrollBarArrowBgColor") {
+                    }
+                    else if (itemsList->ValueStr() == "ChatLogScrollBarArrowBgColor")
+                    {
                         ChatLogScrollBarArrowBgColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "LogWinnerMainPotColor") {
+                    }
+                    else if (itemsList->ValueStr() == "LogWinnerMainPotColor")
+                    {
                         LogWinnerMainPotColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "LogWinnerSidePotColor") {
+                    }
+                    else if (itemsList->ValueStr() == "LogWinnerSidePotColor")
+                    {
                         LogWinnerSidePotColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "LogPlayerSitsOutColor") {
+                    }
+                    else if (itemsList->ValueStr() == "LogPlayerSitsOutColor")
+                    {
                         LogPlayerSitsOutColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "LogNewGameAdminColor") {
+                    }
+                    else if (itemsList->ValueStr() == "LogNewGameAdminColor")
+                    {
                         LogNewGameAdminColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "TabWidgetBorderColor") {
+                    }
+                    else if (itemsList->ValueStr() == "TabWidgetBorderColor")
+                    {
                         TabWidgetBorderColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "TabWidgetBgColor") {
+                    }
+                    else if (itemsList->ValueStr() == "TabWidgetBgColor")
+                    {
                         TabWidgetBgColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "TabWidgetTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "TabWidgetTextColor")
+                    {
                         TabWidgetTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "MenuBgColor") {
+                    }
+                    else if (itemsList->ValueStr() == "MenuBgColor")
+                    {
                         MenuBgColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "MenuTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "MenuTextColor")
+                    {
                         MenuTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BreakLobbyButtonBgColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BreakLobbyButtonBgColor")
+                    {
                         BreakLobbyButtonBgColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BreakLobbyButtonTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BreakLobbyButtonTextColor")
+                    {
                         BreakLobbyButtonTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BreakLobbyButtonBgDisabledColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BreakLobbyButtonBgDisabledColor")
+                    {
                         BreakLobbyButtonBgDisabledColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BreakLobbyButtonTextDisabledColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BreakLobbyButtonTextDisabledColor")
+                    {
                         BreakLobbyButtonTextDisabledColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BreakLobbyButtonBgBlinkColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BreakLobbyButtonBgBlinkColor")
+                    {
                         BreakLobbyButtonBgBlinkColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BreakLobbyButtonTextBlinkColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BreakLobbyButtonTextBlinkColor")
+                    {
                         BreakLobbyButtonTextBlinkColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "PlayerCashTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "PlayerCashTextColor")
+                    {
                         PlayerCashTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "PlayerBetTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "PlayerBetTextColor")
+                    {
                         PlayerBetTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "PlayerNickTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "PlayerNickTextColor")
+                    {
                         PlayerNickTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BoardBigTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BoardBigTextColor")
+                    {
                         BoardBigTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BoardSmallTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BoardSmallTextColor")
+                    {
                         BoardSmallTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "SpeedTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "SpeedTextColor")
+                    {
                         SpeedTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "VoteButtonBgColor") {
+                    }
+                    else if (itemsList->ValueStr() == "VoteButtonBgColor")
+                    {
                         VoteButtonBgColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "VoteButtonTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "VoteButtonTextColor")
+                    {
                         VoteButtonTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetInputTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BetInputTextColor")
+                    {
                         BetInputTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetInputBgColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BetInputBgColor")
+                    {
                         BetInputBgColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetInputDisabledTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BetInputDisabledTextColor")
+                    {
                         BetInputDisabledTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetInputDisabledBgColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BetInputDisabledBgColor")
+                    {
                         BetInputDisabledBgColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "FoldButtonTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "FoldButtonTextColor")
+                    {
                         FoldButtonTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "FoldButtonCheckableTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "FoldButtonCheckableTextColor")
+                    {
                         FoldButtonCheckableTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "CheckCallButtonTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "CheckCallButtonTextColor")
+                    {
                         CheckCallButtonTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "CheckCallButtonCheckableTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "CheckCallButtonCheckableTextColor")
+                    {
                         CheckCallButtonCheckableTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetRaiseButtonTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BetRaiseButtonTextColor")
+                    {
                         BetRaiseButtonTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetRaiseButtonCheckableTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BetRaiseButtonCheckableTextColor")
+                    {
                         BetRaiseButtonCheckableTextColor = QString::fromUtf8(tempString1.c_str());
-
-                   } else if (itemsList->ValueStr() == "BetRaiseHalfPotButtonTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BetRaiseHalfPotButtonTextColor")
+                    {
                         BetRaiseHalfPotButtonTextColor = QString::fromUtf8(tempString1.c_str());
-                   } else if (itemsList->ValueStr() == "BetRaiseHalfPotButtonCheckableTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BetRaiseHalfPotButtonCheckableTextColor")
+                    {
                         BetRaiseHalfPotButtonCheckableTextColor = QString::fromUtf8(tempString1.c_str());
-
-	                } else if (itemsList->ValueStr() == "BetRaiseTwoThirdPotButtonTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BetRaiseTwoThirdPotButtonTextColor")
+                    {
                         BetRaiseTwoThirdPotButtonTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetRaiseTwoThirdPotButtonCheckableTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BetRaiseTwoThirdPotButtonCheckableTextColor")
+                    {
                         BetRaiseTwoThirdPotButtonCheckableTextColor = QString::fromUtf8(tempString1.c_str());
-
-	                } else if (itemsList->ValueStr() == "BetRaisePotButtonTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BetRaisePotButtonTextColor")
+                    {
                         BetRaisePotButtonTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetRaisePotButtonCheckableTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BetRaisePotButtonCheckableTextColor")
+                    {
                         BetRaisePotButtonCheckableTextColor = QString::fromUtf8(tempString1.c_str());
-
-                    } else if (itemsList->ValueStr() == "AllInButtonTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "AllInButtonTextColor")
+                    {
                         AllInButtonTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "AllInButtonCheckableTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "AllInButtonCheckableTextColor")
+                    {
                         AllInButtonCheckableTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetSpeedSliderGrooveBgColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BetSpeedSliderGrooveBgColor")
+                    {
                         BetSpeedSliderGrooveBgColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetSpeedSliderGrooveBorderColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BetSpeedSliderGrooveBorderColor")
+                    {
                         BetSpeedSliderGrooveBorderColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetSpeedSliderHandleBgColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BetSpeedSliderHandleBgColor")
+                    {
                         BetSpeedSliderHandleBgColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "BetSpeedSliderHandleBorderColor") {
+                    }
+                    else if (itemsList->ValueStr() == "BetSpeedSliderHandleBorderColor")
+                    {
                         BetSpeedSliderHandleBorderColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "ShowMyCardsButtonTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "ShowMyCardsButtonTextColor")
+                    {
                         ShowMyCardsButtonTextColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "RatingStarsColor") {
+                    }
+                    else if (itemsList->ValueStr() == "RatingStarsColor")
+                    {
                         RatingStarsColor = QString::fromUtf8(tempString1.c_str());
-                    } else if (itemsList->ValueStr() == "PlayerInfoHintTextColor") {
+                    }
+                    else if (itemsList->ValueStr() == "PlayerInfoHintTextColor")
+                    {
                         PlayerInfoHintTextColor = QString::fromUtf8(tempString1.c_str());
                     }
                     // 				SIZES
-                    else if (itemsList->ValueStr() == "ChatLogTextSize") {
+                    else if (itemsList->ValueStr() == "ChatLogTextSize")
+                    {
                         ChatLogTextSize = QString::fromUtf8(tempString1.c_str());
                     }
                 }
             }
 
-            //check if style items are left and if pictures where not found
+            // check if style items are left and if pictures where not found
             leftItems.clear();
             itemPicsLeft.clear();
 
             // 		INFOS
-            if(StyleDescription == "") {
+            if (StyleDescription == "")
+            {
                 leftItems << "StyleDescription";
             }
-            if(StyleMaintainerName == "") {
+            if (StyleMaintainerName == "")
+            {
                 leftItems << "StyleMaintainerName";
             }
-            if(StyleMaintainerEMail == "") {
+            if (StyleMaintainerEMail == "")
+            {
                 leftItems << "StyleMaintainerEMail";
             }
-            if(StyleCreateDate == "") {
+            if (StyleCreateDate == "")
+            {
                 leftItems << "StyleCreateDate";
             }
-            if(PokerTrainingStyleFileVersion == "") {
+            if (PokerTrainingStyleFileVersion == "")
+            {
                 leftItems << "PokerTrainingStyleFileVersion";
             }
             // 		WINDOWS SETTINGS
-            if(IfFixedWindowSize == "") {
+            if (IfFixedWindowSize == "")
+            {
                 IfFixedWindowSize = getFallBackFieldContent("IfFixedWindowSize", 0);
                 leftItems << "IfFixedWindowSize";
             }
-            if(FixedWindowWidth == "") {
+            if (FixedWindowWidth == "")
+            {
                 FixedWindowWidth = getFallBackFieldContent("FixedWindowWidth", 0);
                 leftItems << "FixedWindowWidth";
             }
-            if(FixedWindowHeight == "") {
+            if (FixedWindowHeight == "")
+            {
                 FixedWindowHeight = getFallBackFieldContent("FixedWindowHeight", 0);
                 leftItems << "FixedWindowHeight";
             }
-            if(MinimumWindowWidth == "") {
+            if (MinimumWindowWidth == "")
+            {
                 MinimumWindowWidth = getFallBackFieldContent("MinimumWindowWidth", 0);
                 leftItems << "MinimumWindowWidth";
             }
-            if(MinimumWindowHeight == "") {
+            if (MinimumWindowHeight == "")
+            {
                 MinimumWindowHeight = getFallBackFieldContent("MinimumWindowHeight", 0);
                 leftItems << "MinimumWindowHeight";
             }
-            if(MaximumWindowWidth == "") {
+            if (MaximumWindowWidth == "")
+            {
                 MaximumWindowWidth = getFallBackFieldContent("MaximumWindowWidth", 0);
                 leftItems << "MaximumWindowWidth";
             }
-            if(MaximumWindowHeight == "") {
+            if (MaximumWindowHeight == "")
+            {
                 MaximumWindowHeight = getFallBackFieldContent("MaximumWindowHeight", 0);
                 leftItems << "MaximumWindowHeight";
             }
             // 		P I C S
 
             // I18N Pics
-            if(ActionAllInI18NPic == "") {
+            if (ActionAllInI18NPic == "")
+            {
                 ActionAllInI18NPic = getFallBackFieldContent("ActionAllInI18NPic", 1);
                 leftItems << "ActionAllInI18NPic";
-            } else if(ActionAllInI18NPic != QString(currentDir+"NULL") && !QFile(ActionAllInI18NPic).exists()) {
-                itemPicsLeft << "ActionAllInI18NPic = "+ActionAllInI18NPic;
+            }
+            else if (ActionAllInI18NPic != QString(currentDir + "NULL") && !QFile(ActionAllInI18NPic).exists())
+            {
+                itemPicsLeft << "ActionAllInI18NPic = " + ActionAllInI18NPic;
                 ActionAllInI18NPic = getFallBackFieldContent("ActionAllInI18NPic", 1);
             }
 
-            if(ActionRaiseI18NPic == "") {
+            if (ActionRaiseI18NPic == "")
+            {
                 ActionRaiseI18NPic = getFallBackFieldContent("ActionRaiseI18NPic", 1);
                 leftItems << "ActionRaiseI18NPic";
-            } else if(ActionRaiseI18NPic != QString(currentDir+"NULL") && !QFile(ActionRaiseI18NPic).exists()) {
-                itemPicsLeft << "ActionRaiseI18NPic = "+ActionRaiseI18NPic;
+            }
+            else if (ActionRaiseI18NPic != QString(currentDir + "NULL") && !QFile(ActionRaiseI18NPic).exists())
+            {
+                itemPicsLeft << "ActionRaiseI18NPic = " + ActionRaiseI18NPic;
                 ActionRaiseI18NPic = getFallBackFieldContent("ActionRaiseI18NPic", 1);
             }
 
-            if(ActionBetI18NPic == "") {
+            if (ActionBetI18NPic == "")
+            {
                 ActionBetI18NPic = getFallBackFieldContent("ActionBetI18NPic", 1);
                 leftItems << "ActionBetI18NPic";
-            } else if(ActionBetI18NPic != QString(currentDir+"NULL") && !QFile(ActionBetI18NPic).exists()) {
-                itemPicsLeft << "ActionBetI18NPic = "+ActionBetI18NPic;
+            }
+            else if (ActionBetI18NPic != QString(currentDir + "NULL") && !QFile(ActionBetI18NPic).exists())
+            {
+                itemPicsLeft << "ActionBetI18NPic = " + ActionBetI18NPic;
                 ActionBetI18NPic = getFallBackFieldContent("ActionBetI18NPic", 1);
             }
 
-            if(ActionCallI18NPic == "") {
+            if (ActionCallI18NPic == "")
+            {
                 ActionCallI18NPic = getFallBackFieldContent("ActionCallI18NPic", 1);
                 leftItems << "ActionCallI18NPic";
-            } else if(ActionCallI18NPic != QString(currentDir+"NULL") && !QFile(ActionCallI18NPic).exists()) {
-                itemPicsLeft << "ActionCallI18NPic = "+ActionCallI18NPic;
+            }
+            else if (ActionCallI18NPic != QString(currentDir + "NULL") && !QFile(ActionCallI18NPic).exists())
+            {
+                itemPicsLeft << "ActionCallI18NPic = " + ActionCallI18NPic;
                 ActionCallI18NPic = getFallBackFieldContent("ActionCallI18NPic", 1);
             }
 
-            if(ActionCheckI18NPic == "") {
+            if (ActionCheckI18NPic == "")
+            {
                 ActionCheckI18NPic = getFallBackFieldContent("ActionCheckI18NPic", 1);
                 leftItems << "ActionCheckI18NPic";
-            } else if(ActionCheckI18NPic != QString(currentDir+"NULL") && !QFile(ActionCheckI18NPic).exists()) {
-                itemPicsLeft << "ActionCheckI18NPic = "+ActionCheckI18NPic;
+            }
+            else if (ActionCheckI18NPic != QString(currentDir + "NULL") && !QFile(ActionCheckI18NPic).exists())
+            {
+                itemPicsLeft << "ActionCheckI18NPic = " + ActionCheckI18NPic;
                 ActionCheckI18NPic = getFallBackFieldContent("ActionCheckI18NPic", 1);
             }
 
-            if(ActionFoldI18NPic == "") {
+            if (ActionFoldI18NPic == "")
+            {
                 ActionFoldI18NPic = getFallBackFieldContent("ActionFoldI18NPic", 1);
                 leftItems << "ActionFoldI18NPic";
-            } else if(ActionFoldI18NPic != QString(currentDir+"NULL") && !QFile(ActionFoldI18NPic).exists()) {
-                itemPicsLeft << "ActionFoldI18NPic = "+ActionFoldI18NPic;
+            }
+            else if (ActionFoldI18NPic != QString(currentDir + "NULL") && !QFile(ActionFoldI18NPic).exists())
+            {
+                itemPicsLeft << "ActionFoldI18NPic = " + ActionFoldI18NPic;
                 ActionFoldI18NPic = getFallBackFieldContent("ActionFoldI18NPic", 1);
             }
 
-            if(ActionWinnerI18NPic == "") {
+            if (ActionWinnerI18NPic == "")
+            {
                 ActionWinnerI18NPic = getFallBackFieldContent(" ActionWinnerI18NPic", 1);
                 leftItems << "ActionWinnerI18NPic";
-            } else if(ActionWinnerI18NPic != QString(currentDir+"NULL") && !QFile(ActionWinnerI18NPic).exists()) {
-                itemPicsLeft << "ActionWinnerI18NPic = "+ActionWinnerI18NPic;
+            }
+            else if (ActionWinnerI18NPic != QString(currentDir + "NULL") && !QFile(ActionWinnerI18NPic).exists())
+            {
+                itemPicsLeft << "ActionWinnerI18NPic = " + ActionWinnerI18NPic;
                 ActionWinnerI18NPic = getFallBackFieldContent(" ActionWinnerI18NPic", 1);
             }
 
             // Other Pics
-            if(BigBlindPuck == "") {
+            if (BigBlindPuck == "")
+            {
                 BigBlindPuck = getFallBackFieldContent("BigBlindPuck", 1);
                 leftItems << "BigBlindPuck";
-            } else if(BigBlindPuck != QString(currentDir+"NULL") && !QFile(BigBlindPuck).exists()) {
-                itemPicsLeft << "BigBlindPuck = "+BigBlindPuck;
+            }
+            else if (BigBlindPuck != QString(currentDir + "NULL") && !QFile(BigBlindPuck).exists())
+            {
+                itemPicsLeft << "BigBlindPuck = " + BigBlindPuck;
                 BigBlindPuck = getFallBackFieldContent("BigBlindPuck", 1);
             }
 
-            if(SmallBlindPuck == "") {
+            if (SmallBlindPuck == "")
+            {
                 SmallBlindPuck = getFallBackFieldContent("SmallBlindPuck", 1);
                 leftItems << "SmallBlindPuck";
-            } else if(SmallBlindPuck != QString(currentDir+"NULL") && !QFile(SmallBlindPuck).exists()) {
-                itemPicsLeft << "SmallBlindPuck = "+SmallBlindPuck;
+            }
+            else if (SmallBlindPuck != QString(currentDir + "NULL") && !QFile(SmallBlindPuck).exists())
+            {
+                itemPicsLeft << "SmallBlindPuck = " + SmallBlindPuck;
                 SmallBlindPuck = getFallBackFieldContent("SmallBlindPuck", 1);
             }
 
-            if(DealerPuck == "") {
+            if (DealerPuck == "")
+            {
                 DealerPuck = getFallBackFieldContent("DealerPuck", 1);
                 leftItems << "DealerPuck";
-            } else if(DealerPuck != QString(currentDir+"NULL") && !QFile(DealerPuck).exists()) {
-                itemPicsLeft << "DealerPuck = "+DealerPuck;
+            }
+            else if (DealerPuck != QString(currentDir + "NULL") && !QFile(DealerPuck).exists())
+            {
+                itemPicsLeft << "DealerPuck = " + DealerPuck;
                 DealerPuck = getFallBackFieldContent("DealerPuck", 1);
             }
 
-            if(DefaultAvatar == "") {
+            if (DefaultAvatar == "")
+            {
                 DefaultAvatar = getFallBackFieldContent("DefaultAvatar", 1);
                 leftItems << "DefaultAvatar";
-            } else if(DefaultAvatar != QString(currentDir+"NULL") && !QFile(DefaultAvatar).exists()) {
-                itemPicsLeft << "DefaultAvatar = "+DefaultAvatar;
+            }
+            else if (DefaultAvatar != QString(currentDir + "NULL") && !QFile(DefaultAvatar).exists())
+            {
+                itemPicsLeft << "DefaultAvatar = " + DefaultAvatar;
                 DefaultAvatar = getFallBackFieldContent("DefaultAvatar", 1);
             }
 
-            if(CardHolderFlop == "") {
+            if (CardHolderFlop == "")
+            {
                 CardHolderFlop = getFallBackFieldContent("CardHolderFlop", 1);
                 leftItems << "CardHolderFlop";
-            } else if(CardHolderFlop != QString(currentDir+"NULL") && !QFile(CardHolderFlop).exists()) {
-                itemPicsLeft << "CardHolderFlop = "+CardHolderFlop;
+            }
+            else if (CardHolderFlop != QString(currentDir + "NULL") && !QFile(CardHolderFlop).exists())
+            {
+                itemPicsLeft << "CardHolderFlop = " + CardHolderFlop;
                 CardHolderFlop = getFallBackFieldContent("CardHolderFlop", 1);
             }
 
-            if(CardHolderTurn == "") {
+            if (CardHolderTurn == "")
+            {
                 CardHolderTurn = getFallBackFieldContent("CardHolderTurn", 1);
                 leftItems << "CardHolderTurn";
-            } else if(CardHolderTurn != QString(currentDir+"NULL") && !QFile(CardHolderTurn).exists()) {
-                itemPicsLeft << "CardHolderTurn = "+CardHolderTurn;
+            }
+            else if (CardHolderTurn != QString(currentDir + "NULL") && !QFile(CardHolderTurn).exists())
+            {
+                itemPicsLeft << "CardHolderTurn = " + CardHolderTurn;
                 CardHolderTurn = getFallBackFieldContent("CardHolderTurn", 1);
             }
 
-            if(CardHolderRiver == "") {
+            if (CardHolderRiver == "")
+            {
                 CardHolderRiver = getFallBackFieldContent("CardHolderRiver", 1);
                 leftItems << "CardHolderRiver";
-            } else if(CardHolderRiver != QString(currentDir+"NULL") && !QFile(CardHolderRiver).exists()) {
-                itemPicsLeft << "CardHolderRiver = "+CardHolderRiver;
+            }
+            else if (CardHolderRiver != QString(currentDir + "NULL") && !QFile(CardHolderRiver).exists())
+            {
+                itemPicsLeft << "CardHolderRiver = " + CardHolderRiver;
                 CardHolderRiver = getFallBackFieldContent("CardHolderRiver", 1);
             }
 
-            if(FoldButtonDefault == "") {
+            if (FoldButtonDefault == "")
+            {
                 FoldButtonDefault = getFallBackFieldContent("FoldButtonDefault", 1);
                 leftItems << "FoldButtonDefault";
-            } else if(FoldButtonDefault != QString(currentDir+"NULL") && !QFile(FoldButtonDefault).exists()) {
-                itemPicsLeft << "FoldButtonDefault = "+FoldButtonDefault;
+            }
+            else if (FoldButtonDefault != QString(currentDir + "NULL") && !QFile(FoldButtonDefault).exists())
+            {
+                itemPicsLeft << "FoldButtonDefault = " + FoldButtonDefault;
                 FoldButtonDefault = getFallBackFieldContent("FoldButtonDefault", 1);
             }
 
-            if(FoldButtonHover == "") {
+            if (FoldButtonHover == "")
+            {
                 FoldButtonHover = getFallBackFieldContent("FoldButtonHover", 1);
                 leftItems << "FoldButtonHover";
-            } else if(FoldButtonHover != QString(currentDir+"NULL") && !QFile(FoldButtonHover).exists()) {
-                itemPicsLeft << "FoldButtonHover = "+FoldButtonHover;
+            }
+            else if (FoldButtonHover != QString(currentDir + "NULL") && !QFile(FoldButtonHover).exists())
+            {
+                itemPicsLeft << "FoldButtonHover = " + FoldButtonHover;
                 FoldButtonHover = getFallBackFieldContent("FoldButtonHover", 1);
             }
 
-            if(FoldButtonChecked == "") {
+            if (FoldButtonChecked == "")
+            {
                 FoldButtonChecked = getFallBackFieldContent("FoldButtonChecked", 1);
                 leftItems << "FoldButtonChecked";
-            } else if(FoldButtonChecked != QString(currentDir+"NULL") && !QFile(FoldButtonChecked).exists()) {
-                itemPicsLeft << "FoldButtonChecked = "+FoldButtonChecked;
+            }
+            else if (FoldButtonChecked != QString(currentDir + "NULL") && !QFile(FoldButtonChecked).exists())
+            {
+                itemPicsLeft << "FoldButtonChecked = " + FoldButtonChecked;
                 FoldButtonChecked = getFallBackFieldContent("FoldButtonChecked", 1);
             }
 
-            if(FoldButtonCheckedHover == "") {
+            if (FoldButtonCheckedHover == "")
+            {
                 FoldButtonCheckedHover = getFallBackFieldContent("FoldButtonCheckedHover", 1);
                 leftItems << "FoldButtonCheckedHover";
-            } else if(FoldButtonCheckedHover != QString(currentDir+"NULL") && !QFile(FoldButtonCheckedHover).exists()) {
-                itemPicsLeft << "FoldButtonCheckedHover = "+FoldButtonCheckedHover;
+            }
+            else if (FoldButtonCheckedHover != QString(currentDir + "NULL") && !QFile(FoldButtonCheckedHover).exists())
+            {
+                itemPicsLeft << "FoldButtonCheckedHover = " + FoldButtonCheckedHover;
                 FoldButtonCheckedHover = getFallBackFieldContent("FoldButtonCheckedHover", 1);
             }
 
-            if(CheckCallButtonDefault == "") {
+            if (CheckCallButtonDefault == "")
+            {
                 CheckCallButtonDefault = getFallBackFieldContent("CheckCallButtonDefault", 1);
                 leftItems << "CheckCallButtonDefault";
-            } else if(CheckCallButtonDefault != QString(currentDir+"NULL") && !QFile(CheckCallButtonDefault).exists()) {
-                itemPicsLeft << "CheckCallButtonDefault = "+CheckCallButtonDefault;
+            }
+            else if (CheckCallButtonDefault != QString(currentDir + "NULL") && !QFile(CheckCallButtonDefault).exists())
+            {
+                itemPicsLeft << "CheckCallButtonDefault = " + CheckCallButtonDefault;
                 CheckCallButtonDefault = getFallBackFieldContent("CheckCallButtonDefault", 1);
             }
 
-            if(CheckCallButtonHover == "") {
+            if (CheckCallButtonHover == "")
+            {
                 CheckCallButtonHover = getFallBackFieldContent("CheckCallButtonHover", 1);
                 leftItems << "CheckCallButtonHover";
-            } else if(CheckCallButtonHover != QString(currentDir+"NULL") && !QFile(CheckCallButtonHover).exists()) {
-                itemPicsLeft << "CheckCallButtonHover = "+CheckCallButtonHover;
+            }
+            else if (CheckCallButtonHover != QString(currentDir + "NULL") && !QFile(CheckCallButtonHover).exists())
+            {
+                itemPicsLeft << "CheckCallButtonHover = " + CheckCallButtonHover;
                 CheckCallButtonHover = getFallBackFieldContent("CheckCallButtonHover", 1);
             }
 
-            if(CheckCallButtonChecked == "") {
+            if (CheckCallButtonChecked == "")
+            {
                 CheckCallButtonChecked = getFallBackFieldContent("CheckCallButtonChecked", 1);
                 leftItems << "CheckCallButtonChecked";
-            } else if(CheckCallButtonChecked != QString(currentDir+"NULL") && !QFile(CheckCallButtonChecked).exists()) {
-                itemPicsLeft << "CheckCallButtonChecked = "+CheckCallButtonChecked;
+            }
+            else if (CheckCallButtonChecked != QString(currentDir + "NULL") && !QFile(CheckCallButtonChecked).exists())
+            {
+                itemPicsLeft << "CheckCallButtonChecked = " + CheckCallButtonChecked;
                 CheckCallButtonChecked = getFallBackFieldContent("CheckCallButtonChecked", 1);
             }
 
-            if(CheckCallButtonCheckedHover == "") {
+            if (CheckCallButtonCheckedHover == "")
+            {
                 CheckCallButtonCheckedHover = getFallBackFieldContent("CheckCallButtonCheckedHover", 1);
                 leftItems << "CheckCallButtonCheckedHover";
-            } else if(CheckCallButtonCheckedHover != QString(currentDir+"NULL") && !QFile(CheckCallButtonCheckedHover).exists()) {
-                itemPicsLeft << "CheckCallButtonCheckedHover = "+CheckCallButtonCheckedHover;
+            }
+            else if (CheckCallButtonCheckedHover != QString(currentDir + "NULL") &&
+                     !QFile(CheckCallButtonCheckedHover).exists())
+            {
+                itemPicsLeft << "CheckCallButtonCheckedHover = " + CheckCallButtonCheckedHover;
                 CheckCallButtonCheckedHover = getFallBackFieldContent("CheckCallButtonCheckedHover", 1);
             }
 
-            if(BetRaiseButtonDefault == "") {
+            if (BetRaiseButtonDefault == "")
+            {
                 BetRaiseButtonDefault = getFallBackFieldContent("BetRaiseButtonDefault", 1);
                 leftItems << "BetRaiseButtonDefault";
-            } else if(BetRaiseButtonDefault != QString(currentDir+"NULL") && !QFile(BetRaiseButtonDefault).exists()) {
-                itemPicsLeft << "BetRaiseButtonDefault = "+BetRaiseButtonDefault;
+            }
+            else if (BetRaiseButtonDefault != QString(currentDir + "NULL") && !QFile(BetRaiseButtonDefault).exists())
+            {
+                itemPicsLeft << "BetRaiseButtonDefault = " + BetRaiseButtonDefault;
                 BetRaiseButtonDefault = getFallBackFieldContent("BetRaiseButtonDefault", 1);
             }
 
-            if(BetRaiseHalfPotButtonDefault == "") {
+            if (BetRaiseHalfPotButtonDefault == "")
+            {
                 BetRaiseHalfPotButtonDefault = getFallBackFieldContent("BetRaiseHalfPotButtonDefault", 1);
                 leftItems << "BetRaiseHalfPotButtonDefault";
-            } else if(BetRaiseHalfPotButtonDefault != QString(currentDir+"NULL") && !QFile(BetRaiseHalfPotButtonDefault).exists()) {
-                itemPicsLeft << "BetRaiseHalfPotButtonDefault = "+BetRaiseHalfPotButtonDefault;
+            }
+            else if (BetRaiseHalfPotButtonDefault != QString(currentDir + "NULL") &&
+                     !QFile(BetRaiseHalfPotButtonDefault).exists())
+            {
+                itemPicsLeft << "BetRaiseHalfPotButtonDefault = " + BetRaiseHalfPotButtonDefault;
                 BetRaiseHalfPotButtonDefault = getFallBackFieldContent("BetRaiseHalfPotButtonDefault", 1);
             }
 
-            if(BetRaiseTwoThirdPotButtonDefault == "") {
+            if (BetRaiseTwoThirdPotButtonDefault == "")
+            {
                 BetRaiseTwoThirdPotButtonDefault = getFallBackFieldContent("BetRaiseTwoThirdPotButtonDefault", 1);
                 leftItems << "BetRaiseTwoThirdPotButtonDefault";
-            } else if(BetRaiseTwoThirdPotButtonDefault != QString(currentDir+"NULL") && !QFile(BetRaiseTwoThirdPotButtonDefault).exists()) {
-                itemPicsLeft << "BetRaiseTwoThirdPotButtonDefault = "+BetRaiseTwoThirdPotButtonDefault;
+            }
+            else if (BetRaiseTwoThirdPotButtonDefault != QString(currentDir + "NULL") &&
+                     !QFile(BetRaiseTwoThirdPotButtonDefault).exists())
+            {
+                itemPicsLeft << "BetRaiseTwoThirdPotButtonDefault = " + BetRaiseTwoThirdPotButtonDefault;
                 BetRaiseTwoThirdPotButtonDefault = getFallBackFieldContent("BetRaiseTwoThirdPotButtonDefault", 1);
             }
 
-            if(BetRaisePotButtonDefault == "") {
+            if (BetRaisePotButtonDefault == "")
+            {
                 BetRaisePotButtonDefault = getFallBackFieldContent("BetRaisePotButtonDefault", 1);
                 leftItems << "BetRaisePotButtonDefault";
-            } else if(BetRaisePotButtonDefault != QString(currentDir+"NULL") && !QFile(BetRaisePotButtonDefault).exists()) {
-                itemPicsLeft << "BetRaisePotButtonDefault = "+BetRaisePotButtonDefault;
+            }
+            else if (BetRaisePotButtonDefault != QString(currentDir + "NULL") &&
+                     !QFile(BetRaisePotButtonDefault).exists())
+            {
+                itemPicsLeft << "BetRaisePotButtonDefault = " + BetRaisePotButtonDefault;
                 BetRaisePotButtonDefault = getFallBackFieldContent("BetRaisePotButtonDefault", 1);
             }
 
-
-            if(BetRaiseButtonHover == "") {
+            if (BetRaiseButtonHover == "")
+            {
                 BetRaiseButtonHover = getFallBackFieldContent("BetRaiseButtonHover", 1);
                 leftItems << "BetRaiseButtonHover";
-            } else if(BetRaiseButtonHover != QString(currentDir+"NULL") && !QFile(BetRaiseButtonHover).exists()) {
-                itemPicsLeft << "BetRaiseButtonHover = "+BetRaiseButtonHover;
+            }
+            else if (BetRaiseButtonHover != QString(currentDir + "NULL") && !QFile(BetRaiseButtonHover).exists())
+            {
+                itemPicsLeft << "BetRaiseButtonHover = " + BetRaiseButtonHover;
                 BetRaiseButtonHover = getFallBackFieldContent("BetRaiseButtonHover", 1);
             }
 
-            if(BetRaiseButtonChecked == "") {
+            if (BetRaiseButtonChecked == "")
+            {
                 BetRaiseButtonChecked = getFallBackFieldContent("BetRaiseButtonChecked", 1);
                 leftItems << "BetRaiseButtonChecked";
-            } else if(BetRaiseButtonChecked != QString(currentDir+"NULL") && !QFile(BetRaiseButtonChecked).exists()) {
-                itemPicsLeft << "BetRaiseButtonChecked = "+BetRaiseButtonChecked;
+            }
+            else if (BetRaiseButtonChecked != QString(currentDir + "NULL") && !QFile(BetRaiseButtonChecked).exists())
+            {
+                itemPicsLeft << "BetRaiseButtonChecked = " + BetRaiseButtonChecked;
                 BetRaiseButtonChecked = getFallBackFieldContent("BetRaiseButtonChecked", 1);
             }
 
-            if(BetRaiseButtonCheckedHover == "") {
+            if (BetRaiseButtonCheckedHover == "")
+            {
                 BetRaiseButtonCheckedHover = getFallBackFieldContent("BetRaiseButtonCheckedHover", 1);
                 leftItems << "BetRaiseButtonCheckedHover";
-            } else if(BetRaiseButtonCheckedHover != QString(currentDir+"NULL") && !QFile(BetRaiseButtonCheckedHover).exists()) {
-                itemPicsLeft << "BetRaiseButtonCheckedHover = "+BetRaiseButtonCheckedHover;
+            }
+            else if (BetRaiseButtonCheckedHover != QString(currentDir + "NULL") &&
+                     !QFile(BetRaiseButtonCheckedHover).exists())
+            {
+                itemPicsLeft << "BetRaiseButtonCheckedHover = " + BetRaiseButtonCheckedHover;
                 BetRaiseButtonCheckedHover = getFallBackFieldContent("BetRaiseButtonCheckedHover", 1);
             }
 
-            if(BetRaiseHalfPotButtonHover == "") {
+            if (BetRaiseHalfPotButtonHover == "")
+            {
                 BetRaiseHalfPotButtonHover = getFallBackFieldContent("BetRaiseHalfPotButtonHover", 1);
                 leftItems << "BetRaiseHalfPotButtonHover";
-            } else if(BetRaiseHalfPotButtonHover != QString(currentDir+"NULL") && !QFile(BetRaiseHalfPotButtonHover).exists()) {
-                itemPicsLeft << "BetRaiseHalfPotButtonHover = "+BetRaiseHalfPotButtonHover;
+            }
+            else if (BetRaiseHalfPotButtonHover != QString(currentDir + "NULL") &&
+                     !QFile(BetRaiseHalfPotButtonHover).exists())
+            {
+                itemPicsLeft << "BetRaiseHalfPotButtonHover = " + BetRaiseHalfPotButtonHover;
                 BetRaiseHalfPotButtonHover = getFallBackFieldContent("BetRaiseHalfPotButtonHover", 1);
             }
 
-            if(BetRaiseHalfPotButtonChecked == "") {
+            if (BetRaiseHalfPotButtonChecked == "")
+            {
                 BetRaiseHalfPotButtonChecked = getFallBackFieldContent("BetRaiseHalfPotButtonChecked", 1);
                 leftItems << "BetRaiseHalfPotButtonChecked";
-            } else if(BetRaiseHalfPotButtonChecked != QString(currentDir+"NULL") && !QFile(BetRaiseHalfPotButtonChecked).exists()) {
-                itemPicsLeft << "BetRaiseHalfPotButtonChecked = "+BetRaiseHalfPotButtonChecked;
+            }
+            else if (BetRaiseHalfPotButtonChecked != QString(currentDir + "NULL") &&
+                     !QFile(BetRaiseHalfPotButtonChecked).exists())
+            {
+                itemPicsLeft << "BetRaiseHalfPotButtonChecked = " + BetRaiseHalfPotButtonChecked;
                 BetRaiseHalfPotButtonChecked = getFallBackFieldContent("BetRaiseHalfPotButtonChecked", 1);
             }
 
-            if(BetRaiseHalfPotButtonCheckedHover == "") {
+            if (BetRaiseHalfPotButtonCheckedHover == "")
+            {
                 BetRaiseHalfPotButtonCheckedHover = getFallBackFieldContent("BetRaiseHalfPotButtonCheckedHover", 1);
                 leftItems << "BetRaiseHalfPotButtonCheckedHover";
-            } else if(BetRaiseHalfPotButtonCheckedHover != QString(currentDir+"NULL") && !QFile(BetRaiseHalfPotButtonCheckedHover).exists()) {
-                itemPicsLeft << "BetRaiseHalfPotButtonCheckedHover = "+BetRaiseHalfPotButtonCheckedHover;
+            }
+            else if (BetRaiseHalfPotButtonCheckedHover != QString(currentDir + "NULL") &&
+                     !QFile(BetRaiseHalfPotButtonCheckedHover).exists())
+            {
+                itemPicsLeft << "BetRaiseHalfPotButtonCheckedHover = " + BetRaiseHalfPotButtonCheckedHover;
                 BetRaiseHalfPotButtonCheckedHover = getFallBackFieldContent("BetRaiseHalfPotButtonCheckedHover", 1);
             }
 
-
-            if(AllInButtonDefault == "") {
+            if (AllInButtonDefault == "")
+            {
                 AllInButtonDefault = getFallBackFieldContent("AllInButtonDefault", 1);
                 leftItems << "AllInButtonDefault";
-            } else if(AllInButtonDefault != QString(currentDir+"NULL") && !QFile(AllInButtonDefault).exists()) {
-                itemPicsLeft << "AllInButtonDefault = "+AllInButtonDefault;
+            }
+            else if (AllInButtonDefault != QString(currentDir + "NULL") && !QFile(AllInButtonDefault).exists())
+            {
+                itemPicsLeft << "AllInButtonDefault = " + AllInButtonDefault;
                 AllInButtonDefault = getFallBackFieldContent("AllInButtonDefault", 1);
             }
 
-
-           if(BetRaiseTwoThirdPotButtonHover == "") {
+            if (BetRaiseTwoThirdPotButtonHover == "")
+            {
                 BetRaiseTwoThirdPotButtonHover = getFallBackFieldContent("BetRaiseTwoThirdPotButtonHover", 1);
                 leftItems << "BetRaiseTwoThirdPotButtonHover";
-            } else if(BetRaiseTwoThirdPotButtonHover != QString(currentDir+"NULL") && !QFile(BetRaiseTwoThirdPotButtonHover).exists()) {
-                itemPicsLeft << "BetRaiseTwoThirdPotButtonHover = "+BetRaiseTwoThirdPotButtonHover;
+            }
+            else if (BetRaiseTwoThirdPotButtonHover != QString(currentDir + "NULL") &&
+                     !QFile(BetRaiseTwoThirdPotButtonHover).exists())
+            {
+                itemPicsLeft << "BetRaiseTwoThirdPotButtonHover = " + BetRaiseTwoThirdPotButtonHover;
                 BetRaiseTwoThirdPotButtonHover = getFallBackFieldContent("BetRaiseTwoThirdPotButtonHover", 1);
             }
 
-            if(BetRaiseTwoThirdPotButtonChecked == "") {
+            if (BetRaiseTwoThirdPotButtonChecked == "")
+            {
                 BetRaiseTwoThirdPotButtonChecked = getFallBackFieldContent("BetRaiseTwoThirdPotButtonChecked", 1);
                 leftItems << "BetRaiseTwoThirdPotButtonChecked";
-            } else if(BetRaiseTwoThirdPotButtonChecked != QString(currentDir+"NULL") && !QFile(BetRaiseTwoThirdPotButtonChecked).exists()) {
-                itemPicsLeft << "BetRaiseTwoThirdPotButtonChecked = "+BetRaiseTwoThirdPotButtonChecked;
+            }
+            else if (BetRaiseTwoThirdPotButtonChecked != QString(currentDir + "NULL") &&
+                     !QFile(BetRaiseTwoThirdPotButtonChecked).exists())
+            {
+                itemPicsLeft << "BetRaiseTwoThirdPotButtonChecked = " + BetRaiseTwoThirdPotButtonChecked;
                 BetRaiseTwoThirdPotButtonChecked = getFallBackFieldContent("BetRaiseTwoThirdPotButtonChecked", 1);
             }
 
-            if(BetRaiseTwoThirdPotButtonCheckedHover == "") {
-                BetRaiseTwoThirdPotButtonCheckedHover = getFallBackFieldContent("BetRaiseTwoThirdPotButtonCheckedHover", 1);
+            if (BetRaiseTwoThirdPotButtonCheckedHover == "")
+            {
+                BetRaiseTwoThirdPotButtonCheckedHover =
+                    getFallBackFieldContent("BetRaiseTwoThirdPotButtonCheckedHover", 1);
                 leftItems << "BetRaiseTwoThirdPotButtonCheckedHover";
-            } else if(BetRaiseTwoThirdPotButtonCheckedHover != QString(currentDir+"NULL") && !QFile(BetRaiseTwoThirdPotButtonCheckedHover).exists()) {
-                itemPicsLeft << "BetRaiseTwoThirdPotButtonCheckedHover = "+BetRaiseTwoThirdPotButtonCheckedHover;
-                BetRaiseTwoThirdPotButtonCheckedHover = getFallBackFieldContent("BetRaiseTwoThirdPotButtonCheckedHover", 1);
             }
-			
+            else if (BetRaiseTwoThirdPotButtonCheckedHover != QString(currentDir + "NULL") &&
+                     !QFile(BetRaiseTwoThirdPotButtonCheckedHover).exists())
+            {
+                itemPicsLeft << "BetRaiseTwoThirdPotButtonCheckedHover = " + BetRaiseTwoThirdPotButtonCheckedHover;
+                BetRaiseTwoThirdPotButtonCheckedHover =
+                    getFallBackFieldContent("BetRaiseTwoThirdPotButtonCheckedHover", 1);
+            }
 
-           if(BetRaisePotButtonHover == "") {
+            if (BetRaisePotButtonHover == "")
+            {
                 BetRaisePotButtonHover = getFallBackFieldContent("BetRaisePotButtonHover", 1);
                 leftItems << "BetRaisePotButtonHover";
-            } else if(BetRaisePotButtonHover != QString(currentDir+"NULL") && !QFile(BetRaisePotButtonHover).exists()) {
-                itemPicsLeft << "BetRaisePotButtonHover = "+BetRaisePotButtonHover;
+            }
+            else if (BetRaisePotButtonHover != QString(currentDir + "NULL") && !QFile(BetRaisePotButtonHover).exists())
+            {
+                itemPicsLeft << "BetRaisePotButtonHover = " + BetRaisePotButtonHover;
                 BetRaisePotButtonHover = getFallBackFieldContent("BetRaisePotButtonHover", 1);
             }
 
-            if(BetRaisePotButtonChecked == "") {
+            if (BetRaisePotButtonChecked == "")
+            {
                 BetRaisePotButtonChecked = getFallBackFieldContent("BetRaisePotButtonChecked", 1);
                 leftItems << "BetRaisePotButtonChecked";
-            } else if(BetRaisePotButtonChecked != QString(currentDir+"NULL") && !QFile(BetRaisePotButtonChecked).exists()) {
-                itemPicsLeft << "BetRaisePotButtonChecked = "+BetRaisePotButtonChecked;
+            }
+            else if (BetRaisePotButtonChecked != QString(currentDir + "NULL") &&
+                     !QFile(BetRaisePotButtonChecked).exists())
+            {
+                itemPicsLeft << "BetRaisePotButtonChecked = " + BetRaisePotButtonChecked;
                 BetRaisePotButtonChecked = getFallBackFieldContent("BetRaisePotButtonChecked", 1);
             }
 
-            if(BetRaisePotButtonCheckedHover == "") {
+            if (BetRaisePotButtonCheckedHover == "")
+            {
                 BetRaisePotButtonCheckedHover = getFallBackFieldContent("BetRaisePotButtonCheckedHover", 1);
                 leftItems << "BetRaisePotButtonCheckedHover";
-            } else if(BetRaisePotButtonCheckedHover != QString(currentDir+"NULL") && !QFile(BetRaisePotButtonCheckedHover).exists()) {
-                itemPicsLeft << "BetRaisePotButtonCheckedHover = "+BetRaisePotButtonCheckedHover;
+            }
+            else if (BetRaisePotButtonCheckedHover != QString(currentDir + "NULL") &&
+                     !QFile(BetRaisePotButtonCheckedHover).exists())
+            {
+                itemPicsLeft << "BetRaisePotButtonCheckedHover = " + BetRaisePotButtonCheckedHover;
                 BetRaisePotButtonCheckedHover = getFallBackFieldContent("BetRaisePotButtonCheckedHover", 1);
             }
 
-
-            if(AllInButtonDefault == "") {
+            if (AllInButtonDefault == "")
+            {
                 AllInButtonDefault = getFallBackFieldContent("AllInButtonDefault", 1);
                 leftItems << "AllInButtonDefault";
-            } else if(AllInButtonDefault != QString(currentDir+"NULL") && !QFile(AllInButtonDefault).exists()) {
-                itemPicsLeft << "AllInButtonDefault = "+AllInButtonDefault;
+            }
+            else if (AllInButtonDefault != QString(currentDir + "NULL") && !QFile(AllInButtonDefault).exists())
+            {
+                itemPicsLeft << "AllInButtonDefault = " + AllInButtonDefault;
                 AllInButtonDefault = getFallBackFieldContent("AllInButtonDefault", 1);
             }
 
-            if(AllInButtonHover == "") {
+            if (AllInButtonHover == "")
+            {
                 AllInButtonHover = getFallBackFieldContent("AllInButtonHover", 1);
                 leftItems << "AllInButtonHover";
-            } else if(AllInButtonHover != QString(currentDir+"NULL") && !QFile(AllInButtonHover).exists()) {
-                itemPicsLeft << "AllInButtonHover = "+AllInButtonHover;
+            }
+            else if (AllInButtonHover != QString(currentDir + "NULL") && !QFile(AllInButtonHover).exists())
+            {
+                itemPicsLeft << "AllInButtonHover = " + AllInButtonHover;
                 AllInButtonHover = getFallBackFieldContent("AllInButtonHover", 1);
             }
 
-            if(AllInButtonChecked == "") {
+            if (AllInButtonChecked == "")
+            {
                 AllInButtonChecked = getFallBackFieldContent("AllInButtonChecked", 1);
                 leftItems << "AllInButtonChecked";
-            } else if(AllInButtonChecked != QString(currentDir+"NULL") && !QFile(AllInButtonChecked).exists()) {
-                itemPicsLeft << "AllInButtonChecked = "+AllInButtonChecked;
+            }
+            else if (AllInButtonChecked != QString(currentDir + "NULL") && !QFile(AllInButtonChecked).exists())
+            {
+                itemPicsLeft << "AllInButtonChecked = " + AllInButtonChecked;
                 AllInButtonChecked = getFallBackFieldContent("AllInButtonChecked", 1);
             }
 
-            if(AllInButtonCheckedHover == "") {
+            if (AllInButtonCheckedHover == "")
+            {
                 AllInButtonCheckedHover = getFallBackFieldContent("AllInButtonCheckedHover", 1);
                 leftItems << "AllInButtonCheckedHover";
-            } else if(AllInButtonCheckedHover != QString(currentDir+"NULL") && !QFile(AllInButtonCheckedHover).exists()) {
-                itemPicsLeft << "AllInButtonCheckedHover = "+AllInButtonCheckedHover;
+            }
+            else if (AllInButtonCheckedHover != QString(currentDir + "NULL") &&
+                     !QFile(AllInButtonCheckedHover).exists())
+            {
+                itemPicsLeft << "AllInButtonCheckedHover = " + AllInButtonCheckedHover;
                 AllInButtonCheckedHover = getFallBackFieldContent("AllInButtonCheckedHover", 1);
             }
 
-            if(RadioButtonPressed == "") {
+            if (RadioButtonPressed == "")
+            {
                 RadioButtonPressed = getFallBackFieldContent("RadioButtonPressed", 1);
                 leftItems << "RadioButtonPressed";
-            } else if(RadioButtonPressed != QString(currentDir+"NULL") && !QFile(RadioButtonPressed).exists()) {
-                itemPicsLeft << "RadioButtonPressed = "+RadioButtonPressed;
+            }
+            else if (RadioButtonPressed != QString(currentDir + "NULL") && !QFile(RadioButtonPressed).exists())
+            {
+                itemPicsLeft << "RadioButtonPressed = " + RadioButtonPressed;
                 RadioButtonPressed = getFallBackFieldContent("RadioButtonPressed", 1);
             }
 
-            if(RadioButtonChecked == "") {
+            if (RadioButtonChecked == "")
+            {
                 RadioButtonChecked = getFallBackFieldContent("RadioButtonChecked", 1);
                 leftItems << "RadioButtonChecked";
-            } else if(RadioButtonChecked != QString(currentDir+"NULL") && !QFile(RadioButtonChecked).exists()) {
-                itemPicsLeft << "RadioButtonChecked = "+RadioButtonChecked;
+            }
+            else if (RadioButtonChecked != QString(currentDir + "NULL") && !QFile(RadioButtonChecked).exists())
+            {
+                itemPicsLeft << "RadioButtonChecked = " + RadioButtonChecked;
                 RadioButtonChecked = getFallBackFieldContent("RadioButtonChecked", 1);
             }
 
-            if(RadioButtonCheckedHover == "") {
+            if (RadioButtonCheckedHover == "")
+            {
                 RadioButtonCheckedHover = getFallBackFieldContent("RadioButtonCheckedHover", 1);
                 leftItems << "RadioButtonCheckedHover";
-            } else if(RadioButtonCheckedHover != QString(currentDir+"NULL") && !QFile(RadioButtonCheckedHover).exists()) {
-                itemPicsLeft << "RadioButtonCheckedHover = "+RadioButtonCheckedHover;
+            }
+            else if (RadioButtonCheckedHover != QString(currentDir + "NULL") &&
+                     !QFile(RadioButtonCheckedHover).exists())
+            {
+                itemPicsLeft << "RadioButtonCheckedHover = " + RadioButtonCheckedHover;
                 RadioButtonCheckedHover = getFallBackFieldContent("RadioButtonCheckedHover", 1);
             }
 
-            if(RadioButtonUnchecked == "") {
+            if (RadioButtonUnchecked == "")
+            {
                 RadioButtonUnchecked = getFallBackFieldContent("RadioButtonUnchecked", 1);
                 leftItems << "RadioButtonUnchecked";
-            } else if(RadioButtonUnchecked != QString(currentDir+"NULL") && !QFile(RadioButtonUnchecked).exists()) {
-                itemPicsLeft << "RadioButtonUnchecked = "+RadioButtonUnchecked;
+            }
+            else if (RadioButtonUnchecked != QString(currentDir + "NULL") && !QFile(RadioButtonUnchecked).exists())
+            {
+                itemPicsLeft << "RadioButtonUnchecked = " + RadioButtonUnchecked;
                 RadioButtonUnchecked = getFallBackFieldContent("RadioButtonUnchecked", 1);
             }
 
-            if(RadioButtonUncheckedHover == "") {
+            if (RadioButtonUncheckedHover == "")
+            {
                 RadioButtonUncheckedHover = getFallBackFieldContent("RadioButtonUncheckedHover", 1);
                 leftItems << "RadioButtonUncheckedHover";
-            } else if(RadioButtonUncheckedHover != QString(currentDir+"NULL") && !QFile(RadioButtonUncheckedHover).exists()) {
-                itemPicsLeft << "RadioButtonUncheckedHover = "+RadioButtonUncheckedHover;
+            }
+            else if (RadioButtonUncheckedHover != QString(currentDir + "NULL") &&
+                     !QFile(RadioButtonUncheckedHover).exists())
+            {
+                itemPicsLeft << "RadioButtonUncheckedHover = " + RadioButtonUncheckedHover;
                 RadioButtonUncheckedHover = getFallBackFieldContent("RadioButtonUncheckedHover", 1);
             }
 
-            if(PlayerTopSeatActive == "") {
+            if (PlayerTopSeatActive == "")
+            {
                 PlayerTopSeatActive = getFallBackFieldContent("PlayerTopSeatActive", 1);
                 leftItems << "PlayerTopSeatActive";
-            } else if(PlayerTopSeatActive != QString(currentDir+"NULL") && !QFile(PlayerTopSeatActive).exists()) {
-                itemPicsLeft << "PlayerTopSeatActive = "+PlayerTopSeatActive;
+            }
+            else if (PlayerTopSeatActive != QString(currentDir + "NULL") && !QFile(PlayerTopSeatActive).exists())
+            {
+                itemPicsLeft << "PlayerTopSeatActive = " + PlayerTopSeatActive;
                 PlayerTopSeatActive = getFallBackFieldContent("PlayerTopSeatActive", 1);
             }
 
-            if(PlayerTopSeatInactive == "") {
+            if (PlayerTopSeatInactive == "")
+            {
                 PlayerTopSeatInactive = getFallBackFieldContent("PlayerTopSeatInactive", 1);
                 leftItems << "PlayerTopSeatInactive";
-            } else if(PlayerTopSeatInactive != QString(currentDir+"NULL") && !QFile(PlayerTopSeatInactive).exists()) {
-                itemPicsLeft << "PlayerTopSeatInactive = "+PlayerTopSeatInactive;
+            }
+            else if (PlayerTopSeatInactive != QString(currentDir + "NULL") && !QFile(PlayerTopSeatInactive).exists())
+            {
+                itemPicsLeft << "PlayerTopSeatInactive = " + PlayerTopSeatInactive;
                 PlayerTopSeatInactive = getFallBackFieldContent("PlayerTopSeatInactive", 1);
             }
 
-            if(PlayerBottomSeatActive == "") {
+            if (PlayerBottomSeatActive == "")
+            {
                 PlayerBottomSeatActive = getFallBackFieldContent("PlayerBottomSeatActive", 1);
                 leftItems << "PlayerBottomSeatActive";
-            } else if(PlayerBottomSeatActive != QString(currentDir+"NULL") && !QFile(PlayerBottomSeatActive).exists()) {
-                itemPicsLeft << "PlayerBottomSeatActive = "+PlayerBottomSeatActive;
+            }
+            else if (PlayerBottomSeatActive != QString(currentDir + "NULL") && !QFile(PlayerBottomSeatActive).exists())
+            {
+                itemPicsLeft << "PlayerBottomSeatActive = " + PlayerBottomSeatActive;
                 PlayerBottomSeatActive = getFallBackFieldContent("PlayerBottomSeatActive", 1);
             }
 
-            if(PlayerBottomSeatInactive == "") {
+            if (PlayerBottomSeatInactive == "")
+            {
                 PlayerBottomSeatInactive = getFallBackFieldContent("PlayerBottomSeatInactive", 1);
                 leftItems << "PlayerBottomSeatInactive";
-            } else if(PlayerBottomSeatInactive != QString(currentDir+"NULL") && !QFile(PlayerBottomSeatInactive).exists()) {
-                itemPicsLeft << "PlayerBottomSeatInactive = "+PlayerBottomSeatInactive;
+            }
+            else if (PlayerBottomSeatInactive != QString(currentDir + "NULL") &&
+                     !QFile(PlayerBottomSeatInactive).exists())
+            {
+                itemPicsLeft << "PlayerBottomSeatInactive = " + PlayerBottomSeatInactive;
                 PlayerBottomSeatInactive = getFallBackFieldContent("PlayerBottomSeatInactive", 1);
             }
 
-            if(Table == "") {
+            if (Table == "")
+            {
                 Table = getFallBackFieldContent("Table", 1);
                 leftItems << "Table";
-            } else if(Table != QString(currentDir+"NULL") && !QFile(Table).exists()) {
-                itemPicsLeft << "Table = "+Table;
+            }
+            else if (Table != QString(currentDir + "NULL") && !QFile(Table).exists())
+            {
+                itemPicsLeft << "Table = " + Table;
                 Table = getFallBackFieldContent("Table", 1);
             }
 
-            if(HandRanking == "") {
+            if (HandRanking == "")
+            {
                 HandRanking = getFallBackFieldContent("HandRanking", 1);
                 leftItems << "HandRanking";
-            } else if(HandRanking != QString(currentDir+"NULL") && !QFile(HandRanking).exists()) {
-                itemPicsLeft << "HandRanking = "+HandRanking;
+            }
+            else if (HandRanking != QString(currentDir + "NULL") && !QFile(HandRanking).exists())
+            {
+                itemPicsLeft << "HandRanking = " + HandRanking;
                 HandRanking = getFallBackFieldContent("HandRanking", 1);
             }
 
-            if(ToolBoxBackground == "") {
+            if (ToolBoxBackground == "")
+            {
                 ToolBoxBackground = getFallBackFieldContent("ToolBoxBackground", 1);
                 leftItems << "ToolBoxBackground";
-            } else if(ToolBoxBackground != QString(currentDir+"NULL") && !QFile(ToolBoxBackground).exists()) {
-                itemPicsLeft << "ToolBoxBackground = "+ToolBoxBackground;
+            }
+            else if (ToolBoxBackground != QString(currentDir + "NULL") && !QFile(ToolBoxBackground).exists())
+            {
+                itemPicsLeft << "ToolBoxBackground = " + ToolBoxBackground;
                 ToolBoxBackground = getFallBackFieldContent("ToolBoxBackground", 1);
             }
 
-            if(ShowMyCardsButtonDefault == "") {
+            if (ShowMyCardsButtonDefault == "")
+            {
                 ShowMyCardsButtonDefault = getFallBackFieldContent("ShowMyCardsButtonDefault", 1);
                 leftItems << "ShowMyCardsButtonDefault";
-            } else if(ShowMyCardsButtonDefault != QString(currentDir+"NULL") && !QFile(ShowMyCardsButtonDefault).exists()) {
-                itemPicsLeft << "ShowMyCardsButtonDefault = "+ShowMyCardsButtonDefault;
+            }
+            else if (ShowMyCardsButtonDefault != QString(currentDir + "NULL") &&
+                     !QFile(ShowMyCardsButtonDefault).exists())
+            {
+                itemPicsLeft << "ShowMyCardsButtonDefault = " + ShowMyCardsButtonDefault;
                 ShowMyCardsButtonDefault = getFallBackFieldContent("ShowMyCardsButtonDefault", 1);
             }
 
-            if(ShowMyCardsButtonHover == "") {
+            if (ShowMyCardsButtonHover == "")
+            {
                 ShowMyCardsButtonHover = getFallBackFieldContent("ShowMyCardsButtonHover", 1);
                 leftItems << "ShowMyCardsButtonHover";
-            } else if(ShowMyCardsButtonHover != QString(currentDir+"NULL") && !QFile(ShowMyCardsButtonHover).exists()) {
-                itemPicsLeft << "ShowMyCardsButtonHover = "+ShowMyCardsButtonHover;
+            }
+            else if (ShowMyCardsButtonHover != QString(currentDir + "NULL") && !QFile(ShowMyCardsButtonHover).exists())
+            {
+                itemPicsLeft << "ShowMyCardsButtonHover = " + ShowMyCardsButtonHover;
                 ShowMyCardsButtonHover = getFallBackFieldContent("ShowMyCardsButtonHover", 1);
             }
 
-
-            //I18N ACTION STRINGS
-            if(ActionAllInI18NString == "") {
+            // I18N ACTION STRINGS
+            if (ActionAllInI18NString == "")
+            {
                 ActionAllInI18NString = "NULL";
                 leftItems << "ActionAllInI18NString";
             }
-            if(ActionRaiseI18NString == "") {
+            if (ActionRaiseI18NString == "")
+            {
                 ActionRaiseI18NString = "NULL";
                 leftItems << "ActionRaiseI18NString";
             }
-            if(ActionBetI18NString == "") {
+            if (ActionBetI18NString == "")
+            {
                 ActionBetI18NString = "NULL";
                 leftItems << "ActionBetI18NString";
             }
-            if(ActionCallI18NString == "") {
+            if (ActionCallI18NString == "")
+            {
                 ActionCallI18NString = "NULL";
                 leftItems << "ActionCallI18NString";
             }
-            if(ActionCheckI18NString == "") {
+            if (ActionCheckI18NString == "")
+            {
                 ActionCheckI18NString = "NULL";
                 leftItems << "ActionCheckI18NString";
             }
-            if(ActionFoldI18NString == "") {
+            if (ActionFoldI18NString == "")
+            {
                 ActionFoldI18NString = "NULL";
                 leftItems << "ActionFoldI18NString";
             }
-            if(PotI18NString == "") {
+            if (PotI18NString == "")
+            {
                 PotI18NString = "NULL";
                 leftItems << "PotI18NString";
             }
-            if(TotalI18NString == "") {
+            if (TotalI18NString == "")
+            {
                 TotalI18NString = "NULL";
                 leftItems << "TotalI18NString";
             }
-            if(BetsI18NString == "") {
+            if (BetsI18NString == "")
+            {
                 BetsI18NString = "NULL";
                 leftItems << "BetsI18NString";
             }
-            if(GameI18NString == "") {
+            if (GameI18NString == "")
+            {
                 GameI18NString = "NULL";
                 leftItems << "GameI18NString";
             }
-            if(HandI18NString == "") {
+            if (HandI18NString == "")
+            {
                 HandI18NString = "NULL";
                 leftItems << "HandI18NString";
             }
-            if(PreflopI18NString == "") {
+            if (PreflopI18NString == "")
+            {
                 PreflopI18NString = "NULL";
                 leftItems << "PreflopI18NString";
             }
-            if(FlopI18NString == "") {
+            if (FlopI18NString == "")
+            {
                 FlopI18NString = "NULL";
                 leftItems << "FlopI18NString";
             }
-            if(TurnI18NString == "") {
+            if (TurnI18NString == "")
+            {
                 TurnI18NString = "NULL";
                 leftItems << "TurnI18NString";
             }
-            if(RiverI18NString == "") {
+            if (RiverI18NString == "")
+            {
                 RiverI18NString = "NULL";
                 leftItems << "RiverI18NString";
             }
 
             // 		COLORS
-            if(FKeyIndicatorColor == "") {
+            if (FKeyIndicatorColor == "")
+            {
                 FKeyIndicatorColor = getFallBackFieldContent("FKeyIndicatorColor", 0);
                 leftItems << "FKeyIndicatorColor";
             }
-            if(ChanceLabelPossibleColor == "") {
+            if (ChanceLabelPossibleColor == "")
+            {
                 ChanceLabelPossibleColor = getFallBackFieldContent("ChanceLabelPossibleColor", 0);
                 leftItems << "ChanceLabelPossibleColor";
             }
-            if(ChanceLabelImpossibleColor == "") {
+            if (ChanceLabelImpossibleColor == "")
+            {
                 ChanceLabelImpossibleColor = getFallBackFieldContent("ChanceLabelImpossibleColor", 0);
                 leftItems << "ChanceLabelImpossibleColor";
             }
-            if(ChatLogTextColor == "") {
+            if (ChatLogTextColor == "")
+            {
                 ChatLogTextColor = getFallBackFieldContent("ChatLogTextColor", 0);
                 leftItems << "ChatLogTextColor";
             }
-            if(ChatTextNickNotifyColor == "") {
+            if (ChatTextNickNotifyColor == "")
+            {
                 ChatTextNickNotifyColor = getFallBackFieldContent("ChatTextNickNotifyColor", 0);
                 leftItems << "ChatTextNickNotifyColor";
             }
-            if(ChatLogBgColor == "") {
+            if (ChatLogBgColor == "")
+            {
                 ChatLogBgColor = getFallBackFieldContent("ChatLogBgColor", 0);
                 leftItems << "ChatLogBgColor";
             }
-            if(ChatLogScrollBarBorderColor == "") {
+            if (ChatLogScrollBarBorderColor == "")
+            {
                 ChatLogScrollBarBorderColor = getFallBackFieldContent("ChatLogScrollBarBorderColor", 0);
                 leftItems << "ChatLogScrollBarBorderColor";
             }
-            if(ChatLogScrollBarBgColor == "") {
+            if (ChatLogScrollBarBgColor == "")
+            {
                 ChatLogScrollBarBgColor = getFallBackFieldContent("ChatLogScrollBarBgColor", 0);
                 leftItems << "ChatLogScrollBarBgColor";
             }
-            if(ChatLogScrollBarHandleBorderColor == "") {
+            if (ChatLogScrollBarHandleBorderColor == "")
+            {
                 ChatLogScrollBarHandleBorderColor = getFallBackFieldContent("ChatLogScrollBarHandleBorderColor", 0);
                 leftItems << "ChatLogScrollBarHandleBorderColor";
             }
-            if(ChatLogScrollBarHandleBgColor == "") {
+            if (ChatLogScrollBarHandleBgColor == "")
+            {
                 ChatLogScrollBarHandleBgColor = getFallBackFieldContent("ChatLogScrollBarHandleBgColor", 0);
                 leftItems << "ChatLogScrollBarHandleBgColor";
             }
-            if(ChatLogScrollBarArrowBorderColor == "") {
+            if (ChatLogScrollBarArrowBorderColor == "")
+            {
                 ChatLogScrollBarArrowBorderColor = getFallBackFieldContent("ChatLogScrollBarArrowBorderColor", 0);
                 leftItems << "ChatLogScrollBarArrowBorderColor";
             }
-            if(ChatLogScrollBarArrowBgColor == "") {
+            if (ChatLogScrollBarArrowBgColor == "")
+            {
                 ChatLogScrollBarArrowBgColor = getFallBackFieldContent("ChatLogScrollBarArrowBgColor", 0);
                 leftItems << "ChatLogScrollBarArrowBgColor";
             }
-            if(LogWinnerMainPotColor == "") {
+            if (LogWinnerMainPotColor == "")
+            {
                 LogWinnerMainPotColor = getFallBackFieldContent("LogWinnerMainPotColor", 0);
                 leftItems << "LogWinnerMainPotColor";
             }
-            if(LogWinnerSidePotColor == "") {
+            if (LogWinnerSidePotColor == "")
+            {
                 LogWinnerSidePotColor = getFallBackFieldContent("LogWinnerSidePotColor", 0);
                 leftItems << "LogWinnerSidePotColor";
             }
-            if(LogPlayerSitsOutColor == "") {
+            if (LogPlayerSitsOutColor == "")
+            {
                 LogPlayerSitsOutColor = getFallBackFieldContent("LogPlayerSitsOutColor", 0);
                 leftItems << "LogPlayerSitsOutColor";
             }
-            if(LogNewGameAdminColor == "") {
+            if (LogNewGameAdminColor == "")
+            {
                 LogNewGameAdminColor = getFallBackFieldContent("LogNewGameAdminColor", 0);
                 leftItems << "LogNewGameAdminColor";
             }
-            if(TabWidgetBorderColor == "") {
+            if (TabWidgetBorderColor == "")
+            {
                 TabWidgetBorderColor = getFallBackFieldContent("TabWidgetBorderColor", 0);
                 leftItems << "TabWidgetBorderColor";
             }
-            if(TabWidgetBgColor == "") {
+            if (TabWidgetBgColor == "")
+            {
                 TabWidgetBgColor = getFallBackFieldContent("TabWidgetBgColor", 0);
                 leftItems << "TabWidgetBgColor";
             }
-            if(TabWidgetTextColor == "") {
+            if (TabWidgetTextColor == "")
+            {
                 TabWidgetTextColor = getFallBackFieldContent("TabWidgetTextColor", 0);
                 leftItems << "TabWidgetTextColor";
             }
-            if(MenuBgColor == "") {
+            if (MenuBgColor == "")
+            {
                 MenuBgColor = getFallBackFieldContent("MenuBgColor", 0);
                 leftItems << "MenuBgColor";
             }
-            if(MenuTextColor == "") {
+            if (MenuTextColor == "")
+            {
                 MenuTextColor = getFallBackFieldContent("MenuTextColor", 0);
                 leftItems << "MenuTextColor";
             }
-            if(BreakLobbyButtonBgColor == "") {
+            if (BreakLobbyButtonBgColor == "")
+            {
                 BreakLobbyButtonBgColor = getFallBackFieldContent("BreakLobbyButtonBgColor", 0);
                 leftItems << "BreakLobbyButtonBgColor";
             }
-            if(BreakLobbyButtonTextColor == "") {
+            if (BreakLobbyButtonTextColor == "")
+            {
                 BreakLobbyButtonTextColor = getFallBackFieldContent("BreakLobbyButtonTextColor", 0);
                 leftItems << "BreakLobbyButtonTextColor";
             }
-            if(BreakLobbyButtonBgDisabledColor == "") {
+            if (BreakLobbyButtonBgDisabledColor == "")
+            {
                 BreakLobbyButtonBgDisabledColor = getFallBackFieldContent("BreakLobbyButtonBgDisabledColor", 0);
                 leftItems << "BreakLobbyButtonBgDisabledColor";
             }
-            if(BreakLobbyButtonTextDisabledColor == "") {
+            if (BreakLobbyButtonTextDisabledColor == "")
+            {
                 BreakLobbyButtonTextDisabledColor = getFallBackFieldContent("BreakLobbyButtonTextDisabledColor", 0);
                 leftItems << "BreakLobbyButtonTextDisabledColor";
             }
-            if(BreakLobbyButtonBgBlinkColor == "") {
+            if (BreakLobbyButtonBgBlinkColor == "")
+            {
                 BreakLobbyButtonBgBlinkColor = getFallBackFieldContent("BreakLobbyButtonBgBlinkColor", 0);
                 leftItems << "BreakLobbyButtonBgBlinkColor";
             }
-            if(BreakLobbyButtonTextBlinkColor == "") {
+            if (BreakLobbyButtonTextBlinkColor == "")
+            {
                 BreakLobbyButtonTextBlinkColor = getFallBackFieldContent("BreakLobbyButtonTextBlinkColor", 0);
                 leftItems << "BreakLobbyButtonTextBlinkColor";
             }
-            if(PlayerCashTextColor == "") {
+            if (PlayerCashTextColor == "")
+            {
                 PlayerCashTextColor = getFallBackFieldContent("PlayerCashTextColor", 0);
                 leftItems << "PlayerCashTextColor";
             }
-            if(PlayerBetTextColor == "") {
+            if (PlayerBetTextColor == "")
+            {
                 PlayerBetTextColor = getFallBackFieldContent("PlayerBetTextColor", 0);
                 leftItems << "PlayerBetTextColor";
             }
-            if(PlayerNickTextColor == "") {
+            if (PlayerNickTextColor == "")
+            {
                 PlayerNickTextColor = getFallBackFieldContent("PlayerNickTextColor", 0);
                 leftItems << "PlayerNickTextColor";
             }
-            if(BoardBigTextColor == "") {
+            if (BoardBigTextColor == "")
+            {
                 BoardBigTextColor = getFallBackFieldContent("BoardBigTextColor", 0);
                 leftItems << "BoardBigTextColor";
             }
-            if(BoardSmallTextColor == "") {
+            if (BoardSmallTextColor == "")
+            {
                 BoardSmallTextColor = getFallBackFieldContent("BoardSmallTextColor", 0);
                 leftItems << "BoardSmallTextColor";
             }
-            if(SpeedTextColor == "") {
+            if (SpeedTextColor == "")
+            {
                 SpeedTextColor = getFallBackFieldContent("SpeedTextColor", 0);
                 leftItems << "SpeedTextColor";
             }
-            if(VoteButtonBgColor == "") {
+            if (VoteButtonBgColor == "")
+            {
                 VoteButtonBgColor = getFallBackFieldContent("VoteButtonBgColor", 0);
                 leftItems << "VoteButtonBgColor";
             }
-            if(VoteButtonTextColor == "") {
+            if (VoteButtonTextColor == "")
+            {
                 VoteButtonTextColor = getFallBackFieldContent("VoteButtonTextColor", 0);
                 leftItems << "VoteButtonTextColor";
             }
-            if(BetInputTextColor == "") {
+            if (BetInputTextColor == "")
+            {
                 BetInputTextColor = getFallBackFieldContent("BetInputTextColor", 0);
                 leftItems << "BetInputTextColor";
             }
-            if(BetInputBgColor == "") {
+            if (BetInputBgColor == "")
+            {
                 BetInputBgColor = getFallBackFieldContent("BetInputBgColor", 0);
                 leftItems << "BetInputBgColor";
             }
-            if(BetInputDisabledTextColor == "") {
+            if (BetInputDisabledTextColor == "")
+            {
                 BetInputDisabledTextColor = getFallBackFieldContent("BetInputDisabledTextColor", 0);
                 leftItems << "BetInputDisabledTextColor";
             }
-            if(BetInputDisabledBgColor == "") {
+            if (BetInputDisabledBgColor == "")
+            {
                 BetInputDisabledBgColor = getFallBackFieldContent("BetInputDisabledBgColor", 0);
                 leftItems << "BetInputDisabledBgColor";
             }
-            if(FoldButtonTextColor == "") {
+            if (FoldButtonTextColor == "")
+            {
                 FoldButtonTextColor = getFallBackFieldContent("FoldButtonTextColor", 0);
                 leftItems << "FoldButtonTextColor";
             }
-            if(FoldButtonCheckableTextColor == "") {
+            if (FoldButtonCheckableTextColor == "")
+            {
                 FoldButtonCheckableTextColor = getFallBackFieldContent("FoldButtonCheckableTextColor", 0);
                 leftItems << "FoldButtonCheckableTextColor";
             }
-            if(CheckCallButtonTextColor == "") {
+            if (CheckCallButtonTextColor == "")
+            {
                 CheckCallButtonTextColor = getFallBackFieldContent("CheckCallButtonTextColor", 0);
                 leftItems << "CheckCallButtonTextColor";
             }
-            if(CheckCallButtonCheckableTextColor == "") {
+            if (CheckCallButtonCheckableTextColor == "")
+            {
                 CheckCallButtonCheckableTextColor = getFallBackFieldContent("CheckCallButtonCheckableTextColor", 0);
                 leftItems << "CheckCallButtonCheckableTextColor";
             }
-            if(BetRaiseButtonTextColor == "") {
+            if (BetRaiseButtonTextColor == "")
+            {
                 BetRaiseButtonTextColor = getFallBackFieldContent("BetRaiseButtonTextColor", 0);
                 leftItems << "BetRaiseButtonTextColor";
             }
-            if(BetRaiseButtonCheckableTextColor == "") {
+            if (BetRaiseButtonCheckableTextColor == "")
+            {
                 BetRaiseButtonCheckableTextColor = getFallBackFieldContent("BetRaiseButtonCheckableTextColor", 0);
                 leftItems << "BetRaiseButtonCheckableTextColor";
             }
 
-            if(BetRaiseHalfPotButtonTextColor == "") {
+            if (BetRaiseHalfPotButtonTextColor == "")
+            {
                 BetRaiseHalfPotButtonTextColor = getFallBackFieldContent("BetRaiseHalfPotButtonTextColor", 0);
                 leftItems << "BetRaiseHalfPotButtonTextColor";
             }
-            if(BetRaiseHalfPotButtonCheckableTextColor == "") {
-                BetRaiseHalfPotButtonCheckableTextColor = getFallBackFieldContent("BetRaiseHalfPotButtonCheckableTextColor", 0);
+            if (BetRaiseHalfPotButtonCheckableTextColor == "")
+            {
+                BetRaiseHalfPotButtonCheckableTextColor =
+                    getFallBackFieldContent("BetRaiseHalfPotButtonCheckableTextColor", 0);
                 leftItems << "BetRaiseHalfPotButtonCheckableTextColor";
             }
 
-            if(BetRaiseTwoThirdPotButtonTextColor == "") {
+            if (BetRaiseTwoThirdPotButtonTextColor == "")
+            {
                 BetRaiseTwoThirdPotButtonTextColor = getFallBackFieldContent("BetRaiseTwoThirdPotButtonTextColor", 0);
                 leftItems << "BetRaiseTwoThirdPotButtonTextColor";
             }
-            if(BetRaiseTwoThirdPotButtonCheckableTextColor == "") {
-                BetRaiseTwoThirdPotButtonCheckableTextColor = getFallBackFieldContent("BetRaiseTwoThirdPotButtonCheckableTextColor", 0);
+            if (BetRaiseTwoThirdPotButtonCheckableTextColor == "")
+            {
+                BetRaiseTwoThirdPotButtonCheckableTextColor =
+                    getFallBackFieldContent("BetRaiseTwoThirdPotButtonCheckableTextColor", 0);
                 leftItems << "BetRaiseTwoThirdPotButtonCheckableTextColor";
             }
 
-            if(BetRaisePotButtonTextColor == "") {
+            if (BetRaisePotButtonTextColor == "")
+            {
                 BetRaisePotButtonTextColor = getFallBackFieldContent("BetRaisePotButtonTextColor", 0);
                 leftItems << "BetRaisePotButtonTextColor";
             }
-            if(BetRaisePotButtonCheckableTextColor == "") {
+            if (BetRaisePotButtonCheckableTextColor == "")
+            {
                 BetRaisePotButtonCheckableTextColor = getFallBackFieldContent("BetRaisePotButtonCheckableTextColor", 0);
                 leftItems << "BetRaisePotButtonCheckableTextColor";
             }
 
-
-            if(AllInButtonTextColor == "") {
+            if (AllInButtonTextColor == "")
+            {
                 AllInButtonTextColor = getFallBackFieldContent("AllInButtonTextColor", 0);
                 leftItems << "AllInButtonTextColor";
             }
-            if(AllInButtonCheckableTextColor == "") {
+            if (AllInButtonCheckableTextColor == "")
+            {
                 AllInButtonCheckableTextColor = getFallBackFieldContent("AllInButtonCheckableTextColor", 0);
                 leftItems << "AllInButtonCheckableTextColor";
             }
-            if(BetSpeedSliderGrooveBgColor == "") {
+            if (BetSpeedSliderGrooveBgColor == "")
+            {
                 BetSpeedSliderGrooveBgColor = getFallBackFieldContent("BetSpeedSliderGrooveBgColor", 0);
                 leftItems << "BetSpeedSliderGrooveBgColor";
             }
-            if(BetSpeedSliderGrooveBorderColor == "") {
+            if (BetSpeedSliderGrooveBorderColor == "")
+            {
                 BetSpeedSliderGrooveBorderColor = getFallBackFieldContent("BetSpeedSliderGrooveBorderColor", 0);
                 leftItems << "BetSpeedSliderGrooveBorderColor";
             }
-            if(BetSpeedSliderHandleBgColor == "") {
+            if (BetSpeedSliderHandleBgColor == "")
+            {
                 BetSpeedSliderHandleBgColor = getFallBackFieldContent("BetSpeedSliderHandleBgColor", 0);
                 leftItems << "BetSpeedSliderHandleBgColor";
             }
-            if(BetSpeedSliderHandleBorderColor == "") {
+            if (BetSpeedSliderHandleBorderColor == "")
+            {
                 BetSpeedSliderHandleBorderColor = getFallBackFieldContent("BetSpeedSliderHandleBorderColor", 0);
                 leftItems << "BetSpeedSliderHandleBorderColor";
             }
-            if(ShowMyCardsButtonTextColor == "") {
+            if (ShowMyCardsButtonTextColor == "")
+            {
                 ShowMyCardsButtonTextColor = getFallBackFieldContent("ShowMyCardsButtonTextColor", 0);
                 leftItems << "ShowMyCardsButtonTextColor";
             }
-            if(RatingStarsColor == "") {
+            if (RatingStarsColor == "")
+            {
                 RatingStarsColor = getFallBackFieldContent("RatingStarsColor", 0);
                 leftItems << "RatingStarsColor";
             }
-            if(PlayerInfoHintTextColor == "") {
+            if (PlayerInfoHintTextColor == "")
+            {
                 PlayerInfoHintTextColor = getFallBackFieldContent("PlayerInfoHintTextColor", 0);
                 leftItems << "PlayerInfoHintTextColor";
             }
 
             // 		SIZE
-            if(ChatLogTextSize == "") {
+            if (ChatLogTextSize == "")
+            {
                 ChatLogTextSize = getFallBackFieldContent("ChatLogTextSize", 0);
                 leftItems << "ChatLogTextSize";
             }
 
-            //set loadedSuccessfull true if everything works
-            //            qDebug() << "leftitem is empty: " << leftItems.isEmpty() << "pics left is empty: " << itemPicsLeft.isEmpty() << "stylefileversion is: " << PokerTrainingStyleFileVersion;
-            if(leftItems.isEmpty() && itemPicsLeft.isEmpty() && PokerTrainingStyleFileVersion != "" && PokerTrainingStyleFileVersion.toInt() == POKERTRAINING_GT_STYLE_FILE_VERSION) {
+            // set loadedSuccessfull true if everything works
+            //             qDebug() << "leftitem is empty: " << leftItems.isEmpty() << "pics left is empty: " <<
+            //             itemPicsLeft.isEmpty() << "stylefileversion is: " << PokerTrainingStyleFileVersion;
+            if (leftItems.isEmpty() && itemPicsLeft.isEmpty() && PokerTrainingStyleFileVersion != "" &&
+                PokerTrainingStyleFileVersion.toInt() == POKERTRAINING_GT_STYLE_FILE_VERSION)
+            {
                 myState = GT_STYLE_OK;
                 //                qDebug() << "myState of: " << StyleDescription << "is now: " << myState;
-            } else {
- 
-                 //if one or more items are left
-                if(!leftItems.isEmpty() && myW != 0) myState = GT_STYLE_FIELDS_EMPTY;
+            }
+            else
+            {
 
-                //if one or more pictures where not found
-                if(!itemPicsLeft.isEmpty() && myW != 0) myState = GT_STYLE_PICTURES_MISSING;
+                // if one or more items are left
+                if (!leftItems.isEmpty() && myW != 0)
+                    myState = GT_STYLE_FIELDS_EMPTY;
+
+                // if one or more pictures where not found
+                if (!itemPicsLeft.isEmpty() && myW != 0)
+                    myState = GT_STYLE_PICTURES_MISSING;
             }
             loadedSuccessfull = 1;
         }
-    } else {
+    }
+    else
+    {
         loadedSuccessfull = 0;
-        //LOG_ERROR(__FILE__ << " (" << __LINE__ << "Cannot load game table style file");
+        // LOG_ERROR(__FILE__ << " (" << __LINE__ << "Cannot load game table style file");
     }
 }
 
-
-void GameTableStyleReader::setTableBackground(gameTableImpl *gt)
+void GameTableStyleReader::setTableBackground(GameTableWindow* gt)
 {
-    gt->setStyleSheet("QMainWindow { background-image: url(\""+Table+"\"); background-position: bottom center; background-origin: content;  background-repeat: no-repeat;}");
+    gt->setStyleSheet(
+        "QMainWindow { background-image: url(\"" + Table +
+        "\"); background-position: bottom center; background-origin: content;  background-repeat: no-repeat;}");
 }
 
-void GameTableStyleReader::setChatLogStyle(QTextBrowser *tb)
+void GameTableStyleReader::setChatLogStyle(QTextBrowser* tb)
 {
-    tb->setStyleSheet("QTextBrowser { "+ font1String +" font-size: "+ChatLogTextSize+"px; color: #"+ChatLogTextColor+"; background-color: #"+ChatLogBgColor+"; border:none; } QScrollBar:vertical { border: 1px solid #"+ChatLogScrollBarBorderColor+"; background: #"+ChatLogScrollBarBgColor+"; width: 15px; margin: 17px -1px 17px 0px; } QScrollBar::handle:vertical { border-radius: 1px; border: 1px solid #"+ChatLogScrollBarHandleBorderColor+"; background: #"+ChatLogScrollBarHandleBgColor+"; min-height: 20px; } QScrollBar::add-line:vertical { margin-right: 0px; margin-left: 1px; border-bottom-right-radius: 2px; border-bottom-left-radius: 2px; border-top-right-radius: 1px; border-top-left-radius: 1px; border: 1px solid #"+ChatLogScrollBarHandleBorderColor+"; background: #"+ChatLogScrollBarHandleBgColor+"; height: 15px; subcontrol-position: bottom; subcontrol-origin: margin; } QScrollBar::sub-line:vertical { margin-right: 0px; margin-left: 1px; border-bottom-right-radius: 1px; border-bottom-left-radius: 1px; border-top-right-radius: 2px; border-top-left-radius: 2px; border: 1px solid #"+ChatLogScrollBarHandleBorderColor+"; background: #"+ChatLogScrollBarHandleBgColor+"; height: 15px; subcontrol-position: top; subcontrol-origin: margin; } QScrollBar:up-arrow:vertical, QScrollBar::down-arrow:vertical { border: 1px solid #"+ChatLogScrollBarArrowBorderColor+"; height: 3px; width: 3px; background: #"+ChatLogScrollBarArrowBgColor+"; } QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }");
+    tb->setStyleSheet(
+        "QTextBrowser { " + font1String + " font-size: " + ChatLogTextSize + "px; color: #" + ChatLogTextColor +
+        "; background-color: #" + ChatLogBgColor + "; border:none; } QScrollBar:vertical { border: 1px solid #" +
+        ChatLogScrollBarBorderColor + "; background: #" + ChatLogScrollBarBgColor +
+        "; width: 15px; margin: 17px -1px 17px 0px; } QScrollBar::handle:vertical { border-radius: 1px; border: 1px "
+        "solid #" +
+        ChatLogScrollBarHandleBorderColor + "; background: #" + ChatLogScrollBarHandleBgColor +
+        "; min-height: 20px; } QScrollBar::add-line:vertical { margin-right: 0px; margin-left: 1px; "
+        "border-bottom-right-radius: 2px; border-bottom-left-radius: 2px; border-top-right-radius: 1px; "
+        "border-top-left-radius: 1px; border: 1px solid #" +
+        ChatLogScrollBarHandleBorderColor + "; background: #" + ChatLogScrollBarHandleBgColor +
+        "; height: 15px; subcontrol-position: bottom; subcontrol-origin: margin; } QScrollBar::sub-line:vertical { "
+        "margin-right: 0px; margin-left: 1px; border-bottom-right-radius: 1px; border-bottom-left-radius: 1px; "
+        "border-top-right-radius: 2px; border-top-left-radius: 2px; border: 1px solid #" +
+        ChatLogScrollBarHandleBorderColor + "; background: #" + ChatLogScrollBarHandleBgColor +
+        "; height: 15px; subcontrol-position: top; subcontrol-origin: margin; } QScrollBar:up-arrow:vertical, "
+        "QScrollBar::down-arrow:vertical { border: 1px solid #" +
+        ChatLogScrollBarArrowBorderColor + "; height: 3px; width: 3px; background: #" + ChatLogScrollBarArrowBgColor +
+        "; } QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }");
 }
 
 void GameTableStyleReader::setChatLogStyle(QPlainTextEdit* pte)
 {
-    pte->setStyleSheet("QPlainTextEdit { "+ font1String +" font-size: "+ChatLogTextSize+"px; color: #"+ChatLogTextColor+"; background-color: #"+ChatLogBgColor+"; border:none; } QScrollBar:vertical { border: 1px solid #"+ChatLogScrollBarBorderColor+"; background: #"+ChatLogScrollBarBgColor+"; width: 15px; margin: 17px -1px 17px 0px; } QScrollBar::handle:vertical { border-radius: 1px; border: 1px solid #"+ChatLogScrollBarHandleBorderColor+"; background: #"+ChatLogScrollBarHandleBgColor+"; min-height: 20px; } QScrollBar::add-line:vertical { margin-right: 0px; margin-left: 1px; border-bottom-right-radius: 2px; border-bottom-left-radius: 2px; border-top-right-radius: 1px; border-top-left-radius: 1px; border: 1px solid #"+ChatLogScrollBarHandleBorderColor+"; background: #"+ChatLogScrollBarHandleBgColor+"; height: 15px; subcontrol-position: bottom; subcontrol-origin: margin; } QScrollBar::sub-line:vertical { margin-right: 0px; margin-left: 1px; border-bottom-right-radius: 1px; border-bottom-left-radius: 1px; border-top-right-radius: 2px; border-top-left-radius: 2px; border: 1px solid #"+ChatLogScrollBarHandleBorderColor+"; background: #"+ChatLogScrollBarHandleBgColor+"; height: 15px; subcontrol-position: top; subcontrol-origin: margin; } QScrollBar:up-arrow:vertical, QScrollBar::down-arrow:vertical { border: 1px solid #"+ChatLogScrollBarArrowBorderColor+"; height: 3px; width: 3px; background: #"+ChatLogScrollBarArrowBgColor+"; } QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }");
+    pte->setStyleSheet(
+        "QPlainTextEdit { " + font1String + " font-size: " + ChatLogTextSize + "px; color: #" + ChatLogTextColor +
+        "; background-color: #" + ChatLogBgColor + "; border:none; } QScrollBar:vertical { border: 1px solid #" +
+        ChatLogScrollBarBorderColor + "; background: #" + ChatLogScrollBarBgColor +
+        "; width: 15px; margin: 17px -1px 17px 0px; } QScrollBar::handle:vertical { border-radius: 1px; border: 1px "
+        "solid #" +
+        ChatLogScrollBarHandleBorderColor + "; background: #" + ChatLogScrollBarHandleBgColor +
+        "; min-height: 20px; } QScrollBar::add-line:vertical { margin-right: 0px; margin-left: 1px; "
+        "border-bottom-right-radius: 2px; border-bottom-left-radius: 2px; border-top-right-radius: 1px; "
+        "border-top-left-radius: 1px; border: 1px solid #" +
+        ChatLogScrollBarHandleBorderColor + "; background: #" + ChatLogScrollBarHandleBgColor +
+        "; height: 15px; subcontrol-position: bottom; subcontrol-origin: margin; } QScrollBar::sub-line:vertical { "
+        "margin-right: 0px; margin-left: 1px; border-bottom-right-radius: 1px; border-bottom-left-radius: 1px; "
+        "border-top-right-radius: 2px; border-top-left-radius: 2px; border: 1px solid #" +
+        ChatLogScrollBarHandleBorderColor + "; background: #" + ChatLogScrollBarHandleBgColor +
+        "; height: 15px; subcontrol-position: top; subcontrol-origin: margin; } QScrollBar:up-arrow:vertical, "
+        "QScrollBar::down-arrow:vertical { border: 1px solid #" +
+        ChatLogScrollBarArrowBorderColor + "; height: 3px; width: 3px; background: #" + ChatLogScrollBarArrowBgColor +
+        "; } QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }");
 }
 
-
-void GameTableStyleReader::setChatInputStyle(QLineEdit *ci)
+void GameTableStyleReader::setChatInputStyle(QLineEdit* ci)
 {
     QString myFontSize;
-    myFontSize=ChatLogTextSize;
-    ci->setStyleSheet("QLineEdit { "+ font1String +" font-size: "+myFontSize+"px; color: #"+ChatLogTextColor+"; background-color: #"+ChatLogBgColor+"; border-top: 2px solid #"+TabWidgetBorderColor+"; }");
+    myFontSize = ChatLogTextSize;
+    ci->setStyleSheet("QLineEdit { " + font1String + " font-size: " + myFontSize + "px; color: #" + ChatLogTextColor +
+                      "; background-color: #" + ChatLogBgColor + "; border-top: 2px solid #" + TabWidgetBorderColor +
+                      "; }");
 }
 
-void GameTableStyleReader::setCashLabelStyle(QLabel *cl)
+void GameTableStyleReader::setCashLabelStyle(QLabel* cl)
 {
-    cl->setStyleSheet("QLabel { "+ font2String +" font-size: "+cashFontSize+"px; font-weight: bold; color: #"+PlayerCashTextColor+"; }");
+    cl->setStyleSheet("QLabel { " + font2String + " font-size: " + cashFontSize + "px; font-weight: bold; color: #" +
+                      PlayerCashTextColor + "; }");
 }
 
-void GameTableStyleReader::setSetLabelStyle(QLabel *sl)
+void GameTableStyleReader::setSetLabelStyle(QLabel* sl)
 {
-    sl->setStyleSheet("QLabel { "+ font2String +" font-size: "+setLabelFontSize+"px; font-weight: bold; color: #"+PlayerBetTextColor+"; }");
+    sl->setStyleSheet("QLabel { " + font2String + " font-size: " + setLabelFontSize +
+                      "px; font-weight: bold; color: #" + PlayerBetTextColor + "; }");
 }
 
-void GameTableStyleReader::setPlayerNameLabelStyle(QLabel *pnl)
+void GameTableStyleReader::setPlayerNameLabelStyle(QLabel* pnl)
 {
-    pnl->setStyleSheet("QLabel { "+ font2String +" font-size: "+playerNameLabelFontSize+"px; font-weight: bold; color: #"+PlayerNickTextColor+"; }");
+    pnl->setStyleSheet("QLabel { " + font2String + " font-size: " + playerNameLabelFontSize +
+                       "px; font-weight: bold; color: #" + PlayerNickTextColor + "; }");
 }
 
-void GameTableStyleReader::setSmallFontBoardStyle(QLabel *l)
+void GameTableStyleReader::setSmallFontBoardStyle(QLabel* l)
 {
-    l->setStyleSheet("QLabel { "+ font2String +" font-size: "+smallBoardFontSize+"px; font-weight: bold; color: #"+BoardSmallTextColor+"; }");
+    l->setStyleSheet("QLabel { " + font2String + " font-size: " + smallBoardFontSize +
+                     "px; font-weight: bold; color: #" + BoardSmallTextColor + "; }");
 }
 
-void GameTableStyleReader::setBigFontBoardStyle(QLabel *l)
+void GameTableStyleReader::setBigFontBoardStyle(QLabel* l)
 {
-    l->setStyleSheet("QLabel { "+ font2String +" font-size: "+bigBoardFontSize+"px; font-weight: bold; color: #"+BoardBigTextColor+"; }");
+    l->setStyleSheet("QLabel { " + font2String + " font-size: " + bigBoardFontSize + "px; font-weight: bold; color: #" +
+                     BoardBigTextColor + "; }");
 }
 
-void GameTableStyleReader::setCardHolderStyle(QLabel *l, int BettingRound)
+void GameTableStyleReader::setCardHolderStyle(QLabel* l, int BettingRound)
 {
-    switch(BettingRound) {
+    switch (BettingRound)
+    {
     case 0:
         l->setPixmap(CardHolderFlop);
         break;
@@ -1467,207 +2080,581 @@ void GameTableStyleReader::setCardHolderStyle(QLabel *l, int BettingRound)
     }
 }
 
-
-void GameTableStyleReader::setBreakButtonStyle(QPushButton *bb, int state)
+void GameTableStyleReader::setBreakButtonStyle(QPushButton* bb, int state)
 {
-    switch(state) {
+    switch (state)
+    {
     // 		default
     case 0:
-        bb->setStyleSheet("QPushButton:enabled { background-color: #"+BreakLobbyButtonBgColor+"; color: #"+BreakLobbyButtonTextColor+";} QPushButton:disabled { background-color: #"+BreakLobbyButtonBgDisabledColor+"; color: #"+BreakLobbyButtonTextDisabledColor+"; font-weight: 900;}");
+        bb->setStyleSheet("QPushButton:enabled { background-color: #" + BreakLobbyButtonBgColor + "; color: #" +
+                          BreakLobbyButtonTextColor + ";} QPushButton:disabled { background-color: #" +
+                          BreakLobbyButtonBgDisabledColor + "; color: #" + BreakLobbyButtonTextDisabledColor +
+                          "; font-weight: 900;}");
         break;
         // 		blink
     case 1:
-        bb->setStyleSheet("QPushButton { background-color: #"+BreakLobbyButtonBgBlinkColor+"; color: "+BreakLobbyButtonTextBlinkColor+";}");
+        bb->setStyleSheet("QPushButton { background-color: #" + BreakLobbyButtonBgBlinkColor +
+                          "; color: " + BreakLobbyButtonTextBlinkColor + ";}");
         break;
     }
 }
 
-void GameTableStyleReader::setSpeedStringStyle(QLabel *l)
+void GameTableStyleReader::setSpeedStringStyle(QLabel* l)
 {
-    l->setStyleSheet("QLabel { color: #"+SpeedTextColor+";}");
+    l->setStyleSheet("QLabel { color: #" + SpeedTextColor + ";}");
 }
 
-void GameTableStyleReader::setVoteButtonStyle(QPushButton *b)
+void GameTableStyleReader::setVoteButtonStyle(QPushButton* b)
 {
-    b->setStyleSheet("QPushButton:enabled { background-color: #"+VoteButtonBgColor+"; color: #"+VoteButtonTextColor+";} ");
+    b->setStyleSheet("QPushButton:enabled { background-color: #" + VoteButtonBgColor + "; color: #" +
+                     VoteButtonTextColor + ";} ");
 }
 
-void GameTableStyleReader::setVoteStringsStyle(QLabel *l)
+void GameTableStyleReader::setVoteStringsStyle(QLabel* l)
 {
-    l->setStyleSheet("QLabel { color: #"+TabWidgetTextColor+"; font-size: 11px;}");
+    l->setStyleSheet("QLabel { color: #" + TabWidgetTextColor + "; font-size: 11px;}");
 }
 
-void GameTableStyleReader::setPlayerSeatInactiveStyle(QGroupBox *ps)
+void GameTableStyleReader::setPlayerSeatInactiveStyle(QGroupBox* ps)
 {
     // 	check if seat is on top or bottom line
-    if(ps->objectName() == "groupBox2" || ps->objectName() == "groupBox1" || ps->objectName() == "groupBox0" || ps->objectName() == "groupBox9" || ps->objectName() == "groupBox8") {
-        ps->setStyleSheet("QGroupBox { border:none; background-image: url(\""+PlayerBottomSeatInactive+"\") }");
-    } else {
-        ps->setStyleSheet("QGroupBox { border:none; background-image: url(\""+PlayerTopSeatInactive+"\") }");
+    if (ps->objectName() == "groupBox2" || ps->objectName() == "groupBox1" || ps->objectName() == "groupBox0" ||
+        ps->objectName() == "groupBox9" || ps->objectName() == "groupBox8")
+    {
+        ps->setStyleSheet("QGroupBox { border:none; background-image: url(\"" + PlayerBottomSeatInactive + "\") }");
+    }
+    else
+    {
+        ps->setStyleSheet("QGroupBox { border:none; background-image: url(\"" + PlayerTopSeatInactive + "\") }");
     }
 }
 
-void GameTableStyleReader::setPlayerSeatActiveStyle(QGroupBox *ps)
+void GameTableStyleReader::setPlayerSeatActiveStyle(QGroupBox* ps)
 {
     // 	check if seat is on top or bottom line
-    if(ps->objectName() == "groupBox2" || ps->objectName() == "groupBox1" || ps->objectName() == "groupBox0" || ps->objectName() == "groupBox9" || ps->objectName() == "groupBox8") {
-        ps->setStyleSheet("QGroupBox { border:none; background-image: url(\""+PlayerBottomSeatActive+"\") }");
-    } else {
-        ps->setStyleSheet("QGroupBox { border:none; background-image: url(\""+PlayerTopSeatActive+"\") }");
+    if (ps->objectName() == "groupBox2" || ps->objectName() == "groupBox1" || ps->objectName() == "groupBox0" ||
+        ps->objectName() == "groupBox9" || ps->objectName() == "groupBox8")
+    {
+        ps->setStyleSheet("QGroupBox { border:none; background-image: url(\"" + PlayerBottomSeatActive + "\") }");
+    }
+    else
+    {
+        ps->setStyleSheet("QGroupBox { border:none; background-image: url(\"" + PlayerTopSeatActive + "\") }");
     }
 }
 
-void GameTableStyleReader::setBetValueInputStyle(QSpinBox *bv)
+void GameTableStyleReader::setBetValueInputStyle(QSpinBox* bv)
 {
-    bv->setStyleSheet("QSpinBox { "+ font2String +" font-size: "+betValueFontSize+"px; font-weight: bold; background-color: #"+BetInputBgColor+"; color: #"+BetInputTextColor+"; } QSpinBox:disabled { background-color: #"+BetInputDisabledBgColor+"; color: #"+BetInputDisabledTextColor+" }");
+    bv->setStyleSheet("QSpinBox { " + font2String + " font-size: " + betValueFontSize +
+                      "px; font-weight: bold; background-color: #" + BetInputBgColor + "; color: #" +
+                      BetInputTextColor + "; } QSpinBox:disabled { background-color: #" + BetInputDisabledBgColor +
+                      "; color: #" + BetInputDisabledTextColor + " }");
 }
 
-void GameTableStyleReader::setAwayRadioButtonsStyle(QRadioButton *rb)
+void GameTableStyleReader::setAwayRadioButtonsStyle(QRadioButton* rb)
 {
-    rb->setStyleSheet("QRadioButton { color: #"+TabWidgetTextColor+"; } QRadioButton::indicator { width: 13px; height: 13px;} QRadioButton::indicator::checked { image: url(\""+RadioButtonChecked+"\");}  QRadioButton::indicator::unchecked { image: url(\""+RadioButtonUnchecked+"\");} QRadioButton::indicator:unchecked:hover { image: url(\""+RadioButtonUncheckedHover+"\");} QRadioButton::indicator:unchecked:pressed { image: url(\""+RadioButtonPressed+"\");} QRadioButton::indicator::checked { image: url(\""+RadioButtonChecked+"\");} QRadioButton::indicator:checked:hover { image: url(\""+RadioButtonCheckedHover+"\");} QRadioButton::indicator:checked:pressed { image: url(\""+RadioButtonPressed+"\");}");
-
+    rb->setStyleSheet(
+        "QRadioButton { color: #" + TabWidgetTextColor +
+        "; } QRadioButton::indicator { width: 13px; height: 13px;} QRadioButton::indicator::checked { image: url(\"" +
+        RadioButtonChecked + "\");}  QRadioButton::indicator::unchecked { image: url(\"" + RadioButtonUnchecked +
+        "\");} QRadioButton::indicator:unchecked:hover { image: url(\"" + RadioButtonUncheckedHover +
+        "\");} QRadioButton::indicator:unchecked:pressed { image: url(\"" + RadioButtonPressed +
+        "\");} QRadioButton::indicator::checked { image: url(\"" + RadioButtonChecked +
+        "\");} QRadioButton::indicator:checked:hover { image: url(\"" + RadioButtonCheckedHover +
+        "\");} QRadioButton::indicator:checked:pressed { image: url(\"" + RadioButtonPressed + "\");}");
 }
 
 QString GameTableStyleReader::getActionPic(int action)
 {
     // 	1 = fold, 2 = check, 3 = call, 4 = bet, 5 = raise, 6 = allin, 7 = winner
-    switch(action) {
-    case 1: {
-        if(ActionFoldI18NPic.endsWith("NULL"))
-            return myAppDataDir+"gfx/gui/misc/actionpics/action_fold.png";
+    switch (action)
+    {
+    case 1:
+    {
+        if (ActionFoldI18NPic.endsWith("NULL"))
+            return myAppDataDir + "gfx/gui/misc/actionpics/action_fold.png";
         else
             return ActionFoldI18NPic;
     }
-        break;
-    case 2: {
-        if(ActionCheckI18NPic.endsWith("NULL"))
-            return myAppDataDir+"gfx/gui/misc/actionpics/action_check.png";
+    break;
+    case 2:
+    {
+        if (ActionCheckI18NPic.endsWith("NULL"))
+            return myAppDataDir + "gfx/gui/misc/actionpics/action_check.png";
         else
             return ActionCheckI18NPic;
     }
-        break;
-    case 3: {
-        if(ActionCallI18NPic.endsWith("NULL"))
-            return myAppDataDir+"gfx/gui/misc/actionpics/action_call.png";
+    break;
+    case 3:
+    {
+        if (ActionCallI18NPic.endsWith("NULL"))
+            return myAppDataDir + "gfx/gui/misc/actionpics/action_call.png";
         else
             return ActionCallI18NPic;
     }
-        break;
-    case 4: {
-        if(ActionBetI18NPic.endsWith("NULL"))
-            return myAppDataDir+"gfx/gui/misc/actionpics/action_bet.png";
+    break;
+    case 4:
+    {
+        if (ActionBetI18NPic.endsWith("NULL"))
+            return myAppDataDir + "gfx/gui/misc/actionpics/action_bet.png";
         else
             return ActionBetI18NPic;
     }
-        break;
-    case 5: {
-        if(ActionRaiseI18NPic.endsWith("NULL"))
-            return myAppDataDir+"gfx/gui/misc/actionpics/action_raise.png";
+    break;
+    case 5:
+    {
+        if (ActionRaiseI18NPic.endsWith("NULL"))
+            return myAppDataDir + "gfx/gui/misc/actionpics/action_raise.png";
         else
             return ActionRaiseI18NPic;
     }
-        break;
-    case 6: {
-        if(ActionAllInI18NPic.endsWith("NULL"))
-            return myAppDataDir+"gfx/gui/misc/actionpics/action_allin.png";
+    break;
+    case 6:
+    {
+        if (ActionAllInI18NPic.endsWith("NULL"))
+            return myAppDataDir + "gfx/gui/misc/actionpics/action_allin.png";
         else
             return ActionAllInI18NPic;
     }
-        break;
-    case 7: {
-        if(ActionWinnerI18NPic.endsWith("NULL"))
-            return myAppDataDir+"gfx/gui/misc/actionpics/action_winner.png";
+    break;
+    case 7:
+    {
+        if (ActionWinnerI18NPic.endsWith("NULL"))
+            return myAppDataDir + "gfx/gui/misc/actionpics/action_winner.png";
         else
             return ActionWinnerI18NPic;
     }
-        break;
+    break;
     }
     return QString("");
 }
 
-void GameTableStyleReader::setButtonsStyle(MyActionButton *br, MyActionButton *brHalf,MyActionButton *brTwoThird,
-	MyActionButton *brPot,	MyActionButton *cc, MyActionButton *f, MyActionButton *a, int state)
+void GameTableStyleReader::setButtonsStyle(MyActionButton* br, MyActionButton* brHalf, MyActionButton* brTwoThird,
+                                           MyActionButton* brPot, MyActionButton* cc, MyActionButton* f,
+                                           MyActionButton* a, int state)
 {
     br->setStyle(this);
-	brHalf->setStyle(this);
-	brTwoThird->setStyle(this);
-	brPot->setStyle(this);
+    brHalf->setStyle(this);
+    brTwoThird->setStyle(this);
+    brPot->setStyle(this);
 
     cc->setStyle(this);
     f->setStyle(this);
     a->setStyle(this);
 
-    switch(state) {
-        //default
-        case 0: {
+    switch (state)
+    {
+    // default
+    case 0:
+    {
 
-			br->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+BetRaiseButtonTextColor+";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseButtonChecked+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseButtonHover+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseButtonCheckedHover+"\");}");
+        br->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center "
+                          "center; background-image: url(\"" +
+                          BetRaiseButtonDefault + "\"); " + font2String + " font-size: " + humanPlayerButtonFontSize +
+                          "px; font-weight: bold; color: #" + BetRaiseButtonTextColor +
+                          ";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center "
+                          "center; background-image: url(\"" +
+                          BetRaiseButtonDefault +
+                          "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center "
+                          "center; background-image: url(\"" +
+                          BetRaiseButtonChecked +
+                          "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; "
+                          "background-image: url(\"" +
+                          BetRaiseButtonHover +
+                          "\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: "
+                          "center center; background-image: url(\"" +
+                          BetRaiseButtonCheckedHover + "\");}");
 
-			brHalf->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseHalfPotButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+BetRaiseHalfPotButtonTextColor+";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseHalfPotButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseHalfPotButtonChecked+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseHalfPotButtonHover+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseHalfPotButtonCheckedHover+"\");}");
-			brTwoThird->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseTwoThirdPotButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+BetRaiseTwoThirdPotButtonTextColor+";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseTwoThirdPotButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseTwoThirdPotButtonChecked+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseTwoThirdPotButtonHover+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseTwoThirdPotButtonCheckedHover+"\");}");
-            brPot->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaisePotButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+BetRaisePotButtonTextColor+";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaisePotButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaisePotButtonChecked+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaisePotButtonHover+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaisePotButtonCheckedHover+"\");}");
+        brHalf->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center "
+                              "center; background-image: url(\"" +
+                              BetRaiseHalfPotButtonDefault + "\"); " + font2String +
+                              " font-size: " + humanPlayerButtonFontSize + "px; font-weight: bold; color: #" +
+                              BetRaiseHalfPotButtonTextColor +
+                              ";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center "
+                              "center; background-image: url(\"" +
+                              BetRaiseHalfPotButtonDefault +
+                              "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center "
+                              "center; background-image: url(\"" +
+                              BetRaiseHalfPotButtonChecked +
+                              "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center "
+                              "center; background-image: url(\"" +
+                              BetRaiseHalfPotButtonHover +
+                              "\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: "
+                              "center center; background-image: url(\"" +
+                              BetRaiseHalfPotButtonCheckedHover + "\");}");
+        brTwoThird->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: "
+                                  "center center; background-image: url(\"" +
+                                  BetRaiseTwoThirdPotButtonDefault + "\"); " + font2String +
+                                  " font-size: " + humanPlayerButtonFontSize + "px; font-weight: bold; color: #" +
+                                  BetRaiseTwoThirdPotButtonTextColor +
+                                  ";} QPushButton:unchecked { background-repeat: no-repeat; background-position: "
+                                  "center center; background-image: url(\"" +
+                                  BetRaiseTwoThirdPotButtonDefault +
+                                  "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: "
+                                  "center center; background-image: url(\"" +
+                                  BetRaiseTwoThirdPotButtonChecked +
+                                  "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center "
+                                  "center; background-image: url(\"" +
+                                  BetRaiseTwoThirdPotButtonHover +
+                                  "\"); } QPushButton:checked:hover { background-repeat: no-repeat; "
+                                  "background-position: center center; background-image: url(\"" +
+                                  BetRaiseTwoThirdPotButtonCheckedHover + "\");}");
+        brPot->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center "
+                             "center; background-image: url(\"" +
+                             BetRaisePotButtonDefault + "\"); " + font2String +
+                             " font-size: " + humanPlayerButtonFontSize + "px; font-weight: bold; color: #" +
+                             BetRaisePotButtonTextColor +
+                             ";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center "
+                             "center; background-image: url(\"" +
+                             BetRaisePotButtonDefault +
+                             "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center "
+                             "center; background-image: url(\"" +
+                             BetRaisePotButtonChecked +
+                             "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center "
+                             "center; background-image: url(\"" +
+                             BetRaisePotButtonHover +
+                             "\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: "
+                             "center center; background-image: url(\"" +
+                             BetRaisePotButtonCheckedHover + "\");}");
 
-            cc->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+CheckCallButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+CheckCallButtonTextColor+";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+CheckCallButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+CheckCallButtonChecked+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+CheckCallButtonHover+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+CheckCallButtonCheckedHover+"\");}");
+        cc->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center "
+                          "center; background-image: url(\"" +
+                          CheckCallButtonDefault + "\"); " + font2String + " font-size: " + humanPlayerButtonFontSize +
+                          "px; font-weight: bold; color: #" + CheckCallButtonTextColor +
+                          ";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center "
+                          "center; background-image: url(\"" +
+                          CheckCallButtonDefault +
+                          "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center "
+                          "center; background-image: url(\"" +
+                          CheckCallButtonChecked +
+                          "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; "
+                          "background-image: url(\"" +
+                          CheckCallButtonHover +
+                          "\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: "
+                          "center center; background-image: url(\"" +
+                          CheckCallButtonCheckedHover + "\");}");
 
-            f->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+FoldButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+FoldButtonTextColor+";}  QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+FoldButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+FoldButtonChecked+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+FoldButtonHover+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+FoldButtonCheckedHover+"\");}");
+        f->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; "
+                         "background-image: url(\"" +
+                         FoldButtonDefault + "\"); " + font2String + " font-size: " + humanPlayerButtonFontSize +
+                         "px; font-weight: bold; color: #" + FoldButtonTextColor +
+                         ";}  QPushButton:unchecked { background-repeat: no-repeat; background-position: center "
+                         "center; background-image: url(\"" +
+                         FoldButtonDefault +
+                         "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center "
+                         "center; background-image: url(\"" +
+                         FoldButtonChecked +
+                         "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; "
+                         "background-image: url(\"" +
+                         FoldButtonHover +
+                         "\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center "
+                         "center; background-image: url(\"" +
+                         FoldButtonCheckedHover + "\");}");
 
-            a->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+AllInButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+AllInButtonTextColor+";}  QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+AllInButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+AllInButtonChecked+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+AllInButtonHover+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+AllInButtonCheckedHover+"\");}");
-        }
-            break;
-            //no hover
-        case 1: {
-
-            br->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+BetRaiseButtonTextColor+";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseButtonChecked+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseButtonDefault+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseButtonChecked+"\");}");
-
-            brHalf->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseHalfPotButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+BetRaiseHalfPotButtonTextColor+";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseHalfPotButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseHalfPotButtonChecked+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseHalfPotButtonDefault+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseHalfPotButtonChecked+"\");}");
-            brTwoThird->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseTwoThirdPotButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+BetRaiseTwoThirdPotButtonTextColor+";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseTwoThirdPotButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseTwoThirdPotButtonChecked+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseTwoThirdPotButtonDefault+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseTwoThirdPotButtonChecked+"\");}");
-            brPot->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaisePotButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+BetRaisePotButtonTextColor+";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaisePotButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaisePotButtonChecked+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaisePotButtonDefault+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaisePotButtonChecked+"\");}");
-
-
-            cc->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+CheckCallButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+CheckCallButtonTextColor+";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+CheckCallButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+CheckCallButtonChecked+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+CheckCallButtonDefault+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+CheckCallButtonChecked+"\");}");
-
-            f->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+FoldButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+FoldButtonTextColor+";}  QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+FoldButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+FoldButtonChecked+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+FoldButtonDefault+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+FoldButtonChecked+"\");}");
-
-            a->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+AllInButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+AllInButtonTextColor+";}  QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+AllInButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+AllInButtonChecked+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+AllInButtonDefault+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+AllInButtonChecked+"\");}");
-        }
-            break;
-            //checkable
-
-        case 2: {
-            br->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+BetRaiseButtonCheckableTextColor+";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseButtonChecked+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseButtonHover+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseButtonCheckedHover+"\");}");
-
-            brHalf->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseHalfPotButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+BetRaiseHalfPotButtonCheckableTextColor+";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseHalfPotButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseHalfPotButtonChecked+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseHalfPotButtonHover+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseHalfPotButtonCheckedHover+"\");}");
-            brTwoThird->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseTwoThirdPotButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+BetRaiseTwoThirdPotButtonCheckableTextColor+";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseTwoThirdPotButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseTwoThirdPotButtonChecked+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseTwoThirdPotButtonHover+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseTwoThirdPotButtonCheckedHover+"\");}");
-            brPot->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaisePotButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+BetRaisePotButtonCheckableTextColor+";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaisePotButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaisePotButtonChecked+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaisePotButtonHover+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaisePotButtonCheckedHover+"\");}");
-
-            cc->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+CheckCallButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+CheckCallButtonCheckableTextColor+";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+CheckCallButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+CheckCallButtonChecked+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+CheckCallButtonHover+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+CheckCallButtonCheckedHover+"\");}");
-
-            f->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+FoldButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+FoldButtonCheckableTextColor+";}  QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+FoldButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+FoldButtonChecked+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+FoldButtonHover+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+FoldButtonCheckedHover+"\");}");
-
-            a->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+AllInButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+AllInButtonCheckableTextColor+";}  QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+AllInButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+AllInButtonChecked+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+AllInButtonHover+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+AllInButtonCheckedHover+"\");}");
-        }
-            break;
+        a->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; "
+                         "background-image: url(\"" +
+                         AllInButtonDefault + "\"); " + font2String + " font-size: " + humanPlayerButtonFontSize +
+                         "px; font-weight: bold; color: #" + AllInButtonTextColor +
+                         ";}  QPushButton:unchecked { background-repeat: no-repeat; background-position: center "
+                         "center; background-image: url(\"" +
+                         AllInButtonDefault +
+                         "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center "
+                         "center; background-image: url(\"" +
+                         AllInButtonChecked +
+                         "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; "
+                         "background-image: url(\"" +
+                         AllInButtonHover +
+                         "\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center "
+                         "center; background-image: url(\"" +
+                         AllInButtonCheckedHover + "\");}");
     }
+    break;
+        // no hover
+    case 1:
+    {
 
+        br->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center "
+                          "center; background-image: url(\"" +
+                          BetRaiseButtonDefault + "\"); " + font2String + " font-size: " + humanPlayerButtonFontSize +
+                          "px; font-weight: bold; color: #" + BetRaiseButtonTextColor +
+                          ";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center "
+                          "center; background-image: url(\"" +
+                          BetRaiseButtonDefault +
+                          "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center "
+                          "center; background-image: url(\"" +
+                          BetRaiseButtonChecked +
+                          "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; "
+                          "background-image: url(\"" +
+                          BetRaiseButtonDefault +
+                          "\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: "
+                          "center center; background-image: url(\"" +
+                          BetRaiseButtonChecked + "\");}");
+
+        brHalf->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center "
+                              "center; background-image: url(\"" +
+                              BetRaiseHalfPotButtonDefault + "\"); " + font2String +
+                              " font-size: " + humanPlayerButtonFontSize + "px; font-weight: bold; color: #" +
+                              BetRaiseHalfPotButtonTextColor +
+                              ";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center "
+                              "center; background-image: url(\"" +
+                              BetRaiseHalfPotButtonDefault +
+                              "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center "
+                              "center; background-image: url(\"" +
+                              BetRaiseHalfPotButtonChecked +
+                              "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center "
+                              "center; background-image: url(\"" +
+                              BetRaiseHalfPotButtonDefault +
+                              "\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: "
+                              "center center; background-image: url(\"" +
+                              BetRaiseHalfPotButtonChecked + "\");}");
+        brTwoThird->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: "
+                                  "center center; background-image: url(\"" +
+                                  BetRaiseTwoThirdPotButtonDefault + "\"); " + font2String +
+                                  " font-size: " + humanPlayerButtonFontSize + "px; font-weight: bold; color: #" +
+                                  BetRaiseTwoThirdPotButtonTextColor +
+                                  ";} QPushButton:unchecked { background-repeat: no-repeat; background-position: "
+                                  "center center; background-image: url(\"" +
+                                  BetRaiseTwoThirdPotButtonDefault +
+                                  "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: "
+                                  "center center; background-image: url(\"" +
+                                  BetRaiseTwoThirdPotButtonChecked +
+                                  "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center "
+                                  "center; background-image: url(\"" +
+                                  BetRaiseTwoThirdPotButtonDefault +
+                                  "\"); } QPushButton:checked:hover { background-repeat: no-repeat; "
+                                  "background-position: center center; background-image: url(\"" +
+                                  BetRaiseTwoThirdPotButtonChecked + "\");}");
+        brPot->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center "
+                             "center; background-image: url(\"" +
+                             BetRaisePotButtonDefault + "\"); " + font2String +
+                             " font-size: " + humanPlayerButtonFontSize + "px; font-weight: bold; color: #" +
+                             BetRaisePotButtonTextColor +
+                             ";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center "
+                             "center; background-image: url(\"" +
+                             BetRaisePotButtonDefault +
+                             "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center "
+                             "center; background-image: url(\"" +
+                             BetRaisePotButtonChecked +
+                             "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center "
+                             "center; background-image: url(\"" +
+                             BetRaisePotButtonDefault +
+                             "\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: "
+                             "center center; background-image: url(\"" +
+                             BetRaisePotButtonChecked + "\");}");
+
+        cc->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center "
+                          "center; background-image: url(\"" +
+                          CheckCallButtonDefault + "\"); " + font2String + " font-size: " + humanPlayerButtonFontSize +
+                          "px; font-weight: bold; color: #" + CheckCallButtonTextColor +
+                          ";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center "
+                          "center; background-image: url(\"" +
+                          CheckCallButtonDefault +
+                          "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center "
+                          "center; background-image: url(\"" +
+                          CheckCallButtonChecked +
+                          "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; "
+                          "background-image: url(\"" +
+                          CheckCallButtonDefault +
+                          "\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: "
+                          "center center; background-image: url(\"" +
+                          CheckCallButtonChecked + "\");}");
+
+        f->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; "
+                         "background-image: url(\"" +
+                         FoldButtonDefault + "\"); " + font2String + " font-size: " + humanPlayerButtonFontSize +
+                         "px; font-weight: bold; color: #" + FoldButtonTextColor +
+                         ";}  QPushButton:unchecked { background-repeat: no-repeat; background-position: center "
+                         "center; background-image: url(\"" +
+                         FoldButtonDefault +
+                         "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center "
+                         "center; background-image: url(\"" +
+                         FoldButtonChecked +
+                         "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; "
+                         "background-image: url(\"" +
+                         FoldButtonDefault +
+                         "\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center "
+                         "center; background-image: url(\"" +
+                         FoldButtonChecked + "\");}");
+
+        a->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; "
+                         "background-image: url(\"" +
+                         AllInButtonDefault + "\"); " + font2String + " font-size: " + humanPlayerButtonFontSize +
+                         "px; font-weight: bold; color: #" + AllInButtonTextColor +
+                         ";}  QPushButton:unchecked { background-repeat: no-repeat; background-position: center "
+                         "center; background-image: url(\"" +
+                         AllInButtonDefault +
+                         "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center "
+                         "center; background-image: url(\"" +
+                         AllInButtonChecked +
+                         "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; "
+                         "background-image: url(\"" +
+                         AllInButtonDefault +
+                         "\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center "
+                         "center; background-image: url(\"" +
+                         AllInButtonChecked + "\");}");
+    }
+    break;
+        // checkable
+
+    case 2:
+    {
+        br->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center "
+                          "center; background-image: url(\"" +
+                          BetRaiseButtonDefault + "\"); " + font2String + " font-size: " + humanPlayerButtonFontSize +
+                          "px; font-weight: bold; color: #" + BetRaiseButtonCheckableTextColor +
+                          ";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center "
+                          "center; background-image: url(\"" +
+                          BetRaiseButtonDefault +
+                          "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center "
+                          "center; background-image: url(\"" +
+                          BetRaiseButtonChecked +
+                          "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; "
+                          "background-image: url(\"" +
+                          BetRaiseButtonHover +
+                          "\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: "
+                          "center center; background-image: url(\"" +
+                          BetRaiseButtonCheckedHover + "\");}");
+
+        brHalf->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center "
+                              "center; background-image: url(\"" +
+                              BetRaiseHalfPotButtonDefault + "\"); " + font2String +
+                              " font-size: " + humanPlayerButtonFontSize + "px; font-weight: bold; color: #" +
+                              BetRaiseHalfPotButtonCheckableTextColor +
+                              ";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center "
+                              "center; background-image: url(\"" +
+                              BetRaiseHalfPotButtonDefault +
+                              "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center "
+                              "center; background-image: url(\"" +
+                              BetRaiseHalfPotButtonChecked +
+                              "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center "
+                              "center; background-image: url(\"" +
+                              BetRaiseHalfPotButtonHover +
+                              "\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: "
+                              "center center; background-image: url(\"" +
+                              BetRaiseHalfPotButtonCheckedHover + "\");}");
+        brTwoThird->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: "
+                                  "center center; background-image: url(\"" +
+                                  BetRaiseTwoThirdPotButtonDefault + "\"); " + font2String +
+                                  " font-size: " + humanPlayerButtonFontSize + "px; font-weight: bold; color: #" +
+                                  BetRaiseTwoThirdPotButtonCheckableTextColor +
+                                  ";} QPushButton:unchecked { background-repeat: no-repeat; background-position: "
+                                  "center center; background-image: url(\"" +
+                                  BetRaiseTwoThirdPotButtonDefault +
+                                  "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: "
+                                  "center center; background-image: url(\"" +
+                                  BetRaiseTwoThirdPotButtonChecked +
+                                  "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center "
+                                  "center; background-image: url(\"" +
+                                  BetRaiseTwoThirdPotButtonHover +
+                                  "\"); } QPushButton:checked:hover { background-repeat: no-repeat; "
+                                  "background-position: center center; background-image: url(\"" +
+                                  BetRaiseTwoThirdPotButtonCheckedHover + "\");}");
+        brPot->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center "
+                             "center; background-image: url(\"" +
+                             BetRaisePotButtonDefault + "\"); " + font2String +
+                             " font-size: " + humanPlayerButtonFontSize + "px; font-weight: bold; color: #" +
+                             BetRaisePotButtonCheckableTextColor +
+                             ";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center "
+                             "center; background-image: url(\"" +
+                             BetRaisePotButtonDefault +
+                             "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center "
+                             "center; background-image: url(\"" +
+                             BetRaisePotButtonChecked +
+                             "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center "
+                             "center; background-image: url(\"" +
+                             BetRaisePotButtonHover +
+                             "\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: "
+                             "center center; background-image: url(\"" +
+                             BetRaisePotButtonCheckedHover + "\");}");
+
+        cc->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center "
+                          "center; background-image: url(\"" +
+                          CheckCallButtonDefault + "\"); " + font2String + " font-size: " + humanPlayerButtonFontSize +
+                          "px; font-weight: bold; color: #" + CheckCallButtonCheckableTextColor +
+                          ";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center "
+                          "center; background-image: url(\"" +
+                          CheckCallButtonDefault +
+                          "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center "
+                          "center; background-image: url(\"" +
+                          CheckCallButtonChecked +
+                          "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; "
+                          "background-image: url(\"" +
+                          CheckCallButtonHover +
+                          "\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: "
+                          "center center; background-image: url(\"" +
+                          CheckCallButtonCheckedHover + "\");}");
+
+        f->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; "
+                         "background-image: url(\"" +
+                         FoldButtonDefault + "\"); " + font2String + " font-size: " + humanPlayerButtonFontSize +
+                         "px; font-weight: bold; color: #" + FoldButtonCheckableTextColor +
+                         ";}  QPushButton:unchecked { background-repeat: no-repeat; background-position: center "
+                         "center; background-image: url(\"" +
+                         FoldButtonDefault +
+                         "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center "
+                         "center; background-image: url(\"" +
+                         FoldButtonChecked +
+                         "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; "
+                         "background-image: url(\"" +
+                         FoldButtonHover +
+                         "\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center "
+                         "center; background-image: url(\"" +
+                         FoldButtonCheckedHover + "\");}");
+
+        a->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; "
+                         "background-image: url(\"" +
+                         AllInButtonDefault + "\"); " + font2String + " font-size: " + humanPlayerButtonFontSize +
+                         "px; font-weight: bold; color: #" + AllInButtonCheckableTextColor +
+                         ";}  QPushButton:unchecked { background-repeat: no-repeat; background-position: center "
+                         "center; background-image: url(\"" +
+                         AllInButtonDefault +
+                         "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center "
+                         "center; background-image: url(\"" +
+                         AllInButtonChecked +
+                         "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; "
+                         "background-image: url(\"" +
+                         AllInButtonHover +
+                         "\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center "
+                         "center; background-image: url(\"" +
+                         AllInButtonCheckedHover + "\");}");
+    }
+    break;
+    }
 }
 
-void GameTableStyleReader::setShowMyCardsButtonStyle( MyActionButton *sc)
+void GameTableStyleReader::setShowMyCardsButtonStyle(MyActionButton* sc)
 {
     sc->setStyle(this);
 
-    //Show My Cards Button has same look and feel all the time
-    sc->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; background-image: url(\""+ShowMyCardsButtonDefault+"\"); "+ font2String +" font-size: "+humanPlayerButtonFontSize+"px; font-weight: bold; color: #"+ShowMyCardsButtonTextColor+";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+ShowMyCardsButtonDefault+"\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; background-image: url(\""+BetRaiseButtonDefault+"\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+ShowMyCardsButtonHover+"\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center center; background-image: url(\""+ShowMyCardsButtonHover+"\");}");
-
+    // Show My Cards Button has same look and feel all the time
+    sc->setStyleSheet("QPushButton { border:none; background-repeat: no-repeat; background-position: center center; "
+                      "background-image: url(\"" +
+                      ShowMyCardsButtonDefault + "\"); " + font2String + " font-size: " + humanPlayerButtonFontSize +
+                      "px; font-weight: bold; color: #" + ShowMyCardsButtonTextColor +
+                      ";} QPushButton:unchecked { background-repeat: no-repeat; background-position: center center; "
+                      "background-image: url(\"" +
+                      ShowMyCardsButtonDefault +
+                      "\"); } QPushButton:checked { background-repeat: no-repeat; background-position: center center; "
+                      "background-image: url(\"" +
+                      BetRaiseButtonDefault +
+                      "\");} QPushButton:hover { background-repeat: no-repeat; background-position: center center; "
+                      "background-image: url(\"" +
+                      ShowMyCardsButtonHover +
+                      "\"); } QPushButton:checked:hover { background-repeat: no-repeat; background-position: center "
+                      "center; background-image: url(\"" +
+                      ShowMyCardsButtonHover + "\");}");
 }
 
 void GameTableStyleReader::setToolBoxBackground(QGroupBox* gb)
 {
-    gb->setStyleSheet("QGroupBox { border:none; background-image: url(\""+ToolBoxBackground+"\") }");
+    gb->setStyleSheet("QGroupBox { border:none; background-image: url(\"" + ToolBoxBackground + "\") }");
 }
 
-void GameTableStyleReader::setTabWidgetStyle(QTabWidget *tw, QTabBar *tb)
+void GameTableStyleReader::setTabWidgetStyle(QTabWidget* tw, QTabBar* tb)
 {
-    tw->setStyleSheet("QTabWidget::pane { border: 2px solid #"+TabWidgetBorderColor+"; border-radius: 2px; background-color: #"+TabWidgetBgColor+"; }  QTabWidget::tab-bar { left: 5px; } ");
+    tw->setStyleSheet("QTabWidget::pane { border: 2px solid #" + TabWidgetBorderColor +
+                      "; border-radius: 2px; background-color: #" + TabWidgetBgColor +
+                      "; }  QTabWidget::tab-bar { left: 5px; } ");
 
     QString bottomPadding("");
 
@@ -1676,13 +2663,31 @@ void GameTableStyleReader::setTabWidgetStyle(QTabWidget *tw, QTabBar *tb)
     QString tabTextFontSize;
     tabTextFontSize = "font-size: 11px; ";
 
-    tb->setStyleSheet("QTabBar::tab{ "+ font1String + tabTextFontSize +" color: #"+TabWidgetTextColor+"; background-color: #"+TabWidgetBgColor+"; border: 2px solid #"+TabWidgetBorderColor+"; border-bottom-color: #"+TabWidgetBorderColor+"; border-top-left-radius: 4px; border-top-right-radius: 4px; padding-top: "+tabBarPaddingTop+"px;"+bottomPadding+" padding-left:"+tabBarPaddingSide+"px; padding-right:"+tabBarPaddingSide+"px;} QTabBar::tab:selected, QTabBar::tab:hover { background-color: #"+TabWidgetBgColor+"; padding-top: "+tabBarPaddingTop+"px; padding-left:"+tabBarPaddingSide+"px; padding-right:"+tabBarPaddingSide+"px;} QTabBar::tab:selected { border-color: #"+TabWidgetBorderColor+"; border-bottom-color: #"+TabWidgetBgColor+"; padding-top: "+tabBarPaddingTop+"px; padding-left:"+tabBarPaddingSide+"px; padding-right:"+tabBarPaddingSide+"px;}  QTabBar::tab:!selected { margin-top: 2px; padding-top: "+tabBarPaddingTop+"px; padding-left:"+tabBarPaddingSide+"px; padding-right:"+tabBarPaddingSide+"px;} QTabBar::tab:selected { margin-left: -4px; margin-right: -4px; padding-top: "+tabBarPaddingTop+"px; padding-left:"+tabBarPaddingSide+"px; padding-right:"+tabBarPaddingSide+"px;} QTabBar::tab:first:selected { margin-left: 0; padding-top: "+tabBarPaddingTop+"px; padding-left:"+tabBarPaddingSide+"px; padding-right:"+tabBarPaddingSide+"px;} QTabBar::tab:last:selected { margin-right: 0; padding-top: "+tabBarPaddingTop+"px; padding-left:"+tabBarPaddingSide+"px; padding-right:"+tabBarPaddingSide+"px;} QTabBar::tab:only-one { margin: 0; } ");
-
+    tb->setStyleSheet(
+        "QTabBar::tab{ " + font1String + tabTextFontSize + " color: #" + TabWidgetTextColor + "; background-color: #" +
+        TabWidgetBgColor + "; border: 2px solid #" + TabWidgetBorderColor + "; border-bottom-color: #" +
+        TabWidgetBorderColor +
+        "; border-top-left-radius: 4px; border-top-right-radius: 4px; padding-top: " + tabBarPaddingTop + "px;" +
+        bottomPadding + " padding-left:" + tabBarPaddingSide + "px; padding-right:" + tabBarPaddingSide +
+        "px;} QTabBar::tab:selected, QTabBar::tab:hover { background-color: #" + TabWidgetBgColor +
+        "; padding-top: " + tabBarPaddingTop + "px; padding-left:" + tabBarPaddingSide +
+        "px; padding-right:" + tabBarPaddingSide + "px;} QTabBar::tab:selected { border-color: #" +
+        TabWidgetBorderColor + "; border-bottom-color: #" + TabWidgetBgColor + "; padding-top: " + tabBarPaddingTop +
+        "px; padding-left:" + tabBarPaddingSide + "px; padding-right:" + tabBarPaddingSide +
+        "px;}  QTabBar::tab:!selected { margin-top: 2px; padding-top: " + tabBarPaddingTop +
+        "px; padding-left:" + tabBarPaddingSide + "px; padding-right:" + tabBarPaddingSide +
+        "px;} QTabBar::tab:selected { margin-left: -4px; margin-right: -4px; padding-top: " + tabBarPaddingTop +
+        "px; padding-left:" + tabBarPaddingSide + "px; padding-right:" + tabBarPaddingSide +
+        "px;} QTabBar::tab:first:selected { margin-left: 0; padding-top: " + tabBarPaddingTop +
+        "px; padding-left:" + tabBarPaddingSide + "px; padding-right:" + tabBarPaddingSide +
+        "px;} QTabBar::tab:last:selected { margin-right: 0; padding-top: " + tabBarPaddingTop + "px; padding-left:" +
+        tabBarPaddingSide + "px; padding-right:" + tabBarPaddingSide + "px;} QTabBar::tab:only-one { margin: 0; } ");
 }
 
-void GameTableStyleReader::setWindowsGeometry(gameTableImpl *gt)
+void GameTableStyleReader::setWindowsGeometry(GameTableWindow* gt)
 {
-    if(IfFixedWindowSize.toInt()) {
+    if (IfFixedWindowSize.toInt())
+    {
         gt->setMinimumSize(FixedWindowWidth.toInt(), FixedWindowHeight.toInt());
         gt->setMaximumSize(FixedWindowWidth.toInt(), FixedWindowHeight.toInt());
         gt->resize(FixedWindowWidth.toInt(), FixedWindowHeight.toInt());
@@ -1690,16 +2695,22 @@ void GameTableStyleReader::setWindowsGeometry(gameTableImpl *gt)
         QScreen* dw = QGuiApplication::primaryScreen();
         int availableWidth = dw->availableSize().width();
         int availableHeight = dw->availableSize().height();
-        if(availableWidth == FixedWindowWidth.toInt() && availableHeight == FixedWindowHeight.toInt()) {
+        if (availableWidth == FixedWindowWidth.toInt() && availableHeight == FixedWindowHeight.toInt())
+        {
             gt->actionFullScreen->setEnabled(true);
-        } else {
+        }
+        else
+        {
             gt->actionFullScreen->setDisabled(true);
-            if(gt->isFullScreen()) {
+            if (gt->isFullScreen())
+            {
                 gt->showNormal();
-                gt->move(50,50);
+                gt->move(50, 50);
             }
         }
-    } else {
+    }
+    else
+    {
         gt->setMinimumSize(MinimumWindowWidth.toInt(), MinimumWindowHeight.toInt());
         gt->setMaximumSize(MaximumWindowWidth.toInt(), MaximumWindowHeight.toInt());
         gt->resize(MinimumWindowWidth.toInt(), MinimumWindowHeight.toInt());
@@ -1707,55 +2718,72 @@ void GameTableStyleReader::setWindowsGeometry(gameTableImpl *gt)
         QScreen* dw = QGuiApplication::primaryScreen();
         int availableWidth = dw->availableSize().width();
         int availableHeight = dw->availableSize().height();
-        if(availableWidth <= MaximumWindowWidth.toInt() && availableHeight <= MaximumWindowHeight.toInt()) {
+        if (availableWidth <= MaximumWindowWidth.toInt() && availableHeight <= MaximumWindowHeight.toInt())
+        {
             gt->actionFullScreen->setEnabled(true);
-        } else {
+        }
+        else
+        {
             gt->actionFullScreen->setDisabled(true);
-            if(gt->isFullScreen()) {
+            if (gt->isFullScreen())
+            {
                 gt->showNormal();
-                gt->move(50,50);
+                gt->move(50, 50);
             }
         }
     }
-
 }
 
-void GameTableStyleReader::setSliderStyle(QSlider *s)
+void GameTableStyleReader::setSliderStyle(QSlider* s)
 {
 
     QString height("");
 
     height = " height: 3px;";
-    s->setStyleSheet("QSlider::groove:horizontal { border: 1px solid #"+BetSpeedSliderGrooveBorderColor+";"+height+" background: #"+BetSpeedSliderGrooveBgColor+"; margin: 4px 0; border-radius: 2px; } QSlider::handle:horizontal { background: #"+BetSpeedSliderHandleBgColor+"; border: 1px solid #"+BetSpeedSliderHandleBorderColor+"; width: 12px; margin: -7px 0; border-radius: 4px;}");
-
+    s->setStyleSheet("QSlider::groove:horizontal { border: 1px solid #" + BetSpeedSliderGrooveBorderColor + ";" +
+                     height + " background: #" + BetSpeedSliderGrooveBgColor +
+                     "; margin: 4px 0; border-radius: 2px; } QSlider::handle:horizontal { background: #" +
+                     BetSpeedSliderHandleBgColor + "; border: 1px solid #" + BetSpeedSliderHandleBorderColor +
+                     "; width: 12px; margin: -7px 0; border-radius: 4px;}");
 }
 
 QString GameTableStyleReader::getFallBackFieldContent(QString field, int type)
 {
-    QFile myFile(myAppDataDir+"gfx/gui/table/default/defaulttablestyle.xml");
+    QFile myFile(myAppDataDir + "gfx/gui/table/default/defaulttablestyle.xml");
     myFile.open(QIODevice::ReadOnly);
     QByteArray thisContent = myFile.readAll();
 
-    //start reading the file and fill vars
+    // start reading the file and fill vars
     string tempString1("");
     TiXmlDocument doc;
     doc.Parse(thisContent.constData());
 
-    if(doc.RootElement()) {
-        TiXmlHandle docHandle( &doc );
+    if (doc.RootElement())
+    {
+        TiXmlHandle docHandle(&doc);
 
-        TiXmlElement *CardDeckElement = docHandle.FirstChild( "PokerTraining" ).FirstChild( "CardDeck" ).ToElement();
-        if(CardDeckElement) {
-            //LOG_ERROR(__FILE__ << " (" << __LINE__ << "A card deck style was selected instead of a game table style.");
-        } else {
-            TiXmlElement* itemsList = docHandle.FirstChild( "PokerTraining" ).FirstChild( "TableStyle" ).FirstChild().ToElement();
-            for( ; itemsList; itemsList=itemsList->NextSiblingElement()) {
-                const char *tmpStr1 = itemsList->Attribute("value");
-                if (tmpStr1) {
+        TiXmlElement* CardDeckElement = docHandle.FirstChild("PokerTraining").FirstChild("CardDeck").ToElement();
+        if (CardDeckElement)
+        {
+            // LOG_ERROR(__FILE__ << " (" << __LINE__ << "A card deck style was selected instead of a game table
+            // style.");
+        }
+        else
+        {
+            TiXmlElement* itemsList =
+                docHandle.FirstChild("PokerTraining").FirstChild("TableStyle").FirstChild().ToElement();
+            for (; itemsList; itemsList = itemsList->NextSiblingElement())
+            {
+                const char* tmpStr1 = itemsList->Attribute("value");
+                if (tmpStr1)
+                {
                     tempString1 = tmpStr1;
-                    if(itemsList->ValueStr() == field.toStdString()) {
-                        if(type == 1) return myAppDataDir+"gfx/gui/table/default/"+QString::fromUtf8(tempString1.c_str());
-                        else return QString::fromUtf8(tempString1.c_str());
+                    if (itemsList->ValueStr() == field.toStdString())
+                    {
+                        if (type == 1)
+                            return myAppDataDir + "gfx/gui/table/default/" + QString::fromUtf8(tempString1.c_str());
+                        else
+                            return QString::fromUtf8(tempString1.c_str());
                     }
                 }
             }
@@ -1767,7 +2795,8 @@ QString GameTableStyleReader::getFallBackFieldContent(QString field, int type)
 
 QString GameTableStyleReader::getStateToolTipInfo()
 {
-    switch (myState) {
+    switch (myState)
+    {
     case GT_STYLE_OK:
         return QString(tr("Everything OK!"));
         break;

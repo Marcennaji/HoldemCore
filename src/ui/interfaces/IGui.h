@@ -54,7 +54,6 @@ class IGui
 
     virtual void waitForGuiUpdateDone() const = 0;
 
-    // Karten-Funktionen
     virtual void dealBettingRoundCards(int) = 0;
     virtual void dealHoleCards() = 0;
     virtual void dealFlopCards() = 0;
@@ -63,7 +62,7 @@ class IGui
 
     virtual void nextPlayerAnimation() = 0;
 
-    virtual void beRoAnimation2(int) = 0;
+    virtual void bettingRoundAnimation(int) = 0;
 
     virtual void preflopAnimation1() = 0;
     virtual void preflopAnimation2() = 0;

@@ -17,22 +17,20 @@
  *****************************************************************************/
 #include "mysetlabel.h"
 
-#include "gametableimpl.h"
+#include "GameTableWindow.h"
 
 using namespace std;
 
-MySetLabel::MySetLabel(QGroupBox* parent)
-	: QLabel(parent), myW(0)
+MySetLabel::MySetLabel(QGroupBox* parent) : QLabel(parent), myW(0)
 {
 }
-
 
 MySetLabel::~MySetLabel()
 {
 }
 
-void MySetLabel::paintEvent(QPaintEvent * event)
+void MySetLabel::paintEvent(QPaintEvent* event)
 {
 
-	QLabel::paintEvent(event);
+    QLabel::paintEvent(event);
 }

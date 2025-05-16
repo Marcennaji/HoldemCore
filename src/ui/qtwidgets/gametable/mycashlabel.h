@@ -20,32 +20,29 @@
 
 #include <iostream>
 
-#include <QtGui>
 #include <QtCore>
+#include <QtGui>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QLabel>
 
-class gameTableImpl;
+class GameTableWindow;
 
 class MyCashLabel : public QLabel
 {
-	Q_OBJECT
-public:
-	MyCashLabel(QGroupBox*);
-	~MyCashLabel();
+    Q_OBJECT
+  public:
+    MyCashLabel(QGroupBox*);
+    ~MyCashLabel();
 
-	void setW(gameTableImpl* theValue) {
-		myW = theValue;
-	}
+    void setW(GameTableWindow* theValue) { myW = theValue; }
 
-public slots:
+  public slots:
 
-	void setText ( const QString &, bool = false );
-private:
+    void setText(const QString&, bool = false);
 
-	QString myText;
-	gameTableImpl *myW;
-
+  private:
+    QString myText;
+    GameTableWindow* myW;
 };
 
 #endif

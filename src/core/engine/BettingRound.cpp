@@ -282,14 +282,11 @@ void BettingRound::run()
 
             if (currentPlayersTurnId == 0)
             {
-                // Wir sind dran
                 myHand->getGuiInterface()->meInAction();
             }
             else
             {
-
-                // Gegner sind dran
-                myHand->getGuiInterface()->beRoAnimation2(myBettingRoundID);
+                myHand->getGuiInterface()->bettingRoundAnimation(myBettingRoundID);
             }
         }
     }

@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
-#include "gametableimpl.h"
 #include <app/session.h>
-#include <ui/qtwidgets/startwindow/startwindowimpl.h>
+#include <ui/qtwidgets/startwindow/StartWindow.h>
+#include "GameTableWindow.h"
 
 #include <ui/qtwidgets/gametable/GuiDisplayGameActions.h>
 #include "myactionbutton.h"
@@ -56,7 +56,7 @@
 
 using namespace std;
 
-gameTableImpl::gameTableImpl(const std::string& appDataDir, QMainWindow* parent)
+GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* parent)
     : QMainWindow(parent), gameSpeed(0), myActionIsBet(0), myActionIsRaise(0), pushButtonBetRaiseIsChecked(false),
       pushButtonBetRaiseHalfPotIsChecked(false), pushButtonBetRaiseTwoThirdPotIsChecked(false),
       pushButtonBetRaisePotIsChecked(false), pushButtonCallCheckIsChecked(false), pushButtonFoldIsChecked(false),
@@ -413,7 +413,7 @@ gameTableImpl::gameTableImpl(const std::string& appDataDir, QMainWindow* parent)
     connect(this, SIGNAL(signalDealTurnCards0()), this, SLOT(dealTurnCards0()));
     connect(this, SIGNAL(signalDealRiverCards0()), this, SLOT(dealRiverCards0()));
     connect(this, SIGNAL(signalNextPlayerAnimation()), this, SLOT(nextPlayerAnimation()));
-    connect(this, SIGNAL(signalBettingRoundAnimation2(int)), this, SLOT(beRoAnimation2(int)));
+    connect(this, SIGNAL(signalBettingRoundAnimation2(int)), this, SLOT(bettingRoundAnimation(int)));
     connect(this, SIGNAL(signalPreflopAnimation1()), this, SLOT(preflopAnimation1()));
     connect(this, SIGNAL(signalPreflopAnimation2()), this, SLOT(preflopAnimation2()));
     connect(this, SIGNAL(signalFlopAnimation1()), this, SLOT(flopAnimation1()));
@@ -429,10 +429,10 @@ gameTableImpl::gameTableImpl(const std::string& appDataDir, QMainWindow* parent)
     connect(this, SIGNAL(signalNextRoundCleanGui()), this, SLOT(nextRoundCleanGui()));
 }
 
-gameTableImpl::~gameTableImpl()
+GameTableWindow::~GameTableWindow()
 {
 }
-void gameTableImpl::initHoleCards()
+void GameTableWindow::initHoleCards()
 {
 
     // holeCardsArray int
@@ -457,7 +457,7 @@ void gameTableImpl::initHoleCards()
     holeCardsArray[9][0] = pixmapLabel_card9a;
     holeCardsArray[9][1] = pixmapLabel_card9b;
 }
-void gameTableImpl::hideHoleCards()
+void GameTableWindow::hideHoleCards()
 {
 
     QPixmap onePix = QPixmap::fromImage(QImage(myAppDataDir + "gfx/gui/misc/1px.png"));
@@ -476,7 +476,7 @@ void gameTableImpl::hideHoleCards()
     }
 }
 
-void gameTableImpl::initGui(int speed)
+void GameTableWindow::initGui(int speed)
 {
     // kill running Singleshots!!!
     stopTimer();
@@ -497,14 +497,14 @@ void gameTableImpl::initGui(int speed)
     }
 }
 
-std::shared_ptr<Session> gameTableImpl::getSession()
+std::shared_ptr<Session> GameTableWindow::getSession()
 {
     assert(myStartWindow->getSession().get());
     return myStartWindow->getSession();
 }
 
 // refresh-Funktionen
-void gameTableImpl::refreshSet()
+void GameTableWindow::refreshSet()
 {
 
     std::shared_ptr<Game> currentGame = myStartWindow->getSession()->getCurrentGame();
@@ -520,7 +520,7 @@ void gameTableImpl::refreshSet()
     }
 }
 
-void gameTableImpl::refreshButton()
+void GameTableWindow::refreshButton()
 {
 
     QPixmap dealerButton = QPixmap::fromImage(QImage(myGameTableStyle->getDealerPuck()));
@@ -584,7 +584,7 @@ void gameTableImpl::refreshButton()
     }
 }
 
-void gameTableImpl::refreshPlayerName()
+void GameTableWindow::refreshPlayerName()
 {
 
     if (myStartWindow->getSession()->getCurrentGame())
@@ -640,7 +640,7 @@ void gameTableImpl::refreshPlayerName()
     }
 }
 
-void gameTableImpl::refreshAction(int playerID, int playerAction)
+void GameTableWindow::refreshAction(int playerID, int playerAction)
 {
 
     QPixmap onePix = QPixmap::fromImage(QImage(myAppDataDir + "gfx/gui/misc/1px.png"));
@@ -713,7 +713,7 @@ void gameTableImpl::refreshAction(int playerID, int playerAction)
         }
     }
 }
-void gameTableImpl::refreshPlayerStatistics()
+void GameTableWindow::refreshPlayerStatistics()
 {
     std::shared_ptr<Game> currentGame = myStartWindow->getSession()->getCurrentGame();
     const int nbPlayers = currentGame->getCurrentHand()->getActivePlayerList()->size();
@@ -776,7 +776,7 @@ void gameTableImpl::refreshPlayerStatistics()
     }
 }
 
-void gameTableImpl::refreshCash()
+void GameTableWindow::refreshCash()
 {
 
     std::shared_ptr<Game> currentGame = myStartWindow->getSession()->getCurrentGame();
@@ -821,7 +821,7 @@ void gameTableImpl::refreshCash()
     }
 }
 
-void gameTableImpl::refreshGroupbox(int playerID, int status)
+void GameTableWindow::refreshGroupbox(int playerID, int status)
 {
 
     int j;
@@ -929,7 +929,7 @@ void gameTableImpl::refreshGroupbox(int playerID, int status)
     }
 }
 
-void gameTableImpl::refreshGameLabels(int gameState)
+void GameTableWindow::refreshGameLabels(int gameState)
 {
 
     switch (gameState)
@@ -970,7 +970,7 @@ void gameTableImpl::refreshGameLabels(int gameState)
     label_gameNumberValue->setText(QString::number(myStartWindow->getSession()->getCurrentGame()->getGameID(), 10));
 }
 
-void gameTableImpl::refreshAll()
+void GameTableWindow::refreshAll()
 {
     refreshSet();
     refreshButton();
@@ -990,7 +990,7 @@ void gameTableImpl::refreshAll()
     refreshHandsRanges();
 }
 
-void gameTableImpl::refreshChangePlayer()
+void GameTableWindow::refreshChangePlayer()
 {
 
     refreshSet();
@@ -1006,7 +1006,7 @@ void gameTableImpl::refreshChangePlayer()
     refreshCash();
 }
 
-void gameTableImpl::refreshPot()
+void GameTableWindow::refreshPot()
 {
     std::shared_ptr<IHand> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
 
@@ -1014,17 +1014,17 @@ void gameTableImpl::refreshPot()
     textLabel_Pot->setText("$" + QString("%L1").arg(currentHand->getBoard()->getPot()));
 }
 
-void gameTableImpl::guiUpdateDone()
+void GameTableWindow::guiUpdateDone()
 {
     guiUpdateSemaphore.release();
 }
 
-void gameTableImpl::waitForGuiUpdateDone()
+void GameTableWindow::waitForGuiUpdateDone()
 {
     guiUpdateSemaphore.acquire();
 }
 
-void gameTableImpl::dealHoleCards()
+void GameTableWindow::dealHoleCards()
 {
 
     int i, k;
@@ -1083,7 +1083,7 @@ void gameTableImpl::dealHoleCards()
     refreshHandsRanges();
 }
 
-void gameTableImpl::dealBettingRoundCards(int myBettingRoundID)
+void GameTableWindow::dealBettingRoundCards(int myBettingRoundID)
 {
 
     uncheckMyButtons();
@@ -1119,33 +1119,33 @@ void gameTableImpl::dealBettingRoundCards(int myBettingRoundID)
     }
 }
 
-void gameTableImpl::dealFlopCards0()
+void GameTableWindow::dealFlopCards0()
 {
     dealFlopCards0Timer->start(preDealCardsSpeed);
 }
 
-void gameTableImpl::dealFlopCards1()
+void GameTableWindow::dealFlopCards1()
 {
 
     boardCardsArray[0]->setPixmap(flipside, true);
     dealFlopCards1Timer->start(dealCardsSpeed);
 }
 
-void gameTableImpl::dealFlopCards2()
+void GameTableWindow::dealFlopCards2()
 {
 
     boardCardsArray[1]->setPixmap(flipside, true);
     dealFlopCards2Timer->start(dealCardsSpeed);
 }
 
-void gameTableImpl::dealFlopCards3()
+void GameTableWindow::dealFlopCards3()
 {
 
     boardCardsArray[2]->setPixmap(flipside, true);
     dealFlopCards3Timer->start(dealCardsSpeed);
 }
 
-void gameTableImpl::dealFlopCards4()
+void GameTableWindow::dealFlopCards4()
 {
 
     int tempBoardCardsArray[5];
@@ -1160,7 +1160,7 @@ void gameTableImpl::dealFlopCards4()
     dealFlopCards4Timer->start(dealCardsSpeed);
 }
 
-void gameTableImpl::dealFlopCards5()
+void GameTableWindow::dealFlopCards5()
 {
 
     int tempBoardCardsArray[5];
@@ -1174,7 +1174,7 @@ void gameTableImpl::dealFlopCards5()
     dealFlopCards5Timer->start(dealCardsSpeed);
 }
 
-void gameTableImpl::dealFlopCards6()
+void GameTableWindow::dealFlopCards6()
 {
 
     int tempBoardCardsArray[5];
@@ -1203,19 +1203,19 @@ void gameTableImpl::dealFlopCards6()
     refreshHandsRanges();
 }
 
-void gameTableImpl::dealTurnCards0()
+void GameTableWindow::dealTurnCards0()
 {
     dealTurnCards0Timer->start(preDealCardsSpeed);
 }
 
-void gameTableImpl::dealTurnCards1()
+void GameTableWindow::dealTurnCards1()
 {
 
     boardCardsArray[3]->setPixmap(flipside, true);
     dealTurnCards1Timer->start(dealCardsSpeed);
 }
 
-void gameTableImpl::dealTurnCards2()
+void GameTableWindow::dealTurnCards2()
 {
 
     int tempBoardCardsArray[5];
@@ -1241,12 +1241,12 @@ void gameTableImpl::dealTurnCards2()
     refreshHandsRanges();
 }
 
-void gameTableImpl::dealRiverCards0()
+void GameTableWindow::dealRiverCards0()
 {
     dealRiverCards0Timer->start(preDealCardsSpeed);
 }
 
-void gameTableImpl::dealRiverCards1()
+void GameTableWindow::dealRiverCards1()
 {
 
     boardCardsArray[4]->setPixmap(flipside, true);
@@ -1255,7 +1255,7 @@ void gameTableImpl::dealRiverCards1()
     dealRiverCards1Timer->start(dealCardsSpeed);
 }
 
-void gameTableImpl::dealRiverCards2()
+void GameTableWindow::dealRiverCards2()
 {
 
     int tempBoardCardsArray[5];
@@ -1281,7 +1281,7 @@ void gameTableImpl::dealRiverCards2()
     refreshHandsRanges();
 }
 
-void gameTableImpl::provideMyActions(int mode)
+void GameTableWindow::provideMyActions(int mode)
 {
 
     QString pushButtonFoldString;
@@ -1488,7 +1488,7 @@ void gameTableImpl::provideMyActions(int mode)
     }
 }
 
-void gameTableImpl::meInAction()
+void GameTableWindow::meInAction()
 {
     myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getGuiInterface()->showCards(0);
 
@@ -1563,7 +1563,7 @@ void gameTableImpl::meInAction()
     }
 }
 
-void gameTableImpl::disableMyButtons()
+void GameTableWindow::disableMyButtons()
 {
 
     std::shared_ptr<Player> humanPlayer =
@@ -1588,7 +1588,7 @@ void gameTableImpl::disableMyButtons()
 #endif
 }
 
-void gameTableImpl::myCallCheck()
+void GameTableWindow::myCallCheck()
 {
 
     if (pushButton_CallCheck->text().startsWith(CallString))
@@ -1601,7 +1601,7 @@ void gameTableImpl::myCallCheck()
     }
 }
 
-void gameTableImpl::myFold()
+void GameTableWindow::myFold()
 {
 
     if (pushButton_Fold->text() == FoldString)
@@ -1622,7 +1622,7 @@ void gameTableImpl::myFold()
     }
 }
 
-void gameTableImpl::myCheck()
+void GameTableWindow::myCheck()
 {
 
     std::shared_ptr<IHand> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
@@ -1639,7 +1639,7 @@ void gameTableImpl::myCheck()
     myActionDone();
 }
 
-int gameTableImpl::getCallAmount()
+int GameTableWindow::getCallAmount()
 {
 
     int tempHighestSet = 0;
@@ -1659,14 +1659,14 @@ int gameTableImpl::getCallAmount()
     }
 }
 
-int gameTableImpl::getBetRaisePushButtonValue()
+int GameTableWindow::getBetRaisePushButtonValue()
 {
 
     int betValue = pushButton_BetRaise->text().simplified().remove(QRegularExpression("[^0-9]")).toInt();
     return betValue;
 }
 
-int gameTableImpl::getBetAmount()
+int GameTableWindow::getBetAmount()
 {
 
     std::shared_ptr<IHand> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
@@ -1688,7 +1688,7 @@ int gameTableImpl::getBetAmount()
     }
 }
 
-void gameTableImpl::myCall()
+void GameTableWindow::myCall()
 {
 
     int tempHighestSet = 0;
@@ -1723,7 +1723,7 @@ void gameTableImpl::myCall()
     myActionDone();
 }
 
-void gameTableImpl::mySet()
+void GameTableWindow::mySet()
 {
     GameState currentState =
         myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getCurrentBettingRound()->getBettingRoundID();
@@ -1800,7 +1800,7 @@ void gameTableImpl::mySet()
     }
 }
 
-void gameTableImpl::myAllIn()
+void GameTableWindow::myAllIn()
 {
 
     if (pushButton_AllIn->text() == AllInString)
@@ -1845,7 +1845,7 @@ void gameTableImpl::myAllIn()
     }
 }
 
-void gameTableImpl::pushButtonBetRaiseClicked(bool checked)
+void GameTableWindow::pushButtonBetRaiseClicked(bool checked)
 {
 
     if (pushButton_BetRaise->isCheckable())
@@ -1876,7 +1876,7 @@ void gameTableImpl::pushButtonBetRaiseClicked(bool checked)
         mySet();
     }
 }
-void gameTableImpl::pushButtonBetRaiseHalfPotClicked(bool checked)
+void GameTableWindow::pushButtonBetRaiseHalfPotClicked(bool checked)
 {
 
     if (pushButton_BetRaiseHalfPot->isCheckable())
@@ -1919,7 +1919,7 @@ void gameTableImpl::pushButtonBetRaiseHalfPotClicked(bool checked)
         mySet();
     }
 }
-void gameTableImpl::pushButtonBetRaiseTwoThirdPotClicked(bool checked)
+void GameTableWindow::pushButtonBetRaiseTwoThirdPotClicked(bool checked)
 {
 
     if (pushButton_BetRaiseTwoThirdPot->isCheckable())
@@ -1961,7 +1961,7 @@ void gameTableImpl::pushButtonBetRaiseTwoThirdPotClicked(bool checked)
         mySet();
     }
 }
-void gameTableImpl::pushButtonBetRaisePotClicked(bool checked)
+void GameTableWindow::pushButtonBetRaisePotClicked(bool checked)
 {
 
     if (pushButton_BetRaisePot->isCheckable())
@@ -2002,7 +2002,7 @@ void gameTableImpl::pushButtonBetRaisePotClicked(bool checked)
         mySet();
     }
 }
-void gameTableImpl::pushButtonCallCheckClicked(bool checked)
+void GameTableWindow::pushButtonCallCheckClicked(bool checked)
 {
 
     if (pushButton_CallCheck->isCheckable())
@@ -2033,7 +2033,7 @@ void gameTableImpl::pushButtonCallCheckClicked(bool checked)
     }
 }
 
-void gameTableImpl::pushButtonFoldClicked(bool checked)
+void GameTableWindow::pushButtonFoldClicked(bool checked)
 {
 
     if (pushButton_Fold->isCheckable())
@@ -2064,7 +2064,7 @@ void gameTableImpl::pushButtonFoldClicked(bool checked)
     }
 }
 
-void gameTableImpl::pushButtonAllInClicked(bool checked)
+void GameTableWindow::pushButtonAllInClicked(bool checked)
 {
 
     if (pushButton_AllIn->isCheckable())
@@ -2095,7 +2095,7 @@ void gameTableImpl::pushButtonAllInClicked(bool checked)
     }
 }
 
-void gameTableImpl::myActionDone()
+void GameTableWindow::myActionDone()
 {
     std::shared_ptr<Player> humanPlayer =
         myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getSeatsList()->front();
@@ -2179,7 +2179,7 @@ void gameTableImpl::myActionDone()
 #endif
 }
 
-void gameTableImpl::nextPlayerAnimation()
+void GameTableWindow::nextPlayerAnimation()
 {
 
     std::shared_ptr<IHand> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
@@ -2209,7 +2209,7 @@ void gameTableImpl::nextPlayerAnimation()
     nextPlayerAnimationTimer->start(nextPlayerSpeed1);
 }
 
-void gameTableImpl::beRoAnimation2(int myBettingRoundID)
+void GameTableWindow::bettingRoundAnimation(int myBettingRoundID)
 {
 
     switch (myBettingRoundID)
@@ -2237,98 +2237,98 @@ void gameTableImpl::beRoAnimation2(int myBettingRoundID)
     break;
     default:
     {
-        cout << "beRoAnimation2() Error" << endl;
+        cout << "bettingRoundAnimation() Error" << endl;
     }
     }
 }
 
-void gameTableImpl::preflopAnimation1()
+void GameTableWindow::preflopAnimation1()
 {
     preflopAnimation1Timer->start(nextPlayerSpeed2);
 }
-void gameTableImpl::preflopAnimation1Action()
+void GameTableWindow::preflopAnimation1Action()
 {
     myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getCurrentBettingRound()->run();
 }
 
-void gameTableImpl::preflopAnimation2()
+void GameTableWindow::preflopAnimation2()
 {
     preflopAnimation2Timer->start(preflopNextPlayerSpeed);
 }
-void gameTableImpl::preflopAnimation2Action()
+void GameTableWindow::preflopAnimation2Action()
 {
     myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getCurrentBettingRound()->nextPlayer();
 }
 
-void gameTableImpl::flopAnimation1()
+void GameTableWindow::flopAnimation1()
 {
     flopAnimation1Timer->start(nextPlayerSpeed2);
 }
-void gameTableImpl::flopAnimation1Action()
+void GameTableWindow::flopAnimation1Action()
 {
     myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getCurrentBettingRound()->run();
 }
 
-void gameTableImpl::flopAnimation2()
+void GameTableWindow::flopAnimation2()
 {
     flopAnimation2Timer->start(nextPlayerSpeed3);
 }
-void gameTableImpl::flopAnimation2Action()
+void GameTableWindow::flopAnimation2Action()
 {
     myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getCurrentBettingRound()->nextPlayer();
 }
 
-void gameTableImpl::turnAnimation1()
+void GameTableWindow::turnAnimation1()
 {
     turnAnimation1Timer->start(nextPlayerSpeed2);
 }
-void gameTableImpl::turnAnimation1Action()
+void GameTableWindow::turnAnimation1Action()
 {
     myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getCurrentBettingRound()->run();
 }
 
-void gameTableImpl::turnAnimation2()
+void GameTableWindow::turnAnimation2()
 {
     turnAnimation2Timer->start(nextPlayerSpeed3);
 }
-void gameTableImpl::turnAnimation2Action()
+void GameTableWindow::turnAnimation2Action()
 {
     myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getCurrentBettingRound()->nextPlayer();
 }
 
-void gameTableImpl::riverAnimation1()
+void GameTableWindow::riverAnimation1()
 {
     riverAnimation1Timer->start(nextPlayerSpeed2);
 }
-void gameTableImpl::riverAnimation1Action()
+void GameTableWindow::riverAnimation1Action()
 {
     myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getCurrentBettingRound()->run();
 }
 
-void gameTableImpl::riverAnimation2()
+void GameTableWindow::riverAnimation2()
 {
     riverAnimation2Timer->start(nextPlayerSpeed3);
 }
-void gameTableImpl::riverAnimation2Action()
+void GameTableWindow::riverAnimation2Action()
 {
     myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getCurrentBettingRound()->nextPlayer();
 }
 
-void gameTableImpl::postRiverAnimation1()
+void GameTableWindow::postRiverAnimation1()
 {
     postRiverAnimation1Timer->start(nextPlayerSpeed2);
 }
-void gameTableImpl::postRiverAnimation1Action()
+void GameTableWindow::postRiverAnimation1Action()
 {
     myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getCurrentBettingRound()->postRiverRun();
 }
 
-void gameTableImpl::postRiverRunAnimation1()
+void GameTableWindow::postRiverRunAnimation1()
 {
     postRiverRunAnimation1Timer->start(postRiverRunAnimationSpeed);
 }
 
-void gameTableImpl::postRiverRunAnimation2()
+void GameTableWindow::postRiverRunAnimation2()
 {
 
     uncheckMyButtons();
@@ -2387,7 +2387,7 @@ void gameTableImpl::postRiverRunAnimation2()
     }
 }
 
-void gameTableImpl::postRiverRunAnimation3()
+void GameTableWindow::postRiverRunAnimation3()
 {
 
     std::shared_ptr<IHand> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
@@ -2453,14 +2453,14 @@ void gameTableImpl::postRiverRunAnimation3()
     postRiverRunAnimation3Timer->start(postRiverRunAnimationSpeed / 2);
 }
 
-void gameTableImpl::postRiverRunAnimation4()
+void GameTableWindow::postRiverRunAnimation4()
 {
 
     distributePotAnimCounter = 0;
     potDistributeTimer->start(winnerBlinkSpeed);
 }
 
-void gameTableImpl::postRiverRunAnimation5()
+void GameTableWindow::postRiverRunAnimation5()
 {
 
     std::shared_ptr<IHand> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
@@ -2512,7 +2512,7 @@ void gameTableImpl::postRiverRunAnimation5()
     }
 }
 
-void gameTableImpl::postRiverRunAnimation6()
+void GameTableWindow::postRiverRunAnimation6()
 {
     int i;
     for (i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
@@ -2566,7 +2566,7 @@ void gameTableImpl::postRiverRunAnimation6()
     postRiverRunAnimation6Timer->start(newRoundSpeed);
 }
 
-void gameTableImpl::showHoleCards(unsigned playerId, bool allIn)
+void GameTableWindow::showHoleCards(unsigned playerId, bool allIn)
 {
     std::shared_ptr<IHand> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
     // TempArrays
@@ -2602,7 +2602,7 @@ void gameTableImpl::showHoleCards(unsigned playerId, bool allIn)
     }
 }
 
-void gameTableImpl::flipHolecardsAllIn()
+void GameTableWindow::flipHolecardsAllIn()
 {
 
     std::shared_ptr<Game> currentGame = myStartWindow->getSession()->getCurrentGame();
@@ -2636,7 +2636,7 @@ void gameTableImpl::flipHolecardsAllIn()
     }
 }
 
-void gameTableImpl::startNewHand()
+void GameTableWindow::startNewHand()
 {
     if (!breakAfterCurrentHand)
     {
@@ -2657,12 +2657,12 @@ void gameTableImpl::startNewHand()
     }
 }
 
-void gameTableImpl::handSwitchRounds()
+void GameTableWindow::handSwitchRounds()
 {
     myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->switchRounds();
 }
 
-void gameTableImpl::nextRoundCleanGui()
+void GameTableWindow::nextRoundCleanGui()
 {
 
     int i, j;
@@ -2722,7 +2722,7 @@ void gameTableImpl::nextRoundCleanGui()
     clearMyButtons();
 }
 
-void gameTableImpl::stopTimer()
+void GameTableWindow::stopTimer()
 {
 
     dealFlopCards0Timer->stop();
@@ -2758,7 +2758,7 @@ void gameTableImpl::stopTimer()
     potDistributeTimer->stop();
 }
 
-void gameTableImpl::setSpeeds()
+void GameTableWindow::setSpeeds()
 {
 
     gameSpeed = (11 - guiGameSpeed) * 10;
@@ -2776,7 +2776,7 @@ void gameTableImpl::setSpeeds()
         gameSpeed * 10; // Zeit bis zwischen Aufhellen und Aktion im Preflop (etwas langsamer da nicht gerechnet wird. )
 }
 
-void gameTableImpl::breakButtonClicked()
+void GameTableWindow::breakButtonClicked()
 {
 
     if (pushButton_break->text() == tr("Show cards"))
@@ -2812,7 +2812,7 @@ void gameTableImpl::breakButtonClicked()
     }
 }
 
-void gameTableImpl::changePlayingMode()
+void GameTableWindow::changePlayingMode()
 {
 
     int mode = -1;
@@ -2833,7 +2833,7 @@ void gameTableImpl::changePlayingMode()
     playingMode = mode;
 }
 
-bool gameTableImpl::eventFilter(QObject* obj, QEvent* event)
+bool GameTableWindow::eventFilter(QObject* obj, QEvent* event)
 {
     QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
 
@@ -2861,7 +2861,7 @@ bool gameTableImpl::eventFilter(QObject* obj, QEvent* event)
     }
 }
 
-void gameTableImpl::switchLogWindow()
+void GameTableWindow::switchLogWindow()
 {
 
     int tab = 0;
@@ -2883,7 +2883,7 @@ void gameTableImpl::switchLogWindow()
     }
 }
 
-void gameTableImpl::switchAwayWindow()
+void GameTableWindow::switchAwayWindow()
 {
 
     int tab = 1;
@@ -2905,7 +2905,7 @@ void gameTableImpl::switchAwayWindow()
     }
 }
 
-void gameTableImpl::switchChanceWindow()
+void GameTableWindow::switchChanceWindow()
 {
 
     int tab = 2;
@@ -2928,7 +2928,7 @@ void gameTableImpl::switchChanceWindow()
     }
 }
 
-void gameTableImpl::switchFullscreen()
+void GameTableWindow::switchFullscreen()
 {
 
     if (this->isFullScreen())
@@ -2941,7 +2941,7 @@ void gameTableImpl::switchFullscreen()
     }
 }
 
-void gameTableImpl::blinkingStartButtonAnimationAction()
+void GameTableWindow::blinkingStartButtonAnimationAction()
 {
 
     QString style = pushButton_break->styleSheet();
@@ -2955,7 +2955,7 @@ void gameTableImpl::blinkingStartButtonAnimationAction()
     }
 }
 
-void gameTableImpl::GameModification()
+void GameTableWindow::GameModification()
 {
 
     pushButton_break->show();
@@ -2970,7 +2970,7 @@ void gameTableImpl::GameModification()
     radioButton_manualAction->click();
 }
 
-void gameTableImpl::updateMyButtonsState(int mode)
+void GameTableWindow::updateMyButtonsState(int mode)
 {
 
     std::shared_ptr<IHand> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
@@ -2990,7 +2990,7 @@ void gameTableImpl::updateMyButtonsState(int mode)
     }
 }
 
-void gameTableImpl::uncheckMyButtons()
+void GameTableWindow::uncheckMyButtons()
 {
 
     pushButton_BetRaise->setChecked(false);
@@ -2999,7 +2999,7 @@ void gameTableImpl::uncheckMyButtons()
     pushButton_AllIn->setChecked(false);
 }
 
-void gameTableImpl::resetButtonsCheckStateMemory()
+void GameTableWindow::resetButtonsCheckStateMemory()
 {
 
     pushButtonCallCheckIsChecked = false;
@@ -3008,7 +3008,7 @@ void gameTableImpl::resetButtonsCheckStateMemory()
     pushButtonBetRaiseIsChecked = false;
 }
 
-void gameTableImpl::clearMyButtons()
+void GameTableWindow::clearMyButtons()
 {
 
     pushButton_BetRaise->setText("");
@@ -3017,7 +3017,7 @@ void gameTableImpl::clearMyButtons()
     pushButton_AllIn->setText("");
 }
 
-void gameTableImpl::myButtonsCheckable(bool state)
+void GameTableWindow::myButtonsCheckable(bool state)
 {
 
     std::shared_ptr<IHand> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
@@ -3075,12 +3075,12 @@ void gameTableImpl::myButtonsCheckable(bool state)
     }
 }
 
-void gameTableImpl::showMaximized()
+void GameTableWindow::showMaximized()
 {
     this->showFullScreen();
 }
 
-void gameTableImpl::closeGameTable()
+void GameTableWindow::closeGameTable()
 {
 
     bool close = true;
@@ -3093,7 +3093,7 @@ void gameTableImpl::closeGameTable()
     }
 }
 
-void gameTableImpl::changeSpinBoxBetValue(int value)
+void GameTableWindow::changeSpinBoxBetValue(int value)
 {
     if (betSliderChangedByInput)
     {
@@ -3137,7 +3137,7 @@ void gameTableImpl::changeSpinBoxBetValue(int value)
     }
 }
 
-void gameTableImpl::spinBoxBetValueChanged(int value)
+void GameTableWindow::spinBoxBetValueChanged(int value)
 {
 
     if (horizontalSlider_bet->isEnabled())
@@ -3170,7 +3170,7 @@ void gameTableImpl::spinBoxBetValueChanged(int value)
     }
 }
 
-void gameTableImpl::refreshHandsRanges()
+void GameTableWindow::refreshHandsRanges()
 {
     const string style =
         "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; "
@@ -3224,7 +3224,7 @@ void gameTableImpl::refreshHandsRanges()
     text_ranges->append(displayText.str().c_str());
 }
 
-void gameTableImpl::refreshCardsChance(GameState BettingRound)
+void GameTableWindow::refreshCardsChance(GameState BettingRound)
 {
 
     std::shared_ptr<Player> player = myStartWindow->getSession()->getCurrentGame()->getSeatsList()->front();
@@ -3280,7 +3280,7 @@ void gameTableImpl::refreshCardsChance(GameState BettingRound)
     }
 }
 
-void gameTableImpl::refreshGameTableStyle()
+void GameTableWindow::refreshGameTableStyle()
 {
     myGameTableStyle->setWindowsGeometry(this);
     myGameTableStyle->setChatLogStyle(textBrowser_Log);
@@ -3462,11 +3462,11 @@ void gameTableImpl::refreshGameTableStyle()
     label_gameNumber->setText(GameString + ":");
 }
 
-void gameTableImpl::closeMessageBoxes()
+void GameTableWindow::closeMessageBoxes()
 {
 }
 
-void gameTableImpl::hide()
+void GameTableWindow::hide()
 {
     // clear log
 
@@ -3475,7 +3475,7 @@ void gameTableImpl::hide()
     QWidget::hide();
 }
 
-SeatState gameTableImpl::getCurrentSeatState(std::shared_ptr<Player> player)
+SeatState GameTableWindow::getCurrentSeatState(std::shared_ptr<Player> player)
 {
 
     if (player->getActiveStatus())
@@ -3496,27 +3496,27 @@ SeatState gameTableImpl::getCurrentSeatState(std::shared_ptr<Player> player)
     return SEAT_UNDEFINED;
 }
 
-void gameTableImpl::enableCallCheckPushButton()
+void GameTableWindow::enableCallCheckPushButton()
 {
     pushButton_CallCheck->setEatMyEvents(false);
 }
 
-void gameTableImpl::setGameSpeed(const int theValue)
+void GameTableWindow::setGameSpeed(const int theValue)
 {
     guiGameSpeed = theValue;
     setSpeeds();
 }
 
-GameTableStyleReader* gameTableImpl::getGameTableStyle() const
+GameTableStyleReader* GameTableWindow::getGameTableStyle() const
 {
     return myGameTableStyle;
 }
 
-void gameTableImpl::setStartWindow(startWindowImpl* s)
+void GameTableWindow::setStartWindow(StartWindow* s)
 {
     myStartWindow = s;
 }
-void gameTableImpl::setGuiLog(GuiDisplayGameActions* l)
+void GameTableWindow::setGuiLog(GuiDisplayGameActions* l)
 {
     myGuiLog = l;
 }

@@ -23,25 +23,25 @@
 
 #include "ui_startwindow.h"
 
-#include <QtWidgets/QMainWindow>
-#include <QtWidgets/QMessageBox>
 #include <app/session.h>
 #include <core/engine/EngineDefs.h>
+
+#include <QtWidgets/QMainWindow>
 
 class IGui;
 class GuiWrapper;
 class Game;
 
-class gameTableImpl;
+class GameTableWindow;
 class GuiDisplayGameActions;
 class SqliteLogStore;
 
-class startWindowImpl : public QMainWindow, public Ui::startWindow
+class StartWindow : public QMainWindow, public Ui::startWindow
 {
     Q_OBJECT
   public:
-    startWindowImpl(const QString& appDataPath, IGui* gui, Session* session, QWidget* parent);
-    ~startWindowImpl();
+    StartWindow(const QString& appDataPath, IGui* gui, Session* session, QWidget* parent);
+    ~StartWindow();
 
     void setSession(std::shared_ptr<Session> session) { mySession = session; }
     std::shared_ptr<Session> getSession()

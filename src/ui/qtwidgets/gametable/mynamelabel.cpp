@@ -16,23 +16,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 #include "mynamelabel.h"
-#include "gametableimpl.h"
 #include <app/session.h>
 #include <core/engine/game.h>
 #include <core/player/Player.h>
 #include <ui/qtwidgets/styles/gametablestylereader.h>
+#include "GameTableWindow.h"
 
-MyNameLabel::MyNameLabel(QGroupBox* parent)
-	: QLabel(parent), myW(0)
+MyNameLabel::MyNameLabel(QGroupBox* parent) : QLabel(parent), myW(0)
 {
 }
-
 
 MyNameLabel::~MyNameLabel()
 {
 }
 
-void MyNameLabel::setText ( const QString &t, bool trans, bool guest, bool computerplayer)
+void MyNameLabel::setText(const QString& t, bool trans, bool guest, bool computerplayer)
 {
-	QLabel::setText(t);
+    QLabel::setText(t);
 }

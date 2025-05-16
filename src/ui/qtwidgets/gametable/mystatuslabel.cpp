@@ -15,40 +15,39 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
+#include "GameTableWindow.h"
 #include "mysetlabel.h"
-#include "gametableimpl.h"
 
 using namespace std;
 
-MyStatusLabel::MyStatusLabel(QGroupBox* parent)
-	: QLabel(parent), myW(NULL), mousePress(false)
+MyStatusLabel::MyStatusLabel(QGroupBox* parent) : QLabel(parent), myW(NULL), mousePress(false)
 {
 
-	mousePress = false;
-
+    mousePress = false;
 }
 
 MyStatusLabel::~MyStatusLabel()
 {
 }
 
-void MyStatusLabel::mousePressEvent(QMouseEvent * event)
+void MyStatusLabel::mousePressEvent(QMouseEvent* event)
 {
 
-	if (!mousePress && objectName().contains("textLabel_Status0")) {
-		mousePress = true;
+    if (!mousePress && objectName().contains("textLabel_Status0"))
+    {
+        mousePress = true;
+    }
 
-	}
-
-	QLabel::mousePressEvent(event);
+    QLabel::mousePressEvent(event);
 }
 
-void MyStatusLabel::mouseReleaseEvent(QMouseEvent * event)
+void MyStatusLabel::mouseReleaseEvent(QMouseEvent* event)
 {
 
-	if (mousePress && objectName().contains("textLabel_Status0")) {
-		mousePress = false;
-	}
+    if (mousePress && objectName().contains("textLabel_Status0"))
+    {
+        mousePress = false;
+    }
 
-	QLabel::mouseReleaseEvent(event);
+    QLabel::mouseReleaseEvent(event);
 }
