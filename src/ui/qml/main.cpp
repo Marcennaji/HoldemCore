@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
     engine.load(QUrl("qrc:/main.qml"));
 #else
     // Debug: load from source path (enables hot reload)
-    const QString path = QDir::currentPath() + "/ui/qml/main.qml";
+    const QString path = QDir::currentPath() + "/main.qml";
     engine.load(QUrl::fromLocalFile(path));
 #endif
 

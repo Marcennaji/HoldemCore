@@ -56,5 +56,23 @@
                 "USE_QML": "ON"
             }
         }
+    ],
+    "buildPresets": [
+        {
+            "name": "build-debug-widgets",
+            "configurePreset": "debug-widgets"
+        },
+        {
+            "name": "build-release-widgets",
+            "configurePreset": "release-widgets"
+        },
+        {
+            "name": "build-debug-qml",
+            "configurePreset": "debug-qml"
+        },
+        {
+            "name": "build-release-qml",
+            "configurePreset": "release-qml"
+        }
     ]
 }

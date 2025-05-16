@@ -2,23 +2,31 @@ import QtQuick
 import QtQuick.Controls
 
 ApplicationWindow {
-    id: window
     width: 800
     height: 600
     visible: true
     title: "PokerTraining (QML)"
 
-    Column {
-        anchors.centerIn: parent
-        spacing: 20
+    StackView {
+        id: nav
+        anchors.fill: parent
+        initialItem: startWindow
+    }
 
-        Label {
-            text: "Welcome to QML PokerTraining!"
+    Component {
+        id: startWindow
+        StartWindow {
+            onStartGame: (players, chips, profile) => {
+                console.log("StartGame called with:", players, chips, profile)
+                nav.push(gameTable)
+            }
         }
+    }
 
-        Button {
-            text: "Start Game"
-            onClicked: console.log("Start game clicked")
+    Component {
+        id: gameTable
+        GameTable {
+            onBackToStart: nav.pop()
         }
     }
 }
