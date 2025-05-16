@@ -1,0 +1,60 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 21,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "debug-widgets",
+            "displayName": "Debug (Widgets UI)",
+            "description": "Builds the Qt Widgets version with debug symbols and no QML",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/debug-widgets",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "USE_WIDGETS": "ON",
+                "USE_QML": "OFF",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        },
+        {
+            "name": "debug-qml",
+            "displayName": "Debug (QML UI - Hot Reload)",
+            "description": "Builds the QML version using source-based loading (hot reload)",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/debug-qml",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "USE_WIDGETS": "OFF",
+                "USE_QML": "ON",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        },
+        {
+            "name": "release-widgets",
+            "displayName": "Release (Widgets UI)",
+            "description": "Builds the Qt Widgets version optimized for release",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/release-widgets",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "USE_WIDGETS": "ON",
+                "USE_QML": "OFF"
+            }
+        },
+        {
+            "name": "release-qml",
+            "displayName": "Release (QML UI - QRC bundled)",
+            "description": "Builds the QML version with QML files embedded via qrc",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/release-qml",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "USE_WIDGETS": "OFF",
+                "USE_QML": "ON"
+            }
+        }
+    ]
+}
