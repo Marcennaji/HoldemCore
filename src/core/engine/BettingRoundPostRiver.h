@@ -27,7 +27,7 @@ class IHand;
 class BettingRoundPostRiver : public BettingRound
 {
   public:
-    BettingRoundPostRiver(ILogger* logger, IHand*, int, int);
+    BettingRoundPostRiver(GameEvents*, ILogger* logger, IHand*, int, int);
     ~BettingRoundPostRiver();
 
     void setHighestCardsValue(int theValue);

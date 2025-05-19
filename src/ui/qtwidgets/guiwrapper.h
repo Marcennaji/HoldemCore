@@ -39,8 +39,8 @@ class GuiWrapper : public IGui
     void setStartWindow(void* w);
     void initGui(int speed);
 
-    std::shared_ptr<Session> getSession();
-    void setSession(std::shared_ptr<Session> session);
+    Session* getSession();
+    void setSession(Session* session);
 
     void* getGameTableWindow() const override { return static_cast<void*>(myW); }
     GuiDisplayGameActions* getGuiLog() const { return myGuiLog; }

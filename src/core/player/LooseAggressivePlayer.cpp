@@ -34,9 +34,10 @@
 
 using namespace std;
 
-LooseAggressivePlayer::LooseAggressivePlayer(IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id, PlayerType type,
-                                             std::string name, int sC, bool aS, bool sotS, int mB)
-    : Player(ha, ps, id, type, name, sC, aS, sotS, mB)
+LooseAggressivePlayer::LooseAggressivePlayer(GameEvents* events, IHandAuditStore* ha, IPlayersStatisticsStore* ps,
+                                             int id, PlayerType type, std::string name, int sC, bool aS, bool sotS,
+                                             int mB)
+    : Player(events, ha, ps, id, type, name, sC, aS, sotS, mB)
 {
 
     // initialize utg starting range, in a full table

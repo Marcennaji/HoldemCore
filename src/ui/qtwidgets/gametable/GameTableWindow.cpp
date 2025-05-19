@@ -497,9 +497,9 @@ void GameTableWindow::initGui(int speed)
     }
 }
 
-std::shared_ptr<Session> GameTableWindow::getSession()
+Session* GameTableWindow::getSession()
 {
-    assert(myStartWindow->getSession().get());
+    assert(myStartWindow->getSession());
     return myStartWindow->getSession();
 }
 

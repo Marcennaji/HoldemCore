@@ -33,8 +33,8 @@ class IGui
 
     virtual void initGui(int speed) = 0;
 
-    virtual std::shared_ptr<Session> getSession() = 0;
-    virtual void setSession(std::shared_ptr<Session> session) = 0;
+    virtual Session* getSession() = 0;
+    virtual void setSession(Session* session) = 0;
 
     virtual void* getGameTableWindow() const = 0;
     virtual GuiDisplayGameActions* getGuiLog() const = 0;

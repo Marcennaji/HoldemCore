@@ -6,19 +6,22 @@
 #include <ui/qtwidgets/startwindow/StartWindow.h>
 
 GuiAppController::GuiAppController(ILogger* logger, const QString& app, const QString& log, const QString& user)
-    : appDataPath(app), logPath(log), userDataPath(user)
+    : myAppDataPath(app), myLogPath(log), myUserDataPath(user)
 {
-    gameActionslogger = std::make_unique<SqliteLogStore>(logPath.toStdString());
-    gui = std::make_unique<GuiWrapper>(userDataPath.toStdString(), nullptr);
-    session = std::make_unique<Session>(logger, gui.get(), gameActionslogger.get(), gameActionslogger.get(),
-                                        gameActionslogger.get());
-    session->init();
-    gameActionslogger->init();
+    assert(logger != nullptr);
+
+    myGameActionslogger = std::make_unique<SqliteLogStore>(myLogPath.toStdString());
+    myGameActionslogger->init();
+    myGui = std::make_unique<GuiWrapper>(myUserDataPath.toStdString(), nullptr);
+    myEvents = std::make_unique<GameEvents>();
+    mySession = std::make_unique<Session>(myEvents.get(), logger, myGui.get(), myGameActionslogger.get(),
+                                          myGameActionslogger.get(), myGameActionslogger.get());
+    mySession->init();
 }
 
 StartWindow* GuiAppController::createMainWindow()
 {
-    return new StartWindow(appDataPath, gui.get(), session.get(), nullptr);
+    return new StartWindow(myAppDataPath, myGui.get(), mySession.get(), nullptr);
 }
 
 GuiAppController::~GuiAppController() = default;

@@ -25,9 +25,9 @@
 
 using namespace std;
 
-HumanPlayer::HumanPlayer(IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id, PlayerType type, std::string name,
-                         int sC, bool aS, bool sotS, int mB)
-    : Player(ha, ps, id, type, name, sC, aS, sotS, mB)
+HumanPlayer::HumanPlayer(GameEvents* events, IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id, PlayerType type,
+                         std::string name, int sC, bool aS, bool sotS, int mB)
+    : Player(events, ha, ps, id, type, name, sC, aS, sotS, mB)
 {
 }
 

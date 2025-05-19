@@ -12,5 +12,6 @@ add_library(core INTERFACE)
 target_include_directories(core INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/engine
     ${CMAKE_CURRENT_SOURCE_DIR}/player
+    ${CMAKE_CURRENT_SOURCE_DIR}/events
     ${CMAKE_SOURCE_DIR}/src
 )

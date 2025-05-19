@@ -25,8 +25,8 @@
 
 using namespace std;
 
-BettingRoundPostRiver::BettingRoundPostRiver(ILogger* logger, IHand* hi, int dP, int sB)
-    : BettingRound(logger, hi, dP, sB, GAME_STATE_POST_RIVER), highestCardsValue(0)
+BettingRoundPostRiver::BettingRoundPostRiver(GameEvents* events, ILogger* logger, IHand* hi, int dP, int sB)
+    : BettingRound(events, logger, hi, dP, sB, GAME_STATE_POST_RIVER), highestCardsValue(0)
 {
 }
 

@@ -27,11 +27,12 @@
 
 using namespace std;
 
-BettingRound::BettingRound(ILogger* logger, IHand* hi, unsigned dP, int sB, GameState gS)
+BettingRound::BettingRound(GameEvents* events, ILogger* logger, IHand* hi, unsigned dP, int sB, GameState gS)
     : myLogger(logger), IBettingRound(), myHand(hi), myBettingRoundID(gS), dealerPosition(dP), smallBlindPosition(0),
       dealerPositionId(dP), smallBlindPositionId(0), bigBlindPositionId(0), smallBlind(sB), highestSet(0),
       minimumRaise(2 * sB), fullBetRule(false), firstRun(true), firstRunGui(true), firstRound(true),
-      firstHeadsUpRound(true), currentPlayersTurnId(0), firstRoundLastPlayersTurnId(0), logBoardCardsDone(false)
+      firstHeadsUpRound(true), currentPlayersTurnId(0), firstRoundLastPlayersTurnId(0), logBoardCardsDone(false),
+      myEvents(events)
 {
     currentPlayersTurnIt = myHand->getRunningPlayerList()->begin();
     lastPlayersTurnIt = myHand->getRunningPlayerList()->begin();
@@ -232,7 +233,6 @@ void BettingRound::run()
                 (*it_c)->setAction(PLAYER_ACTION_NONE);
             }
 
-            // Sets in den Pot verschieben und Sets = 0 und Pot-refresh
             myHand->getBoard()->collectSets();
             myHand->getBoard()->collectPot();
             myHand->getGuiInterface()->refreshPot();
@@ -248,7 +248,6 @@ void BettingRound::run()
         }
         else
         {
-            // aktuelle BettingRound ist wirklich dran
 
             // determine next running player
             PlayerListConstIterator currentPlayersTurnIt = myHand->getRunningPlayerIt(currentPlayersTurnId);

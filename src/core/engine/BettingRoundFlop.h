@@ -28,7 +28,7 @@ class BettingRoundFlop : public BettingRound
 {
 
   public:
-    BettingRoundFlop(ILogger* logger, IHand*, unsigned, int);
+    BettingRoundFlop(GameEvents*, ILogger* logger, IHand*, unsigned, int);
     ~BettingRoundFlop();
 };
 

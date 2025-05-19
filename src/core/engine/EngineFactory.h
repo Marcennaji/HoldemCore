@@ -33,7 +33,7 @@
 class EngineFactory
 {
   public:
-    EngineFactory(ILogger*);
+    EngineFactory(GameEvents*, ILogger*);
     ~EngineFactory();
 
     virtual std::shared_ptr<IHand> createHand(std::shared_ptr<EngineFactory> f, IGui* g, std::shared_ptr<IBoard> b,
@@ -45,6 +45,7 @@ class EngineFactory
 
   private:
     ILogger* myLogger;
+    GameEvents* myEvents;
 };
 
 #endif

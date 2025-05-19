@@ -68,7 +68,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
 
     ~GameTableWindow();
 
-    std::shared_ptr<Session> getSession();
+    Session* getSession();
 
     GameTableStyleReader* getGameTableStyle() const;
     bool getGuestMode() const;

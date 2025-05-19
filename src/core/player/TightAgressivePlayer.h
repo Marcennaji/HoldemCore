@@ -24,8 +24,8 @@ class TightAgressivePlayer : public Player
 {
 
   public:
-    TightAgressivePlayer(IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type, std::string name, int sC,
-                         bool aS, bool sotS, int mB);
+    TightAgressivePlayer(GameEvents* events, IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type,
+                         std::string name, int sC, bool aS, bool sotS, int mB);
 
     ~TightAgressivePlayer();
 

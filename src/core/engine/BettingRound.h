@@ -26,7 +26,7 @@
 class BettingRound : public IBettingRound
 {
   public:
-    BettingRound(ILogger* logger, IHand* hi, unsigned dP, int sB, GameState gS);
+    BettingRound(GameEvents*, ILogger* logger, IHand* hi, unsigned dP, int sB, GameState gS);
     ~BettingRound();
 
     GameState getBettingRoundID() const;
@@ -86,6 +86,7 @@ class BettingRound : public IBettingRound
   private:
     IHand* myHand;
     ILogger* myLogger;
+    GameEvents* myEvents;
 
     const GameState myBettingRoundID;
     int dealerPosition;

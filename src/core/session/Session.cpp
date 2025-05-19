@@ -18,6 +18,7 @@
 
 #include "Session.h"
 #include <core/engine/Game.h>
+#include <core/engine/GameEvents.h>
 #include <infra/persistence/SqliteLogStore.h>
 #include <ui/interfaces/IGui.h>
 
@@ -36,9 +37,10 @@
 
 using namespace std;
 
-Session::Session(ILogger* logger, IGui* g, IRankingStore* rs, IPlayersStatisticsStore* ps, IHandAuditStore* ha)
+Session::Session(GameEvents* events, ILogger* logger, IGui* g, IRankingStore* rs, IPlayersStatisticsStore* ps,
+                 IHandAuditStore* ha)
     : myLogger(logger), currentGameNum(0), myGui(g), myRankingStore(rs), myPlayersStatisticsStore(ps),
-      myHandAuditStore(ha)
+      myHandAuditStore(ha), myEvents(events)
 {
 }
 
@@ -60,7 +62,7 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
     myGui->hideHoleCards();
     myGui->initGui(gameData.guiSpeed);
 
-    std::shared_ptr<EngineFactory> factory(new EngineFactory(myLogger));
+    std::shared_ptr<EngineFactory> factory(new EngineFactory(myEvents, myLogger));
 
     PlayerList playerList;
     playerList.reset(new std::list<std::shared_ptr<Player>>);
@@ -80,9 +82,9 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
 
         if (i == 0)
         {
-            player =
-                new HumanPlayer(myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_HUMAN, HumanPlayerName[0],
-                                gameData.startMoney, startData.numberOfPlayers > i, i == 0 ? true : false, 0);
+            player = new HumanPlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_HUMAN,
+                                     HumanPlayerName[0], gameData.startMoney, startData.numberOfPlayers > i,
+                                     i == 0 ? true : false, 0);
         }
         else
         {
@@ -94,27 +96,28 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
 
                 if (rand == 1)
                     player =
-                        new TightAgressivePlayer(myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
-                                                 TightAgressivePlayerName[i], gameData.startMoney,
+                        new TightAgressivePlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
+                                                 PLAYER_TYPE_COMPUTER, TightAgressivePlayerName[i], gameData.startMoney,
                                                  startData.numberOfPlayers > i, i == 0 ? true : false, 0);
                 else
-                    player = new UltraTightPlayer(myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
-                                                  UltraTightPlayerName[i], gameData.startMoney,
+                    player = new UltraTightPlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
+                                                  PLAYER_TYPE_COMPUTER, UltraTightPlayerName[i], gameData.startMoney,
                                                   startData.numberOfPlayers > i, i == 0 ? true : false, 0);
             }
 
             if (tableProfile == LARGE_AGRESSIVE_OPPONENTS)
             {
 
-                player = new LooseAggressivePlayer(myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
-                                                   LooseAggressivePlayerName[i], gameData.startMoney,
-                                                   startData.numberOfPlayers > i, i == 0 ? true : false, 0);
+                player =
+                    new LooseAggressivePlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
+                                              PLAYER_TYPE_COMPUTER, LooseAggressivePlayerName[i], gameData.startMoney,
+                                              startData.numberOfPlayers > i, i == 0 ? true : false, 0);
             }
 
             if (tableProfile == MANIAC_OPPONENTS)
             {
 
-                player = new ManiacPlayer(myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
+                player = new ManiacPlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
                                           ManiacPlayerName[i], gameData.startMoney, startData.numberOfPlayers > i,
                                           i == 0 ? true : false, 0);
             }
@@ -126,38 +129,38 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
 
                 if (rand < 3 && nbManiac < startData.numberOfPlayers / 3)
                 {
-                    player = new ManiacPlayer(myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
-                                              ManiacPlayerName[i], gameData.startMoney, startData.numberOfPlayers > i,
-                                              i == 0 ? true : false, 0);
+                    player = new ManiacPlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
+                                              PLAYER_TYPE_COMPUTER, ManiacPlayerName[i], gameData.startMoney,
+                                              startData.numberOfPlayers > i, i == 0 ? true : false, 0);
                     nbManiac++;
                 }
                 else if (rand < 5 && nbUltraTight < startData.numberOfPlayers / 3)
                 {
-                    player = new UltraTightPlayer(myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
-                                                  UltraTightPlayerName[i], gameData.startMoney,
+                    player = new UltraTightPlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
+                                                  PLAYER_TYPE_COMPUTER, UltraTightPlayerName[i], gameData.startMoney,
                                                   startData.numberOfPlayers > i, i == 0 ? true : false, 0);
                     nbUltraTight++;
                 }
                 else if (rand < 9 && nbLoose < startData.numberOfPlayers / 3)
                 {
-                    player =
-                        new LooseAggressivePlayer(myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
-                                                  LooseAggressivePlayerName[i], gameData.startMoney,
-                                                  startData.numberOfPlayers > i, i == 0 ? true : false, 0);
+                    player = new LooseAggressivePlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
+                                                       PLAYER_TYPE_COMPUTER, LooseAggressivePlayerName[i],
+                                                       gameData.startMoney, startData.numberOfPlayers > i,
+                                                       i == 0 ? true : false, 0);
                     nbLoose++;
                 }
                 else if (nbTight < startData.numberOfPlayers / 3)
                 {
                     player =
-                        new TightAgressivePlayer(myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
-                                                 TightAgressivePlayerName[i], gameData.startMoney,
+                        new TightAgressivePlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
+                                                 PLAYER_TYPE_COMPUTER, TightAgressivePlayerName[i], gameData.startMoney,
                                                  startData.numberOfPlayers > i, i == 0 ? true : false, 0);
                     nbTight++;
                 }
                 else
                     // default
-                    player = new UltraTightPlayer(myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
-                                                  UltraTightPlayerName[i], gameData.startMoney,
+                    player = new UltraTightPlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
+                                                  PLAYER_TYPE_COMPUTER, UltraTightPlayerName[i], gameData.startMoney,
                                                   startData.numberOfPlayers > i, i == 0 ? true : false, 0);
             }
 

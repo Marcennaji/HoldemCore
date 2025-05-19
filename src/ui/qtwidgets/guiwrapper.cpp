@@ -56,11 +56,11 @@ void GuiWrapper::hideHoleCards()
     myW->hideHoleCards();
 }
 
-std::shared_ptr<Session> GuiWrapper::getSession()
+Session* GuiWrapper::getSession()
 {
     return myStartWindow->getSession();
 }
-void GuiWrapper::setSession(std::shared_ptr<Session> /*session*/)
+void GuiWrapper::setSession(Session* /*session*/)
 {
     // myStartWindow->setSession(session);
 }

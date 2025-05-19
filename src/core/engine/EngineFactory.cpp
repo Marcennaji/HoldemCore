@@ -16,14 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 
-#include "enginefactory.h"
+#include "EngineFactory.h"
 
 #include <core/interfaces/ILogger.h>
+#include "BettingRoundFlop.h"
 #include "BettingRoundPostRiver.h"
 #include "BettingRoundPreflop.h"
 #include "BettingRoundRiver.h"
 #include "BettingRoundTurn.h"
-#include "BettingRoundflop.h"
 #include "Board.h"
 #include "Hand.h"
 #include "Randomizer.h"
@@ -33,8 +33,10 @@
 #include "ManiacPlayer.h"
 #include "TightAgressivePlayer.h"
 
-EngineFactory::EngineFactory(ILogger* logger) : myLogger(logger)
+EngineFactory::EngineFactory(GameEvents* events, ILogger* logger) : myLogger(logger), myEvents(events)
 {
+    assert(myLogger != nullptr);
+    assert(myEvents != nullptr);
 }
 
 EngineFactory::~EngineFactory()
@@ -46,7 +48,7 @@ std::shared_ptr<IHand> EngineFactory::createHand(std::shared_ptr<EngineFactory> 
                                                  PlayerList sl, PlayerList apl, PlayerList rpl, int id, int sP, int dP,
                                                  int sB, int sC)
 {
-    return std::shared_ptr<IHand>(new Hand(myLogger, f, g, b, l, ps, hs, sl, apl, rpl, id, sP, dP, sB, sC));
+    return std::shared_ptr<IHand>(new Hand(myEvents, myLogger, f, g, b, l, ps, hs, sl, apl, rpl, id, sP, dP, sB, sC));
 }
 
 std::shared_ptr<IBoard> EngineFactory::createBoard(unsigned dp)
@@ -58,15 +60,15 @@ std::vector<std::shared_ptr<IBettingRound>> EngineFactory::createBettingRound(IH
 {
     std::vector<std::shared_ptr<IBettingRound>> myBettingRound;
 
-    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundPreflop(myLogger, hi, dP, sB)));
+    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundPreflop(myEvents, myLogger, hi, dP, sB)));
 
-    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundFlop(myLogger, hi, dP, sB)));
+    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundFlop(myEvents, myLogger, hi, dP, sB)));
 
-    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundTurn(myLogger, hi, dP, sB)));
+    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundTurn(myEvents, myLogger, hi, dP, sB)));
 
-    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundRiver(myLogger, hi, dP, sB)));
+    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundRiver(myEvents, myLogger, hi, dP, sB)));
 
-    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundPostRiver(myLogger, hi, dP, sB)));
+    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundPostRiver(myEvents, myLogger, hi, dP, sB)));
 
     return myBettingRound;
 }

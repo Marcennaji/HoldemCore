@@ -18,7 +18,7 @@
 
 #include "BettingRoundPreflop.h"
 
-#include "exception.h"
+#include "Exception.h"
 #include "model/EngineError.h"
 
 #include "core/interfaces/IHand.h"
@@ -27,8 +27,8 @@
 
 using namespace std;
 
-BettingRoundPreflop::BettingRoundPreflop(ILogger* logger, IHand* hi, unsigned dP, int sB)
-    : BettingRound(logger, hi, dP, sB, GAME_STATE_PREFLOP)
+BettingRoundPreflop::BettingRoundPreflop(GameEvents* events, ILogger* logger, IHand* hi, unsigned dP, int sB)
+    : BettingRound(events, logger, hi, dP, sB, GAME_STATE_PREFLOP)
 {
     setHighestSet(2 * getSmallBlind());
 }

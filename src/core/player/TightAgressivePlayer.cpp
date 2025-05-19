@@ -32,9 +32,9 @@
 
 using namespace std;
 
-TightAgressivePlayer::TightAgressivePlayer(IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id, PlayerType type,
-                                           std::string name, int sC, bool aS, bool sotS, int mB)
-    : Player(ha, ps, id, type, name, sC, aS, sotS, mB)
+TightAgressivePlayer::TightAgressivePlayer(GameEvents* events, IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id,
+                                           PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB)
+    : Player(events, ha, ps, id, type, name, sC, aS, sotS, mB)
 {
 
     int utgFullTableRange = 0;

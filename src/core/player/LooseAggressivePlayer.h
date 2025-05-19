@@ -24,8 +24,8 @@ class LooseAggressivePlayer : public Player
 {
 
   public:
-    LooseAggressivePlayer(IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type, std::string name, int sC,
-                          bool aS, bool sotS, int mB);
+    LooseAggressivePlayer(GameEvents* events, IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type,
+                          std::string name, int sC, bool aS, bool sotS, int mB);
 
     ~LooseAggressivePlayer();
 

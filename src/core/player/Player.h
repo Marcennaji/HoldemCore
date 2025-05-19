@@ -97,8 +97,8 @@ static int outsOddsTwoCard[] = {
 class Player
 {
   public:
-    Player(IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type, std::string name, int sC, bool aS,
-           bool sotS, int mB);
+    Player(GameEvents*, IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type, std::string name, int sC,
+           bool aS, bool sotS, int mB);
 
     ~Player();
 
@@ -311,6 +311,7 @@ class Player
     IHandAuditStore* myHandAuditStore;
     IPlayersStatisticsStore* myPlayersStatisticsStore;
     IHand* currentHand;
+    GameEvents* myEvents;
 
     PostFlopState myFlopState;
     PostFlopState myTurnState;

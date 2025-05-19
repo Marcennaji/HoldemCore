@@ -24,8 +24,8 @@ class UltraTightPlayer : public Player
 {
 
   public:
-    UltraTightPlayer(IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type, std::string name, int sC,
-                     bool aS, bool sotS, int mB);
+    UltraTightPlayer(GameEvents*, IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type, std::string name,
+                     int sC, bool aS, bool sotS, int mB);
 
     ~UltraTightPlayer();
 

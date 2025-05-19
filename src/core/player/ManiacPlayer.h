@@ -24,8 +24,8 @@ class ManiacPlayer : public Player
 {
 
   public:
-    ManiacPlayer(IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type, std::string name, int sC, bool aS,
-                 bool sotS, int mB);
+    ManiacPlayer(GameEvents*, IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type, std::string name,
+                 int sC, bool aS, bool sotS, int mB);
 
     ~ManiacPlayer();
 

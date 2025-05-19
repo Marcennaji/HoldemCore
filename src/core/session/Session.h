@@ -25,6 +25,7 @@
 #include <core/engine/model/GameData.h>
 #include <core/engine/model/StartData.h>
 #include <core/interfaces/ILogger.h>
+#include "core/engine/GameEvents.h"
 
 class IGui;
 class Game;
@@ -32,12 +33,11 @@ class IRankingStore;
 class IPlayersStatisticsStore;
 class IHandAuditStore;
 class QtToolsInterface;
-class GameEvents;
 
 class Session
 {
   public:
-    Session(ILogger*, IGui*, IRankingStore*, IPlayersStatisticsStore*, IHandAuditStore*);
+    Session(GameEvents* events, ILogger*, IGui*, IRankingStore*, IPlayersStatisticsStore*, IHandAuditStore*);
 
     ~Session();
 
@@ -53,18 +53,16 @@ class Session
     IPlayersStatisticsStore* getPlayersStatisticsStore() { return myPlayersStatisticsStore; }
     IHandAuditStore* getHandAuditStore() { return myHandAuditStore; }
 
-    void setGameEvents(GameEvents* events) { m_events = events; }
-
   private:
     int currentGameNum;
 
     std::shared_ptr<Game> currentGame;
+    GameEvents* myEvents;
     IGui* myGui;
     ILogger* myLogger;
     IRankingStore* myRankingStore;
     IPlayersStatisticsStore* myPlayersStatisticsStore;
     IHandAuditStore* myHandAuditStore;
-    GameEvents* m_events = nullptr;
 };
 
 #endif

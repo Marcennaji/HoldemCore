@@ -43,10 +43,10 @@ class StartWindow : public QMainWindow, public Ui::startWindow
     StartWindow(const QString& appDataPath, IGui* gui, Session* session, QWidget* parent);
     ~StartWindow();
 
-    void setSession(std::shared_ptr<Session> session) { mySession = session; }
-    std::shared_ptr<Session> getSession()
+    void setSession(Session* session) { mySession = session; }
+    Session* getSession()
     {
-        assert(mySession.get());
+        assert(mySession != nullptr);
         return mySession;
     }
     void setGuiLog(GuiDisplayGameActions* l) { myGuiLog = l; }
@@ -66,7 +66,7 @@ class StartWindow : public QMainWindow, public Ui::startWindow
     GuiDisplayGameActions* myGuiLog;
 
     std::shared_ptr<IGui> myGuiInterface;
-    std::shared_ptr<Session> mySession;
+    Session* mySession;
 
     friend class GuiWrapper;
 };

@@ -19,24 +19,25 @@
 #include "Hand.h"
 #include <core/interfaces/ILogger.h>
 #include "CardsValue.h"
+#include "GameEvents.h"
 #include "Randomizer.h"
 #include "model/ButtonState.h"
 
-#include "exception.h"
+#include "Exception.h"
 #include "model/EngineError.h"
 
 #include <iostream>
 
 using namespace std;
 
-Hand::Hand(ILogger* logger, std::shared_ptr<EngineFactory> f, IGui* g, std::shared_ptr<IBoard> b, IRankingStore* l,
-           IPlayersStatisticsStore* ps, IHandAuditStore* ha, PlayerList sl, PlayerList apl, PlayerList rpl, int id,
-           int sP, unsigned dP, int sB, int sC)
+Hand::Hand(GameEvents* events, ILogger* logger, std::shared_ptr<EngineFactory> f, IGui* g, std::shared_ptr<IBoard> b,
+           IRankingStore* l, IPlayersStatisticsStore* ps, IHandAuditStore* ha, PlayerList sl, PlayerList apl,
+           PlayerList rpl, int id, int sP, unsigned dP, int sB, int sC)
     : myLogger(logger), myFactory(f), myGui(g), myBoard(b), myRankingStore(l), myPlayersStatisticsStore(ps),
       myHandAuditStore(ha), seatsList(sl), activePlayerList(apl), runningPlayerList(rpl), myBettingRound(0), myID(id),
       startQuantityPlayers(sP), dealerPosition(dP), smallBlindPosition(dP), bigBlindPosition(dP),
       currentRound(GAME_STATE_PREFLOP), roundBeforePostRiver(GAME_STATE_PREFLOP), smallBlind(sB), startCash(sC),
-      previousPlayerID(-1), lastActionPlayerID(0), allInCondition(false), cardsShown(false)
+      previousPlayerID(-1), lastActionPlayerID(0), allInCondition(false), cardsShown(false), myEvents(events)
 {
 
     int i, j, k;
@@ -454,7 +455,9 @@ void Hand::switchRounds()
     if (nonFoldPlayerCounter == 1)
     {
         myBoard->collectPot();
-        myGui->refreshPot();
+        if (myEvents && myEvents->onPotUpdated)
+            myEvents->onPotUpdated(myBoard->getPot());
+
         myGui->refreshSet();
         currentRound = GAME_STATE_POST_RIVER;
     }
@@ -530,7 +533,9 @@ void Hand::switchRounds()
     if (allInCondition)
     {
         myBoard->collectPot();
-        myGui->refreshPot();
+        if (myEvents && myEvents->onPotUpdated)
+            myEvents->onPotUpdated(myBoard->getPot());
+
         myGui->refreshSet();
         myGui->flipHolecardsAllIn();
 
