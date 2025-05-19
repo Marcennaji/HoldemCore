@@ -1,0 +1,17 @@
+// ui/qt/controller/GuiBridgeWidgets.cpp
+#include "GuiBridgeWidgets.h"
+#include "ui/qtwidgets/gametable/GameTableWindow.h"
+
+GuiBridgeWidgets::GuiBridgeWidgets(GameTableWindow* table, QObject* parent) : QObject(parent), myGameTableWindow(table)
+{
+}
+
+void GuiBridgeWidgets::connectTo(GameEvents& events)
+{
+    // Update pot display
+    events.onPotUpdated = [this](int pot)
+    {
+        QMetaObject::invokeMethod(
+            myGameTableWindow, [this]() { myGameTableWindow->refreshPot(); }, Qt::QueuedConnection);
+    };
+}

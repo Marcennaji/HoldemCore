@@ -131,7 +131,6 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     void initGui(int speed);
     void hideHoleCards();
 
-    // refresh-Funktionen
     void refreshSet();
     void refreshCash();
     void refreshAction(int = -1, int = -1);
@@ -151,10 +150,8 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     void guiUpdateDone();
     void waitForGuiUpdateDone();
 
-    // Karten-Funktionen
     void dealHoleCards();
 
-    // Spieler-Funktionen
     void provideMyActions(int mode = -1); // mode 0 == called from dealBettingRoundcards
     void meInAction();
     void disableMyButtons();
