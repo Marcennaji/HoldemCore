@@ -32,6 +32,7 @@ class IRankingStore;
 class IPlayersStatisticsStore;
 class IHandAuditStore;
 class QtToolsInterface;
+class GameEvents;
 
 class Session
 {
@@ -52,6 +53,8 @@ class Session
     IPlayersStatisticsStore* getPlayersStatisticsStore() { return myPlayersStatisticsStore; }
     IHandAuditStore* getHandAuditStore() { return myHandAuditStore; }
 
+    void setGameEvents(GameEvents* events) { m_events = events; }
+
   private:
     int currentGameNum;
 
@@ -61,6 +64,7 @@ class Session
     IRankingStore* myRankingStore;
     IPlayersStatisticsStore* myPlayersStatisticsStore;
     IHandAuditStore* myHandAuditStore;
+    GameEvents* m_events = nullptr;
 };
 
 #endif

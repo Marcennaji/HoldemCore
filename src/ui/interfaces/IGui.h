@@ -86,7 +86,6 @@ class IGui
     virtual void updateMyButtonsState() = 0;
     virtual void disableMyButtons() = 0;
 
-    // log.cpp
     virtual void logPlayerActionMsg(std::string playName, int action, int setValue) = 0;
     virtual void logNewGameHandMsg(int gameID, int HandID) = 0;
     virtual void logPlayerWinsMsg(std::string playerName, int pot, bool main) = 0;
