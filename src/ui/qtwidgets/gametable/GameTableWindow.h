@@ -89,7 +89,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     // void signalRefreshPot();
     void signalRefreshGroupbox(int = -1, int = -1);
     void signalRefreshAll();
-    void signalRefreshPlayerName();
+    // void signalRefreshPlayerName();
     void signalRefreshButton();
     void signalRefreshGameLabels(int);
 

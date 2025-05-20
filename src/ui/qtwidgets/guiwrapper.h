@@ -51,7 +51,6 @@ class GuiWrapper : public IGui
     void refreshChangePlayer() const;
     void refreshGroupbox(int = -1, int = -1) const;
     void refreshAll() const;
-    void refreshPlayerName() const;
     void refreshButton() const;
     void refreshGameLabels(GameState state) const;
 

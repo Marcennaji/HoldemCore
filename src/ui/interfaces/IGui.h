@@ -48,7 +48,7 @@ class IGui
     // virtual void refreshPot() const = 0;
     virtual void refreshGroupbox(int = -1, int = -1) const = 0;
     virtual void refreshAll() const = 0;
-    virtual void refreshPlayerName() const = 0;
+    // virtual void refreshPlayerName() const = 0;
     virtual void refreshButton() const = 0;
     virtual void refreshGameLabels(GameState state) const = 0;
 
