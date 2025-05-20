@@ -396,7 +396,8 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     connect(this, SIGNAL(signalRefreshAction(int, int)), this, SLOT(refreshAction(int, int)));
     // connect(this, SIGNAL(signalRefreshChangePlayer()), this, SLOT(refreshChangePlayer()));
     // connect(this, SIGNAL(signalRefreshPot()), this, SLOT(refreshPot()));
-    connect(this, SIGNAL(signalRefreshGroupbox(int, int)), this, SLOT(refreshGroupbox(int, int)));
+    connect(this, SIGNAL(signalrefreshPlayersActiveInactiveStyles(int, int)), this,
+            SLOT(refreshPlayersActiveInactiveStyles(int, int)));
     connect(this, SIGNAL(signalRefreshAll()), this, SLOT(refreshAll()));
     // connect(this, SIGNAL(signalRefreshPlayerName()), this, SLOT(refreshPlayerName()));
     connect(this, SIGNAL(signalRefreshButton()), this, SLOT(refreshButton()));
@@ -819,7 +820,7 @@ void GameTableWindow::refreshCash()
     }
 }
 
-void GameTableWindow::refreshGroupbox(int playerID, int status)
+void GameTableWindow::refreshPlayersActiveInactiveStyles(int playerID, int status)
 {
 
     int j;
@@ -835,12 +836,10 @@ void GameTableWindow::refreshGroupbox(int playerID, int status)
 
             if ((*it_c)->getTurn())
             {
-                // Groupbox glow wenn der Spiele dran ist.
                 myGameTableStyle->setPlayerSeatActiveStyle(groupBoxArray[(*it_c)->getID()]);
             }
             else
             {
-                // Groupbox auf Hintergrundfarbe setzen wenn der Spiele nicht dran aber aktiv ist.
                 if ((*it_c)->getActiveStatus())
                 {
                     if ((*it_c)->getID() == 0)
@@ -853,7 +852,6 @@ void GameTableWindow::refreshGroupbox(int playerID, int status)
                     }
                     myGameTableStyle->setPlayerSeatInactiveStyle(groupBoxArray[(*it_c)->getID()]);
                 }
-                // Groupbox verdunkeln wenn der Spiele inactive ist.
                 else
                 {
                     if ((*it_c)->getID() == 0)
@@ -982,7 +980,7 @@ void GameTableWindow::refreshAll()
     }
 
     refreshCash();
-    refreshGroupbox();
+    refreshPlayersActiveInactiveStyles();
     refreshPlayerName();
     refreshPlayerStatistics();
     refreshHandsRanges();

@@ -52,15 +52,6 @@ void GuiWrapper::initGui(int speed)
     myW->signalInitGui(speed);
 }
 
-Session* GuiWrapper::getSession()
-{
-    return myStartWindow->getSession();
-}
-void GuiWrapper::setSession(Session* /*session*/)
-{
-    // myStartWindow->setSession(session);
-}
-
 void GuiWrapper::refreshAction(int playerID, int playerAction) const
 {
     myW->signalRefreshAction(playerID, playerAction);
@@ -69,9 +60,9 @@ void GuiWrapper::refreshAll() const
 {
     myW->signalRefreshAll();
 }
-void GuiWrapper::refreshGroupbox(int playerID, int status) const
+void GuiWrapper::refreshPlayersActiveInactiveStyles(int playerID, int status) const
 {
-    myW->signalRefreshGroupbox(playerID, status);
+    myW->signalrefreshPlayersActiveInactiveStyles(playerID, status);
 }
 
 void GuiWrapper::refreshButton() const

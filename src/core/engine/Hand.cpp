@@ -566,7 +566,7 @@ void Hand::switchRounds()
     if (it_c != activePlayerList->end())
     {
         // lastPlayersTurn is active
-        myGui->refreshGroupbox(previousPlayerID, 1);
+        myGui->refreshPlayersActiveInactiveStyles(previousPlayerID, 1);
     }
 
     myGui->refreshGameLabels((GameState) getCurrentRound());

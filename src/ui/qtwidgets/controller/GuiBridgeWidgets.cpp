@@ -7,14 +7,12 @@ GuiBridgeWidgets::GuiBridgeWidgets(GameTableWindow* table, QObject* parent) : QO
 
 void GuiBridgeWidgets::connectTo(GameEvents& events)
 {
-    // Update pot display
     events.onPotUpdated = [this](int pot)
     {
         QMetaObject::invokeMethod(
-            myGameTableWindow, [this]() { myGameTableWindow->refreshPot(); }, Qt::QueuedConnection);
+            myGameTableWindow, [this]() { myGameTableWindow->refreshPot(); }, Qt::DirectConnection);
     };
 
-    // Update cash display
     events.onRefreshCash = [this]()
     {
         QMetaObject::invokeMethod(

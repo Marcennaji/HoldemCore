@@ -33,9 +33,6 @@ class IGui
 
     virtual void initGui(int speed) = 0;
 
-    virtual Session* getSession() = 0;
-    virtual void setSession(Session* session) = 0;
-
     virtual void* getGameTableWindow() const = 0;
     virtual GuiDisplayGameActions* getGuiDisplayGameActions() const = 0;
 
@@ -45,7 +42,7 @@ class IGui
     // virtual void refreshCash() const = 0;
     virtual void refreshAction(int = -1, int = -1) const = 0;
     // virtual void refreshPot() const = 0;
-    virtual void refreshGroupbox(int = -1, int = -1) const = 0;
+    virtual void refreshPlayersActiveInactiveStyles(int = -1, int = -1) const = 0;
     virtual void refreshAll() const = 0;
     // virtual void refreshPlayerName() const = 0;
     virtual void refreshButton() const = 0;
