@@ -391,7 +391,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     connect(radioButton_autoCheckCallAny, SIGNAL(clicked()), this, SLOT(changePlayingMode()));
 
     connect(this, SIGNAL(signalInitGui(int)), this, SLOT(initGui(int)));
-    connect(this, SIGNAL(signalRefreshSet()), this, SLOT(refreshSet()));
+    // connect(this, SIGNAL(signalRefreshSet()), this, SLOT(refreshSet()));
     // connect(this, SIGNAL(signalRefreshCash()), this, SLOT(refreshCash()));
     connect(this, SIGNAL(signalRefreshAction(int, int)), this, SLOT(refreshAction(int, int)));
     connect(this, SIGNAL(signalRefreshChangePlayer()), this, SLOT(refreshChangePlayer()));

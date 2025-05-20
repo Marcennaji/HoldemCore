@@ -82,7 +82,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
 
     void signalShowClientDialog();
 
-    void signalRefreshSet();
+    // void signalRefreshSet();
     // void signalRefreshCash();
     void signalRefreshAction(int = -1, int = -1);
     void signalRefreshChangePlayer();

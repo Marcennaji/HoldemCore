@@ -460,7 +460,9 @@ void Hand::switchRounds()
         if (myEvents && myEvents->onPotUpdated)
             myEvents->onPotUpdated(myBoard->getPot());
 
-        myGui->refreshSet();
+        if (myEvents && myEvents->onRefreshSet)
+            myEvents->onRefreshSet();
+        ;
         currentRound = GAME_STATE_POST_RIVER;
     }
 
@@ -538,7 +540,9 @@ void Hand::switchRounds()
         if (myEvents && myEvents->onPotUpdated)
             myEvents->onPotUpdated(myBoard->getPot());
 
-        myGui->refreshSet();
+        if (myEvents && myEvents->onRefreshSet)
+            myEvents->onRefreshSet();
+
         myGui->flipHolecardsAllIn();
 
         if (currentRound < GAME_STATE_POST_RIVER)

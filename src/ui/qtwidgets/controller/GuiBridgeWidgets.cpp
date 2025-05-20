@@ -26,4 +26,9 @@ void GuiBridgeWidgets::connectTo(GameEvents& events)
         QMetaObject::invokeMethod(
             myGameTableWindow, [this]() { myGameTableWindow->refreshPlayerName(); }, Qt::QueuedConnection);
     };
+    events.onRefreshSet = [this]()
+    {
+        QMetaObject::invokeMethod(
+            myGameTableWindow, [this]() { myGameTableWindow->refreshSet(); }, Qt::QueuedConnection);
+    };
 }

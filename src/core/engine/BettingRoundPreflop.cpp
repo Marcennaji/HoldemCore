@@ -173,7 +173,8 @@ void BettingRoundPreflop::run()
         if (myEvents && myEvents->onPotUpdated)
             myEvents->onPotUpdated(getHand()->getBoard()->getPot());
 
-        getHand()->getGuiInterface()->refreshSet();
+        if (myEvents && myEvents->onRefreshSet)
+            myEvents->onRefreshSet();
 
         if (myEvents && myEvents->onRefreshCash)
             myEvents->onRefreshCash();

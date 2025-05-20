@@ -66,11 +66,6 @@ void GuiWrapper::setSession(Session* /*session*/)
     // myStartWindow->setSession(session);
 }
 
-void GuiWrapper::refreshSet() const
-{
-    myW->signalRefreshSet();
-}
-
 void GuiWrapper::refreshAction(int playerID, int playerAction) const
 {
     myW->signalRefreshAction(playerID, playerAction);
