@@ -1,4 +1,3 @@
-// ui/qt/controller/GuiBridgeWidgets.h
 #pragma once
 
 #include <QObject>

@@ -169,7 +169,8 @@ void BettingRoundPreflop::run()
         // Sets in den Pot verschieben und Sets = 0 und Pot-refresh
         getHand()->getBoard()->collectSets();
         getHand()->getBoard()->collectPot();
-        getHand()->getGuiInterface()->refreshPot();
+        if (myEvents && myEvents->onPotUpdated)
+            myEvents->onPotUpdated(getHand()->getBoard()->getPot());
 
         getHand()->getGuiInterface()->refreshSet();
         getHand()->getGuiInterface()->refreshCash();

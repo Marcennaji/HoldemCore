@@ -2,8 +2,11 @@
 #include "GuiAppController.h"
 #include <core/session/Session.h>
 #include <infra/persistence/SqliteLogStore.h>
+#include <ui/qtwidgets/gametable/GameTableWindow.h>
 #include <ui/qtwidgets/guiwrapper.h>
 #include <ui/qtwidgets/startwindow/StartWindow.h>
+
+#include "GuiBridgeWidgets.h"
 
 GuiAppController::GuiAppController(ILogger* logger, const QString& app, const QString& log, const QString& user)
     : myAppDataPath(app), myLogPath(log), myUserDataPath(user)
@@ -17,6 +20,9 @@ GuiAppController::GuiAppController(ILogger* logger, const QString& app, const QS
     mySession = std::make_unique<Session>(myEvents.get(), logger, myGui.get(), myGameActionslogger.get(),
                                           myGameActionslogger.get(), myGameActionslogger.get());
     mySession->init();
+
+    myBridge = std::make_unique<GuiBridgeWidgets>(static_cast<GameTableWindow*>(myGui->getGameTableWindow()));
+    myBridge->connectTo(*myEvents);
 }
 
 StartWindow* GuiAppController::createMainWindow()

@@ -235,7 +235,8 @@ void BettingRound::run()
 
             myHand->getBoard()->collectSets();
             myHand->getBoard()->collectPot();
-            myHand->getGuiInterface()->refreshPot();
+            if (myEvents && myEvents->onPotUpdated)
+                myEvents->onPotUpdated(myHand->getBoard()->getPot());
 
             myHand->getGuiInterface()->refreshSet();
             myHand->getGuiInterface()->refreshCash();

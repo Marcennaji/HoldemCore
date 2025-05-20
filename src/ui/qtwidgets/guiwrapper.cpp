@@ -85,10 +85,6 @@ void GuiWrapper::refreshAll() const
 {
     myW->signalRefreshAll();
 }
-void GuiWrapper::refreshPot() const
-{
-    myW->signalRefreshPot();
-}
 void GuiWrapper::refreshGroupbox(int playerID, int status) const
 {
     myW->signalRefreshGroupbox(playerID, status);

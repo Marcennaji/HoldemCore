@@ -1,4 +1,3 @@
-// ui/qt/controller/GuiBridgeWidgets.cpp
 #include "GuiBridgeWidgets.h"
 #include "ui/qtwidgets/gametable/GameTableWindow.h"
 

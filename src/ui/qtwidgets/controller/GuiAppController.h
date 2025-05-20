@@ -11,6 +11,7 @@ class StartWindow;
 class SqliteLogStore;
 class Session;
 class GuiWrapper;
+class GuiBridgeWidgets;
 
 class GuiAppController
 {
@@ -28,4 +29,5 @@ class GuiAppController
     std::unique_ptr<GuiWrapper> myGui;
     std::unique_ptr<Session> mySession;
     std::unique_ptr<GameEvents> myEvents;
+    std::unique_ptr<GuiBridgeWidgets> myBridge;
 };

@@ -261,7 +261,9 @@ void Hand::start()
     myGui->dealHoleCards();
 
     getBoard()->collectSets();
-    getGuiInterface()->refreshPot();
+
+    if (myEvents && myEvents->onPotUpdated)
+        myEvents->onPotUpdated(getBoard()->getPot());
 
     // change rounds | first start preflop
     myGui->nextPlayerAnimation();

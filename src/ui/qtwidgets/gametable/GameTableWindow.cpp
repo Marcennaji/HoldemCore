@@ -397,7 +397,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     connect(this, SIGNAL(signalRefreshCash()), this, SLOT(refreshCash()));
     connect(this, SIGNAL(signalRefreshAction(int, int)), this, SLOT(refreshAction(int, int)));
     connect(this, SIGNAL(signalRefreshChangePlayer()), this, SLOT(refreshChangePlayer()));
-    connect(this, SIGNAL(signalRefreshPot()), this, SLOT(refreshPot()));
+    // connect(this, SIGNAL(signalRefreshPot()), this, SLOT(refreshPot()));
     connect(this, SIGNAL(signalRefreshGroupbox(int, int)), this, SLOT(refreshGroupbox(int, int)));
     connect(this, SIGNAL(signalRefreshAll()), this, SLOT(refreshAll()));
     connect(this, SIGNAL(signalRefreshPlayerName()), this, SLOT(refreshPlayerName()));

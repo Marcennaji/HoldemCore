@@ -123,7 +123,8 @@ void Player::action()
 
     evaluateBetAmount(); // original bet amount may be modified
     currentHand->getBoard()->collectSets();
-    currentHand->getGuiInterface()->refreshPot();
+    if (myEvents && myEvents->onPotUpdated)
+        myEvents->onPotUpdated(currentHand->getBoard()->getPot());
 
     myTurn = 0;
 
