@@ -18,6 +18,7 @@ struct GameEvents
     std::function<void(unsigned playerId)> onShowHoleCards;
 
     // --- GUI refresh ---
+    std::function<void()> onHideHoleCards;
     std::function<void()> onRefreshCash;
     std::function<void()> onRefreshSet;
     std::function<void()> onRefreshAction;

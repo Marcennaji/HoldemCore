@@ -52,11 +52,6 @@ void GuiWrapper::initGui(int speed)
     myW->signalInitGui(speed);
 }
 
-void GuiWrapper::hideHoleCards()
-{
-    myW->hideHoleCards();
-}
-
 Session* GuiWrapper::getSession()
 {
     return myStartWindow->getSession();

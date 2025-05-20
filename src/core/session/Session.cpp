@@ -48,18 +48,15 @@ Session::~Session()
 {
 }
 
-bool Session::init()
-{
-    return true;
-}
-
 void Session::startGame(const GameData& gameData, const StartData& startData)
 {
 
     currentGame.reset();
     currentGameNum++;
 
-    myGui->hideHoleCards();
+    if (myEvents && myEvents->onHideHoleCards)
+        myEvents->onHideHoleCards();
+
     myGui->initGui(gameData.guiSpeed);
 
     std::shared_ptr<EngineFactory> factory(new EngineFactory(myEvents, myLogger));

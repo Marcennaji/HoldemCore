@@ -41,8 +41,6 @@ class Session
 
     ~Session();
 
-    bool init();
-
     void startGame(const GameData& gameData, const StartData& startData);
 
     std::shared_ptr<Game> getCurrentGame();

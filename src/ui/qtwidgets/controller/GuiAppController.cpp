@@ -17,12 +17,10 @@ GuiAppController::GuiAppController(ILogger* logger, const QString& app, const QS
     myGameActionslogger->init();
     myGui = std::make_unique<GuiWrapper>(myUserDataPath.toStdString(), nullptr);
     myEvents = std::make_unique<GameEvents>();
-    mySession = std::make_unique<Session>(myEvents.get(), logger, myGui.get(), myGameActionslogger.get(),
-                                          myGameActionslogger.get(), myGameActionslogger.get());
-    mySession->init();
-
     myBridge = std::make_unique<GuiBridgeWidgets>(static_cast<GameTableWindow*>(myGui->getGameTableWindow()));
     myBridge->connectTo(*myEvents);
+    mySession = std::make_unique<Session>(myEvents.get(), logger, myGui.get(), myGameActionslogger.get(),
+                                          myGameActionslogger.get(), myGameActionslogger.get());
 }
 
 StartWindow* GuiAppController::createMainWindow()

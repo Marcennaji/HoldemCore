@@ -39,7 +39,7 @@ class IGui
     virtual void* getGameTableWindow() const = 0;
     virtual GuiDisplayGameActions* getGuiDisplayGameActions() const = 0;
 
-    virtual void hideHoleCards() = 0;
+    // virtual void hideHoleCards() = 0;
     virtual void setStartWindow(void*) = 0;
     // virtual void refreshSet() const = 0;
     // virtual void refreshCash() const = 0;

@@ -18,17 +18,22 @@ void GuiBridgeWidgets::connectTo(GameEvents& events)
     events.onRefreshCash = [this]()
     {
         QMetaObject::invokeMethod(
-            myGameTableWindow, [this]() { myGameTableWindow->refreshCash(); }, Qt::QueuedConnection);
+            myGameTableWindow, [this]() { myGameTableWindow->refreshCash(); }, Qt::DirectConnection);
     };
 
     events.onRefreshPlayerName = [this]()
     {
         QMetaObject::invokeMethod(
-            myGameTableWindow, [this]() { myGameTableWindow->refreshPlayerName(); }, Qt::QueuedConnection);
+            myGameTableWindow, [this]() { myGameTableWindow->refreshPlayerName(); }, Qt::DirectConnection);
     };
     events.onRefreshSet = [this]()
     {
         QMetaObject::invokeMethod(
-            myGameTableWindow, [this]() { myGameTableWindow->refreshSet(); }, Qt::QueuedConnection);
+            myGameTableWindow, [this]() { myGameTableWindow->refreshSet(); }, Qt::DirectConnection);
+    };
+    events.onHideHoleCards = [this]()
+    {
+        QMetaObject::invokeMethod(
+            myGameTableWindow, [this]() { myGameTableWindow->hideHoleCards(); }, Qt::DirectConnection);
     };
 }
