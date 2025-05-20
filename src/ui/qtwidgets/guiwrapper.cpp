@@ -70,10 +70,6 @@ void GuiWrapper::refreshAction(int playerID, int playerAction) const
 {
     myW->signalRefreshAction(playerID, playerAction);
 }
-void GuiWrapper::refreshChangePlayer() const
-{
-    myW->signalRefreshChangePlayer();
-}
 void GuiWrapper::refreshAll() const
 {
     myW->signalRefreshAll();

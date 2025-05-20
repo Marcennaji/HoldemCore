@@ -48,7 +48,6 @@ class GuiWrapper : public IGui
     void refreshSet() const;
     void refreshCash() const;
     void refreshAction(int = -1, int = -1) const;
-    void refreshChangePlayer() const;
     void refreshGroupbox(int = -1, int = -1) const;
     void refreshAll() const;
     void refreshButton() const;

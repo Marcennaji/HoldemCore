@@ -394,7 +394,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     // connect(this, SIGNAL(signalRefreshSet()), this, SLOT(refreshSet()));
     // connect(this, SIGNAL(signalRefreshCash()), this, SLOT(refreshCash()));
     connect(this, SIGNAL(signalRefreshAction(int, int)), this, SLOT(refreshAction(int, int)));
-    connect(this, SIGNAL(signalRefreshChangePlayer()), this, SLOT(refreshChangePlayer()));
+    // connect(this, SIGNAL(signalRefreshChangePlayer()), this, SLOT(refreshChangePlayer()));
     // connect(this, SIGNAL(signalRefreshPot()), this, SLOT(refreshPot()));
     connect(this, SIGNAL(signalRefreshGroupbox(int, int)), this, SLOT(refreshGroupbox(int, int)));
     connect(this, SIGNAL(signalRefreshAll()), this, SLOT(refreshAll()));
@@ -986,22 +986,6 @@ void GameTableWindow::refreshAll()
     refreshPlayerName();
     refreshPlayerStatistics();
     refreshHandsRanges();
-}
-
-void GameTableWindow::refreshChangePlayer()
-{
-
-    refreshSet();
-
-    std::shared_ptr<Game> currentGame = myStartWindow->getSession()->getCurrentGame();
-    PlayerListConstIterator it_c;
-    PlayerList seatsList = currentGame->getSeatsList();
-    for (it_c = seatsList->begin(); it_c != seatsList->end(); ++it_c)
-    {
-        refreshAction((*it_c)->getID(), (*it_c)->getAction());
-    }
-
-    refreshCash();
 }
 
 void GameTableWindow::refreshPot()
