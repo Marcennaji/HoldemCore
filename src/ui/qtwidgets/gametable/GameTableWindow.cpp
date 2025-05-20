@@ -407,7 +407,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     connect(this, SIGNAL(signalDisableMyButtons()), this, SLOT(disableMyButtons()));
     connect(this, SIGNAL(signalUpdateMyButtonsState()), this, SLOT(updateMyButtonsState()));
     connect(this, SIGNAL(signalDealBettingRoundCards(int)), this, SLOT(dealBettingRoundCards(int)));
-    connect(this, SIGNAL(signalDealHoleCards()), this, SLOT(dealHoleCards()));
+    // connect(this, SIGNAL(signalDealHoleCards()), this, SLOT(dealHoleCards()));
     connect(this, SIGNAL(signalDealFlopCards0()), this, SLOT(dealFlopCards0()));
     connect(this, SIGNAL(signalDealTurnCards0()), this, SLOT(dealTurnCards0()));
     connect(this, SIGNAL(signalDealRiverCards0()), this, SLOT(dealRiverCards0()));

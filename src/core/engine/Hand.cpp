@@ -258,7 +258,8 @@ void Hand::start()
     }
 
     // deal cards
-    myGui->dealHoleCards();
+    if (myEvents && myEvents->onDealHoleCards)
+        myEvents->onDealHoleCards();
 
     getBoard()->collectSets();
 

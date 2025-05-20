@@ -85,10 +85,6 @@ void GuiWrapper::dealBettingRoundCards(int myBettingRoundID)
     myW->signalDealBettingRoundCards(myBettingRoundID);
 }
 
-void GuiWrapper::dealHoleCards()
-{
-    myW->signalDealHoleCards();
-}
 void GuiWrapper::dealFlopCards()
 {
     myW->signalDealFlopCards0();

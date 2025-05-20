@@ -101,7 +101,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
 
     void signalDealBettingRoundCards(int myBettingRoundID);
 
-    void signalDealHoleCards();
+    // void signalDealHoleCards();
     void signalDealFlopCards0();
     void signalDealTurnCards0();
     void signalDealRiverCards0();
