@@ -239,7 +239,10 @@ void BettingRound::run()
                 myEvents->onPotUpdated(myHand->getBoard()->getPot());
 
             myHand->getGuiInterface()->refreshSet();
-            myHand->getGuiInterface()->refreshCash();
+
+            if (myEvents && myEvents->onRefreshCash)
+                myEvents->onRefreshCash();
+
             for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
             {
                 myHand->getGuiInterface()->refreshAction(i, PLAYER_ACTION_NONE);

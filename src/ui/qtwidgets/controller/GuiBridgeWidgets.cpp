@@ -13,4 +13,11 @@ void GuiBridgeWidgets::connectTo(GameEvents& events)
         QMetaObject::invokeMethod(
             myGameTableWindow, [this]() { myGameTableWindow->refreshPot(); }, Qt::QueuedConnection);
     };
+
+    // Update cash display
+    events.onRefreshCash = [this]()
+    {
+        QMetaObject::invokeMethod(
+            myGameTableWindow, [this]() { myGameTableWindow->refreshCash(); }, Qt::QueuedConnection);
+    };
 }

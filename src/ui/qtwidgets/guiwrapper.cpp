@@ -70,10 +70,7 @@ void GuiWrapper::refreshSet() const
 {
     myW->signalRefreshSet();
 }
-void GuiWrapper::refreshCash() const
-{
-    myW->signalRefreshCash();
-}
+
 void GuiWrapper::refreshAction(int playerID, int playerAction) const
 {
     myW->signalRefreshAction(playerID, playerAction);

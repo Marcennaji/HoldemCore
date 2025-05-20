@@ -42,7 +42,7 @@ class IGui
     virtual void hideHoleCards() = 0;
     virtual void setStartWindow(void*) = 0;
     virtual void refreshSet() const = 0;
-    virtual void refreshCash() const = 0;
+    // virtual void refreshCash() const = 0;
     virtual void refreshAction(int = -1, int = -1) const = 0;
     virtual void refreshChangePlayer() const = 0;
     // virtual void refreshPot() const = 0;
