@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
-#ifndef GUILOG_H
-#define GUILOG_H
+#pragma once
 
 #include <QObject>
 #include <QStringList>
@@ -64,5 +63,3 @@ class GuiDisplayGameActions : public QObject
 
     friend class GuiWrapper;
 };
-
-#endif

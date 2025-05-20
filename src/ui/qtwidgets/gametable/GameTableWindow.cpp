@@ -363,7 +363,6 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     connect(postRiverRunAnimation6Timer, SIGNAL(timeout()), this, SLOT(startNewHand()));
 
     connect(blinkingStartButtonAnimationTimer, SIGNAL(timeout()), this, SLOT(blinkingStartButtonAnimationAction()));
-    // connect(voteOnKickTimeoutTimer, SIGNAL(timeout()), this, SLOT(nextVoteOnKickTimeoutAnimationFrame()));
     connect(enableCallCheckPushButtonTimer, SIGNAL(timeout()), this, SLOT(enableCallCheckPushButton()));
 
     connect(actionClose, SIGNAL(triggered()), this, SLOT(closeGameTable()));
@@ -391,7 +390,6 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     connect(radioButton_autoCheckFold, SIGNAL(clicked()), this, SLOT(changePlayingMode()));
     connect(radioButton_autoCheckCallAny, SIGNAL(clicked()), this, SLOT(changePlayingMode()));
 
-    // Nachrichten Thread-Save
     connect(this, SIGNAL(signalInitGui(int)), this, SLOT(initGui(int)));
     connect(this, SIGNAL(signalRefreshSet()), this, SLOT(refreshSet()));
     connect(this, SIGNAL(signalRefreshCash()), this, SLOT(refreshCash()));
@@ -2417,7 +2415,8 @@ void GameTableWindow::postRiverRunAnimation3()
                 QPixmap::fromImage(QImage(myGameTableStyle->getActionPic(7))));
 
             // set Player value (logging)
-            myGuiLog->logPlayerWinsMsg(QString::fromUtf8((*it_c)->getName().c_str()), (*it_c)->getLastMoneyWon(), true);
+            myGuiDisplayGameActions->logPlayerWinsMsg(QString::fromUtf8((*it_c)->getName().c_str()),
+                                                      (*it_c)->getLastMoneyWon(), true);
         }
     }
 
@@ -2433,8 +2432,8 @@ void GameTableWindow::postRiverRunAnimation3()
             {
                 if ((*it_int) == (*it_c)->getID())
                 {
-                    myGuiLog->logPlayerWinsMsg(QString::fromUtf8((*it_c)->getName().c_str()),
-                                               (*it_c)->getLastMoneyWon(), false);
+                    myGuiDisplayGameActions->logPlayerWinsMsg(QString::fromUtf8((*it_c)->getName().c_str()),
+                                                              (*it_c)->getLastMoneyWon(), false);
                 }
             }
         }
@@ -3516,7 +3515,7 @@ void GameTableWindow::setStartWindow(StartWindow* s)
 {
     myStartWindow = s;
 }
-void GameTableWindow::setGuiLog(GuiDisplayGameActions* l)
+void GameTableWindow::setGuiDisplayGameActions(GuiDisplayGameActions* l)
 {
-    myGuiLog = l;
+    myGuiDisplayGameActions = l;
 }

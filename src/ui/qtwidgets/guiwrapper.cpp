@@ -26,22 +26,23 @@
 
 using namespace std;
 
-GuiWrapper::GuiWrapper(const std::string& appDataDir, StartWindow* s) : myGuiLog(NULL), myW(NULL), myStartWindow(s)
+GuiWrapper::GuiWrapper(const std::string& appDataDir, StartWindow* s)
+    : myGuiDisplayGameActions(NULL), myW(NULL), myStartWindow(s)
 {
 
     myW = new GameTableWindow(appDataDir);
-    myGuiLog = new GuiDisplayGameActions(myW);
+    myGuiDisplayGameActions = new GuiDisplayGameActions(myW);
 }
 
 GuiWrapper::~GuiWrapper()
 {
-    delete myGuiLog;
+    delete myGuiDisplayGameActions;
 }
 void GuiWrapper::setStartWindow(void* w)
 {
     myStartWindow = static_cast<StartWindow*>(w);
-    if (myGuiLog)
-        myStartWindow->setGuiLog(myGuiLog);
+    if (myGuiDisplayGameActions)
+        myStartWindow->setGuiDisplayGameActions(myGuiDisplayGameActions);
     if (myW)
         myW->setStartWindow(myStartWindow);
 }
@@ -213,31 +214,31 @@ void GuiWrapper::disableMyButtons()
 }
 void GuiWrapper::logPlayerActionMsg(string playerName, int action, int setValue)
 {
-    myGuiLog->signalLogPlayerActionMsg(QString::fromUtf8(playerName.c_str()), action, setValue);
+    myGuiDisplayGameActions->signalLogPlayerActionMsg(QString::fromUtf8(playerName.c_str()), action, setValue);
 }
 void GuiWrapper::logNewGameHandMsg(int gameID, int handID)
 {
-    myGuiLog->signalLogNewGameHandMsg(gameID, handID);
+    myGuiDisplayGameActions->signalLogNewGameHandMsg(gameID, handID);
 }
 void GuiWrapper::logNewBlindsSetsMsg(int sbSet, int bbSet, std::string sbName, std::string bbName)
 {
-    myGuiLog->signalLogNewBlindsSetsMsg(sbSet, bbSet, QString::fromUtf8(sbName.c_str()),
-                                        QString::fromUtf8(bbName.c_str()));
+    myGuiDisplayGameActions->signalLogNewBlindsSetsMsg(sbSet, bbSet, QString::fromUtf8(sbName.c_str()),
+                                                       QString::fromUtf8(bbName.c_str()));
 }
 void GuiWrapper::logPlayerWinsMsg(std::string playerName, int pot, bool main)
 {
-    myGuiLog->signalLogPlayerWinsMsg(QString::fromUtf8(playerName.c_str()), pot, main);
+    myGuiDisplayGameActions->signalLogPlayerWinsMsg(QString::fromUtf8(playerName.c_str()), pot, main);
 }
 void GuiWrapper::logDealBoardCardsMsg(int roundID, int card1, int card2, int card3, int card4, int card5)
 {
-    myGuiLog->signalLogDealBoardCardsMsg(roundID, card1, card2, card3, card4, card5);
+    myGuiDisplayGameActions->signalLogDealBoardCardsMsg(roundID, card1, card2, card3, card4, card5);
 }
 void GuiWrapper::logFlipHoleCardsMsg(string playerName, int card1, int card2, int cardsValueInt, string showHas)
 {
-    myGuiLog->signalLogFlipHoleCardsMsg(QString::fromUtf8(playerName.c_str()), card1, card2, cardsValueInt,
-                                        QString::fromUtf8(showHas.c_str()));
+    myGuiDisplayGameActions->signalLogFlipHoleCardsMsg(QString::fromUtf8(playerName.c_str()), card1, card2,
+                                                       cardsValueInt, QString::fromUtf8(showHas.c_str()));
 }
 void GuiWrapper::logPlayerWinGame(std::string playerName, int gameID)
 {
-    myGuiLog->signalLogPlayerWinGame(QString::fromUtf8(playerName.c_str()), gameID);
+    myGuiDisplayGameActions->signalLogPlayerWinGame(QString::fromUtf8(playerName.c_str()), gameID);
 }

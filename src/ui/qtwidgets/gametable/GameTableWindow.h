@@ -71,10 +71,9 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     Session* getSession();
 
     GameTableStyleReader* getGameTableStyle() const;
-    bool getGuestMode() const;
 
     void setStartWindow(StartWindow* s);
-    void setGuiLog(GuiDisplayGameActions* l);
+    void setGuiDisplayGameActions(GuiDisplayGameActions* l);
 
     void setSpeeds();
 
@@ -277,7 +276,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
   private:
     void initHoleCards();
 
-    GuiDisplayGameActions* myGuiLog;
+    GuiDisplayGameActions* myGuiDisplayGameActions;
 
     // Timer
     QTimer* potDistributeTimer;

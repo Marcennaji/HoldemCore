@@ -1,5 +1,5 @@
-// core/events/GameEvents.h
 #pragma once
+
 #include <functional>
 #include <string>
 #include <vector>
@@ -24,7 +24,7 @@ struct GameEvents
     std::function<void()> onRefreshPlayerName;
     std::function<void()> onRefreshAll;
 
-    // --- Logging (UI log view) ---
+    // --- Optional: Logging players's actions in the UI (UI log view) ---
     std::function<void(std::string playerName, int action, int setValue)> onLogPlayerAction;
     std::function<void(int gameID, int handID)> onLogNewHand;
     std::function<void(std::string playerName, int pot, bool isMain)> onLogPlayerWins;
@@ -33,7 +33,7 @@ struct GameEvents
     std::function<void(std::string name, int c1, int c2, int value, std::string showType)> onLogFlipHoleCards;
     std::function<void(std::string playerName, int gameID)> onLogGameWin;
 
-    // --- Optional animations (skip for QML if needed) ---
+    // --- Optional: animations ---
     std::function<void()> onPreflopAnimation1;
     std::function<void()> onPreflopAnimation2;
     std::function<void()> onFlopAnimation1;
@@ -46,7 +46,7 @@ struct GameEvents
     std::function<void()> onPostRiverRunAnimation1;
     std::function<void()> onFlipHolecardsAllIn;
 
-    // --- Optional UI control ---
+    // --- Optional: UI control ---
     std::function<void()> onDisableButtons;
     std::function<void()> onUpdateMyButtons;
     std::function<void()> onMeInAction;

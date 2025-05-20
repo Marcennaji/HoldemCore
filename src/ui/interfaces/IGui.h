@@ -37,7 +37,7 @@ class IGui
     virtual void setSession(Session* session) = 0;
 
     virtual void* getGameTableWindow() const = 0;
-    virtual GuiDisplayGameActions* getGuiLog() const = 0;
+    virtual GuiDisplayGameActions* getGuiDisplayGameActions() const = 0;
 
     virtual void hideHoleCards() = 0;
     virtual void setStartWindow(void*) = 0;

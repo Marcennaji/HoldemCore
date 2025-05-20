@@ -49,7 +49,7 @@ class StartWindow : public QMainWindow, public Ui::startWindow
         assert(mySession != nullptr);
         return mySession;
     }
-    void setGuiLog(GuiDisplayGameActions* l) { myGuiLog = l; }
+    void setGuiDisplayGameActions(GuiDisplayGameActions* l) { myGuiDisplayGameActions = l; }
 
     //	void keyPressEvent( QKeyEvent *);
     bool eventFilter(QObject* obj, QEvent* event);
@@ -63,7 +63,7 @@ class StartWindow : public QMainWindow, public Ui::startWindow
   private:
     QString myAppDataPath;
 
-    GuiDisplayGameActions* myGuiLog;
+    GuiDisplayGameActions* myGuiDisplayGameActions;
 
     std::shared_ptr<IGui> myGuiInterface;
     Session* mySession;

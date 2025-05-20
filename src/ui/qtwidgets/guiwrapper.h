@@ -43,7 +43,7 @@ class GuiWrapper : public IGui
     void setSession(Session* session);
 
     void* getGameTableWindow() const override { return static_cast<void*>(myW); }
-    GuiDisplayGameActions* getGuiLog() const { return myGuiLog; }
+    GuiDisplayGameActions* getGuiDisplayGameActions() const { return myGuiDisplayGameActions; }
 
     void refreshSet() const;
     void refreshCash() const;
@@ -101,7 +101,7 @@ class GuiWrapper : public IGui
     void hideHoleCards();
 
   private:
-    GuiDisplayGameActions* myGuiLog;
+    GuiDisplayGameActions* myGuiDisplayGameActions;
     GameTableWindow* myW;
     StartWindow* myStartWindow;
 };
