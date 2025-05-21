@@ -203,7 +203,8 @@ void BettingRoundPreflop::run()
         (*currentPlayersTurnIt)->setTurn(true);
 
         // highlight active players groupbox and clear action
-        getHand()->getGuiInterface()->refreshPlayersActiveInactiveStyles(getCurrentPlayersTurnId(), 2);
+        if (myEvents && myEvents->onRefreshPlayersActiveInactiveStyles)
+            myEvents->onRefreshPlayersActiveInactiveStyles(getCurrentPlayersTurnId(), 2);
 
         if (myEvents && myEvents->onRefreshAction)
             myEvents->onRefreshAction(getCurrentPlayersTurnId(), PLAYER_ACTION_NONE);

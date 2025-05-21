@@ -64,4 +64,10 @@ void GuiBridgeWidgets::connectTo(GameEvents& events)
             myGameTableWindow, [this, state]() { myGameTableWindow->refreshTableDescriptiveLabels(state); },
             Qt::DirectConnection);
     };
+    events.onRefreshPlayersActiveInactiveStyles = [this](int playerId, int status)
+    {
+        QMetaObject::invokeMethod(
+            myGameTableWindow, [this, playerId, status]()
+            { myGameTableWindow->refreshPlayersActiveInactiveStyles(playerId, status); }, Qt::DirectConnection);
+    };
 }

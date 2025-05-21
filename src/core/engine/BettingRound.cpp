@@ -272,7 +272,8 @@ void BettingRound::run()
             currentPlayersTurnId = (*currentPlayersTurnIt)->getID();
 
             // highlight active players groupbox and clear action
-            myHand->getGuiInterface()->refreshPlayersActiveInactiveStyles(currentPlayersTurnId, 2);
+            if (myEvents && myEvents->onRefreshPlayersActiveInactiveStyles)
+                myEvents->onRefreshPlayersActiveInactiveStyles(currentPlayersTurnId, 2);
 
             if (myEvents && myEvents->onRefreshAction)
                 myEvents->onRefreshAction(currentPlayersTurnId, 0);

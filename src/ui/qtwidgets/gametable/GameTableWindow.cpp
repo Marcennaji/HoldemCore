@@ -396,10 +396,9 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     // connect(this, SIGNAL(signalRefreshAction(int, int)), this, SLOT(refreshAction(int, int)));
     // connect(this, SIGNAL(signalRefreshChangePlayer()), this, SLOT(refreshChangePlayer()));
     // connect(this, SIGNAL(signalRefreshPot()), this, SLOT(refreshPot()));
-    connect(this, SIGNAL(signalrefreshPlayersActiveInactiveStyles(int, int)), this,
-            SLOT(refreshPlayersActiveInactiveStyles(int, int)));
-    // connect(this, SIGNAL(signalRefreshAll()), this, SLOT(refreshAll()));
-    // connect(this, SIGNAL(signalRefreshPlayerName()), this, SLOT(refreshPlayerName()));
+    // connect(this, SIGNAL(signalrefreshPlayersActiveInactiveStyles(int, int)), this,
+    // SLOT(refreshPlayersActiveInactiveStyles(int, int))); connect(this, SIGNAL(signalRefreshAll()), this,
+    // SLOT(refreshAll())); connect(this, SIGNAL(signalRefreshPlayerName()), this, SLOT(refreshPlayerName()));
     // connect(this, SIGNAL(signalrefreshDealerAndBlindsButtons()), this, SLOT(refreshDealerAndBlindsButtons()));
     // connect(this, SIGNAL(signalrefreshTableDescriptiveLabels(int)), this, SLOT(refreshTableDescriptiveLabels(int)));
     connect(this, SIGNAL(signalGuiUpdateDone()), this, SLOT(guiUpdateDone()));

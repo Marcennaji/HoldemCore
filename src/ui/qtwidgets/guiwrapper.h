@@ -42,8 +42,6 @@ class GuiWrapper : public IGui
     void* getGameTableWindow() const override { return static_cast<void*>(myW); }
     GuiDisplayGameActions* getGuiDisplayGameActions() const { return myGuiDisplayGameActions; }
 
-    void refreshPlayersActiveInactiveStyles(int = -1, int = -1) const;
-
     void waitForGuiUpdateDone() const;
 
     void dealBettingRoundCards(int myBettingRoundID);
