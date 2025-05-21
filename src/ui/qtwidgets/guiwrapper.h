@@ -42,11 +42,7 @@ class GuiWrapper : public IGui
     void* getGameTableWindow() const override { return static_cast<void*>(myW); }
     GuiDisplayGameActions* getGuiDisplayGameActions() const { return myGuiDisplayGameActions; }
 
-    void refreshSet() const;
-    void refreshCash() const;
-    void refreshAction(int = -1, int = -1) const;
     void refreshPlayersActiveInactiveStyles(int = -1, int = -1) const;
-    void refreshAll() const;
     void refreshButton() const;
     void refreshGameLabels(GameState state) const;
 

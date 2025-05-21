@@ -52,10 +52,6 @@ void GuiWrapper::initGui(int speed)
     myW->signalInitGui(speed);
 }
 
-void GuiWrapper::refreshAll() const
-{
-    myW->signalRefreshAll();
-}
 void GuiWrapper::refreshPlayersActiveInactiveStyles(int playerID, int status) const
 {
     myW->signalrefreshPlayersActiveInactiveStyles(playerID, status);

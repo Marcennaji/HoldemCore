@@ -398,7 +398,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     // connect(this, SIGNAL(signalRefreshPot()), this, SLOT(refreshPot()));
     connect(this, SIGNAL(signalrefreshPlayersActiveInactiveStyles(int, int)), this,
             SLOT(refreshPlayersActiveInactiveStyles(int, int)));
-    connect(this, SIGNAL(signalRefreshAll()), this, SLOT(refreshAll()));
+    // connect(this, SIGNAL(signalRefreshAll()), this, SLOT(refreshAll()));
     // connect(this, SIGNAL(signalRefreshPlayerName()), this, SLOT(refreshPlayerName()));
     connect(this, SIGNAL(signalRefreshButton()), this, SLOT(refreshButton()));
     connect(this, SIGNAL(signalRefreshGameLabels(int)), this, SLOT(refreshGameLabels(int)));
@@ -964,26 +964,6 @@ void GameTableWindow::refreshGameLabels(int gameState)
     label_handNumberValue->setText(
         QString::number(myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getID(), 10));
     label_gameNumberValue->setText(QString::number(myStartWindow->getSession()->getCurrentGame()->getGameID(), 10));
-}
-
-void GameTableWindow::refreshAll()
-{
-    refreshSet();
-    refreshButton();
-
-    std::shared_ptr<Game> currentGame = myStartWindow->getSession()->getCurrentGame();
-    PlayerListConstIterator it_c;
-    PlayerList seatsList = currentGame->getSeatsList();
-    for (it_c = seatsList->begin(); it_c != seatsList->end(); ++it_c)
-    {
-        refreshAction((*it_c)->getID(), (*it_c)->getAction());
-    }
-
-    refreshCash();
-    refreshPlayersActiveInactiveStyles();
-    refreshPlayerName();
-    refreshPlayerStatistics();
-    refreshHandsRanges();
 }
 
 void GameTableWindow::refreshPot()
@@ -2648,7 +2628,6 @@ void GameTableWindow::nextRoundCleanGui()
 
     int i, j;
 
-    // GUI bereinigen - Bilder löschen, Animationen unterbrechen
     QPixmap onePix = QPixmap::fromImage(QImage(myAppDataDir + "gfx/gui/misc/1px.png"));
     for (i = 0; i < 5; i++)
     {
@@ -2674,7 +2653,22 @@ void GameTableWindow::nextRoundCleanGui()
 
     textLabel_handLabel->setText("");
 
-    refreshAll();
+    refreshSet();
+    refreshButton();
+
+    std::shared_ptr<Game> currentGame = myStartWindow->getSession()->getCurrentGame();
+    PlayerListConstIterator it_c;
+    PlayerList seatsList = currentGame->getSeatsList();
+    for (it_c = seatsList->begin(); it_c != seatsList->end(); ++it_c)
+    {
+        refreshAction((*it_c)->getID(), (*it_c)->getAction());
+    }
+
+    refreshCash();
+    refreshPlayersActiveInactiveStyles();
+    refreshPlayerName();
+    refreshPlayerStatistics();
+    refreshHandsRanges();
 
     flipHolecardsAllInAlreadyDone = false;
 
@@ -2690,9 +2684,6 @@ void GameTableWindow::nextRoundCleanGui()
     int width = tempMetrics.horizontalAdvance(tr("Show cards"));
     pushButton_break->setMinimumSize(width + 10, 20);
     pushButton_break->setText(tr("Show cards"));
-
-    // Clear Statusbarmessage
-    //  	statusBar()->clearMessage();
 
     horizontalSlider_bet->setDisabled(true);
     spinBox_betValue->setDisabled(true);

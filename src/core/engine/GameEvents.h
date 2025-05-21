@@ -21,7 +21,6 @@ struct GameEvents
     std::function<void()> onRefreshSet;
     std::function<void(int playerID, int playerAction)> onRefreshAction;
     std::function<void()> onRefreshPlayerName;
-    std::function<void()> onRefreshAll;
 
     // --- Optional: Logging players's actions in the UI (UI log view) ---
     std::function<void(std::string playerName, int action, int setValue)> onLogPlayerAction;

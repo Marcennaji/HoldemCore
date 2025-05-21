@@ -43,7 +43,8 @@ class IGui
     // virtual void refreshAction(int = -1, int = -1) const = 0;
     // virtual void refreshPot() const = 0;
     virtual void refreshPlayersActiveInactiveStyles(int = -1, int = -1) const = 0;
-    virtual void refreshAll() const = 0;
+    virtual void nextRoundCleanGui() = 0;
+    // virtual void refreshAll() const = 0;
     // virtual void refreshPlayerName() const = 0;
     virtual void refreshButton() const = 0;
     virtual void refreshGameLabels(GameState state) const = 0;
@@ -76,7 +77,6 @@ class IGui
     virtual void postRiverRunAnimation1() = 0;
     virtual void flipHolecardsAllIn() = 0;
 
-    virtual void nextRoundCleanGui() = 0;
     virtual void meInAction() = 0;
     virtual void showCards(unsigned playerId) = 0;
     virtual void updateMyButtonsState() = 0;
