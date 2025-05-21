@@ -43,7 +43,7 @@ class GuiWrapper : public IGui
     GuiDisplayGameActions* getGuiDisplayGameActions() const { return myGuiDisplayGameActions; }
 
     void refreshPlayersActiveInactiveStyles(int = -1, int = -1) const;
-    void refreshButton() const;
+
     void refreshGameLabels(GameState state) const;
 
     void waitForGuiUpdateDone() const;

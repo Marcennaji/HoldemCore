@@ -90,7 +90,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     void signalrefreshPlayersActiveInactiveStyles(int = -1, int = -1);
     // void signalRefreshAll();
     // void signalRefreshPlayerName();
-    void signalRefreshButton();
+    // void signalrefreshDealerAndBlindsButtons();
     void signalRefreshGameLabels(int);
 
     void signalGuiUpdateDone();
@@ -137,7 +137,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
 
     void refreshPlayerName();
     void refreshGameLabels(int);
-    void refreshButton();
+    void refreshDealerAndBlindsButtons();
     void refreshPlayerStatistics();
     void refreshCardsChance(GameState);
     void refreshHandsRanges();
