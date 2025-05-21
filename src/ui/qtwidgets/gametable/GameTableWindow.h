@@ -123,7 +123,6 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     void signalPostRiverShowCards(unsigned playerId);
 
     void signalFlipHolecardsAllIn();
-    void signalNextRoundCleanGui();
 
   public slots:
 
@@ -240,7 +239,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
 
     void stopTimer();
 
-    void nextRoundCleanGui();
+    void nextBettingRoundInitializeGui();
 
     void breakButtonClicked();
 

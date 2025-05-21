@@ -186,8 +186,8 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
         playerList->push_back(*i);
     }
 
-    currentGame.reset(new Game(myGui, factory, playerList, gameData, startData, currentGameNum, myRankingStore,
-                               myPlayersStatisticsStore, myHandAuditStore));
+    currentGame.reset(new Game(myEvents, myGui, factory, playerList, gameData, startData, currentGameNum,
+                               myRankingStore, myPlayersStatisticsStore, myHandAuditStore));
     currentGame->initHand();
     currentGame->startHand();
 }

@@ -72,8 +72,6 @@ class GuiWrapper : public IGui
 
     void flipHolecardsAllIn();
 
-    void nextRoundCleanGui();
-
     void meInAction();
     void showCards(unsigned playerId);
     void disableMyButtons();

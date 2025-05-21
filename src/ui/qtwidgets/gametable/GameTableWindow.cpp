@@ -425,7 +425,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     connect(this, SIGNAL(signalPostRiverRunAnimation1()), this, SLOT(postRiverRunAnimation1()));
     connect(this, SIGNAL(signalPostRiverShowCards(unsigned)), this, SLOT(showHoleCards(unsigned)));
     connect(this, SIGNAL(signalFlipHolecardsAllIn()), this, SLOT(flipHolecardsAllIn()));
-    connect(this, SIGNAL(signalNextRoundCleanGui()), this, SLOT(nextRoundCleanGui()));
+    // connect(this, SIGNAL(signalnextBettingRoundInitializeGui()), this, SLOT(nextBettingRoundInitializeGui()));
 }
 
 GameTableWindow::~GameTableWindow()
@@ -2623,7 +2623,8 @@ void GameTableWindow::handSwitchRounds()
     myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->switchRounds();
 }
 
-void GameTableWindow::nextRoundCleanGui()
+// TODO: Temporary glue method — will be replaced by ordered GameEvents
+void GameTableWindow::nextBettingRoundInitializeGui()
 {
 
     int i, j;

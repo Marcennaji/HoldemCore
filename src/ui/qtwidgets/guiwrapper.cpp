@@ -132,11 +132,6 @@ void GuiWrapper::flipHolecardsAllIn()
     myW->signalFlipHolecardsAllIn();
 }
 
-void GuiWrapper::nextRoundCleanGui()
-{
-    myW->signalNextRoundCleanGui();
-}
-
 void GuiWrapper::meInAction()
 {
     myW->signalMeInAction();

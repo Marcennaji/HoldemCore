@@ -30,11 +30,11 @@
 
 using namespace std;
 
-Game::Game(IGui* gui, std::shared_ptr<EngineFactory> factory, const PlayerList& playerList, const GameData& gameData,
-           const StartData& startData, int gameId, IRankingStore* l, IPlayersStatisticsStore* ps,
-           IHandAuditStore* handAuditStore)
-    : myFactory(factory), myGui(gui), myRankingStore(l), myPlayersStatisticsStore(ps), myHandAuditStore(handAuditStore),
-      startQuantityPlayers(startData.numberOfPlayers), startCash(gameData.startMoney),
+Game::Game(GameEvents* events, IGui* gui, std::shared_ptr<EngineFactory> factory, const PlayerList& playerList,
+           const GameData& gameData, const StartData& startData, int gameId, IRankingStore* l,
+           IPlayersStatisticsStore* ps, IHandAuditStore* handAuditStore)
+    : myFactory(factory), myGui(gui), myEvents(events), myRankingStore(l), myPlayersStatisticsStore(ps),
+      myHandAuditStore(handAuditStore), startQuantityPlayers(startData.numberOfPlayers), startCash(gameData.startMoney),
       startSmallBlind(gameData.firstSmallBlind), myGameID(gameId), currentSmallBlind(gameData.firstSmallBlind),
       currentHandID(0), dealerPosition(0), lastHandBlindsRaised(1), lastTimeBlindsRaised(0), myGameData(gameData)
 {
@@ -157,7 +157,8 @@ void Game::initHand()
 
 void Game::startHand()
 {
-    myGui->nextRoundCleanGui();
+    if (myEvents && myEvents->onNextBettingRoundInitializeGui)
+        myEvents->onNextBettingRoundInitializeGui();
 
     // log new hand
     myGui->logNewGameHandMsg(myGameID, currentHandID);

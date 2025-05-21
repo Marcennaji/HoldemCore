@@ -43,7 +43,7 @@ class IGui
     // virtual void refreshAction(int = -1, int = -1) const = 0;
     // virtual void refreshPot() const = 0;
     virtual void refreshPlayersActiveInactiveStyles(int = -1, int = -1) const = 0;
-    virtual void nextRoundCleanGui() = 0;
+    // virtual void nextBettingRoundInitializeGui() = 0;
     // virtual void refreshAll() const = 0;
     // virtual void refreshPlayerName() const = 0;
     virtual void refreshButton() const = 0;

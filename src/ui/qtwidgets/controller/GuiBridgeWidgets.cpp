@@ -51,4 +51,10 @@ void GuiBridgeWidgets::connectTo(GameEvents& events)
             myGameTableWindow, [this, playerId, playerAction]()
             { myGameTableWindow->refreshAction(playerId, playerAction); }, Qt::DirectConnection);
     };
+
+    events.onNextBettingRoundInitializeGui = [this]()
+    {
+        QMetaObject::invokeMethod(
+            myGameTableWindow, [this]() { myGameTableWindow->nextBettingRoundInitializeGui(); }, Qt::DirectConnection);
+    };
 }
