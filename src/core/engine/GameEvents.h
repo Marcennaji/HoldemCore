@@ -12,9 +12,6 @@ struct GameEvents
 
     // --- Card dealing ---
     std::function<void()> onDealHoleCards;
-    std::function<void()> onDealFlopCards;
-    std::function<void()> onDealTurnCard;
-    std::function<void()> onDealRiverCard;
     std::function<void(unsigned playerId)> onShowHoleCards;
 
     // --- GUI refresh ---

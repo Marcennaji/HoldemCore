@@ -52,9 +52,9 @@ class IGui
 
     virtual void dealBettingRoundCards(int) = 0;
     // virtual void dealHoleCards() = 0;
-    virtual void dealFlopCards() = 0;
-    virtual void dealTurnCard() = 0;
-    virtual void dealRiverCard() = 0;
+    // virtual void dealFlopCards() = 0;
+    // virtual void dealTurnCard() = 0;
+    // virtual void dealRiverCard() = 0;
 
     virtual void nextPlayerAnimation() = 0;
 
