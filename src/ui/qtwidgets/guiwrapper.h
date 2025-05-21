@@ -44,8 +44,6 @@ class GuiWrapper : public IGui
 
     void refreshPlayersActiveInactiveStyles(int = -1, int = -1) const;
 
-    void refreshGameLabels(GameState state) const;
-
     void waitForGuiUpdateDone() const;
 
     void dealBettingRoundCards(int myBettingRoundID);

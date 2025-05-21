@@ -47,7 +47,7 @@ class IGui
     // virtual void refreshAll() const = 0;
     // virtual void refreshPlayerName() const = 0;
     // virtual void refreshDealerAndBlindsButtons() const = 0;
-    virtual void refreshGameLabels(GameState state) const = 0;
+    // virtual void refreshTableDescriptiveLabels(GameState state) const = 0;
 
     virtual void waitForGuiUpdateDone() const = 0;
 

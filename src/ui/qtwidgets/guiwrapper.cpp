@@ -57,11 +57,6 @@ void GuiWrapper::refreshPlayersActiveInactiveStyles(int playerID, int status) co
     myW->signalrefreshPlayersActiveInactiveStyles(playerID, status);
 }
 
-void GuiWrapper::refreshGameLabels(GameState state) const
-{
-    myW->signalRefreshGameLabels(state);
-}
-
 void GuiWrapper::waitForGuiUpdateDone() const
 {
     myW->signalGuiUpdateDone();

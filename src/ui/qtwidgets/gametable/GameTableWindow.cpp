@@ -401,7 +401,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     // connect(this, SIGNAL(signalRefreshAll()), this, SLOT(refreshAll()));
     // connect(this, SIGNAL(signalRefreshPlayerName()), this, SLOT(refreshPlayerName()));
     // connect(this, SIGNAL(signalrefreshDealerAndBlindsButtons()), this, SLOT(refreshDealerAndBlindsButtons()));
-    connect(this, SIGNAL(signalRefreshGameLabels(int)), this, SLOT(refreshGameLabels(int)));
+    // connect(this, SIGNAL(signalrefreshTableDescriptiveLabels(int)), this, SLOT(refreshTableDescriptiveLabels(int)));
     connect(this, SIGNAL(signalGuiUpdateDone()), this, SLOT(guiUpdateDone()));
     connect(this, SIGNAL(signalMeInAction()), this, SLOT(meInAction()));
     connect(this, SIGNAL(signalDisableMyButtons()), this, SLOT(disableMyButtons()));
@@ -925,7 +925,7 @@ void GameTableWindow::refreshPlayersActiveInactiveStyles(int playerID, int statu
     }
 }
 
-void GameTableWindow::refreshGameLabels(int gameState)
+void GameTableWindow::refreshTableDescriptiveLabels(int gameState)
 {
 
     switch (gameState)

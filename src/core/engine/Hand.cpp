@@ -570,7 +570,8 @@ void Hand::switchRounds()
         myGui->refreshPlayersActiveInactiveStyles(previousPlayerID, 1);
     }
 
-    myGui->refreshGameLabels((GameState) getCurrentRound());
+    if (myEvents && myEvents->onRefreshTableDescriptiveLabels)
+        myEvents->onRefreshTableDescriptiveLabels(getCurrentRound());
 
     if (currentRound < GAME_STATE_POST_RIVER)
     {
