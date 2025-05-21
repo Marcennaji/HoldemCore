@@ -39,4 +39,10 @@ void GuiBridgeWidgets::connectTo(GameEvents& events)
         QMetaObject::invokeMethod(
             myGameTableWindow, [this]() { myGameTableWindow->dealHoleCards(); }, Qt::DirectConnection);
     };
+    events.onDealBettingRoundCards = [this](int bettingRoundId)
+    {
+        QMetaObject::invokeMethod(
+            myGameTableWindow, [this, bettingRoundId]() { myGameTableWindow->dealBettingRoundCards(bettingRoundId); },
+            Qt::DirectConnection);
+    };
 }

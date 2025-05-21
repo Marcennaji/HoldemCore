@@ -97,7 +97,9 @@ void BettingRound::run()
     {
         firstRunGui = false;
         myHand->setPreviousPlayerID(-1);
-        myHand->getGuiInterface()->dealBettingRoundCards(myBettingRoundID);
+
+        if (myEvents && myEvents->onDealBettingRoundCards)
+            myEvents->onDealBettingRoundCards(myBettingRoundID);
     }
     else
     {

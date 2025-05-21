@@ -13,6 +13,7 @@ struct GameEvents
     // --- Card dealing ---
     std::function<void()> onDealHoleCards;
     std::function<void(unsigned playerId)> onShowHoleCards;
+    std::function<void(int bettingRoundId)> onDealBettingRoundCards;
 
     // --- GUI refresh ---
     std::function<void()> onHideHoleCards;

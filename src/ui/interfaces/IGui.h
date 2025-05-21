@@ -50,7 +50,7 @@ class IGui
 
     virtual void waitForGuiUpdateDone() const = 0;
 
-    virtual void dealBettingRoundCards(int) = 0;
+    // virtual void dealBettingRoundCards(int) = 0;
     // virtual void dealHoleCards() = 0;
     // virtual void dealFlopCards() = 0;
     // virtual void dealTurnCard() = 0;
