@@ -181,7 +181,8 @@ void BettingRoundPreflop::run()
 
         for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
         {
-            getHand()->getGuiInterface()->refreshAction(i, PLAYER_ACTION_NONE);
+            if (myEvents && myEvents->onRefreshAction)
+                myEvents->onRefreshAction(i, PLAYER_ACTION_NONE);
         }
 
         getHand()->switchRounds();
@@ -203,7 +204,9 @@ void BettingRoundPreflop::run()
 
         // highlight active players groupbox and clear action
         getHand()->getGuiInterface()->refreshPlayersActiveInactiveStyles(getCurrentPlayersTurnId(), 2);
-        getHand()->getGuiInterface()->refreshAction(getCurrentPlayersTurnId(), PLAYER_ACTION_NONE);
+
+        if (myEvents && myEvents->onRefreshAction)
+            myEvents->onRefreshAction(getCurrentPlayersTurnId(), PLAYER_ACTION_NONE);
 
         if (getCurrentPlayersTurnId() == 0)
         {

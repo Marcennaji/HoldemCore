@@ -249,7 +249,8 @@ void BettingRound::run()
 
             for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
             {
-                myHand->getGuiInterface()->refreshAction(i, PLAYER_ACTION_NONE);
+                if (myEvents && myEvents->onRefreshAction)
+                    myEvents->onRefreshAction(i, PLAYER_ACTION_NONE);
             }
 
             myHand->switchRounds();
@@ -272,7 +273,9 @@ void BettingRound::run()
 
             // highlight active players groupbox and clear action
             myHand->getGuiInterface()->refreshPlayersActiveInactiveStyles(currentPlayersTurnId, 2);
-            myHand->getGuiInterface()->refreshAction(currentPlayersTurnId, 0);
+
+            if (myEvents && myEvents->onRefreshAction)
+                myEvents->onRefreshAction(currentPlayersTurnId, 0);
 
             currentPlayersTurnIt = myHand->getRunningPlayerIt(currentPlayersTurnId);
             if (currentPlayersTurnIt == myHand->getRunningPlayerList()->end())

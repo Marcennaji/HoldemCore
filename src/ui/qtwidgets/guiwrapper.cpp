@@ -52,10 +52,6 @@ void GuiWrapper::initGui(int speed)
     myW->signalInitGui(speed);
 }
 
-void GuiWrapper::refreshAction(int playerID, int playerAction) const
-{
-    myW->signalRefreshAction(playerID, playerAction);
-}
 void GuiWrapper::refreshAll() const
 {
     myW->signalRefreshAll();

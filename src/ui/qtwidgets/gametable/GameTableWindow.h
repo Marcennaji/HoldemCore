@@ -84,7 +84,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
 
     // void signalRefreshSet();
     // void signalRefreshCash();
-    void signalRefreshAction(int = -1, int = -1);
+    // void signalRefreshAction(int = -1, int = -1);
     // void signalRefreshChangePlayer();
     // void signalRefreshPot();
     void signalrefreshPlayersActiveInactiveStyles(int = -1, int = -1);
@@ -132,7 +132,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
 
     void refreshSet();
     void refreshCash();
-    void refreshAction(int = -1, int = -1);
+    void refreshAction(int playerId = -1, int playerAction = -1);
     void refreshPot();
     void refreshPlayersActiveInactiveStyles(int = -1, int = -1);
     void refreshAll();

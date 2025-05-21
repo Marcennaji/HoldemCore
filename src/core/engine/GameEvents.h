@@ -19,7 +19,7 @@ struct GameEvents
     std::function<void()> onHideHoleCards;
     std::function<void()> onRefreshCash;
     std::function<void()> onRefreshSet;
-    std::function<void()> onRefreshAction;
+    std::function<void(int playerID, int playerAction)> onRefreshAction;
     std::function<void()> onRefreshPlayerName;
     std::function<void()> onRefreshAll;
 
