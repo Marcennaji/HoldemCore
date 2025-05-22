@@ -2364,41 +2364,8 @@ void GameTableWindow::postRiverRunAnimation3()
             // Show "Winner" label
             actionLabelArray[(*it_c)->getID()]->setPixmap(
                 QPixmap::fromImage(QImage(myGameTableStyle->getActionPic(7))));
-
-            // set Player value (logging)
-            myGuiDisplayGameActions->logPlayerWinsMsg(QString::fromUtf8((*it_c)->getName().c_str()),
-                                                      (*it_c)->getLastMoneyWon(), true);
         }
     }
-
-    // log side pot winners -> TODO
-    list<unsigned>::iterator it_int;
-    for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
-    {
-        if ((*it_c)->getAction() != PLAYER_ACTION_FOLD &&
-            (*it_c)->getCardsValueInt() != currentHand->getCurrentBettingRound()->getHighestCardsValue())
-        {
-
-            for (it_int = winners.begin(); it_int != winners.end(); ++it_int)
-            {
-                if ((*it_int) == (*it_c)->getID())
-                {
-                    myGuiDisplayGameActions->logPlayerWinsMsg(QString::fromUtf8((*it_c)->getName().c_str()),
-                                                              (*it_c)->getLastMoneyWon(), false);
-                }
-            }
-        }
-    }
-
-    for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
-    {
-        if ((*it_c)->getCash() == 0)
-        {
-            //			currentHand->getGuiInterface()->logPlayerSitsOut((*it_c)->getName());
-        }
-    }
-
-    //	textBrowser_Log->append("");
 
     postRiverRunAnimation3Timer->start(postRiverRunAnimationSpeed / 2);
 }
@@ -2489,17 +2456,6 @@ void GameTableWindow::postRiverRunAnimation6()
 
     if (playersPositiveCashCounter == 1)
     {
-
-        for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
-        {
-
-            if ((*it_c)->getCash() > 0)
-            {
-                currentHand->getGuiInterface()->logPlayerWinGame(
-                    (*it_c)->getName(), myStartWindow->getSession()->getCurrentGame()->getGameID());
-            }
-        }
-
         currentGameOver = true;
 
         pushButton_break->setDisabled(false);

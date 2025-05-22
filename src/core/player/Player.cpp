@@ -153,8 +153,6 @@ void Player::action()
     // set that i was the last active player. need this for unhighlighting groupbox
     currentHand->setPreviousPlayerID(myID);
 
-    currentHand->getGuiInterface()->logPlayerActionMsg(myName, myAction, mySet);
-
     if (myEvents && myEvents->onActivePlayerActionDone)
         myEvents->onActivePlayerActionDone();
 
@@ -747,9 +745,6 @@ int Player::getLastRelativeSet() const
 void Player::setAction(PlayerAction theValue, bool blind)
 {
     myAction = theValue;
-    // logging for human player
-    if (myAction && !blind)
-        currentHand->getGuiInterface()->logPlayerActionMsg(myName, myAction, mySet);
 }
 PlayerAction Player::getAction() const
 {
@@ -812,23 +807,6 @@ bool Player::getTurn() const
 void Player::setCardsFlip(bool theValue, int state)
 {
     myCardsFlip = theValue;
-    // log flipping cards
-    if (myCardsFlip)
-    {
-        switch (state)
-        {
-        case 1:
-            currentHand->getGuiInterface()->logFlipHoleCardsMsg(myName, myCards[0], myCards[1], myCardsValueInt);
-            break;
-        case 2:
-            currentHand->getGuiInterface()->logFlipHoleCardsMsg(myName, myCards[0], myCards[1]);
-            break;
-        case 3:
-            currentHand->getGuiInterface()->logFlipHoleCardsMsg(myName, myCards[0], myCards[1], myCardsValueInt, "has");
-            break;
-        default:;
-        }
-    }
 }
 bool Player::getCardsFlip() const
 {

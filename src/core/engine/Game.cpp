@@ -160,9 +160,6 @@ void Game::startHand()
     if (myEvents && myEvents->onNextBettingRoundInitializeGui)
         myEvents->onNextBettingRoundInitializeGui();
 
-    // log new hand
-    myGui->logNewGameHandMsg(myGameID, currentHandID);
-
     currentHand->start();
 }
 

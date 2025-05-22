@@ -123,33 +123,3 @@ void GuiWrapper::disableMyButtons()
 {
     myW->signalDisableMyButtons();
 }
-void GuiWrapper::logPlayerActionMsg(string playerName, int action, int setValue)
-{
-    myGuiDisplayGameActions->signalLogPlayerActionMsg(QString::fromUtf8(playerName.c_str()), action, setValue);
-}
-void GuiWrapper::logNewGameHandMsg(int gameID, int handID)
-{
-    myGuiDisplayGameActions->signalLogNewGameHandMsg(gameID, handID);
-}
-void GuiWrapper::logNewBlindsSetsMsg(int sbSet, int bbSet, std::string sbName, std::string bbName)
-{
-    myGuiDisplayGameActions->signalLogNewBlindsSetsMsg(sbSet, bbSet, QString::fromUtf8(sbName.c_str()),
-                                                       QString::fromUtf8(bbName.c_str()));
-}
-void GuiWrapper::logPlayerWinsMsg(std::string playerName, int pot, bool main)
-{
-    myGuiDisplayGameActions->signalLogPlayerWinsMsg(QString::fromUtf8(playerName.c_str()), pot, main);
-}
-void GuiWrapper::logDealBoardCardsMsg(int roundID, int card1, int card2, int card3, int card4, int card5)
-{
-    myGuiDisplayGameActions->signalLogDealBoardCardsMsg(roundID, card1, card2, card3, card4, card5);
-}
-void GuiWrapper::logFlipHoleCardsMsg(string playerName, int card1, int card2, int cardsValueInt, string showHas)
-{
-    myGuiDisplayGameActions->signalLogFlipHoleCardsMsg(QString::fromUtf8(playerName.c_str()), card1, card2,
-                                                       cardsValueInt, QString::fromUtf8(showHas.c_str()));
-}
-void GuiWrapper::logPlayerWinGame(std::string playerName, int gameID)
-{
-    myGuiDisplayGameActions->signalLogPlayerWinGame(QString::fromUtf8(playerName.c_str()), gameID);
-}

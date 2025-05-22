@@ -174,8 +174,6 @@ void BettingRound::run()
                      << CardsValue::CardStringValue[tempBoardCardsArray[2]] << "  *************************" << endl
                      << endl;
 #endif
-                myHand->getGuiInterface()->logDealBoardCardsMsg(myBettingRoundID, tempBoardCardsArray[0],
-                                                                tempBoardCardsArray[1], tempBoardCardsArray[2]);
                 break;
             case GAME_STATE_TURN:
 #ifdef LOG_POKER_EXEC
@@ -187,9 +185,6 @@ void BettingRound::run()
                      << CardsValue::CardStringValue[tempBoardCardsArray[3]] << "  *************************" << endl
                      << endl;
 #endif
-                myHand->getGuiInterface()->logDealBoardCardsMsg(myBettingRoundID, tempBoardCardsArray[0],
-                                                                tempBoardCardsArray[1], tempBoardCardsArray[2],
-                                                                tempBoardCardsArray[3]);
                 break;
             case GAME_STATE_RIVER:
 #ifdef LOG_POKER_EXEC
@@ -202,9 +197,6 @@ void BettingRound::run()
                      << CardsValue::CardStringValue[tempBoardCardsArray[4]] << "  *************************" << endl
                      << endl;
 #endif
-                myHand->getGuiInterface()->logDealBoardCardsMsg(myBettingRoundID, tempBoardCardsArray[0],
-                                                                tempBoardCardsArray[1], tempBoardCardsArray[2],
-                                                                tempBoardCardsArray[3], tempBoardCardsArray[4]);
 
                 break;
             default:

@@ -242,22 +242,6 @@ Hand::~Hand()
 
 void Hand::start()
 {
-
-    // Log blinds sets for new Hand
-    PlayerListConstIterator it_sB, it_bB;
-    it_sB = getActivePlayerIt(getCurrentBettingRound()->getSmallBlindPositionId());
-    it_bB = getActivePlayerIt(getCurrentBettingRound()->getBigBlindPositionId());
-    if (it_sB != getActivePlayerList()->end() && it_bB != getActivePlayerList()->end())
-    {
-        myGui->logNewBlindsSetsMsg((*it_sB)->getSet(), (*it_bB)->getSet(), (*it_sB)->getName().c_str(),
-                                   (*it_bB)->getName().c_str());
-    }
-    else
-    {
-        myLogger->error("cannot find sBID or bBID");
-    }
-
-    // deal cards
     if (myEvents && myEvents->onDealHoleCards)
         myEvents->onDealHoleCards();
 
@@ -557,8 +541,6 @@ void Hand::switchRounds()
             int tempBoardCardsArray[5];
 
             myBoard->getCards(tempBoardCardsArray);
-            myGui->logDealBoardCardsMsg(currentRound, tempBoardCardsArray[0], tempBoardCardsArray[1],
-                                        tempBoardCardsArray[2], tempBoardCardsArray[3], tempBoardCardsArray[4]);
         }
     }
 
