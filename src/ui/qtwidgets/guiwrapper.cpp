@@ -102,10 +102,6 @@ void GuiWrapper::flipHolecardsAllIn()
     myW->signalFlipHolecardsAllIn();
 }
 
-void GuiWrapper::showCards(unsigned playerId)
-{
-    myW->signalPostRiverShowCards(playerId);
-}
 void GuiWrapper::updateMyButtonsState()
 {
     myW->signalUpdateMyButtonsState();

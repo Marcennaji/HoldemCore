@@ -417,7 +417,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     connect(this, SIGNAL(signalRiverAnimation2()), this, SLOT(riverAnimation2()));
     connect(this, SIGNAL(signalPostRiverAnimation1()), this, SLOT(postRiverAnimation1()));
     connect(this, SIGNAL(signalPostRiverRunAnimation1()), this, SLOT(postRiverRunAnimation1()));
-    connect(this, SIGNAL(signalPostRiverShowCards(unsigned)), this, SLOT(showHoleCards(unsigned)));
+    // connect(this, SIGNAL(signalPostRiverShowCards(unsigned)), this, SLOT(showHoleCards(unsigned)));
     connect(this, SIGNAL(signalFlipHolecardsAllIn()), this, SLOT(flipHolecardsAllIn()));
     // connect(this, SIGNAL(signalnextBettingRoundInitializeGui()), this, SLOT(nextBettingRoundInitializeGui()));
 }
@@ -1434,7 +1434,7 @@ void GameTableWindow::provideMyActions(int mode)
 
 void GameTableWindow::doHumanAction()
 {
-    myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getGuiInterface()->showCards(0);
+    showHoleCards(0);
 
     myButtonsCheckable(false);
 
@@ -2267,7 +2267,6 @@ void GameTableWindow::postRiverRunAnimation2()
                     showHoleCards((*it_c)->getID());
                 }
             }
-            // Wenn einmal umgedreht dann fertig!!
             flipHolecardsAllInAlreadyDone = true;
         }
         else

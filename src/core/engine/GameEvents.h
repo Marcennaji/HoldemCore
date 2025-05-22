@@ -28,7 +28,6 @@ struct GameEvents
     std::function<void(int playerID, int status)> onRefreshPlayersActiveInactiveStyles;
 
     std::function<void()> onDisableButtons;
-    std::function<void()> onUpdateMyButtons;
     std::function<void()> onDoHumanAction;
 
     // --- Optional: animations ---

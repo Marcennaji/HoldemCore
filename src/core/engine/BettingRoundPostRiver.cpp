@@ -98,7 +98,9 @@ void BettingRoundPostRiver::postRiverRun()
 
             if ((*it_c)->getCurrentHandActions().getPreflopActions().size() > 0 &&
                 (*it_c)->getCurrentHandActions().getPreflopActions().at(0) != PLAYER_ACTION_FOLD)
-                getHand()->getGuiInterface()->showCards((*it_c)->getID());
+
+                if (myEvents && myEvents->onShowHoleCards)
+                    myEvents->onShowHoleCards((*it_c)->getID());
         }
     }
 }
