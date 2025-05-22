@@ -26,23 +26,19 @@
 
 using namespace std;
 
-GuiWrapper::GuiWrapper(const std::string& appDataDir, StartWindow* s)
-    : myGuiDisplayGameActions(NULL), myW(NULL), myStartWindow(s)
+GuiWrapper::GuiWrapper(const std::string& appDataDir, StartWindow* s) : myW(NULL), myStartWindow(s)
 {
 
     myW = new GameTableWindow(appDataDir);
-    myGuiDisplayGameActions = new GuiDisplayGameActions(myW);
 }
 
 GuiWrapper::~GuiWrapper()
 {
-    delete myGuiDisplayGameActions;
 }
 void GuiWrapper::setStartWindow(void* w)
 {
     myStartWindow = static_cast<StartWindow*>(w);
-    if (myGuiDisplayGameActions)
-        myStartWindow->setGuiDisplayGameActions(myGuiDisplayGameActions);
+
     if (myW)
         myW->setStartWindow(myStartWindow);
 }

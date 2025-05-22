@@ -34,7 +34,6 @@ class IGui
     virtual void initGui(int speed) = 0;
 
     virtual void* getGameTableWindow() const = 0;
-    virtual GuiDisplayGameActions* getGuiDisplayGameActions() const = 0;
 
     // virtual void hideHoleCards() = 0;
     virtual void setStartWindow(void*) = 0;

@@ -40,7 +40,6 @@ class GuiWrapper : public IGui
     void initGui(int speed);
 
     void* getGameTableWindow() const override { return static_cast<void*>(myW); }
-    GuiDisplayGameActions* getGuiDisplayGameActions() const { return myGuiDisplayGameActions; }
 
     void dealBettingRoundCards(int myBettingRoundID);
     void dealHoleCards();
@@ -70,7 +69,6 @@ class GuiWrapper : public IGui
     void updateMyButtonsState();
 
   private:
-    GuiDisplayGameActions* myGuiDisplayGameActions;
     GameTableWindow* myW;
     StartWindow* myStartWindow;
 };

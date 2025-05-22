@@ -29,7 +29,6 @@ using namespace std;
 GuiDisplayGameActions::GuiDisplayGameActions(GameTableWindow* w) : myW(w)
 {
 
-    myW->setGuiDisplayGameActions(this);
     myStyle = myW->getGameTableStyle();
 
     connect(this, SIGNAL(signalLogPlayerActionMsg(QString, int, int)), this,

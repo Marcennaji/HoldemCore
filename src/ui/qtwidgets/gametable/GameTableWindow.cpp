@@ -3434,7 +3434,3 @@ void GameTableWindow::setStartWindow(StartWindow* s)
 {
     myStartWindow = s;
 }
-void GameTableWindow::setGuiDisplayGameActions(GuiDisplayGameActions* l)
-{
-    myGuiDisplayGameActions = l;
-}

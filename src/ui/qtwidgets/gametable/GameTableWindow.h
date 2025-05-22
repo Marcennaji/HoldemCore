@@ -271,8 +271,6 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
   private:
     void initHoleCards();
 
-    GuiDisplayGameActions* myGuiDisplayGameActions;
-
     // Timer
     QTimer* potDistributeTimer;
     QTimer* timer;
