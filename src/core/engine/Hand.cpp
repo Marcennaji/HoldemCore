@@ -266,8 +266,8 @@ void Hand::start()
     if (myEvents && myEvents->onPotUpdated)
         myEvents->onPotUpdated(getBoard()->getPot());
 
-    // change rounds | first start preflop
-    myGui->nextPlayerAnimation();
+    if (myEvents && myEvents->onActivePlayerActionDone)
+        myEvents->onActivePlayerActionDone();
 }
 
 void Hand::assignButtons()

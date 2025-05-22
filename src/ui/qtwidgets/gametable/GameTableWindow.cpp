@@ -127,7 +127,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     dealRiverCards1Timer = new QTimer(this);
     dealRiverCards2Timer = new QTimer(this);
 
-    nextPlayerAnimationTimer = new QTimer(this);
+    activePlayerActionDoneTimer = new QTimer(this);
     preflopAnimation1Timer = new QTimer(this);
     preflopAnimation2Timer = new QTimer(this);
     flopAnimation1Timer = new QTimer(this);
@@ -165,7 +165,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     dealRiverCards1Timer->setSingleShot(true);
     dealRiverCards2Timer->setSingleShot(true);
 
-    nextPlayerAnimationTimer->setSingleShot(true);
+    activePlayerActionDoneTimer->setSingleShot(true);
     preflopAnimation1Timer->setSingleShot(true);
     preflopAnimation2Timer->setSingleShot(true);
     flopAnimation1Timer->setSingleShot(true);
@@ -344,7 +344,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     connect(dealRiverCards1Timer, SIGNAL(timeout()), this, SLOT(dealRiverCards2()));
     connect(dealRiverCards2Timer, SIGNAL(timeout()), this, SLOT(handSwitchRounds()));
 
-    connect(nextPlayerAnimationTimer, SIGNAL(timeout()), this, SLOT(handSwitchRounds()));
+    connect(activePlayerActionDoneTimer, SIGNAL(timeout()), this, SLOT(handSwitchRounds()));
     connect(preflopAnimation1Timer, SIGNAL(timeout()), this, SLOT(preflopAnimation1Action()));
     connect(preflopAnimation2Timer, SIGNAL(timeout()), this, SLOT(preflopAnimation2Action()));
     connect(flopAnimation1Timer, SIGNAL(timeout()), this, SLOT(flopAnimation1Action()));
@@ -410,7 +410,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     connect(this, SIGNAL(signalDealFlopCards0()), this, SLOT(dealFlopCards0()));
     connect(this, SIGNAL(signalDealTurnCards0()), this, SLOT(dealTurnCards0()));
     connect(this, SIGNAL(signalDealRiverCards0()), this, SLOT(dealRiverCards0()));
-    connect(this, SIGNAL(signalNextPlayerAnimation()), this, SLOT(nextPlayerAnimation()));
+    // connect(this, SIGNAL(signalactivePlayerActionDone()), this, SLOT(activePlayerActionDone()));
     connect(this, SIGNAL(signalBettingRoundAnimation2(int)), this, SLOT(bettingRoundAnimation(int)));
     connect(this, SIGNAL(signalPreflopAnimation1()), this, SLOT(preflopAnimation1()));
     connect(this, SIGNAL(signalPreflopAnimation2()), this, SLOT(preflopAnimation2()));
@@ -2104,7 +2104,7 @@ void GameTableWindow::myActionDone()
 
     disableMyButtons();
 
-    nextPlayerAnimation();
+    activePlayerActionDone();
 
     // prevent escape button working while allIn
     myActionIsRaise = 0;
@@ -2138,7 +2138,7 @@ void GameTableWindow::myActionDone()
 #endif
 }
 
-void GameTableWindow::nextPlayerAnimation()
+void GameTableWindow::activePlayerActionDone()
 {
 
     std::shared_ptr<IHand> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
@@ -2165,7 +2165,7 @@ void GameTableWindow::nextPlayerAnimation()
     // refresh actions for human player
     updateMyButtonsState();
 
-    nextPlayerAnimationTimer->start(nextPlayerSpeed1);
+    activePlayerActionDoneTimer->start(nextPlayerSpeed1);
 }
 
 void GameTableWindow::bettingRoundAnimation(int myBettingRoundID)
@@ -2711,7 +2711,7 @@ void GameTableWindow::stopTimer()
     dealRiverCards1Timer->stop();
     dealRiverCards2Timer->stop();
 
-    nextPlayerAnimationTimer->stop();
+    activePlayerActionDoneTimer->stop();
     preflopAnimation1Timer->stop();
     preflopAnimation2Timer->stop();
     flopAnimation1Timer->stop();

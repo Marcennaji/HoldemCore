@@ -70,4 +70,9 @@ void GuiBridgeWidgets::connectTo(GameEvents& events)
             myGameTableWindow, [this, playerId, status]()
             { myGameTableWindow->refreshPlayersActiveInactiveStyles(playerId, status); }, Qt::DirectConnection);
     };
+    events.onActivePlayerActionDone = [this]()
+    {
+        QMetaObject::invokeMethod(
+            myGameTableWindow, [this]() { myGameTableWindow->activePlayerActionDone(); }, Qt::DirectConnection);
+    };
 }

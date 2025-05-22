@@ -106,7 +106,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     void signalDealTurnCards0();
     void signalDealRiverCards0();
 
-    void signalNextPlayerAnimation();
+    void signalactivePlayerActionDone();
 
     void signalBettingRoundAnimation2(int);
 
@@ -194,7 +194,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     void dealRiverCards1();
     void dealRiverCards2();
 
-    void nextPlayerAnimation();
+    void activePlayerActionDone();
 
     void bettingRoundAnimation(int);
 
@@ -293,7 +293,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     QTimer* dealRiverCards1Timer;
     QTimer* dealRiverCards2Timer;
 
-    QTimer* nextPlayerAnimationTimer;
+    QTimer* activePlayerActionDoneTimer;
     QTimer* preflopAnimation1Timer;
     QTimer* preflopAnimation2Timer;
     QTimer* flopAnimation1Timer;

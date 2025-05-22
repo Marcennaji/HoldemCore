@@ -47,8 +47,6 @@ class GuiWrapper : public IGui
     void dealBettingRoundCards(int myBettingRoundID);
     void dealHoleCards();
 
-    void nextPlayerAnimation();
-
     void bettingRoundAnimation(int);
 
     void preflopAnimation1();

@@ -58,11 +58,6 @@ void GuiWrapper::waitForGuiUpdateDone() const
     myW->waitForGuiUpdateDone();
 }
 
-void GuiWrapper::nextPlayerAnimation()
-{
-    myW->signalNextPlayerAnimation();
-}
-
 void GuiWrapper::bettingRoundAnimation(int myBettingRoundID)
 {
     myW->signalBettingRoundAnimation2(myBettingRoundID);

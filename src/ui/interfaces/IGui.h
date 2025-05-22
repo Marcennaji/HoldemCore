@@ -57,7 +57,7 @@ class IGui
     // virtual void dealTurnCard() = 0;
     // virtual void dealRiverCard() = 0;
 
-    virtual void nextPlayerAnimation() = 0;
+    // virtual void activePlayerActionDone() = 0;
 
     virtual void bettingRoundAnimation(int) = 0;
 

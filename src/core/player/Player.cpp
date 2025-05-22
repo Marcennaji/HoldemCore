@@ -154,7 +154,9 @@ void Player::action()
     currentHand->setPreviousPlayerID(myID);
 
     currentHand->getGuiInterface()->logPlayerActionMsg(myName, myAction, mySet);
-    currentHand->getGuiInterface()->nextPlayerAnimation();
+
+    if (myEvents && myEvents->onActivePlayerActionDone)
+        myEvents->onActivePlayerActionDone();
 
     // currentHand->getGuiInterface()->showCards(myID);//test
 }
