@@ -75,4 +75,9 @@ void GuiBridgeWidgets::connectTo(GameEvents& events)
         QMetaObject::invokeMethod(
             myGameTableWindow, [this]() { myGameTableWindow->activePlayerActionDone(); }, Qt::DirectConnection);
     };
+    events.onDoHumanAction = [this]()
+    {
+        QMetaObject::invokeMethod(
+            myGameTableWindow, [this]() { myGameTableWindow->doHumanAction(); }, Qt::DirectConnection);
+    };
 }

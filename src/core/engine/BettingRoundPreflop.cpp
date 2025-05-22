@@ -211,12 +211,11 @@ void BettingRoundPreflop::run()
 
         if (getCurrentPlayersTurnId() == 0)
         {
-            // Wir sind dran
-            getHand()->getGuiInterface()->doHumanAction();
+            if (myEvents && myEvents->onDoHumanAction)
+                myEvents->onDoHumanAction();
         }
         else
         {
-            // Gegner sind dran
             getHand()->getGuiInterface()->bettingRoundAnimation(getBettingRoundID());
         }
     }

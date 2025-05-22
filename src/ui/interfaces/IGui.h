@@ -56,7 +56,10 @@ class IGui
     // virtual void dealRiverCard() = 0;
 
     // virtual void activePlayerActionDone() = 0;
-
+    // virtual void doHumanAction() = 0;
+    virtual void showCards(unsigned playerId) = 0;
+    virtual void updateMyButtonsState() = 0;
+    virtual void disableMyButtons() = 0;
     virtual void bettingRoundAnimation(int) = 0;
 
     virtual void preflopAnimation1() = 0;
@@ -74,11 +77,6 @@ class IGui
     virtual void postRiverAnimation1() = 0;
     virtual void postRiverRunAnimation1() = 0;
     virtual void flipHolecardsAllIn() = 0;
-
-    virtual void doHumanAction() = 0;
-    virtual void showCards(unsigned playerId) = 0;
-    virtual void updateMyButtonsState() = 0;
-    virtual void disableMyButtons() = 0;
 };
 
 #endif

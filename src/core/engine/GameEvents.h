@@ -27,6 +27,10 @@ struct GameEvents
     std::function<void()> onRefreshPlayerName;
     std::function<void(int playerID, int status)> onRefreshPlayersActiveInactiveStyles;
 
+    std::function<void()> onDisableButtons;
+    std::function<void()> onUpdateMyButtons;
+    std::function<void()> onDoHumanAction;
+
     // --- Optional: animations ---
     std::function<void()> onPreflopAnimation1;
     std::function<void()> onPreflopAnimation2;
@@ -39,11 +43,6 @@ struct GameEvents
     std::function<void()> onPostRiverAnimation1;
     std::function<void()> onPostRiverRunAnimation1;
     std::function<void()> onFlipHolecardsAllIn;
-
-    // --- Optional: UI control ---
-    std::function<void()> onDisableButtons;
-    std::function<void()> onUpdateMyButtons;
-    std::function<void()> onDoHumanAction;
 
     void clear()
     {
