@@ -131,7 +131,6 @@ class GameTableStyleReader : public QObject
     void setButtonsStyle(MyActionButton*, MyActionButton*, MyActionButton*, MyActionButton*, MyActionButton*,
                          MyActionButton*, MyActionButton*, int);
     void setShowMyCardsButtonStyle(MyActionButton* sc);
-    void setAwayRadioButtonsStyle(QRadioButton*);
 
     QString getActionAllInI18NString() const { return ActionAllInI18NString; }
     QString getActionRaiseI18NString() const { return ActionRaiseI18NString; }

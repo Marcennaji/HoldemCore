@@ -3013,107 +3013,11 @@
               <enum>Qt::NoFocus</enum>
              </property>
              <property name="currentIndex">
-              <number>3</number>
+              <number>0</number>
              </property>
              <property name="usesScrollButtons">
               <bool>false</bool>
              </property>
-             <widget class="QWidget" name="tab_Log">
-              <attribute name="title">
-               <string>Log</string>
-              </attribute>
-              <layout class="QGridLayout">
-               <property name="margin" stdset="0">
-                <number>0</number>
-               </property>
-               <property name="spacing">
-                <number>0</number>
-               </property>
-               <item row="0" column="0">
-                <widget class="QTextBrowser" name="textBrowser_Log">
-                 <property name="focusPolicy">
-                  <enum>Qt::WheelFocus</enum>
-                 </property>
-                 <property name="autoFillBackground">
-                  <bool>true</bool>
-                 </property>
-                 <property name="horizontalScrollBarPolicy">
-                  <enum>Qt::ScrollBarAsNeeded</enum>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-             <widget class="QWidget" name="tab_away">
-              <attribute name="title">
-               <string>Away</string>
-              </attribute>
-              <layout class="QGridLayout">
-               <item row="0" column="0">
-                <widget class="QRadioButton" name="radioButton_manualAction">
-                 <property name="focusPolicy">
-                  <enum>Qt::NoFocus</enum>
-                 </property>
-                 <property name="text">
-                  <string>Manual Action (default)</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QRadioButton" name="radioButton_autoCheckFold">
-                 <property name="focusPolicy">
-                  <enum>Qt::NoFocus</enum>
-                 </property>
-                 <property name="text">
-                  <string>Auto-Check / Auto-Fold</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QRadioButton" name="radioButton_autoCheckCallAny">
-                 <property name="focusPolicy">
-                  <enum>Qt::NoFocus</enum>
-                 </property>
-                 <property name="text">
-                  <string>Auto-Check / Auto-Call-Any</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
-                <spacer>
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>40</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
-             </widget>
-             <widget class="QWidget" name="tab_Chance">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <attribute name="title">
-               <string>Simulation</string>
-              </attribute>
-              <layout class="QGridLayout" name="gridLayout">
-               <item row="0" column="0">
-                <widget class="MyChanceLabel" name="label_chance">
-                 <property name="text">
-                  <string/>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
              <widget class="QWidget" name="tab_ranges">
               <attribute name="title">
                <string>Ranges (estimation)</string>
@@ -3135,6 +3039,23 @@
                  </property>
                  <property name="horizontalScrollBarPolicy">
                   <enum>Qt::ScrollBarAsNeeded</enum>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="tab_Chance">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <attribute name="title">
+               <string>Simulation</string>
+              </attribute>
+              <layout class="QGridLayout" name="gridLayout">
+               <item row="0" column="0">
+                <widget class="MyChanceLabel" name="label_chance">
+                 <property name="text">
+                  <string/>
                  </property>
                 </widget>
                </item>

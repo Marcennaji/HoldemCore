@@ -385,10 +385,6 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
 
     connect(pushButton_break, SIGNAL(clicked()), this, SLOT(breakButtonClicked()));
 
-    connect(radioButton_manualAction, SIGNAL(clicked()), this, SLOT(changePlayingMode()));
-    connect(radioButton_autoCheckFold, SIGNAL(clicked()), this, SLOT(changePlayingMode()));
-    connect(radioButton_autoCheckCallAny, SIGNAL(clicked()), this, SLOT(changePlayingMode()));
-
     connect(this, SIGNAL(signalInitGui(int)), this, SLOT(initGui(int)));
     // connect(this, SIGNAL(signalRefreshSet()), this, SLOT(refreshSet()));
     // connect(this, SIGNAL(signalRefreshCash()), this, SLOT(refreshCash()));
@@ -1809,9 +1805,6 @@ void GameTableWindow::pushButtonBetRaiseClicked(bool checked)
             pushButtonAllInIsChecked = false;
 
             pushButtonBetRaiseIsChecked = true;
-
-            if (!radioButton_manualAction->isChecked())
-                radioButton_manualAction->click();
         }
         else
         {
@@ -1842,9 +1835,6 @@ void GameTableWindow::pushButtonBetRaiseHalfPotClicked(bool checked)
             pushButtonAllInIsChecked = false;
 
             pushButtonBetRaiseHalfPotIsChecked = true;
-
-            if (!radioButton_manualAction->isChecked())
-                radioButton_manualAction->click();
         }
         else
         {
@@ -1885,9 +1875,6 @@ void GameTableWindow::pushButtonBetRaiseTwoThirdPotClicked(bool checked)
             pushButtonAllInIsChecked = false;
 
             pushButtonBetRaiseTwoThirdPotIsChecked = true;
-
-            if (!radioButton_manualAction->isChecked())
-                radioButton_manualAction->click();
         }
         else
         {
@@ -1927,9 +1914,6 @@ void GameTableWindow::pushButtonBetRaisePotClicked(bool checked)
             pushButtonAllInIsChecked = false;
 
             pushButtonBetRaisePotIsChecked = true;
-
-            if (!radioButton_manualAction->isChecked())
-                radioButton_manualAction->click();
         }
         else
         {
@@ -1966,9 +1950,6 @@ void GameTableWindow::pushButtonCallCheckClicked(bool checked)
             pushButtonBetRaiseIsChecked = false;
 
             pushButtonCallCheckIsChecked = true;
-
-            if (!radioButton_manualAction->isChecked())
-                radioButton_manualAction->click();
         }
         else
         {
@@ -1997,9 +1978,6 @@ void GameTableWindow::pushButtonFoldClicked(bool checked)
             pushButtonBetRaiseIsChecked = false;
 
             pushButtonFoldIsChecked = true;
-
-            if (!radioButton_manualAction->isChecked())
-                radioButton_manualAction->click();
         }
         else
         {
@@ -2028,9 +2006,6 @@ void GameTableWindow::pushButtonAllInClicked(bool checked)
             pushButtonBetRaiseIsChecked = false;
 
             pushButtonAllInIsChecked = true;
-
-            if (!radioButton_manualAction->isChecked())
-                radioButton_manualAction->click();
         }
         else
         {
@@ -2729,27 +2704,6 @@ void GameTableWindow::breakButtonClicked()
     }
 }
 
-void GameTableWindow::changePlayingMode()
-{
-
-    int mode = -1;
-
-    if (radioButton_manualAction->isChecked())
-    {
-        mode = 0;
-    }
-    if (radioButton_autoCheckFold->isChecked())
-    {
-        mode = 2;
-    }
-    if (radioButton_autoCheckCallAny->isChecked())
-    {
-        mode = 1;
-    }
-
-    playingMode = mode;
-}
-
 bool GameTableWindow::eventFilter(QObject* obj, QEvent* event)
 {
     QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
@@ -2882,9 +2836,6 @@ void GameTableWindow::GameModification()
 
     pushButton_break->setText(tr("Show cards"));
     pushButton_break->setMinimumSize(width + 10, 20);
-
-    // Set the playing mode to "manual"
-    radioButton_manualAction->click();
 }
 
 void GameTableWindow::updateMyButtonsState(int mode)
@@ -3200,7 +3151,6 @@ void GameTableWindow::refreshCardsChance(GameState BettingRound)
 void GameTableWindow::refreshGameTableStyle()
 {
     myGameTableStyle->setWindowsGeometry(this);
-    myGameTableStyle->setChatLogStyle(textBrowser_Log);
 
     int i;
     for (i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
@@ -3241,11 +3191,6 @@ void GameTableWindow::refreshGameTableStyle()
 
     myGameTableStyle->setBetValueInputStyle(spinBox_betValue);
     myGameTableStyle->setSliderStyle(horizontalSlider_bet);
-
-    // 	away radiobuttons
-    myGameTableStyle->setAwayRadioButtonsStyle(radioButton_manualAction);
-    myGameTableStyle->setAwayRadioButtonsStyle(radioButton_autoCheckFold);
-    myGameTableStyle->setAwayRadioButtonsStyle(radioButton_autoCheckCallAny);
 
     myGameTableStyle->setToolBoxBackground(groupBox_RightToolBox);
 
@@ -3385,10 +3330,6 @@ void GameTableWindow::closeMessageBoxes()
 
 void GameTableWindow::hide()
 {
-    // clear log
-
-    textBrowser_Log->clear();
-    // textBrowser_ranges->clear();
     QWidget::hide();
 }
 

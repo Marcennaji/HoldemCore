@@ -2151,19 +2151,6 @@ void GameTableStyleReader::setBetValueInputStyle(QSpinBox* bv)
                       "; color: #" + BetInputDisabledTextColor + " }");
 }
 
-void GameTableStyleReader::setAwayRadioButtonsStyle(QRadioButton* rb)
-{
-    rb->setStyleSheet(
-        "QRadioButton { color: #" + TabWidgetTextColor +
-        "; } QRadioButton::indicator { width: 13px; height: 13px;} QRadioButton::indicator::checked { image: url(\"" +
-        RadioButtonChecked + "\");}  QRadioButton::indicator::unchecked { image: url(\"" + RadioButtonUnchecked +
-        "\");} QRadioButton::indicator:unchecked:hover { image: url(\"" + RadioButtonUncheckedHover +
-        "\");} QRadioButton::indicator:unchecked:pressed { image: url(\"" + RadioButtonPressed +
-        "\");} QRadioButton::indicator::checked { image: url(\"" + RadioButtonChecked +
-        "\");} QRadioButton::indicator:checked:hover { image: url(\"" + RadioButtonCheckedHover +
-        "\");} QRadioButton::indicator:checked:pressed { image: url(\"" + RadioButtonPressed + "\");}");
-}
-
 QString GameTableStyleReader::getActionPic(int action)
 {
     // 	1 = fold, 2 = check, 3 = call, 4 = bet, 5 = raise, 6 = allin, 7 = winner

@@ -253,7 +253,6 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     void clearMyButtons();
     void myButtonsCheckable(bool state);
 
-    void changePlayingMode();
     void changeSpinBoxBetValue(int);
     void spinBoxBetValueChanged(int);
 
