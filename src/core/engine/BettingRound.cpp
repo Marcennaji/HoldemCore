@@ -285,7 +285,7 @@ void BettingRound::run()
 
             if (currentPlayersTurnId == 0)
             {
-                myHand->getGuiInterface()->meInAction();
+                myHand->getGuiInterface()->doHumanAction();
             }
             else
             {

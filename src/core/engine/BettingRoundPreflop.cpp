@@ -212,7 +212,7 @@ void BettingRoundPreflop::run()
         if (getCurrentPlayersTurnId() == 0)
         {
             // Wir sind dran
-            getHand()->getGuiInterface()->meInAction();
+            getHand()->getGuiInterface()->doHumanAction();
         }
         else
         {

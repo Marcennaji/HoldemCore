@@ -75,7 +75,7 @@ class IGui
     virtual void postRiverRunAnimation1() = 0;
     virtual void flipHolecardsAllIn() = 0;
 
-    virtual void meInAction() = 0;
+    virtual void doHumanAction() = 0;
     virtual void showCards(unsigned playerId) = 0;
     virtual void updateMyButtonsState() = 0;
     virtual void disableMyButtons() = 0;

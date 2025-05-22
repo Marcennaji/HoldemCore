@@ -397,7 +397,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     // connect(this, SIGNAL(signalrefreshDealerAndBlindsButtons()), this, SLOT(refreshDealerAndBlindsButtons()));
     // connect(this, SIGNAL(signalrefreshTableDescriptiveLabels(int)), this, SLOT(refreshTableDescriptiveLabels(int)));
     // connect(this, SIGNAL(signalGuiUpdateDone()), this, SLOT(guiUpdateDone()));
-    connect(this, SIGNAL(signalMeInAction()), this, SLOT(meInAction()));
+    connect(this, SIGNAL(signalDoHumanAction()), this, SLOT(doHumanAction()));
     connect(this, SIGNAL(signalDisableMyButtons()), this, SLOT(disableMyButtons()));
     connect(this, SIGNAL(signalUpdateMyButtonsState()), this, SLOT(updateMyButtonsState()));
     // connect(this, SIGNAL(signalDealBettingRoundCards(int)), this, SLOT(dealBettingRoundCards(int)));
@@ -1432,7 +1432,7 @@ void GameTableWindow::provideMyActions(int mode)
     }
 }
 
-void GameTableWindow::meInAction()
+void GameTableWindow::doHumanAction()
 {
     myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getGuiInterface()->showCards(0);
 
@@ -1484,26 +1484,6 @@ void GameTableWindow::meInAction()
     {
         pushButton_AllIn->click();
         pushButtonAllInIsChecked = false;
-    }
-
-    // automatic mode
-    switch (playingMode)
-    {
-    case 0: // Manual mode
-        break;
-    case 1: // Auto check / call all
-        myCallCheck();
-        break;
-    case 2: // Auto check / fold all
-        if (pushButton_CallCheck->text() == CheckString)
-        {
-            myCheck();
-        }
-        else
-        {
-            myFold();
-        }
-        break;
     }
 }
 

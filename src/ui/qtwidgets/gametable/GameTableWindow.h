@@ -93,7 +93,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
 
     // void signalGuiUpdateDone();
 
-    void signalMeInAction();
+    void signalDoHumanAction();
     void signalUpdateMyButtonsState();
     void signalDisableMyButtons();
 
@@ -145,7 +145,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     void dealHoleCards();
 
     void provideMyActions(int mode = -1); // mode 0 == called from dealBettingRoundcards
-    void meInAction();
+    void doHumanAction();
     void disableMyButtons();
 
     void setGameSpeed(const int theValue);

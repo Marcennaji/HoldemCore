@@ -150,7 +150,6 @@ void Player::action()
     cout << endl << "---------------------------------------------------------------------------------" << endl << endl;
 #endif
 
-    // set that i was the last active player. need this for unhighlighting groupbox
     currentHand->setPreviousPlayerID(myID);
 
     if (myEvents && myEvents->onActivePlayerActionDone)

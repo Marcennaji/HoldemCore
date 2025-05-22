@@ -102,9 +102,9 @@ void GuiWrapper::flipHolecardsAllIn()
     myW->signalFlipHolecardsAllIn();
 }
 
-void GuiWrapper::meInAction()
+void GuiWrapper::doHumanAction()
 {
-    myW->signalMeInAction();
+    myW->signalDoHumanAction();
 }
 void GuiWrapper::showCards(unsigned playerId)
 {

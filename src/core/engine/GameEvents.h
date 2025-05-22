@@ -43,7 +43,7 @@ struct GameEvents
     // --- Optional: UI control ---
     std::function<void()> onDisableButtons;
     std::function<void()> onUpdateMyButtons;
-    std::function<void()> onMeInAction;
+    std::function<void()> onDoHumanAction;
 
     void clear()
     {
