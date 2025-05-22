@@ -52,12 +52,6 @@ void GuiWrapper::initGui(int speed)
     myW->signalInitGui(speed);
 }
 
-void GuiWrapper::waitForGuiUpdateDone() const
-{
-    myW->signalGuiUpdateDone();
-    myW->waitForGuiUpdateDone();
-}
-
 void GuiWrapper::bettingRoundAnimation(int myBettingRoundID)
 {
     myW->signalBettingRoundAnimation2(myBettingRoundID);

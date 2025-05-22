@@ -401,7 +401,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     // SLOT(refreshAll())); connect(this, SIGNAL(signalRefreshPlayerName()), this, SLOT(refreshPlayerName()));
     // connect(this, SIGNAL(signalrefreshDealerAndBlindsButtons()), this, SLOT(refreshDealerAndBlindsButtons()));
     // connect(this, SIGNAL(signalrefreshTableDescriptiveLabels(int)), this, SLOT(refreshTableDescriptiveLabels(int)));
-    connect(this, SIGNAL(signalGuiUpdateDone()), this, SLOT(guiUpdateDone()));
+    // connect(this, SIGNAL(signalGuiUpdateDone()), this, SLOT(guiUpdateDone()));
     connect(this, SIGNAL(signalMeInAction()), this, SLOT(meInAction()));
     connect(this, SIGNAL(signalDisableMyButtons()), this, SLOT(disableMyButtons()));
     connect(this, SIGNAL(signalUpdateMyButtonsState()), this, SLOT(updateMyButtonsState()));
@@ -971,16 +971,6 @@ void GameTableWindow::refreshPot()
 
     textLabel_Sets->setText("$" + QString("%L1").arg(currentHand->getBoard()->getSets()));
     textLabel_Pot->setText("$" + QString("%L1").arg(currentHand->getBoard()->getPot()));
-}
-
-void GameTableWindow::guiUpdateDone()
-{
-    guiUpdateSemaphore.release();
-}
-
-void GameTableWindow::waitForGuiUpdateDone()
-{
-    guiUpdateSemaphore.acquire();
 }
 
 void GameTableWindow::dealHoleCards()

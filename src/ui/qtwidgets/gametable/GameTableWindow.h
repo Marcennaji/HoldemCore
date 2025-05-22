@@ -93,7 +93,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     // void signalrefreshDealerAndBlindsButtons();
     // void signalrefreshTableDescriptiveLabels(int);
 
-    void signalGuiUpdateDone();
+    // void signalGuiUpdateDone();
 
     void signalMeInAction();
     void signalUpdateMyButtonsState();
@@ -143,9 +143,6 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     void refreshHandsRanges();
 
     SeatState getCurrentSeatState(std::shared_ptr<Player>);
-
-    void guiUpdateDone();
-    void waitForGuiUpdateDone();
 
     void dealHoleCards();
 

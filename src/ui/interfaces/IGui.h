@@ -49,7 +49,7 @@ class IGui
     // virtual void refreshDealerAndBlindsButtons() const = 0;
     // virtual void refreshTableDescriptiveLabels(GameState state) const = 0;
 
-    virtual void waitForGuiUpdateDone() const = 0;
+    // virtual void waitForGuiUpdateDone() const = 0;
 
     // virtual void dealBettingRoundCards(int) = 0;
     // virtual void dealHoleCards() = 0;
