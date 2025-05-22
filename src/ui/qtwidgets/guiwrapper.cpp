@@ -96,7 +96,3 @@ void GuiWrapper::postRiverRunAnimation1()
 {
     myW->signalPostRiverRunAnimation1();
 }
-void GuiWrapper::disableMyButtons()
-{
-    myW->signalDisableMyButtons();
-}

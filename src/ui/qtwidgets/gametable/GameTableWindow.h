@@ -94,8 +94,8 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     // void signalGuiUpdateDone();
 
     // void signalDoHumanAction();
-    void signalupdateHumanPlayerButtonsState();
-    void signalDisableMyButtons();
+    // void signalupdateHumanPlayerButtonsState();
+    // void signalDisableMyButtons();
 
     // void signalDealBettingRoundCards(int myBettingRoundID);
 

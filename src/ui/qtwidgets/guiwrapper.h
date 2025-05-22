@@ -60,8 +60,6 @@ class GuiWrapper : public IGui
     void postRiverAnimation1();
     void postRiverRunAnimation1();
 
-    void disableMyButtons();
-
   private:
     GameTableWindow* myW;
     StartWindow* myStartWindow;

@@ -59,7 +59,7 @@ class IGui
     // virtual void doHumanAction() = 0;
     // virtual void showCards(unsigned playerId) = 0;
     // virtual void updateHumanPlayerButtonsState() = 0;
-    virtual void disableMyButtons() = 0;
+    // virtual void disableMyButtons() = 0;
     virtual void bettingRoundAnimation(int) = 0;
 
     virtual void preflopAnimation1() = 0;
