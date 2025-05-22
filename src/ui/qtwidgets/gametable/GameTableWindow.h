@@ -94,7 +94,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     // void signalGuiUpdateDone();
 
     // void signalDoHumanAction();
-    void signalUpdateMyButtonsState();
+    void signalupdateHumanPlayerButtonsState();
     void signalDisableMyButtons();
 
     // void signalDealBettingRoundCards(int myBettingRoundID);
@@ -246,7 +246,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
 
     void GameModification();
 
-    void updateMyButtonsState(int mode = -1); // mode 0 == called from dealBettingRoundcards
+    void updateHumanPlayerButtonsState(int mode = -1); // mode 0 == called from dealBettingRoundcards
     void uncheckMyButtons();
     void resetButtonsCheckStateMemory();
     void clearMyButtons();

@@ -399,7 +399,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     // connect(this, SIGNAL(signalGuiUpdateDone()), this, SLOT(guiUpdateDone()));
     // connect(this, SIGNAL(signalDoHumanAction()), this, SLOT(doHumanAction()));
     connect(this, SIGNAL(signalDisableMyButtons()), this, SLOT(disableMyButtons()));
-    connect(this, SIGNAL(signalUpdateMyButtonsState()), this, SLOT(updateMyButtonsState()));
+    // connect(this, SIGNAL(signalupdateHumanPlayerButtonsState()), this, SLOT(updateHumanPlayerButtonsState()));
     // connect(this, SIGNAL(signalDealBettingRoundCards(int)), this, SLOT(dealBettingRoundCards(int)));
     // connect(this, SIGNAL(signalDealHoleCards()), this, SLOT(dealHoleCards()));
     connect(this, SIGNAL(signalDealFlopCards0()), this, SLOT(dealFlopCards0()));
@@ -1138,7 +1138,7 @@ void GameTableWindow::dealFlopCards6()
     // sonst normale Variante
     else
     {
-        updateMyButtonsState(0); // mode 0 == called from dealBettingRoundcards
+        updateHumanPlayerButtonsState(0); // mode 0 == called from dealBettingRoundcards
         dealFlopCards6Timer->start(postDealCardsSpeed);
     }
 
@@ -1177,7 +1177,7 @@ void GameTableWindow::dealTurnCards2()
     // sonst normale Variante
     else
     {
-        updateMyButtonsState(0); // mode 0 == called from dealBettingRoundcards
+        updateHumanPlayerButtonsState(0); // mode 0 == called from dealBettingRoundcards
         dealTurnCards2Timer->start(postDealCardsSpeed);
     }
     // refresh CardsChanceMonitor Tool
@@ -1217,7 +1217,7 @@ void GameTableWindow::dealRiverCards2()
     // sonst normale Variante
     else
     {
-        updateMyButtonsState(0); // mode 0 == called from dealBettingRoundcards
+        updateHumanPlayerButtonsState(0); // mode 0 == called from dealBettingRoundcards
         dealRiverCards2Timer->start(postDealCardsSpeed);
     }
     // refresh CardsChanceMonitor Tool
@@ -2107,7 +2107,7 @@ void GameTableWindow::activePlayerActionDone()
     refreshHandsRanges();
 
     // refresh actions for human player
-    updateMyButtonsState();
+    updateHumanPlayerButtonsState();
 
     activePlayerActionDoneTimer->start(nextPlayerSpeed1);
 }
@@ -2817,7 +2817,7 @@ void GameTableWindow::GameModification()
     pushButton_break->setMinimumSize(width + 10, 20);
 }
 
-void GameTableWindow::updateMyButtonsState(int mode)
+void GameTableWindow::updateHumanPlayerButtonsState(int mode)
 {
 
     std::shared_ptr<IHand> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
