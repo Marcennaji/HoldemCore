@@ -97,11 +97,6 @@ void GuiWrapper::postRiverRunAnimation1()
     myW->signalPostRiverRunAnimation1();
 }
 
-void GuiWrapper::flipHolecardsAllIn()
-{
-    myW->signalFlipHolecardsAllIn();
-}
-
 void GuiWrapper::updateMyButtonsState()
 {
     myW->signalUpdateMyButtonsState();

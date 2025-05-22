@@ -522,13 +522,15 @@ void Hand::switchRounds()
     if (allInCondition)
     {
         myBoard->collectPot();
+
         if (myEvents && myEvents->onPotUpdated)
             myEvents->onPotUpdated(myBoard->getPot());
 
         if (myEvents && myEvents->onRefreshSet)
             myEvents->onRefreshSet();
 
-        myGui->flipHolecardsAllIn();
+        if (myEvents && myEvents->onFlipHoleCardsAllIn)
+            myEvents->onFlipHoleCardsAllIn();
 
         if (currentRound < GAME_STATE_POST_RIVER)
         { // do not increment past 4

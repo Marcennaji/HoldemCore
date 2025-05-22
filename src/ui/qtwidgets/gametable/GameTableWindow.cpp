@@ -92,7 +92,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
 
     flipside = QPixmap::fromImage(QImage(myCardDeckStyle->getCurrentDir() + "flipside.png"));
 
-    flipHolecardsAllInAlreadyDone = false;
+    flipHoleCardsAllInAlreadyDone = false;
 
     // userWidgetsArray init
     userWidgetsArray[0] = pushButton_BetRaise;
@@ -418,7 +418,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     connect(this, SIGNAL(signalPostRiverAnimation1()), this, SLOT(postRiverAnimation1()));
     connect(this, SIGNAL(signalPostRiverRunAnimation1()), this, SLOT(postRiverRunAnimation1()));
     // connect(this, SIGNAL(signalPostRiverShowCards(unsigned)), this, SLOT(showHoleCards(unsigned)));
-    connect(this, SIGNAL(signalFlipHolecardsAllIn()), this, SLOT(flipHolecardsAllIn()));
+    // connect(this, SIGNAL(signalFlipHoleCardsAllIn()), this, SLOT(flipHoleCardsAllIn()));
     // connect(this, SIGNAL(signalnextBettingRoundInitializeGui()), this, SLOT(nextBettingRoundInitializeGui()));
 }
 
@@ -2256,7 +2256,7 @@ void GameTableWindow::postRiverRunAnimation2()
     if (nonfoldPlayersCounter != 1)
     {
 
-        if (!flipHolecardsAllInAlreadyDone)
+        if (!flipHoleCardsAllInAlreadyDone)
         {
 
             for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
@@ -2267,7 +2267,7 @@ void GameTableWindow::postRiverRunAnimation2()
                     showHoleCards((*it_c)->getID());
                 }
             }
-            flipHolecardsAllInAlreadyDone = true;
+            flipHoleCardsAllInAlreadyDone = true;
         }
         else
         {
@@ -2461,12 +2461,12 @@ void GameTableWindow::showHoleCards(unsigned playerId, bool allIn)
     }
 }
 
-void GameTableWindow::flipHolecardsAllIn()
+void GameTableWindow::flipHoleCardsAllIn()
 {
 
     std::shared_ptr<Game> currentGame = myStartWindow->getSession()->getCurrentGame();
 
-    if (!flipHolecardsAllInAlreadyDone && currentGame->getCurrentHand()->getCurrentRound() < GAME_STATE_RIVER)
+    if (!flipHoleCardsAllInAlreadyDone && currentGame->getCurrentHand()->getCurrentRound() < GAME_STATE_RIVER)
     {
         // Aktive Spieler zählen --> wenn nur noch einer nicht-folded dann keine Karten umdrehen
         int nonfoldPlayersCounter = 0;
@@ -2491,7 +2491,7 @@ void GameTableWindow::flipHolecardsAllIn()
         }
 
         // Wenn einmal umgedreht dann fertig!!
-        flipHolecardsAllInAlreadyDone = true;
+        flipHoleCardsAllInAlreadyDone = true;
     }
 }
 
@@ -2569,7 +2569,7 @@ void GameTableWindow::nextBettingRoundInitializeGui()
     refreshPlayerStatistics();
     refreshHandsRanges();
 
-    flipHolecardsAllInAlreadyDone = false;
+    flipHoleCardsAllInAlreadyDone = false;
 
     pushButton_break->setEnabled(true);
     breakAfterCurrentHand = false;

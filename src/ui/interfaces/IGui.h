@@ -76,7 +76,7 @@ class IGui
 
     virtual void postRiverAnimation1() = 0;
     virtual void postRiverRunAnimation1() = 0;
-    virtual void flipHolecardsAllIn() = 0;
+    // virtual void flipHoleCardsAllIn() = 0;
 };
 
 #endif

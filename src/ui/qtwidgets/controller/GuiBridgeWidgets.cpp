@@ -86,4 +86,9 @@ void GuiBridgeWidgets::connectTo(GameEvents& events)
         QMetaObject::invokeMethod(
             myGameTableWindow, [this]() { myGameTableWindow->doHumanAction(); }, Qt::DirectConnection);
     };
+    events.onFlipHoleCardsAllIn = [this]()
+    {
+        QMetaObject::invokeMethod(
+            myGameTableWindow, [this]() { myGameTableWindow->flipHoleCardsAllIn(); }, Qt::DirectConnection);
+    };
 }

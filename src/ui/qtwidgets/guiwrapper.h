@@ -60,8 +60,6 @@ class GuiWrapper : public IGui
     void postRiverAnimation1();
     void postRiverRunAnimation1();
 
-    void flipHolecardsAllIn();
-
     void disableMyButtons();
     void updateMyButtonsState();
 

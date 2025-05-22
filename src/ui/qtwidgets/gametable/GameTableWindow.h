@@ -119,7 +119,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     void signalPostRiverAnimation1();
     void signalPostRiverRunAnimation1();
 
-    void signalFlipHolecardsAllIn();
+    // void signalFlipHoleCardsAllIn();
 
   public slots:
 
@@ -226,7 +226,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
 
     void blinkingStartButtonAnimationAction();
 
-    void flipHolecardsAllIn();
+    void flipHoleCardsAllIn();
     void handSwitchRounds();
 
     void startNewHand();
@@ -361,7 +361,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     bool myButtonsAreCheckable;
     bool breakAfterCurrentHand;
     bool currentGameOver;
-    bool flipHolecardsAllInAlreadyDone;
+    bool flipHoleCardsAllInAlreadyDone;
     bool betSliderChangedByInput;
     bool guestMode;
 

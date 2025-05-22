@@ -41,7 +41,7 @@ struct GameEvents
     std::function<void()> onRiverAnimation2;
     std::function<void()> onPostRiverAnimation1;
     std::function<void()> onPostRiverRunAnimation1;
-    std::function<void()> onFlipHolecardsAllIn;
+    std::function<void()> onFlipHoleCardsAllIn;
 
     void clear()
     {
