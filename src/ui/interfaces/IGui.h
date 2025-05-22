@@ -23,7 +23,6 @@
 #include <memory>
 #include <string>
 
-class GuiDisplayGameActions;
 class Session;
 
 class IGui

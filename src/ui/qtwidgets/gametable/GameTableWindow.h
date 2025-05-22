@@ -34,7 +34,6 @@
 
 #define USER_WIDGETS_NUMBER 9
 
-class GuiDisplayGameActions;
 class Game;
 
 class IGui;
@@ -73,7 +72,6 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     GameTableStyleReader* getGameTableStyle() const;
 
     void setStartWindow(StartWindow* s);
-    void setGuiDisplayGameActions(GuiDisplayGameActions* l);
 
     void setSpeeds();
 

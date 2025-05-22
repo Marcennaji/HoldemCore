@@ -26,7 +26,6 @@
 class Session;
 class GameTableWindow;
 class StartWindow;
-class GuiDisplayGameActions;
 class Game;
 
 class GuiWrapper : public IGui

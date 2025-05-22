@@ -21,7 +21,6 @@
 #include <core/session/Session.h>
 #include <infra/persistence/SqliteLogStore.h>
 #include <ui/qtwidgets/gametable/GameTableWindow.h>
-#include <ui/qtwidgets/gametable/GuiDisplayGameActions.h>
 #include <ui/qtwidgets/startwindow/StartWindow.h>
 
 using namespace std;

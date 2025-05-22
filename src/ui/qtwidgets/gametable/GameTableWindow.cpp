@@ -19,7 +19,6 @@
 #include <core/session/Session.h>
 #include <ui/qtwidgets/startwindow/StartWindow.h>
 
-#include <ui/qtwidgets/gametable/GuiDisplayGameActions.h>
 #include "myactionbutton.h"
 #include "mycardspixmaplabel.h"
 #include "mycashlabel.h"

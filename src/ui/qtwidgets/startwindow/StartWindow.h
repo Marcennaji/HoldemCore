@@ -33,7 +33,6 @@ class GuiWrapper;
 class Game;
 
 class GameTableWindow;
-class GuiDisplayGameActions;
 class SqliteLogStore;
 
 class StartWindow : public QMainWindow, public Ui::startWindow
