@@ -19,7 +19,6 @@
 #define GUIWRAPPER_H
 
 #include "core/engine/model/GameData.h"
-#include "ui/interfaces/IGui.h"
 
 #include <string>
 
@@ -28,7 +27,7 @@ class GameTableWindow;
 class StartWindow;
 class Game;
 
-class GuiWrapper : public IGui
+class GuiWrapper
 {
   public:
     GuiWrapper(const std::string& appDataDir, StartWindow*);
@@ -37,7 +36,7 @@ class GuiWrapper : public IGui
 
     void setStartWindow(void* w);
 
-    void* getGameTableWindow() const override { return static_cast<void*>(myW); }
+    void* getGameTableWindow() const { return static_cast<void*>(myW); }
 
     void dealBettingRoundCards(int myBettingRoundID);
     void dealHoleCards();

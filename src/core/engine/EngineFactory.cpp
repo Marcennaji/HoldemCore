@@ -43,12 +43,12 @@ EngineFactory::~EngineFactory()
 {
 }
 
-std::shared_ptr<IHand> EngineFactory::createHand(std::shared_ptr<EngineFactory> f, IGui* g, std::shared_ptr<IBoard> b,
+std::shared_ptr<IHand> EngineFactory::createHand(std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
                                                  IRankingStore* l, IPlayersStatisticsStore* ps, IHandAuditStore* hs,
                                                  PlayerList sl, PlayerList apl, PlayerList rpl, int id, int sP, int dP,
                                                  int sB, int sC)
 {
-    return std::shared_ptr<IHand>(new Hand(myEvents, myLogger, f, g, b, l, ps, hs, sl, apl, rpl, id, sP, dP, sB, sC));
+    return std::shared_ptr<IHand>(new Hand(myEvents, myLogger, f, b, l, ps, hs, sl, apl, rpl, id, sP, dP, sB, sC));
 }
 
 std::shared_ptr<IBoard> EngineFactory::createBoard(unsigned dp)

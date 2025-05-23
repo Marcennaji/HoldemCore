@@ -19,8 +19,8 @@ GuiAppController::GuiAppController(ILogger* logger, const QString& app, const QS
     myEvents = std::make_unique<GameEvents>();
     myBridge = std::make_unique<GuiBridgeWidgets>(static_cast<GameTableWindow*>(myGui->getGameTableWindow()));
     myBridge->connectTo(*myEvents);
-    mySession = std::make_unique<Session>(myEvents.get(), logger, myGui.get(), myGameActionslogger.get(),
-                                          myGameActionslogger.get(), myGameActionslogger.get());
+    mySession = std::make_unique<Session>(myEvents.get(), logger, myGameActionslogger.get(), myGameActionslogger.get(),
+                                          myGameActionslogger.get());
 }
 
 StartWindow* GuiAppController::createMainWindow()

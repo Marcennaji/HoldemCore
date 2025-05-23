@@ -36,7 +36,6 @@
 
 class Game;
 
-class IGui;
 class IBoard;
 class Player;
 class MyCardsPixmapLabel;

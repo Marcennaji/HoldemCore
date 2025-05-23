@@ -28,7 +28,7 @@
 
 using namespace std;
 
-StartWindow::StartWindow(const QString& appDataPath, IGui* gui, Session* session, QWidget* parent)
+StartWindow::StartWindow(const QString& appDataPath, GuiWrapper* gui, Session* session, QWidget* parent)
     : QMainWindow(parent), myAppDataPath(appDataPath), myGuiInterface(gui), mySession(session)
 {
     setupUi(this);

@@ -27,7 +27,6 @@
 #include <core/interfaces/ILogger.h>
 #include "core/engine/GameEvents.h"
 
-class IGui;
 class Game;
 class IRankingStore;
 class IPlayersStatisticsStore;
@@ -37,15 +36,13 @@ class QtToolsInterface;
 class Session
 {
   public:
-    Session(GameEvents* events, ILogger*, IGui*, IRankingStore*, IPlayersStatisticsStore*, IHandAuditStore*);
+    Session(GameEvents* events, ILogger*, IRankingStore*, IPlayersStatisticsStore*, IHandAuditStore*);
 
     ~Session();
 
     void startGame(const GameData& gameData, const StartData& startData);
 
     std::shared_ptr<Game> getCurrentGame();
-
-    IGui* getGui();
 
     IRankingStore* getRankingStore() { return myRankingStore; }
     IPlayersStatisticsStore* getPlayersStatisticsStore() { return myPlayersStatisticsStore; }
@@ -56,7 +53,6 @@ class Session
 
     std::shared_ptr<Game> currentGame;
     GameEvents* myEvents;
-    IGui* myGui;
     ILogger* myLogger;
     IRankingStore* myRankingStore;
     IPlayersStatisticsStore* myPlayersStatisticsStore;

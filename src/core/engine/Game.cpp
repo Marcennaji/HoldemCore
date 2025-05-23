@@ -20,20 +20,19 @@
 
 #include "EngineFactory.h"
 #include "Exception.h"
+#include "core/interfaces/persistence/IHandAuditStore.h"
+#include "core/interfaces/persistence/IRankingStore.h"
 #include "model/EngineError.h"
 #include "model/StartData.h"
-
-#include <ui/interfaces/IGui.h>
-#include "infra/persistence/SqliteLogStore.h"
 
 #include <iostream>
 
 using namespace std;
 
-Game::Game(GameEvents* events, IGui* gui, std::shared_ptr<EngineFactory> factory, const PlayerList& playerList,
+Game::Game(GameEvents* events, std::shared_ptr<EngineFactory> factory, const PlayerList& playerList,
            const GameData& gameData, const StartData& startData, int gameId, IRankingStore* l,
            IPlayersStatisticsStore* ps, IHandAuditStore* handAuditStore)
-    : myFactory(factory), myGui(gui), myEvents(events), myRankingStore(l), myPlayersStatisticsStore(ps),
+    : myFactory(factory), myEvents(events), myRankingStore(l), myPlayersStatisticsStore(ps),
       myHandAuditStore(handAuditStore), startQuantityPlayers(startData.numberOfPlayers), startCash(gameData.startMoney),
       startSmallBlind(gameData.firstSmallBlind), myGameID(gameId), currentSmallBlind(gameData.firstSmallBlind),
       currentHandID(0), dealerPosition(0), lastHandBlindsRaised(1), lastTimeBlindsRaised(0), myGameData(gameData)
@@ -122,11 +121,10 @@ void Game::initHand()
     (*runningPlayerList) = (*activePlayerList);
 
     // create Hand
-    currentHand = myFactory->createHand(myFactory, myGui, currentBoard, myRankingStore, myPlayersStatisticsStore,
+    currentHand = myFactory->createHand(myFactory, currentBoard, myRankingStore, myPlayersStatisticsStore,
                                         myHandAuditStore, seatsList, activePlayerList, runningPlayerList, currentHandID,
                                         startQuantityPlayers, dealerPosition, currentSmallBlind, startCash);
 
-    // shifting dealer button -> TODO exception-rule !!!
     bool nextDealerFound = false;
     PlayerListConstIterator dealerPositionIt = currentHand->getSeatIt(dealerPosition);
     if (dealerPositionIt == seatsList->end())

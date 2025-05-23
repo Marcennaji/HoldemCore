@@ -25,7 +25,6 @@
 
 #include <string>
 
-class IGui;
 struct GameEvents;
 class IRankingStore;
 class IPlayersStatisticsStore;
@@ -38,8 +37,8 @@ class Game
 {
 
   public:
-    Game(GameEvents*, IGui* gui, std::shared_ptr<EngineFactory> factory, const PlayerList& playerList,
-         const GameData& gameData, const StartData& startData, int gameId, IRankingStore* rankingStore,
+    Game(GameEvents*, std::shared_ptr<EngineFactory> factory, const PlayerList& playerList, const GameData& gameData,
+         const StartData& startData, int gameId, IRankingStore* rankingStore,
          IPlayersStatisticsStore* playersStatisticsStore, IHandAuditStore* handAuditStore);
 
     ~Game();
@@ -89,7 +88,6 @@ class Game
   private:
     std::shared_ptr<EngineFactory> myFactory;
 
-    IGui* myGui;
     GameEvents* myEvents;
     IRankingStore* myRankingStore;
     IPlayersStatisticsStore* myPlayersStatisticsStore;

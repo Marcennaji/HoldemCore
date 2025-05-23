@@ -19,8 +19,6 @@
 #include "Session.h"
 #include <core/engine/Game.h>
 #include <core/engine/GameEvents.h>
-#include <infra/persistence/SqliteLogStore.h>
-#include <ui/interfaces/IGui.h>
 
 #include <core/engine/EngineFactory.h>
 #include <core/engine/Randomizer.h>
@@ -37,10 +35,10 @@
 
 using namespace std;
 
-Session::Session(GameEvents* events, ILogger* logger, IGui* g, IRankingStore* rs, IPlayersStatisticsStore* ps,
+Session::Session(GameEvents* events, ILogger* logger, IRankingStore* rs, IPlayersStatisticsStore* ps,
                  IHandAuditStore* ha)
-    : myLogger(logger), currentGameNum(0), myGui(g), myRankingStore(rs), myPlayersStatisticsStore(ps),
-      myHandAuditStore(ha), myEvents(events)
+    : myLogger(logger), currentGameNum(0), myRankingStore(rs), myPlayersStatisticsStore(ps), myHandAuditStore(ha),
+      myEvents(events)
 {
 }
 
@@ -187,8 +185,8 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
         playerList->push_back(*i);
     }
 
-    currentGame.reset(new Game(myEvents, myGui, factory, playerList, gameData, startData, currentGameNum,
-                               myRankingStore, myPlayersStatisticsStore, myHandAuditStore));
+    currentGame.reset(new Game(myEvents, factory, playerList, gameData, startData, currentGameNum, myRankingStore,
+                               myPlayersStatisticsStore, myHandAuditStore));
     currentGame->initHand();
     currentGame->startHand();
 }
@@ -196,9 +194,4 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
 std::shared_ptr<Game> Session::getCurrentGame()
 {
     return currentGame;
-}
-
-IGui* Session::getGui()
-{
-    return myGui;
 }

@@ -18,6 +18,9 @@
 
 #include "BettingRoundPostRiver.h"
 #include "core/interfaces/IHand.h"
+#include "core/interfaces/persistence/IHandAuditStore.h"
+#include "core/interfaces/persistence/IPlayersStatisticsStore.h"
+#include "core/interfaces/persistence/IRankingStore.h"
 
 #include "Player.h"
 

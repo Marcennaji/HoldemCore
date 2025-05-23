@@ -36,7 +36,7 @@ class EngineFactory
     EngineFactory(GameEvents*, ILogger*);
     ~EngineFactory();
 
-    virtual std::shared_ptr<IHand> createHand(std::shared_ptr<EngineFactory> f, IGui* g, std::shared_ptr<IBoard> b,
+    virtual std::shared_ptr<IHand> createHand(std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
                                               IRankingStore* l, IPlayersStatisticsStore* ps, IHandAuditStore* hs,
                                               PlayerList sl, PlayerList apl, PlayerList rpl, int id, int sP, int dP,
                                               int sB, int sC);

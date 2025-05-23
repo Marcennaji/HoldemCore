@@ -28,18 +28,13 @@
 
 #include <QtWidgets/QMainWindow>
 
-class IGui;
 class GuiWrapper;
-class Game;
-
-class GameTableWindow;
-class SqliteLogStore;
 
 class StartWindow : public QMainWindow, public Ui::startWindow
 {
     Q_OBJECT
   public:
-    StartWindow(const QString& appDataPath, IGui* gui, Session* session, QWidget* parent);
+    StartWindow(const QString& appDataPath, GuiWrapper* gui, Session* session, QWidget* parent);
     ~StartWindow();
 
     void setSession(Session* session) { mySession = session; }
@@ -61,7 +56,7 @@ class StartWindow : public QMainWindow, public Ui::startWindow
   private:
     QString myAppDataPath;
 
-    std::shared_ptr<IGui> myGuiInterface;
+    std::shared_ptr<GuiWrapper> myGuiInterface;
     Session* mySession;
 
     friend class GuiWrapper;
