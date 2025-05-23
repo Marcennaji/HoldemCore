@@ -1,12 +1,6 @@
 # PokerTraining
 
-**PokerTraining** is a No-Limit Texas Hold'em training software focused exclusively on **cash game strategy**. It is designed for offline use, whether you're playing casually or working to improve your skills through structured practice. The software features smart, adaptable AI opponents and a variety of tools to analyze play and support your growth as a cash game player.
-
-Play against up to 9 bot players, each with customizable and dynamic playing styles ranging from ultra-tight to loose-aggressive. Bots adjust their behavior in response to opponents' patterns, offering a more realistic and educational experience.
-
-> 🎯 **Focused on Cash Games**: Tournament play is intentionally excluded to keep the software specialized on deep-stack, cash game strategy — where long-term decision making, range balancing, and exploitative adjustments matter most.
-
----
+**PokerTraining** is a No-Limit Texas Hold'em training software that lets you play against up to 9 bot players, each with customizable and dynamic playing styles ranging from ultra-tight to loose-aggressive. Bots adjust their behavior in response to opponents' patterns, offering a more realistic and educational experience.
 
 ## Features
 
@@ -42,29 +36,3 @@ Play against up to 9 bot players, each with customizable and dynamic playing sty
   A responsive and user-friendly graphical interface built with Qt, ensuring smooth interaction across platforms.
 
 ---
-
-## Who Is This For?
-
-- 🧠 **Players looking to improve cash game fundamentals**
-- 🤖 **Users who want to train against intelligent, adaptive AI opponents**
-- ✈️ **Anyone wanting to play poker offline without needing internet access**
-
----
-
-## Installation
-
-> 🛠️ *Note: Build instructions may vary depending on your OS. Below is a general overview.*
-
-### Prerequisites
-- C++17-compatible compiler
-- [Qt 5 or 6](https://www.qt.io/)
-- CMake (3.15+ recommended)
-
-### Build (Linux/macOS/Windows)
-```bash
-git clone https://github.com/Marcennaji/PokerTraining.git
-cd PokerTraining
-mkdir build && cd build
-cmake ..
-make
-./PokerTraining

@@ -17,7 +17,6 @@
  *****************************************************************************/
 #include "StartWindow.h"
 
-#include <ui/qtwidgets/GuiWrapper.h>
 #include <ui/qtwidgets/gametable/GameTableWindow.h>
 
 #include <core/engine/EngineDefs.h>

@@ -3,7 +3,6 @@
 #include <core/session/Session.h>
 #include <infra/persistence/SqliteLogStore.h>
 #include <ui/qtwidgets/gametable/GameTableWindow.h>
-#include <ui/qtwidgets/guiwrapper.h>
 #include <ui/qtwidgets/startwindow/StartWindow.h>
 
 #include "GuiBridgeWidgets.h"
