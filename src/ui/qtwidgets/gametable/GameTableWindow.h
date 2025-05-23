@@ -106,8 +106,6 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
 
     void signalactivePlayerActionDone();
 
-    void signalBettingRoundAnimation2(int);
-
     void signalPreflopAnimation1();
     void signalPreflopAnimation2();
     void signalFlopAnimation1();

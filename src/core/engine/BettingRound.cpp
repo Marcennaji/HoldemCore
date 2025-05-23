@@ -290,7 +290,8 @@ void BettingRound::run()
             }
             else
             {
-                myHand->getGuiInterface()->bettingRoundAnimation(myBettingRoundID);
+                if (myEvents && myEvents->onBettingRoundAnimation)
+                    myEvents->onBettingRoundAnimation(myBettingRoundID);
             }
         }
     }

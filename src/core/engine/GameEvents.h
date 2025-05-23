@@ -31,6 +31,8 @@ struct GameEvents
     std::function<void()> onDoHumanAction;
 
     // --- Optional: animations ---
+    std::function<void(int bettingRoundId)> onBettingRoundAnimation;
+
     std::function<void()> onPreflopAnimation1;
     std::function<void()> onPreflopAnimation2;
     std::function<void()> onFlopAnimation1;

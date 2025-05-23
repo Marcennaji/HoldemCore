@@ -47,11 +47,6 @@ void GuiWrapper::initGui(int speed)
     myW->signalInitGui(speed);
 }
 
-void GuiWrapper::bettingRoundAnimation(int myBettingRoundID)
-{
-    myW->signalBettingRoundAnimation2(myBettingRoundID);
-}
-
 void GuiWrapper::preflopAnimation1()
 {
     myW->signalPreflopAnimation1();

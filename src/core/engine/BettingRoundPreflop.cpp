@@ -216,7 +216,8 @@ void BettingRoundPreflop::run()
         }
         else
         {
-            getHand()->getGuiInterface()->bettingRoundAnimation(getBettingRoundID());
+            if (myEvents && myEvents->onBettingRoundAnimation)
+                myEvents->onBettingRoundAnimation(getBettingRoundID());
         }
     }
 }
