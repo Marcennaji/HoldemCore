@@ -47,10 +47,6 @@ void GuiWrapper::initGui(int speed)
     myW->signalInitGui(speed);
 }
 
-void GuiWrapper::preflopAnimation1()
-{
-    myW->signalPreflopAnimation1();
-}
 void GuiWrapper::preflopAnimation2()
 {
     myW->signalPreflopAnimation2();

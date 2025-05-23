@@ -97,4 +97,9 @@ void GuiBridgeWidgets::connectTo(GameEvents& events)
             myGameTableWindow, [this, bettingRoundId]() { myGameTableWindow->bettingRoundAnimation(bettingRoundId); },
             Qt::DirectConnection);
     };
+    events.onPreflopAnimation = [this]()
+    {
+        QMetaObject::invokeMethod(
+            myGameTableWindow, [this]() { myGameTableWindow->preflopAnimation1(); }, Qt::DirectConnection);
+    };
 }

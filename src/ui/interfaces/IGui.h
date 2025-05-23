@@ -61,22 +61,22 @@ class IGui
     // virtual void updateHumanPlayerButtonsState() = 0;
     // virtual void disableMyButtons() = 0;
     // virtual void bettingRoundAnimation(int) = 0;
+    // virtual void flipHoleCardsAllIn() = 0;
 
-    virtual void preflopAnimation1() = 0;
-    virtual void preflopAnimation2() = 0;
+    // virtual void preflopAnimation1() = 0;
+    // virtual void preflopAnimation2() = 0;
 
     virtual void flopAnimation1() = 0;
-    virtual void flopAnimation2() = 0;
+    // virtual void flopAnimation2() = 0;
 
     virtual void turnAnimation1() = 0;
-    virtual void turnAnimation2() = 0;
+    // virtual void turnAnimation2() = 0;
 
     virtual void riverAnimation1() = 0;
-    virtual void riverAnimation2() = 0;
+    // virtual void riverAnimation2() = 0;
 
     virtual void postRiverAnimation1() = 0;
     virtual void postRiverRunAnimation1() = 0;
-    // virtual void flipHoleCardsAllIn() = 0;
 };
 
 #endif

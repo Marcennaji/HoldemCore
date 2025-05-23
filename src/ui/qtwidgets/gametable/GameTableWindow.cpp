@@ -407,7 +407,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     connect(this, SIGNAL(signalDealRiverCards0()), this, SLOT(dealRiverCards0()));
     // connect(this, SIGNAL(signalactivePlayerActionDone()), this, SLOT(activePlayerActionDone()));
     // connect(this, SIGNAL(signalBettingRoundAnimation2(int)), this, SLOT(bettingRoundAnimation(int)));
-    connect(this, SIGNAL(signalPreflopAnimation1()), this, SLOT(preflopAnimation1()));
+    // connect(this, SIGNAL(signalPreflopAnimation1()), this, SLOT(preflopAnimation1()));
     connect(this, SIGNAL(signalPreflopAnimation2()), this, SLOT(preflopAnimation2()));
     connect(this, SIGNAL(signalFlopAnimation1()), this, SLOT(flopAnimation1()));
     connect(this, SIGNAL(signalFlopAnimation2()), this, SLOT(flopAnimation2()));
@@ -3039,12 +3039,15 @@ void GameTableWindow::refreshHandsRanges()
     for (it_c = players->begin(); it_c != players->end(); ++it_c)
     {
 
-        // display ranges for every player who didn't fold preflop
+        // display ranges for every player who didn't fold preflop, except for the human player
+        if ((*it_c)->getID() == 0)
+            continue;
+
         if ((*it_c)->getCurrentHandActions().getPreflopActions().size() > 0 &&
             (*it_c)->getCurrentHandActions().getPreflopActions().front() != PLAYER_ACTION_FOLD)
         {
 
-            displayText << style << "<b>" << ((*it_c)->getName() == " " ? "Human" : (*it_c)->getName()) << "</b> : ";
+            displayText << style << "<b>" << ((*it_c)->getName()) << "</b> : ";
 
             std::istringstream oss((*it_c)->getEstimatedRange());
             std::string singleRange;

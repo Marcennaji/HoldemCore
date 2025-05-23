@@ -567,7 +567,8 @@ void Hand::switchRounds()
     {
     case GAME_STATE_PREFLOP:
     {
-        myGui->preflopAnimation1();
+        if (myEvents && myEvents->onPreflopAnimation)
+            myEvents->onPreflopAnimation();
     }
     break;
     case GAME_STATE_FLOP:

@@ -43,7 +43,6 @@ class GuiWrapper : public IGui
     void dealBettingRoundCards(int myBettingRoundID);
     void dealHoleCards();
 
-    void preflopAnimation1();
     void preflopAnimation2();
 
     void flopAnimation1();
