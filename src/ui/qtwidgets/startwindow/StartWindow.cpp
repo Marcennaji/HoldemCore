@@ -28,11 +28,11 @@
 
 using namespace std;
 
-StartWindow::StartWindow(const QString& appDataPath, GuiWrapper* gui, Session* session, QWidget* parent)
-    : QMainWindow(parent), myAppDataPath(appDataPath), myGuiInterface(gui), mySession(session)
+StartWindow::StartWindow(const QString& appDataPath, GameTableWindow* tableWindow, Session* session, QWidget* parent)
+    : QMainWindow(parent), myAppDataPath(appDataPath), myGameTableWindow(tableWindow), mySession(session)
 {
     setupUi(this);
-    myGuiInterface->setStartWindow(this);
+    myGameTableWindow->setStartWindow(this);
     setWindowTitle(QString(tr("PokerTraining %1").arg(POKERTRAINING_BETA_RELEASE_STRING)));
     setWindowIcon(QIcon(myAppDataPath + "gfx/gui/misc/windowicon.png"));
     setStatusBar(nullptr);
@@ -50,8 +50,8 @@ void StartWindow::startNewGame()
 {
 
     this->hide();
-    auto gameTableWindow = static_cast<GameTableWindow*>(myGuiInterface->getGameTableWindow());
-    gameTableWindow->show();
+
+    myGameTableWindow->show();
 
     GameData gameData;
 
@@ -75,7 +75,7 @@ void StartWindow::startNewGame()
     Randomizer::GetRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
     startData.startDealerPlayerId = static_cast<unsigned>(tmpDealerPos);
 
-    gameTableWindow->GameModification();
+    myGameTableWindow->GameModification();
 
     mySession->startGame(gameData, startData);
 }

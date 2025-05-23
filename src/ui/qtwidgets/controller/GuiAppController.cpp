@@ -13,19 +13,22 @@ GuiAppController::GuiAppController(ILogger* logger, const QString& app, const QS
 {
     assert(logger != nullptr);
 
+    myEvents = std::make_unique<GameEvents>();
+
     myGameActionslogger = std::make_unique<SqliteLogStore>(myLogPath.toStdString());
     myGameActionslogger->init();
-    myGui = std::make_unique<GuiWrapper>(myUserDataPath.toStdString(), nullptr);
-    myEvents = std::make_unique<GameEvents>();
-    myBridge = std::make_unique<GuiBridgeWidgets>(static_cast<GameTableWindow*>(myGui->getGameTableWindow()));
+
+    myGameTableWindow = std::make_unique<GameTableWindow>(myUserDataPath.toStdString());
+    myBridge = std::make_unique<GuiBridgeWidgets>(myGameTableWindow.get());
     myBridge->connectTo(*myEvents);
+
     mySession = std::make_unique<Session>(myEvents.get(), logger, myGameActionslogger.get(), myGameActionslogger.get(),
                                           myGameActionslogger.get());
 }
 
 StartWindow* GuiAppController::createMainWindow()
 {
-    return new StartWindow(myAppDataPath, myGui.get(), mySession.get(), nullptr);
+    return new StartWindow(myAppDataPath, myGameTableWindow.get(), mySession.get(), nullptr);
 }
 
 GuiAppController::~GuiAppController() = default;

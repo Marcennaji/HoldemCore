@@ -10,7 +10,7 @@
 class StartWindow;
 class SqliteLogStore;
 class Session;
-class GuiWrapper;
+class GameTableWindow;
 class GuiBridgeWidgets;
 
 class GuiAppController
@@ -26,7 +26,7 @@ class GuiAppController
     QString myLogPath;
     QString myUserDataPath;
     std::unique_ptr<SqliteLogStore> myGameActionslogger;
-    std::unique_ptr<GuiWrapper> myGui;
+    std::unique_ptr<GameTableWindow> myGameTableWindow;
     std::unique_ptr<Session> mySession;
     std::unique_ptr<GameEvents> myEvents;
     std::unique_ptr<GuiBridgeWidgets> myBridge;
