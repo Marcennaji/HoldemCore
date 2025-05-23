@@ -39,8 +39,7 @@ struct GameEvents
     std::function<void()> onTurnAnimation;
     std::function<void()> onRiverAnimation;
     std::function<void()> onPostRiverAnimation;
-
-    std::function<void()> onPostRiverRunAnimation1;
+    std::function<void()> onPostRiverRunAnimation;
 
     void clear()
     {

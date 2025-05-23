@@ -122,4 +122,9 @@ void GuiBridgeWidgets::connectTo(GameEvents& events)
         QMetaObject::invokeMethod(
             myGameTableWindow, [this]() { myGameTableWindow->postRiverAnimation1(); }, Qt::DirectConnection);
     };
+    events.onPostRiverRunAnimation = [this]()
+    {
+        QMetaObject::invokeMethod(
+            myGameTableWindow, [this]() { myGameTableWindow->postRiverRunAnimation1(); }, Qt::DirectConnection);
+    };
 }

@@ -115,7 +115,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     // void signalRiverAnimation1();
     void signalRiverAnimation2();
     // void signalPostRiverAnimation1();
-    void signalPostRiverRunAnimation1();
+    // void signalPostRiverRunAnimation1();
 
     // void signalFlipHoleCardsAllIn();
 

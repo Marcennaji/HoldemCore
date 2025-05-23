@@ -66,8 +66,3 @@ void GuiWrapper::riverAnimation2()
 {
     myW->signalRiverAnimation2();
 }
-
-void GuiWrapper::postRiverRunAnimation1()
-{
-    myW->signalPostRiverRunAnimation1();
-}

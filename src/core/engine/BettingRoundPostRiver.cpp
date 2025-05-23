@@ -87,7 +87,8 @@ void BettingRoundPostRiver::postRiverRun()
     {
         getHand()->getPlayersStatisticsStore()->updatePlayersStatistics(getHand()->getActivePlayerList());
     }
-    getHand()->getGuiInterface()->postRiverRunAnimation1();
+    if (myEvents && myEvents->onPostRiverAnimation)
+        myEvents->onPostRiverRunAnimation();
 
     if (getHand()->getCardsShown())
     {
