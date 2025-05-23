@@ -14,6 +14,7 @@ struct GameEvents
     std::function<void()> onDealHoleCards;
     std::function<void(unsigned playerId)> onShowHoleCards;
     std::function<void(int bettingRoundId)> onDealBettingRoundCards;
+    std::function<void()> onFlipHoleCardsAllIn;
 
     std::function<void()> onActivePlayerActionDone;
 
@@ -34,16 +35,12 @@ struct GameEvents
     std::function<void(int bettingRoundId)> onBettingRoundAnimation;
 
     std::function<void()> onPreflopAnimation;
+    std::function<void()> onFlopAnimation;
+    std::function<void()> onTurnAnimation;
+    std::function<void()> onRiverAnimation;
+    std::function<void()> onPostRiverAnimation;
 
-    std::function<void()> onFlopAnimation1;
-    std::function<void()> onFlopAnimation2;
-    std::function<void()> onTurnAnimation1;
-    std::function<void()> onTurnAnimation2;
-    std::function<void()> onRiverAnimation1;
-    std::function<void()> onRiverAnimation2;
-    std::function<void()> onPostRiverAnimation1;
     std::function<void()> onPostRiverRunAnimation1;
-    std::function<void()> onFlipHoleCardsAllIn;
 
     void clear()
     {

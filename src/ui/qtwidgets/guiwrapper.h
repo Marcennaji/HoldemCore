@@ -48,7 +48,6 @@ class GuiWrapper : public IGui
     void flopAnimation1();
     void flopAnimation2();
 
-    void turnAnimation1();
     void turnAnimation2();
 
     void riverAnimation1();

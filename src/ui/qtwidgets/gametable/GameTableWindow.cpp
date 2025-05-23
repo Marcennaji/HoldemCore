@@ -409,13 +409,13 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     // connect(this, SIGNAL(signalBettingRoundAnimation2(int)), this, SLOT(bettingRoundAnimation(int)));
     // connect(this, SIGNAL(signalPreflopAnimation1()), this, SLOT(preflopAnimation1()));
     connect(this, SIGNAL(signalPreflopAnimation2()), this, SLOT(preflopAnimation2()));
-    connect(this, SIGNAL(signalFlopAnimation1()), this, SLOT(flopAnimation1()));
+    // connect(this, SIGNAL(signalFlopAnimation1()), this, SLOT(flopAnimation1()));
     connect(this, SIGNAL(signalFlopAnimation2()), this, SLOT(flopAnimation2()));
-    connect(this, SIGNAL(signalTurnAnimation1()), this, SLOT(turnAnimation1()));
+    // connect(this, SIGNAL(signalTurnAnimation1()), this, SLOT(turnAnimation1()));
     connect(this, SIGNAL(signalTurnAnimation2()), this, SLOT(turnAnimation2()));
-    connect(this, SIGNAL(signalRiverAnimation1()), this, SLOT(riverAnimation1()));
+    // connect(this, SIGNAL(signalRiverAnimation1()), this, SLOT(riverAnimation1()));
     connect(this, SIGNAL(signalRiverAnimation2()), this, SLOT(riverAnimation2()));
-    connect(this, SIGNAL(signalPostRiverAnimation1()), this, SLOT(postRiverAnimation1()));
+    // connect(this, SIGNAL(signalPostRiverAnimation1()), this, SLOT(postRiverAnimation1()));
     connect(this, SIGNAL(signalPostRiverRunAnimation1()), this, SLOT(postRiverRunAnimation1()));
     // connect(this, SIGNAL(signalPostRiverShowCards(unsigned)), this, SLOT(showHoleCards(unsigned)));
     // connect(this, SIGNAL(signalFlipHoleCardsAllIn()), this, SLOT(flipHoleCardsAllIn()));

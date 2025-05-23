@@ -573,22 +573,26 @@ void Hand::switchRounds()
     break;
     case GAME_STATE_FLOP:
     {
-        myGui->flopAnimation1();
+        if (myEvents && myEvents->onFlopAnimation)
+            myEvents->onFlopAnimation();
     }
     break;
     case GAME_STATE_TURN:
     {
-        myGui->turnAnimation1();
+        if (myEvents && myEvents->onTurnAnimation)
+            myEvents->onTurnAnimation();
     }
     break;
     case GAME_STATE_RIVER:
     {
-        myGui->riverAnimation1();
+        if (myEvents && myEvents->onRiverAnimation)
+            myEvents->onRiverAnimation();
     }
     break;
     case GAME_STATE_POST_RIVER:
     {
-        myGui->postRiverAnimation1();
+        if (myEvents && myEvents->onPostRiverAnimation)
+            myEvents->onPostRiverAnimation();
     }
     break;
     default:

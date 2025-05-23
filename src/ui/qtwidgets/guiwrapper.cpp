@@ -52,37 +52,21 @@ void GuiWrapper::preflopAnimation2()
     myW->signalPreflopAnimation2();
 }
 
-void GuiWrapper::flopAnimation1()
-{
-    myW->signalFlopAnimation1();
-}
 void GuiWrapper::flopAnimation2()
 {
     myW->signalFlopAnimation2();
 }
 
-void GuiWrapper::turnAnimation1()
-{
-    myW->signalTurnAnimation1();
-}
 void GuiWrapper::turnAnimation2()
 {
     myW->signalTurnAnimation2();
 }
 
-void GuiWrapper::riverAnimation1()
-{
-    myW->signalRiverAnimation1();
-}
 void GuiWrapper::riverAnimation2()
 {
     myW->signalRiverAnimation2();
 }
 
-void GuiWrapper::postRiverAnimation1()
-{
-    myW->signalPostRiverAnimation1();
-}
 void GuiWrapper::postRiverRunAnimation1()
 {
     myW->signalPostRiverRunAnimation1();
