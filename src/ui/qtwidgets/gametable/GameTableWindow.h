@@ -76,7 +76,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     void setSpeeds();
 
   signals:
-    void signalInitGui(int speed);
+    // void signalinitializeGui(int speed);
 
     void signalShowClientDialog();
 
@@ -121,7 +121,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
 
   public slots:
 
-    void initGui(int speed);
+    void initializeGui(int speed);
     void hideHoleCards();
 
     void refreshSet();
@@ -229,7 +229,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
 
     void startNewHand();
 
-    void stopTimer();
+    void stopAllGuiTimers();
 
     void nextBettingRoundInitializeGui();
 

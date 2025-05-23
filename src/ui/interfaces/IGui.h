@@ -30,7 +30,7 @@ class IGui
   public:
     virtual ~IGui() {};
 
-    virtual void initGui(int speed) = 0;
+    // virtual void initializeGui(int speed) = 0;
 
     virtual void* getGameTableWindow() const = 0;
 

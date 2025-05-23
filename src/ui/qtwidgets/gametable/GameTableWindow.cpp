@@ -385,7 +385,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
 
     connect(pushButton_break, SIGNAL(clicked()), this, SLOT(breakButtonClicked()));
 
-    connect(this, SIGNAL(signalInitGui(int)), this, SLOT(initGui(int)));
+    // connect(this, SIGNAL(signalinitializeGui(int)), this, SLOT(initializeGui(int)));
     // connect(this, SIGNAL(signalRefreshSet()), this, SLOT(refreshSet()));
     // connect(this, SIGNAL(signalRefreshCash()), this, SLOT(refreshCash()));
     // connect(this, SIGNAL(signalRefreshAction(int, int)), this, SLOT(refreshAction(int, int)));
@@ -469,10 +469,9 @@ void GameTableWindow::hideHoleCards()
     }
 }
 
-void GameTableWindow::initGui(int speed)
+void GameTableWindow::initializeGui(int speed)
 {
-    // kill running Singleshots!!!
-    stopTimer();
+    stopAllGuiTimers();
 
     label_Pot->setText(PotString);
 
@@ -2593,7 +2592,7 @@ void GameTableWindow::nextBettingRoundInitializeGui()
     clearMyButtons();
 }
 
-void GameTableWindow::stopTimer()
+void GameTableWindow::stopAllGuiTimers()
 {
 
     dealFlopCards0Timer->stop();
@@ -2631,20 +2630,18 @@ void GameTableWindow::stopTimer()
 
 void GameTableWindow::setSpeeds()
 {
-
     gameSpeed = (11 - guiGameSpeed) * 10;
-    dealCardsSpeed = (gameSpeed / 2) * 10;    // milliseconds
-    preDealCardsSpeed = dealCardsSpeed * 2;   // Zeit for Karten aufdecken auf dem Board (Flop, Turn, River)
-    postDealCardsSpeed = dealCardsSpeed * 3;  // Zeit nach Karten aufdecken auf dem Board (Flop, Turn, River)
-    AllInDealCardsSpeed = dealCardsSpeed * 4; // Zeit nach Karten aufdecken auf dem Board (Flop, Turn, River) bei AllIn
+    dealCardsSpeed = (gameSpeed / 2) * 10; // milliseconds
+    preDealCardsSpeed = dealCardsSpeed * 2;
+    postDealCardsSpeed = dealCardsSpeed * 3;
+    AllInDealCardsSpeed = dealCardsSpeed * 4;
     postRiverRunAnimationSpeed = gameSpeed * 18;
     winnerBlinkSpeed = gameSpeed * 3; // milliseconds
     newRoundSpeed = gameSpeed * 35;
-    nextPlayerSpeed1 = gameSpeed * 10; // Zeit zwischen dem Setzen des Spielers und dem Verdunkeln
-    nextPlayerSpeed2 = gameSpeed * 4;  // Zeit zwischen Verdunkeln des einen und aufhellen des anderen Spielers
-    nextPlayerSpeed3 = gameSpeed * 7;  // Zeit bis zwischen Aufhellen und Aktion
-    preflopNextPlayerSpeed =
-        gameSpeed * 10; // Zeit bis zwischen Aufhellen und Aktion im Preflop (etwas langsamer da nicht gerechnet wird. )
+    nextPlayerSpeed1 = gameSpeed * 10;
+    nextPlayerSpeed2 = gameSpeed * 4;
+    nextPlayerSpeed3 = gameSpeed * 7;
+    preflopNextPlayerSpeed = gameSpeed * 10;
 }
 
 void GameTableWindow::breakButtonClicked()
@@ -2934,7 +2931,7 @@ void GameTableWindow::closeGameTable()
 
     if (close)
     {
-        stopTimer();
+        stopAllGuiTimers();
         myStartWindow->show();
         this->hide();
     }

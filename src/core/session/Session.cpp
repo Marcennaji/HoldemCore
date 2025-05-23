@@ -57,7 +57,8 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
     if (myEvents && myEvents->onHideHoleCards)
         myEvents->onHideHoleCards();
 
-    myGui->initGui(gameData.guiSpeed);
+    if (myEvents && myEvents->onInitializeGui)
+        myEvents->onInitializeGui(gameData.guiSpeed);
 
     std::shared_ptr<EngineFactory> factory(new EngineFactory(myEvents, myLogger));
 

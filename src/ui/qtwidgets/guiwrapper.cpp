@@ -42,11 +42,6 @@ void GuiWrapper::setStartWindow(void* w)
         myW->setStartWindow(myStartWindow);
 }
 
-void GuiWrapper::initGui(int speed)
-{
-    myW->signalInitGui(speed);
-}
-
 void GuiWrapper::preflopAnimation2()
 {
     myW->signalPreflopAnimation2();

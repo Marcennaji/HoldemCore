@@ -6,6 +6,8 @@
 
 struct GameEvents
 {
+    std::function<void(int gameSpeed)> onInitializeGui;
+
     // --- Game state display ---
     std::function<void(int)> onPotUpdated;
     std::function<void(unsigned playerId, int newChips)> onPlayerChipsUpdated;

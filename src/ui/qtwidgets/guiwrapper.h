@@ -36,7 +36,6 @@ class GuiWrapper : public IGui
     ~GuiWrapper();
 
     void setStartWindow(void* w);
-    void initGui(int speed);
 
     void* getGameTableWindow() const override { return static_cast<void*>(myW); }
 

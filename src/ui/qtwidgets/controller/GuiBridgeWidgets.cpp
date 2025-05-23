@@ -7,6 +7,12 @@ GuiBridgeWidgets::GuiBridgeWidgets(GameTableWindow* table, QObject* parent) : QO
 
 void GuiBridgeWidgets::connectTo(GameEvents& events)
 {
+    events.onInitializeGui = [this](int gameSpeed)
+    {
+        QMetaObject::invokeMethod(
+            myGameTableWindow, [this, gameSpeed]() { myGameTableWindow->initializeGui(gameSpeed); },
+            Qt::DirectConnection);
+    };
     events.onPotUpdated = [this](int pot)
     {
         QMetaObject::invokeMethod(
