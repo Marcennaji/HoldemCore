@@ -68,8 +68,8 @@ class CurrentHandActions
     std::vector<PlayerAction> m_riverActions;
 };
 
-static const char* TightAgressivePlayerName[] = {"Tintin",  "Tonio", "Theo",  "Ted",  "Thor",
-                                                 "Taslima", "Tina",  "Tania", "Tata", "Timmy"};
+static const char* TightAggressivePlayerName[] = {"Tintin",  "Tonio", "Theo",  "Ted",  "Thor",
+                                                  "Taslima", "Tina",  "Tania", "Tata", "Timmy"};
 
 static const char* LooseAggressivePlayerName[] = {"Louis", "Louane", "Ludovic", "Lucas", "Laure",
                                                   "Leila", "Lino",   "Laurent", "Lucie", "Ludivine"};

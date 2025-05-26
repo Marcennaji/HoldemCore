@@ -61,7 +61,7 @@ void StartWindow::startNewGame()
 
     if (radioButton_opponentsLooseAggressive->isChecked())
         gameData.tableProfile = LARGE_AGRESSIVE_OPPONENTS;
-    else if (radioButton_opponentsTightAgressive->isChecked())
+    else if (radioButton_opponentsTightAggressive->isChecked())
         gameData.tableProfile = TIGHT_AGRESSIVE_OPPONENTS;
     else
         gameData.tableProfile = RANDOM_OPPONENTS;

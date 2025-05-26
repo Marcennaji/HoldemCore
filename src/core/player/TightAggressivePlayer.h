@@ -21,14 +21,14 @@
 #include "Player.h"
 namespace pkt::core
 {
-class TightAgressivePlayer : public Player
+class TightAggressivePlayer : public Player
 {
 
   public:
-    TightAgressivePlayer(GameEvents* events, IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type,
-                         std::string name, int sC, bool aS, bool sotS, int mB);
+    TightAggressivePlayer(GameEvents* events, IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type,
+                          std::string name, int sC, bool aS, bool sotS, int mB);
 
-    ~TightAgressivePlayer();
+    ~TightAggressivePlayer();
 
   protected:
     bool preflopShouldCall();

@@ -26,7 +26,7 @@
 #include <core/player/HumanPlayer.h>
 #include <core/player/LooseAggressivePlayer.h>
 #include <core/player/ManiacPlayer.h>
-#include <core/player/TightAgressivePlayer.h>
+#include <core/player/TightAggressivePlayer.h>
 #include <core/player/UltraTightPlayer.h>
 
 #include <algorithm>
@@ -94,10 +94,10 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
                 Randomizer::GetRand(1, 3, 1, &rand);
 
                 if (rand == 1)
-                    player =
-                        new TightAgressivePlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
-                                                 PLAYER_TYPE_COMPUTER, TightAgressivePlayerName[i], gameData.startMoney,
-                                                 startData.numberOfPlayers > i, i == 0 ? true : false, 0);
+                    player = new TightAggressivePlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
+                                                       PLAYER_TYPE_COMPUTER, TightAggressivePlayerName[i],
+                                                       gameData.startMoney, startData.numberOfPlayers > i,
+                                                       i == 0 ? true : false, 0);
                 else
                     player = new UltraTightPlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
                                                   PLAYER_TYPE_COMPUTER, UltraTightPlayerName[i], gameData.startMoney,
@@ -150,10 +150,10 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
                 }
                 else if (nbTight < startData.numberOfPlayers / 3)
                 {
-                    player =
-                        new TightAgressivePlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
-                                                 PLAYER_TYPE_COMPUTER, TightAgressivePlayerName[i], gameData.startMoney,
-                                                 startData.numberOfPlayers > i, i == 0 ? true : false, 0);
+                    player = new TightAggressivePlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
+                                                       PLAYER_TYPE_COMPUTER, TightAggressivePlayerName[i],
+                                                       gameData.startMoney, startData.numberOfPlayers > i,
+                                                       i == 0 ? true : false, 0);
                     nbTight++;
                 }
                 else

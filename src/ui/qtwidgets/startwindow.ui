@@ -79,7 +79,7 @@
            <bool>false</bool>
           </property>
          </widget>
-         <widget class="QRadioButton" name="radioButton_opponentsTightAgressive">
+         <widget class="QRadioButton" name="radioButton_opponentsTightAggressive">
           <property name="geometry">
            <rect>
             <x>10</x>

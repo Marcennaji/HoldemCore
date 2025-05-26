@@ -31,7 +31,7 @@
 #include "HumanPlayer.h"
 #include "LooseAggressivePlayer.h"
 #include "ManiacPlayer.h"
-#include "TightAgressivePlayer.h"
+#include "TightAggressivePlayer.h"
 
 namespace pkt::core
 {

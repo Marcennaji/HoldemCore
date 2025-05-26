@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
-#include "TightAgressivePlayer.h"
+#include "TightAggressivePlayer.h"
 
 #include <core/engine/CardsValue.h>
 #include <core/engine/Exception.h>
@@ -35,8 +35,9 @@ namespace pkt::core
 
 using namespace std;
 
-TightAgressivePlayer::TightAgressivePlayer(GameEvents* events, IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id,
-                                           PlayerType type, std::string name, int sC, bool aS, bool sotS, int mB)
+TightAggressivePlayer::TightAggressivePlayer(GameEvents* events, IHandAuditStore* ha, IPlayersStatisticsStore* ps,
+                                             int id, PlayerType type, std::string name, int sC, bool aS, bool sotS,
+                                             int mB)
     : Player(events, ha, ps, id, type, name, sC, aS, sotS, mB)
 {
 
@@ -45,11 +46,11 @@ TightAgressivePlayer::TightAgressivePlayer(GameEvents* events, IHandAuditStore* 
     initializeRanges(45, utgFullTableRange);
 }
 
-TightAgressivePlayer::~TightAgressivePlayer()
+TightAggressivePlayer::~TightAggressivePlayer()
 {
 }
 
-bool TightAgressivePlayer::preflopShouldCall()
+bool TightAggressivePlayer::preflopShouldCall()
 {
 
     const int nbRaises = currentHand->getPreflopRaisesNumber();
@@ -121,7 +122,7 @@ bool TightAgressivePlayer::preflopShouldCall()
     return isCardsInRange(myCard1, myCard2, stringCallingRange);
 }
 
-bool TightAgressivePlayer::preflopShouldRaise()
+bool TightAggressivePlayer::preflopShouldRaise()
 {
 
     const int nbRaises = currentHand->getPreflopRaisesNumber();
@@ -229,7 +230,7 @@ bool TightAgressivePlayer::preflopShouldRaise()
     return true;
 }
 
-bool TightAgressivePlayer::flopShouldBet()
+bool TightAggressivePlayer::flopShouldBet()
 {
 
     const int pot = currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets();
@@ -354,7 +355,7 @@ bool TightAgressivePlayer::flopShouldBet()
 
     return false;
 }
-bool TightAgressivePlayer::flopShouldCall()
+bool TightAggressivePlayer::flopShouldCall()
 {
 
     const int nbRaises = currentHand->getFlopBetsOrRaisesNumber();
@@ -377,7 +378,7 @@ bool TightAgressivePlayer::flopShouldCall()
     return true;
 }
 
-bool TightAgressivePlayer::flopShouldRaise()
+bool TightAggressivePlayer::flopShouldRaise()
 {
 
     const int pot = currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets();
@@ -453,7 +454,7 @@ bool TightAgressivePlayer::flopShouldRaise()
     return false;
 }
 
-bool TightAgressivePlayer::turnShouldBet()
+bool TightAggressivePlayer::turnShouldBet()
 {
 
     const bool bHavePosition = getHavePosition(myPosition, currentHand->getRunningPlayerList());
@@ -525,7 +526,7 @@ bool TightAgressivePlayer::turnShouldBet()
     return false;
 }
 
-bool TightAgressivePlayer::turnShouldCall()
+bool TightAggressivePlayer::turnShouldCall()
 {
 
     const int pot = currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets();
@@ -590,7 +591,7 @@ bool TightAgressivePlayer::turnShouldCall()
     return true;
 }
 
-bool TightAgressivePlayer::turnShouldRaise()
+bool TightAggressivePlayer::turnShouldRaise()
 {
 
     const int pot = currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets();
@@ -646,7 +647,7 @@ bool TightAgressivePlayer::turnShouldRaise()
     return false;
 }
 
-bool TightAgressivePlayer::riverShouldBet()
+bool TightAggressivePlayer::riverShouldBet()
 {
 
     const int pot = currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets();
@@ -747,7 +748,7 @@ bool TightAgressivePlayer::riverShouldBet()
     return false;
 }
 
-bool TightAgressivePlayer::riverShouldCall()
+bool TightAggressivePlayer::riverShouldCall()
 {
 
     const int lastRaiserID = currentHand->getLastRaiserID();
@@ -825,7 +826,7 @@ bool TightAgressivePlayer::riverShouldCall()
     return true;
 }
 
-bool TightAgressivePlayer::riverShouldRaise()
+bool TightAggressivePlayer::riverShouldRaise()
 {
 
     const int pot = currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets();
