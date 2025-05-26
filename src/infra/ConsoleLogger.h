@@ -3,12 +3,18 @@
 #include <iostream>
 #include <string>
 
-class ConsoleLogger : public ILogger {
+namespace pkt::infra
+{
+
+class ConsoleLogger : public pkt::core::ILogger
+{
     int logLevel;
-public:
+
+  public:
     explicit ConsoleLogger(int level = 1);
 
     void error(const std::string& msg) override;
     void info(const std::string& msg) override;
     void verbose(const std::string& msg, int level = 2) override;
 };
+} // namespace pkt::infra

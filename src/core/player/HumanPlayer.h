@@ -15,11 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
-#ifndef HUMAN_PLAYER_H
-#define HUMAN_PLAYER_H
+
+#pragma once
 
 #include "Player.h"
-
+namespace pkt::core
+{
 class HumanPlayer : public Player
 {
 
@@ -47,4 +48,4 @@ class HumanPlayer : public Player
     bool riverShouldBet() { return false; }
 };
 
-#endif
+} // namespace pkt::core

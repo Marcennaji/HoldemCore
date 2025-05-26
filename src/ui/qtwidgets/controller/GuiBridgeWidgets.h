@@ -11,7 +11,7 @@ class GuiBridgeWidgets : public QObject
 
   public:
     explicit GuiBridgeWidgets(GameTableWindow* table, QObject* parent = nullptr);
-    void connectTo(GameEvents& events);
+    void connectTo(pkt::core::GameEvents& events);
 
   private:
     GameTableWindow* myGameTableWindow;

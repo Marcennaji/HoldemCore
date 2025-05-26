@@ -31,6 +31,9 @@
 #include <map>
 #include <sstream>
 
+namespace pkt::core
+{
+
 using namespace std;
 
 UltraTightPlayer::UltraTightPlayer(GameEvents* events, IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id,
@@ -853,3 +856,4 @@ bool UltraTightPlayer::riverShouldRaise()
 
     return false;
 }
+} // namespace pkt::core

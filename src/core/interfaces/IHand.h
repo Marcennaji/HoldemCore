@@ -23,6 +23,12 @@
 #include "core/interfaces/IBettingRound.h"
 #include "core/interfaces/IBoard.h"
 
+#include <memory>
+#include <vector>
+
+namespace pkt::core
+{
+
 class IRankingStore;
 class IPlayersStatisticsStore;
 class IHandAuditStore;
@@ -110,3 +116,4 @@ class IHand
     friend class BettingRoundRiver;
     friend class BettingRoundPostRiver;
 };
+} // namespace pkt::core

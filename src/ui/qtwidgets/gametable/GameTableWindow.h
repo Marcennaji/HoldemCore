@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
-#ifndef GAMETABLEIMPL_H
-#define GAMETABLEIMPL_H
+#pragma once
 
 #include <core/engine/EngineDefs.h>
 #include <core/engine/model/GameData.h>
@@ -34,10 +33,13 @@
 
 #define USER_WIDGETS_NUMBER 9
 
+namespace pkt::core
+{
 class Game;
-
 class IBoard;
 class Player;
+} // namespace pkt::core
+
 class MyCardsPixmapLabel;
 class MyCashLabel;
 class MyNameLabel;
@@ -66,7 +68,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
 
     ~GameTableWindow();
 
-    Session* getSession();
+    pkt::core::Session* getSession();
 
     GameTableStyleReader* getGameTableStyle() const;
 
@@ -133,10 +135,10 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     void refreshTableDescriptiveLabels(int);
     void refreshDealerAndBlindsButtons();
     void refreshPlayerStatistics();
-    void refreshCardsChance(GameState);
+    void refreshCardsChance(pkt::core::GameState);
     void refreshHandsRanges();
 
-    SeatState getCurrentSeatState(std::shared_ptr<Player>);
+    SeatState getCurrentSeatState(std::shared_ptr<pkt::core::Player>);
 
     void dealHoleCards();
 
@@ -388,8 +390,4 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     QString FlopString;
     QString TurnString;
     QString RiverString;
-
-    friend class GuiWrapper;
 };
-
-#endif

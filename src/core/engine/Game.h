@@ -16,14 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 
-#ifndef GAME_H
-#define GAME_H
+#pragma once
 
 #include "EngineDefs.h"
 #include "model/GameData.h"
 #include "model/StartData.h"
 
 #include <string>
+
+namespace pkt::core
+{
 
 struct GameEvents;
 class IRankingStore;
@@ -115,4 +117,4 @@ class Game
     std::list<int> blindsList;
 };
 
-#endif
+} // namespace pkt::core

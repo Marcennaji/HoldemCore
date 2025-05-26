@@ -54,6 +54,8 @@
 #endif
 
 using namespace std;
+using namespace pkt::core;
+using Game = pkt::core::Game;
 
 GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* parent)
     : QMainWindow(parent), gameSpeed(0), myActionIsBet(0), myActionIsRaise(0), pushButtonBetRaiseIsChecked(false),

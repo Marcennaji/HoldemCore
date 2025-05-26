@@ -15,15 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
-
-#ifndef BOARD_H
-#define BOARD_H
+#pragma once
 
 #include <iostream>
 #include <memory>
 #include <vector>
 
 #include "core/interfaces/IBoard.h"
+namespace pkt::core
+{
 
 class Player;
 class IHand;
@@ -75,4 +75,4 @@ class Board : public IBoard
     unsigned lastActionPlayerID;
 };
 
-#endif
+} // namespace pkt::core

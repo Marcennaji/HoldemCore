@@ -3,6 +3,8 @@
 
 #include <core/engine/GameEvents.h>
 #include <core/interfaces/ILogger.h>
+#include <core/session/Session.h>
+#include <infra/persistence/SqliteLogStore.h>
 
 #include <QString>
 #include <memory>
@@ -16,7 +18,8 @@ class GuiBridgeWidgets;
 class GuiAppController
 {
   public:
-    GuiAppController(ILogger* logger, const QString& appPath, const QString& logPath, const QString& userDataPath);
+    GuiAppController(pkt::core::ILogger* logger, const QString& appPath, const QString& logPath,
+                     const QString& userDataPath);
     ~GuiAppController();
 
     StartWindow* createMainWindow();
@@ -25,9 +28,9 @@ class GuiAppController
     QString myAppDataPath;
     QString myLogPath;
     QString myUserDataPath;
-    std::unique_ptr<SqliteLogStore> myGameActionslogger;
+    std::unique_ptr<pkt::infra::SqliteLogStore> myGameActionslogger;
     std::unique_ptr<GameTableWindow> myGameTableWindow;
-    std::unique_ptr<Session> mySession;
-    std::unique_ptr<GameEvents> myEvents;
+    std::unique_ptr<pkt::core::Session> mySession;
+    std::unique_ptr<pkt::core::GameEvents> myEvents;
     std::unique_ptr<GuiBridgeWidgets> myBridge;
 };

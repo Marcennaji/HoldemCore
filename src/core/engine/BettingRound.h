@@ -16,12 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 
-#ifndef BERO_H
-#define BERO_H
+#pragma once
 
 #include <core/interfaces/ILogger.h>
 #include "core/interfaces/IBettingRound.h"
 #include "core/interfaces/IHand.h"
+
+namespace pkt::core
+{
+class GameEvents;
 
 class BettingRound : public IBettingRound
 {
@@ -116,4 +119,4 @@ class BettingRound : public IBettingRound
     bool logBoardCardsDone;
 };
 
-#endif
+} // namespace pkt::core

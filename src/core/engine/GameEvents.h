@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 
+namespace pkt::core
+{
+
 struct GameEvents
 {
     std::function<void(int gameSpeed)> onInitializeGui;
@@ -48,3 +51,4 @@ struct GameEvents
         *this = GameEvents(); // reset all handlers
     }
 };
+} // namespace pkt::core

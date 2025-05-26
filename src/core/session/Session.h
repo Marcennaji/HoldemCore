@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
-#ifndef STDSESSION_H
-#define STDSESSION_H
+
+#pragma once
 
 #include <memory>
 #include <string>
@@ -26,7 +26,8 @@
 #include <core/engine/model/StartData.h>
 #include <core/interfaces/ILogger.h>
 #include "core/engine/GameEvents.h"
-
+namespace pkt::core
+{
 class Game;
 class IRankingStore;
 class IPlayersStatisticsStore;
@@ -59,4 +60,4 @@ class Session
     IHandAuditStore* myHandAuditStore;
 };
 
-#endif
+} // namespace pkt::core

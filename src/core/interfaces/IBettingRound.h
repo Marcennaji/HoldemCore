@@ -21,6 +21,9 @@
 #include "core/engine/EngineDefs.h"
 #include "core/engine/model/GameState.h"
 
+namespace pkt::core
+{
+
 class IBettingRound
 {
   public:
@@ -61,3 +64,4 @@ class IBettingRound
 
     virtual void postRiverRun() = 0;
 };
+} // namespace pkt::core

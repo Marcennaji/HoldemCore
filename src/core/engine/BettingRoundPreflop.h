@@ -22,8 +22,10 @@
 
 #include <iostream>
 
-class IHand;
+namespace pkt::core
+{
 
+class IHand;
 class BettingRoundPreflop : public BettingRound
 {
 
@@ -37,3 +39,4 @@ class BettingRoundPreflop : public BettingRound
     // 	PlayerListIterator bigBlindPositionIt; // iterator for activePlayerList
     // 	unsigned bigBlindPositionId;
 };
+} // namespace pkt::core

@@ -16,10 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 
-#ifndef BOARDINTERFACE_H
-#define BOARDINTERFACE_H
+#pragma once
 
 #include "core/engine/EngineDefs.h"
+
+#include <list>
+namespace pkt::core
+{
 
 class IHand;
 
@@ -49,10 +52,10 @@ class IBoard
     virtual void determinePlayerNeedToShowCards() = 0;
 
     virtual std::list<unsigned> getWinners() const = 0;
-    virtual void setWinners(const std::list<unsigned>& winners) = 0;
+    virtual void setWinners(const ::std::list<unsigned>& winners) = 0;
 
     virtual std::list<unsigned> getPlayerNeedToShowCards() const = 0;
-    virtual void setPlayerNeedToShowCards(const std::list<unsigned>& playerNeedToShowCards) = 0;
+    virtual void setPlayerNeedToShowCards(const ::std::list<unsigned>& playerNeedToShowCards) = 0;
 };
 
-#endif
+} // namespace pkt::core

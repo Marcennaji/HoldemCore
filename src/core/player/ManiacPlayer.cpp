@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
+
 #include <core/player/ManiacPlayer.h>
 
 #include <core/engine/CardsValue.h>
@@ -29,6 +30,9 @@
 #include <iostream>
 #include <map>
 #include <sstream>
+
+namespace pkt::core
+{
 
 using namespace std;
 
@@ -810,3 +814,4 @@ bool ManiacPlayer::riverShouldRaise()
 
     return false;
 }
+} // namespace pkt::core

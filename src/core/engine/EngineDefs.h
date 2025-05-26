@@ -18,35 +18,36 @@
 
 #pragma once
 
-#include <memory>
 #include <list>
+#include <memory>
 
+namespace pkt::core
+{
 class Player;
 
-typedef std::shared_ptr<std::list<std::shared_ptr<Player> > > PlayerList;
-typedef std::list<std::shared_ptr<Player> >::iterator PlayerListIterator;
-typedef std::list<std::shared_ptr<Player> >::const_iterator PlayerListConstIterator;
+typedef std::shared_ptr<std::list<std::shared_ptr<Player>>> PlayerList;
+typedef std::list<std::shared_ptr<Player>>::iterator PlayerListIterator;
+typedef std::list<std::shared_ptr<Player>>::const_iterator PlayerListConstIterator;
+} // namespace pkt::core
 
+#define MIN_NUMBER_OF_PLAYERS 2
+#define MAX_NUMBER_OF_PLAYERS 10
 
-#define MIN_NUMBER_OF_PLAYERS        2
-#define MAX_NUMBER_OF_PLAYERS        10
+#define DEBUG_MODE 0
+#define SQLITE_LOG 1
+#define SQLITE_LOG_ALL 0
 
-#define DEBUG_MODE                   0
-#define SQLITE_LOG                   1
-#define SQLITE_LOG_ALL               0
+#define POKERTRAINING_VERSION_MAJOR 0
+#define POKERTRAINING_VERSION_MINOR 1
+#define POKERTRAINING_VERSION ((POKERTRAINING_VERSION_MAJOR << 8) | POKERTRAINING_VERSION_MINOR)
 
-#define POKERTRAINING_VERSION_MAJOR  0
-#define POKERTRAINING_VERSION_MINOR  1
-#define POKERTRAINING_VERSION        ((POKERTRAINING_VERSION_MAJOR << 8) | POKERTRAINING_VERSION_MINOR)
-
-#define POKERTRAINING_BETA_REVISION  0
+#define POKERTRAINING_BETA_REVISION 0
 #define POKERTRAINING_BETA_RELEASE_STRING "1.5.0"
 
-#define SQLITE_LOG_VERSION           1
+#define SQLITE_LOG_VERSION 1
 
-#define GAME_START_CASH              100
-#define GAME_NUMBER_OF_PLAYERS       6
-#define GAME_START_SBLIND            5
-#define GAME_SPEED                   8
+#define GAME_START_CASH 100
+#define GAME_NUMBER_OF_PLAYERS 6
+#define GAME_START_SBLIND 5
+#define GAME_SPEED 8
 #define MIN_HANDS_STATISTICS_ACCURATE 30
-

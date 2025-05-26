@@ -25,6 +25,9 @@
 #include <core/interfaces/ILogger.h>
 #include <core/player/Player.h>
 
+namespace pkt::core
+{
+
 using namespace std;
 
 BettingRound::BettingRound(GameEvents* events, ILogger* logger, IHand* hi, unsigned dP, int sB, GameState gS)
@@ -451,3 +454,4 @@ int BettingRound::getSmallBlind() const
 {
     return smallBlind;
 }
+} // namespace pkt::core

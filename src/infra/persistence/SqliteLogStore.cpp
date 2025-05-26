@@ -28,7 +28,11 @@
 #include <sstream>
 #include <sys/types.h>
 
+namespace pkt::infra
+{
+
 using namespace std;
+using namespace pkt::core;
 
 SqliteLogStore::SqliteLogStore(const std::string& logDir)
     : mySqliteLogDb(0), mySqliteLogFileName(""), myLogDir(logDir), uniqueGameID(0), currentHandID(0), sql("")
@@ -642,3 +646,4 @@ std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> SqliteLogStore::getPlaye
 
     return playerStatistics;
 }
+} // namespace pkt::infra

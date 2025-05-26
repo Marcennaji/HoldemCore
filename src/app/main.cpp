@@ -92,12 +92,12 @@ int main(int argc, char** argv)
     QApplication app(argc, argv);
     int* p = NULL;
 
-    AppDirectories dirs = AppDirectories::initialize();
+    pkt::infra::AppDirectories dirs = pkt::infra::AppDirectories::initialize();
     QString appPath = QString::fromStdString(dirs.appDataDir);
     QString logPath = QString::fromStdString(dirs.logDir);
     QString userPath = QString::fromStdString(dirs.userDataDir);
 
-    auto logger = std::make_unique<ConsoleLogger>();
+    auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
     GuiAppController controller(logger.get(), appPath, logPath, userPath);
     StartWindow* mainWindow = controller.createMainWindow();
 

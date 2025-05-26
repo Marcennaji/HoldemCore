@@ -34,6 +34,8 @@ static inline void InitRandState()
 {
     // No need for shared_ptr in this case
 }
+namespace pkt::core
+{
 
 void Randomizer::ShuffleArrayNonDeterministic(vector<int>& inout)
 {
@@ -52,3 +54,4 @@ void Randomizer::GetRand(int minValue, int maxValue, unsigned count, int* out)
         *startPtr++ = dist(g_rand_engine);
     }
 }
+} // namespace pkt::core

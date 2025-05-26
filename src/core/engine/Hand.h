@@ -31,6 +31,9 @@ class IRankingStore;
 class IPlayersStatisticsStore;
 class IHandAuditStore;
 
+namespace pkt::core
+{
+
 class Hand : public IHand
 {
   public:
@@ -147,3 +150,4 @@ class Hand : public IHand
     bool allInCondition;
     bool cardsShown;
 };
+} // namespace pkt::core

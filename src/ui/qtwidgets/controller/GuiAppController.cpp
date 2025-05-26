@@ -7,22 +7,23 @@
 
 #include "GuiBridgeWidgets.h"
 
-GuiAppController::GuiAppController(ILogger* logger, const QString& app, const QString& log, const QString& user)
+GuiAppController::GuiAppController(pkt::core::ILogger* logger, const QString& app, const QString& log,
+                                   const QString& user)
     : myAppDataPath(app), myLogPath(log), myUserDataPath(user)
 {
     assert(logger != nullptr);
 
-    myEvents = std::make_unique<GameEvents>();
+    myEvents = std::make_unique<pkt::core::GameEvents>();
 
-    myGameActionslogger = std::make_unique<SqliteLogStore>(myLogPath.toStdString());
+    myGameActionslogger = std::make_unique<pkt::infra::SqliteLogStore>(myLogPath.toStdString());
     myGameActionslogger->init();
 
     myGameTableWindow = std::make_unique<GameTableWindow>(myUserDataPath.toStdString());
     myBridge = std::make_unique<GuiBridgeWidgets>(myGameTableWindow.get());
     myBridge->connectTo(*myEvents);
 
-    mySession = std::make_unique<Session>(myEvents.get(), logger, myGameActionslogger.get(), myGameActionslogger.get(),
-                                          myGameActionslogger.get());
+    mySession = std::make_unique<pkt::core::Session>(myEvents.get(), logger, myGameActionslogger.get(),
+                                                     myGameActionslogger.get(), myGameActionslogger.get());
 }
 
 StartWindow* GuiAppController::createMainWindow()

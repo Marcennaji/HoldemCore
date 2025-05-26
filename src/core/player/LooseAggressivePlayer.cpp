@@ -30,6 +30,9 @@
 #include <map>
 #include <sstream>
 
+namespace pkt::core
+{
+
 using namespace std;
 
 LooseAggressivePlayer::LooseAggressivePlayer(GameEvents* events, IHandAuditStore* ha, IPlayersStatisticsStore* ps,
@@ -888,3 +891,4 @@ bool LooseAggressivePlayer::riverShouldRaise()
 
     return false;
 }
+} // namespace pkt::core

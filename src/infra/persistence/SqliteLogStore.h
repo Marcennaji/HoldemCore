@@ -33,8 +33,13 @@
 #define SQL_LOG_FILE "pokerTraining-log-v0.9.pdb"
 
 struct sqlite3;
+namespace pkt::infra
+{
 
-class SqliteLogStore : public IRankingStore, public IHandAuditStore, public IPlayersStatisticsStore
+using core::PlayerList;
+using core::PlayerStatistics;
+
+class SqliteLogStore : public core::IRankingStore, public core::IHandAuditStore, public core::IPlayersStatisticsStore
 {
 
   public:
@@ -68,3 +73,4 @@ class SqliteLogStore : public IRankingStore, public IHandAuditStore, public IPla
     std::string sql;
     std::string myLogDir;
 };
+} // namespace pkt::infra

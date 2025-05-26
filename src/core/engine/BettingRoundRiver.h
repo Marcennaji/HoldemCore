@@ -16,12 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 
-#ifndef BERORIVER_H
-#define BERORIVER_H
+#pragma once
 
 #include <iostream>
 #include "BettingRound.h"
-
+namespace pkt::core
+{
 class IHand;
 
 class BettingRoundRiver : public BettingRound
@@ -31,4 +31,4 @@ class BettingRoundRiver : public BettingRound
     ~BettingRoundRiver();
 };
 
-#endif
+} // namespace pkt::core

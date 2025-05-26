@@ -2,6 +2,9 @@
 
 #include "core/engine/EngineDefs.h"
 
+namespace pkt::core
+{
+
 class IRankingStore
 {
   public:
@@ -11,3 +14,4 @@ class IRankingStore
     virtual void updateRankingGameWinner(PlayerList activePlayerList) = 0;
     virtual void updateRankingPlayedGames(PlayerList activePlayerList) = 0;
 };
+} // namespace pkt::core

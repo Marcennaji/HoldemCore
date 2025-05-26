@@ -28,6 +28,9 @@
 
 #include <iostream>
 
+namespace pkt::core
+{
+
 using namespace std;
 
 Hand::Hand(GameEvents* events, ILogger* logger, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
@@ -844,3 +847,4 @@ void Hand::setTurnLastRaiserID(int id)
 {
     turnLastRaiserID = id;
 }
+} // namespace pkt::core

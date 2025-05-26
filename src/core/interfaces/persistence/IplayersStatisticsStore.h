@@ -4,6 +4,9 @@
 #include "core/engine/EngineDefs.h"
 #include "core/engine/model/PlayerStatistics.h"
 
+namespace pkt::core
+{
+
 class IPlayersStatisticsStore
 {
   public:
@@ -14,3 +17,4 @@ class IPlayersStatisticsStore
 
     virtual void updatePlayersStatistics(PlayerList activePlayerList) = 0;
 };
+} // namespace pkt::core

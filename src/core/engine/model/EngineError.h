@@ -18,7 +18,11 @@
 
 #pragma once
 
-enum class EngineError {
+namespace pkt::core
+{
+
+enum class EngineError
+{
     SEAT_NOT_FOUND = 10001,
     ACTIVE_PLAYER_NOT_FOUND = 10002,
     RUNNING_PLAYER_NOT_FOUND = 10003,
@@ -29,3 +33,4 @@ enum class EngineError {
     FORMER_RUNNING_PLAYER_NOT_FOUND = 10012,
     PLAYER_ACTION_ERROR = 10030
 };
+} // namespace pkt::core

@@ -16,8 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 
-#ifndef ENGINEFACTORY_H
-#define ENGINEFACTORY_H
+#pragma once
 
 #include "EngineFactory.h"
 
@@ -29,7 +28,8 @@
 
 #include <memory>
 #include <vector>
-
+namespace pkt::core
+{
 class EngineFactory
 {
   public:
@@ -48,4 +48,4 @@ class EngineFactory
     GameEvents* myEvents;
 };
 
-#endif
+} // namespace pkt::core

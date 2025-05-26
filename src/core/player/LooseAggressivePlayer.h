@@ -15,11 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
-#ifndef LARGE_AGRESSIVE_PLAYER_H
-#define LARGE_AGRESSIVE_PLAYER_H
+
+#pragma once
 
 #include "Player.h"
-
+namespace pkt::core
+{
 class LooseAggressivePlayer : public Player
 {
 
@@ -45,4 +46,4 @@ class LooseAggressivePlayer : public Player
     bool riverShouldBet();
 };
 
-#endif
+} // namespace pkt::core

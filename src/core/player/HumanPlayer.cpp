@@ -20,6 +20,8 @@
 #ifndef max
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 #endif
+namespace pkt::core
+{
 
 using namespace std;
 
@@ -49,3 +51,4 @@ const SimResults HumanPlayer::getHandSimulation() const
 
     return r;
 }
+} // namespace pkt::core

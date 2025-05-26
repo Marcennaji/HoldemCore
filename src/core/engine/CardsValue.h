@@ -21,25 +21,28 @@
 #include "EngineDefs.h"
 
 #include <iostream>
-#include <vector>
 #include <map>
+#include <memory>
+#include <vector>
+
+namespace pkt::core
+{
 
 typedef std::shared_ptr<std::list<std::shared_ptr<Player>>> PlayerList;
 
 class CardsValue
 {
-public:
+  public:
+    static int holeCardsClass(int, int);
+    static int cardsValue(int*, int*);
+    static std::string determineHandName(int myCardsValueInt, PlayerList activePlayerList);
+    static std::list<std::string> translateCardsValueCode(int cardsValueCode);
 
-	static int holeCardsClass(int, int);
-	static int cardsValue(int*, int*);
-	static std::string determineHandName(int myCardsValueInt, PlayerList activePlayerList);
-	static std::list<std::string> translateCardsValueCode(int cardsValueCode);
+    static int holeCardsToIntCode(int*);
+    static int* intCodeToHoleCards(int);
 
-	static int holeCardsToIntCode(int*);
-	static int* intCodeToHoleCards(int);
-
-	static const std::string CardStringValue[];
-	static std::map<std::string,int> CardStringOrdering;
-
+    static const std::string CardStringValue[];
+    static std::map<std::string, int> CardStringOrdering;
 };
 
+} // namespace pkt::core

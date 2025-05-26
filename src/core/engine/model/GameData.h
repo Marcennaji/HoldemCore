@@ -21,6 +21,8 @@
 
 #include "TableProfile.h"
 
+namespace pkt::core
+{
 struct GameData
 {
     GameData()
@@ -36,3 +38,4 @@ struct GameData
     int delayBetweenHandsSec;
     int playerActionTimeoutSec;
 };
+} // namespace pkt::core

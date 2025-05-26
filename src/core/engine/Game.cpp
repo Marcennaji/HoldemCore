@@ -27,6 +27,9 @@
 
 #include <iostream>
 
+namespace pkt::core
+{
+
 using namespace std;
 
 Game::Game(GameEvents* events, std::shared_ptr<EngineFactory> factory, const PlayerList& playerList,
@@ -220,3 +223,4 @@ std::shared_ptr<Player> Game::getPlayerByName(const std::string& name)
     }
     return tmpPlayer;
 }
+} // namespace pkt::core

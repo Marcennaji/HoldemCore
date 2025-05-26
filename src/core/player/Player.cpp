@@ -32,6 +32,9 @@
 #include <fstream>
 #include <sstream>
 
+namespace pkt::core
+{
+
 using namespace std;
 
 void CurrentHandActions::reset()
@@ -4680,3 +4683,4 @@ bool Player::shouldPotControl(const PostFlopState& r, const SimResults& simulati
 
     return potControl;
 }
+} // namespace pkt::core

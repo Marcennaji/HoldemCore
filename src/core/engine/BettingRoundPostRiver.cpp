@@ -26,6 +26,9 @@
 
 #include <iostream>
 
+namespace pkt::core
+{
+
 using namespace std;
 
 BettingRoundPostRiver::BettingRoundPostRiver(GameEvents* events, ILogger* logger, IHand* hi, int dP, int sB)
@@ -116,3 +119,4 @@ int BettingRoundPostRiver::getHighestCardsValue() const
 {
     return highestCardsValue;
 }
+} // namespace pkt::core

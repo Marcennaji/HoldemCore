@@ -19,6 +19,9 @@
 #include "Exception.h"
 #include <sstream>
 
+namespace pkt::core
+{
+
 using namespace std;
 
 Exception::Exception(const char* sourcefile, int sourceline, EngineError errorId, int osErrorCode)
@@ -46,3 +49,4 @@ const char* Exception::what() const throw()
 {
     return m_msg.c_str();
 }
+} // namespace pkt::core

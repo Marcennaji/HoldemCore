@@ -1,7 +1,9 @@
-#ifndef PLAYER_POSITION_H
-#define PLAYER_POSITION_H
+#pragma once
+namespace pkt::core
+{
 
-enum PlayerPosition {
+enum PlayerPosition
+{
     UNKNOWN = 0,
     SB = 1,
     BB = 2,
@@ -15,4 +17,4 @@ enum PlayerPosition {
     BUTTON = 10
 };
 
-#endif // PLAYER_POSITION_H
+} // namespace pkt::core

@@ -3,8 +3,10 @@ import argparse
 import subprocess
 import re
 
-def to_namespace(path_parts):
-    return "::".join(["pkt"] + path_parts)
+LAYER_NAMESPACES = {"core", "infra", "ui"}
+
+def to_namespace(layer):
+    return f"pkt::{layer}"
 
 def is_comment_or_include_or_declaration(line):
     stripped = line.strip()
@@ -32,15 +34,14 @@ def find_insertion_index(lines):
         if is_comment_or_include_or_declaration(line):
             continue
         return idx
-    return -1  # fallback: no code found
+    return -1
 
-def wrap_in_namespace(file_path, namespace_path):
+def wrap_in_namespace(file_path, namespace_name):
     with open(file_path, 'r', encoding='utf-8') as f:
         lines = f.readlines()
 
-    flat_ns = to_namespace(namespace_path)
-    if any(f"namespace {flat_ns}" in line for line in lines):
-        print(f"[SKIP] {file_path} already contains namespace {flat_ns}")
+    if any(f"namespace {namespace_name}" in line for line in lines):
+        print(f"[SKIP] {file_path} already contains namespace {namespace_name}")
         return
 
     insert_at = find_insertion_index(lines)
@@ -48,12 +49,11 @@ def wrap_in_namespace(file_path, namespace_path):
         print(f"[SKIP] {file_path}: no code found")
         return
 
-    # Split the file
     preamble = lines[:insert_at]
     body = lines[insert_at:]
 
     indented_body = ["    " + line if line.strip() else "\n" for line in body]
-    namespaced = [f"\nnamespace {flat_ns} {{\n\n"] + indented_body + [f"}} // namespace {flat_ns}\n"]
+    namespaced = [f"\nnamespace {namespace_name} {{\n\n"] + indented_body + [f"}} // namespace {namespace_name}\n"]
 
     with open(file_path, 'w', encoding='utf-8') as f:
         f.writelines(preamble + namespaced)
@@ -63,6 +63,12 @@ def wrap_in_namespace(file_path, namespace_path):
         print(f"[OK] {file_path} (namespaced)")
     except Exception as e:
         print(f"[WARN] clang-format failed on {file_path}: {e}")
+
+def get_top_layer_namespace(relative_path):
+    parts = relative_path.split(os.sep)
+    if parts and parts[0] in LAYER_NAMESPACES:
+        return parts[0]
+    return None
 
 def is_excluded(abs_path, exclude_dirs):
     return any(abs_path.startswith(excluded) for excluded in exclude_dirs)
@@ -76,13 +82,12 @@ def process_directory(root_dir, exclude_dirs):
             if filename.endswith(('.cpp', '.h')):
                 full_path = os.path.join(dirpath, filename)
                 relative_path = os.path.relpath(full_path, root_dir)
-                namespace_parts = os.path.dirname(relative_path).split(os.sep)
-                if namespace_parts == ['.']:
-                    namespace_parts = []
-                wrap_in_namespace(full_path, namespace_parts)
+                layer = get_top_layer_namespace(relative_path)
+                if layer:
+                    wrap_in_namespace(full_path, to_namespace(layer))
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Inject pkt::<namespace> into .cpp/.h files at the right spot.")
+    parser = argparse.ArgumentParser(description="Inject pkt::<layer> into .cpp/.h files")
     parser.add_argument("root", help="Root directory (e.g., PokerTraining/src)")
     parser.add_argument("--exclude", action='append', default=[], help="Subdirectory to exclude (can be repeated)")
     args = parser.parse_args()

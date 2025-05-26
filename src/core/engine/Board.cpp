@@ -27,6 +27,9 @@
 
 #include <algorithm>
 
+namespace pkt::core
+{
+
 Board::Board(unsigned dp) : IBoard(), pot(0), sets(0), dealerPosition(dp), allInCondition(false), lastActionPlayerID(0)
 {
     myCards[0] = myCards[1] = myCards[2] = myCards[3] = myCards[4] = 0;
@@ -470,3 +473,4 @@ void Board::setPlayerNeedToShowCards(const std::list<unsigned>& p)
 {
     playerNeedToShowCards = p;
 }
+} // namespace pkt::core

@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
-#ifndef MANIAC_PLAYER_H
-#define MANIAC_PLAYER_H
+#pragma once
 
 #include "Player.h"
-
+namespace pkt::core
+{
 class ManiacPlayer : public Player
 {
 
@@ -45,4 +45,4 @@ class ManiacPlayer : public Player
     bool riverShouldBet();
 };
 
-#endif
+} // namespace pkt::core

@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
-#ifndef PLAYING_STYLE_ULTRA_TIGHT_H
-#define PLAYING_STYLE_ULTRA_TIGHT_H
 
+#pragma once
 #include "Player.h"
-
+namespace pkt::core
+{
 class UltraTightPlayer : public Player
 {
 
@@ -45,4 +45,4 @@ class UltraTightPlayer : public Player
     bool riverShouldBet();
 };
 
-#endif
+} // namespace pkt::core

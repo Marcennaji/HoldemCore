@@ -3,8 +3,12 @@
 
 #include <core/interfaces/ILogger.h>
 
-struct EngineServices {
+namespace pkt::core
+{
+
+struct EngineServices
+{
     ILogger* logger;
 };
 
-
+} // namespace pkt::core

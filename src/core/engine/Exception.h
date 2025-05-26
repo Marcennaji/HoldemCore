@@ -25,6 +25,9 @@
 #include <exception>
 #include <string>
 
+namespace pkt::core
+{
+
 class Exception : public std::exception
 {
   public:
@@ -44,3 +47,4 @@ class Exception : public std::exception
 
     std::string m_msg;
 };
+} // namespace pkt::core

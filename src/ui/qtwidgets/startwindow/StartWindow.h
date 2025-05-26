@@ -34,11 +34,11 @@ class StartWindow : public QMainWindow, public Ui::startWindow
 {
     Q_OBJECT
   public:
-    StartWindow(const QString& appDataPath, GameTableWindow* tableWindow, Session* session, QWidget* parent);
+    StartWindow(const QString& appDataPath, GameTableWindow* tableWindow, pkt::core::Session* session, QWidget* parent);
     ~StartWindow();
 
-    void setSession(Session* session) { mySession = session; }
-    Session* getSession()
+    void setSession(pkt::core::Session* session) { mySession = session; }
+    pkt::core::Session* getSession()
     {
         assert(mySession != nullptr);
         return mySession;
@@ -57,7 +57,7 @@ class StartWindow : public QMainWindow, public Ui::startWindow
     QString myAppDataPath;
 
     std::shared_ptr<GameTableWindow> myGameTableWindow;
-    Session* mySession;
+    pkt::core::Session* mySession;
 
     friend class GuiWrapper;
 };

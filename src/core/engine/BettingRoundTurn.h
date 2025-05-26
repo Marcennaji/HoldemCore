@@ -16,12 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 
-#ifndef BEROTURN_H
-#define BEROTURN_H
-
 #include <iostream>
 #include "BettingRound.h"
-
+namespace pkt::core
+{
 class IHand;
 
 class BettingRoundTurn : public BettingRound
@@ -31,4 +29,4 @@ class BettingRoundTurn : public BettingRound
     ~BettingRoundTurn();
 };
 
-#endif
+} // namespace pkt::core

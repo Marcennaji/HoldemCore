@@ -19,6 +19,9 @@
 #include "BettingRoundTurn.h"
 #include "core/interfaces/IHand.h"
 
+namespace pkt::core
+{
+
 using namespace std;
 
 BettingRoundTurn::BettingRoundTurn(GameEvents* events, ILogger* logger, IHand* hi, unsigned dP, int sB)
@@ -29,3 +32,4 @@ BettingRoundTurn::BettingRoundTurn(GameEvents* events, ILogger* logger, IHand* h
 BettingRoundTurn::~BettingRoundTurn()
 {
 }
+} // namespace pkt::core

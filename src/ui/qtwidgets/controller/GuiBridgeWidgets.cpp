@@ -5,7 +5,7 @@ GuiBridgeWidgets::GuiBridgeWidgets(GameTableWindow* table, QObject* parent) : QO
 {
 }
 
-void GuiBridgeWidgets::connectTo(GameEvents& events)
+void GuiBridgeWidgets::connectTo(pkt::core::GameEvents& events)
 {
     events.onInitializeGui = [this](int gameSpeed)
     {

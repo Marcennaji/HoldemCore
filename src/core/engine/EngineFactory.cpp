@@ -33,6 +33,9 @@
 #include "ManiacPlayer.h"
 #include "TightAgressivePlayer.h"
 
+namespace pkt::core
+{
+
 EngineFactory::EngineFactory(GameEvents* events, ILogger* logger) : myLogger(logger), myEvents(events)
 {
     assert(myLogger != nullptr);
@@ -72,3 +75,4 @@ std::vector<std::shared_ptr<IBettingRound>> EngineFactory::createBettingRound(IH
 
     return myBettingRound;
 }
+} // namespace pkt::core

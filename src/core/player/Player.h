@@ -33,6 +33,9 @@
 #include <memory>
 #include <string>
 
+namespace pkt::core
+{
+
 enum PlayerType
 {
     PLAYER_TYPE_COMPUTER,
@@ -363,3 +366,4 @@ class Player
 
     bool m_isSessionActive;
 };
+} // namespace pkt::core

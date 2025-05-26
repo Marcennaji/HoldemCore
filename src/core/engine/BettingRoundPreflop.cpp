@@ -25,6 +25,9 @@
 
 #include "Player.h"
 
+namespace pkt::core
+{
+
 using namespace std;
 
 BettingRoundPreflop::BettingRoundPreflop(GameEvents* events, ILogger* logger, IHand* hi, unsigned dP, int sB)
@@ -221,3 +224,4 @@ void BettingRoundPreflop::run()
         }
     }
 }
+} // namespace pkt::core

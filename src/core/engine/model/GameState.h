@@ -19,8 +19,10 @@
 
 #pragma once
 
-
-enum GameState {
+namespace pkt::core
+{
+enum GameState
+{
     GAME_STATE_PREFLOP = 0,
     GAME_STATE_FLOP,
     GAME_STATE_TURN,
@@ -29,5 +31,4 @@ enum GameState {
     GAME_STATE_PREFLOP_SMALL_BLIND = 0xF0,
     GAME_STATE_PREFLOP_BIG_BLIND = 0xF1
 };
-
-
+}

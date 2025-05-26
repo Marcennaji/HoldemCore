@@ -16,13 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 
-
 #pragma once
 
-struct StartData {
-	StartData() : startDealerPlayerId(0), numberOfPlayers(0) {}
-	unsigned startDealerPlayerId;
-	int numberOfPlayers;
+namespace pkt::core
+{
+
+struct StartData
+{
+    StartData() : startDealerPlayerId(0), numberOfPlayers(0) {}
+    unsigned startDealerPlayerId;
+    int numberOfPlayers;
 };
 
-
+} // namespace pkt::core

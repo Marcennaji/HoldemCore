@@ -33,6 +33,9 @@
 #include <random>
 #include <sstream>
 
+namespace pkt::core
+{
+
 using namespace std;
 
 Session::Session(GameEvents* events, ILogger* logger, IRankingStore* rs, IPlayersStatisticsStore* ps,
@@ -195,3 +198,4 @@ std::shared_ptr<Game> Session::getCurrentGame()
 {
     return currentGame;
 }
+} // namespace pkt::core

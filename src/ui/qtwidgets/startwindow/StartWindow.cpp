@@ -26,6 +26,7 @@
 #include <core/player/Player.h>
 
 using namespace std;
+using namespace pkt::core;
 
 StartWindow::StartWindow(const QString& appDataPath, GameTableWindow* tableWindow, Session* session, QWidget* parent)
     : QMainWindow(parent), myAppDataPath(appDataPath), myGameTableWindow(tableWindow), mySession(session)

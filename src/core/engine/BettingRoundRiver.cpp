@@ -21,6 +21,9 @@
 
 #include <iostream>
 
+namespace pkt::core
+{
+
 using namespace std;
 
 BettingRoundRiver::BettingRoundRiver(GameEvents* events, ILogger* logger, IHand* hi, unsigned dP, int sB)
@@ -31,3 +34,4 @@ BettingRoundRiver::BettingRoundRiver(GameEvents* events, ILogger* logger, IHand*
 BettingRoundRiver::~BettingRoundRiver()
 {
 }
+} // namespace pkt::core
