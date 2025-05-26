@@ -68,17 +68,17 @@ class CurrentHandActions
     std::vector<PlayerAction> m_riverActions;
 };
 
-static const char* TightAggressivePlayerName[] = {"Tintin",  "Tonio", "Theo",  "Ted",  "Thor",
-                                                  "Taslima", "Tina",  "Tania", "Tata", "Timmy"};
+static const char* TightAggressiveBotStrategyName[] = {"Tintin",  "Tonio", "Theo",  "Ted",  "Thor",
+                                                       "Taslima", "Tina",  "Tania", "Tata", "Timmy"};
 
-static const char* LooseAggressivePlayerName[] = {"Louis", "Louane", "Ludovic", "Lucas", "Laure",
-                                                  "Leila", "Lino",   "Laurent", "Lucie", "Ludivine"};
+static const char* LooseAggressiveBotStrategyName[] = {"Louis", "Louane", "Ludovic", "Lucas", "Laure",
+                                                       "Leila", "Lino",   "Laurent", "Lucie", "Ludivine"};
 
-static const char* ManiacPlayerName[] = {"Maurice",  "Milou",    "Michou", "Maelle",  "Mokhtar",
-                                         "Mireille", "Marianne", "Momo",   "Maurane", "Maya"};
+static const char* ManiacBotStrategyName[] = {"Maurice",  "Milou",    "Michou", "Maelle",  "Mokhtar",
+                                              "Mireille", "Marianne", "Momo",   "Maurane", "Maya"};
 
-static const char* UltraTightPlayerName[] = {"Ursula",  "Uri",    "Ulrich", "Ulysses", "Urbain",
-                                             "Umberto", "Urania", "Ugo",    "Uma",     "Urso"};
+static const char* UltraTightBotStrategyName[] = {"Ursula",  "Uri",    "Ulrich", "Ulysses", "Urbain",
+                                                  "Umberto", "Urania", "Ugo",    "Uma",     "Urso"};
 
 static const char* HumanPlayerName[] = {" "};
 

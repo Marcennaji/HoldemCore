@@ -58,18 +58,18 @@ C:.
 �           CMakeLists.txt
 �           HumanPlayer.cpp
 �           HumanPlayer.h
-�           LooseAggressivePlayer.cpp
-�           LooseAggressivePlayer.h
-�           ManiacPlayer.cpp
-�           ManiacPlayer.h
+�           LooseAggressiveBotStrategy.cpp
+�           LooseAggressiveBotStrategy.h
+�           ManiacBotStrategy.cpp
+�           ManiacBotStrategy.h
 �           player.cpp
 �           player.h
 �           PlayerStatistics.cpp
 �           PlayerStatistics.h
 �           TightAgressivePlayer.cpp
 �           TightAgressivePlayer.h
-�           UltraTightPlayer.cpp
-�           UltraTightPlayer.h
+�           UltraTightBotStrategy.cpp
+�           UltraTightBotStrategy.h
 �           
 +---infra
 �       log.cpp

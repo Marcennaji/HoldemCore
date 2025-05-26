@@ -20,14 +20,14 @@
 #include "Player.h"
 namespace pkt::core
 {
-class UltraTightPlayer : public Player
+class UltraTightBotStrategy : public Player
 {
 
   public:
-    UltraTightPlayer(GameEvents*, IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type, std::string name,
-                     int sC, bool aS, bool sotS, int mB);
+    UltraTightBotStrategy(GameEvents*, IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type,
+                          std::string name, int sC, bool aS, bool sotS, int mB);
 
-    ~UltraTightPlayer();
+    ~UltraTightBotStrategy();
 
   protected:
     bool preflopShouldCall();

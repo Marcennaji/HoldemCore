@@ -29,9 +29,9 @@
 #include "Randomizer.h"
 
 #include "HumanPlayer.h"
-#include "LooseAggressivePlayer.h"
-#include "ManiacPlayer.h"
-#include "TightAggressivePlayer.h"
+#include "LooseAggressiveBotStrategy.h"
+#include "ManiacBotStrategy.h"
+#include "TightAggressiveBotStrategy.h"
 
 namespace pkt::core
 {

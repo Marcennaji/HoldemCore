@@ -151,10 +151,10 @@ void SqliteLogStore::createDatabase()
 
         for (int j = 2; j <= MAX_NUMBER_OF_PLAYERS; j++)
         {
-            InitializePlayersStatistics(TightAggressivePlayerName[i], j);
-            InitializePlayersStatistics(LooseAggressivePlayerName[i], j);
-            InitializePlayersStatistics(ManiacPlayerName[i], j);
-            InitializePlayersStatistics(UltraTightPlayerName[i], j);
+            InitializePlayersStatistics(TightAggressiveBotStrategyName[i], j);
+            InitializePlayersStatistics(LooseAggressiveBotStrategyName[i], j);
+            InitializePlayersStatistics(ManiacBotStrategyName[i], j);
+            InitializePlayersStatistics(UltraTightBotStrategyName[i], j);
         }
     }
     for (int j = 2; j <= MAX_NUMBER_OF_PLAYERS; j++)

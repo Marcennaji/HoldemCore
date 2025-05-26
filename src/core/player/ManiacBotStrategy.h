@@ -20,14 +20,14 @@
 #include "Player.h"
 namespace pkt::core
 {
-class ManiacPlayer : public Player
+class ManiacBotStrategy : public Player
 {
 
   public:
-    ManiacPlayer(GameEvents*, IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type, std::string name,
-                 int sC, bool aS, bool sotS, int mB);
+    ManiacBotStrategy(GameEvents*, IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type,
+                      std::string name, int sC, bool aS, bool sotS, int mB);
 
-    ~ManiacPlayer();
+    ~ManiacBotStrategy();
 
   protected:
     bool preflopShouldCall();
