@@ -94,13 +94,19 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
                 Randomizer::GetRand(1, 3, 1, &rand);
 
                 if (rand == 1)
+                {
                     player = new Player(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
                                         TightAggressiveBotStrategyName[i], gameData.startMoney,
                                         startData.numberOfPlayers > i, i == 0 ? true : false, 0);
+                    player->setStrategy(make_shared<TightAggressiveBotStrategy>());
+                }
                 else
+                {
                     player = new Player(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
                                         UltraTightBotStrategyName[i], gameData.startMoney,
                                         startData.numberOfPlayers > i, i == 0 ? true : false, 0);
+                    player->setStrategy(make_shared<UltraTightBotStrategy>());
+                }
             }
 
             if (tableProfile == LARGE_AGRESSIVE_OPPONENTS)
@@ -109,6 +115,7 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
                 player = new Player(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
                                     LooseAggressiveBotStrategyName[i], gameData.startMoney,
                                     startData.numberOfPlayers > i, i == 0 ? true : false, 0);
+                player->setStrategy(make_shared<LooseAggressiveBotStrategy>());
             }
 
             if (tableProfile == MANIAC_OPPONENTS)
@@ -117,6 +124,7 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
                 player = new Player(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
                                     ManiacBotStrategyName[i], gameData.startMoney, startData.numberOfPlayers > i,
                                     i == 0 ? true : false, 0);
+                player->setStrategy(make_shared<ManiacBotStrategy>());
             }
 
             if (tableProfile == RANDOM_OPPONENTS)
@@ -129,6 +137,7 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
                     player = new Player(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
                                         ManiacBotStrategyName[i], gameData.startMoney, startData.numberOfPlayers > i,
                                         i == 0 ? true : false, 0);
+                    player->setStrategy(make_shared<ManiacBotStrategy>());
                     nbManiac++;
                 }
                 else if (rand < 5 && nbUltraTight < startData.numberOfPlayers / 3)
@@ -136,6 +145,7 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
                     player = new Player(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
                                         UltraTightBotStrategyName[i], gameData.startMoney,
                                         startData.numberOfPlayers > i, i == 0 ? true : false, 0);
+                    player->setStrategy(make_shared<UltraTightBotStrategy>());
                     nbUltraTight++;
                 }
                 else if (rand < 9 && nbLoose < startData.numberOfPlayers / 3)
@@ -143,6 +153,7 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
                     player = new Player(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
                                         LooseAggressiveBotStrategyName[i], gameData.startMoney,
                                         startData.numberOfPlayers > i, i == 0 ? true : false, 0);
+                    player->setStrategy(make_shared<LooseAggressiveBotStrategy>());
                     nbLoose++;
                 }
                 else if (nbTight < startData.numberOfPlayers / 3)
@@ -150,6 +161,7 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
                     player = new Player(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
                                         TightAggressiveBotStrategyName[i], gameData.startMoney,
                                         startData.numberOfPlayers > i, i == 0 ? true : false, 0);
+                    player->setStrategy(make_shared<TightAggressiveBotStrategy>());
                     nbTight++;
                 }
                 else
@@ -157,6 +169,7 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
                     player = new Player(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
                                         UltraTightBotStrategyName[i], gameData.startMoney,
                                         startData.numberOfPlayers > i, i == 0 ? true : false, 0);
+                player->setStrategy(make_shared<UltraTightBotStrategy>());
             }
 
             if (i > startData.numberOfPlayers / 2)

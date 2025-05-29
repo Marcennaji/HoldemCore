@@ -72,7 +72,7 @@ class IBotStrategy
     virtual ~IBotStrategy() = default;
 
   protected:
-    void initializeRanges(int utgHeadsUpRange, int utgFullTableRange);
+    void initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange);
     float getPreflopCallingRange(CurrentHandContext&, bool deterministic = false) const;
     float getPreflopRaisingRange(CurrentHandContext&, bool deterministic = false) const;
     int getRange(PlayerPosition p, int nbPlayers) const;

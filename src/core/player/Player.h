@@ -241,7 +241,6 @@ class Player
     void displayPlausibleRange(GameState g);
     std::string getFilledRange(std::vector<std::string>& ranges, std::vector<float>& rangesValues,
                                const float rangeMax) const;
-    void initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange);
 
     std::string getHandToRange(const std::string card1, const std::string card2) const;
 

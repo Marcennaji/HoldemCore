@@ -84,7 +84,7 @@ void IBotStrategy::initializeRanges(const int utgHeadsUpRange, const int utgFull
     }
 }
 
-float IBotStrategy::getPreflopCallingRange(CurrentHandContext& context, bool deterministic = false) const
+float IBotStrategy::getPreflopCallingRange(CurrentHandContext& context, bool deterministic) const
 {
 
     const int nbRaises = context.preflopRaisesNumber;
@@ -248,7 +248,7 @@ float IBotStrategy::getPreflopCallingRange(CurrentHandContext& context, bool det
     return callingRange;
 }
 
-float IBotStrategy::getPreflopRaisingRange(CurrentHandContext& context, bool deterministic = false) const
+float IBotStrategy::getPreflopRaisingRange(CurrentHandContext& context, bool deterministic) const
 {
     const int nbRaises = context.preflopRaisesNumber;
     const int nbCalls = context.preflopCallsNumber;
@@ -490,7 +490,7 @@ int IBotStrategy::getRange(PlayerPosition p, const int nbPlayers) const
     }
 }
 
-int IBotStrategy::computePreflopRaiseAmount(CurrentHandContext& ctx, bool deterministic = false)
+int IBotStrategy::computePreflopRaiseAmount(CurrentHandContext& ctx, bool deterministic)
 {
     int myRaiseAmount = 0;
 
@@ -537,7 +537,7 @@ int IBotStrategy::computePreflopRaiseAmount(CurrentHandContext& ctx, bool determ
     return myRaiseAmount;
 }
 
-bool IBotStrategy::shouldPotControl(CurrentHandContext& ctx, bool deterministic = false)
+bool IBotStrategy::shouldPotControl(CurrentHandContext& ctx, bool deterministic)
 {
 
     assert(ctx.gameState == GAME_STATE_FLOP || ctx.gameState == GAME_STATE_TURN);
