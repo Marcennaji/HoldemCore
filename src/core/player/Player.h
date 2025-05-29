@@ -228,21 +228,7 @@ class Player
     static int getBoardCardsHigherThan(std::string stringBoard, std::string card);
 
   protected:
-    virtual bool preflopShouldCall() = 0;
-    virtual bool flopShouldCall() = 0;
-    virtual bool turnShouldCall() = 0;
-    virtual bool riverShouldCall() = 0;
-
-    virtual bool preflopShouldRaise() = 0;
-    virtual bool flopShouldRaise() = 0;
-    virtual bool turnShouldRaise() = 0;
-    virtual bool riverShouldRaise() = 0;
-
-    virtual bool flopShouldBet() = 0;
-    virtual bool turnShouldBet() = 0;
-    virtual bool riverShouldBet() = 0;
-
-    void loadStatistics();
+     void loadStatistics();
     void resetPlayerStatistics();
     void simulateHand();
 

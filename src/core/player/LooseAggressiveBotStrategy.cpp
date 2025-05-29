@@ -269,7 +269,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
         }
     }
 
-    return computePreflopRaiseAmount();
+    return computePreflopRaiseAmount(ctx, deterministic);
 }
 
 int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic)
@@ -363,7 +363,7 @@ int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool dete
 
         // if there was a lot of action preflop, and i was not the last raiser : don't bet
         if (ctx.preflopRaisesNumber > 2 && ctx.preflopLastRaiser->getID() != ctx.myID)
-            return false;
+            return 0;
 
         // if I was the last raiser preflop, I may bet with not much
         if (ctx.preflopLastRaiser->getID() == ctx.myID && ctx.nbRunningPlayers < 4 && ctx.myCash > ctx.pot * 4 &&
@@ -378,7 +378,7 @@ int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool dete
         }
     }
 
-    return false;
+    return 0;
 }
 bool LooseAggressiveBotStrategy::flopShouldCall(CurrentHandContext& ctx, bool deterministic)
 {
@@ -575,23 +575,23 @@ bool LooseAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx, bool de
 int LooseAggressiveBotStrategy::turnShouldRaise(CurrentHandContext& ctx, bool deterministic)
 {
     if (ctx.turnBetsOrRaisesNumber == 0)
-        return false;
+        return 0;
 
     if (Player::shouldPotControl(ctx.myPostFlopState, ctx.myHandSimulation, GAME_STATE_TURN))
-        return false;
+        return 0;
 
     if (ctx.turnBetsOrRaisesNumber == 2 && ctx.myHandSimulation.win < 0.95)
-        return false;
+        return 0;
 
     if (ctx.turnBetsOrRaisesNumber > 2 && ctx.myHandSimulation.win != 1)
-        return false;
+        return 0;
 
     if (ctx.myHandSimulation.winRanged > 0.98 && ctx.myHandSimulation.win > 0.98 && ctx.myHandSimulation.winSd > 0.9)
     {
         int rand = 0;
         Randomizer::GetRand(1, 4, 1, &rand);
         if (rand == 1)
-            return false; // very strong hand, slow play, just call
+            return 0; // very strong hand, slow play, just call
     }
 
     if (ctx.myHandSimulation.win == 1 || (ctx.myHandSimulation.winRanged == 1 && ctx.turnBetsOrRaisesNumber < 3))
