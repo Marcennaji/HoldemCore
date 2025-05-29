@@ -498,22 +498,22 @@ int IBotStrategy::computePreflopRaiseAmount(CurrentHandContext& ctx, bool determ
     const int nbCalls = ctx.preflopCallsNumber;
     const int nbPlayers = ctx.nbPlayers;
 
-    const int BB = ctx.smallBlind * 2;
+    const int bigBlind = ctx.smallBlind * 2;
 
     if (nbRaises == 0)
     { // first to raise
 
-        myRaiseAmount = (ctx.myM > 8 ? 2 * BB : 1.5 * BB);
+        myRaiseAmount = (ctx.myM > 8 ? 2 * bigBlind : 1.5 * bigBlind);
 
         if (nbPlayers > 4)
         { // adjust for position
             if (ctx.myPosition < MIDDLE)
-                myRaiseAmount += BB;
+                myRaiseAmount += bigBlind;
             if (ctx.myPosition == BUTTON)
                 myRaiseAmount -= ctx.smallBlind;
         }
         if (ctx.preflopCallsNumber > 0) // increase raise amount if there are limpers
-            myRaiseAmount += (ctx.preflopCallsNumber * BB);
+            myRaiseAmount += (ctx.preflopCallsNumber * bigBlind);
     }
     else
     {
@@ -535,6 +535,69 @@ int IBotStrategy::computePreflopRaiseAmount(CurrentHandContext& ctx, bool determ
         myRaiseAmount = ctx.myCash;
 
     return myRaiseAmount;
+}
+
+bool IBotStrategy::shouldPotControl(CurrentHandContext& ctx, bool deterministic = false)
+{
+
+    assert(ctx.gameState == GAME_STATE_FLOP || ctx.gameState == GAME_STATE_TURN);
+
+    bool potControl = false;
+    const int bigBlind = ctx.smallBlind * 2;
+
+    if (ctx.gameState == GAME_STATE_FLOP &&
+        !(ctx.preflopLastRaiser->getID() == ctx.myID && ctx.flopBetsOrRaisesNumber == 0))
+    {
+
+        if (ctx.pot >= bigBlind * 20)
+        {
+
+            if (ctx.myPostFlopState.IsPocketPair && !ctx.myPostFlopState.IsOverPair)
+                potControl = true;
+
+            if (ctx.myPostFlopState.IsFullHousePossible &&
+                !(ctx.myPostFlopState.IsTrips || ctx.myPostFlopState.IsFlush || ctx.myPostFlopState.IsFullHouse ||
+                  ctx.myPostFlopState.IsQuads))
+                potControl = true;
+
+            if ((ctx.myPostFlopState.IsOverPair || ctx.myPostFlopState.IsTopPair) && ctx.mySet > bigBlind * 20)
+                potControl = true;
+        }
+    }
+    else
+
+        if (ctx.gameState == GAME_STATE_TURN)
+    {
+
+        if (ctx.pot >= bigBlind * 40)
+        {
+
+            if (ctx.myPostFlopState.IsPocketPair && !ctx.myPostFlopState.IsOverPair)
+                potControl = true;
+
+            if (ctx.myPostFlopState.IsOverPair)
+                potControl = true;
+
+            if (ctx.myPostFlopState.IsFullHousePossible &&
+                !(ctx.myPostFlopState.IsTrips || ctx.myPostFlopState.IsFlush || ctx.myPostFlopState.IsFullHouse ||
+                  ctx.myPostFlopState.IsQuads))
+                potControl = true;
+
+            // 2 pairs
+            if (ctx.myPostFlopState.IsTwoPair && !ctx.myPostFlopState.IsFullHousePossible)
+                potControl = true;
+
+            if (ctx.myPostFlopState.IsTrips && ctx.mySet > bigBlind * 60)
+                potControl = true;
+        }
+    }
+
+#ifdef LOG_POKER_EXEC
+    if (potControl)
+        cout << "\t\tShould control pot" << endl;
+#endif
+
+    return potControl;
 }
 
 } // namespace pkt::core

@@ -277,14 +277,14 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
 int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic)
 {
 
-    if (ctx.flopRaisesNumber > 0)
+    if (ctx.flopBetsOrRaisesNumber > 0)
         return 0;
 
-    if (Player::shouldPotControl(ctx.myPostFlopState, ctx.myHandSimulation, GAME_STATE_FLOP))
+    if (shouldPotControl(ctx, deterministic))
         return 0;
 
     // donk bets :
-    if (ctx.flopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() != ctx.myID)
+    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.preflopLastRaiser->getID() != ctx.myID)
     {
         if (ctx.preflopLastRaiser->getPosition() > ctx.myPosition)
         {
@@ -401,7 +401,7 @@ int ManiacBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool determinist
     if (nbRaises == 0)
         return 0;
 
-    if (Player::shouldPotControl(ctx.myPostFlopState, ctx.myHandSimulation, GAME_STATE_FLOP))
+    if (shouldPotControl(ctx, deterministic))
         return 0;
 
     if (nbRaises < 2 && ctx.nbRunningPlayers < 4 && ctx.myCanBluff && ctx.myHandSimulation.winRanged < 0.3 &&
@@ -459,7 +459,7 @@ int ManiacBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool deterministic
     if (nbRaises > 0)
         return 0;
 
-    if (Player::shouldPotControl(ctx.myPostFlopState, ctx.myHandSimulation, GAME_STATE_TURN))
+    if (shouldPotControl(ctx, deterministic))
         return 0;
 
     if (ctx.flopBetsOrRaisesNumber > 1 && !ctx.myFlopIsAggressor && ctx.myHandSimulation.winRanged < 0.8)
@@ -551,7 +551,7 @@ int ManiacBotStrategy::turnShouldRaise(CurrentHandContext& ctx, bool determinist
     if (ctx.turnBetsOrRaisesNumber == 0)
         return 0;
 
-    if (Player::shouldPotControl(ctx.myPostFlopState, ctx.myHandSimulation, GAME_STATE_TURN))
+    if (shouldPotControl(ctx, deterministic))
         return 0;
 
     if (ctx.turnBetsOrRaisesNumber == 1 && ctx.myHandSimulation.win < 0.9)

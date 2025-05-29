@@ -217,14 +217,14 @@ int TightAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
 int TightAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic)
 {
 
-    if (ctx.flopRaisesNumber > 0)
+    if (ctx.flopBetsOrRaisesNumber > 0)
         return 0;
 
-    if (Player::shouldPotControl(ctx.myPostFlopState, ctx.myHandSimulation, GAME_STATE_FLOP))
+    if (shouldPotControl(ctx, deterministic))
         return 0;
 
     // donk bets :
-    if (ctx.flopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() != ctx.myID)
+    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.preflopLastRaiser->getID() != ctx.myID)
     {
         if (ctx.preflopLastRaiser->getPosition() > ctx.myPosition)
         {
@@ -347,7 +347,7 @@ int TightAggressiveBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool de
     if (nbRaises == 0)
         return 0;
 
-    if (Player::shouldPotControl(ctx.myPostFlopState, ctx.myHandSimulation, GAME_STATE_FLOP))
+    if (shouldPotControl(ctx, deterministic))
         return 0;
 
     if (nbRaises == 1 && ctx.myHandSimulation.win < 0.90)
@@ -412,7 +412,7 @@ int TightAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool dete
     if (nbRaises > 0)
         return 0;
 
-    if (Player::shouldPotControl(ctx.myPostFlopState, ctx.myHandSimulation, GAME_STATE_TURN))
+    if (shouldPotControl(ctx, deterministic))
         return 0;
 
     if (ctx.flopBetsOrRaisesNumber > 1 && !ctx.myFlopIsAggressor && ctx.myHandSimulation.winRanged < 0.75 &&
@@ -523,7 +523,7 @@ int TightAggressiveBotStrategy::turnShouldRaise(CurrentHandContext& ctx, bool de
     if (ctx.turnBetsOrRaisesNumber == 0)
         return 0;
 
-    if (Player::shouldPotControl(ctx.myPostFlopState, ctx.myHandSimulation, GAME_STATE_TURN))
+    if (shouldPotControl(ctx, deterministic))
         return 0;
 
     if (ctx.turnBetsOrRaisesNumber == 2 && ctx.myHandSimulation.win < 0.98)

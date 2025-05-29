@@ -135,7 +135,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     void refreshTableDescriptiveLabels(int);
     void refreshDealerAndBlindsButtons();
     void refreshPlayerStatistics();
-    void refreshCardsChance(pkt::core::GameState);
+
     void refreshHandsRanges();
 
     SeatState getCurrentSeatState(std::shared_ptr<pkt::core::Player>);

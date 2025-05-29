@@ -2,6 +2,7 @@
 #pragma once
 
 #include <core/player/Player.h>
+#include <third_party/psim/psim.hpp>
 
 namespace pkt::core
 {
@@ -9,17 +10,15 @@ namespace pkt::core
 struct CurrentHandContext
 {
     // data that is common to all players
-    const GameState gameState;
-    const int preflopRaisesNumber;
-    const int preflopCallsNumber;
-    const int flopRaisesNumber;
-    const int flopCallsNumber;
-    const int flopBetsOrRaisesNumber; // including allins
-    const int turnBetsOrRaisesNumber;
-    const int riverBetsOrRaisesNumber;
-    const int nbPlayers;        // total number of players in the current hand, including the ones who folded
-    const int nbRunningPlayers; // running players = players who raised + players who called + players who didn't act
-                                // yet. All-in players are not "running" any more
+    GameState gameState;
+    int preflopRaisesNumber;
+    int preflopCallsNumber;
+    int flopBetsOrRaisesNumber; // including allins
+    int turnBetsOrRaisesNumber;
+    int riverBetsOrRaisesNumber;
+    int nbPlayers;        // total number of players in the current hand, including the ones who folded
+    int nbRunningPlayers; // running players = players who raised + players who called + players who didn't act
+                          // yet. All-in players are not "running" any more
     std::shared_ptr<Player> preflopLastRaiser;
     std::shared_ptr<Player> flopLastRaiser;
     std::shared_ptr<Player> turnLastRaiser;
@@ -73,11 +72,12 @@ class IBotStrategy
     virtual ~IBotStrategy() = default;
 
   protected:
-    void initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange);
+    void initializeRanges(int utgHeadsUpRange, int utgFullTableRange);
     float getPreflopCallingRange(CurrentHandContext&, bool deterministic = false) const;
     float getPreflopRaisingRange(CurrentHandContext&, bool deterministic = false) const;
-    int getRange(PlayerPosition p, const int nbPlayers) const;
+    int getRange(PlayerPosition p, int nbPlayers) const;
     int computePreflopRaiseAmount(CurrentHandContext&, bool deterministic = false);
+    bool shouldPotControl(CurrentHandContext&, bool deterministic = false);
 
     bool myShouldCall = false;
     bool myShouldRaise = false;

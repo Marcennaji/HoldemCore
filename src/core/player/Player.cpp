@@ -25,6 +25,7 @@
 #include <core/interfaces/ILogger.h>
 #include <core/interfaces/persistence/IHandAuditStore.h>
 #include <core/interfaces/persistence/IPlayersStatisticsStore.h>
+#include <core/player/strategy/IBotStrategy.h>
 
 #include <algorithm>
 #include <cmath>
@@ -94,11 +95,57 @@ void Player::setHand(IHand* br)
 {
     currentHand = br;
 }
+CurrentHandContext Player::buildPlayerContext(const GameState state) const
+{
+    CurrentHandContext ctx;
+
+    // Shared game state
+    ctx.gameState = state;
+    ctx.preflopRaisesNumber = currentHand->getPreflopRaisesNumber();
+    ctx.preflopCallsNumber = currentHand->getPreflopCallsNumber();
+    ctx.flopBetsOrRaisesNumber = currentHand->getFlopBetsOrRaisesNumber();
+    ctx.turnBetsOrRaisesNumber = currentHand->getTurnBetsOrRaisesNumber();
+    ctx.riverBetsOrRaisesNumber = currentHand->getRiverBetsOrRaisesNumber();
+    ctx.nbPlayers = currentHand->getActivePlayerList()->size();
+    ctx.nbRunningPlayers = currentHand->getRunningPlayerList()->size();
+    ctx.lastVPIPPlayer = getPlayerByUniqueId(currentHand->getLastRaiserID());
+    ctx.preflopLastRaiser = getPlayerByUniqueId(currentHand->getPreflopLastRaiserID());
+    ctx.flopLastRaiser = getPlayerByUniqueId(currentHand->getFlopLastRaiserID());
+    ctx.turnLastRaiser = getPlayerByUniqueId(currentHand->getTurnLastRaiserID());
+
+    ctx.callersPositions = currentHand->getCallersPositions();
+    ctx.pot = currentHand->getBoard()->getPot();
+    ctx.potOdd = getPotOdd();
+    ctx.sets = currentHand->getBoard()->getSets();
+    ctx.highestSet = currentHand->getCurrentBettingRound()->getHighestSet();
+    ctx.isPreflopBigBet = isPreflopBigBet();
+    ctx.smallBlind = currentHand->getSmallBlind();
+    ctx.stringBoard = getStringBoard();
+
+    // Player-specific
+    ctx.myPreflopCallingRange = getStandardCallingRange(ctx.nbPlayers);
+    ctx.myCash = myCash;
+    ctx.mySet = mySet;
+    ctx.myM = static_cast<int>(getM());
+    ctx.myID = myID;
+    ctx.myCard1 = myCard1;
+    ctx.myCard2 = myCard2;
+    ctx.myPosition = myPosition;
+    ctx.myCurrentHandActions = myCurrentHandActions;
+    ctx.myCanBluff = canBluff(state);
+    ctx.myHavePosition = Player::getHavePosition(myPosition, currentHand->getRunningPlayerList());
+    ctx.myPreflopIsAggressor = isAgressor(state);
+    ctx.myFlopIsAggressor = isAgressor(state);
+    ctx.myTurnIsAggressor = isAgressor(state);
+    ctx.myRiverIsAggressor = isAgressor(state);
+    ctx.myPostFlopState = getPostFlopState();
+    ctx.myHandSimulation = getHandSimulation();
+
+    return ctx;
+}
 
 void Player::action()
 {
-    myRaiseAmount = 0;
-    myBetAmount = 0;
 
     switch (currentHand->getCurrentRound())
     {
@@ -163,7 +210,7 @@ void Player::action()
 void Player::doPreflopAction()
 {
 
-    const int nbPlayers = currentHand->getActivePlayerList()->size();
+    CurrentHandContext ctx = buildPlayerContext(GAME_STATE_PREFLOP);
 
 #ifdef LOG_POKER_EXEC
     cout << endl
@@ -172,9 +219,9 @@ void Player::doPreflopAction()
          << "\tpreflop raise : " << getStatistics(nbPlayers).getPreflopStatistics().getPreflopRaise() << " % " << endl;
 #endif
 
-    myShouldBet = false;
-    myShouldCall = preflopShouldCall();
-    myShouldRaise = preflopShouldRaise();
+    myShouldBet = 0;
+    myShouldCall = myStrategy->preflopShouldCall(ctx);
+    myShouldRaise = myStrategy->preflopShouldRaise(ctx);
 
     myPreflopPotOdd = getPotOdd();
 
@@ -198,9 +245,7 @@ void Player::doPreflopAction()
             myAction = PLAYER_ACTION_FOLD;
     }
 
-    if (myAction != PLAYER_ACTION_RAISE && myAction != PLAYER_ACTION_ALLIN)
-        myRaiseAmount = 0;
-    else
+    if (myAction == PLAYER_ACTION_RAISE || myAction != PLAYER_ACTION_ALLIN)
         currentHand->setPreflopLastRaiserID(myID);
 
     myCurrentHandActions.m_preflopActions.push_back(myAction);
@@ -213,7 +258,7 @@ void Player::doPreflopAction()
 void Player::doFlopAction()
 {
 
-    const int nbPlayers = currentHand->getActivePlayerList()->size();
+    CurrentHandContext ctx = buildPlayerContext(GAME_STATE_FLOP);
 
 #ifdef LOG_POKER_EXEC
     cout << endl
@@ -222,14 +267,9 @@ void Player::doFlopAction()
          << "\tPFR : " << getStatistics(nbPlayers).getPreflopStatistics().getPreflopRaise() << endl;
 #endif
 
-    myFlopState = getPostFlopState();
-    DisplayHandState(&myFlopState);
-
-    myFlopHandSimulation = getHandSimulation();
-
-    myShouldBet = flopShouldBet();
-    myShouldCall = myShouldBet ? false : flopShouldCall();
-    myShouldRaise = myShouldBet ? false : flopShouldRaise();
+    myShouldBet = myStrategy->flopShouldBet(ctx);
+    myShouldCall = myShouldBet ? false : myStrategy->flopShouldCall(ctx);
+    myShouldRaise = myShouldBet ? false : myStrategy->flopShouldRaise(ctx);
 
     if (myShouldRaise)
         myShouldCall = false;
@@ -248,12 +288,6 @@ void Player::doFlopAction()
             myAction = PLAYER_ACTION_FOLD;
     }
 
-    if (myAction != PLAYER_ACTION_RAISE)
-        myRaiseAmount = 0;
-
-    if (myAction != PLAYER_ACTION_BET)
-        myBetAmount = 0;
-
     if (myAction == PLAYER_ACTION_BET || myAction == PLAYER_ACTION_RAISE || myAction == PLAYER_ACTION_ALLIN)
         currentHand->setFlopLastRaiserID(myID);
 
@@ -267,7 +301,7 @@ void Player::doFlopAction()
 void Player::doTurnAction()
 {
 
-    const int nbPlayers = currentHand->getActivePlayerList()->size();
+    CurrentHandContext ctx = buildPlayerContext(GAME_STATE_TURN);
 
 #ifdef LOG_POKER_EXEC
     cout << endl
@@ -276,14 +310,9 @@ void Player::doTurnAction()
          << "\tPFR : " << getStatistics(nbPlayers).getPreflopStatistics().getPreflopRaise() << endl;
 #endif
 
-    myTurnState = getPostFlopState();
-    DisplayHandState(&myTurnState);
-
-    myTurnHandSimulation = getHandSimulation();
-
-    myShouldBet = turnShouldBet();
-    myShouldCall = myShouldBet ? false : turnShouldCall();
-    myShouldRaise = myShouldBet ? false : turnShouldRaise();
+    myShouldBet = myStrategy->turnShouldBet(ctx);
+    myShouldCall = myShouldBet ? false : myStrategy->turnShouldCall(ctx);
+    myShouldRaise = myShouldBet ? false : myStrategy->turnShouldRaise(ctx);
 
     if (myShouldRaise)
         myShouldCall = false;
@@ -302,12 +331,6 @@ void Player::doTurnAction()
             myAction = PLAYER_ACTION_FOLD;
     }
 
-    if (myAction != PLAYER_ACTION_RAISE)
-        myRaiseAmount = 0;
-
-    if (myAction != PLAYER_ACTION_BET)
-        myBetAmount = 0;
-
     if (myAction == PLAYER_ACTION_BET || myAction == PLAYER_ACTION_RAISE || myAction == PLAYER_ACTION_ALLIN)
         currentHand->setTurnLastRaiserID(myID);
 
@@ -321,7 +344,7 @@ void Player::doTurnAction()
 void Player::doRiverAction()
 {
 
-    const int nbPlayers = currentHand->getActivePlayerList()->size();
+    CurrentHandContext ctx = buildPlayerContext(GAME_STATE_RIVER);
 
 #ifdef LOG_POKER_EXEC
     cout << endl
@@ -330,13 +353,9 @@ void Player::doRiverAction()
          << "\tPFR : " << getStatistics(nbPlayers).getPreflopStatistics().getPreflopRaise() << endl;
 #endif
 
-    myRiverState = getPostFlopState();
-    DisplayHandState(&myRiverState);
-    myRiverHandSimulation = getHandSimulation();
-
-    myShouldBet = riverShouldBet();
-    myShouldCall = myShouldBet ? false : riverShouldCall();
-    myShouldRaise = myShouldBet ? false : riverShouldRaise();
+    myShouldBet = myStrategy->riverShouldBet(ctx);
+    myShouldCall = myShouldBet ? false : myStrategy->riverShouldCall(ctx);
+    myShouldRaise = myShouldBet ? false : myStrategy->riverShouldRaise(ctx);
 
     if (myShouldRaise)
         myShouldCall = false;
@@ -355,12 +374,6 @@ void Player::doRiverAction()
             myAction = PLAYER_ACTION_FOLD;
     }
 
-    if (myAction != PLAYER_ACTION_RAISE)
-        myRaiseAmount = 0;
-
-    if (myAction != PLAYER_ACTION_BET)
-        myBetAmount = 0;
-
     myCurrentHandActions.m_riverActions.push_back(myAction);
 
     updateRiverStatistics();
@@ -370,6 +383,9 @@ void Player::doRiverAction()
 }
 void Player::evaluateBetAmount()
 {
+
+    int myBetAmount = 0;
+    int myRaiseAmount = 0;
 
     int highestSet = currentHand->getCurrentBettingRound()->getHighestSet();
 
@@ -698,15 +714,6 @@ void Player::setName(const std::string& theValue)
 std::string Player::getName() const
 {
     return myName;
-}
-
-void Player::setAvatar(const std::string& theValue)
-{
-    myAvatar = theValue;
-}
-std::string Player::getAvatar() const
-{
-    return myAvatar;
 }
 
 void Player::setCash(int theValue)
@@ -4043,65 +4050,4 @@ bool Player::isInVeryLooseMode() const
         return false;
 }
 
-bool Player::shouldPotControl(const PostFlopState& r, const SimResults& simulation, const GameState state)
-{
-
-    assert(state == GAME_STATE_FLOP || state == GAME_STATE_TURN);
-
-    const int lastRaiserID = currentHand->getLastRaiserID();
-    const int pot = currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets();
-    const int BB = currentHand->getSmallBlind() * 2;
-
-    bool potControl = false;
-
-    if (state == GAME_STATE_FLOP &&
-        !(currentHand->getPreflopLastRaiserID() == myID && currentHand->getFlopBetsOrRaisesNumber() == 0))
-    {
-
-        if (pot >= BB * 20)
-        {
-
-            if (r.IsPocketPair && !r.IsOverPair)
-                potControl = true;
-
-            if (r.IsFullHousePossible && !(r.IsTrips || r.IsFlush || r.IsFullHouse || r.IsQuads))
-                potControl = true;
-
-            if ((r.IsOverPair || r.IsTopPair) && mySet > BB * 20)
-                potControl = true;
-        }
-    }
-    else
-
-        if (state == GAME_STATE_TURN)
-    {
-
-        if (pot >= BB * 40)
-        {
-
-            if (r.IsPocketPair && !r.IsOverPair)
-                potControl = true;
-
-            if (r.IsOverPair)
-                potControl = true;
-
-            if (r.IsFullHousePossible && !(r.IsTrips || r.IsFlush || r.IsFullHouse || r.IsQuads))
-                potControl = true;
-
-            // 2 pairs
-            if (r.IsTwoPair && !r.IsFullHousePossible)
-                potControl = true;
-
-            if (r.IsTrips && mySet > BB * 60)
-                potControl = true;
-        }
-    }
-
-#ifdef LOG_POKER_EXEC
-    if (potControl)
-        cout << "\t\tShould control pot" << endl;
-#endif
-
-    return potControl;
-}
 } // namespace pkt::core

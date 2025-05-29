@@ -45,6 +45,8 @@ enum PlayerType
 class IHandAuditStore;
 class IPlayersStatisticsStore;
 class IHand;
+class IBotStrategy;
+class CurrentHandContext;
 
 class CurrentHandActions
 {
@@ -105,6 +107,8 @@ class Player
 
     ~Player();
 
+    void setStrategy(std::shared_ptr<IBotStrategy> strategy) { myStrategy = strategy; }
+
     void doPreflopAction();
     void doFlopAction();
     void doTurnAction();
@@ -117,8 +121,7 @@ class Player
     PlayerType getType() const;
     void setName(const std::string& theValue);
     std::string getName() const;
-    void setAvatar(const std::string& theValue);
-    std::string getAvatar() const;
+
     void setCash(int theValue);
     int getCash() const;
     void setSet(int theValue);
@@ -221,16 +224,15 @@ class Player
     static bool isCardsInRange(std::string card1, std::string card2, std::string range);
     static std::string getFakeCard(char c);
     static std::string getStringRange(int nbPlayers, int range);
-    static bool shouldPotControl(const PostFlopState&, const SimResults&, const GameState);
     static const int getDrawingProbability(const PostFlopState& state);
     static bool isDrawingProbOk(const PostFlopState&, const int potOdd);
     static const int getImplicitOdd(const PostFlopState& state);
     static int getBoardCardsHigherThan(std::string stringBoard, std::string card);
 
-  protected:
-     void loadStatistics();
+  private:
+    CurrentHandContext buildPlayerContext(const GameState gameState) const;
+    void loadStatistics();
     void resetPlayerStatistics();
-    void simulateHand();
 
     void evaluateBetAmount();
     float getMaxOpponentsStrengths() const;
@@ -281,19 +283,12 @@ class Player
                                           const RiverStatistics&);
 
     // attributes
+    std::shared_ptr<IBotStrategy> myStrategy;
 
     IHandAuditStore* myHandAuditStore;
     IPlayersStatisticsStore* myPlayersStatisticsStore;
     IHand* currentHand;
     GameEvents* myEvents;
-
-    PostFlopState myFlopState;
-    PostFlopState myTurnState;
-    PostFlopState myRiverState;
-
-    SimResults myFlopHandSimulation;
-    SimResults myTurnHandSimulation;
-    SimResults myRiverHandSimulation;
 
     CurrentHandActions myCurrentHandActions;
 
@@ -312,8 +307,8 @@ class Player
     bool logHoleCardsDone;
 
     // current hand playing
-    bool myShouldBet;
-    bool myShouldRaise;
+    int myShouldBet;
+    int myShouldRaise;
     bool myShouldCall;
 
     int myCards[2];

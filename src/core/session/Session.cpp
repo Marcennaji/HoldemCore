@@ -94,32 +94,29 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
                 Randomizer::GetRand(1, 3, 1, &rand);
 
                 if (rand == 1)
-                    player = new TightAggressiveBotStrategy(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
-                                                            PLAYER_TYPE_COMPUTER, TightAggressiveBotStrategyName[i],
-                                                            gameData.startMoney, startData.numberOfPlayers > i,
-                                                            i == 0 ? true : false, 0);
+                    player = new Player(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
+                                        TightAggressiveBotStrategyName[i], gameData.startMoney,
+                                        startData.numberOfPlayers > i, i == 0 ? true : false, 0);
                 else
-                    player = new UltraTightBotStrategy(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
-                                                       PLAYER_TYPE_COMPUTER, UltraTightBotStrategyName[i],
-                                                       gameData.startMoney, startData.numberOfPlayers > i,
-                                                       i == 0 ? true : false, 0);
+                    player = new Player(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
+                                        UltraTightBotStrategyName[i], gameData.startMoney,
+                                        startData.numberOfPlayers > i, i == 0 ? true : false, 0);
             }
 
             if (tableProfile == LARGE_AGRESSIVE_OPPONENTS)
             {
 
-                player = new LooseAggressiveBotStrategy(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
-                                                        PLAYER_TYPE_COMPUTER, LooseAggressiveBotStrategyName[i],
-                                                        gameData.startMoney, startData.numberOfPlayers > i,
-                                                        i == 0 ? true : false, 0);
+                player = new Player(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
+                                    LooseAggressiveBotStrategyName[i], gameData.startMoney,
+                                    startData.numberOfPlayers > i, i == 0 ? true : false, 0);
             }
 
             if (tableProfile == MANIAC_OPPONENTS)
             {
 
-                player = new ManiacBotStrategy(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
-                                               PLAYER_TYPE_COMPUTER, ManiacBotStrategyName[i], gameData.startMoney,
-                                               startData.numberOfPlayers > i, i == 0 ? true : false, 0);
+                player = new Player(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
+                                    ManiacBotStrategyName[i], gameData.startMoney, startData.numberOfPlayers > i,
+                                    i == 0 ? true : false, 0);
             }
 
             if (tableProfile == RANDOM_OPPONENTS)
@@ -129,41 +126,37 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
 
                 if (rand < 3 && nbManiac < startData.numberOfPlayers / 3)
                 {
-                    player = new ManiacBotStrategy(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
-                                                   PLAYER_TYPE_COMPUTER, ManiacBotStrategyName[i], gameData.startMoney,
-                                                   startData.numberOfPlayers > i, i == 0 ? true : false, 0);
+                    player = new Player(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
+                                        ManiacBotStrategyName[i], gameData.startMoney, startData.numberOfPlayers > i,
+                                        i == 0 ? true : false, 0);
                     nbManiac++;
                 }
                 else if (rand < 5 && nbUltraTight < startData.numberOfPlayers / 3)
                 {
-                    player = new UltraTightBotStrategy(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
-                                                       PLAYER_TYPE_COMPUTER, UltraTightBotStrategyName[i],
-                                                       gameData.startMoney, startData.numberOfPlayers > i,
-                                                       i == 0 ? true : false, 0);
+                    player = new Player(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
+                                        UltraTightBotStrategyName[i], gameData.startMoney,
+                                        startData.numberOfPlayers > i, i == 0 ? true : false, 0);
                     nbUltraTight++;
                 }
                 else if (rand < 9 && nbLoose < startData.numberOfPlayers / 3)
                 {
-                    player = new LooseAggressiveBotStrategy(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
-                                                            PLAYER_TYPE_COMPUTER, LooseAggressiveBotStrategyName[i],
-                                                            gameData.startMoney, startData.numberOfPlayers > i,
-                                                            i == 0 ? true : false, 0);
+                    player = new Player(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
+                                        LooseAggressiveBotStrategyName[i], gameData.startMoney,
+                                        startData.numberOfPlayers > i, i == 0 ? true : false, 0);
                     nbLoose++;
                 }
                 else if (nbTight < startData.numberOfPlayers / 3)
                 {
-                    player = new TightAggressiveBotStrategy(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
-                                                            PLAYER_TYPE_COMPUTER, TightAggressiveBotStrategyName[i],
-                                                            gameData.startMoney, startData.numberOfPlayers > i,
-                                                            i == 0 ? true : false, 0);
+                    player = new Player(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
+                                        TightAggressiveBotStrategyName[i], gameData.startMoney,
+                                        startData.numberOfPlayers > i, i == 0 ? true : false, 0);
                     nbTight++;
                 }
                 else
                     // default
-                    player = new UltraTightBotStrategy(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
-                                                       PLAYER_TYPE_COMPUTER, UltraTightBotStrategyName[i],
-                                                       gameData.startMoney, startData.numberOfPlayers > i,
-                                                       i == 0 ? true : false, 0);
+                    player = new Player(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
+                                        UltraTightBotStrategyName[i], gameData.startMoney,
+                                        startData.numberOfPlayers > i, i == 0 ? true : false, 0);
             }
 
             if (i > startData.numberOfPlayers / 2)

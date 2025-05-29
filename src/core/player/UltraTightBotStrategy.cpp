@@ -216,10 +216,10 @@ int UltraTightBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool dete
 int UltraTightBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic)
 {
 
-    if (ctx.flopRaisesNumber > 0)
+    if (ctx.flopBetsOrRaisesNumber > 0)
         return 0;
 
-    if (Player::shouldPotControl(ctx.myPostFlopState, ctx.myHandSimulation, GAME_STATE_FLOP))
+    if (shouldPotControl(ctx, deterministic))
         return 0;
 
     // don't bet if in position, and pretty good drawing probs
@@ -227,7 +227,7 @@ int UltraTightBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool determini
         return false;
 
     // donk bets :
-    if (ctx.flopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() != ctx.myID)
+    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.preflopLastRaiser->getID() != ctx.myID)
     {
         if (ctx.preflopLastRaiser->getPosition() > ctx.myPosition)
         {
@@ -329,7 +329,7 @@ bool UltraTightBotStrategy::flopShouldCall(CurrentHandContext& ctx, bool determi
     if (Player::isDrawingProbOk(ctx.myPostFlopState, ctx.potOdd))
         return true;
 
-    if (ctx.myHandSimulation.winRanged == 0.95 && ctx.myHandSimulation.win > 0.5)
+    if (ctx.myHandSimulation.winRanged >= 0.95 && ctx.myHandSimulation.win > 0.5)
         return true;
 
     if (ctx.myHandSimulation.winRanged * 100 < ctx.potOdd && ctx.myHandSimulation.win < 0.95)
@@ -349,7 +349,7 @@ int UltraTightBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool determi
     if (nbRaises == 0)
         return 0;
 
-    if (Player::shouldPotControl(ctx.myPostFlopState, ctx.myHandSimulation, GAME_STATE_FLOP))
+    if (shouldPotControl(ctx, deterministic))
         return 0;
 
     if (nbRaises == 1 && ctx.myHandSimulation.win < 0.90)
@@ -413,7 +413,7 @@ int UltraTightBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool determini
     if (nbRaises > 0)
         return 0;
 
-    if (Player::shouldPotControl(ctx.myPostFlopState, ctx.myHandSimulation, GAME_STATE_TURN))
+    if (shouldPotControl(ctx, deterministic))
         return 0;
 
     if (ctx.flopBetsOrRaisesNumber > 1 && !ctx.myFlopIsAggressor && ctx.myHandSimulation.winRanged < 0.7 &&
@@ -525,7 +525,7 @@ int UltraTightBotStrategy::turnShouldRaise(CurrentHandContext& ctx, bool determi
     if (ctx.turnBetsOrRaisesNumber == 0)
         return 0;
 
-    if (Player::shouldPotControl(ctx.myPostFlopState, ctx.myHandSimulation, GAME_STATE_TURN))
+    if (shouldPotControl(ctx, deterministic))
         return 0;
 
     if (ctx.turnBetsOrRaisesNumber == 2 && ctx.myHandSimulation.win < 0.98)

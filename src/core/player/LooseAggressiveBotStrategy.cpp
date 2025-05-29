@@ -275,14 +275,14 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
 int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic)
 {
 
-    if (ctx.flopRaisesNumber > 0)
+    if (ctx.flopBetsOrRaisesNumber > 0)
         return 0;
 
-    if (Player::shouldPotControl(ctx.myPostFlopState, ctx.myHandSimulation, GAME_STATE_FLOP))
+    if (shouldPotControl(ctx, deterministic))
         return 0;
 
     // donk bets :
-    if (ctx.flopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() != ctx.myID)
+    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.preflopLastRaiser->getID() != ctx.myID)
     {
         if (ctx.preflopLastRaiser->getPosition() > ctx.myPosition)
         {
@@ -407,10 +407,8 @@ int LooseAggressiveBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool de
     const int nbRaises = ctx.flopBetsOrRaisesNumber;
 
     if (nbRaises == 0)
-        return 0;
-
-    if (Player::shouldPotControl(ctx.myPostFlopState, ctx.myHandSimulation, GAME_STATE_FLOP))
-        return 0;
+        if (shouldPotControl(ctx, deterministic))
+            return 0;
 
     // if (nbRaises == 1 && myFlopHandSimulation.win < 0.90)
     // return false;
@@ -472,10 +470,8 @@ int LooseAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool dete
     const int nbRaises = ctx.turnBetsOrRaisesNumber;
 
     if (nbRaises > 0)
-        return 0;
-
-    if (Player::shouldPotControl(ctx.myPostFlopState, ctx.myHandSimulation, GAME_STATE_TURN))
-        return 0;
+        if (shouldPotControl(ctx, deterministic))
+            return 0;
 
     if (ctx.flopBetsOrRaisesNumber > 1 && !ctx.myFlopIsAggressor && ctx.myHandSimulation.winRanged < 0.8 &&
         ctx.myHandSimulation.win < 0.9)
@@ -575,10 +571,8 @@ bool LooseAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx, bool de
 int LooseAggressiveBotStrategy::turnShouldRaise(CurrentHandContext& ctx, bool deterministic)
 {
     if (ctx.turnBetsOrRaisesNumber == 0)
-        return 0;
-
-    if (Player::shouldPotControl(ctx.myPostFlopState, ctx.myHandSimulation, GAME_STATE_TURN))
-        return 0;
+        if (shouldPotControl(ctx, deterministic))
+            return 0;
 
     if (ctx.turnBetsOrRaisesNumber == 2 && ctx.myHandSimulation.win < 0.95)
         return 0;

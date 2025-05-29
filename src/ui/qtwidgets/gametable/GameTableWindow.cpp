@@ -1023,8 +1023,6 @@ void GameTableWindow::dealHoleCards()
         }
     }
 
-    // refresh CardsChanceMonitor Tool
-    refreshCardsChance(GAME_STATE_PREFLOP);
     refreshHandsRanges();
 }
 
@@ -1143,8 +1141,6 @@ void GameTableWindow::dealFlopCards6()
         dealFlopCards6Timer->start(postDealCardsSpeed);
     }
 
-    // refresh CardsChanceMonitor Tool
-    refreshCardsChance(GAME_STATE_FLOP);
     refreshHandsRanges();
 }
 
@@ -1181,8 +1177,7 @@ void GameTableWindow::dealTurnCards2()
         updateHumanPlayerButtonsState(0); // mode 0 == called from dealBettingRoundcards
         dealTurnCards2Timer->start(postDealCardsSpeed);
     }
-    // refresh CardsChanceMonitor Tool
-    refreshCardsChance(GAME_STATE_TURN);
+
     refreshHandsRanges();
 }
 
@@ -1221,8 +1216,7 @@ void GameTableWindow::dealRiverCards2()
         updateHumanPlayerButtonsState(0); // mode 0 == called from dealBettingRoundcards
         dealRiverCards2Timer->start(postDealCardsSpeed);
     }
-    // refresh CardsChanceMonitor Tool
-    refreshCardsChance(GAME_STATE_RIVER);
+
     refreshHandsRanges();
 }
 
@@ -3071,62 +3065,6 @@ void GameTableWindow::refreshHandsRanges()
 
     text_ranges->clear();
     text_ranges->append(displayText.str().c_str());
-}
-
-void GameTableWindow::refreshCardsChance(GameState BettingRound)
-{
-
-    std::shared_ptr<Player> player = myStartWindow->getSession()->getCurrentGame()->getSeatsList()->front();
-    std::shared_ptr<HumanPlayer> humanPlayer = std::static_pointer_cast<HumanPlayer>(player);
-
-    const string style =
-        "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; "
-        "text-indent:0px;\"><span style=\" font-family:'Ubuntu';  font-size:8pt; font-weight:400; color:#ffffff;\">";
-
-    stringstream displayText;
-    displayText.precision(0);
-
-    if (humanPlayer->getActiveStatus())
-    {
-
-        std::shared_ptr<IHand> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
-        PlayerList players = currentHand->getActivePlayerList();
-
-        if (humanPlayer->getAction() == PLAYER_ACTION_FOLD || currentHand->getCurrentRound() == GAME_STATE_PREFLOP)
-        {
-            label_chance->setText("");
-        }
-        else
-        {
-
-            string state = "Flop";
-            if (currentHand->getCurrentRound() == GAME_STATE_TURN)
-                state = "Turn";
-            if (currentHand->getCurrentRound() == GAME_STATE_RIVER)
-                state = "River";
-
-            displayText << style << state << " :";
-
-            const int nbOpponents = max(1, currentHand->getRunningPlayerList()->size() - 1);
-
-            if (nbOpponents > 0)
-            {
-
-                SimResults r = humanPlayer->getHandSimulation();
-
-                displayText << style << "<br>" << tr("Against ").toStdString() << nbOpponents
-                            << tr(" opponent(s) with random hands :").toStdString();
-
-                displayText << style << fixed << tr("I have ").toStdString() << r.win * 100
-                            << tr("% chances to win right now<br>").toStdString() << tr("I have ").toStdString()
-                            << r.winSd * 100 << tr("% chances to win at showdown<br>").toStdString()
-                            << tr("I have ").toStdString() << r.tieSd * 100
-                            << tr("% chances to tie at showdown").toStdString();
-            }
-
-            label_chance->setText(QApplication::translate("gametableimpl", displayText.str().c_str(), 0));
-        }
-    }
 }
 
 void GameTableWindow::refreshGameTableStyle()
