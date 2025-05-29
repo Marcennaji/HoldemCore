@@ -128,6 +128,7 @@ class Player
     int getLastRelativeSet() const;
 
     void setHand(IHand*);
+    IHand* getHand() const { return currentHand; }
     void setAction(PlayerAction theValue, bool blind = 0);
     PlayerAction getAction() const;
 
@@ -174,7 +175,7 @@ class Player
 
     void setEstimatedRange(const std::string);
 
-    bool getHavePosition(PlayerPosition myPos, PlayerList runningPlayers) const;
+    static bool getHavePosition(PlayerPosition myPos, PlayerList runningPlayers);
 
     void setIsSessionActive(bool active);
     bool isSessionActive() const;
@@ -204,8 +205,6 @@ class Player
     void computeEstimatedPreflopRange(const int playerId) const;
     const SimResults getHandSimulation() const;
 
-    float getPreflopCallingRange() const;
-    float getPreflopRaisingRange() const;
     bool isAgressor(const GameState gameState) const;
     std::string getEstimatedRange() const;
 
@@ -218,6 +217,15 @@ class Player
                                const std::string board = "");
 
     bool isInVeryLooseMode() const;
+
+    static bool isCardsInRange(std::string card1, std::string card2, std::string range);
+    static std::string getFakeCard(char c);
+    static std::string getStringRange(int nbPlayers, int range);
+    static bool shouldPotControl(const PostFlopState&, const SimResults&, const GameState);
+    static const int getDrawingProbability(const PostFlopState& state);
+    static bool isDrawingProbOk(const PostFlopState&, const int potOdd);
+    static const int getImplicitOdd(const PostFlopState& state);
+    static int getBoardCardsHigherThan(std::string stringBoard, std::string card);
 
   protected:
     virtual bool preflopShouldCall() = 0;
@@ -234,13 +242,10 @@ class Player
     virtual bool turnShouldBet() = 0;
     virtual bool riverShouldBet() = 0;
 
-    bool shouldPotControl(const PostFlopState&, const SimResults&, const GameState) const;
-
     void loadStatistics();
     void resetPlayerStatistics();
     void simulateHand();
-    bool isCardsInRange(std::string card1, std::string card2, std::string range) const;
-    std::string getFakeCard(char c) const;
+
     void evaluateBetAmount();
     float getMaxOpponentsStrengths() const;
     bool isPreflopBigBet() const;
@@ -249,24 +254,16 @@ class Player
     std::string getFilledRange(std::vector<std::string>& ranges, std::vector<float>& rangesValues,
                                const float rangeMax) const;
     void initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange);
-    int getRange(PlayerPosition p) const;
-    std::string getStringRange(int nbPlayers, int range) const;
+
     std::string getHandToRange(const std::string card1, const std::string card2) const;
-    int getBoardCardsHigherThan(std::string card) const;
-    bool isDrawingProbOk() const;
+
     bool canBluff(const GameState) const;
     int getPreflopPotOdd() const;
-    void computePreflopRaiseAmount();
     int getStandardRaisingRange(int nbPlayers) const;
     int getStandardCallingRange(int nbPlayers) const;
     std::string computeEstimatedPreflopRangeFromLastRaiser(const int opponentId,
                                                            PreflopStatistics& lastRaiserStats) const;
     std::string computeEstimatedPreflopRangeFromCaller(const int opponentId, PreflopStatistics& callerStats) const;
-
-    // returns a % chance, for a winning draw
-    const int getDrawingProbability() const;
-
-    const int getImplicitOdd() const;
 
     char incrementCardValue(char c) const;
 
@@ -298,18 +295,6 @@ class Player
                                           const RiverStatistics&);
 
     // attributes
-
-    // vector index is player position, value is range %
-    std::vector<int> UTG_STARTING_RANGE;
-    std::vector<int> UTG_PLUS_ONE_STARTING_RANGE;
-    std::vector<int> UTG_PLUS_TWO_STARTING_RANGE;
-    std::vector<int> MIDDLE_STARTING_RANGE;
-    std::vector<int> MIDDLE_PLUS_ONE_STARTING_RANGE;
-    std::vector<int> LATE_STARTING_RANGE;
-    std::vector<int> CUTOFF_STARTING_RANGE;
-    std::vector<int> BUTTON_STARTING_RANGE;
-    std::vector<int> SB_STARTING_RANGE;
-    std::vector<int> BB_STARTING_RANGE;
 
     IHandAuditStore* myHandAuditStore;
     IPlayersStatisticsStore* myPlayersStatisticsStore;
@@ -350,8 +335,6 @@ class Player
     std::string myCard2;
     int myCash;
     int mySet;
-    int myRaiseAmount;
-    int myBetAmount;
     int myLastRelativeSet;
     PlayerAction myAction;
     int myButton;             // 0 = none, 1 = dealer, 2 =small, 3 = big

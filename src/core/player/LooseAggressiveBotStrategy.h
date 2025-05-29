@@ -18,32 +18,32 @@
 
 #pragma once
 
-#include "Player.h"
+#include "core/player/strategy/IBotStrategy.h"
+
 namespace pkt::core
 {
-class LooseAggressiveBotStrategy : public Player
+class LooseAggressiveBotStrategy : public IBotStrategy
 {
 
   public:
-    LooseAggressiveBotStrategy(GameEvents* events, IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type,
-                               std::string name, int sC, bool aS, bool sotS, int mB);
+    LooseAggressiveBotStrategy();
 
     ~LooseAggressiveBotStrategy();
 
   protected:
-    bool preflopShouldCall();
-    bool flopShouldCall();
-    bool turnShouldCall();
-    bool riverShouldCall();
+    bool preflopShouldCall(CurrentHandContext& context, bool deterministic = false) override;
+    bool flopShouldCall(CurrentHandContext& context, bool deterministic = false) override;
+    bool turnShouldCall(CurrentHandContext& context, bool deterministic = false) override;
+    bool riverShouldCall(CurrentHandContext& context, bool deterministic = false) override;
 
-    bool preflopShouldRaise();
-    bool flopShouldRaise();
-    bool turnShouldRaise();
-    bool riverShouldRaise();
+    int preflopShouldRaise(CurrentHandContext& context, bool deterministic = false) override;
+    int flopShouldRaise(CurrentHandContext& context, bool deterministic = false) override;
+    int turnShouldRaise(CurrentHandContext& context, bool deterministic = false) override;
+    int riverShouldRaise(CurrentHandContext& context, bool deterministic = false) override;
 
-    bool flopShouldBet();
-    bool turnShouldBet();
-    bool riverShouldBet();
+    int flopShouldBet(CurrentHandContext& context, bool deterministic = false) override;
+    int turnShouldBet(CurrentHandContext& context, bool deterministic = false) override;
+    int riverShouldBet(CurrentHandContext& context, bool deterministic = false) override;
 };
 
 } // namespace pkt::core

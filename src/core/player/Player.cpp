@@ -25,7 +25,6 @@
 #include <core/interfaces/ILogger.h>
 #include <core/interfaces/persistence/IHandAuditStore.h>
 #include <core/interfaces/persistence/IPlayersStatisticsStore.h>
-#include <third_party/sqlite3/sqlite3.h>
 
 #include <algorithm>
 #include <cmath>
@@ -207,7 +206,6 @@ void Player::doPreflopAction()
     myCurrentHandActions.m_preflopActions.push_back(myAction);
 
     updatePreflopStatistics();
-    // cout << endl << myName << " action : " << myAction << endl;
 
     if (myAction != PLAYER_ACTION_FOLD)
         updateUnplausibleRangesGivenPreflopActions();
@@ -1107,10 +1105,8 @@ std::string Player::getStringBoard() const
 
     return stringBoard;
 }
-int Player::getBoardCardsHigherThan(std::string card) const
+int Player::getBoardCardsHigherThan(std::string stringBoard, std::string card)
 {
-
-    string stringBoard = getStringBoard();
 
     std::istringstream oss(stringBoard);
     std::string boardCard;
@@ -1126,7 +1122,7 @@ int Player::getBoardCardsHigherThan(std::string card) const
     return n;
 }
 
-bool Player::getHavePosition(PlayerPosition myPos, PlayerList runningPlayers) const
+bool Player::getHavePosition(PlayerPosition myPos, PlayerList runningPlayers)
 {
     // return true if myPos is last to play, false if not
 
@@ -1161,7 +1157,7 @@ std::shared_ptr<Player> Player::getPlayerByUniqueId(unsigned id) const
     return tmpPlayer;
 }
 
-bool Player::isCardsInRange(string card1, string card2, string ranges) const
+bool Player::isCardsInRange(string card1, string card2, string ranges)
 {
 
     // process individual ranges, from a string looking like "33,66+,T8o,ATs+,QJs,JTs,AQo+, KcJh"
@@ -1541,7 +1537,7 @@ char Player::incrementCardValue(char c) const
     }
 }
 
-string Player::getFakeCard(char c) const
+string Player::getFakeCard(char c)
 {
 
     char tmp[3];
@@ -1594,125 +1590,6 @@ float Player::getM() const
         return 0;
 }
 
-void Player::initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange)
-{
-
-    const float step = (float) (utgHeadsUpRange - utgFullTableRange) / 8;
-
-    // values are % best hands
-
-    UTG_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    UTG_STARTING_RANGE[2] = utgHeadsUpRange;
-    UTG_STARTING_RANGE[3] = utgHeadsUpRange - step;
-    UTG_STARTING_RANGE[4] = utgHeadsUpRange - (2 * step);
-    UTG_STARTING_RANGE[5] = utgHeadsUpRange - (3 * step);
-    UTG_STARTING_RANGE[6] = utgHeadsUpRange - (4 * step);
-    UTG_STARTING_RANGE[7] = utgFullTableRange + (3 * step);
-    UTG_STARTING_RANGE[8] = utgFullTableRange + (2 * step);
-    UTG_STARTING_RANGE[9] = utgFullTableRange + step;
-    UTG_STARTING_RANGE[10] = utgFullTableRange;
-
-    assert(UTG_STARTING_RANGE[7] < UTG_STARTING_RANGE[6]);
-
-    // we have the UTG starting ranges. Now, deduce the starting ranges for other positions :
-
-    UTG_PLUS_ONE_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < UTG_PLUS_ONE_STARTING_RANGE.size(); i++)
-    {
-        UTG_PLUS_ONE_STARTING_RANGE[i] = min(50, UTG_STARTING_RANGE[i] + 1);
-    }
-
-    UTG_PLUS_TWO_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < UTG_PLUS_TWO_STARTING_RANGE.size(); i++)
-    {
-        UTG_PLUS_TWO_STARTING_RANGE[i] = min(50, UTG_PLUS_ONE_STARTING_RANGE[i] + 1);
-    }
-
-    MIDDLE_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < MIDDLE_STARTING_RANGE.size(); i++)
-    {
-        MIDDLE_STARTING_RANGE[i] = min(50, UTG_PLUS_TWO_STARTING_RANGE[i] + 1);
-    }
-
-    MIDDLE_PLUS_ONE_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < MIDDLE_PLUS_ONE_STARTING_RANGE.size(); i++)
-    {
-        MIDDLE_PLUS_ONE_STARTING_RANGE[i] = min(50, MIDDLE_STARTING_RANGE[i] + 1);
-    }
-
-    LATE_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < LATE_STARTING_RANGE.size(); i++)
-    {
-        LATE_STARTING_RANGE[i] = min(50, MIDDLE_PLUS_ONE_STARTING_RANGE[i] + 1);
-    }
-
-    CUTOFF_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < CUTOFF_STARTING_RANGE.size(); i++)
-    {
-        CUTOFF_STARTING_RANGE[i] = min(50, LATE_STARTING_RANGE[i] + 1);
-    }
-
-    BUTTON_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < BUTTON_STARTING_RANGE.size(); i++)
-    {
-        BUTTON_STARTING_RANGE[i] = min(50, CUTOFF_STARTING_RANGE[i] + 1);
-    }
-
-    SB_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < SB_STARTING_RANGE.size(); i++)
-    {
-        SB_STARTING_RANGE[i] = CUTOFF_STARTING_RANGE[i];
-    }
-
-    BB_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < BB_STARTING_RANGE.size(); i++)
-    {
-        BB_STARTING_RANGE[i] = SB_STARTING_RANGE[i] + 1;
-    }
-}
-
-int Player::getRange(PlayerPosition p) const
-{
-
-    int nbPlayers = currentHand->getActivePlayerList()->size();
-
-    switch (p)
-    {
-
-    case UTG:
-        return UTG_STARTING_RANGE[nbPlayers];
-        break;
-    case UTG_PLUS_ONE:
-        return UTG_PLUS_ONE_STARTING_RANGE[nbPlayers];
-        break;
-    case UTG_PLUS_TWO:
-        return UTG_PLUS_TWO_STARTING_RANGE[nbPlayers];
-        break;
-    case MIDDLE:
-        return MIDDLE_STARTING_RANGE[nbPlayers];
-        break;
-    case MIDDLE_PLUS_ONE:
-        return MIDDLE_PLUS_ONE_STARTING_RANGE[nbPlayers];
-        break;
-    case LATE:
-        return LATE_STARTING_RANGE[nbPlayers];
-        break;
-    case CUTOFF:
-        return CUTOFF_STARTING_RANGE[nbPlayers];
-        break;
-    case BUTTON:
-        return BUTTON_STARTING_RANGE[nbPlayers];
-        break;
-    case SB:
-        return SB_STARTING_RANGE[nbPlayers];
-        break;
-    case BB:
-        return BB_STARTING_RANGE[nbPlayers];
-        break;
-    default:
-        return 0;
-    }
-}
 const SimResults Player::getHandSimulation() const
 {
 
@@ -3309,29 +3186,20 @@ void Player::DisplayHandState(const PostFlopState* state) const
 }
 
 // returns a % chance, for a winning draw
-const int Player::getDrawingProbability() const
+const int Player::getDrawingProbability(const PostFlopState& postFlopState)
 {
 
-    PostFlopState state;
-
-    if (currentHand->getCurrentRound() == GAME_STATE_FLOP)
-        state = myFlopState;
-    else if (currentHand->getCurrentRound() == GAME_STATE_TURN)
-        state = myTurnState;
-    else
-        return 0;
-
-    if (!state.UsesFirst && !state.UsesSecond)
+    if (!postFlopState.UsesFirst && !postFlopState.UsesSecond)
         return 0;
 
     int outs = 0;
 
     // do not count outs for straight or flush, is the board is paired
 
-    if (!state.IsFullHousePossible)
-        outs = state.StraightOuts + state.FlushOuts + state.BetterOuts;
+    if (!postFlopState.IsFullHousePossible)
+        outs = postFlopState.StraightOuts + postFlopState.FlushOuts + postFlopState.BetterOuts;
     else
-        outs = state.BetterOuts;
+        outs = postFlopState.BetterOuts;
 
     if (outs == 0)
         return 0;
@@ -3340,9 +3208,9 @@ const int Player::getDrawingProbability() const
         outs = 20;
 
     // if the last raiser is allin on flop : we must count our odds for the turn AND the river
-    if (currentHand->getCurrentRound() == GAME_STATE_FLOP)
+    // TODO : this is not correct, as we must also take into account the other players actions, and their stacks
+    /*if (currentHand->getCurrentRound() == GAME_STATE_FLOP)
     {
-
         const int lastRaiserID = currentHand->getLastRaiserID();
 
         if (lastRaiserID != -1)
@@ -3355,48 +3223,17 @@ const int Player::getDrawingProbability() const
                 if ((*itAction) == PLAYER_ACTION_ALLIN)
                     return outsOddsTwoCard[outs];
         }
-    }
+    }*/
 
     return outsOddsOneCard[outs];
 }
 
-const int Player::getImplicitOdd() const
+const int Player::getImplicitOdd(const PostFlopState& state)
 {
 
-    // const int nbPlayers =	currentHand->getRunningPlayerList()->size();
-
-    PostFlopState state;
-
-    if (currentHand->getCurrentRound() == GAME_STATE_FLOP)
-        state = myFlopState;
-    else if (currentHand->getCurrentRound() == GAME_STATE_TURN)
-        state = myTurnState;
-    else
-        return 0;
-
-    // TODO compute implicit odd according to opponent's profiles and actions in this hand
+    // TODO compute implicit odd according to opponent's profiles, stack sizes and actions in this hand
 
     int implicitOdd = 0;
-
-    PlayerList players = currentHand->getRunningPlayerList(); // note that all in players are not "running" any more
-
-    for (PlayerListIterator it = players->begin(); it != players->end(); ++it)
-    {
-
-        if ((*it)->getID() == myID)
-            continue;
-
-        if ((*it)->getCash() >= currentHand->getBoard()->getPot() * 2 &&
-            getCash() >= currentHand->getBoard()->getPot() * 2)
-            implicitOdd += 4;
-        else if ((*it)->getCash() >= currentHand->getBoard()->getPot() &&
-                 getCash() >= currentHand->getBoard()->getPot())
-            implicitOdd += 2;
-    }
-
-    if (state.FlushOuts >= 8 && isCardsInRange(myCard1, myCard2, "A2s+"))
-        // going for a flush max : increase implicit odd
-        implicitOdd = implicitOdd * 2;
 
     return implicitOdd;
 }
@@ -4015,16 +3852,11 @@ string Player::getFilledRange(std::vector<string>& ranges, std::vector<float>& r
         return estimatedRange;
 }
 
-bool Player::isDrawingProbOk() const
+bool Player::isDrawingProbOk(const PostFlopState& postFlopState, const int potOdd)
 {
 
-    const int potOdd = getPotOdd();
-
-    if (!(currentHand->getCurrentRound() == GAME_STATE_FLOP || currentHand->getCurrentRound() == GAME_STATE_TURN))
-        return false;
-
-    int implicitOdd = getImplicitOdd();
-    int drawingProb = getDrawingProbability();
+    int implicitOdd = getImplicitOdd(postFlopState);
+    int drawingProb = getDrawingProbability(postFlopState);
 
     if (drawingProb > 0)
     {
@@ -4048,371 +3880,6 @@ bool Player::isDrawingProbOk() const
 #endif
     }
     return false;
-}
-
-float Player::getPreflopCallingRange() const
-{
-
-    const int nbRaises = currentHand->getPreflopRaisesNumber();
-    const int nbCalls = currentHand->getPreflopCallsNumber();
-    const int nbPlayers = currentHand->getActivePlayerList()->size();
-    assert(nbPlayers >= 2);
-    PlayerList runningPlayers = currentHand->getRunningPlayerList();
-    std::vector<PlayerPosition> callersPositions = currentHand->getCallersPositions();
-
-    float callingRange = getRange(myPosition);
-
-#ifdef LOG_POKER_EXEC
-    cout << endl << "\t\tInitial calling range : " << callingRange << endl;
-#endif
-
-    if (nbRaises == 0 && nbCalls == 0 && myPosition != BUTTON && myPosition != SB)
-        // never limp if nobody has limped, except on button or small blind
-        return -1;
-
-    if (nbRaises == 0 && nbCalls > 0)
-    { // 1 or more players have limped, but nobody has raised
-#ifdef LOG_POKER_EXEC
-        cout << "\t\t1 or more players have limped, but nobody has raised. Adjusting callingRange : " << callingRange
-             << " * 1.2 = " << callingRange * 1.2 << endl;
-#endif
-        callingRange = callingRange * 1.2;
-    }
-
-    if (nbRaises == 0)
-    {
-        if (callingRange > 100)
-            callingRange = 100;
-#ifdef LOG_POKER_EXEC
-        cout << "\t\tStandard calling range : " << callingRange << "%" << endl;
-#endif
-        return callingRange;
-    }
-
-    // one or more players raised or re-raised :
-    const int lastRaiserID = currentHand->getPreflopLastRaiserID();
-    std::shared_ptr<Player> lastRaiser = getPlayerByUniqueId(lastRaiserID);
-
-    PreflopStatistics raiserStats = lastRaiser->getStatistics(nbPlayers).getPreflopStatistics();
-
-    // if not enough hands, then try to use the statistics collected for (nbPlayers + 1), they should be more accurate
-    if (raiserStats.m_hands < MIN_HANDS_STATISTICS_ACCURATE && nbPlayers < 10 &&
-        lastRaiser->getStatistics(nbPlayers + 1).getPreflopStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE)
-        raiserStats = lastRaiser->getStatistics(nbPlayers + 1).getPreflopStatistics();
-
-    if (raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getPreflopRaise() != 0)
-    {
-
-        // adjust range according to the last raiser's stats
-        if ((myPosition == BUTTON || myPosition == CUTOFF) && runningPlayers->size() > 5)
-            callingRange = raiserStats.getPreflopRaise() * (nbPlayers > 3 ? 0.7 : 0.9);
-        else
-            callingRange = raiserStats.getPreflopRaise() * (nbPlayers > 3 ? 0.5 : 0.7);
-
-        if (nbRaises == 2) // 3bet
-            callingRange = raiserStats.getPreflop3Bet();
-        else if (nbRaises == 3) // 4bet
-            callingRange = raiserStats.getPreflop4Bet();
-        else if (nbRaises > 3) // 5bet or more
-            callingRange = raiserStats.getPreflop4Bet() * .5;
-
-#ifdef LOG_POKER_EXEC
-        cout << "\t\tadjusting callingRange to the last raiser's stats, value is now " << callingRange << endl;
-#endif
-    }
-    else
-    {
-        // no stats available for the raiser
-
-        if (nbRaises == 2) // 3bet
-            callingRange = callingRange / 2;
-        else if (nbRaises == 3) // 4bet
-            callingRange = callingRange / 3;
-        else if (nbRaises > 3) // 5bet or more
-            callingRange = callingRange / 4;
-
-#ifdef LOG_POKER_EXEC
-        cout << "\t\tno stats available, callingRange value is now " << callingRange << endl;
-#endif
-    }
-
-    const int potOdd = getPotOdd();
-
-    // if big bet, tighten again
-    if (isPreflopBigBet())
-    {
-
-        const int highestSet = min(myCash, currentHand->getCurrentBettingRound()->getHighestSet());
-
-        if (potOdd <= 70 && highestSet > currentHand->getSmallBlind() * 20 && highestSet - mySet > mySet * 6)
-            callingRange = 1.5;
-        else if ((potOdd > 70 && potOdd < 85) ||
-                 (highestSet > currentHand->getSmallBlind() * 8 && highestSet < currentHand->getSmallBlind() * 10))
-            callingRange = callingRange * 0.7;
-        else if ((potOdd >= 85 && potOdd < 95) ||
-                 (highestSet >= currentHand->getSmallBlind() * 10 && highestSet < currentHand->getSmallBlind() * 15))
-            callingRange = callingRange * 0.5;
-        else if ((potOdd >= 95 && potOdd < 99) ||
-                 (highestSet >= currentHand->getSmallBlind() * 15 && highestSet < currentHand->getSmallBlind() * 20))
-            callingRange = callingRange * 0.3;
-        else if (potOdd >= 99)
-            callingRange = callingRange * 0.1;
-
-#ifdef LOG_POKER_EXEC
-        cout << "\t\tpot odd is " << potOdd << " : adjusting callingRange, value is now " << callingRange << endl;
-#endif
-    }
-
-    // if the player is being loose or agressive for every last hands, adjust our range, if nobody else has called or
-    // raised
-    if (lastRaiser->isInVeryLooseMode() && (myPosition >= LATE || myPosition == SB || myPosition == BB) &&
-        nbCalls == 0 && nbRaises == 1)
-    {
-
-        if (callingRange < 20)
-        {
-            callingRange = 20;
-#ifdef LOG_POKER_EXEC
-            cout << "\t\toveragression detected, setting range to " << callingRange << endl;
-#endif
-        }
-    }
-
-    // call if odds are good
-    if (potOdd <= 30 && getM() > 15 && (myPosition >= LATE || myPosition == SB || myPosition == BB))
-    {
-        callingRange = 40;
-#ifdef LOG_POKER_EXEC
-        cout << "\t\tsmall bet (pot odd is " << potOdd << ") : adjusting callingRange, value is now " << callingRange
-             << endl;
-#endif
-    }
-
-    // call if the raiser is allin, and not a big bet
-    if (getM() > 10 && potOdd <= 20 && nbRaises < 2 && lastRaiser->getAction() == PLAYER_ACTION_ALLIN &&
-        (myPosition >= LATE || myPosition == SB || myPosition == BB))
-    {
-        callingRange = 100;
-#ifdef LOG_POKER_EXEC
-        cout << "\t\traiser allin and small bet (pot odd is " << potOdd << ") : adjusting callingRange, value is now "
-             << callingRange << endl;
-#endif
-    }
-
-    callingRange = ceil(callingRange);
-
-    if (callingRange < 1)
-        callingRange = 1;
-
-    if (callingRange > 100)
-        callingRange = 100;
-
-#ifdef LOG_POKER_EXEC
-    cout << "\t\tStandard calling range : " << callingRange << "%" << endl;
-#endif
-
-    return callingRange;
-}
-
-float Player::getPreflopRaisingRange() const
-{
-
-    const int nbRaises = currentHand->getPreflopRaisesNumber();
-    const int nbCalls = currentHand->getPreflopCallsNumber();
-    const int nbPlayers = currentHand->getActivePlayerList()->size();
-    assert(nbPlayers >= 2);
-    PlayerList runningPlayers = currentHand->getRunningPlayerList();
-    std::vector<PlayerPosition> callersPositions = currentHand->getCallersPositions();
-    const int highestSet = currentHand->getCurrentBettingRound()->getHighestSet();
-    const int sets = currentHand->getBoard()->getSets();
-    const int lastRaiserID = currentHand->getPreflopLastRaiserID();
-    std::shared_ptr<Player> lastRaiser = getPlayerByUniqueId(lastRaiserID);
-
-    float raisingRange = getRange(myPosition) * 0.8;
-
-#ifdef LOG_POKER_EXEC
-    cout << endl << "\t\tInitial raising range : " << raisingRange << endl;
-#endif
-
-    if (nbRaises == 0 && nbCalls > 1 && nbPlayers > 3)
-    { // 2 or more players have limped, but nobody has raised : tighten our usual raising range
-#ifdef LOG_POKER_EXEC
-        cout << "\t\t2 or more players have limped, but nobody has raised : tighten our usual raising range : "
-                "adjusting raisingRange, value is now "
-             << raisingRange * 0.7 << endl;
-#endif
-        raisingRange = raisingRange * 0.7;
-    }
-
-    if (nbRaises > 0 && lastRaiserID != myID)
-    {
-
-        // determine if we should 3bet or 4bet
-
-        PreflopStatistics raiserStats = lastRaiser->getStatistics(nbPlayers).getPreflopStatistics();
-        ;
-
-        // if not enough hands, then try to use the statistics collected for (nbPlayers + 1), as they should be more
-        // accurate
-        if (raiserStats.m_hands < MIN_HANDS_STATISTICS_ACCURATE && nbPlayers < 10 &&
-            lastRaiser->getStatistics(nbPlayers + 1).getPreflopStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE)
-            raiserStats = lastRaiser->getStatistics(nbPlayers + 1).getPreflopStatistics();
-
-        if (raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getPreflopRaise() != 0)
-        {
-
-            // adjust range according to the last raiser's stats
-
-            if (nbRaises == 1)
-            {
-
-                // a bet already occured, determine 3-bet range
-                if ((myPosition == BUTTON || myPosition == CUTOFF) &&
-                    runningPlayers->size() >
-                        4) // running players = me + player who raised + players who called + players who didn't act yet
-                    raisingRange = raiserStats.getPreflopRaise() * (nbPlayers > 3 ? 0.7 : 0.9);
-                else
-                {
-                    raisingRange =
-                        std::min(raisingRange, raiserStats.getPreflopRaise() * (nbPlayers > 3 ? 0.5f : 0.7f));
-                }
-            }
-            else if (nbRaises == 2) // a 3-bet already occurred, determine 4-bet range
-                raisingRange = min(raisingRange, raiserStats.getPreflop3Bet() * (nbPlayers > 3 ? 0.5f : 0.7f));
-            else if (nbRaises == 3) // a 4-bet already occurred, determine 5-bet range
-                raisingRange = min(raisingRange, raiserStats.getPreflop4Bet() * (nbPlayers > 3 ? 0.5f : 0.7f));
-            else if (nbRaises > 3) // a 5-bet already occurred, determine 6-bet range
-                raisingRange = 0;  // raise with aces only
-
-#ifdef LOG_POKER_EXEC
-            cout << "\t\t1 or more players have raised : adjusting raisingRange, value is now " << raisingRange << endl;
-#endif
-        }
-        else
-        {
-
-            // no stats available for last raiser,
-            if (nbRaises == 1)
-                raisingRange = 2; // 3bet him with top 2%
-            else
-                raisingRange = 0; // 4bet him with aces only
-
-#ifdef LOG_POKER_EXEC
-            cout << "\t\t1 or more players have raised, but no stats available : adjusting raisingRange, value is now "
-                 << raisingRange << endl;
-#endif
-        }
-
-        const int potOdd = getPotOdd();
-
-        if (isPreflopBigBet())
-        {
-
-            const int highestSet = min(myCash, currentHand->getCurrentBettingRound()->getHighestSet());
-
-            if (potOdd <= 70 && highestSet > currentHand->getSmallBlind() * 20 && highestSet - mySet > mySet * 6)
-                raisingRange = 1.5;
-            else if ((potOdd > 70 && potOdd < 85) ||
-                     (highestSet > currentHand->getSmallBlind() * 8 && highestSet < currentHand->getSmallBlind() * 10))
-                raisingRange = raisingRange * 0.6;
-            else if ((potOdd >= 85 && potOdd < 95) || (highestSet >= currentHand->getSmallBlind() * 10 &&
-                                                       highestSet < currentHand->getSmallBlind() * 15))
-                raisingRange = raisingRange * 0.4;
-            else if ((potOdd >= 95 && potOdd < 99) || (highestSet >= currentHand->getSmallBlind() * 15 &&
-                                                       highestSet < currentHand->getSmallBlind() * 20))
-                raisingRange = min(1.0f, raisingRange * 0.3f);
-            else if (potOdd >= 99)
-                raisingRange = min(1.0f, raisingRange * 0.2f);
-
-#ifdef LOG_POKER_EXEC
-            cout << "\t\tbig bet with pot odd " << potOdd << " : adjusting raisingRange, value is now " << raisingRange
-                 << endl;
-#endif
-
-            // if the raiser is being overagressive for last 8 hands or so, adjust our range (if nobody else has raised
-            // or called)
-            if (lastRaiser->isInVeryLooseMode() && (myPosition >= LATE || myPosition == SB || myPosition == BB) &&
-                nbCalls == 0 && nbRaises == 1)
-            {
-
-                if (raisingRange < 15)
-                {
-                    raisingRange = 15;
-#ifdef LOG_POKER_EXEC
-                    cout << "\t\toveragression detected, setting range to " << raisingRange << endl;
-#endif
-                }
-            }
-        }
-    }
-    else
-    { // no previous raise
-
-        // steal blinds
-        if (!isCardsInRange(myCard1, myCard2, getStringRange(nbPlayers, raisingRange)) &&
-            (myPosition == SB || myPosition == BUTTON || myPosition == CUTOFF) && canBluff(GAME_STATE_PREFLOP))
-        {
-
-            int rand = 0;
-            Randomizer::GetRand(1, 3, 1, &rand);
-            if (rand == 2)
-            {
-                raisingRange = 100;
-#ifdef LOG_POKER_EXEC
-                cout << "\t\ttrying to steal blind, setting raising range to 100" << endl;
-#endif
-            }
-        }
-    }
-
-    // adjust my raising range according to my stack :
-
-    // index is remaining hands to play, if i just fold every hand. Value is the minimum corresponding raising range
-    static const int mToMinimumRange[] = {65, 45, 44, 43, 40, 39, 38, 37, 36, 35, /* M = 1 (full ring) */
-                                          34, 33, 33, 33, 33, 33, 33, 32, 31,     /* M = 2 */
-                                          30, 30, 29, 28, 28, 28, 28, 28, 27,     /* M = 3 */
-                                          27, 27, 27, 27, 26, 26, 26, 26, 25,     /* M = 4 */
-                                          25, 25, 25, 25, 25, 25, 24, 23, 23,     /* M = 5 */
-                                          23, 23, 23, 23, 22, 22, 22, 21, 20,     /* M = 6 */
-                                          20, 20, 20, 20, 20, 19, 19, 18, 17,     /* M = 7 */
-                                          17, 17, 17, 17, 17, 16, 16, 16, 15,     /* M = 8 */
-                                          15, 15, 15, 15, 15, 14, 14, 14, 13,     /* M = 9 */
-                                          13, 12, 11, 10, 9,  8,  7,  6,  5};     /* M = 10 */
-
-    // hands remaining before beeing broke, only with the blind cost
-    int handsLeft = getM() * nbPlayers;
-
-    if (handsLeft < 1)
-        handsLeft = 1;
-
-    if (handsLeft < 90)
-    {
-
-        float f = mToMinimumRange[handsLeft];
-
-        if (handsLeft > 4 && nbRaises > 0)
-            f = f / (nbRaises * 4);
-
-        raisingRange = (f > raisingRange ? f : raisingRange);
-
-#ifdef LOG_POKER_EXEC
-        cout << "\t\tHands left : " << handsLeft << ", so minimum raising range is set to " << f << endl;
-#endif
-    }
-
-    raisingRange = ceil(raisingRange);
-
-    if (raisingRange < 0)
-        raisingRange = 0;
-
-    if (raisingRange > 100)
-        raisingRange = 100;
-
-#ifdef LOG_POKER_EXEC
-    cout << "\t\tStandard raising range : " << raisingRange << "% : ";
-#endif
-
-    return raisingRange;
 }
 
 bool Player::isPreflopBigBet() const
@@ -4449,13 +3916,13 @@ bool Player::isAgressor(const GameState gameState) const
 bool Player::canBluff(const GameState gameState) const
 {
 
-    // check if there is no calling station at the table, for this betting round
+    // check if there is no calling station at the table
     // check also if my opponents stacks are big enough to bluff them
 
     const int nbPlayers = currentHand->getActivePlayerList()->size();
     const int nbRaises = currentHand->getPreflopRaisesNumber();
 
-    PlayerList players = currentHand->getRunningPlayerList(); // note that all-in players are not "running" any more
+    PlayerList players = currentHand->getRunningPlayerList();
 
     if (players->size() == 1)
         // all other players are allin
@@ -4494,7 +3961,7 @@ bool Player::canBluff(const GameState gameState) const
     return true;
 }
 
-std::string Player::getStringRange(int nbPlayers, int range) const
+std::string Player::getStringRange(int nbPlayers, int range)
 {
 
     if (range > 100)
@@ -4576,53 +4043,7 @@ bool Player::isInVeryLooseMode() const
         return false;
 }
 
-void Player::computePreflopRaiseAmount()
-{
-
-    const int nbRaises = currentHand->getPreflopRaisesNumber();
-    const int nbCalls = currentHand->getPreflopCallsNumber();
-    const int nbPlayers = currentHand->getActivePlayerList()->size();
-
-    const int BB = currentHand->getSmallBlind() * 2;
-
-    if (nbRaises == 0)
-    { // first to raise
-
-        myRaiseAmount = (getM() > 8 ? 2 * BB : 1.5 * BB);
-
-        if (nbPlayers > 4)
-        { // adjust for position
-            if (myPosition < MIDDLE)
-                myRaiseAmount += BB;
-            if (myPosition == BUTTON)
-                myRaiseAmount -= currentHand->getSmallBlind();
-        }
-        if (currentHand->getPreflopCallsNumber() > 0) // increase raise amount if there are limpers
-            myRaiseAmount += (currentHand->getPreflopCallsNumber() * BB);
-    }
-    else
-    {
-
-        const int lastRaiserID = currentHand->getPreflopLastRaiserID();
-        std::shared_ptr<Player> lastRaiser = getPlayerByUniqueId(lastRaiserID);
-        int totalPot = currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets();
-
-        if (nbRaises == 1)
-        { // will 3bet
-            myRaiseAmount = totalPot * (myPosition > lastRaiser->getPosition() ? 1.2 : 1.4);
-        }
-        if (nbRaises > 1)
-        { // will 4bet or more
-            myRaiseAmount = totalPot * (myPosition > lastRaiser->getPosition() ? 1 : 1.2);
-        }
-    }
-
-    // if i would be commited in the pot with the computed amount, just go allin preflop
-    if (myRaiseAmount > (myCash * 0.3))
-        myRaiseAmount = myCash;
-}
-
-bool Player::shouldPotControl(const PostFlopState& r, const SimResults& simulation, const GameState state) const
+bool Player::shouldPotControl(const PostFlopState& r, const SimResults& simulation, const GameState state)
 {
 
     assert(state == GAME_STATE_FLOP || state == GAME_STATE_TURN);
