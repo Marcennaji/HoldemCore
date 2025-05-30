@@ -63,6 +63,8 @@ class CurrentHandActions
 
   protected:
     friend class Player;
+    friend class HumanPlayer;
+    friend class BotPlayer;
 
     std::vector<PlayerAction> m_preflopActions;
     std::vector<PlayerAction> m_flopActions;
@@ -82,7 +84,7 @@ static const char* ManiacBotStrategyName[] = {"Maurice",  "Milou",    "Michou", 
 static const char* UltraTightBotStrategyName[] = {"Ursula",  "Uri",    "Ulrich", "Ulysses", "Urbain",
                                                   "Umberto", "Urania", "Ugo",    "Uma",     "Urso"};
 
-static const char* HumanPlayerName[] = {" "};
+static const char* HumanPlayerName[] = {"You"};
 
 // values are odd %, according to the outs number. Array index is the number of outs
 static int outsOddsOneCard[] = {
@@ -107,13 +109,7 @@ class Player
 
     ~Player();
 
-    void setStrategy(std::shared_ptr<IBotStrategy> strategy) { myStrategy = strategy; }
-
-    void doPreflopAction();
-    void doFlopAction();
-    void doTurnAction();
-    void doRiverAction();
-
+    virtual void action() = 0;
     int getID() const;
     void setID(unsigned newId);
     void setGuid(const std::string& theValue);
@@ -169,8 +165,6 @@ class Player
     int getLastMoneyWon() const;
 
     std::string getCardsValueString() const;
-
-    void action();
 
     const PlayerPosition getPosition() const;
     void setPosition();
@@ -229,12 +223,10 @@ class Player
     static const int getImplicitOdd(const PostFlopState& state);
     static int getBoardCardsHigherThan(std::string stringBoard, std::string card);
 
-  private:
-    CurrentHandContext buildPlayerContext(const GameState gameState) const;
+  protected:
     void loadStatistics();
     void resetPlayerStatistics();
 
-    void evaluateBetAmount();
     float getMaxOpponentsStrengths() const;
     bool isPreflopBigBet() const;
     float getOpponentWinningHandsPercentage(const int idPlayer, std::string board) const;
@@ -282,7 +274,6 @@ class Player
                                           const RiverStatistics&);
 
     // attributes
-    std::shared_ptr<IBotStrategy> myStrategy;
 
     IHandAuditStore* myHandAuditStore;
     IPlayersStatisticsStore* myPlayersStatisticsStore;

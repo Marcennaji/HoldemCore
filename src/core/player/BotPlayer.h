@@ -19,18 +19,30 @@
 #pragma once
 
 #include "Player.h"
+
 namespace pkt::core
 {
-class HumanPlayer : public Player
+class BotPlayer : public Player
 {
 
   public:
-    HumanPlayer(GameEvents*, IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type, std::string name,
-                int sC, bool aS, bool sotS, int mB);
+    BotPlayer(GameEvents*, IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type, std::string name,
+              int sC, bool aS, bool sotS, int mB);
 
-    ~HumanPlayer();
+    ~BotPlayer();
 
+    void setStrategy(std::unique_ptr<IBotStrategy> strategy) { myStrategy = std::move(strategy); }
     void action() override;
+    void doPreflopAction();
+    void doFlopAction();
+    void doTurnAction();
+    void doRiverAction();
+
+  private:
+    void evaluateBetAmount();
+    CurrentHandContext buildPlayerContext(const GameState gameState) const;
+
+    std::unique_ptr<IBotStrategy> myStrategy;
 };
 
 } // namespace pkt::core

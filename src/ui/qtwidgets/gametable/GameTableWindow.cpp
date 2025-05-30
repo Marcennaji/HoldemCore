@@ -988,7 +988,6 @@ void GameTableWindow::dealHoleCards()
     QPixmap tempCardsPixmapArray[2];
     int tempCardsIntArray[2];
 
-    // Karten der Gegner und eigene Karten austeilen
     int j;
     std::shared_ptr<Game> currentGame = myStartWindow->getSession()->getCurrentGame();
 
@@ -1001,8 +1000,9 @@ void GameTableWindow::dealHoleCards()
         {
             if ((*it_c)->getActiveStatus())
             {
-                if (((*it_c)->getID() == 0) /* || DEBUG_MODE*/)
+                if (((*it_c)->getID() == 0))
                 {
+                    (*it_c)->computeEstimatedPreflopRange(0);
                     tempCardsPixmapArray[j].load(myCardDeckStyle->getCurrentDir() +
                                                  QString::number(tempCardsIntArray[j], 10) + ".png");
 
@@ -1129,12 +1129,10 @@ void GameTableWindow::dealFlopCards6()
     boardCardsArray[2]->setPixmap(card, false);
 
     // stable
-    // wenn alle All In
     if (myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getAllInCondition())
     {
         dealFlopCards6Timer->start(AllInDealCardsSpeed);
     }
-    // sonst normale Variante
     else
     {
         updateHumanPlayerButtonsState(0); // mode 0 == called from dealBettingRoundcards
@@ -3031,10 +3029,6 @@ void GameTableWindow::refreshHandsRanges()
 
     for (it_c = players->begin(); it_c != players->end(); ++it_c)
     {
-
-        // display ranges for every player who didn't fold preflop, except for the human player
-        if ((*it_c)->getID() == 0)
-            continue;
 
         if ((*it_c)->getCurrentHandActions().getPreflopActions().size() > 0 &&
             (*it_c)->getCurrentHandActions().getPreflopActions().front() != PLAYER_ACTION_FOLD)

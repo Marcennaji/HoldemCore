@@ -34,5 +34,66 @@ HumanPlayer::HumanPlayer(GameEvents* events, IHandAuditStore* ha, IPlayersStatis
 HumanPlayer::~HumanPlayer()
 {
 }
+void HumanPlayer::action()
+{
 
+    switch (currentHand->getCurrentRound())
+    {
+
+    case GAME_STATE_PREFLOP:
+        // doPreflopAction();
+        break;
+
+    case GAME_STATE_FLOP:
+        // doFlopAction();
+        break;
+
+    case GAME_STATE_TURN:
+        // doTurnAction();
+        break;
+
+    case GAME_STATE_RIVER:
+        // doRiverAction();
+        break;
+
+    default:
+        break;
+    }
+
+    // evaluateBetAmount(); // original bet amount may be modified
+    currentHand->getBoard()->collectSets();
+    if (myEvents && myEvents->onPotUpdated)
+        myEvents->onPotUpdated(currentHand->getBoard()->getPot());
+
+    myTurn = 0;
+
+#ifdef LOG_POKER_EXEC
+    cout << endl;
+    if (myAction == PLAYER_ACTION_FOLD)
+        cout << "FOLD";
+    else if (myAction == PLAYER_ACTION_BET)
+        cout << "BET " << myBetAmount;
+    else if (myAction == PLAYER_ACTION_RAISE)
+        cout << "RAISE " << myRaiseAmount;
+    else if (myAction == PLAYER_ACTION_CALL)
+        cout << "CALL ";
+    else if (myAction == PLAYER_ACTION_CHECK)
+        cout << "CHECK";
+    else if (myAction == PLAYER_ACTION_ALLIN)
+        cout << "ALLIN ";
+    else if (myAction == PLAYER_ACTION_NONE)
+        cout << "NONE";
+    else
+        cout << "undefined ?";
+
+    cout << endl << "---------------------------------------------------------------------------------" << endl << endl;
+#endif
+
+    currentHand->setPreviousPlayerID(myID);
+
+    if (myEvents && myEvents->onActivePlayerActionDone)
+        myEvents->onActivePlayerActionDone();
+
+    // currentHand->getGuiInterface()->showCards(myID);//test
+}
 } // namespace pkt::core
