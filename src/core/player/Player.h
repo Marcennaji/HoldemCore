@@ -107,9 +107,8 @@ class Player
     Player(GameEvents*, IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type, std::string name, int sC,
            bool aS, bool sotS, int mB);
 
-    ~Player();
+    virtual ~Player() = default;
 
-    virtual void action() = 0;
     int getID() const;
     void setID(unsigned newId);
     void setGuid(const std::string& theValue);

@@ -77,48 +77,22 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     void setSpeeds();
 
   signals:
-    // void signalinitializeGui(int speed);
 
     void signalShowClientDialog();
 
-    // void signalRefreshSet();
-    // void signalRefreshCash();
-    // void signalRefreshAction(int = -1, int = -1);
-    // void signalRefreshChangePlayer();
-    // void signalRefreshPot();
-    // void signalrefreshPlayersActiveInactiveStyles(int = -1, int = -1);
-    // void signalRefreshAll();
-    // void signalRefreshPlayerName();
-    // void signalrefreshDealerAndBlindsButtons();
-    // void signalrefreshTableDescriptiveLabels(int);
-
-    // void signalGuiUpdateDone();
-
-    // void signalDoHumanAction();
-    // void signalupdateHumanPlayerButtonsState();
-    // void signalDisableMyButtons();
-
-    // void signalDealBettingRoundCards(int myBettingRoundID);
-
-    // void signalDealHoleCards();
     void signalDealFlopCards0();
     void signalDealTurnCards0();
     void signalDealRiverCards0();
 
     void signalactivePlayerActionDone();
 
-    // void signalPreflopAnimation1();
     void signalPreflopAnimation2();
     void signalFlopAnimation1();
     void signalFlopAnimation2();
-    // void signalTurnAnimation1();
-    void signalTurnAnimation2();
-    // void signalRiverAnimation1();
-    void signalRiverAnimation2();
-    // void signalPostRiverAnimation1();
-    // void signalPostRiverRunAnimation1();
 
-    // void signalFlipHoleCardsAllIn();
+    void signalTurnAnimation2();
+
+    void signalRiverAnimation2();
 
   public slots:
 

@@ -86,10 +86,6 @@ Player::Player(GameEvents* events, IHandAuditStore* ha, IPlayersStatisticsStore*
     }
 }
 
-Player::~Player()
-{
-}
-
 void Player::setHand(IHand* br)
 {
     currentHand = br;

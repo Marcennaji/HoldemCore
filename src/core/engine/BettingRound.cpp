@@ -23,7 +23,7 @@
 #include "model/EngineError.h"
 
 #include <core/interfaces/ILogger.h>
-#include <core/player/Player.h>
+#include <core/player/BotPlayer.h>
 
 namespace pkt::core
 {
@@ -90,7 +90,9 @@ void BettingRound::nextPlayer()
         myLogger->error("RUNNING_PLAYER_NOT_FOUND");
     }
 
-    (*currentPlayersTurnConstIt)->action();
+    auto botPtr = std::dynamic_pointer_cast<BotPlayer>(*currentPlayersTurnConstIt);
+    if (botPtr)
+        botPtr->action();
 }
 
 void BettingRound::run()

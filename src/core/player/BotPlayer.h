@@ -20,6 +20,7 @@
 
 #include "Player.h"
 #include "core/player/strategy/CurrentHandContext.h"
+#include "core/player/strategy/IBotStrategy.h"
 
 namespace pkt::core
 {
@@ -33,7 +34,7 @@ class BotPlayer : public Player
     ~BotPlayer();
 
     void setStrategy(std::unique_ptr<IBotStrategy> strategy) { myStrategy = std::move(strategy); }
-    void action() override;
+    void action();
     void doPreflopAction();
     void doFlopAction();
     void doTurnAction();

@@ -1531,9 +1531,6 @@ void GameTableWindow::myFold()
         // set that i was the last active player. need this for unhighlighting groupbox
         currentHand->setPreviousPlayerID(0);
 
-        // 		statusBar()->clearMessage();
-
-        // Spiel läuft weiter
         myActionDone();
     }
 }
@@ -1549,9 +1546,6 @@ void GameTableWindow::myCheck()
     // set that i was the last active player. need this for unhighlighting groupbox
     currentHand->setPreviousPlayerID(0);
 
-    // 	statusBar()->clearMessage();
-
-    // Spiel läuft weiter
     myActionDone();
 }
 
@@ -1703,15 +1697,11 @@ void GameTableWindow::mySet()
         currentHand->getBoard()->collectSets();
         refreshPot();
 
-        // 		statusBar()->clearMessage();
-
         // set that i was the last active player. need this for unhighlighting groupbox
         currentHand->setPreviousPlayerID(0);
 
-        // lastPlayerAction für Karten umblättern reihenfolge setzrn
         currentHand->setLastActionPlayerID(humanPlayer->getID());
 
-        // Spiel läuft weiter
         myActionDone();
     }
 }
@@ -2022,12 +2012,18 @@ void GameTableWindow::myActionDone()
     else if (currentState == GAME_STATE_FLOP)
     {
         humanPlayer->getCurrentHandActions().getFlopActions().push_back(humanPlayer->getAction());
+        if (humanPlayer->getAction() == PLAYER_ACTION_BET || humanPlayer->getAction() == PLAYER_ACTION_RAISE ||
+            humanPlayer->getAction() == PLAYER_ACTION_ALLIN)
+            currentHand->setFlopLastRaiserID(humanPlayer->getID());
         humanPlayer->updateFlopStatistics();
         humanPlayer->updateUnplausibleRangesGivenFlopActions();
     }
     else if (currentState == GAME_STATE_TURN)
     {
         humanPlayer->getCurrentHandActions().getTurnActions().push_back(humanPlayer->getAction());
+        if (humanPlayer->getAction() == PLAYER_ACTION_BET || humanPlayer->getAction() == PLAYER_ACTION_RAISE ||
+            humanPlayer->getAction() == PLAYER_ACTION_ALLIN)
+            currentHand->setTurnLastRaiserID(humanPlayer->getID());
         humanPlayer->updateTurnStatistics();
         humanPlayer->updateUnplausibleRangesGivenTurnActions();
     }

@@ -29,8 +29,6 @@ class HumanPlayer : public Player
                 int sC, bool aS, bool sotS, int mB);
 
     ~HumanPlayer();
-
-    void action() override;
 };
 
 } // namespace pkt::core
