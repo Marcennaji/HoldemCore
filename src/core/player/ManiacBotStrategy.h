@@ -20,6 +20,8 @@
 #include "core/player/strategy/IBotStrategy.h"
 namespace pkt::core
 {
+// Forward declaration
+class CurrentHandContext;
 class ManiacBotStrategy : public IBotStrategy
 {
 

@@ -22,6 +22,8 @@
 
 namespace pkt::core
 {
+// Forward declaration
+class CurrentHandContext;
 class LooseAggressiveBotStrategy : public IBotStrategy
 {
 

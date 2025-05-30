@@ -19,6 +19,7 @@
 #pragma once
 
 #include "Player.h"
+#include "core/player/strategy/CurrentHandContext.h"
 
 namespace pkt::core
 {
@@ -40,9 +41,13 @@ class BotPlayer : public Player
 
   private:
     void evaluateBetAmount();
-    CurrentHandContext buildPlayerContext(const GameState gameState) const;
+    void buildPlayerContext(const GameState gameState);
 
     std::unique_ptr<IBotStrategy> myStrategy;
+    GameState myCurrentGameState = GAME_STATE_NONE;
+    int myBetAmount = 0;
+    int myRaiseAmount = 0;
+    CurrentHandContext myCurrentHandContext;
 };
 
 } // namespace pkt::core

@@ -1002,7 +1002,6 @@ void GameTableWindow::dealHoleCards()
             {
                 if (((*it_c)->getID() == 0))
                 {
-                    (*it_c)->computeEstimatedPreflopRange(0);
                     tempCardsPixmapArray[j].load(myCardDeckStyle->getCurrentDir() +
                                                  QString::number(tempCardsIntArray[j], 10) + ".png");
 

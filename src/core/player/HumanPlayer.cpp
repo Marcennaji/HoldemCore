@@ -60,7 +60,6 @@ void HumanPlayer::action()
         break;
     }
 
-    // evaluateBetAmount(); // original bet amount may be modified
     currentHand->getBoard()->collectSets();
     if (myEvents && myEvents->onPotUpdated)
         myEvents->onPotUpdated(currentHand->getBoard()->getPot());
@@ -70,21 +69,21 @@ void HumanPlayer::action()
 #ifdef LOG_POKER_EXEC
     cout << endl;
     if (myAction == PLAYER_ACTION_FOLD)
-        cout << "FOLD";
+        cout << "you FOLD";
     else if (myAction == PLAYER_ACTION_BET)
-        cout << "BET " << myBetAmount;
+        cout << "you BET ";
     else if (myAction == PLAYER_ACTION_RAISE)
-        cout << "RAISE " << myRaiseAmount;
+        cout << "you RAISE ";
     else if (myAction == PLAYER_ACTION_CALL)
-        cout << "CALL ";
+        cout << "you CALL ";
     else if (myAction == PLAYER_ACTION_CHECK)
-        cout << "CHECK";
+        cout << "you CHECK";
     else if (myAction == PLAYER_ACTION_ALLIN)
-        cout << "ALLIN ";
+        cout << "you ALLIN ";
     else if (myAction == PLAYER_ACTION_NONE)
-        cout << "NONE";
+        cout << "you NONE";
     else
-        cout << "undefined ?";
+        cout << "you undefined ?";
 
     cout << endl << "---------------------------------------------------------------------------------" << endl << endl;
 #endif

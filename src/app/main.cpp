@@ -18,6 +18,7 @@
 
 #include <cstdlib>
 #include <ctime>
+#include <fstream>
 #include <iostream>
 
 #include "core/session/Session.h"
@@ -59,6 +60,18 @@ int main(int argc, char** argv)
     /////// can be removed for non-qt-guis ////////////
     // QtSingleApplication a( argc, argv );
 
+    QApplication app(argc, argv);
+    int* p = NULL;
+    pkt::infra::AppDirectories dirs = pkt::infra::AppDirectories::initialize();
+
+    QString appPath = QString::fromStdString(dirs.appDataDir);
+    QString logPath = QString::fromStdString(dirs.logDir);
+    QString userPath = QString::fromStdString(dirs.userDataDir);
+
+    auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
+    GuiAppController controller(logger.get(), appPath, logPath, userPath);
+    StartWindow* mainWindow = controller.createMainWindow();
+
 #ifdef LOG_POKER_EXEC
 
 #ifdef LOG_POKER_CONSOLE
@@ -88,18 +101,6 @@ int main(int argc, char** argv)
 #endif
 
 #endif
-
-    QApplication app(argc, argv);
-    int* p = NULL;
-
-    pkt::infra::AppDirectories dirs = pkt::infra::AppDirectories::initialize();
-    QString appPath = QString::fromStdString(dirs.appDataDir);
-    QString logPath = QString::fromStdString(dirs.logDir);
-    QString userPath = QString::fromStdString(dirs.userDataDir);
-
-    auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
-    GuiAppController controller(logger.get(), appPath, logPath, userPath);
-    StartWindow* mainWindow = controller.createMainWindow();
 
     return app.exec();
 }

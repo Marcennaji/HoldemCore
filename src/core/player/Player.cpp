@@ -1365,7 +1365,7 @@ void Player::updateUnplausibleRangesGivenPreflopActions()
     const string originalEstimatedRange = myEstimatedRange;
 
 #ifdef LOG_POKER_EXEC
-    std::cout << endl << "\tPlausible range on preflop :\t" << myEstimatedRange << endl;
+    std::cout << endl << "\tPlausible range on preflop for player " << myID << " :\t" << myEstimatedRange << endl;
 #endif
 
     const int nbPlayers = currentHand->getActivePlayerList()->size();

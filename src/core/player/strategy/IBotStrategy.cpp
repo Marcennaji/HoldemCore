@@ -1,6 +1,7 @@
 #include "IBotStrategy.h"
 #include <core/engine/Randomizer.h>
 #include <core/engine/model/Ranges.h>
+#include "CurrentHandContext.h"
 
 using namespace std;
 
@@ -546,7 +547,7 @@ bool IBotStrategy::shouldPotControl(CurrentHandContext& ctx, bool deterministic)
     const int bigBlind = ctx.smallBlind * 2;
 
     if (ctx.gameState == GAME_STATE_FLOP &&
-        !(ctx.preflopLastRaiser->getID() == ctx.myID && ctx.flopBetsOrRaisesNumber == 0))
+        !(ctx.preflopLastRaiser && ctx.preflopLastRaiser->getID() == ctx.myID && ctx.flopBetsOrRaisesNumber == 0))
     {
 
         if (ctx.pot >= bigBlind * 20)

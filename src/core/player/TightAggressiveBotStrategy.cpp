@@ -23,6 +23,7 @@
 #include <core/engine/model/Ranges.h>
 #include <core/interfaces/IHand.h>
 #include <core/interfaces/ILogger.h>
+#include <core/player/strategy/CurrentHandContext.h>
 #include "Exception.h"
 
 #include <fstream>
@@ -51,7 +52,8 @@ TightAggressiveBotStrategy::~TightAggressiveBotStrategy()
 bool TightAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool deterministic)
 {
 
-    if (ctx.myPreflopCallingRange == -1)
+    float callingRange = getPreflopCallingRange(ctx);
+    if (callingRange == -1)
         return false; // never call : raise or fold
 
     string stringCallingRange;
@@ -67,7 +69,7 @@ bool TightAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool
     else
         RANGES_STRING = TOP_RANGE_MORE_4_PLAYERS;
 
-    stringCallingRange = RANGES_STRING[(int) ctx.myPreflopCallingRange];
+    stringCallingRange = RANGES_STRING[(int) callingRange];
 
     std::shared_ptr<Player> lastRaiser = ctx.preflopLastRaiser;
 
