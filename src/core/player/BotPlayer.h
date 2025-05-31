@@ -42,7 +42,7 @@ class BotPlayer : public Player
 
   private:
     void evaluateBetAmount();
-    void buildPlayerContext(const GameState gameState);
+    void updatePlayerContext(const GameState gameState);
 
     std::unique_ptr<IBotStrategy> myStrategy;
     GameState myCurrentGameState = GAME_STATE_NONE;

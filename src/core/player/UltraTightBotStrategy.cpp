@@ -229,7 +229,7 @@ int UltraTightBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool determini
         return false;
 
     // donk bets :
-    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.preflopLastRaiser->getID() != ctx.myID)
+    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() != ctx.myID)
     {
         if (ctx.preflopLastRaiser->getPosition() > ctx.myPosition)
         {
@@ -277,7 +277,8 @@ int UltraTightBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool determini
 
         int rand = 0;
         Randomizer::GetRand(1, 7, 1, &rand);
-        if (rand == 3 && !ctx.myHavePosition && ctx.preflopLastRaiser->getID() != ctx.myID)
+        if (rand == 3 && !ctx.myHavePosition && ctx.preflopRaisesNumber > 0 &&
+            ctx.preflopLastRaiser->getID() != ctx.myID)
             return 0; // may check-raise or check-call
 
         // if no raise preflop, or if more than 1 opponent
@@ -291,7 +292,7 @@ int UltraTightBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool determini
         }
 
         // if i have raised preflop, bet
-        if (ctx.preflopLastRaiser->getID() == ctx.myID)
+        if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() == ctx.myID)
         {
             if (ctx.nbRunningPlayers < 4)
                 return ctx.pot * 0.6;
@@ -312,8 +313,8 @@ int UltraTightBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool determini
         if (rand == 1)
         {
             // if I was the last raiser preflop, bet if i have a big enough stack
-            if (ctx.preflopLastRaiser->getID() == ctx.myID && ctx.nbRunningPlayers < 4 && ctx.myCash > ctx.pot * 5 &&
-                ctx.myCanBluff)
+            if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() == ctx.myID && ctx.nbRunningPlayers < 4 &&
+                ctx.myCash > ctx.pot * 5 && ctx.myCanBluff)
             {
                 return ctx.pot * 0.6;
             }

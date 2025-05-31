@@ -1629,7 +1629,6 @@ void GameTableWindow::myCall()
 
     // 	statusBar()->clearMessage();
 
-    // Spiel läuft weiter
     myActionDone();
 }
 

@@ -226,7 +226,7 @@ int TightAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool dete
         return 0;
 
     // donk bets :
-    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.preflopLastRaiser->getID() != ctx.myID)
+    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() != ctx.myID)
     {
         if (ctx.preflopLastRaiser->getPosition() > ctx.myPosition)
         {
@@ -292,7 +292,7 @@ int TightAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool dete
         }
 
         // if i have raised preflop, bet
-        if (ctx.preflopLastRaiser->getID() == ctx.myID)
+        if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() == ctx.myID)
         {
             if (ctx.nbRunningPlayers < 4)
                 return ctx.pot * 0.6;

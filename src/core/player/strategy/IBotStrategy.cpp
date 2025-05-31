@@ -547,7 +547,7 @@ bool IBotStrategy::shouldPotControl(CurrentHandContext& ctx, bool deterministic)
     const int bigBlind = ctx.smallBlind * 2;
 
     if (ctx.gameState == GAME_STATE_FLOP &&
-        !(ctx.preflopLastRaiser && ctx.preflopLastRaiser->getID() == ctx.myID && ctx.flopBetsOrRaisesNumber == 0))
+        !(ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() == ctx.myID && ctx.flopBetsOrRaisesNumber == 0))
     {
 
         if (ctx.pot >= bigBlind * 20)

@@ -350,7 +350,7 @@ int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool dete
         }
 
         // if i have raised preflop, bet
-        if (ctx.preflopLastRaiser->getID() == ctx.myID && ctx.preflopRaisesNumber > 0)
+        if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() == ctx.myID && ctx.preflopRaisesNumber > 0)
         {
             if (ctx.nbRunningPlayers < 4)
                 return ctx.pot * 0.8;
@@ -368,8 +368,8 @@ int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool dete
             return 0;
 
         // if I was the last raiser preflop, I may bet with not much
-        if (ctx.preflopLastRaiser->getID() == ctx.myID && ctx.nbRunningPlayers < 4 && ctx.myCash > ctx.pot * 4 &&
-            ctx.myCanBluff)
+        if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() == ctx.myID && ctx.nbRunningPlayers < 4 &&
+            ctx.myCash > ctx.pot * 4 && ctx.myCanBluff)
         {
 
             if (ctx.myHandSimulation.winRanged > 0.2)

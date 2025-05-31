@@ -286,7 +286,7 @@ int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic
         return 0;
 
     // donk bets :
-    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.preflopLastRaiser->getID() != ctx.myID)
+    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() != ctx.myID)
     {
         if (ctx.preflopLastRaiser->getPosition() > ctx.myPosition)
         {
@@ -347,7 +347,7 @@ int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic
         }
 
         // if i have raised preflop, bet
-        if (ctx.preflopLastRaiser->getID() == ctx.myID && ctx.preflopRaisesNumber > 0)
+        if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() == ctx.myID)
         {
             return ctx.pot * 0.8;
         }
@@ -362,8 +362,8 @@ int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic
             return 0;
 
         // if I was the last raiser preflop, I may bet with not much
-        if (ctx.preflopLastRaiser->getID() == ctx.myID && ctx.nbRunningPlayers < 4 && ctx.myCash > ctx.pot * 4 &&
-            ctx.myCanBluff)
+        if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() == ctx.myID && ctx.nbRunningPlayers < 4 &&
+            ctx.myCash > ctx.pot * 4 && ctx.myCanBluff)
         {
             if (ctx.myHandSimulation.winRanged > 0.15 && ctx.myHandSimulation.win > 0.3)
             {

@@ -37,7 +37,7 @@ BotPlayer::~BotPlayer()
 {
 }
 
-void BotPlayer::buildPlayerContext(const GameState state)
+void BotPlayer::updatePlayerContext(const GameState state)
 {
 
     // Shared game state
@@ -97,7 +97,7 @@ void BotPlayer::buildPlayerContext(const GameState state)
     if (currentHand->getCurrentBettingRound()->getBettingRoundID() != myCurrentGameState)
     {
         // do this init once per player and betting round
-        myCurrentHandContext.myHandSimulation = getHandSimulation();
+        // myCurrentHandContext.myHandSimulation = getHandSimulation();
         myCurrentHandContext.myID = myID;
         myCurrentHandContext.myCard1 = myCard1;
         myCurrentHandContext.myCard2 = myCard2;
@@ -175,7 +175,7 @@ void BotPlayer::action()
 void BotPlayer::doPreflopAction()
 {
 
-    buildPlayerContext(GAME_STATE_PREFLOP);
+    updatePlayerContext(GAME_STATE_PREFLOP);
 
 #ifdef LOG_POKER_EXEC
     cout << endl
@@ -224,7 +224,7 @@ void BotPlayer::doPreflopAction()
 void BotPlayer::doFlopAction()
 {
 
-    buildPlayerContext(GAME_STATE_FLOP);
+    updatePlayerContext(GAME_STATE_FLOP);
 
 #ifdef LOG_POKER_EXEC
     cout << endl
@@ -268,7 +268,7 @@ void BotPlayer::doFlopAction()
 void BotPlayer::doTurnAction()
 {
 
-    buildPlayerContext(GAME_STATE_TURN);
+    updatePlayerContext(GAME_STATE_TURN);
 
 #ifdef LOG_POKER_EXEC
     cout << endl
@@ -312,7 +312,7 @@ void BotPlayer::doTurnAction()
 void BotPlayer::doRiverAction()
 {
 
-    buildPlayerContext(GAME_STATE_RIVER);
+    updatePlayerContext(GAME_STATE_RIVER);
 
 #ifdef LOG_POKER_EXEC
     cout << endl
