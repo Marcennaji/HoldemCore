@@ -50,4 +50,5 @@ typedef std::list<std::shared_ptr<Player>>::const_iterator PlayerListConstIterat
 #define GAME_NUMBER_OF_PLAYERS 6
 #define GAME_START_SBLIND 5
 #define GAME_SPEED 8
-#define MIN_HANDS_STATISTICS_ACCURATE 30
+// #define MIN_HANDS_STATISTICS_ACCURATE 30
+#define MIN_HANDS_STATISTICS_ACCURATE 2

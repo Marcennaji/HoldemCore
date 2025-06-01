@@ -37,7 +37,7 @@ BotPlayer::~BotPlayer()
 {
 }
 
-void BotPlayer::updatePlayerContext(const GameState state)
+void BotPlayer::updateCurrentHandContext(const GameState state)
 {
 
     // Shared game state
@@ -62,49 +62,33 @@ void BotPlayer::updatePlayerContext(const GameState state)
     myCurrentHandContext.myCurrentHandActions = myCurrentHandActions;
     myCurrentHandContext.myCanBluff = canBluff(state);
     myCurrentHandContext.myHavePosition = Player::getHavePosition(myPosition, currentHand->getRunningPlayerList());
+    myCurrentHandContext.isPreflopBigBet = isPreflopBigBet();
+    myCurrentHandContext.myPreflopIsAggressor = isAgressor(GAME_STATE_PREFLOP);
+    myCurrentHandContext.preflopLastRaiser = getPlayerByUniqueId(currentHand->getPreflopLastRaiserID());
+    myCurrentHandContext.preflopRaisesNumber = currentHand->getPreflopRaisesNumber();
+    myCurrentHandContext.preflopCallsNumber = currentHand->getPreflopCallsNumber();
 
-    if (state == GAME_STATE_PREFLOP)
-    {
-        myCurrentHandContext.isPreflopBigBet = isPreflopBigBet();
-        myCurrentHandContext.myPreflopIsAggressor = isAgressor(GAME_STATE_PREFLOP);
-        myCurrentHandContext.preflopLastRaiser = getPlayerByUniqueId(currentHand->getPreflopLastRaiserID());
-        myCurrentHandContext.preflopRaisesNumber = currentHand->getPreflopRaisesNumber();
-        myCurrentHandContext.preflopCallsNumber = currentHand->getPreflopCallsNumber();
-    }
-    else
-    {
-        myCurrentHandContext.myPostFlopState = getPostFlopState();
+    myCurrentHandContext.myPostFlopState = getPostFlopState();
 
-        if (state == GAME_STATE_FLOP)
-        {
-            myCurrentHandContext.myFlopIsAggressor = isAgressor(GAME_STATE_FLOP);
-            myCurrentHandContext.flopBetsOrRaisesNumber = currentHand->getFlopBetsOrRaisesNumber();
-            myCurrentHandContext.flopLastRaiser = getPlayerByUniqueId(currentHand->getFlopLastRaiserID());
-        }
-        else if (state == GAME_STATE_TURN)
-        {
-            myCurrentHandContext.myTurnIsAggressor = isAgressor(GAME_STATE_TURN);
-            myCurrentHandContext.turnBetsOrRaisesNumber = currentHand->getTurnBetsOrRaisesNumber();
-            myCurrentHandContext.turnLastRaiser = getPlayerByUniqueId(currentHand->getTurnLastRaiserID());
-        }
-        else if (state == GAME_STATE_RIVER)
-        {
-            myCurrentHandContext.myRiverIsAggressor = isAgressor(GAME_STATE_RIVER);
-            myCurrentHandContext.riverBetsOrRaisesNumber = currentHand->getRiverBetsOrRaisesNumber();
-        }
-    }
+    myCurrentHandContext.myFlopIsAggressor = isAgressor(GAME_STATE_FLOP);
+    myCurrentHandContext.flopBetsOrRaisesNumber = currentHand->getFlopBetsOrRaisesNumber();
+    myCurrentHandContext.flopLastRaiser = getPlayerByUniqueId(currentHand->getFlopLastRaiserID());
 
-    if (currentHand->getCurrentBettingRound()->getBettingRoundID() != myCurrentGameState)
-    {
-        // do this init once per player and betting round
-        // myCurrentHandContext.myHandSimulation = getHandSimulation();
-        myCurrentHandContext.myID = myID;
-        myCurrentHandContext.myCard1 = myCard1;
-        myCurrentHandContext.myCard2 = myCard2;
-        myCurrentHandContext.myPosition = myPosition;
-        myCurrentHandContext.nbPlayers = currentHand->getActivePlayerList()->size();
-        myCurrentHandContext.smallBlind = currentHand->getSmallBlind();
-    }
+    myCurrentHandContext.myTurnIsAggressor = isAgressor(GAME_STATE_TURN);
+    myCurrentHandContext.turnBetsOrRaisesNumber = currentHand->getTurnBetsOrRaisesNumber();
+    myCurrentHandContext.turnLastRaiser = getPlayerByUniqueId(currentHand->getTurnLastRaiserID());
+
+    myCurrentHandContext.myRiverIsAggressor = isAgressor(GAME_STATE_RIVER);
+    myCurrentHandContext.riverBetsOrRaisesNumber = currentHand->getRiverBetsOrRaisesNumber();
+
+    // should do this init once per player and betting round
+    // myCurrentHandContext.myHandSimulation = getHandSimulation();
+    myCurrentHandContext.myID = myID;
+    myCurrentHandContext.myCard1 = myCard1;
+    myCurrentHandContext.myCard2 = myCard2;
+    myCurrentHandContext.myPosition = myPosition;
+    myCurrentHandContext.nbPlayers = currentHand->getActivePlayerList()->size();
+    myCurrentHandContext.smallBlind = currentHand->getSmallBlind();
 }
 
 void BotPlayer::action()
@@ -132,8 +116,6 @@ void BotPlayer::action()
     default:
         break;
     }
-
-    myCurrentGameState = currentHand->getCurrentBettingRound()->getBettingRoundID();
 
     evaluateBetAmount(); // original bet amount may be modified
     currentHand->getBoard()->collectSets();
@@ -175,7 +157,7 @@ void BotPlayer::action()
 void BotPlayer::doPreflopAction()
 {
 
-    updatePlayerContext(GAME_STATE_PREFLOP);
+    updateCurrentHandContext(GAME_STATE_PREFLOP);
 
 #ifdef LOG_POKER_EXEC
     cout << endl
@@ -224,7 +206,7 @@ void BotPlayer::doPreflopAction()
 void BotPlayer::doFlopAction()
 {
 
-    updatePlayerContext(GAME_STATE_FLOP);
+    updateCurrentHandContext(GAME_STATE_FLOP);
 
 #ifdef LOG_POKER_EXEC
     cout << endl
@@ -268,7 +250,7 @@ void BotPlayer::doFlopAction()
 void BotPlayer::doTurnAction()
 {
 
-    updatePlayerContext(GAME_STATE_TURN);
+    updateCurrentHandContext(GAME_STATE_TURN);
 
 #ifdef LOG_POKER_EXEC
     cout << endl
@@ -312,7 +294,7 @@ void BotPlayer::doTurnAction()
 void BotPlayer::doRiverAction()
 {
 
-    updatePlayerContext(GAME_STATE_RIVER);
+    updateCurrentHandContext(GAME_STATE_RIVER);
 
 #ifdef LOG_POKER_EXEC
     cout << endl

@@ -112,19 +112,22 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
             if (tableProfile == LARGE_AGRESSIVE_OPPONENTS)
             {
 
-                player = new BotPlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
-                                       LooseAggressiveBotStrategyName[i], gameData.startMoney,
-                                       startData.numberOfPlayers > i, i == 0 ? true : false, 0);
-                static_cast<BotPlayer*>(player)->setStrategy(make_unique<LooseAggressiveBotStrategy>());
-            }
+                Randomizer::GetRand(1, 3, 1, &rand);
 
-            if (tableProfile == MANIAC_OPPONENTS)
-            {
-
-                player = new BotPlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_COMPUTER,
-                                       ManiacBotStrategyName[i], gameData.startMoney, startData.numberOfPlayers > i,
-                                       i == 0 ? true : false, 0);
-                static_cast<BotPlayer*>(player)->setStrategy(make_unique<ManiacBotStrategy>());
+                if (rand == 1)
+                {
+                    player = new BotPlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
+                                           PLAYER_TYPE_COMPUTER, LooseAggressiveBotStrategyName[i], gameData.startMoney,
+                                           startData.numberOfPlayers > i, i == 0 ? true : false, 0);
+                    static_cast<BotPlayer*>(player)->setStrategy(make_unique<LooseAggressiveBotStrategy>());
+                }
+                else
+                {
+                    player = new BotPlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
+                                           PLAYER_TYPE_COMPUTER, ManiacBotStrategyName[i], gameData.startMoney,
+                                           startData.numberOfPlayers > i, i == 0 ? true : false, 0);
+                    static_cast<BotPlayer*>(player)->setStrategy(make_unique<ManiacBotStrategy>());
+                }
             }
 
             if (tableProfile == RANDOM_OPPONENTS)

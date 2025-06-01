@@ -9,6 +9,8 @@ namespace pkt::core
 
 struct CurrentHandContext
 {
+    void reset();
+
     // data that is common to all players
     GameState gameState;
     int preflopRaisesNumber = 0;
