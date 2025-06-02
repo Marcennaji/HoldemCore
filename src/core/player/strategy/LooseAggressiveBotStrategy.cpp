@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
-#include <core/player/ManiacBotStrategy.h>
+#include <core/player/strategy/LooseAggressiveBotStrategy.h>
 
 #include <core/engine/CardsValue.h>
 #include <core/engine/Randomizer.h>
@@ -36,20 +36,20 @@ namespace pkt::core
 
 using namespace std;
 
-ManiacBotStrategy::ManiacBotStrategy() : IBotStrategy()
+LooseAggressiveBotStrategy::LooseAggressiveBotStrategy() : IBotStrategy()
 {
 
     // initialize utg starting range, in a full table
     int utgFullTableRange = 0;
-    Randomizer::GetRand(30, 35, 1, &utgFullTableRange);
-    initializeRanges(50, utgFullTableRange);
+    Randomizer::GetRand(13, 15, 1, &utgFullTableRange);
+    initializeRanges(48, utgFullTableRange);
 }
 
-ManiacBotStrategy::~ManiacBotStrategy()
+LooseAggressiveBotStrategy::~LooseAggressiveBotStrategy()
 {
 }
 
-bool ManiacBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool deterministic)
+bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool deterministic)
 {
 
     float callingRange = getPreflopCallingRange(ctx);
@@ -94,10 +94,9 @@ bool ManiacBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool determin
         stringCallingRange += HIGH_SUITED_ACES;
         stringCallingRange += PAIRS;
 
-        if (ctx.nbRunningPlayers > 2 && ctx.preflopRaisesNumber + ctx.preflopCallsNumber > 1 &&
-            ctx.myPosition >= MIDDLE)
+        if (ctx.nbRunningPlayers > 2 && ctx.preflopRaisesNumber + ctx.preflopCallsNumber > 1 && ctx.myPosition >= LATE)
         {
-            stringCallingRange += CONNECTORS;
+            stringCallingRange += SUITED_CONNECTORS;
             stringCallingRange += SUITED_ONE_GAPED;
             stringCallingRange += SUITED_TWO_GAPED;
 #ifdef LOG_POKER_EXEC
@@ -137,7 +136,7 @@ bool ManiacBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool determin
     return Player::isCardsInRange(ctx.myCard1, ctx.myCard2, stringCallingRange);
 }
 
-int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool deterministic)
+int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool deterministic)
 {
 
     float raisingRange = getPreflopRaisingRange(ctx);
@@ -145,8 +144,8 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
     if (raisingRange == -1)
         return 0; // never raise : call or fold
 
-    if (ctx.preflopRaisesNumber > 3)
-        return 0; // never 6-bet : call or fold
+    if (ctx.preflopRaisesNumber > 2)
+        return 0; // never 5-bet : call or fold
 
     string stringRaisingRange;
 
@@ -175,15 +174,15 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
         PreflopStatistics raiserStats = ctx.preflopLastRaiser->getStatistics(ctx.nbPlayers).getPreflopStatistics();
 
         if (!Player::isCardsInRange(ctx.myCard1, ctx.myCard2, stringRaisingRange) && ctx.myM > 20 &&
-            ctx.myCash > ctx.highestSet * 20 && ctx.myPosition > UTG_PLUS_TWO &&
+            ctx.myCash > ctx.highestSet * 20 && ctx.myPosition > MIDDLE &&
             raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE &&
             ctx.myPosition > ctx.preflopLastRaiser->getPosition() &&
             ctx.preflopLastRaiser->getCash() > ctx.highestSet * 10 && !ctx.isPreflopBigBet &&
             ctx.preflopCallsNumber < 2)
         {
-            if (ctx.myCanBluff && ctx.myPosition > LATE && ctx.preflopRaisesNumber == 1 &&
-                !Player::isCardsInRange(ctx.myCard1, ctx.myCard2, ACES + BROADWAYS) &&
-                raiserStats.getPreflopCall3BetsFrequency() < 30)
+
+            if (ctx.myCanBluff && ctx.myPosition > LATE &&
+                !Player::isCardsInRange(ctx.myCard1, ctx.myCard2, ACES + BROADWAYS))
             {
 
                 speculativeHandedAdded = true;
@@ -194,7 +193,8 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
             else
             {
                 if (Player::isCardsInRange(ctx.myCard1, ctx.myCard2,
-                                           LOW_PAIRS + SUITED_CONNECTORS + SUITED_ONE_GAPED + SUITED_TWO_GAPED))
+                                           LOW_PAIRS + CONNECTORS + SUITED_ONE_GAPED + SUITED_TWO_GAPED) &&
+                    raiserStats.getPreflopCall3BetsFrequency() < 30)
                 {
 
                     speculativeHandedAdded = true;
@@ -209,7 +209,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
                     {
 
                         int rand = 0;
-                        Randomizer::GetRand(1, 3, 1, &rand);
+                        Randomizer::GetRand(1, 4, 1, &rand);
                         if (rand == 1)
                         {
                             speculativeHandedAdded = true;
@@ -236,17 +236,15 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
             ctx.preflopCallsNumber < 2)
         {
 
-            if (ctx.myCanBluff && ctx.myPosition > LATE && raiserStats.getPreflop3Bet() > 8)
+            if (ctx.myCanBluff && ctx.myPosition > LATE &&
+                Player::isCardsInRange(ctx.myCard1, ctx.myCard2, HIGH_SUITED_CONNECTORS) &&
+                raiserStats.getPreflop3Bet() > 8)
             {
-                int rand = 0;
-                Randomizer::GetRand(1, 5, 1, &rand);
-                if (rand == 1)
-                {
-                    speculativeHandedAdded = true;
+
+                speculativeHandedAdded = true;
 #ifdef LOG_POKER_EXEC
-                    cout << "\t\tManiac adding this speculative hand to our initial raising range";
+                cout << "\t\tLAG adding this speculative hand to our initial raising range";
 #endif
-                }
             }
         }
     }
@@ -262,7 +260,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
     {
 
         int rand = 0;
-        Randomizer::GetRand(1, 10, 1, &rand);
+        Randomizer::GetRand(1, 6, 1, &rand);
         if (rand == 1)
         {
 #ifdef LOG_POKER_EXEC
@@ -276,7 +274,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
     return computePreflopRaiseAmount(ctx, deterministic);
 }
 
-int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic)
+int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic)
 {
 
     if (ctx.flopBetsOrRaisesNumber > 0)
@@ -286,7 +284,7 @@ int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic
         return 0;
 
     // donk bets :
-    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() != ctx.myID)
+    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.preflopLastRaiser->getID() != ctx.myID)
     {
         if (ctx.preflopLastRaiser->getPosition() > ctx.myPosition)
         {
@@ -327,14 +325,19 @@ int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic
         return 0;
 
     // if pretty good hand
-    if (ctx.myHandSimulation.winRanged > 0.5 || ctx.myHandSimulation.win > 0.9)
+    if ((ctx.myHandSimulation.winRanged > 0.5 || ctx.myHandSimulation.win > 0.9) && ctx.myHandSimulation.win > 0.5)
     {
 
         // always bet if my hand will lose a lot of its value on next betting rounds
         if (ctx.myHandSimulation.winRanged - ctx.myHandSimulation.winSd > 0.1)
         {
-            return ctx.pot * 0.8;
+            return ctx.pot;
         }
+
+        int rand = 0;
+        Randomizer::GetRand(1, 7, 1, &rand);
+        if (rand == 3 && !ctx.myHavePosition)
+            return 0; // may check-raise or check-call
 
         // if no raise preflop, or if more than 1 opponent
         if (ctx.preflopRaisesNumber == 0 || ctx.nbRunningPlayers > 2)
@@ -347,9 +350,12 @@ int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic
         }
 
         // if i have raised preflop, bet
-        if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() == ctx.myID)
+        if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() == ctx.myID && ctx.preflopRaisesNumber > 0)
         {
-            return ctx.pot * 0.8;
+            if (ctx.nbRunningPlayers < 4)
+                return ctx.pot * 0.8;
+            else
+                return ctx.pot;
         }
     }
     else
@@ -365,8 +371,10 @@ int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic
         if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() == ctx.myID && ctx.nbRunningPlayers < 4 &&
             ctx.myCash > ctx.pot * 4 && ctx.myCanBluff)
         {
-            if (ctx.myHandSimulation.winRanged > 0.15 && ctx.myHandSimulation.win > 0.3)
+
+            if (ctx.myHandSimulation.winRanged > 0.2)
             {
+
                 return ctx.pot * 0.8;
             }
         }
@@ -374,7 +382,7 @@ int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic
 
     return 0;
 }
-bool ManiacBotStrategy::flopShouldCall(CurrentHandContext& ctx, bool deterministic)
+bool LooseAggressiveBotStrategy::flopShouldCall(CurrentHandContext& ctx, bool deterministic)
 {
 
     if (ctx.flopBetsOrRaisesNumber == 0)
@@ -386,38 +394,26 @@ bool ManiacBotStrategy::flopShouldCall(CurrentHandContext& ctx, bool determinist
     if (ctx.myHandSimulation.winRanged == 1 && ctx.myHandSimulation.win > 0.5)
         return true;
 
-    if (ctx.myHandSimulation.winRanged * 100 < ctx.potOdd * 0.8 && ctx.myHandSimulation.win < 0.9)
+    if (ctx.myHandSimulation.winRanged * 100 < ctx.potOdd * 0.9 && ctx.myHandSimulation.win < 0.92)
         return false;
 
-    if (ctx.myHandSimulation.winRanged < 0.25)
+    if (ctx.myHandSimulation.winRanged < 0.25 && ctx.myHandSimulation.win < 0.9)
         return false;
 
     return true;
 }
 
-int ManiacBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool deterministic)
+int LooseAggressiveBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool deterministic)
 {
 
     const int nbRaises = ctx.flopBetsOrRaisesNumber;
 
     if (nbRaises == 0)
-        return 0;
+        if (shouldPotControl(ctx, deterministic))
+            return 0;
 
-    if (shouldPotControl(ctx, deterministic))
-        return 0;
-
-    if (nbRaises < 2 && ctx.nbRunningPlayers < 4 && ctx.myCanBluff && ctx.myHandSimulation.winRanged < 0.3 &&
-        Player::getBoardCardsHigherThan(ctx.stringBoard, "Jh") < 2 &&
-        Player::getBoardCardsHigherThan(ctx.stringBoard, "Kh") == 0)
-    {
-
-        int rand = 0;
-        Randomizer::GetRand(1, 3, 1, &rand);
-        if (rand == 2)
-        {
-            return ctx.pot * 2;
-        }
-    }
+    // if (nbRaises == 1 && myFlopHandSimulation.win < 0.90)
+    // return false;
 
     if (nbRaises == 2 && ctx.myHandSimulation.win < 0.95)
         return 0;
@@ -433,18 +429,35 @@ int ManiacBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool determinist
     {
 
         int rand = 0;
-        Randomizer::GetRand(1, 2, 1, &rand);
+        Randomizer::GetRand(1, 3, 1, &rand);
         if (rand == 2)
         {
             return ctx.pot;
         }
     }
 
-    if (ctx.myHandSimulation.winRanged > 0.9 && ctx.myHandSimulation.win > 0.5 && nbRaises < 3)
+    if (ctx.myHandSimulation.winRanged * 100 < ctx.potOdd)
+    {
+
+        if (ctx.potOdd < 30 && ctx.nbRunningPlayers < 4)
+        {
+
+            int rand = 0;
+            Randomizer::GetRand(1, 6, 1, &rand);
+            if (rand == 2 && ctx.myHandSimulation.winRanged > 0.3 && ctx.myHandSimulation.win > 0.5)
+            {
+                return ctx.pot;
+                ;
+            }
+        }
+        return 0;
+    }
+
+    if (ctx.myHandSimulation.winRanged > 0.85 && ctx.myHandSimulation.win > 0.5 && nbRaises < 3)
     {
         return ctx.pot;
     }
-    if (ctx.myHandSimulation.winRanged > 0.8 && ctx.myHandSimulation.win > 0.5 && nbRaises < 2)
+    if (ctx.myHandSimulation.winRanged > 0.7 && ctx.myHandSimulation.win > 0.5 && nbRaises < 2)
     {
         return ctx.pot;
     }
@@ -452,51 +465,61 @@ int ManiacBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool determinist
     return 0;
 }
 
-int ManiacBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool deterministic)
+int LooseAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool deterministic)
 {
 
     const int pot = ctx.pot + ctx.sets;
     const int nbRaises = ctx.turnBetsOrRaisesNumber;
 
     if (nbRaises > 0)
+        if (shouldPotControl(ctx, deterministic))
+            return 0;
+
+    if (ctx.flopBetsOrRaisesNumber > 1 && !ctx.myFlopIsAggressor && ctx.myHandSimulation.winRanged < 0.8 &&
+        ctx.myHandSimulation.win < 0.9)
         return 0;
 
-    if (shouldPotControl(ctx, deterministic))
-        return 0;
-
-    if (ctx.flopBetsOrRaisesNumber > 1 && !ctx.myFlopIsAggressor && ctx.myHandSimulation.winRanged < 0.8)
-        return 0;
-
-    if (ctx.flopBetsOrRaisesNumber == 0 && ctx.myHavePosition)
+    if (ctx.flopBetsOrRaisesNumber == 0 && ctx.myHavePosition && ctx.nbRunningPlayers < 4 &&
+        Player::getDrawingProbability(ctx.myPostFlopState) < 15 && ctx.myCash > pot * 4)
     {
-        return pot * 0.8;
+        return pot * 0.6;
     }
 
-    if (ctx.myHandSimulation.winRanged < 0.3 && ctx.myHandSimulation.win < 0.9 && !ctx.myHavePosition)
+    if (ctx.myHandSimulation.winRanged < 0.5 && ctx.myHandSimulation.win < 0.9 && !ctx.myHavePosition)
         return 0;
 
-    if (ctx.myHandSimulation.winRanged > 0.4 && ctx.myHandSimulation.win > 0.5 && ctx.myHavePosition)
+    if (ctx.myHandSimulation.winRanged > 0.5 && ctx.myHandSimulation.win > 0.5 && ctx.myHavePosition)
     {
-        return pot * 0.8;
+        return pot * 0.6;
     }
 
-    if (Player::getDrawingProbability(ctx.myPostFlopState) > 15 && !ctx.myHavePosition)
+    if (Player::getDrawingProbability(ctx.myPostFlopState) > 20 && !ctx.myHavePosition)
     {
-        return pot * 0.8;
+        int rand = 0;
+        Randomizer::GetRand(1, 2, 1, &rand);
+        if (rand == 1)
+        {
+            return pot * 0.6;
+        }
     }
     else
     {
         // no draw, not a good hand, but last to speak and nobody has bet
         if (ctx.myHavePosition && ctx.myCanBluff)
         {
-            return pot * 0.8;
+            int rand = 0;
+            Randomizer::GetRand(1, 2, 1, &rand);
+            if (rand == 2)
+            {
+                return pot * 0.6;
+            }
         }
     }
 
     return 0;
 }
 
-bool ManiacBotStrategy::turnShouldCall(CurrentHandContext& ctx, bool deterministic)
+bool LooseAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx, bool deterministic)
 {
     if (ctx.turnBetsOrRaisesNumber == 0)
         return false;
@@ -506,8 +529,7 @@ bool ManiacBotStrategy::turnShouldCall(CurrentHandContext& ctx, bool determinist
 
     TurnStatistics raiserStats = ctx.turnLastRaiser->getStatistics(ctx.nbPlayers).getTurnStatistics();
 
-    // if not enough hands, then try to use the statistics collected for (nbPlayers + 1), they should be more
-    // accurate
+    // if not enough hands, then try to use the statistics collected for (nbPlayers + 1), they should be more accurate
     if (raiserStats.m_hands < MIN_HANDS_STATISTICS_ACCURATE && ctx.nbPlayers < 10 &&
         ctx.turnLastRaiser->getStatistics(ctx.nbPlayers + 1).getTurnStatistics().m_hands >
             MIN_HANDS_STATISTICS_ACCURATE)
@@ -526,7 +548,7 @@ bool ManiacBotStrategy::turnShouldCall(CurrentHandContext& ctx, bool determinist
         if (raiserStats.getAgressionFrequency() < 20)
             return false;
     }
-    if (ctx.turnBetsOrRaisesNumber > 2 && ctx.myHandSimulation.winRanged < 0.8 && ctx.myHandSimulation.win < 0.9)
+    if (ctx.turnBetsOrRaisesNumber > 2 && ctx.myHandSimulation.winRanged < 0.9 && ctx.myHandSimulation.win < 0.9)
     {
         if (raiserStats.m_hands <= MIN_HANDS_STATISTICS_ACCURATE)
             return false;
@@ -534,12 +556,12 @@ bool ManiacBotStrategy::turnShouldCall(CurrentHandContext& ctx, bool determinist
             return false;
     }
 
-    if (ctx.myHandSimulation.winRanged < 0.5 &&
+    if (ctx.myHandSimulation.winRanged < 0.6 && ctx.myHandSimulation.win < 0.9 &&
         (ctx.flopBetsOrRaisesNumber > 0 || raiserStats.getAgressionFrequency() < 30))
         return false;
 
-    if (!ctx.myPreflopIsAggressor && !ctx.myFlopIsAggressor && ctx.myHandSimulation.winRanged < 0.7 &&
-        raiserStats.getAgressionFrequency() < 30 && !ctx.myHavePosition)
+    if (!ctx.myPreflopIsAggressor && !ctx.myFlopIsAggressor && ctx.myHandSimulation.winRanged < 0.8 &&
+        ctx.myHandSimulation.win < 0.9 && raiserStats.getAgressionFrequency() < 30 && !ctx.myHavePosition)
         return false;
 
     if (ctx.myHandSimulation.winRanged < 0.25 && ctx.myHandSimulation.win < 0.9)
@@ -548,23 +570,26 @@ bool ManiacBotStrategy::turnShouldCall(CurrentHandContext& ctx, bool determinist
     return true;
 }
 
-int ManiacBotStrategy::turnShouldRaise(CurrentHandContext& ctx, bool deterministic)
+int LooseAggressiveBotStrategy::turnShouldRaise(CurrentHandContext& ctx, bool deterministic)
 {
     if (ctx.turnBetsOrRaisesNumber == 0)
-        return 0;
+        if (shouldPotControl(ctx, deterministic))
+            return 0;
 
-    if (shouldPotControl(ctx, deterministic))
-        return 0;
-
-    if (ctx.turnBetsOrRaisesNumber == 1 && ctx.myHandSimulation.win < 0.9)
-        return 0;
-
-    if (ctx.turnBetsOrRaisesNumber == 2 && ctx.myHandSimulation.win < 0.94)
+    if (ctx.turnBetsOrRaisesNumber == 2 && ctx.myHandSimulation.win < 0.95)
         return 0;
 
     if (ctx.turnBetsOrRaisesNumber > 2 && ctx.myHandSimulation.win != 1)
         return 0;
 
+    if (ctx.myHandSimulation.winRanged > 0.98 && ctx.myHandSimulation.win > 0.98 && ctx.myHandSimulation.winSd > 0.9)
+    {
+        int rand = 0;
+        Randomizer::GetRand(1, 4, 1, &rand);
+        if (rand == 1)
+            return 0; // very strong hand, slow play, just call
+    }
+
     if (ctx.myHandSimulation.win == 1 || (ctx.myHandSimulation.winRanged == 1 && ctx.turnBetsOrRaisesNumber < 3))
     {
         return ctx.pot * 0.6;
@@ -573,29 +598,32 @@ int ManiacBotStrategy::turnShouldRaise(CurrentHandContext& ctx, bool determinist
     if (ctx.myHandSimulation.winRanged * 100 < ctx.potOdd && ctx.myHandSimulation.winRanged < 0.94)
         return 0;
 
-    if (ctx.myHandSimulation.win == 1 || (ctx.myHandSimulation.winRanged == 1 && ctx.turnBetsOrRaisesNumber < 3))
+    if (ctx.myHandSimulation.winRanged > 0.7 && ctx.myHandSimulation.win > 0.7 && ctx.turnBetsOrRaisesNumber == 1 &&
+        ctx.flopBetsOrRaisesNumber < 2)
+    {
+
+        return ctx.pot * 0.6;
+    }
+    if (ctx.myHandSimulation.winRanged > 0.94 && ctx.myHandSimulation.win > 0.94 && ctx.turnBetsOrRaisesNumber < 4)
     {
         return ctx.pot * 0.6;
     }
 
-    if (ctx.myHandSimulation.winRanged * 100 < ctx.potOdd && ctx.myHandSimulation.winRanged < 0.94)
-        return 0;
-
-    if (ctx.myHandSimulation.winRanged > 0.6 && ctx.myHandSimulation.win > 0.6 && ctx.turnBetsOrRaisesNumber == 1 &&
-        ctx.flopBetsOrRaisesNumber < 2 && ctx.nbRunningPlayers < 3)
+    if ((Player::isDrawingProbOk(ctx.myPostFlopState, ctx.potOdd) || ctx.myHavePosition) && ctx.nbRunningPlayers == 2 &&
+        !(ctx.myHandSimulation.winRanged * 100 < ctx.potOdd) && ctx.myCanBluff && ctx.turnBetsOrRaisesNumber < 2)
     {
-        return ctx.pot * 0.6;
-    }
 
-    if (ctx.myHandSimulation.winRanged > 0.9 && ctx.myHandSimulation.win > 0.9 && ctx.turnBetsOrRaisesNumber < 4)
-    {
-        return ctx.pot * 0.6;
+        int rand = 0;
+        Randomizer::GetRand(1, 4, 1, &rand);
+        if (rand == 1)
+        {
+            return ctx.pot * 0.6;
+        }
     }
-
     return 0;
 }
 
-int ManiacBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool deterministic)
+int LooseAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool deterministic)
 {
 
     if (ctx.riverBetsOrRaisesNumber > 0)
@@ -603,7 +631,7 @@ int ManiacBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool deterministi
 
     // blocking bet if my chances to win are weak, but not ridiculous
     if (!ctx.myHavePosition && ctx.myHandSimulation.winRanged < 0.7 && ctx.myHandSimulation.winRanged > 0.4 &&
-        ctx.myHandSimulation.winSd > 0.4)
+        ctx.myHandSimulation.winSd > 0.5)
     {
         int rand = 0;
         Randomizer::GetRand(1, 2, 1, &rand);
@@ -617,7 +645,7 @@ int ManiacBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool deterministi
     if (ctx.myTurnIsAggressor)
     {
 
-        if (ctx.myHandSimulation.winRanged < .2 && ctx.myHandSimulation.winSd > 0.3 && ctx.nbRunningPlayers < 4 &&
+        if (ctx.myHandSimulation.winRanged < .15 && ctx.myHandSimulation.winSd > 0.3 && ctx.nbRunningPlayers < 4 &&
             ctx.myCash >= ctx.pot && ctx.myCanBluff)
         {
 
@@ -631,10 +659,10 @@ int ManiacBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool deterministi
     }
 
     int rand = 0;
-    Randomizer::GetRand(40, 90, 1, &rand);
+    Randomizer::GetRand(40, 80, 1, &rand);
     float coeff = (float) rand / (float) 100;
 
-    if (ctx.myHandSimulation.winSd > .9 || (ctx.myHavePosition && ctx.myHandSimulation.winSd > .85))
+    if (ctx.myHandSimulation.winSd > .94 || (ctx.myHavePosition && ctx.myHandSimulation.winSd > .9))
     {
         int rand = 0;
         Randomizer::GetRand(1, 5, 1, &rand);
@@ -656,19 +684,28 @@ int ManiacBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool deterministi
     return 0;
 }
 
-bool ManiacBotStrategy::riverShouldCall(CurrentHandContext& ctx, bool deterministic)
+bool LooseAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx, bool deterministic)
 {
+
     const int nbRaises = ctx.riverBetsOrRaisesNumber;
 
     if (nbRaises == 0)
         return false;
 
-    if (ctx.myHandSimulation.win > .95 && ctx.myHandSimulation.winSd > 0.5)
+    RiverStatistics raiserStats = ctx.lastVPIPPlayer->getStatistics(ctx.nbPlayers).getRiverStatistics();
+
+    // if not enough hands, then try to use the statistics collected for (nbPlayers + 1), they should be more accurate
+    if (raiserStats.m_hands < MIN_HANDS_STATISTICS_ACCURATE && ctx.nbPlayers < 10 &&
+        ctx.lastVPIPPlayer->getStatistics(ctx.nbPlayers + 1).getTurnStatistics().m_hands >
+            MIN_HANDS_STATISTICS_ACCURATE)
+        raiserStats = ctx.lastVPIPPlayer->getStatistics(ctx.nbPlayers + 1).getRiverStatistics();
+
+    if (ctx.myHandSimulation.win > .95)
     {
         return true;
     }
 
-    if (ctx.myHandSimulation.winRanged * 100 < ctx.potOdd)
+    if (ctx.myHandSimulation.winRanged * 100 < ctx.potOdd && ctx.myHandSimulation.winSd < 0.97)
         return false;
 
     if (ctx.myHandSimulation.winRanged < .3 && ctx.myHandSimulation.winSd < 0.97)
@@ -677,16 +714,45 @@ bool ManiacBotStrategy::riverShouldCall(CurrentHandContext& ctx, bool determinis
     }
 
     // if hazardous call may cost me my stack, don't call even with good odds
-    if (ctx.potOdd > 10 && ctx.myHandSimulation.winRanged < .4 && ctx.myHandSimulation.winSd < 0.97 &&
+    if (ctx.potOdd > 10 && ctx.myHandSimulation.winRanged < .5 && ctx.myHandSimulation.winSd < 0.97 &&
         ctx.highestSet >= ctx.myCash + ctx.mySet && ctx.myM > 8)
     {
 
-        return false;
+        if (raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE &&
+            ctx.lastVPIPPlayer->getStatistics(ctx.nbPlayers).getWentToShowDown() < 50)
+            return false;
     }
+
+    // assume that if there was more than 1 player to play after the raiser and he is not a maniac, he shouldn't bluff
+    // TODO
+    /*if (ctx.nbRunningPlayers > 2 && ctx.myHandSimulation.winRanged < .6 &&
+        ctx.myHandSimulation.winSd < 0.97 &&
+        (raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getAgressionFactor() < 4 &&
+         raiserStats.getAgressionFrequency() < 50))
+    {
+
+        PlayerListConstIterator it_c;
+        int playersAfterRaiser = 0;
+
+        for (it_c = currentHand->getRunningPlayerList()->begin(); it_c != currentHand->getRunningPlayerList()->end();
+             ++it_c)
+        {
+            if ((*it_c)->getPosition() > ctx.lastVPIPPlayer->getPosition())
+            {
+                playersAfterRaiser++;
+            }
+        }
+        if (playersAfterRaiser > 1)
+            return false;
+    }*/
+
+    if (raiserStats.m_hands <= MIN_HANDS_STATISTICS_ACCURATE && ctx.potOdd * 1.5 > ctx.myHandSimulation.winRanged * 100)
+        return false;
+
     return true;
 }
 
-int ManiacBotStrategy::riverShouldRaise(CurrentHandContext& ctx, bool deterministic)
+int LooseAggressiveBotStrategy::riverShouldRaise(CurrentHandContext& ctx, bool deterministic)
 {
 
     if (ctx.riverBetsOrRaisesNumber == 0)
@@ -695,11 +761,11 @@ int ManiacBotStrategy::riverShouldRaise(CurrentHandContext& ctx, bool determinis
     //  TODO : analyze previous actions, and determine if we must bet for value, without the nuts
     if (ctx.riverBetsOrRaisesNumber < 3 && ctx.myHandSimulation.winRanged > .98 && ctx.myHandSimulation.winSd > 0.5)
     {
-        return ctx.pot;
+        return ctx.pot * 0.8;
     }
 
     if (ctx.riverBetsOrRaisesNumber < 2 && ctx.myHandSimulation.winRanged * 100 > ctx.potOdd &&
-        ctx.myHandSimulation.winRanged > 0.9)
+        ctx.myHandSimulation.winRanged > 0.9 && ctx.myHandSimulation.winSd > 0.5)
     {
         return ctx.pot * 0.6;
     }

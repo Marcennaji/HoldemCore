@@ -25,10 +25,10 @@
 #include <core/interfaces/ILogger.h>
 #include <core/player/BotPlayer.h>
 #include <core/player/HumanPlayer.h>
-#include <core/player/LooseAggressiveBotStrategy.h>
-#include <core/player/ManiacBotStrategy.h>
-#include <core/player/TightAggressiveBotStrategy.h>
-#include <core/player/UltraTightBotStrategy.h>
+#include <core/player/strategy/LooseAggressiveBotStrategy.h>
+#include <core/player/strategy/ManiacBotStrategy.h>
+#include <core/player/strategy/TightAggressiveBotStrategy.h>
+#include <core/player/strategy/UltraTightBotStrategy.h>
 
 #include <algorithm>
 #include <random>
