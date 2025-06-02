@@ -2262,8 +2262,7 @@ void GameTableWindow::postRiverRunAnimation2()
             {
                 if ((*it_c)->getAction() != PLAYER_ACTION_FOLD)
                 {
-                    // set Player value (logging) for all in already shown cards
-                    (*it_c)->setCardsFlip(1, 3);
+                    (*it_c)->setCardsFlip(1);
                 }
             }
         }
@@ -2435,15 +2434,7 @@ void GameTableWindow::showHoleCards(unsigned playerId, bool allIn)
                     QImage(myCardDeckStyle->getCurrentDir() + QString::number(tempCardsIntArray[j], 10) + ".png"));
                 holeCardsArray[(*it_c)->getID()][j]->setPixmap(tempCardsPixmapArray[j], false);
             }
-            // set Player value (logging)
-            if (currentHand->getCurrentRound() < GAME_STATE_RIVER || allIn)
-            {
-                (*it_c)->setCardsFlip(1, 2); // for BettingRound before postriver or allin just log the hole cards
-            }
-            else
-            {
-                (*it_c)->setCardsFlip(1, 1); // for postriver log the value
-            }
+            (*it_c)->setCardsFlip(1);
         }
     }
 }

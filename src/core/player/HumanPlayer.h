@@ -26,7 +26,7 @@ class HumanPlayer : public Player
 
   public:
     HumanPlayer(GameEvents*, IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type, std::string name,
-                int sC, bool aS, bool sotS, int mB);
+                int sC, bool aS, int mB);
 
     ~HumanPlayer();
 };

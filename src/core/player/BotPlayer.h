@@ -29,7 +29,7 @@ class BotPlayer : public Player
 
   public:
     BotPlayer(GameEvents*, IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type, std::string name,
-              int sC, bool aS, bool sotS, int mB);
+              int sC, bool aS, int mB);
 
     ~BotPlayer();
 

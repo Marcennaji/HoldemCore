@@ -63,11 +63,11 @@ std::vector<PlayerAction>& CurrentHandActions::getRiverActions()
 }
 
 Player::Player(GameEvents* events, IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id, PlayerType type,
-               std::string name, int sC, bool aS, bool sotS, int mB)
+               std::string name, int sC, bool aS, int mB)
     : myHandAuditStore(ha), myPlayersStatisticsStore(ps), currentHand(0), myID(id), myType(type), myName(name),
-      myCardsValueInt(0), logHoleCardsDone(false), myCash(sC), mySet(0), myLastRelativeSet(0),
-      myAction(PLAYER_ACTION_NONE), myButton(mB), myActiveStatus(aS), myStayOnTableStatus(sotS), myTurn(0),
-      myCardsFlip(0), myRoundStartCash(0), lastMoneyWon(0), m_isSessionActive(false), myEvents(events)
+      myCardsValueInt(0), myCash(sC), mySet(0), myLastRelativeSet(0), myAction(PLAYER_ACTION_NONE), myButton(mB),
+      myActiveStatus(aS), myTurn(0), myCardsFlip(0), myRoundStartCash(0), lastMoneyWon(0), m_isSessionActive(false),
+      myEvents(events)
 {
     loadStatistics();
 
@@ -263,16 +263,6 @@ void Player::setID(unsigned newId)
     myID = newId;
 }
 
-void Player::setGuid(const std::string& theValue)
-{
-    myGuid = theValue;
-}
-
-std::string Player::getGuid() const
-{
-    return myGuid;
-}
-
 PlayerType Player::getType() const
 {
     return myType;
@@ -302,10 +292,7 @@ void Player::setSet(int theValue)
     mySet += theValue;
     myCash -= theValue;
 }
-void Player::setSetAbsolute(int theValue)
-{
-    mySet = theValue;
-}
+
 void Player::setSetNull()
 {
     mySet = 0;
@@ -347,15 +334,6 @@ bool Player::getActiveStatus() const
     return myActiveStatus;
 }
 
-void Player::setStayOnTableStatus(bool theValue)
-{
-    myStayOnTableStatus = theValue;
-}
-bool Player::getStayOnTableStatus() const
-{
-    return myStayOnTableStatus;
-}
-
 void Player::setCards(int* theValue)
 {
 
@@ -382,7 +360,7 @@ bool Player::getTurn() const
     return myTurn;
 }
 
-void Player::setCardsFlip(bool theValue, int state)
+void Player::setCardsFlip(bool theValue)
 {
     myCardsFlip = theValue;
 }
@@ -398,16 +376,6 @@ void Player::setCardsValueInt(int theValue)
 int Player::getCardsValueInt() const
 {
     return myCardsValueInt;
-}
-
-void Player::setLogHoleCardsDone(bool theValue)
-{
-    logHoleCardsDone = theValue;
-}
-
-bool Player::getLogHoleCardsDone() const
-{
-    return logHoleCardsDone;
 }
 
 void Player::setBestHandPosition(int* theValue)

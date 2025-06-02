@@ -54,7 +54,7 @@ Hand::Hand(GameEvents* events, ILogger* logger, std::shared_ptr<EngineFactory> f
     {
         (*it)->setHand(this);
         // set myFlipCards 0
-        (*it)->setCardsFlip(0, 0);
+        (*it)->setCardsFlip(0);
     }
 
     // generate cards and assign to board and player

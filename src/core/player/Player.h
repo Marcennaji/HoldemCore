@@ -104,14 +104,13 @@ class Player
 {
   public:
     Player(GameEvents*, IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type, std::string name, int sC,
-           bool aS, bool sotS, int mB);
+           bool aS, int mB);
 
     virtual ~Player() = default;
 
     int getID() const;
     void setID(unsigned newId);
-    void setGuid(const std::string& theValue);
-    std::string getGuid() const;
+
     PlayerType getType() const;
     void setName(const std::string& theValue);
     std::string getName() const;
@@ -119,7 +118,6 @@ class Player
     void setCash(int theValue);
     int getCash() const;
     void setSet(int theValue);
-    void setSetAbsolute(int theValue);
     void setSetNull();
     int getSet() const;
     int getLastRelativeSet() const;
@@ -134,24 +132,17 @@ class Player
     void setActiveStatus(bool theValue);
     bool getActiveStatus() const;
 
-    void setStayOnTableStatus(bool theValue);
-    bool getStayOnTableStatus() const;
-
     void setCards(int* theValue);
     void getCards(int* theValue) const;
 
     void setTurn(bool theValue);
     bool getTurn() const;
 
-    void setCardsFlip(bool theValue, int state);
+    void setCardsFlip(bool theValue);
     bool getCardsFlip() const;
 
     void setCardsValueInt(int theValue);
     int getCardsValueInt() const;
-
-    void setLogHoleCardsDone(bool theValue);
-
-    bool getLogHoleCardsDone() const;
 
     void setBestHandPosition(int* theValue);
     void getBestHandPosition(int* theValue) const;
@@ -274,7 +265,6 @@ class Player
 
     // const
     int myID;
-    std::string myGuid;
     PlayerType myType;
     std::string myName;
     std::string myAvatar;
@@ -284,7 +274,6 @@ class Player
     std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> myStatistics;
     int myCardsValueInt;
     int myBestHandPosition[5];
-    bool logHoleCardsDone;
 
     int myCards[2];
     std::string myCard1;
@@ -293,11 +282,10 @@ class Player
     int mySet;
     int myLastRelativeSet;
     PlayerAction myAction;
-    int myButton;             // 0 = none, 1 = dealer, 2 =small, 3 = big
-    bool myActiveStatus;      // 0 = inactive, 1 = active
-    bool myStayOnTableStatus; // 0 = left, 1 = stay
-    bool myTurn;              // 0 = no, 1 = yes
-    bool myCardsFlip;         // 0 = cards are not fliped, 1 = cards are already flipped,
+    int myButton;        // 0 = none, 1 = dealer, 2 =small, 3 = big
+    bool myActiveStatus; // 0 = inactive, 1 = active
+    bool myTurn;         // 0 = no, 1 = yes
+    bool myCardsFlip;    // 0 = cards are not fliped, 1 = cards are already flipped,
     int myRoundStartCash;
     int lastMoneyWon;
     int myPreflopPotOdd;
