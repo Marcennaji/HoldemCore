@@ -1,6 +1,7 @@
 #include "IBotStrategy.h"
 #include <core/engine/Randomizer.h>
 #include <core/engine/model/Ranges.h>
+#include <core/player/Helpers.h>
 #include "CurrentHandContext.h"
 
 using namespace std;
@@ -384,7 +385,7 @@ float IBotStrategy::getPreflopRaisingRange(CurrentHandContext& context, bool det
     { // no previous raise
 
         // steal blinds
-        if (!Player::isCardsInRange(myCard1, myCard2, Player::getStringRange(nbPlayers, raisingRange)) &&
+        if (!isCardsInRange(myCard1, myCard2, getStringRange(nbPlayers, raisingRange)) &&
             (myPosition == SB || myPosition == BUTTON || myPosition == CUTOFF) && canBluff)
         {
 

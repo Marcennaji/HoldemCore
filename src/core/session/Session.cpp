@@ -29,6 +29,9 @@
 #include <core/player/strategy/ManiacBotStrategy.h>
 #include <core/player/strategy/TightAggressiveBotStrategy.h>
 #include <core/player/strategy/UltraTightBotStrategy.h>
+#include "core/player/DefaultPlayerFactory.h"
+#include "core/player/Helpers.h"
+#include "core/player/strategy/StrategyAssigner.h"
 
 #include <algorithm>
 #include <random>
@@ -52,159 +55,44 @@ Session::~Session()
 
 void Session::startGame(const GameData& gameData, const StartData& startData)
 {
-
     currentGame.reset();
     currentGameNum++;
 
     if (myEvents && myEvents->onHideHoleCards)
         myEvents->onHideHoleCards();
-
     if (myEvents && myEvents->onInitializeGui)
         myEvents->onInitializeGui(gameData.guiSpeed);
 
-    std::shared_ptr<EngineFactory> factory(new EngineFactory(myEvents, myLogger));
+    auto engineFactory = std::make_shared<EngineFactory>(myEvents, myLogger);
 
-    PlayerList playerList;
-    playerList.reset(new std::list<std::shared_ptr<Player>>);
+    auto strategyAssigner = std::make_unique<StrategyAssigner>(gameData.tableProfile, startData.numberOfPlayers - 1);
 
-    TableProfile tableProfile = gameData.tableProfile;
+    auto playerFactory = std::make_unique<DefaultPlayerFactory>(myEvents, myHandAuditStore, myPlayersStatisticsStore,
+                                                                strategyAssigner.get());
 
-    int nbLoose = 0;
-    int nbManiac = 0;
-    int nbTight = 0;
-    int nbUltraTight = 0;
-    int rand = 0;
-    Player* player = nullptr;
+    auto playerList = std::make_shared<std::list<std::shared_ptr<Player>>>();
 
-    for (int i = 0; i < startData.numberOfPlayers; i++)
+    playerList->push_back(playerFactory->createHumanPlayer(0, HumanPlayerName, gameData.startMoney));
+
+    for (int i = 1; i < startData.numberOfPlayers; ++i)
     {
-
-        if (i == 0)
-        {
-            player = new HumanPlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i, PLAYER_TYPE_HUMAN,
-                                     HumanPlayerName[0], gameData.startMoney, startData.numberOfPlayers > i,
-                                     i == 0 ? true : false, 0);
-        }
-        else
-        {
-
-            if (tableProfile == TIGHT_AGRESSIVE_OPPONENTS)
-            {
-
-                Randomizer::GetRand(1, 3, 1, &rand);
-
-                if (rand == 1)
-                {
-                    player = new BotPlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
-                                           PLAYER_TYPE_COMPUTER, TightAggressiveBotStrategyName[i], gameData.startMoney,
-                                           startData.numberOfPlayers > i, i == 0 ? true : false, 0);
-                    static_cast<BotPlayer*>(player)->setStrategy(make_unique<TightAggressiveBotStrategy>());
-                }
-                else
-                {
-                    player = new BotPlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
-                                           PLAYER_TYPE_COMPUTER, UltraTightBotStrategyName[i], gameData.startMoney,
-                                           startData.numberOfPlayers > i, i == 0 ? true : false, 0);
-                    static_cast<BotPlayer*>(player)->setStrategy(make_unique<UltraTightBotStrategy>());
-                }
-            }
-
-            if (tableProfile == LARGE_AGRESSIVE_OPPONENTS)
-            {
-
-                Randomizer::GetRand(1, 3, 1, &rand);
-
-                if (rand == 1)
-                {
-                    player = new BotPlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
-                                           PLAYER_TYPE_COMPUTER, LooseAggressiveBotStrategyName[i], gameData.startMoney,
-                                           startData.numberOfPlayers > i, i == 0 ? true : false, 0);
-                    static_cast<BotPlayer*>(player)->setStrategy(make_unique<LooseAggressiveBotStrategy>());
-                }
-                else
-                {
-                    player = new BotPlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
-                                           PLAYER_TYPE_COMPUTER, ManiacBotStrategyName[i], gameData.startMoney,
-                                           startData.numberOfPlayers > i, i == 0 ? true : false, 0);
-                    static_cast<BotPlayer*>(player)->setStrategy(make_unique<ManiacBotStrategy>());
-                }
-            }
-
-            if (tableProfile == RANDOM_OPPONENTS)
-            {
-
-                Randomizer::GetRand(1, 12, 1, &rand);
-
-                if (rand < 3 && nbManiac < startData.numberOfPlayers / 3)
-                {
-                    player = new BotPlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
-                                           PLAYER_TYPE_COMPUTER, ManiacBotStrategyName[i], gameData.startMoney,
-                                           startData.numberOfPlayers > i, i == 0 ? true : false, 0);
-                    static_cast<BotPlayer*>(player)->setStrategy(make_unique<ManiacBotStrategy>());
-                    nbManiac++;
-                }
-                else if (rand < 5 && nbUltraTight < startData.numberOfPlayers / 3)
-                {
-                    player = new BotPlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
-                                           PLAYER_TYPE_COMPUTER, UltraTightBotStrategyName[i], gameData.startMoney,
-                                           startData.numberOfPlayers > i, i == 0 ? true : false, 0);
-                    static_cast<BotPlayer*>(player)->setStrategy(make_unique<UltraTightBotStrategy>());
-                    nbUltraTight++;
-                }
-                else if (rand < 9 && nbLoose < startData.numberOfPlayers / 3)
-                {
-                    player = new BotPlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
-                                           PLAYER_TYPE_COMPUTER, LooseAggressiveBotStrategyName[i], gameData.startMoney,
-                                           startData.numberOfPlayers > i, i == 0 ? true : false, 0);
-                    static_cast<BotPlayer*>(player)->setStrategy(make_unique<LooseAggressiveBotStrategy>());
-                    nbLoose++;
-                }
-                else if (nbTight < startData.numberOfPlayers / 3)
-                {
-                    player = new BotPlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
-                                           PLAYER_TYPE_COMPUTER, TightAggressiveBotStrategyName[i], gameData.startMoney,
-                                           startData.numberOfPlayers > i, i == 0 ? true : false, 0);
-                    static_cast<BotPlayer*>(player)->setStrategy(make_unique<TightAggressiveBotStrategy>());
-                    nbTight++;
-                }
-                else
-                {
-                    // default
-                    player = new BotPlayer(myEvents, myHandAuditStore, myPlayersStatisticsStore, i,
-                                           PLAYER_TYPE_COMPUTER, UltraTightBotStrategyName[i], gameData.startMoney,
-                                           startData.numberOfPlayers > i, i == 0 ? true : false, 0);
-                    static_cast<BotPlayer*>(player)->setStrategy(make_unique<UltraTightBotStrategy>());
-                    nbUltraTight++;
-                }
-            }
-
-            if (i > startData.numberOfPlayers / 2)
-                tableProfile = RANDOM_OPPONENTS; // fill the remaining opponents with random profiles */
-        }
-
-        player->setIsSessionActive(true);
-        playerList->push_back(std::shared_ptr<Player>(player));
+        playerList->push_back(playerFactory->createBotPlayer(i, gameData.tableProfile));
     }
 
-    // random shuffle the list (only the computer opponents, not the human):
+    // Shuffle bots but keep human first
+    shufflePlayers(*playerList, 0);
 
-    vector<std::shared_ptr<Player>> v(playerList->size());
-    copy(++(playerList->begin()), playerList->end(), ++(v.begin()));
-    std::mt19937 rng(std::time(nullptr));
-    std::shuffle(++(v.begin()), v.end(), rng);
-    (*v.begin()) = (*playerList->begin()); // the human player
-
-    playerList->clear();
-
+    // Reassign player IDs after shuffle
     int id = 0;
-    for (vector<std::shared_ptr<Player>>::iterator i = v.begin(); i != v.end(); i++)
+    for (auto& p : *playerList)
     {
-        (*i)->setID(id++);
-        playerList->push_back(*i);
+        p->setID(id++);
+        p->setIsSessionActive(true);
     }
 
-    currentGame.reset(new Game(myEvents, factory, playerList, gameData, startData, currentGameNum, myRankingStore,
-                               myPlayersStatisticsStore, myHandAuditStore));
+    currentGame = std::make_unique<Game>(myEvents, engineFactory, playerList, gameData, startData, currentGameNum,
+                                         myRankingStore, myPlayersStatisticsStore, myHandAuditStore);
+
     currentGame->initHand();
     currentGame->startHand();
 }

@@ -159,7 +159,7 @@ void SqliteLogStore::createDatabase()
     }
     for (int j = 2; j <= MAX_NUMBER_OF_PLAYERS; j++)
     {
-        InitializePlayersStatistics(HumanPlayerName[0], j);
+        InitializePlayersStatistics(HumanPlayerName, j);
     }
 }
 

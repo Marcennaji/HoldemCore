@@ -24,7 +24,6 @@
 #include <core/interfaces/IHand.h>
 
 #include <third_party/psim/psim.hpp>
-#include <third_party/sqlite3/sqlite3.h>
 
 #include <array>
 #include <assert.h>
@@ -84,7 +83,7 @@ static const char* ManiacBotStrategyName[] = {"Maurice",  "Milou",    "Michou", 
 static const char* UltraTightBotStrategyName[] = {"Ursula",  "Uri",    "Ulrich", "Ulysses", "Urbain",
                                                   "Umberto", "Urania", "Ugo",    "Uma",     "Urso"};
 
-static const char* HumanPlayerName[] = {"You"};
+static const char* HumanPlayerName = "You";
 
 // values are odd %, according to the outs number. Array index is the number of outs
 static int outsOddsOneCard[] = {
@@ -213,14 +212,6 @@ class Player
                                const std::string board = "");
 
     bool isInVeryLooseMode() const;
-
-    static bool isCardsInRange(std::string card1, std::string card2, std::string range);
-    static std::string getFakeCard(char c);
-    static std::string getStringRange(int nbPlayers, int range);
-    static const int getDrawingProbability(const PostFlopState& state);
-    static bool isDrawingProbOk(const PostFlopState&, const int potOdd);
-    static const int getImplicitOdd(const PostFlopState& state);
-    static int getBoardCardsHigherThan(std::string stringBoard, std::string card);
 
   protected:
     void loadStatistics();

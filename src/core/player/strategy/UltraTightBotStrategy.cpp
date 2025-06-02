@@ -23,6 +23,7 @@
 #include <core/engine/model/Ranges.h>
 #include <core/interfaces/IHand.h>
 #include <core/interfaces/ILogger.h>
+#include <core/player/Helpers.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include "Exception.h"
 
@@ -111,7 +112,7 @@ bool UltraTightBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool dete
     cout << "\t\tLAG final calling range : " << stringCallingRange << endl;
 #endif
 
-    return Player::isCardsInRange(ctx.myCard1, ctx.myCard2, stringCallingRange);
+    return isCardsInRange(ctx.myCard1, ctx.myCard2, stringCallingRange);
 }
 
 int UltraTightBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool deterministic)
@@ -151,7 +152,7 @@ int UltraTightBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool dete
     {
         PreflopStatistics raiserStats = ctx.preflopLastRaiser->getStatistics(ctx.nbPlayers).getPreflopStatistics();
 
-        if (!Player::isCardsInRange(ctx.myCard1, ctx.myCard2, stringRaisingRange) && ctx.myM > 20 &&
+        if (!isCardsInRange(ctx.myCard1, ctx.myCard2, stringRaisingRange) && ctx.myM > 20 &&
             ctx.myCash > ctx.highestSet * 20 && ctx.myPosition > MIDDLE_PLUS_ONE &&
             raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE &&
             ctx.myPosition > ctx.preflopLastRaiser->getPosition() &&
@@ -159,8 +160,7 @@ int UltraTightBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool dete
             ctx.preflopCallsNumber < 2)
         {
 
-            if (ctx.myCanBluff && ctx.myPosition > LATE &&
-                !Player::isCardsInRange(ctx.myCard1, ctx.myCard2, LOW_PAIRS) &&
+            if (ctx.myCanBluff && ctx.myPosition > LATE && !isCardsInRange(ctx.myCard1, ctx.myCard2, LOW_PAIRS) &&
                 raiserStats.getPreflopCall3BetsFrequency() < 20)
             {
 
@@ -176,7 +176,7 @@ int UltraTightBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool dete
             }
             else
             {
-                if (Player::isCardsInRange(ctx.myCard1, ctx.myCard2, SUITED_CONNECTORS + SUITED_ONE_GAPED) &&
+                if (isCardsInRange(ctx.myCard1, ctx.myCard2, SUITED_CONNECTORS + SUITED_ONE_GAPED) &&
                     raiserStats.getPreflopCall3BetsFrequency() < 30)
                 {
 
@@ -189,15 +189,15 @@ int UltraTightBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool dete
         }
     }
 
-    if (!speculativeHandedAdded && !Player::isCardsInRange(ctx.myCard1, ctx.myCard2, stringRaisingRange))
+    if (!speculativeHandedAdded && !isCardsInRange(ctx.myCard1, ctx.myCard2, stringRaisingRange))
         return 0;
 
     // sometimes, just call a single raise instead of raising, even with a strong hand
     // nb. raising range 100 means that I want to steal a bet or BB
     if (!speculativeHandedAdded && ctx.preflopCallsNumber == 0 && ctx.preflopRaisesNumber == 1 && raisingRange < 100 &&
-        !(Player::isCardsInRange(ctx.myCard1, ctx.myCard2, LOW_PAIRS + MEDIUM_PAIRS) && ctx.nbPlayers < 4) &&
-        !(Player::isCardsInRange(ctx.myCard1, ctx.myCard2, HIGH_PAIRS) && ctx.preflopCallsNumber > 0) &&
-        Player::isCardsInRange(ctx.myCard1, ctx.myCard2, Player::getStringRange(ctx.nbPlayers, 4)))
+        !(isCardsInRange(ctx.myCard1, ctx.myCard2, LOW_PAIRS + MEDIUM_PAIRS) && ctx.nbPlayers < 4) &&
+        !(isCardsInRange(ctx.myCard1, ctx.myCard2, HIGH_PAIRS) && ctx.preflopCallsNumber > 0) &&
+        isCardsInRange(ctx.myCard1, ctx.myCard2, getStringRange(ctx.nbPlayers, 4)))
     {
 
         int rand = 0;
@@ -225,7 +225,7 @@ int UltraTightBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool determini
         return 0;
 
     // don't bet if in position, and pretty good drawing probs
-    if (Player::getDrawingProbability(ctx.myPostFlopState) > 20 && ctx.myHavePosition)
+    if (getDrawingProbability(ctx.myPostFlopState) > 20 && ctx.myHavePosition)
         return false;
 
     // donk bets :
@@ -234,7 +234,7 @@ int UltraTightBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool determini
         if (ctx.preflopLastRaiser->getPosition() > ctx.myPosition)
         {
 
-            if (Player::getDrawingProbability(ctx.myPostFlopState) > 25)
+            if (getDrawingProbability(ctx.myPostFlopState) > 25)
             {
                 int rand = 0;
                 Randomizer::GetRand(1, 2, 1, &rand);
@@ -251,8 +251,8 @@ int UltraTightBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool determini
             }
 
             // if the flop is dry, try to get the pot
-            if (ctx.nbPlayers < 3 && ctx.myCanBluff && Player::getBoardCardsHigherThan(ctx.stringBoard, "Jh") < 2 &&
-                Player::getBoardCardsHigherThan(ctx.stringBoard, "Kh") == 0 && !ctx.myPostFlopState.IsFlushDrawPossible)
+            if (ctx.nbPlayers < 3 && ctx.myCanBluff && getBoardCardsHigherThan(ctx.stringBoard, "Jh") < 2 &&
+                getBoardCardsHigherThan(ctx.stringBoard, "Kh") == 0 && !ctx.myPostFlopState.IsFlushDrawPossible)
             {
 
                 int rand = 0;
@@ -329,7 +329,7 @@ bool UltraTightBotStrategy::flopShouldCall(CurrentHandContext& ctx, bool determi
     if (ctx.flopBetsOrRaisesNumber == 0)
         return false;
 
-    if (Player::isDrawingProbOk(ctx.myPostFlopState, ctx.potOdd))
+    if (isDrawingProbOk(ctx.myPostFlopState, ctx.potOdd))
         return true;
 
     if (ctx.myHandSimulation.winRanged >= 0.95 && ctx.myHandSimulation.win > 0.5)
@@ -367,7 +367,7 @@ int UltraTightBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool determi
     if (nbRaises > 3 && ctx.myHandSimulation.win != 1)
         return 0;
 
-    if ((Player::isDrawingProbOk(ctx.myPostFlopState, ctx.potOdd) || ctx.myHavePosition) && ctx.nbRunningPlayers == 2 &&
+    if ((isDrawingProbOk(ctx.myPostFlopState, ctx.potOdd) || ctx.myHavePosition) && ctx.nbRunningPlayers == 2 &&
         !(ctx.myHandSimulation.winRanged * 100 < ctx.potOdd) && ctx.myCanBluff && nbRaises < 2)
     {
 
@@ -424,7 +424,7 @@ int UltraTightBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool determini
         return 0;
 
     if (ctx.flopBetsOrRaisesNumber == 0 && ctx.myHavePosition && ctx.nbRunningPlayers < 4 &&
-        Player::getDrawingProbability(ctx.myPostFlopState) < 9 && ctx.myCash > pot * 4)
+        getDrawingProbability(ctx.myPostFlopState) < 9 && ctx.myCash > pot * 4)
     {
         int rand = 0;
         Randomizer::GetRand(1, 3, 1, &rand);
@@ -445,7 +445,7 @@ int UltraTightBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool determini
         return pot * 0.6;
     }
 
-    if (Player::getDrawingProbability(ctx.myPostFlopState) > 20 && !ctx.myHavePosition)
+    if (getDrawingProbability(ctx.myPostFlopState) > 20 && !ctx.myHavePosition)
     {
         int rand = 0;
         Randomizer::GetRand(1, 5, 1, &rand);
@@ -476,7 +476,7 @@ bool UltraTightBotStrategy::turnShouldCall(CurrentHandContext& ctx, bool determi
     if (ctx.turnBetsOrRaisesNumber == 0)
         return false;
 
-    if (Player::isDrawingProbOk(ctx.myPostFlopState, ctx.potOdd))
+    if (isDrawingProbOk(ctx.myPostFlopState, ctx.potOdd))
         return true;
 
     TurnStatistics raiserStats = ctx.turnLastRaiser->getStatistics(ctx.nbPlayers).getTurnStatistics();
