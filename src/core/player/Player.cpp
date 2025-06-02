@@ -28,6 +28,8 @@
 #include <third_party/psim/psim.hpp>
 #include "Helpers.h"
 
+#include <sstream>
+
 namespace pkt::core
 {
 
@@ -1226,7 +1228,7 @@ void Player::updateUnplausibleRangesGivenPreflopActions()
         myEstimatedRange = originalEstimatedRange;
 
 #ifdef LOG_POKER_EXEC
-    displayPlausibleRange(GAME_STATE_PREFLOP);
+    logUnplausibleHands(GAME_STATE_PREFLOP);
 #endif
 }
 
@@ -1354,7 +1356,7 @@ void Player::updateUnplausibleRangesGivenFlopActions()
 #ifdef LOG_POKER_EXEC
     if (unplausibleRanges != "")
         cout << "\tRemoving unplausible ranges : " << unplausibleRanges << endl;
-    displayPlausibleRange(GAME_STATE_FLOP);
+    logUnplausibleHands(GAME_STATE_FLOP);
 #endif
 }
 
@@ -1757,7 +1759,7 @@ void Player::updateUnplausibleRangesGivenTurnActions()
 #ifdef LOG_POKER_EXEC
     if (unplausibleRanges != "")
         cout << "\tRemoving unplausible ranges : " << unplausibleRanges << endl;
-    displayPlausibleRange(GAME_STATE_TURN);
+    logUnplausibleHands(GAME_STATE_TURN);
 #endif
 }
 
@@ -2090,7 +2092,7 @@ void Player::updateUnplausibleRangesGivenRiverActions()
 #ifdef LOG_POKER_EXEC
     if (unplausibleRanges != "")
         cout << "\tRemoving unplausible ranges : " << unplausibleRanges << endl;
-    displayPlausibleRange(GAME_STATE_RIVER);
+    logUnplausibleHands(GAME_STATE_RIVER);
 #endif
 }
 
@@ -2445,7 +2447,7 @@ std::string Player::substractRange(const std::string originRanges, const std::st
     return newRange;
 }
 
-void Player::displayPlausibleRange(GameState g)
+void Player::logUnplausibleHands(GameState g)
 {
 
     const int nbPlayers = currentHand->getActivePlayerList()->size();
@@ -2472,9 +2474,8 @@ void Player::displayPlausibleRange(GameState g)
         label = "river";
         bettingRound = 'R';
     }
-    // if some hands are not plausible any more within the estimated starting range, substract them from the starting
-    // range,
-
+    // during dev phase : if some hands are not part of the estimated starting range for this player, insert them in a
+    // database, for auditing purposes
     if (!isCardsInRange(myCard1, myCard2, myEstimatedRange))
     {
         std::cout << endl
@@ -2510,103 +2511,6 @@ std::string Player::getHandToRange(const std::string card1, const std::string ca
         result << card1.at(0) << card2.at(0) << "o";
 
     return result.str();
-}
-
-void Player::DisplayHandState(const PostFlopState* state) const
-{
-
-#ifdef LOG_POKER_EXEC
-
-    cout << endl << "\t";
-
-    if (!state->UsesFirst && !state->UsesSecond)
-        cout << "Playing the board, ";
-    else if (state->UsesFirst && !state->UsesSecond)
-        cout << "Using only first hole card, ";
-    else if (!state->UsesFirst && state->UsesSecond)
-        cout << "Using only second hole card, ";
-    else if (state->UsesFirst && state->UsesSecond)
-        cout << "Using both hole cards, ";
-
-    if (state->IsNoPair)
-    {
-        if (state->IsOverCards)
-            cout << "with over cards";
-        else
-            cout << "with high card";
-    }
-    else if (state->IsOnePair)
-    {
-        if (state->IsTopPair)
-            cout << "with top pair";
-        else if (state->IsMiddlePair)
-            cout << "with middle pair";
-        else if (state->IsBottomPair)
-            cout << "with bottom pair";
-        else if (state->IsOverPair)
-            cout << "with over pair";
-        else if (state->IsPocketPair)
-            cout << "with pocket pair";
-        else if (state->IsFullHousePossible)
-            cout << "with one pair on board";
-        else
-            cout << "with one pair ";
-    }
-    else if (state->IsTwoPair)
-        cout << "with two pair";
-    else if (state->IsTrips)
-        cout << "with trips";
-    else if (state->IsStraight)
-        cout << "with a straight";
-    else if (state->IsFlush)
-        cout << "with a flush";
-    else if (state->IsFullHouse)
-        cout << "with a full house";
-    else if (state->IsQuads)
-        cout << "with quads";
-    else if (state->IsStFlush)
-        cout << "with a straight flush";
-
-    // Do we have a flush and straight draw?
-    bool flushDraw = (state->Is3Flush || state->Is4Flush);
-    bool straightDraw = (state->StraightOuts);
-    bool anotherDraw = (flushDraw && straightDraw);
-
-    if (anotherDraw)
-        cout << ", ";
-    else if (flushDraw || straightDraw)
-        cout << " and ";
-
-    if (state->Is4Flush)
-        cout << "4 flush cards (" << state->FlushOuts << " outs)";
-    else if (state->Is3Flush)
-        cout << "3 flush cards";
-
-    if (anotherDraw)
-        cout << ", and ";
-
-    if (straightDraw)
-        cout << state->StraightOuts << " outs to a straight";
-
-    cout << ".";
-
-    if (state->BetterOuts)
-        cout << " " << state->BetterOuts << " outs to boat or better.";
-
-    if (state->IsFlushPossible)
-        cout << " Someone may have a flush.";
-    else if (state->IsFlushDrawPossible)
-        cout << " Someone may be drawing to a flush.";
-
-    if (state->IsStraightPossible)
-        cout << " Someone may have a straight.";
-    else if (state->IsStraightDrawPossible)
-        cout << " Someone may be drawing to a straight.";
-
-    if (state->IsFullHousePossible)
-        cout << " The board is paired.";
-
-#endif
 }
 
 std::map<int, float> Player::evaluateOpponentsStrengths() const

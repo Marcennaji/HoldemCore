@@ -184,7 +184,6 @@ class Player
     int getPotOdd() const;
     void setPreflopPotOdd(const int potOdd);
 
-    void DisplayHandState(const PostFlopState* state) const;
     std::vector<std::string> getRangeAtomicValues(std::string range, const bool returnRange = false) const;
     std::string getStringBoard() const;
     std::map<int, float> evaluateOpponentsStrengths() const;
@@ -211,7 +210,7 @@ class Player
     float getMaxOpponentsStrengths() const;
     bool isPreflopBigBet() const;
     float getOpponentWinningHandsPercentage(const int idPlayer, std::string board) const;
-    void displayPlausibleRange(GameState g);
+    void logUnplausibleHands(GameState g);
     std::string getFilledRange(std::vector<std::string>& ranges, std::vector<float>& rangesValues,
                                const float rangeMax) const;
 
