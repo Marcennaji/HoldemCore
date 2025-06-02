@@ -81,8 +81,7 @@ void BotPlayer::updateCurrentHandContext(const GameState state)
     myCurrentHandContext.myRiverIsAggressor = isAgressor(GAME_STATE_RIVER);
     myCurrentHandContext.riverBetsOrRaisesNumber = currentHand->getRiverBetsOrRaisesNumber();
 
-    // should do this init once per player and betting round
-    // myCurrentHandContext.myHandSimulation = getHandSimulation();
+    myCurrentHandContext.myHandSimulation = getHandSimulation();
     myCurrentHandContext.myID = myID;
     myCurrentHandContext.myCard1 = myCard1;
     myCurrentHandContext.myCard2 = myCard2;

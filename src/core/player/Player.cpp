@@ -1178,8 +1178,7 @@ const SimResults Player::getHandSimulation() const
     const string cards = (getCardsValueString() + getStringBoard()).c_str();
 
     SimulateHand(cards.c_str(), &r, 0, 1, 0);
-    r.win = 50;
-    r.winSd = 50;      // win at showdown
+
     float win = r.win; // save the value
 
     const int nbOpponents = std::max(1, (int) currentHand->getRunningPlayerList()->size() -

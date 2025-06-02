@@ -389,7 +389,7 @@ unsigned int RankHand(const Hand& shand)
 void SimulateHand(const Hand& shand, SimResults* results, float lowRange, float highRange, unsigned int boards)
 {
     SimCurrent(shand, results, lowRange, highRange);
-    SimSd(shand, results, lowRange, highRange, boards);
+    // SimSd(shand, results, lowRange, highRange, boards);
 }
 
 void SimulateHandMulti(const Hand& shand, SimResults* results, unsigned int boards, unsigned int hands,
