@@ -1183,7 +1183,7 @@ const SimResults Player::getHandSimulation() const
 
     const int nbOpponents = std::max(1, (int) currentHand->getRunningPlayerList()->size() -
                                             1); // note that allin opponents are not "running" any more
-    SimulateHandMulti(cards.c_str(), &r, 1300, 350, nbOpponents);
+    SimulateHandMulti(cards.c_str(), &r, 200, 100, nbOpponents);
     r.win = win; // because SimulateHandMulti doesn't compute 'win'
 
     // evaluate my strength against my opponents's guessed ranges :
@@ -1301,6 +1301,11 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 
     // compute winning hands % against my rank
     int nbWinningHands = 0;
+
+    if (opponent->getEstimatedRange().size() == 0)
+    {
+        computeEstimatedPreflopRange(opponentId);
+    }
 
     vector<std::string> ranges = getRangeAtomicValues(opponent->getEstimatedRange());
 

@@ -166,27 +166,27 @@ void BotPlayer::doPreflopAction()
          << getStatistics(myCurrentHandContext.nbPlayers).getPreflopStatistics().getPreflopRaise() << " % " << endl;
 #endif
 
-    myShouldBet = 0;
-    myShouldCall = myStrategy->preflopShouldCall(myCurrentHandContext);
-    myShouldRaise = myStrategy->preflopShouldRaise(myCurrentHandContext);
+    myBetAmount = 0;
+    bool shouldCall = myStrategy->preflopShouldCall(myCurrentHandContext);
+    myRaiseAmount = myStrategy->preflopShouldRaise(myCurrentHandContext);
 
     myPreflopPotOdd = getPotOdd();
 
-    if (myShouldRaise)
-        myShouldCall = false;
+    if (myRaiseAmount > 0)
+        shouldCall = false;
 
     // if last to speak, and nobody has raised : I can check
-    if (currentHand->getPreflopRaisesNumber() == 0 && !myShouldRaise && myPosition == BB)
+    if (currentHand->getPreflopRaisesNumber() == 0 && !myRaiseAmount && myPosition == BB)
     {
         myAction = PLAYER_ACTION_CHECK;
     }
     else
     {
-        if (myShouldBet)
+        if (myBetAmount > 0)
             myAction = PLAYER_ACTION_BET;
-        else if (myShouldCall)
+        else if (shouldCall)
             myAction = PLAYER_ACTION_CALL;
-        else if (myShouldRaise)
+        else if (myRaiseAmount > 0)
             myAction = PLAYER_ACTION_RAISE;
         else
             myAction = PLAYER_ACTION_FOLD;
@@ -215,22 +215,22 @@ void BotPlayer::doFlopAction()
          << endl;
 #endif
 
-    myShouldBet = myStrategy->flopShouldBet(myCurrentHandContext);
-    myShouldCall = myShouldBet ? false : myStrategy->flopShouldCall(myCurrentHandContext);
-    myShouldRaise = myShouldBet ? false : myStrategy->flopShouldRaise(myCurrentHandContext);
+    myBetAmount = myStrategy->flopShouldBet(myCurrentHandContext);
+    bool shouldCall = myBetAmount ? false : myStrategy->flopShouldCall(myCurrentHandContext);
+    myRaiseAmount = myBetAmount ? false : myStrategy->flopShouldRaise(myCurrentHandContext);
 
-    if (myShouldRaise)
-        myShouldCall = false;
+    if (myRaiseAmount)
+        shouldCall = false;
 
-    if (currentHand->getFlopBetsOrRaisesNumber() == 0 && !myShouldRaise && !myShouldBet)
+    if (currentHand->getFlopBetsOrRaisesNumber() == 0 && !myRaiseAmount && !myBetAmount)
         myAction = PLAYER_ACTION_CHECK;
     else
     {
-        if (myShouldBet)
+        if (myBetAmount)
             myAction = PLAYER_ACTION_BET;
-        else if (myShouldCall)
+        else if (shouldCall)
             myAction = PLAYER_ACTION_CALL;
-        else if (myShouldRaise)
+        else if (myRaiseAmount)
             myAction = PLAYER_ACTION_RAISE;
         else
             myAction = PLAYER_ACTION_FOLD;
@@ -259,22 +259,22 @@ void BotPlayer::doTurnAction()
          << endl;
 #endif
 
-    myShouldBet = myStrategy->turnShouldBet(myCurrentHandContext);
-    myShouldCall = myShouldBet ? false : myStrategy->turnShouldCall(myCurrentHandContext);
-    myShouldRaise = myShouldBet ? false : myStrategy->turnShouldRaise(myCurrentHandContext);
+    myBetAmount = myStrategy->turnShouldBet(myCurrentHandContext);
+    bool shouldCall = myBetAmount ? false : myStrategy->turnShouldCall(myCurrentHandContext);
+    myRaiseAmount = myBetAmount ? false : myStrategy->turnShouldRaise(myCurrentHandContext);
 
-    if (myShouldRaise)
-        myShouldCall = false;
+    if (myRaiseAmount)
+        shouldCall = false;
 
-    if (currentHand->getTurnBetsOrRaisesNumber() == 0 && !myShouldRaise && !myShouldBet)
+    if (currentHand->getTurnBetsOrRaisesNumber() == 0 && !myRaiseAmount && !myBetAmount)
         myAction = PLAYER_ACTION_CHECK;
     else
     {
-        if (myShouldBet)
+        if (myBetAmount)
             myAction = PLAYER_ACTION_BET;
-        else if (myShouldCall)
+        else if (shouldCall)
             myAction = PLAYER_ACTION_CALL;
-        else if (myShouldRaise)
+        else if (myRaiseAmount)
             myAction = PLAYER_ACTION_RAISE;
         else
             myAction = PLAYER_ACTION_FOLD;
@@ -303,22 +303,22 @@ void BotPlayer::doRiverAction()
          << endl;
 #endif
 
-    myShouldBet = myStrategy->riverShouldBet(myCurrentHandContext);
-    myShouldCall = myShouldBet ? false : myStrategy->riverShouldCall(myCurrentHandContext);
-    myShouldRaise = myShouldBet ? false : myStrategy->riverShouldRaise(myCurrentHandContext);
+    myBetAmount = myStrategy->riverShouldBet(myCurrentHandContext);
+    bool shouldCall = myBetAmount ? false : myStrategy->riverShouldCall(myCurrentHandContext);
+    myRaiseAmount = myBetAmount ? false : myStrategy->riverShouldRaise(myCurrentHandContext);
 
-    if (myShouldRaise)
-        myShouldCall = false;
+    if (myRaiseAmount)
+        shouldCall = false;
 
-    if (currentHand->getRiverBetsOrRaisesNumber() == 0 && !myShouldRaise && !myShouldBet)
+    if (currentHand->getRiverBetsOrRaisesNumber() == 0 && !myRaiseAmount && !myBetAmount)
         myAction = PLAYER_ACTION_CHECK;
     else
     {
-        if (myShouldBet)
+        if (myBetAmount)
             myAction = PLAYER_ACTION_BET;
-        else if (myShouldCall)
+        else if (shouldCall)
             myAction = PLAYER_ACTION_CALL;
-        else if (myShouldRaise)
+        else if (myRaiseAmount)
             myAction = PLAYER_ACTION_RAISE;
         else
             myAction = PLAYER_ACTION_FOLD;

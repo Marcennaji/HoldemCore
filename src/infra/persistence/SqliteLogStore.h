@@ -30,7 +30,7 @@
 #include <filesystem>
 #include <string>
 
-#define SQL_LOG_FILE "pokerTraining-log-v0.9.pdb"
+#define SQL_LOG_FILE "pokerTraining.db"
 
 struct sqlite3;
 namespace pkt::infra

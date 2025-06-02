@@ -295,11 +295,6 @@ class Player
     int myBestHandPosition[5];
     bool logHoleCardsDone;
 
-    // current hand playing
-    int myShouldBet;
-    int myShouldRaise;
-    bool myShouldCall;
-
     int myCards[2];
     std::string myCard1;
     std::string myCard2;

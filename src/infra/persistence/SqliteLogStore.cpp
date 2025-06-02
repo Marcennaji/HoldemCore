@@ -277,7 +277,9 @@ int SqliteLogStore::getIntegerValue(const std::string playerName, const std::str
             }
             else
             {
-                cout << "Implausible information about player " << playerName << " in log-db!" << endl;
+                cout << "Warning : no data for player " << playerName << " in table " << tableName
+                     << ". SQL query was :\n"
+                     << sql_select << endl;
             }
         }
         sqlite3_free_table(result_Player);
