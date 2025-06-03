@@ -30,7 +30,6 @@ class TightAggressiveBotStrategy : public IBotStrategy
 
     ~TightAggressiveBotStrategy();
 
-  protected:
     bool preflopShouldCall(CurrentHandContext& context, bool deterministic = false) override;
     bool flopShouldCall(CurrentHandContext& context, bool deterministic = false) override;
     bool turnShouldCall(CurrentHandContext& context, bool deterministic = false) override;

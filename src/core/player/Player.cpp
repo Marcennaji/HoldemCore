@@ -608,7 +608,10 @@ void Player::loadStatistics()
 {
 
     resetPlayerStatistics(); // reset stats to 0
-    myStatistics = myPlayersStatisticsStore->getPlayerStatistics(myName);
+    if (myPlayersStatisticsStore)
+        myStatistics = myPlayersStatisticsStore->getPlayerStatistics(myName);
+    else
+        myStatistics.fill(PlayerStatistics());
 }
 
 const PostFlopState Player::getPostFlopState() const

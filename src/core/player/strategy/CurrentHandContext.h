@@ -9,7 +9,7 @@ namespace pkt::core
 
 struct CurrentHandContext
 {
-    void reset();
+    void reset(); // all fields are zeroed or nullptr
 
     // data that is common to all players
     GameState gameState;
@@ -50,19 +50,19 @@ struct CurrentHandContext
     bool myFlopIsAggressor = false;
     bool myTurnIsAggressor = false;
     bool myRiverIsAggressor = false;
-    PostFlopState myPostFlopState;
+    PostFlopState myPostFlopState{};
 
     SimResults myHandSimulation = {
-        0.100f, // win
-        0.0f,   // tie
-        0.0f,   // lose
-        0.100f, // winRanged
-        0.100f, // winSd
-        0.0f,   // tieSd
-        0.0f,   // loseSd
-        0.0f,   // dNow
-        0.0f,   // d94
-        0.0f    // d90
+        0.0f, // win
+        0.0f, // tie
+        0.0f, // lose
+        0.0f, // winRanged
+        0.0f, // winSd
+        0.0f, // tieSd
+        0.0f, // loseSd
+        0.0f, // dNow
+        0.0f, // d94
+        0.0f  // d90
     };
 };
 
