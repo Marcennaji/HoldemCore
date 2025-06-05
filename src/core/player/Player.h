@@ -22,6 +22,7 @@
 #include <core/engine/EngineDefs.h>
 #include <core/engine/model/PlayerStatistics.h>
 #include <core/interfaces/IHand.h>
+#include "RangeManager.h"
 
 #include <third_party/psim/psim.hpp>
 
@@ -288,7 +289,7 @@ class Player
     int myRoundStartCash;
     int lastMoneyWon;
     int myPreflopPotOdd;
-    std::string myEstimatedRange; // estimated range for a particular hand (i.e, plausible range to my opponents eyes)
+    std::unique_ptr<RangeManager> myRangeManager;
 
     bool m_isSessionActive;
 };
