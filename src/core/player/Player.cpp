@@ -1073,7 +1073,7 @@ float Player::getMaxOpponentsStrengths() const
     //	if (strenghts.size() == 1){
     //		std::shared_ptr<Player> opponent = getPlayerByUniqueId(opponentID);
     //
-    //		if (opponent->isInVeryLooseMode())
+    //		if (opponent->isInVeryLooseMode(nbPlayers))
     //			return maxOpponentsStrengths;
     //	}
     //
@@ -1266,7 +1266,7 @@ void Player::updateUnplausibleRangesGivenFlopActions()
         getStatistics(nbPlayers + 1).getPreflopStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE)
         preflop = getStatistics(nbPlayers + 1).getPreflopStatistics();
 
-    if (isInVeryLooseMode())
+    if (isInVeryLooseMode(nbPlayers))
     {
 #ifdef LOG_POKER_EXEC
         std::cout << endl
@@ -1412,7 +1412,7 @@ bool Player::isUnplausibleHandGivenFlopBet(const PostFlopState& r, int nbChecks,
         flop.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
         return false; // he is very agressive, so don't make any guess
 
-    if (isInVeryLooseMode())
+    if (isInVeryLooseMode(nbPlayers))
         return false; // he is (temporarily ?) very agressive, so don't make any guess
 
     if (!r.UsesFirst && !r.UsesSecond)
@@ -1507,7 +1507,7 @@ bool Player::isUnplausibleHandGivenFlopCall(const PostFlopState& r, int nbRaises
     if (getPotOdd() < 20)
         return false;
 
-    if (isInVeryLooseMode())
+    if (isInVeryLooseMode(nbPlayers))
         return false; // he is (temporarily ?) very agressive, so don't make any guess
 
     if (!r.UsesFirst && !r.UsesSecond)
@@ -1549,7 +1549,7 @@ bool Player::isUnplausibleHandGivenFlopRaise(const PostFlopState& r, int nbRaise
         flop.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
         return false; // he is usually very agressive, so don't make any guess
 
-    if (isInVeryLooseMode())
+    if (isInVeryLooseMode(nbPlayers))
         return false; // he is (temporarily ?) very agressive, so don't make any guess
 
     if (!r.UsesFirst && !r.UsesSecond)
@@ -1615,7 +1615,7 @@ bool Player::isUnplausibleHandGivenFlopAllin(const PostFlopState& r, int nbRaise
         flop.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
         return false; // he is usually very agressive, so don't make any guess
 
-    if (isInVeryLooseMode())
+    if (isInVeryLooseMode(nbPlayers))
         return false; // he is (temporarily ?) very agressive, so don't make any guess
 
     if (!r.UsesFirst && !r.UsesSecond)
@@ -1669,7 +1669,7 @@ void Player::updateUnplausibleRangesGivenTurnActions()
         getStatistics(nbPlayers + 1).getPreflopStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE)
         preflop = getStatistics(nbPlayers + 1).getPreflopStatistics();
 
-    if (isInVeryLooseMode())
+    if (isInVeryLooseMode(nbPlayers))
     {
 #ifdef LOG_POKER_EXEC
         std::cout << endl
@@ -1805,7 +1805,7 @@ bool Player::isUnplausibleHandGivenTurnBet(const PostFlopState& r, int nbChecks,
         turn.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
         return false; // he is usually very agressive, so don't make any guess
 
-    if (isInVeryLooseMode())
+    if (isInVeryLooseMode(nbPlayers))
         return false; // he is (temporarily ?) very agressive, so don't make any guess
 
     if (!r.UsesFirst && !r.UsesSecond)
@@ -1845,7 +1845,7 @@ bool Player::isUnplausibleHandGivenTurnCall(const PostFlopState& r, int nbRaises
     if (getPotOdd() < 20)
         return false;
 
-    if (isInVeryLooseMode())
+    if (isInVeryLooseMode(nbPlayers))
         return false; // he is (temporarily ?) very loose, so don't make any guess
 
     if (!r.UsesFirst && !r.UsesSecond)
@@ -1904,7 +1904,7 @@ bool Player::isUnplausibleHandGivenTurnRaise(const PostFlopState& r, int nbRaise
         turn.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
         return false; // he is very agressive, so don't make any guess
 
-    if (isInVeryLooseMode())
+    if (isInVeryLooseMode(nbPlayers))
         return false; // he is (temporarily ?) very agressive, so don't make any guess
 
     if (!r.UsesFirst && !r.UsesSecond)
@@ -1957,7 +1957,7 @@ bool Player::isUnplausibleHandGivenTurnAllin(const PostFlopState& r, int nbRaise
         turn.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
         return false; // he is usually very agressive, so don't make any guess
 
-    if (isInVeryLooseMode())
+    if (isInVeryLooseMode(nbPlayers))
         return false; // he is (temporarily ?) very agressive, so don't make any guess
 
     if (!r.UsesFirst && !r.UsesSecond)
@@ -2004,7 +2004,7 @@ void Player::updateUnplausibleRangesGivenRiverActions()
         getStatistics(nbPlayers + 1).getPreflopStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE)
         preflop = getStatistics(nbPlayers + 1).getPreflopStatistics();
 
-    if (isInVeryLooseMode())
+    if (isInVeryLooseMode(nbPlayers))
     {
 #ifdef LOG_POKER_EXEC
         std::cout << endl << "\tSeems to be on very loose mode : estimated range is\t" << myEstimatedRange << endl;
@@ -2122,7 +2122,7 @@ bool Player::isUnplausibleHandGivenRiverBet(const PostFlopState& r, int nbChecks
         river.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
         return false; // he is usually very agressive, so don't make any guess
 
-    if (isInVeryLooseMode())
+    if (isInVeryLooseMode(nbPlayers))
         return false; // he is (temporarily ?) very agressive, so don't make any guess
 
     if (!r.UsesFirst && !r.UsesSecond)
@@ -2172,7 +2172,7 @@ bool Player::isUnplausibleHandGivenRiverCall(const PostFlopState& r, int nbRaise
         river.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
         return false; // he is usually very agressive, so don't make any guess
 
-    if (isInVeryLooseMode())
+    if (isInVeryLooseMode(nbPlayers))
         return false; // he is (temporarily ?) very agressive, so don't make any guess
 
     if (!r.UsesFirst && !r.UsesSecond)
@@ -2210,7 +2210,7 @@ bool Player::isUnplausibleHandGivenRiverRaise(const PostFlopState& r, int nbRais
         river.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
         return false; // he is usually very agressive, so don't make any guess
 
-    if (isInVeryLooseMode())
+    if (isInVeryLooseMode(nbPlayers))
         return false; // he is (temporarily ?) very agressive, so don't make any guess
 
     // the player has raised the river, and is not a maniac player : he should have at least 2 pairs
@@ -2262,7 +2262,7 @@ bool Player::isUnplausibleHandGivenRiverAllin(const PostFlopState& r, int nbRais
         river.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
         return false; // he is usually very agressive, so don't make any guess
 
-    if (isInVeryLooseMode())
+    if (isInVeryLooseMode(nbPlayers))
         return false; // he is (temporarily ?) very agressive, so don't make any guess
 
     if (!r.UsesFirst && !r.UsesSecond)
@@ -2728,7 +2728,7 @@ string Player::computeEstimatedPreflopRangeFromLastRaiser(const int opponentId, 
     }
 
     // if the player is being loose or agressive for 8 hands or so, adjust the range
-    if (opponent->isInVeryLooseMode())
+    if (opponent->isInVeryLooseMode(nbPlayers))
     {
         if (range < 40)
         {
@@ -2989,7 +2989,7 @@ string Player::computeEstimatedPreflopRangeFromCaller(const int opponentId, Pref
 
         std::shared_ptr<Player> lastRaiser = getPlayerByUniqueId(lastRaiserID);
 
-        if (lastRaiser->isInVeryLooseMode())
+        if (lastRaiser->isInVeryLooseMode(nbPlayers))
         {
             if (nbPlayers > 6 && range < 20)
             {
@@ -3305,10 +3305,8 @@ void Player::setEstimatedRange(const std::string range)
     myEstimatedRange = range;
 }
 
-bool Player::isInVeryLooseMode() const
+bool Player::isInVeryLooseMode(const int nbPlayers) const
 {
-
-    const int nbPlayers = currentHand->getActivePlayerList()->size();
     PlayerStatistics stats = getStatistics(nbPlayers);
 
     PreflopStatistics preflop = stats.getPreflopStatistics();

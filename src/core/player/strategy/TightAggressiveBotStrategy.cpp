@@ -741,6 +741,13 @@ int TightAggressiveBotStrategy::riverShouldRaise(CurrentHandContext& ctx, bool d
         return ctx.pot * 0.6;
     }
 
+    if (ctx.myHandSimulation.winRanged == 1.0f && ctx.myHandSimulation.winSd == 1.0f &&
+        ctx.myHandSimulation.win == 1.0f)
+    {
+        // if nuts, bet to get value
+        return ctx.pot * 0.6;
+    }
+
     return 0;
 }
 } // namespace pkt::core

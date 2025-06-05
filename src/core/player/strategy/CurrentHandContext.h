@@ -12,7 +12,7 @@ struct CurrentHandContext
     void reset(); // all fields are zeroed or nullptr
 
     // data that is common to all players
-    GameState gameState;
+    GameState gameState = GAME_STATE_NONE; // current game state, e.g. PREFLOP, FLOP, TURN, RIVER, SHOWDOWN
     int preflopRaisesNumber = 0;
     int preflopCallsNumber = 0;
     int flopBetsOrRaisesNumber = 0; // including allins

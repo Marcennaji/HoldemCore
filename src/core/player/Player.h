@@ -201,7 +201,7 @@ class Player
     std::string substractRange(const std::string startingRange, const std::string rangeToSubstract,
                                const std::string board = "");
 
-    bool isInVeryLooseMode() const;
+    bool isInVeryLooseMode(const int nbPlayers) const;
 
   protected:
     void loadStatistics();

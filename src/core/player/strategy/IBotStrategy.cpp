@@ -201,7 +201,7 @@ float IBotStrategy::getPreflopCallingRange(CurrentHandContext& context, bool det
 
     // if the player is being loose or agressive for every last hands, adjust our range, if nobody else has called or
     // raised
-    if (lastRaiser->isInVeryLooseMode() && (myPosition >= LATE || myPosition == SB || myPosition == BB) &&
+    if (lastRaiser->isInVeryLooseMode(nbPlayers) && (myPosition >= LATE || myPosition == SB || myPosition == BB) &&
         nbCalls == 0 && nbRaises == 1)
     {
 
@@ -367,8 +367,8 @@ float IBotStrategy::getPreflopRaisingRange(CurrentHandContext& context, bool det
 
             // if the raiser is being overagressive for last 8 hands or so, adjust our range (if nobody else has raised
             // or called)
-            if (lastRaiser->isInVeryLooseMode() && (myPosition >= LATE || myPosition == SB || myPosition == BB) &&
-                nbCalls == 0 && nbRaises == 1)
+            if (lastRaiser->isInVeryLooseMode(nbPlayers) &&
+                (myPosition >= LATE || myPosition == SB || myPosition == BB) && nbCalls == 0 && nbRaises == 1)
             {
 
                 if (raisingRange < 15)
