@@ -81,8 +81,6 @@ class Game
     }
 
     std::shared_ptr<Player> getPlayerByUniqueId(unsigned id);
-    std::shared_ptr<Player> getPlayerByNumber(int number);
-    std::shared_ptr<Player> getPlayerByName(const std::string& name);
     std::shared_ptr<Player> getCurrentPlayer();
 
     void raiseBlinds();

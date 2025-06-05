@@ -181,23 +181,6 @@ std::shared_ptr<Player> Game::getPlayerByUniqueId(unsigned id)
     return tmpPlayer;
 }
 
-std::shared_ptr<Player> Game::getPlayerByNumber(int number)
-{
-    std::shared_ptr<Player> tmpPlayer;
-    PlayerListIterator i = getSeatsList()->begin();
-    PlayerListIterator end = getSeatsList()->end();
-    while (i != end)
-    {
-        if ((*i)->getID() == number)
-        {
-            tmpPlayer = *i;
-            break;
-        }
-        ++i;
-    }
-    return tmpPlayer;
-}
-
 std::shared_ptr<Player> Game::getCurrentPlayer()
 {
     std::shared_ptr<Player> tmpPlayer =
@@ -207,20 +190,4 @@ std::shared_ptr<Player> Game::getCurrentPlayer()
     return tmpPlayer;
 }
 
-std::shared_ptr<Player> Game::getPlayerByName(const std::string& name)
-{
-    std::shared_ptr<Player> tmpPlayer;
-    PlayerListIterator i = getSeatsList()->begin();
-    PlayerListIterator end = getSeatsList()->end();
-    while (i != end)
-    {
-        if ((*i)->getName() == name)
-        {
-            tmpPlayer = *i;
-            break;
-        }
-        ++i;
-    }
-    return tmpPlayer;
-}
 } // namespace pkt::core
