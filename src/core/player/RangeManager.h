@@ -25,8 +25,11 @@ class RangeManager
 
     void setEstimatedRange(const std::string& range);
     std::string getEstimatedRange() const;
+    std::vector<std::string> getRangeAtomicValues(std::string range, const bool returnRange = false) const;
 
   private:
+    char incrementCardValue(char c) const;
+
     std::string myEstimatedRange;
     int myPlayerId;
     IHand* myHand;

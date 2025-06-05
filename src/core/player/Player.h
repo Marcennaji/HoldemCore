@@ -185,7 +185,6 @@ class Player
     int getPotOdd() const;
     void setPreflopPotOdd(const int potOdd);
 
-    std::vector<std::string> getRangeAtomicValues(std::string range, const bool returnRange = false) const;
     std::string getStringBoard() const;
     std::map<int, float> evaluateOpponentsStrengths() const;
     void computeEstimatedPreflopRange(const int playerId) const;
@@ -224,8 +223,6 @@ class Player
     std::string computeEstimatedPreflopRangeFromLastRaiser(const int opponentId,
                                                            PreflopStatistics& lastRaiserStats) const;
     std::string computeEstimatedPreflopRangeFromCaller(const int opponentId, PreflopStatistics& callerStats) const;
-
-    char incrementCardValue(char c) const;
 
     bool isUnplausibleHandGivenFlopCheck(const PostFlopState& r, const FlopStatistics& flop);
     bool isUnplausibleHandGivenFlopBet(const PostFlopState& r, int nbChecks, const FlopStatistics& flop);
