@@ -198,9 +198,6 @@ class Player
     void updateUnplausibleRangesGivenTurnActions();
     void updateUnplausibleRangesGivenRiverActions();
 
-    std::string substractRange(const std::string startingRange, const std::string rangeToSubstract,
-                               const std::string board = "");
-
     bool isInVeryLooseMode(const int nbPlayers) const;
 
     std::unique_ptr<RangeManager>& getRangeManager() { return myRangeManager; }

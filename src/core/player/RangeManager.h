@@ -31,6 +31,8 @@ class RangeManager
                                       const PreflopStatistics& lastRaiserStats, bool lastRaiserIsInVeryLooseMode);
     int getStandardRaisingRange(int nbPlayers) const;
     int getStandardCallingRange(int nbPlayers) const;
+    std::string substractRange(const std::string startingRange, const std::string rangeToSubstract,
+                               const std::string board = "");
 
   private:
     std::string computeEstimatedPreflopRangeFromLastRaiser(const Player& opponent,
