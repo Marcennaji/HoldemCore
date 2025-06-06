@@ -961,11 +961,11 @@ void Player::updateUnplausibleRangesGivenPreflopActions()
 
         if (stats.m_hands >= MIN_HANDS_STATISTICS_ACCURATE)
             myRangeManager->setEstimatedRange(myRangeManager->substractRange(
-                myRangeManager->getEstimatedRange(), getStringRange(nbPlayers, stats.getPreflopRaise())));
+                myRangeManager->getEstimatedRange(), RangeManager::getStringRange(nbPlayers, stats.getPreflopRaise())));
         else
             myRangeManager->setEstimatedRange(myRangeManager->substractRange(
                 myRangeManager->getEstimatedRange(),
-                getStringRange(nbPlayers, myRangeManager->getStandardRaisingRange(nbPlayers))));
+                RangeManager::getStringRange(nbPlayers, myRangeManager->getStandardRaisingRange(nbPlayers))));
     }
 
     if (myRangeManager->getEstimatedRange() == "")
@@ -2064,29 +2064,6 @@ void Player::logUnplausibleHands(GameState g)
                   << myRangeManager->getEstimatedRange() << endl;
 }
 
-std::string Player::getHandToRange(const std::string card1, const std::string card2) const
-{
-
-    // receive a hand like Ac Ks and translate it into a range like AKo
-
-    std::stringstream result;
-
-    if (card1.size() != 2 || card2.size() != 2)
-    {
-        cout << "Player::getHandToRange invalid hand : " << card1 << " " << card2 << endl;
-        return "";
-    }
-
-    if (card1.at(0) == card2.at(0))
-        result << card2.at(0) << card2.at(0); // pair
-    else if (card1.at(1) == card2.at(1))      // suited hand
-        result << card1.at(0) << card2.at(0) << "s";
-    else
-        result << card1.at(0) << card2.at(0) << "o";
-
-    return result.str();
-}
-
 std::map<int, float> Player::evaluateOpponentsStrengths() const
 {
 
@@ -2281,25 +2258,6 @@ bool Player::canBluff(const GameState gameState) const
     }
 
     return true;
-}
-
-std::string getStringRange(int nbPlayers, int range)
-{
-
-    if (range > 100)
-    { // should never happen, but...
-        cout << "warning : bad range in getStringRange : " << range << endl;
-        range = 100;
-    }
-
-    if (nbPlayers == 2)
-        return TOP_RANGE_2_PLAYERS[range];
-    else if (nbPlayers == 3)
-        return TOP_RANGE_3_PLAYERS[range];
-    else if (nbPlayers == 4)
-        return TOP_RANGE_4_PLAYERS[range];
-    else
-        return TOP_RANGE_MORE_4_PLAYERS[range];
 }
 
 int Player::getPreflopPotOdd() const

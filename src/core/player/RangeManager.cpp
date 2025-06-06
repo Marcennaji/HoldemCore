@@ -1029,4 +1029,46 @@ std::string RangeManager::substractRange(const std::string originRanges, const s
     return newRange;
 }
 
+std::string RangeManager::getHandToRange(const std::string card1, const std::string card2) const
+{
+
+    // receive a hand like Ac Ks and translate it into a range like AKo
+
+    std::stringstream result;
+
+    if (card1.size() != 2 || card2.size() != 2)
+    {
+        cout << "RangeManager::getHandToRange invalid hand : " << card1 << " " << card2 << endl;
+        return "";
+    }
+
+    if (card1.at(0) == card2.at(0))
+        result << card2.at(0) << card2.at(0); // pair
+    else if (card1.at(1) == card2.at(1))      // suited hand
+        result << card1.at(0) << card2.at(0) << "s";
+    else
+        result << card1.at(0) << card2.at(0) << "o";
+
+    return result.str();
+}
+
+std::string RangeManager::getStringRange(int nbPlayers, int range)
+{
+
+    if (range > 100)
+    { // should never happen, but...
+        cout << "warning : bad range in getStringRange : " << range << endl;
+        range = 100;
+    }
+
+    if (nbPlayers == 2)
+        return TOP_RANGE_2_PLAYERS[range];
+    else if (nbPlayers == 3)
+        return TOP_RANGE_3_PLAYERS[range];
+    else if (nbPlayers == 4)
+        return TOP_RANGE_4_PLAYERS[range];
+    else
+        return TOP_RANGE_MORE_4_PLAYERS[range];
+}
+
 } // namespace pkt::core::player

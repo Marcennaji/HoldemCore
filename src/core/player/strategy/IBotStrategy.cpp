@@ -385,7 +385,7 @@ float IBotStrategy::getPreflopRaisingRange(CurrentHandContext& context, bool det
     { // no previous raise
 
         // steal blinds
-        if (!isCardsInRange(myCard1, myCard2, getStringRange(nbPlayers, raisingRange)) &&
+        if (!isCardsInRange(myCard1, myCard2, RangeManager::getStringRange(nbPlayers, raisingRange)) &&
             (myPosition == SB || myPosition == BUTTON || myPosition == CUTOFF) && canBluff)
         {
 

@@ -217,8 +217,6 @@ class Player
     float getOpponentWinningHandsPercentage(const int idPlayer, std::string board) const;
     void logUnplausibleHands(GameState g);
 
-    std::string getHandToRange(const std::string card1, const std::string card2) const;
-
     bool canBluff(const GameState) const;
 
     bool isUnplausibleHandGivenFlopCheck(const PostFlopState& r, const FlopStatistics& flop);

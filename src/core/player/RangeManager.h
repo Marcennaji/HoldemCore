@@ -38,6 +38,8 @@ class RangeManager
     int getStandardCallingRange(int nbPlayers) const;
     std::string substractRange(const std::string startingRange, const std::string rangeToSubstract,
                                const std::string board = "");
+    std::string getHandToRange(const std::string card1, const std::string card2) const;
+    static std::string getStringRange(int nbPlayers, int range);
 
   private:
     std::string computeEstimatedPreflopRangeFromLastRaiser(const Player& opponent,
