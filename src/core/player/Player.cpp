@@ -35,35 +35,6 @@ namespace pkt::core::player
 
 using namespace std;
 
-void CurrentHandActions::reset()
-{
-
-    m_preflopActions.clear();
-    m_flopActions.clear();
-    m_turnActions.clear();
-    m_riverActions.clear();
-}
-
-std::vector<PlayerAction>& CurrentHandActions::getPreflopActions()
-{
-    return m_preflopActions;
-}
-
-std::vector<PlayerAction>& CurrentHandActions::getFlopActions()
-{
-    return m_flopActions;
-}
-
-std::vector<PlayerAction>& CurrentHandActions::getTurnActions()
-{
-    return m_turnActions;
-}
-
-std::vector<PlayerAction>& CurrentHandActions::getRiverActions()
-{
-    return m_riverActions;
-}
-
 Player::Player(GameEvents* events, IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id, PlayerType type,
                std::string name, int sC, bool aS, int mB)
     : myHandAuditStore(ha), myPlayersStatisticsStore(ps), currentHand(0), myID(id), myType(type), myName(name),

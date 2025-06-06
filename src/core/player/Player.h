@@ -22,6 +22,7 @@
 #include <core/engine/EngineDefs.h>
 #include <core/engine/model/PlayerStatistics.h>
 #include <core/interfaces/IHand.h>
+#include "CurrentHandActions.h"
 #include "RangeManager.h"
 
 #include <third_party/psim/psim.hpp>
@@ -52,30 +53,6 @@ enum PlayerType
 
 class IBotStrategy;
 class CurrentHandContext;
-
-class CurrentHandActions
-{
-  public:
-    CurrentHandActions() { reset(); };
-    ~CurrentHandActions() {};
-
-    void reset(); // init to zero
-
-    std::vector<PlayerAction>& getPreflopActions();
-    std::vector<PlayerAction>& getFlopActions();
-    std::vector<PlayerAction>& getTurnActions();
-    std::vector<PlayerAction>& getRiverActions();
-
-  protected:
-    friend class Player;
-    friend class HumanPlayer;
-    friend class BotPlayer;
-
-    std::vector<PlayerAction> m_preflopActions;
-    std::vector<PlayerAction> m_flopActions;
-    std::vector<PlayerAction> m_turnActions;
-    std::vector<PlayerAction> m_riverActions;
-};
 
 static const char* TightAggressiveBotStrategyName[] = {"Tintin",  "Tonio", "Theo",  "Ted",  "Thor",
                                                        "Taslima", "Tina",  "Tania", "Tata", "Timmy"};
