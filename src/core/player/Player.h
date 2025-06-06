@@ -35,6 +35,14 @@
 
 namespace pkt::core
 {
+class IHand;
+class IHandAuditStore;
+class IPlayersStatisticsStore;
+
+} // namespace pkt::core
+
+namespace pkt::core::player
+{
 
 enum PlayerType
 {
@@ -42,9 +50,6 @@ enum PlayerType
     PLAYER_TYPE_HUMAN
 };
 
-class IHandAuditStore;
-class IPlayersStatisticsStore;
-class IHand;
 class IBotStrategy;
 class CurrentHandContext;
 
@@ -282,4 +287,4 @@ class Player
 
     bool m_isSessionActive;
 };
-} // namespace pkt::core
+} // namespace pkt::core::player

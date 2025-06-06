@@ -18,10 +18,13 @@
 
 #pragma once
 
+#include <core/player/typedefs.h>
 #include "EngineDefs.h"
 #include "model/GameData.h"
 #include "model/StartData.h"
 
+#include <list>
+#include <memory>
 #include <string>
 
 namespace pkt::core
@@ -39,8 +42,8 @@ class Game
 {
 
   public:
-    Game(GameEvents*, std::shared_ptr<EngineFactory> factory, const PlayerList& playerList, const GameData& gameData,
-         const StartData& startData, int gameId, IRankingStore* rankingStore,
+    Game(GameEvents*, std::shared_ptr<EngineFactory> factory, const pkt::core::player::PlayerList& playerList,
+         const GameData& gameData, const StartData& startData, int gameId, IRankingStore* rankingStore,
          IPlayersStatisticsStore* playersStatisticsStore, IHandAuditStore* handAuditStore);
 
     ~Game();
@@ -51,9 +54,9 @@ class Game
     std::shared_ptr<IHand> getCurrentHand();
     const std::shared_ptr<IHand> getCurrentHand() const;
 
-    PlayerList getSeatsList() const { return seatsList; }
-    PlayerList getActivePlayerList() const { return activePlayerList; }
-    PlayerList getRunningPlayerList() const { return runningPlayerList; }
+    pkt::core::player::PlayerList getSeatsList() const { return seatsList; }
+    pkt::core::player::PlayerList getActivePlayerList() const { return activePlayerList; }
+    pkt::core::player::PlayerList getRunningPlayerList() const { return runningPlayerList; }
 
     void setStartQuantityPlayers(int theValue) { startQuantityPlayers = theValue; }
     int getStartQuantityPlayers() const { return startQuantityPlayers; }
@@ -80,8 +83,8 @@ class Game
             dealerPosition = newDealer;
     }
 
-    std::shared_ptr<Player> getPlayerByUniqueId(unsigned id);
-    std::shared_ptr<Player> getCurrentPlayer();
+    std::shared_ptr<pkt::core::player::Player> getPlayerByUniqueId(unsigned id);
+    std::shared_ptr<pkt::core::player::Player> getCurrentPlayer();
 
     void raiseBlinds();
 
@@ -95,9 +98,9 @@ class Game
     std::shared_ptr<IHand> currentHand;
     std::shared_ptr<IBoard> currentBoard;
 
-    PlayerList seatsList;
-    PlayerList activePlayerList;  // used seats
-    PlayerList runningPlayerList; // nonfolded and nonallin active players
+    pkt::core::player::PlayerList seatsList;
+    pkt::core::player::PlayerList activePlayerList;  // used seats
+    pkt::core::player::PlayerList runningPlayerList; // nonfolded and nonallin active players
 
     // start variables
     int startQuantityPlayers;

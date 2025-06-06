@@ -3,7 +3,7 @@
 #include "HumanPlayer.h"
 #include "core/player/strategy/IBotStrategy.h"
 
-namespace pkt::core
+namespace pkt::core::player
 {
 
 DefaultPlayerFactory::DefaultPlayerFactory(GameEvents* events, IHandAuditStore* audit, IPlayersStatisticsStore* stats,
@@ -27,4 +27,4 @@ std::shared_ptr<Player> DefaultPlayerFactory::createBotPlayer(int id, TableProfi
     return bot;
 }
 
-} // namespace pkt::core
+} // namespace pkt::core::player

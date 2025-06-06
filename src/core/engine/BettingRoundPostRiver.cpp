@@ -30,6 +30,7 @@ namespace pkt::core
 {
 
 using namespace std;
+using namespace pkt::core::player;
 
 BettingRoundPostRiver::BettingRoundPostRiver(GameEvents* events, ILogger* logger, IHand* hi, int dP, int sB)
     : BettingRound(events, logger, hi, dP, sB, GAME_STATE_POST_RIVER), highestCardsValue(0)

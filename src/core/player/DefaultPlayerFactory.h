@@ -3,7 +3,7 @@
 #include "IPlayerFactory.h"
 #include "core/player/strategy/StrategyAssigner.h"
 
-namespace pkt::core
+namespace pkt::core::player
 {
 
 class DefaultPlayerFactory : public IPlayerFactory
@@ -21,4 +21,4 @@ class DefaultPlayerFactory : public IPlayerFactory
     IPlayersStatisticsStore* myStats;
     StrategyAssigner* myStrategyAssigner;
 };
-} // namespace pkt::core
+} // namespace pkt::core::player

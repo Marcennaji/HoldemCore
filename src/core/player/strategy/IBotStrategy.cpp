@@ -6,7 +6,7 @@
 
 using namespace std;
 
-namespace pkt::core
+namespace pkt::core::player
 {
 
 void IBotStrategy::initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange)
@@ -602,4 +602,4 @@ bool IBotStrategy::shouldPotControl(CurrentHandContext& ctx, bool deterministic)
     return potControl;
 }
 
-} // namespace pkt::core
+} // namespace pkt::core::player

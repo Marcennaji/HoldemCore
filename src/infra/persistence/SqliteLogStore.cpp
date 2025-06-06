@@ -17,6 +17,7 @@
  *****************************************************************************/
 
 #include "SqliteLogStore.h"
+#include <core/player/typedefs.h>
 #include "core/engine/CardsValue.h"
 #include "core/engine/EngineDefs.h"
 #include "core/engine/model/PlayerStatistics.h"
@@ -33,6 +34,7 @@ namespace pkt::infra
 
 using namespace std;
 using namespace pkt::core;
+using namespace pkt::core::player;
 
 SqliteLogStore::SqliteLogStore(const std::string& logDir)
     : mySqliteLogDb(0), mySqliteLogFileName(""), myLogDir(logDir), uniqueGameID(0), currentHandID(0), sql("")

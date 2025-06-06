@@ -6,7 +6,7 @@
 class StrategyTest : public ::testing::Test
 {
   protected:
-    pkt::core::CurrentHandContext ctx;
+    pkt::core::player::CurrentHandContext ctx;
 
     void SetUp() override
     {

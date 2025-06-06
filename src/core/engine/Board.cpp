@@ -29,6 +29,7 @@
 
 namespace pkt::core
 {
+using namespace pkt::core::player;
 
 Board::Board(unsigned dp) : IBoard(), pot(0), sets(0), dealerPosition(dp), allInCondition(false), lastActionPlayerID(0)
 {

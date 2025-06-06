@@ -4,7 +4,7 @@
 #include <core/player/Player.h>
 #include <third_party/psim/psim.hpp>
 
-namespace pkt::core
+namespace pkt::core::player
 {
 
 struct CurrentHandContext
@@ -66,4 +66,4 @@ struct CurrentHandContext
     };
 };
 
-} // namespace pkt::core
+} // namespace pkt::core::player

@@ -29,6 +29,7 @@ namespace pkt::core
 {
 
 using namespace std;
+using namespace pkt::core::player;
 
 BettingRound::BettingRound(GameEvents* events, ILogger* logger, IHand* hi, unsigned dP, int sB, GameState gS)
     : myLogger(logger), IBettingRound(), myHand(hi), myBettingRoundID(gS), dealerPosition(dP), smallBlindPosition(0),

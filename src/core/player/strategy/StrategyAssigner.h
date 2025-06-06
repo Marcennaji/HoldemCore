@@ -3,7 +3,7 @@
 #include "core/engine/model/TableProfile.h"
 #include "core/player/strategy/IBotStrategy.h"
 
-namespace pkt::core
+namespace pkt::core::player
 {
 
 class StrategyAssigner
@@ -22,4 +22,4 @@ class StrategyAssigner
     int maxPerType;
 };
 
-} // namespace pkt::core
+} // namespace pkt::core::player

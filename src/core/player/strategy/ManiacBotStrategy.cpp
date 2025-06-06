@@ -32,7 +32,7 @@
 #include <map>
 #include <sstream>
 
-namespace pkt::core
+namespace pkt::core::player
 {
 
 using namespace std;
@@ -706,4 +706,4 @@ int ManiacBotStrategy::riverShouldRaise(CurrentHandContext& ctx, bool determinis
 
     return 0;
 }
-} // namespace pkt::core
+} // namespace pkt::core::player

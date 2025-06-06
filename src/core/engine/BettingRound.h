@@ -56,11 +56,11 @@ class BettingRound : public IBettingRound
     void setFirstRoundLastPlayersTurnId(unsigned theValue);
     unsigned getFirstRoundLastPlayersTurnId() const;
 
-    void setCurrentPlayersTurnIt(PlayerListIterator theValue);
-    PlayerListIterator getCurrentPlayersTurnIt() const;
+    void setCurrentPlayersTurnIt(pkt::core::player::PlayerListIterator theValue);
+    pkt::core::player::PlayerListIterator getCurrentPlayersTurnIt() const;
 
-    void setLastPlayersTurnIt(PlayerListIterator theValue);
-    PlayerListIterator getLastPlayersTurnIt() const;
+    void setLastPlayersTurnIt(pkt::core::player::PlayerListIterator theValue);
+    pkt::core::player::PlayerListIterator getLastPlayersTurnIt() const;
 
     void setHighestSet(int theValue);
     int getHighestSet() const;
@@ -110,8 +110,8 @@ class BettingRound : public IBettingRound
     bool firstRound;
     bool firstHeadsUpRound;
 
-    PlayerListIterator currentPlayersTurnIt; // iterator for runningPlayerList
-    PlayerListIterator lastPlayersTurnIt;    // iterator for runningPlayerList
+    pkt::core::player::PlayerListIterator currentPlayersTurnIt; // iterator for runningPlayerList
+    pkt::core::player::PlayerListIterator lastPlayersTurnIt;    // iterator for runningPlayerList
 
     unsigned currentPlayersTurnId;
     unsigned firstRoundLastPlayersTurnId;

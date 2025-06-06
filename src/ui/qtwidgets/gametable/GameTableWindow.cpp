@@ -54,6 +54,7 @@
 #endif
 
 using namespace std;
+using namespace pkt::core::player;
 using namespace pkt::core;
 using Game = pkt::core::Game;
 

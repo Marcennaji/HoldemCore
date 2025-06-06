@@ -22,7 +22,7 @@
 #include "core/player/strategy/CurrentHandContext.h"
 #include "core/player/strategy/IBotStrategy.h"
 
-namespace pkt::core
+namespace pkt::core::player
 {
 class BotPlayer : public Player
 {
@@ -52,4 +52,4 @@ class BotPlayer : public Player
     CurrentHandContext myCurrentHandContext;
 };
 
-} // namespace pkt::core
+} // namespace pkt::core::player

@@ -819,7 +819,7 @@ int CardsValue::cardsValue(int* cards, int* position)
     return array[0][1] * 1000000 + array[1][1] * 10000 + array[2][1] * 100 + array[3][1] * 10 + array[4][1];
 }
 
-std::string CardsValue::determineHandName(int myCardsValueInt, PlayerList activePlayerList)
+std::string CardsValue::determineHandName(int myCardsValueInt, pkt::core::player::PlayerList activePlayerList)
 {
 
     std::list<int> shownCardsValueInt;
@@ -827,7 +827,7 @@ std::string CardsValue::determineHandName(int myCardsValueInt, PlayerList active
     bool different = false;
     bool equal = false;
     //	std::shared_ptr<Game> currentGame = myW->getSession()->getCurrentGame();
-    PlayerListConstIterator it_c;
+    pkt::core::player::PlayerListConstIterator it_c;
     //	PlayerList activePlayerList = currentGame->getActivePlayerList();
 
     // collect cardsValueInt of all players who will show their cards

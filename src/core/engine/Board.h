@@ -22,10 +22,17 @@
 #include <vector>
 
 #include "core/interfaces/IBoard.h"
+
+#include "core/player/typedefs.h"
+
+namespace pkt::core::player
+{
+class Player;
+
+} // namespace pkt::core::player
 namespace pkt::core
 {
 
-class Player;
 class IHand;
 
 class Board : public IBoard
@@ -34,7 +41,7 @@ class Board : public IBoard
     Board(unsigned dealerPosition);
     ~Board();
 
-    void setPlayerLists(PlayerList, PlayerList, PlayerList);
+    void setPlayerLists(pkt::core::player::PlayerList, pkt::core::player::PlayerList, pkt::core::player::PlayerList);
 
     void setCards(int* theValue);
     void getCards(int* theValue);
@@ -60,9 +67,9 @@ class Board : public IBoard
     void setPlayerNeedToShowCards(const std::list<unsigned>& p);
 
   private:
-    PlayerList seatsList;
-    PlayerList activePlayerList;
-    PlayerList runningPlayerList;
+    pkt::core::player::PlayerList seatsList;
+    pkt::core::player::PlayerList activePlayerList;
+    pkt::core::player::PlayerList runningPlayerList;
 
     std::list<unsigned> winners;
     std::list<unsigned> playerNeedToShowCards;

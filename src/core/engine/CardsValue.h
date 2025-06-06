@@ -18,24 +18,22 @@
 
 #pragma once
 
-#include "EngineDefs.h"
-
+#include <core/player/typedefs.h>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <vector>
+#include "EngineDefs.h"
 
 namespace pkt::core
 {
-
-typedef std::shared_ptr<std::list<std::shared_ptr<Player>>> PlayerList;
 
 class CardsValue
 {
   public:
     static int holeCardsClass(int, int);
     static int cardsValue(int*, int*);
-    static std::string determineHandName(int myCardsValueInt, PlayerList activePlayerList);
+    static std::string determineHandName(int myCardsValueInt, pkt::core::player::PlayerList activePlayerList);
     static std::list<std::string> translateCardsValueCode(int cardsValueCode);
 
     static int holeCardsToIntCode(int*);

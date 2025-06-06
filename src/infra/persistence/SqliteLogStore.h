@@ -23,6 +23,7 @@
 #include <core/interfaces/persistence/IHandAuditStore.h>
 #include <core/interfaces/persistence/IPlayersStatisticsStore.h>
 #include <core/interfaces/persistence/IRankingStore.h>
+#include <core/player/typedefs.h>
 #include "core/engine/EngineDefs.h"
 #include "core/engine/model/GameState.h"
 #include "core/engine/model/PlayerStatistics.h"
@@ -36,8 +37,8 @@ struct sqlite3;
 namespace pkt::infra
 {
 
-using core::PlayerList;
 using core::PlayerStatistics;
+using core::player::PlayerList;
 
 class SqliteLogStore : public core::IRankingStore, public core::IHandAuditStore, public core::IPlayersStatisticsStore
 {

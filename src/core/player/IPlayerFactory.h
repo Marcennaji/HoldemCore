@@ -3,7 +3,7 @@
 #include "Player.h"
 #include "core/engine/model/TableProfile.h"
 
-namespace pkt::core
+namespace pkt::core::player
 {
 
 class IPlayerFactory
@@ -15,4 +15,4 @@ class IPlayerFactory
     virtual std::shared_ptr<Player> createBotPlayer(int id, TableProfile profile) = 0;
 };
 
-} // namespace pkt::core
+} // namespace pkt::core::player

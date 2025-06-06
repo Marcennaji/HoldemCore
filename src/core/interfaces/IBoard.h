@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <core/player/typedefs.h>
 #include "core/engine/EngineDefs.h"
 
 #include <list>
@@ -32,7 +33,8 @@ class IBoard
   public:
     virtual ~IBoard() {};
     //
-    virtual void setPlayerLists(PlayerList, PlayerList, PlayerList) = 0;
+    virtual void setPlayerLists(pkt::core::player::PlayerList, pkt::core::player::PlayerList,
+                                pkt::core::player::PlayerList) = 0;
     //
     virtual void setCards(int* theValue) = 0;
     virtual void getCards(int* theValue) = 0;

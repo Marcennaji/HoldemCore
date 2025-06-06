@@ -7,7 +7,7 @@
 
 struct PostFlopState;
 
-namespace pkt::core
+namespace pkt::core::player
 {
 class Player;
 
@@ -21,4 +21,4 @@ const int getImplicitOdd(const PostFlopState& state);
 int getBoardCardsHigherThan(std::string stringBoard, std::string card);
 void logPostFlopState(const Player& player, const PostFlopState& state, std::ostream& out = std::cout);
 
-} // namespace pkt::core
+} // namespace pkt::core::player

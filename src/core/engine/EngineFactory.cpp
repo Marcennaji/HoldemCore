@@ -48,8 +48,9 @@ EngineFactory::~EngineFactory()
 
 std::shared_ptr<IHand> EngineFactory::createHand(std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
                                                  IRankingStore* l, IPlayersStatisticsStore* ps, IHandAuditStore* hs,
-                                                 PlayerList sl, PlayerList apl, PlayerList rpl, int id, int sP, int dP,
-                                                 int sB, int sC)
+                                                 pkt::core::player::PlayerList sl, pkt::core::player::PlayerList apl,
+                                                 pkt::core::player::PlayerList rpl, int id, int sP, int dP, int sB,
+                                                 int sC)
 {
     return std::shared_ptr<IHand>(new Hand(myEvents, myLogger, f, b, l, ps, hs, sl, apl, rpl, id, sP, dP, sB, sC));
 }

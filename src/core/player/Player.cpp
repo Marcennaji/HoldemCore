@@ -30,7 +30,7 @@
 
 #include <sstream>
 
-namespace pkt::core
+namespace pkt::core::player
 {
 
 using namespace std;
@@ -2335,4 +2335,4 @@ bool Player::isInVeryLooseMode(const int nbPlayers) const
         return false;
 }
 
-} // namespace pkt::core
+} // namespace pkt::core::player

@@ -29,6 +29,7 @@ namespace pkt::core
 {
 
 using namespace std;
+using namespace pkt::core::player;
 
 BettingRoundPreflop::BettingRoundPreflop(GameEvents* events, ILogger* logger, IHand* hi, unsigned dP, int sB)
     : BettingRound(events, logger, hi, dP, sB, GAME_STATE_PREFLOP)

@@ -4,11 +4,12 @@
 namespace pkt::test
 {
 
-class DummyPlayer : public pkt::core::Player
+class DummyPlayer : public pkt::core::player::Player
 {
   public:
     DummyPlayer(int id = 42)
-        : pkt::core::Player(nullptr, nullptr, nullptr, id, pkt::core::PLAYER_TYPE_COMPUTER, "Dummy", 1000, true, 0)
+        : pkt::core::player::Player(nullptr, nullptr, nullptr, id, pkt::core::player::PLAYER_TYPE_COMPUTER, "Dummy",
+                                    1000, true, 0)
     {
         setIsSessionActive(true);
     }

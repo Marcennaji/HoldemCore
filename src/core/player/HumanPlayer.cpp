@@ -20,7 +20,7 @@
 #ifndef max
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 #endif
-namespace pkt::core
+namespace pkt::core::player
 {
 
 using namespace std;
@@ -35,4 +35,4 @@ HumanPlayer::~HumanPlayer()
 {
 }
 
-} // namespace pkt::core
+} // namespace pkt::core::player

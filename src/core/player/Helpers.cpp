@@ -10,7 +10,7 @@
 #include <sstream>
 #include <string>
 
-namespace pkt::core
+namespace pkt::core::player
 {
 using namespace std;
 
@@ -312,4 +312,4 @@ void logPostFlopState(const Player& player, const PostFlopState& state, std::ost
         out << " The board is paired.";
 }
 
-} // namespace pkt::core
+} // namespace pkt::core::player

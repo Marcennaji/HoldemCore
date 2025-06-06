@@ -32,7 +32,7 @@
 #include <map>
 #include <sstream>
 
-namespace pkt::core
+namespace pkt::core::player
 {
 
 using namespace std;
@@ -743,4 +743,4 @@ int UltraTightBotStrategy::riverShouldRaise(CurrentHandContext& ctx, bool determ
 
     return 0;
 }
-} // namespace pkt::core
+} // namespace pkt::core::player

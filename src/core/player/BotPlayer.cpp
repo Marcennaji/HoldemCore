@@ -22,7 +22,7 @@
 #ifndef max
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 #endif
-namespace pkt::core
+namespace pkt::core::player
 {
 
 using namespace std;
@@ -464,4 +464,4 @@ void BotPlayer::evaluateBetAmount()
     currentHand->getCurrentBettingRound()->setHighestSet(highestSet);
 }
 
-} // namespace pkt::core
+} // namespace pkt::core::player

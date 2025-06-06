@@ -18,18 +18,6 @@
 
 #pragma once
 
-#include <list>
-#include <memory>
-
-namespace pkt::core
-{
-class Player;
-
-typedef std::shared_ptr<std::list<std::shared_ptr<Player>>> PlayerList;
-typedef std::list<std::shared_ptr<Player>>::iterator PlayerListIterator;
-typedef std::list<std::shared_ptr<Player>>::const_iterator PlayerListConstIterator;
-} // namespace pkt::core
-
 #define MIN_NUMBER_OF_PLAYERS 2
 #define MAX_NUMBER_OF_PLAYERS 10
 
@@ -50,5 +38,4 @@ typedef std::list<std::shared_ptr<Player>>::const_iterator PlayerListConstIterat
 #define GAME_NUMBER_OF_PLAYERS 6
 #define GAME_START_SBLIND 5
 #define GAME_SPEED 8
-// #define MIN_HANDS_STATISTICS_ACCURATE 30
-#define MIN_HANDS_STATISTICS_ACCURATE 2
+#define MIN_HANDS_STATISTICS_ACCURATE 30

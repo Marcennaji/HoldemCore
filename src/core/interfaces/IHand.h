@@ -40,9 +40,9 @@ class IHand
 
     virtual void start() = 0;
 
-    virtual PlayerList getSeatsList() const = 0;
-    virtual PlayerList getActivePlayerList() const = 0;
-    virtual PlayerList getRunningPlayerList() const = 0;
+    virtual pkt::core::player::PlayerList getSeatsList() const = 0;
+    virtual pkt::core::player::PlayerList getActivePlayerList() const = 0;
+    virtual pkt::core::player::PlayerList getRunningPlayerList() const = 0;
 
     virtual std::shared_ptr<IBoard> getBoard() const = 0;
     virtual std::shared_ptr<IBettingRound> getPreflop() const = 0;
@@ -104,9 +104,9 @@ class IHand
     virtual void setTurnLastRaiserID(int id) = 0;
 
   protected:
-    virtual PlayerListIterator getSeatIt(unsigned) const = 0;
-    virtual PlayerListIterator getActivePlayerIt(unsigned) const = 0;
-    virtual PlayerListIterator getRunningPlayerIt(unsigned) const = 0;
+    virtual pkt::core::player::PlayerListIterator getSeatIt(unsigned) const = 0;
+    virtual pkt::core::player::PlayerListIterator getActivePlayerIt(unsigned) const = 0;
+    virtual pkt::core::player::PlayerListIterator getRunningPlayerIt(unsigned) const = 0;
 
     friend class Game;
     friend class BettingRound;

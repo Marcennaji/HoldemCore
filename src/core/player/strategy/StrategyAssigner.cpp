@@ -5,7 +5,7 @@
 #include "TightAggressiveBotStrategy.h"
 #include "UltraTightBotStrategy.h"
 
-namespace pkt::core
+namespace pkt::core::player
 {
 
 StrategyAssigner::StrategyAssigner(TableProfile profile, int botCount) : myProfile(profile), maxPerType(botCount / 3)
@@ -54,4 +54,4 @@ std::unique_ptr<IBotStrategy> StrategyAssigner::chooseStrategyFor(int botIndex)
     return std::make_unique<UltraTightBotStrategy>();
 }
 
-} // namespace pkt::core
+} // namespace pkt::core::player

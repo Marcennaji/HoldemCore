@@ -32,7 +32,7 @@
 #include <map>
 #include <sstream>
 
-namespace pkt::core
+namespace pkt::core::player
 {
 
 using namespace std;
@@ -750,4 +750,4 @@ int TightAggressiveBotStrategy::riverShouldRaise(CurrentHandContext& ctx, bool d
 
     return 0;
 }
-} // namespace pkt::core
+} // namespace pkt::core::player

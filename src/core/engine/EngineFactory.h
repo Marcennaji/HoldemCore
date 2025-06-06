@@ -28,6 +28,9 @@
 
 #include <memory>
 #include <vector>
+
+#include "core/player/typedefs.h"
+
 namespace pkt::core
 {
 class EngineFactory
@@ -38,8 +41,9 @@ class EngineFactory
 
     virtual std::shared_ptr<IHand> createHand(std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
                                               IRankingStore* l, IPlayersStatisticsStore* ps, IHandAuditStore* hs,
-                                              PlayerList sl, PlayerList apl, PlayerList rpl, int id, int sP, int dP,
-                                              int sB, int sC);
+                                              pkt::core::player::PlayerList sl, pkt::core::player::PlayerList apl,
+                                              pkt::core::player::PlayerList rpl, int id, int sP, int dP, int sB,
+                                              int sC);
     virtual std::shared_ptr<IBoard> createBoard(unsigned dp);
     virtual std::vector<std::shared_ptr<IBettingRound>> createBettingRound(IHand* hi, unsigned dP, int sB);
 

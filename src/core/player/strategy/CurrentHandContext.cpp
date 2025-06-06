@@ -1,6 +1,6 @@
 #include "CurrentHandContext.h"
 
-namespace pkt::core
+namespace pkt::core::player
 {
 
 void CurrentHandContext::reset()
@@ -59,4 +59,4 @@ void CurrentHandContext::reset()
     };
 }
 
-} // namespace pkt::core
+} // namespace pkt::core::player

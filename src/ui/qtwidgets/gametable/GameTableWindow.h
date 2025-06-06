@@ -33,11 +33,15 @@
 
 #define USER_WIDGETS_NUMBER 9
 
+namespace pkt::core::player
+{
+class Player;
+} // namespace pkt::core::player
+
 namespace pkt::core
 {
 class Game;
 class IBoard;
-class Player;
 } // namespace pkt::core
 
 class MyCardsPixmapLabel;
@@ -112,7 +116,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
 
     void refreshHandsRanges();
 
-    SeatState getCurrentSeatState(std::shared_ptr<pkt::core::Player>);
+    SeatState getCurrentSeatState(std::shared_ptr<pkt::core::player::Player>);
 
     void dealHoleCards();
 

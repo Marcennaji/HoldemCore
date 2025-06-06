@@ -32,6 +32,7 @@ namespace pkt::core
 {
 
 using namespace std;
+using namespace pkt::core::player;
 
 Hand::Hand(GameEvents* events, ILogger* logger, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
            IRankingStore* l, IPlayersStatisticsStore* ps, IHandAuditStore* ha, PlayerList sl, PlayerList apl,

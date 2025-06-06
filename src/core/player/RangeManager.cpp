@@ -11,7 +11,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace pkt::core
+namespace pkt::core::player
 {
 
 using namespace std;
@@ -1029,4 +1029,4 @@ std::string RangeManager::substractRange(const std::string originRanges, const s
     return newRange;
 }
 
-} // namespace pkt::core
+} // namespace pkt::core::player

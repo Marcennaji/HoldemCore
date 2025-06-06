@@ -19,7 +19,7 @@
 #pragma once
 
 #include "Player.h"
-namespace pkt::core
+namespace pkt::core::player
 {
 class HumanPlayer : public Player
 {
@@ -31,4 +31,4 @@ class HumanPlayer : public Player
     ~HumanPlayer();
 };
 
-} // namespace pkt::core
+} // namespace pkt::core::player

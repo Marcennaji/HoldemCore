@@ -41,6 +41,7 @@ namespace pkt::core
 {
 
 using namespace std;
+using namespace pkt::core::player;
 
 Session::Session(GameEvents* events, ILogger* logger, IRankingStore* rs, IPlayersStatisticsStore* ps,
                  IHandAuditStore* ha)

@@ -18,7 +18,7 @@
 #pragma once
 
 #include "core/player/strategy/IBotStrategy.h"
-namespace pkt::core
+namespace pkt::core::player
 {
 // Forward declaration
 class CurrentHandContext;
@@ -45,4 +45,4 @@ class UltraTightBotStrategy : public IBotStrategy
     int riverShouldBet(CurrentHandContext& context, bool deterministic = false) override;
 };
 
-} // namespace pkt::core
+} // namespace pkt::core::player

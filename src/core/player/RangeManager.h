@@ -10,13 +10,18 @@ struct PostFlopState;
 
 namespace pkt::core
 {
-
 class IHand;
 class IPlayersStatisticsStore;
 
+struct PreflopStatistics;
 struct FlopStatistics;
 struct TurnStatistics;
 struct RiverStatistics;
+} // namespace pkt::core
+
+namespace pkt::core::player
+{
+class Player;
 
 class RangeManager
 {
@@ -50,4 +55,4 @@ class RangeManager
     IHand* myHand;
     IPlayersStatisticsStore* myStatsStore;
 };
-} // namespace pkt::core
+} // namespace pkt::core::player

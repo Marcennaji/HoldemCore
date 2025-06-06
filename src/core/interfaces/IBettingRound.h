@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <core/player/typedefs.h>
 #include "core/engine/EngineDefs.h"
 #include "core/engine/model/GameState.h"
 
@@ -34,8 +35,8 @@ class IBettingRound
     virtual void setCurrentPlayersTurnId(unsigned) = 0;
     virtual unsigned getCurrentPlayersTurnId() const = 0;
 
-    virtual void setCurrentPlayersTurnIt(PlayerListIterator) = 0;
-    virtual PlayerListIterator getCurrentPlayersTurnIt() const = 0;
+    virtual void setCurrentPlayersTurnIt(pkt::core::player::PlayerListIterator) = 0;
+    virtual pkt::core::player::PlayerListIterator getCurrentPlayersTurnIt() const = 0;
 
     virtual void setSmallBlindPositionId(unsigned) = 0;
     virtual unsigned getSmallBlindPositionId() const = 0;

@@ -3,6 +3,7 @@
 #include "StrategyTest.h"
 
 using namespace pkt::core;
+using namespace pkt::core::player;
 
 class TightAggressiveStrategyTest : public StrategyTest
 {

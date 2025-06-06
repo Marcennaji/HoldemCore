@@ -3,7 +3,7 @@
 
 #include <core/player/Player.h>
 
-namespace pkt::core
+namespace pkt::core::player
 {
 // Forward declaration
 class CurrentHandContext;
@@ -53,4 +53,4 @@ class IBotStrategy
     std::vector<int> SB_STARTING_RANGE;
     std::vector<int> BB_STARTING_RANGE;
 };
-} // namespace pkt::core
+} // namespace pkt::core::player

@@ -31,6 +31,7 @@ namespace pkt::core
 {
 
 using namespace std;
+using namespace pkt::core::player;
 
 Game::Game(GameEvents* events, std::shared_ptr<EngineFactory> factory, const PlayerList& playerList,
            const GameData& gameData, const StartData& startData, int gameId, IRankingStore* l,
