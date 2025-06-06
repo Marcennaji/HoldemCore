@@ -876,12 +876,12 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
     // compute winning hands % against my rank
     int nbWinningHands = 0;
 
-    if (opponent->getEstimatedRange().size() == 0)
+    if (opponent->myRangeManager->getEstimatedRange().size() == 0)
     {
         computeEstimatedPreflopRange(opponentId);
     }
 
-    vector<std::string> ranges = myRangeManager->getRangeAtomicValues(opponent->getEstimatedRange());
+    vector<std::string> ranges = myRangeManager->getRangeAtomicValues(opponent->myRangeManager->getEstimatedRange());
 
     vector<std::string> newRanges;
 
@@ -2268,15 +2268,6 @@ int Player::getPreflopPotOdd() const
 void Player::setPreflopPotOdd(const int potOdd)
 {
     myPreflopPotOdd = potOdd;
-}
-
-std::string Player::getEstimatedRange() const
-{
-    return myRangeManager->getEstimatedRange();
-}
-void Player::setEstimatedRange(const std::string range)
-{
-    myRangeManager->setEstimatedRange(range);
 }
 
 bool Player::isInVeryLooseMode(const int nbPlayers) const

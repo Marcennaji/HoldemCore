@@ -3022,7 +3022,7 @@ void GameTableWindow::refreshHandsRanges()
 
             displayText << style << "<b>" << ((*it_c)->getName()) << "</b> : ";
 
-            std::istringstream oss((*it_c)->getEstimatedRange());
+            std::istringstream oss((*it_c)->getRangeManager()->getEstimatedRange());
             std::string singleRange;
 
             while (getline(oss, singleRange, ','))

@@ -165,8 +165,6 @@ class Player
     void setPosition();
     std::string getPositionLabel(PlayerPosition p) const;
 
-    void setEstimatedRange(const std::string);
-
     static bool getHavePosition(PlayerPosition myPos, PlayerList runningPlayers);
 
     void setIsSessionActive(bool active);
@@ -196,7 +194,6 @@ class Player
     const SimResults getHandSimulation() const;
 
     bool isAgressor(const GameState gameState) const;
-    std::string getEstimatedRange() const;
 
     void updateUnplausibleRangesGivenPreflopActions();
     void updateUnplausibleRangesGivenFlopActions();
