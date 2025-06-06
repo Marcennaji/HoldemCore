@@ -26,8 +26,15 @@ class RangeManager
     void setEstimatedRange(const std::string& range);
     std::string getEstimatedRange() const;
     std::vector<std::string> getRangeAtomicValues(std::string range, const bool returnRange = false) const;
+    void computeEstimatedPreflopRange(Player& opponent, int nbPlayers, int lastRaiserID, int preflopRaises,
+                                      const PreflopStatistics& lastRaiserStats);
+    int getStandardRaisingRange(int nbPlayers) const;
+    int getStandardCallingRange(int nbPlayers) const;
 
   private:
+    std::string computeEstimatedPreflopRangeFromLastRaiser(const Player& opponent,
+                                                           const PreflopStatistics& opponentStats,
+                                                           const PreflopStatistics& previousRaiserStats) const;
     char incrementCardValue(char c) const;
 
     std::string myEstimatedRange;

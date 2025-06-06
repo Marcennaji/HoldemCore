@@ -203,10 +203,13 @@ class Player
 
     bool isInVeryLooseMode(const int nbPlayers) const;
 
+    std::unique_ptr<RangeManager>& getRangeManager() { return myRangeManager; }
+    int getPreflopPotOdd() const;
+
   protected:
+    const PreflopStatistics getPreviousRaiserStats(const int opponentId, const PreflopStatistics& opponentStats) const;
     void loadStatistics();
     void resetPlayerStatistics();
-
     float getMaxOpponentsStrengths() const;
     bool isPreflopBigBet() const;
     float getOpponentWinningHandsPercentage(const int idPlayer, std::string board) const;
@@ -217,11 +220,7 @@ class Player
     std::string getHandToRange(const std::string card1, const std::string card2) const;
 
     bool canBluff(const GameState) const;
-    int getPreflopPotOdd() const;
-    int getStandardRaisingRange(int nbPlayers) const;
-    int getStandardCallingRange(int nbPlayers) const;
-    std::string computeEstimatedPreflopRangeFromLastRaiser(const int opponentId,
-                                                           PreflopStatistics& lastRaiserStats) const;
+
     std::string computeEstimatedPreflopRangeFromCaller(const int opponentId, PreflopStatistics& callerStats) const;
 
     bool isUnplausibleHandGivenFlopCheck(const PostFlopState& r, const FlopStatistics& flop);
