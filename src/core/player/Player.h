@@ -214,14 +214,10 @@ class Player
     bool isPreflopBigBet() const;
     float getOpponentWinningHandsPercentage(const int idPlayer, std::string board) const;
     void logUnplausibleHands(GameState g);
-    std::string getFilledRange(std::vector<std::string>& ranges, std::vector<float>& rangesValues,
-                               const float rangeMax) const;
 
     std::string getHandToRange(const std::string card1, const std::string card2) const;
 
     bool canBluff(const GameState) const;
-
-    std::string computeEstimatedPreflopRangeFromCaller(const int opponentId, PreflopStatistics& callerStats) const;
 
     bool isUnplausibleHandGivenFlopCheck(const PostFlopState& r, const FlopStatistics& flop);
     bool isUnplausibleHandGivenFlopBet(const PostFlopState& r, int nbChecks, const FlopStatistics& flop);
