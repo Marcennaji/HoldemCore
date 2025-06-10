@@ -176,7 +176,7 @@ class Player
     bool isAgressor(const GameState gameState) const;
 
     void updateUnplausibleRangesGivenPreflopActions();
-    void updateUnplausibleRangesGivenFlopActions();
+
     void updateUnplausibleRangesGivenTurnActions();
     void updateUnplausibleRangesGivenRiverActions();
     void updateCurrentHandContext(const GameState gameState);
@@ -196,15 +196,6 @@ class Player
     void logUnplausibleHands(GameState g);
 
     bool canBluff(const GameState) const;
-
-    bool isUnplausibleHandGivenFlopCheck(const PostFlopState& r, const FlopStatistics& flop);
-    bool isUnplausibleHandGivenFlopBet(const PostFlopState& r, int nbChecks, const FlopStatistics& flop);
-    bool isUnplausibleHandGivenFlopCall(const PostFlopState& r, int nbRaises, int nbBets, int nbChecks, int nbCalls,
-                                        const FlopStatistics& flop);
-    bool isUnplausibleHandGivenFlopRaise(const PostFlopState& r, int nbRaises, int nbBets, int nbChecks, int nbCalls,
-                                         const FlopStatistics& flop);
-    bool isUnplausibleHandGivenFlopAllin(const PostFlopState& r, int nbRaises, int nbBets, int nbChecks, int nbCalls,
-                                         const FlopStatistics& flop);
 
     bool isUnplausibleHandGivenTurnCheck(const PostFlopState& r, const TurnStatistics&);
     bool isUnplausibleHandGivenTurnBet(const PostFlopState& r, int nbChecks, const TurnStatistics&);
