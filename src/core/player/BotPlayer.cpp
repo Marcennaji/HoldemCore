@@ -103,7 +103,6 @@ void BotPlayer::action()
 
 void BotPlayer::doPreflopAction()
 {
-
     updateCurrentHandContext(GAME_STATE_PREFLOP);
 
 #ifdef LOG_POKER_EXEC
@@ -146,13 +145,13 @@ void BotPlayer::doPreflopAction()
     myCurrentHandActions.m_preflopActions.push_back(myAction);
 
     updatePreflopStatistics();
+    updateCurrentHandContext(GAME_STATE_PREFLOP);
 
     if (myAction != PLAYER_ACTION_FOLD)
         myRangeManager->updateUnplausibleRangesGivenPreflopActions(*myCurrentHandContext);
 }
 void BotPlayer::doFlopAction()
 {
-
     updateCurrentHandContext(GAME_STATE_FLOP);
 
 #ifdef LOG_POKER_EXEC
@@ -238,7 +237,7 @@ void BotPlayer::doTurnAction()
     updateCurrentHandContext(GAME_STATE_TURN);
 
     if (myAction != PLAYER_ACTION_FOLD)
-        updateUnplausibleRangesGivenTurnActions();
+        myRangeManager->updateUnplausibleRangesGivenTurnActions(*myCurrentHandContext);
 }
 void BotPlayer::doRiverAction()
 {
@@ -280,7 +279,7 @@ void BotPlayer::doRiverAction()
     updateCurrentHandContext(GAME_STATE_RIVER);
 
     if (myAction != PLAYER_ACTION_FOLD)
-        updateUnplausibleRangesGivenRiverActions();
+        myRangeManager->updateUnplausibleRangesGivenRiverActions(*myCurrentHandContext);
 }
 void BotPlayer::evaluateBetAmount()
 {

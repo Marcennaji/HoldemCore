@@ -41,14 +41,14 @@ class RangeManager
     std::string getHandToRange(const std::string card1, const std::string card2) const;
     static std::string getStringRange(int nbPlayers, int range);
 
-    void updateUnplausibleRangesGivenPreflopActions(CurrentHandContext& context);
-    void updateUnplausibleRangesGivenFlopActions(CurrentHandContext& context);
-    void updateUnplausibleRangesGivenTurnActions(CurrentHandContext& context);
-    void updateUnplausibleRangesGivenRiverActions(CurrentHandContext& context);
+    void updateUnplausibleRangesGivenPreflopActions(CurrentHandContext&);
+    void updateUnplausibleRangesGivenFlopActions(CurrentHandContext&);
+    void updateUnplausibleRangesGivenTurnActions(CurrentHandContext&);
+    void updateUnplausibleRangesGivenRiverActions(CurrentHandContext&);
 
   private:
-    std::string computeEstimatedPreflopRangeFromLastRaiser(CurrentHandContext& ctx) const;
-    std::string computeEstimatedPreflopRangeFromCaller(CurrentHandContext& ctx) const;
+    std::string computeEstimatedPreflopRangeFromLastRaiser(CurrentHandContext&) const;
+    std::string computeEstimatedPreflopRangeFromCaller(CurrentHandContext&) const;
     char incrementCardValue(char c) const;
     std::string getFilledRange(std::vector<std::string>& ranges, std::vector<float>& rangesValues,
                                const float rangeMax) const;

@@ -2029,14 +2029,14 @@ void GameTableWindow::myActionDone()
             currentHand->setTurnLastRaiserID(humanPlayer->getID());
         humanPlayer->updateTurnStatistics();
         humanPlayer->updateCurrentHandContext(GAME_STATE_TURN);
-        humanPlayer->updateUnplausibleRangesGivenTurnActions();
+        humanPlayer->getRangeManager()->updateUnplausibleRangesGivenTurnActions(humanPlayer->getCurrentHandContext());
     }
     else if (currentState == GAME_STATE_RIVER)
     {
         humanPlayer->getCurrentHandActions().getRiverActions().push_back(humanPlayer->getAction());
         humanPlayer->updateRiverStatistics();
         humanPlayer->updateCurrentHandContext(GAME_STATE_RIVER);
-        humanPlayer->updateUnplausibleRangesGivenRiverActions();
+        humanPlayer->getRangeManager()->updateUnplausibleRangesGivenRiverActions(humanPlayer->getCurrentHandContext());
     }
 
     disableMyButtons();

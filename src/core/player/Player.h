@@ -174,8 +174,6 @@ class Player
 
     bool isAgressor(const GameState gameState) const;
 
-    void updateUnplausibleRangesGivenTurnActions();
-    void updateUnplausibleRangesGivenRiverActions();
     void updateCurrentHandContext(const GameState gameState);
 
     bool isInVeryLooseMode(const int nbPlayers) const;
@@ -193,24 +191,6 @@ class Player
     void logUnplausibleHands(GameState g);
 
     bool canBluff(const GameState) const;
-
-    bool isUnplausibleHandGivenTurnCheck(const PostFlopState& r, const TurnStatistics&);
-    bool isUnplausibleHandGivenTurnBet(const PostFlopState& r, int nbChecks, const TurnStatistics&);
-    bool isUnplausibleHandGivenTurnCall(const PostFlopState& r, int nbRaises, int nbBets, int nbChecks, int nbCalls,
-                                        const TurnStatistics&);
-    bool isUnplausibleHandGivenTurnRaise(const PostFlopState& r, int nbRaises, int nbBets, int nbChecks, int nbCalls,
-                                         const TurnStatistics&);
-    bool isUnplausibleHandGivenTurnAllin(const PostFlopState& r, int nbRaises, int nbBets, int nbChecks, int nbCalls,
-                                         const TurnStatistics&);
-
-    bool isUnplausibleHandGivenRiverCheck(const PostFlopState& r, const RiverStatistics&);
-    bool isUnplausibleHandGivenRiverBet(const PostFlopState& r, int nbChecks, const RiverStatistics&);
-    bool isUnplausibleHandGivenRiverCall(const PostFlopState& r, int nbRaises, int nbBets, int nbChecks, int nbCalls,
-                                         const RiverStatistics&);
-    bool isUnplausibleHandGivenRiverRaise(const PostFlopState& r, int nbRaises, int nbBets, int nbChecks, int nbCalls,
-                                          const RiverStatistics&);
-    bool isUnplausibleHandGivenRiverAllin(const PostFlopState& r, int nbRaises, int nbBets, int nbChecks, int nbCalls,
-                                          const RiverStatistics&);
 
     // attributes
 

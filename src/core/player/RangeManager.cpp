@@ -308,7 +308,6 @@ void RangeManager::computeEstimatedPreflopRange(CurrentHandContext& ctx)
 #endif
 
     PreflopStatistics preflop = ctx.myStatistics.getPreflopStatistics();
-    PreflopStatistics lastRaiserStats = ctx.preflopLastRaiser->getStatistics(ctx.nbPlayers).getPreflopStatistics();
     const int nbPlayers = ctx.nbPlayers;
 
 #ifdef LOG_POKER_EXEC
@@ -345,7 +344,7 @@ void RangeManager::computeEstimatedPreflopRange(CurrentHandContext& ctx)
     string estimatedRange;
 
     // if the player is the last raiser :
-    if (ctx.myID == ctx.preflopLastRaiser->getID())
+    if (ctx.preflopLastRaiser && ctx.myID == ctx.preflopLastRaiser->getID())
         estimatedRange = computeEstimatedPreflopRangeFromLastRaiser(ctx);
     else
         estimatedRange = computeEstimatedPreflopRangeFromCaller(ctx);
@@ -1202,6 +1201,178 @@ void RangeManager::updateUnplausibleRangesGivenFlopActions(CurrentHandContext& c
     if (unplausibleRanges != "")
         cout << "\tRemoving unplausible ranges : " << unplausibleRanges << endl;
     // logUnplausibleHands(GAME_STATE_FLOP);
+#endif
+}
+
+// purpose : remove some unplausible hands, who would normally be in the estimated preflop range
+void RangeManager::updateUnplausibleRangesGivenTurnActions(CurrentHandContext& ctx)
+{
+
+    const int nbPlayers = ctx.nbPlayers;
+    const PlayerStatistics& stats = ctx.myStatistics;
+    const bool bHavePosition = ctx.myHavePosition;
+    const string originalEstimatedRange = getEstimatedRange();
+    string unplausibleRanges;
+
+#ifdef LOG_POKER_EXEC
+    std::cout << endl << "\tPlausible range on turn, before update :\t" << getEstimatedRange() << endl;
+#endif
+
+    // update my unplausible hands (unplausible to my opponents eyes), given what I did on turn
+
+    TurnStatistics turn = stats.getTurnStatistics();
+    PreflopStatistics preflop = stats.getPreflopStatistics();
+
+    if (ctx.myIsInVeryLooseMode)
+    {
+#ifdef LOG_POKER_EXEC
+        std::cout << endl
+                  << "\tSeems to be (temporarily ?) on very loose mode : estimated range is\t" << getEstimatedRange()
+                  << endl;
+#endif
+        return;
+    }
+
+    vector<std::string> ranges = getRangeAtomicValues(getEstimatedRange());
+
+    for (vector<std::string>::const_iterator i = ranges.begin(); i != ranges.end(); i++)
+    {
+
+        string s1 = (*i).substr(0, 2);
+        string s2 = (*i).substr(2, 4);
+
+        std::string stringHand = s1 + " " + s2;
+        PostFlopState r;
+        GetHandState((stringHand + ctx.stringBoard).c_str(), &r);
+
+        bool removeHand = false;
+        PlayerAction myAction = ctx.myCurrentHandActions.getTurnActions().back();
+
+        if (myAction == PLAYER_ACTION_CALL)
+            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenTurnCall(r, ctx);
+        else if (myAction == PLAYER_ACTION_CHECK)
+            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenTurnCheck(r, ctx);
+        else if (myAction == PLAYER_ACTION_RAISE)
+            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenTurnRaise(r, ctx);
+        else if (myAction == PLAYER_ACTION_BET)
+            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenTurnBet(r, ctx);
+        else if (myAction == PLAYER_ACTION_ALLIN)
+            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenTurnAllin(r, ctx);
+
+        if (removeHand)
+        {
+
+            string range = s1 + s2;
+            string newUnplausibleRange = ",";
+            newUnplausibleRange += range;
+            newUnplausibleRange += ",";
+
+            if (unplausibleRanges.find(newUnplausibleRange) == string::npos)
+                unplausibleRanges += newUnplausibleRange;
+        }
+    }
+
+    setEstimatedRange(substractRange(getEstimatedRange(), unplausibleRanges, ctx.stringBoard));
+
+    if (getEstimatedRange() == "")
+    {
+        // keep previous range
+#ifdef LOG_POKER_EXEC
+        cout << "\tCan't remove all plausible ranges, keeping last one" << endl;
+#endif
+        setEstimatedRange(originalEstimatedRange);
+        unplausibleRanges = "";
+    }
+
+#ifdef LOG_POKER_EXEC
+    if (unplausibleRanges != "")
+        cout << "\tRemoving unplausible ranges : " << unplausibleRanges << endl;
+    // logUnplausibleHands(GAME_STATE_TURN);
+#endif
+}
+
+// purpose : remove some unplausible hands, woul would normally be in the estimated preflop range
+void RangeManager::updateUnplausibleRangesGivenRiverActions(CurrentHandContext& ctx)
+{
+
+    const int nbPlayers = ctx.nbPlayers;
+    const PlayerStatistics& stats = ctx.myStatistics;
+    const bool bHavePosition = ctx.myHavePosition;
+    const string originalEstimatedRange = getEstimatedRange();
+    string unplausibleRanges;
+
+#ifdef LOG_POKER_EXEC
+    std::cout << endl << "\tPlausible range on river, before update :\t" << getEstimatedRange() << endl;
+#endif
+
+    // update my unplausible hands (unplausible to my opponents eyes), given what I did on river
+
+    RiverStatistics river = stats.getRiverStatistics();
+
+    PreflopStatistics preflop = stats.getPreflopStatistics();
+
+    if (ctx.myIsInVeryLooseMode)
+    {
+#ifdef LOG_POKER_EXEC
+        std::cout << endl << "\tSeems to be on very loose mode : estimated range is\t" << getEstimatedRange() << endl;
+#endif
+        return;
+    }
+
+    vector<std::string> ranges = getRangeAtomicValues(getEstimatedRange());
+
+    for (vector<std::string>::const_iterator i = ranges.begin(); i != ranges.end(); i++)
+    {
+
+        string s1 = (*i).substr(0, 2);
+        string s2 = (*i).substr(2, 4);
+
+        std::string stringHand = s1 + " " + s2;
+        PostFlopState r;
+        GetHandState((stringHand + ctx.stringBoard).c_str(), &r);
+
+        bool removeHand = false;
+
+        if (ctx.myCurrentHandActions.getRiverActions().back() == PLAYER_ACTION_CALL)
+            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenRiverCall(r, ctx);
+        else if (ctx.myCurrentHandActions.getRiverActions().back() == PLAYER_ACTION_CHECK)
+            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenRiverCheck(r, ctx);
+        else if (ctx.myCurrentHandActions.getRiverActions().back() == PLAYER_ACTION_RAISE)
+            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenRiverRaise(r, ctx);
+        else if (ctx.myCurrentHandActions.getRiverActions().back() == PLAYER_ACTION_BET)
+            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenRiverBet(r, ctx);
+        else if (ctx.myCurrentHandActions.getRiverActions().back() == PLAYER_ACTION_ALLIN)
+            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenRiverAllin(r, ctx);
+
+        if (removeHand)
+        {
+
+            string range = s1 + s2;
+            string newUnplausibleRange = ",";
+            newUnplausibleRange += range;
+            newUnplausibleRange += ",";
+
+            if (unplausibleRanges.find(newUnplausibleRange) == string::npos)
+                unplausibleRanges += newUnplausibleRange;
+        }
+    }
+
+    setEstimatedRange(substractRange(getEstimatedRange(), unplausibleRanges, ctx.stringBoard));
+
+    if (getEstimatedRange() == "")
+    {
+        // keep previous range
+#ifdef LOG_POKER_EXEC
+        cout << "\tCan't remove all plausible ranges, keeping last one" << endl;
+#endif
+        setEstimatedRange(originalEstimatedRange);
+        unplausibleRanges = "";
+    }
+
+#ifdef LOG_POKER_EXEC
+    if (unplausibleRanges != "")
+        cout << "\tRemoving unplausible ranges : " << unplausibleRanges << endl;
+    // logUnplausibleHands(GAME_STATE_RIVER);
 #endif
 }
 
