@@ -39,6 +39,7 @@ namespace pkt::core
 class IHand;
 class IHandAuditStore;
 class IPlayersStatisticsStore;
+struct CurrentHandContext;
 
 } // namespace pkt::core
 
@@ -52,7 +53,6 @@ enum PlayerType
 };
 
 class IBotStrategy;
-class CurrentHandContext;
 
 static const char* TightAggressiveBotStrategyName[] = {"Tintin",  "Tonio", "Theo",  "Ted",  "Thor",
                                                        "Taslima", "Tina",  "Tania", "Tata", "Timmy"};
@@ -152,6 +152,9 @@ class Player
     float getM() const;
 
     const PlayerStatistics& getStatistics(const int nbPlayers) const;
+    CurrentHandContext& getCurrentHandContext() { return *myCurrentHandContext; };
+
+    virtual float getPreflopCallingRange(CurrentHandContext& context, bool deterministic = false) const;
 
     const PostFlopState getPostFlopState() const;
     CurrentHandActions& getCurrentHandActions();
@@ -176,6 +179,7 @@ class Player
     void updateUnplausibleRangesGivenFlopActions();
     void updateUnplausibleRangesGivenTurnActions();
     void updateUnplausibleRangesGivenRiverActions();
+    void updateCurrentHandContext(const GameState gameState);
 
     bool isInVeryLooseMode(const int nbPlayers) const;
 
@@ -228,6 +232,7 @@ class Player
     GameEvents* myEvents;
 
     CurrentHandActions myCurrentHandActions;
+    std::unique_ptr<CurrentHandContext> myCurrentHandContext;
 
     // const
     int myID;

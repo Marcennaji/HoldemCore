@@ -19,7 +19,7 @@
 #pragma once
 
 #include "Player.h"
-#include "core/player/strategy/CurrentHandContext.h"
+
 #include "core/player/strategy/IBotStrategy.h"
 
 namespace pkt::core::player
@@ -40,16 +40,16 @@ class BotPlayer : public Player
     void doTurnAction();
     void doRiverAction();
 
+    float getPreflopCallingRange(CurrentHandContext& context, bool deterministic) const override;
+
   private:
     void evaluateBetAmount();
-    void updateCurrentHandContext(const GameState gameState);
 
     std::unique_ptr<IBotStrategy> myStrategy;
     GameState myCurrentGameState = GAME_STATE_NONE;
     int myCurrentHandID = 0;
     int myBetAmount = 0;
     int myRaiseAmount = 0;
-    CurrentHandContext myCurrentHandContext;
 };
 
 } // namespace pkt::core::player

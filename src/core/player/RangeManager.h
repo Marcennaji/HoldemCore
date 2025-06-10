@@ -22,6 +22,7 @@ struct RiverStatistics;
 namespace pkt::core::player
 {
 class Player;
+struct CurrentHandContext;
 
 class RangeManager
 {
@@ -40,6 +41,8 @@ class RangeManager
                                const std::string board = "");
     std::string getHandToRange(const std::string card1, const std::string card2) const;
     static std::string getStringRange(int nbPlayers, int range);
+
+    void updateUnplausibleRangesGivenFlopActions(CurrentHandContext& context);
 
   private:
     std::string computeEstimatedPreflopRangeFromLastRaiser(const Player& opponent,

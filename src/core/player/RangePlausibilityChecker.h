@@ -33,8 +33,6 @@ class RangePlausibilityChecker
     static bool isUnplausibleHandGivenRiverCall(const PostFlopState& testedHand, CurrentHandContext& context);
     static bool isUnplausibleHandGivenRiverRaise(const PostFlopState& testedHand, CurrentHandContext& context);
     static bool isUnplausibleHandGivenRiverAllin(const PostFlopState& testedHand, CurrentHandContext& context);
-
-    static bool boardHasHeavyDrawPotential(const std::string& board);
 };
 
 } // namespace pkt::core::player

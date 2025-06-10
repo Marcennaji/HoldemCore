@@ -2006,6 +2006,7 @@ void GameTableWindow::myActionDone()
         if (humanPlayer->getAction() == PLAYER_ACTION_RAISE || humanPlayer->getAction() == PLAYER_ACTION_ALLIN)
             currentHand->setPreflopLastRaiserID(humanPlayer->getID());
         humanPlayer->updatePreflopStatistics();
+        humanPlayer->updateCurrentHandContext(GAME_STATE_PREFLOP);
         if (humanPlayer->getAction() != PLAYER_ACTION_FOLD)
             humanPlayer->updateUnplausibleRangesGivenPreflopActions();
     }
@@ -2016,7 +2017,8 @@ void GameTableWindow::myActionDone()
             humanPlayer->getAction() == PLAYER_ACTION_ALLIN)
             currentHand->setFlopLastRaiserID(humanPlayer->getID());
         humanPlayer->updateFlopStatistics();
-        humanPlayer->updateUnplausibleRangesGivenFlopActions();
+        humanPlayer->updateCurrentHandContext(GAME_STATE_FLOP);
+        humanPlayer->getRangeManager()->updateUnplausibleRangesGivenFlopActions(humanPlayer->getCurrentHandContext());
     }
     else if (currentState == GAME_STATE_TURN)
     {
@@ -2025,12 +2027,14 @@ void GameTableWindow::myActionDone()
             humanPlayer->getAction() == PLAYER_ACTION_ALLIN)
             currentHand->setTurnLastRaiserID(humanPlayer->getID());
         humanPlayer->updateTurnStatistics();
+        humanPlayer->updateCurrentHandContext(GAME_STATE_TURN);
         humanPlayer->updateUnplausibleRangesGivenTurnActions();
     }
     else if (currentState == GAME_STATE_RIVER)
     {
         humanPlayer->getCurrentHandActions().getRiverActions().push_back(humanPlayer->getAction());
         humanPlayer->updateRiverStatistics();
+        humanPlayer->updateCurrentHandContext(GAME_STATE_RIVER);
         humanPlayer->updateUnplausibleRangesGivenRiverActions();
     }
 

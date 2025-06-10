@@ -25,6 +25,7 @@
 #include <core/interfaces/ILogger.h>
 #include <core/interfaces/persistence/IHandAuditStore.h>
 #include <core/interfaces/persistence/IPlayersStatisticsStore.h>
+#include <core/player/strategy/CurrentHandContext.h>
 #include <third_party/psim/psim.hpp>
 #include "Helpers.h"
 
@@ -43,6 +44,7 @@ Player::Player(GameEvents* events, IHandAuditStore* ha, IPlayersStatisticsStore*
       myEvents(events)
 {
     myRangeManager = std::make_unique<RangeManager>(myID, myPlayersStatisticsStore);
+    myCurrentHandContext = std::make_unique<CurrentHandContext>();
     loadStatistics();
 
     int i;
@@ -2253,6 +2255,83 @@ bool Player::isInVeryLooseMode(const int nbPlayers) const
         return true;
     else
         return false;
+}
+
+void Player::updateCurrentHandContext(const GameState state)
+{
+
+    // Shared game state
+    myCurrentHandContext->gameState = state;
+
+    myCurrentHandContext->nbRunningPlayers = currentHand->getRunningPlayerList()->size();
+    myCurrentHandContext->lastVPIPPlayer = getPlayerByUniqueId(currentHand->getLastRaiserID());
+
+    myCurrentHandContext->callersPositions = currentHand->getCallersPositions();
+    myCurrentHandContext->pot = currentHand->getBoard()->getPot();
+    myCurrentHandContext->potOdd = getPotOdd();
+    myCurrentHandContext->sets = currentHand->getBoard()->getSets();
+    myCurrentHandContext->highestSet = currentHand->getCurrentBettingRound()->getHighestSet();
+
+    myCurrentHandContext->stringBoard = getStringBoard();
+
+    // Player-specific
+
+    myCurrentHandContext->myCash = myCash;
+    myCurrentHandContext->mySet = mySet;
+    myCurrentHandContext->myM = static_cast<int>(getM());
+    myCurrentHandContext->myCurrentHandActions = myCurrentHandActions;
+    myCurrentHandContext->myCanBluff = canBluff(state);
+    myCurrentHandContext->myHavePosition = Player::getHavePosition(myPosition, currentHand->getRunningPlayerList());
+    myCurrentHandContext->isPreflopBigBet = isPreflopBigBet();
+    myCurrentHandContext->myPreflopIsAggressor = isAgressor(GAME_STATE_PREFLOP);
+    myCurrentHandContext->preflopLastRaiser = getPlayerByUniqueId(currentHand->getPreflopLastRaiserID());
+    myCurrentHandContext->preflopRaisesNumber = currentHand->getPreflopRaisesNumber();
+    myCurrentHandContext->preflopCallsNumber = currentHand->getPreflopCallsNumber();
+
+    for (std::vector<PlayerAction>::const_iterator i = myCurrentHandActions.m_flopActions.begin();
+         i != myCurrentHandActions.m_flopActions.end(); i++)
+    {
+
+        if (*i == PLAYER_ACTION_RAISE)
+            myCurrentHandContext->nbRaises++;
+        else if (*i == PLAYER_ACTION_BET)
+            myCurrentHandContext->nbBets++;
+        else if (*i == PLAYER_ACTION_CHECK)
+            myCurrentHandContext->nbChecks++;
+        else if (*i == PLAYER_ACTION_CALL)
+            myCurrentHandContext->nbCalls++;
+        else if (*i == PLAYER_ACTION_ALLIN)
+            myCurrentHandContext->nbAllins++;
+    }
+
+    myCurrentHandContext->myPostFlopState = getPostFlopState();
+
+    myCurrentHandContext->myFlopIsAggressor = isAgressor(GAME_STATE_FLOP);
+    myCurrentHandContext->flopBetsOrRaisesNumber = currentHand->getFlopBetsOrRaisesNumber();
+    myCurrentHandContext->flopLastRaiser = getPlayerByUniqueId(currentHand->getFlopLastRaiserID());
+
+    myCurrentHandContext->myTurnIsAggressor = isAgressor(GAME_STATE_TURN);
+    myCurrentHandContext->turnBetsOrRaisesNumber = currentHand->getTurnBetsOrRaisesNumber();
+    myCurrentHandContext->turnLastRaiser = getPlayerByUniqueId(currentHand->getTurnLastRaiserID());
+
+    myCurrentHandContext->myRiverIsAggressor = isAgressor(GAME_STATE_RIVER);
+    myCurrentHandContext->riverBetsOrRaisesNumber = currentHand->getRiverBetsOrRaisesNumber();
+
+    myCurrentHandContext->myStatistics = getStatistics(currentHand->getActivePlayerList()->size());
+    myCurrentHandContext->myPreflopCallingRange = getPreflopCallingRange(*myCurrentHandContext);
+    myCurrentHandContext->myHandSimulation = getHandSimulation();
+    myCurrentHandContext->myID = myID;
+    myCurrentHandContext->myCard1 = myCard1;
+    myCurrentHandContext->myCard2 = myCard2;
+    myCurrentHandContext->myIsInVeryLooseMode = isInVeryLooseMode(currentHand->getActivePlayerList()->size());
+    myCurrentHandContext->myPosition = myPosition;
+    myCurrentHandContext->nbPlayers = currentHand->getActivePlayerList()->size();
+    myCurrentHandContext->smallBlind = currentHand->getSmallBlind();
+}
+
+float Player::getPreflopCallingRange(CurrentHandContext& context, bool deterministic) const
+{
+    return myRangeManager->getStandardCallingRange(currentHand->getActivePlayerList()->size());
 }
 
 } // namespace pkt::core::player

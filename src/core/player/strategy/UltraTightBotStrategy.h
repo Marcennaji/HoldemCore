@@ -21,7 +21,7 @@
 namespace pkt::core::player
 {
 // Forward declaration
-class CurrentHandContext;
+struct CurrentHandContext;
 class UltraTightBotStrategy : public IBotStrategy
 {
 

@@ -18,6 +18,7 @@
 #include "BotPlayer.h"
 #include <core/player/strategy/CurrentHandContext.h>
 #include <core/player/strategy/IBotStrategy.h>
+#include "core/player/strategy/CurrentHandContext.h"
 
 #ifndef max
 #define max(a, b) (((a) > (b)) ? (a) : (b))
@@ -35,78 +36,6 @@ BotPlayer::BotPlayer(GameEvents* events, IHandAuditStore* ha, IPlayersStatistics
 
 BotPlayer::~BotPlayer()
 {
-}
-
-void BotPlayer::updateCurrentHandContext(const GameState state)
-{
-
-    // Shared game state
-    myCurrentHandContext.gameState = state;
-
-    myCurrentHandContext.nbRunningPlayers = currentHand->getRunningPlayerList()->size();
-    myCurrentHandContext.lastVPIPPlayer = getPlayerByUniqueId(currentHand->getLastRaiserID());
-
-    myCurrentHandContext.callersPositions = currentHand->getCallersPositions();
-    myCurrentHandContext.pot = currentHand->getBoard()->getPot();
-    myCurrentHandContext.potOdd = getPotOdd();
-    myCurrentHandContext.sets = currentHand->getBoard()->getSets();
-    myCurrentHandContext.highestSet = currentHand->getCurrentBettingRound()->getHighestSet();
-
-    myCurrentHandContext.stringBoard = getStringBoard();
-
-    // Player-specific
-
-    myCurrentHandContext.myCash = myCash;
-    myCurrentHandContext.mySet = mySet;
-    myCurrentHandContext.myM = static_cast<int>(getM());
-    myCurrentHandContext.myCurrentHandActions = myCurrentHandActions;
-    myCurrentHandContext.myCanBluff = canBluff(state);
-    myCurrentHandContext.myHavePosition = Player::getHavePosition(myPosition, currentHand->getRunningPlayerList());
-    myCurrentHandContext.isPreflopBigBet = isPreflopBigBet();
-    myCurrentHandContext.myPreflopIsAggressor = isAgressor(GAME_STATE_PREFLOP);
-    myCurrentHandContext.preflopLastRaiser = getPlayerByUniqueId(currentHand->getPreflopLastRaiserID());
-    myCurrentHandContext.preflopRaisesNumber = currentHand->getPreflopRaisesNumber();
-    myCurrentHandContext.preflopCallsNumber = currentHand->getPreflopCallsNumber();
-
-    for (std::vector<PlayerAction>::const_iterator i = myCurrentHandActions.m_flopActions.begin();
-         i != myCurrentHandActions.m_flopActions.end(); i++)
-    {
-
-        if (*i == PLAYER_ACTION_RAISE)
-            myCurrentHandContext.nbRaises++;
-        else if (*i == PLAYER_ACTION_BET)
-            myCurrentHandContext.nbBets++;
-        else if (*i == PLAYER_ACTION_CHECK)
-            myCurrentHandContext.nbChecks++;
-        else if (*i == PLAYER_ACTION_CALL)
-            myCurrentHandContext.nbCalls++;
-        else if (*i == PLAYER_ACTION_ALLIN)
-            myCurrentHandContext.nbAllins++;
-    }
-
-    myCurrentHandContext.myPostFlopState = getPostFlopState();
-
-    myCurrentHandContext.myFlopIsAggressor = isAgressor(GAME_STATE_FLOP);
-    myCurrentHandContext.flopBetsOrRaisesNumber = currentHand->getFlopBetsOrRaisesNumber();
-    myCurrentHandContext.flopLastRaiser = getPlayerByUniqueId(currentHand->getFlopLastRaiserID());
-
-    myCurrentHandContext.myTurnIsAggressor = isAgressor(GAME_STATE_TURN);
-    myCurrentHandContext.turnBetsOrRaisesNumber = currentHand->getTurnBetsOrRaisesNumber();
-    myCurrentHandContext.turnLastRaiser = getPlayerByUniqueId(currentHand->getTurnLastRaiserID());
-
-    myCurrentHandContext.myRiverIsAggressor = isAgressor(GAME_STATE_RIVER);
-    myCurrentHandContext.riverBetsOrRaisesNumber = currentHand->getRiverBetsOrRaisesNumber();
-
-    myCurrentHandContext.myStatistics = getStatistics(currentHand->getActivePlayerList()->size());
-    myCurrentHandContext.myPreflopCallingRange = myStrategy->getPreflopCallingRange(myCurrentHandContext);
-    myCurrentHandContext.myHandSimulation = getHandSimulation();
-    myCurrentHandContext.myID = myID;
-    myCurrentHandContext.myCard1 = myCard1;
-    myCurrentHandContext.myCard2 = myCard2;
-    myCurrentHandContext.myIsInVeryLooseMode = isInVeryLooseMode(currentHand->getActivePlayerList()->size());
-    myCurrentHandContext.myPosition = myPosition;
-    myCurrentHandContext.nbPlayers = currentHand->getActivePlayerList()->size();
-    myCurrentHandContext.smallBlind = currentHand->getSmallBlind();
 }
 
 void BotPlayer::action()
@@ -182,12 +111,12 @@ void BotPlayer::doPreflopAction()
          << "\t" << getPositionLabel(myPosition) << "\t" << myName << "\t" << getCardsValueString() << "\t"
          << "stack = " << myCash << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
          << "\tpreflop raise : "
-         << getStatistics(myCurrentHandContext.nbPlayers).getPreflopStatistics().getPreflopRaise() << " % " << endl;
+         << getStatistics(myCurrentHandContext->nbPlayers).getPreflopStatistics().getPreflopRaise() << " % " << endl;
 #endif
 
     myBetAmount = 0;
-    bool shouldCall = myStrategy->preflopShouldCall(myCurrentHandContext);
-    myRaiseAmount = myStrategy->preflopShouldRaise(myCurrentHandContext);
+    bool shouldCall = myStrategy->preflopShouldCall(*myCurrentHandContext);
+    myRaiseAmount = myStrategy->preflopShouldRaise(*myCurrentHandContext);
 
     myPreflopPotOdd = getPotOdd();
 
@@ -230,13 +159,13 @@ void BotPlayer::doFlopAction()
     cout << endl
          << "\t" << getPositionLabel(myPosition) << "\t" << myName << "\t" << getCardsValueString() << "\t"
          << "stack = " << myCash << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
-         << "\tPFR : " << getStatistics(myCurrentHandContext.nbPlayers).getPreflopStatistics().getPreflopRaise()
+         << "\tPFR : " << getStatistics(myCurrentHandContext->nbPlayers).getPreflopStatistics().getPreflopRaise()
          << endl;
 #endif
 
-    myBetAmount = myStrategy->flopShouldBet(myCurrentHandContext);
-    bool shouldCall = myBetAmount ? false : myStrategy->flopShouldCall(myCurrentHandContext);
-    myRaiseAmount = myBetAmount ? false : myStrategy->flopShouldRaise(myCurrentHandContext);
+    myBetAmount = myStrategy->flopShouldBet(*myCurrentHandContext);
+    bool shouldCall = myBetAmount ? false : myStrategy->flopShouldCall(*myCurrentHandContext);
+    myRaiseAmount = myBetAmount ? false : myStrategy->flopShouldRaise(*myCurrentHandContext);
 
     if (myRaiseAmount)
         shouldCall = false;
@@ -261,9 +190,10 @@ void BotPlayer::doFlopAction()
     myCurrentHandActions.m_flopActions.push_back(myAction);
 
     updateFlopStatistics();
+    updateCurrentHandContext(GAME_STATE_FLOP);
 
     if (myAction != PLAYER_ACTION_FOLD)
-        updateUnplausibleRangesGivenFlopActions();
+        myRangeManager->updateUnplausibleRangesGivenFlopActions(*myCurrentHandContext);
 }
 void BotPlayer::doTurnAction()
 {
@@ -274,13 +204,13 @@ void BotPlayer::doTurnAction()
     cout << endl
          << "\t" << getPositionLabel(myPosition) << "\t" << myName << "\t" << getCardsValueString() << "\t"
          << "stack = " << myCash << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
-         << "\tPFR : " << getStatistics(myCurrentHandContext.nbPlayers).getPreflopStatistics().getPreflopRaise()
+         << "\tPFR : " << getStatistics(myCurrentHandContext->nbPlayers).getPreflopStatistics().getPreflopRaise()
          << endl;
 #endif
 
-    myBetAmount = myStrategy->turnShouldBet(myCurrentHandContext);
-    bool shouldCall = myBetAmount ? false : myStrategy->turnShouldCall(myCurrentHandContext);
-    myRaiseAmount = myBetAmount ? false : myStrategy->turnShouldRaise(myCurrentHandContext);
+    myBetAmount = myStrategy->turnShouldBet(*myCurrentHandContext);
+    bool shouldCall = myBetAmount ? false : myStrategy->turnShouldCall(*myCurrentHandContext);
+    myRaiseAmount = myBetAmount ? false : myStrategy->turnShouldRaise(*myCurrentHandContext);
 
     if (myRaiseAmount)
         shouldCall = false;
@@ -305,6 +235,7 @@ void BotPlayer::doTurnAction()
     myCurrentHandActions.m_turnActions.push_back(myAction);
 
     updateTurnStatistics();
+    updateCurrentHandContext(GAME_STATE_TURN);
 
     if (myAction != PLAYER_ACTION_FOLD)
         updateUnplausibleRangesGivenTurnActions();
@@ -318,13 +249,13 @@ void BotPlayer::doRiverAction()
     cout << endl
          << "\t" << getPositionLabel(myPosition) << "\t" << myName << "\t" << getCardsValueString() << "\t"
          << "stack = " << myCash << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
-         << "\tPFR : " << getStatistics(myCurrentHandContext.nbPlayers).getPreflopStatistics().getPreflopRaise()
+         << "\tPFR : " << getStatistics(myCurrentHandContext->nbPlayers).getPreflopStatistics().getPreflopRaise()
          << endl;
 #endif
 
-    myBetAmount = myStrategy->riverShouldBet(myCurrentHandContext);
-    bool shouldCall = myBetAmount ? false : myStrategy->riverShouldCall(myCurrentHandContext);
-    myRaiseAmount = myBetAmount ? false : myStrategy->riverShouldRaise(myCurrentHandContext);
+    myBetAmount = myStrategy->riverShouldBet(*myCurrentHandContext);
+    bool shouldCall = myBetAmount ? false : myStrategy->riverShouldCall(*myCurrentHandContext);
+    myRaiseAmount = myBetAmount ? false : myStrategy->riverShouldRaise(*myCurrentHandContext);
 
     if (myRaiseAmount)
         shouldCall = false;
@@ -346,6 +277,7 @@ void BotPlayer::doRiverAction()
     myCurrentHandActions.m_riverActions.push_back(myAction);
 
     updateRiverStatistics();
+    updateCurrentHandContext(GAME_STATE_RIVER);
 
     if (myAction != PLAYER_ACTION_FOLD)
         updateUnplausibleRangesGivenRiverActions();
@@ -481,6 +413,11 @@ void BotPlayer::evaluateBetAmount()
     }
 
     currentHand->getCurrentBettingRound()->setHighestSet(highestSet);
+}
+
+float BotPlayer::getPreflopCallingRange(CurrentHandContext& context, bool deterministic) const
+{
+    return myStrategy->getPreflopCallingRange(context, deterministic);
 }
 
 } // namespace pkt::core::player

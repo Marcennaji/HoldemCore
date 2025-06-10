@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 #include "HumanPlayer.h"
+#include <core/player/strategy/CurrentHandContext.h>
 
 #ifndef max
 #define max(a, b) (((a) > (b)) ? (a) : (b))
