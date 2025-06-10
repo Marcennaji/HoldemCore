@@ -2008,7 +2008,8 @@ void GameTableWindow::myActionDone()
         humanPlayer->updatePreflopStatistics();
         humanPlayer->updateCurrentHandContext(GAME_STATE_PREFLOP);
         if (humanPlayer->getAction() != PLAYER_ACTION_FOLD)
-            humanPlayer->updateUnplausibleRangesGivenPreflopActions();
+            humanPlayer->getRangeManager()->updateUnplausibleRangesGivenPreflopActions(
+                humanPlayer->getCurrentHandContext());
     }
     else if (currentState == GAME_STATE_FLOP)
     {

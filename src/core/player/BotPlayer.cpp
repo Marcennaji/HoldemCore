@@ -148,7 +148,7 @@ void BotPlayer::doPreflopAction()
     updatePreflopStatistics();
 
     if (myAction != PLAYER_ACTION_FOLD)
-        updateUnplausibleRangesGivenPreflopActions();
+        myRangeManager->updateUnplausibleRangesGivenPreflopActions(*myCurrentHandContext);
 }
 void BotPlayer::doFlopAction()
 {

@@ -174,8 +174,6 @@ class Player
 
     bool isAgressor(const GameState gameState) const;
 
-    void updateUnplausibleRangesGivenPreflopActions();
-
     void updateUnplausibleRangesGivenTurnActions();
     void updateUnplausibleRangesGivenRiverActions();
     void updateCurrentHandContext(const GameState gameState);

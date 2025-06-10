@@ -906,48 +906,6 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
     return (float) nbWinningHands / (float) newRanges.size();
 }
 
-// purpose : remove some unplausible hands (to my opponents eyes), given what I did preflop
-void Player::updateUnplausibleRangesGivenPreflopActions()
-{
-    getRangeManager()->computeEstimatedPreflopRange(*myCurrentHandContext);
-    const string originalEstimatedRange = myRangeManager->getEstimatedRange();
-
-#ifdef LOG_POKER_EXEC
-    std::cout << endl
-              << "\tPlausible range on preflop for player " << myID << " :\t" << myRangeManager->getEstimatedRange()
-              << endl;
-#endif
-
-    const int nbPlayers = currentHand->getActivePlayerList()->size();
-
-    PreflopStatistics stats = getStatistics(nbPlayers).getPreflopStatistics();
-
-    // if not enough hands, then try to use the statistics collected for (nbPlayers + 1), they should be more accurate
-    if (stats.m_hands < MIN_HANDS_STATISTICS_ACCURATE && nbPlayers < 10 &&
-        getStatistics(nbPlayers + 1).getPreflopStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE)
-        stats = getStatistics(nbPlayers + 1).getPreflopStatistics();
-
-    // if no raise and the BB checks :
-    if (getCurrentHandActions().getPreflopActions().back() == PLAYER_ACTION_CHECK)
-    {
-
-        if (stats.m_hands >= MIN_HANDS_STATISTICS_ACCURATE)
-            myRangeManager->setEstimatedRange(myRangeManager->substractRange(
-                myRangeManager->getEstimatedRange(), RangeManager::getStringRange(nbPlayers, stats.getPreflopRaise())));
-        else
-            myRangeManager->setEstimatedRange(myRangeManager->substractRange(
-                myRangeManager->getEstimatedRange(),
-                RangeManager::getStringRange(nbPlayers, myRangeManager->getStandardRaisingRange(nbPlayers))));
-    }
-
-    if (myRangeManager->getEstimatedRange() == "")
-        myRangeManager->setEstimatedRange(originalEstimatedRange);
-
-#ifdef LOG_POKER_EXEC
-    logUnplausibleHands(GAME_STATE_PREFLOP);
-#endif
-}
-
 // purpose : remove some unplausible hands, who would normally be in the estimated preflop range
 void Player::updateUnplausibleRangesGivenTurnActions()
 {
