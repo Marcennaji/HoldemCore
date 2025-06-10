@@ -16,23 +16,25 @@ class CurrentHandActions;
 class RangePlausibilityChecker
 {
   public:
-    bool isUnplausibleHandGivenFlopCheck(CurrentHandContext& context);
-    bool isUnplausibleHandGivenFlopBet(CurrentHandContext& context);
-    bool isUnplausibleHandGivenFlopCall(CurrentHandContext& context);
-    bool isUnplausibleHandGivenFlopRaise(CurrentHandContext& context);
-    bool isUnplausibleHandGivenFlopAllin(CurrentHandContext& context);
+    static bool isUnplausibleHandGivenFlopCheck(const PostFlopState& testedHand, CurrentHandContext& context);
+    static bool isUnplausibleHandGivenFlopBet(const PostFlopState& testedHand, CurrentHandContext& context);
+    static bool isUnplausibleHandGivenFlopCall(const PostFlopState& testedHand, CurrentHandContext& context);
+    static bool isUnplausibleHandGivenFlopRaise(const PostFlopState& testedHand, CurrentHandContext& context);
+    static bool isUnplausibleHandGivenFlopAllin(const PostFlopState& testedHand, CurrentHandContext& context);
 
-    bool isUnplausibleHandGivenTurnCheck(CurrentHandContext& context);
-    bool isUnplausibleHandGivenTurnBet(CurrentHandContext& context);
-    bool isUnplausibleHandGivenTurnCall(CurrentHandContext& context);
-    bool isUnplausibleHandGivenTurnRaise(CurrentHandContext& context);
-    bool isUnplausibleHandGivenTurnAllin(CurrentHandContext& context);
+    static bool isUnplausibleHandGivenTurnCheck(const PostFlopState& testedHand, CurrentHandContext& context);
+    static bool isUnplausibleHandGivenTurnBet(const PostFlopState& testedHand, CurrentHandContext& context);
+    static bool isUnplausibleHandGivenTurnCall(const PostFlopState& testedHand, CurrentHandContext& context);
+    static bool isUnplausibleHandGivenTurnRaise(const PostFlopState& testedHand, CurrentHandContext& context);
+    static bool isUnplausibleHandGivenTurnAllin(const PostFlopState& testedHand, CurrentHandContext& context);
 
-    bool isUnplausibleHandGivenRiverCheck(CurrentHandContext& context);
-    bool isUnplausibleHandGivenRiverBet(CurrentHandContext& context);
-    bool isUnplausibleHandGivenRiverCall(CurrentHandContext& context);
-    bool isUnplausibleHandGivenRiverRaise(CurrentHandContext& context);
-    bool isUnplausibleHandGivenRiverAllin(CurrentHandContext& context);
+    static bool isUnplausibleHandGivenRiverCheck(const PostFlopState& testedHand, CurrentHandContext& context);
+    static bool isUnplausibleHandGivenRiverBet(const PostFlopState& testedHand, CurrentHandContext& context);
+    static bool isUnplausibleHandGivenRiverCall(const PostFlopState& testedHand, CurrentHandContext& context);
+    static bool isUnplausibleHandGivenRiverRaise(const PostFlopState& testedHand, CurrentHandContext& context);
+    static bool isUnplausibleHandGivenRiverAllin(const PostFlopState& testedHand, CurrentHandContext& context);
+
+    static bool boardHasHeavyDrawPotential(const std::string& board);
 };
 
 } // namespace pkt::core::player

@@ -68,6 +68,22 @@ void BotPlayer::updateCurrentHandContext(const GameState state)
     myCurrentHandContext.preflopRaisesNumber = currentHand->getPreflopRaisesNumber();
     myCurrentHandContext.preflopCallsNumber = currentHand->getPreflopCallsNumber();
 
+    for (std::vector<PlayerAction>::const_iterator i = myCurrentHandActions.m_flopActions.begin();
+         i != myCurrentHandActions.m_flopActions.end(); i++)
+    {
+
+        if (*i == PLAYER_ACTION_RAISE)
+            myCurrentHandContext.nbRaises++;
+        else if (*i == PLAYER_ACTION_BET)
+            myCurrentHandContext.nbBets++;
+        else if (*i == PLAYER_ACTION_CHECK)
+            myCurrentHandContext.nbChecks++;
+        else if (*i == PLAYER_ACTION_CALL)
+            myCurrentHandContext.nbCalls++;
+        else if (*i == PLAYER_ACTION_ALLIN)
+            myCurrentHandContext.nbAllins++;
+    }
+
     myCurrentHandContext.myPostFlopState = getPostFlopState();
 
     myCurrentHandContext.myFlopIsAggressor = isAgressor(GAME_STATE_FLOP);
@@ -81,10 +97,13 @@ void BotPlayer::updateCurrentHandContext(const GameState state)
     myCurrentHandContext.myRiverIsAggressor = isAgressor(GAME_STATE_RIVER);
     myCurrentHandContext.riverBetsOrRaisesNumber = currentHand->getRiverBetsOrRaisesNumber();
 
+    myCurrentHandContext.myStatistics = getStatistics(currentHand->getActivePlayerList()->size());
+    myCurrentHandContext.myPreflopCallingRange = myStrategy->getPreflopCallingRange(myCurrentHandContext);
     myCurrentHandContext.myHandSimulation = getHandSimulation();
     myCurrentHandContext.myID = myID;
     myCurrentHandContext.myCard1 = myCard1;
     myCurrentHandContext.myCard2 = myCard2;
+    myCurrentHandContext.myIsInVeryLooseMode = isInVeryLooseMode(currentHand->getActivePlayerList()->size());
     myCurrentHandContext.myPosition = myPosition;
     myCurrentHandContext.nbPlayers = currentHand->getActivePlayerList()->size();
     myCurrentHandContext.smallBlind = currentHand->getSmallBlind();

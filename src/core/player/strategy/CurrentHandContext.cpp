@@ -12,6 +12,11 @@ void CurrentHandContext::reset()
     flopBetsOrRaisesNumber = 0;
     turnBetsOrRaisesNumber = 0;
     riverBetsOrRaisesNumber = 0;
+    nbChecks = 0;
+    nbRaises = 0;
+    nbBets = 0;
+    nbAllins = 0;
+    nbCalls = 0;
     nbPlayers = 0;
     nbRunningPlayers = 0;
     preflopLastRaiser = nullptr;
@@ -37,7 +42,9 @@ void CurrentHandContext::reset()
     myCard2.clear();
     myPosition = PlayerPosition::UNKNOWN;
     myCurrentHandActions = CurrentHandActions{};
+    myStatistics = PlayerStatistics{};
     myCanBluff = false;
+    myIsInVeryLooseMode = false; // true if the player is in very loose mode (e.g. playing a lot of hands)
     myHavePosition = false;
     myPreflopIsAggressor = false;
     myFlopIsAggressor = false;

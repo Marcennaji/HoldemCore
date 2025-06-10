@@ -13,6 +13,11 @@ struct CurrentHandContext
 
     // data that is common to all players
     GameState gameState = GAME_STATE_NONE; // current game state, e.g. PREFLOP, FLOP, TURN, RIVER, SHOWDOWN
+    int nbChecks = 0;                      // number of checks in the current betting round
+    int nbRaises = 0;                      // number of raises in the current betting round
+    int nbBets = 0;                        // number of bets in the current betting round
+    int nbAllins = 0;                      // number of all-ins in the current betting round
+    int nbCalls = 0;                       // number of calls in the current betting round
     int preflopRaisesNumber = 0;
     int preflopCallsNumber = 0;
     int flopBetsOrRaisesNumber = 0; // including allins
@@ -44,12 +49,14 @@ struct CurrentHandContext
     std::string myCard2 = "";
     PlayerPosition myPosition = PlayerPosition::UNKNOWN;
     CurrentHandActions myCurrentHandActions;
+    PlayerStatistics myStatistics{};
     bool myCanBluff = false;     // true if the player can bluff in the current betting round
     bool myHavePosition = false; // true if the player is last to act in the current betting round
     bool myPreflopIsAggressor = false;
     bool myFlopIsAggressor = false;
     bool myTurnIsAggressor = false;
     bool myRiverIsAggressor = false;
+    bool myIsInVeryLooseMode = false; // true if the player is in very loose mode (e.g. playing a lot of hands)
     PostFlopState myPostFlopState{};
 
     SimResults myHandSimulation = {
