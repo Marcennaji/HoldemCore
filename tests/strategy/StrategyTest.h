@@ -10,7 +10,7 @@ class StrategyTest : public ::testing::Test
 
     void SetUp() override
     {
-        ctx.reset();
+
         ctx.nbPlayers = 6;
         ctx.nbRunningPlayers = 6;
         ctx.pot = 100;

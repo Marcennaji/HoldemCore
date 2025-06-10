@@ -170,7 +170,6 @@ class Player
 
     std::string getStringBoard() const;
     std::map<int, float> evaluateOpponentsStrengths() const;
-    void computeEstimatedPreflopRange(const int playerId) const;
     const SimResults getHandSimulation() const;
 
     bool isAgressor(const GameState gameState) const;

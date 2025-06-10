@@ -851,7 +851,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 
     if (opponent->myRangeManager->getEstimatedRange().size() == 0)
     {
-        computeEstimatedPreflopRange(opponentId);
+        opponent->getRangeManager()->computeEstimatedPreflopRange(*myCurrentHandContext);
     }
 
     vector<std::string> ranges = myRangeManager->getRangeAtomicValues(opponent->myRangeManager->getEstimatedRange());
@@ -909,8 +909,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 // purpose : remove some unplausible hands (to my opponents eyes), given what I did preflop
 void Player::updateUnplausibleRangesGivenPreflopActions()
 {
-
-    computeEstimatedPreflopRange(myID);
+    getRangeManager()->computeEstimatedPreflopRange(*myCurrentHandContext);
     const string originalEstimatedRange = myRangeManager->getEstimatedRange();
 
 #ifdef LOG_POKER_EXEC
@@ -1658,21 +1657,6 @@ std::map<int, float> Player::evaluateOpponentsStrengths() const
     return result;
 }
 
-void Player::computeEstimatedPreflopRange(const int opponentId) const
-{
-    const int nbPlayers = currentHand->getActivePlayerList()->size();
-    std::shared_ptr<Player> opponent = getPlayerByUniqueId(opponentId);
-    const int lastRaiserID = currentHand->getPreflopLastRaiserID();
-    std::shared_ptr<Player> lastRaiser = getPlayerByUniqueId(lastRaiserID);
-    bool looseMode = false;
-    if (lastRaiserID != -1)
-        looseMode = lastRaiser->isInVeryLooseMode(nbPlayers);
-
-    myRangeManager->computeEstimatedPreflopRange(
-        *opponent, nbPlayers, lastRaiserID, currentHand->getPreflopRaisesNumber(),
-        getPreviousRaiserStats(opponentId, opponent->getStatistics(nbPlayers).getPreflopStatistics()), looseMode);
-}
-
 const PreflopStatistics Player::getPreviousRaiserStats(const int opponentId,
                                                        const PreflopStatistics& opponentStats) const
 {
@@ -1855,33 +1839,27 @@ bool Player::isInVeryLooseMode(const int nbPlayers) const
 void Player::updateCurrentHandContext(const GameState state)
 {
 
-    // Shared game state
+    // general (and shared) game state
     myCurrentHandContext->gameState = state;
-
     myCurrentHandContext->nbRunningPlayers = currentHand->getRunningPlayerList()->size();
     myCurrentHandContext->lastVPIPPlayer = getPlayerByUniqueId(currentHand->getLastRaiserID());
-
     myCurrentHandContext->callersPositions = currentHand->getCallersPositions();
     myCurrentHandContext->pot = currentHand->getBoard()->getPot();
     myCurrentHandContext->potOdd = getPotOdd();
     myCurrentHandContext->sets = currentHand->getBoard()->getSets();
     myCurrentHandContext->highestSet = currentHand->getCurrentBettingRound()->getHighestSet();
-
     myCurrentHandContext->stringBoard = getStringBoard();
-
-    // Player-specific
-
-    myCurrentHandContext->myCash = myCash;
-    myCurrentHandContext->mySet = mySet;
-    myCurrentHandContext->myM = static_cast<int>(getM());
-    myCurrentHandContext->myCurrentHandActions = myCurrentHandActions;
-    myCurrentHandContext->myCanBluff = canBluff(state);
-    myCurrentHandContext->myHavePosition = Player::getHavePosition(myPosition, currentHand->getRunningPlayerList());
-    myCurrentHandContext->isPreflopBigBet = isPreflopBigBet();
-    myCurrentHandContext->myPreflopIsAggressor = isAgressor(GAME_STATE_PREFLOP);
     myCurrentHandContext->preflopLastRaiser = getPlayerByUniqueId(currentHand->getPreflopLastRaiserID());
     myCurrentHandContext->preflopRaisesNumber = currentHand->getPreflopRaisesNumber();
     myCurrentHandContext->preflopCallsNumber = currentHand->getPreflopCallsNumber();
+    myCurrentHandContext->isPreflopBigBet = isPreflopBigBet();
+    myCurrentHandContext->flopBetsOrRaisesNumber = currentHand->getFlopBetsOrRaisesNumber();
+    myCurrentHandContext->flopLastRaiser = getPlayerByUniqueId(currentHand->getFlopLastRaiserID());
+    myCurrentHandContext->turnBetsOrRaisesNumber = currentHand->getTurnBetsOrRaisesNumber();
+    myCurrentHandContext->turnLastRaiser = getPlayerByUniqueId(currentHand->getTurnLastRaiserID());
+    myCurrentHandContext->riverBetsOrRaisesNumber = currentHand->getRiverBetsOrRaisesNumber();
+    myCurrentHandContext->nbPlayers = currentHand->getActivePlayerList()->size();
+    myCurrentHandContext->smallBlind = currentHand->getSmallBlind();
 
     for (std::vector<PlayerAction>::const_iterator i = myCurrentHandActions.m_flopActions.begin();
          i != myCurrentHandActions.m_flopActions.end(); i++)
@@ -1899,29 +1877,28 @@ void Player::updateCurrentHandContext(const GameState state)
             myCurrentHandContext->nbAllins++;
     }
 
-    myCurrentHandContext->myPostFlopState = getPostFlopState();
-
+    // Player-specific, visible from the opponents :
+    myCurrentHandContext->myCash = myCash;
+    myCurrentHandContext->mySet = mySet;
+    myCurrentHandContext->myM = static_cast<int>(getM());
+    myCurrentHandContext->myCurrentHandActions = myCurrentHandActions;
+    myCurrentHandContext->myHavePosition = Player::getHavePosition(myPosition, currentHand->getRunningPlayerList());
+    myCurrentHandContext->myPreflopIsAggressor = isAgressor(GAME_STATE_PREFLOP);
     myCurrentHandContext->myFlopIsAggressor = isAgressor(GAME_STATE_FLOP);
-    myCurrentHandContext->flopBetsOrRaisesNumber = currentHand->getFlopBetsOrRaisesNumber();
-    myCurrentHandContext->flopLastRaiser = getPlayerByUniqueId(currentHand->getFlopLastRaiserID());
-
     myCurrentHandContext->myTurnIsAggressor = isAgressor(GAME_STATE_TURN);
-    myCurrentHandContext->turnBetsOrRaisesNumber = currentHand->getTurnBetsOrRaisesNumber();
-    myCurrentHandContext->turnLastRaiser = getPlayerByUniqueId(currentHand->getTurnLastRaiserID());
-
     myCurrentHandContext->myRiverIsAggressor = isAgressor(GAME_STATE_RIVER);
-    myCurrentHandContext->riverBetsOrRaisesNumber = currentHand->getRiverBetsOrRaisesNumber();
-
     myCurrentHandContext->myStatistics = getStatistics(currentHand->getActivePlayerList()->size());
-    myCurrentHandContext->myPreflopCallingRange = getPreflopCallingRange(*myCurrentHandContext);
-    myCurrentHandContext->myHandSimulation = getHandSimulation();
     myCurrentHandContext->myID = myID;
-    myCurrentHandContext->myCard1 = myCard1;
-    myCurrentHandContext->myCard2 = myCard2;
     myCurrentHandContext->myIsInVeryLooseMode = isInVeryLooseMode(currentHand->getActivePlayerList()->size());
     myCurrentHandContext->myPosition = myPosition;
-    myCurrentHandContext->nbPlayers = currentHand->getActivePlayerList()->size();
-    myCurrentHandContext->smallBlind = currentHand->getSmallBlind();
+
+    // player specific, hidden from the opponents :
+    myCurrentHandContext->myCanBluff = canBluff(state);
+    myCurrentHandContext->myPreflopCallingRange = getPreflopCallingRange(*myCurrentHandContext);
+    myCurrentHandContext->myHandSimulation = getHandSimulation();
+    myCurrentHandContext->myCard1 = myCard1;
+    myCurrentHandContext->myCard2 = myCard2;
+    myCurrentHandContext->myPostFlopState = getPostFlopState();
 }
 
 float Player::getPreflopCallingRange(CurrentHandContext& context, bool deterministic) const
