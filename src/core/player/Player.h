@@ -182,7 +182,6 @@ class Player
     int getPreflopPotOdd() const;
 
   protected:
-    const PreflopStatistics getPreviousRaiserStats(const int opponentId, const PreflopStatistics& opponentStats) const;
     void loadStatistics();
     void resetPlayerStatistics();
     float getMaxOpponentsStrengths() const;
