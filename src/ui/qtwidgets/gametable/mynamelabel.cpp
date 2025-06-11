@@ -30,7 +30,7 @@ MyNameLabel::~MyNameLabel()
 {
 }
 
-void MyNameLabel::setText(const QString& t, bool trans, bool guest, bool computerplayer)
+void MyNameLabel::setText(const QString& t)
 {
     QLabel::setText(t);
 }

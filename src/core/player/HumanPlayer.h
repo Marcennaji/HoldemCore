@@ -25,8 +25,8 @@ class HumanPlayer : public Player
 {
 
   public:
-    HumanPlayer(GameEvents*, IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type, std::string name,
-                int sC, bool aS, int mB);
+    HumanPlayer(GameEvents*, IHandAuditStore*, IPlayersStatisticsStore*, int id, std::string name, int sC, bool aS,
+                int mB);
 
     ~HumanPlayer();
 };

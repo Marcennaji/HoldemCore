@@ -38,7 +38,7 @@ class MyNameLabel : public QLabel
 
   public slots:
 
-    void setText(const QString&, bool = false, bool = false, bool = false);
+    void setText(const QString& t);
 
   private:
     QString myText;

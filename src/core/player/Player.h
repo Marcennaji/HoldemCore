@@ -46,12 +46,6 @@ struct CurrentHandContext;
 namespace pkt::core::player
 {
 
-enum PlayerType
-{
-    PLAYER_TYPE_COMPUTER,
-    PLAYER_TYPE_HUMAN
-};
-
 class IBotStrategy;
 
 static const char* TightAggressiveBotStrategyName[] = {"Tintin",  "Tonio", "Theo",  "Ted",  "Thor",
@@ -86,15 +80,13 @@ static int outsOddsTwoCard[] = {
 class Player
 {
   public:
-    Player(GameEvents*, IHandAuditStore*, IPlayersStatisticsStore*, int id, PlayerType type, std::string name, int sC,
-           bool aS, int mB);
+    Player(GameEvents*, IHandAuditStore*, IPlayersStatisticsStore*, int id, std::string name, int sC, bool aS, int mB);
 
     virtual ~Player() = default;
 
     int getID() const;
     void setID(unsigned newId);
 
-    PlayerType getType() const;
     void setName(const std::string& theValue);
     std::string getName() const;
 
@@ -203,7 +195,6 @@ class Player
 
     // const
     int myID;
-    PlayerType myType;
     std::string myName;
     std::string myAvatar;
 

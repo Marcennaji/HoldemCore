@@ -28,9 +28,9 @@ namespace pkt::core::player
 
 using namespace std;
 
-BotPlayer::BotPlayer(GameEvents* events, IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id, PlayerType type,
-                     std::string name, int sC, bool aS, int mB)
-    : Player(events, ha, ps, id, type, name, sC, aS, mB)
+BotPlayer::BotPlayer(GameEvents* events, IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id, std::string name,
+                     int sC, bool aS, int mB)
+    : Player(events, ha, ps, id, name, sC, aS, mB)
 {
 }
 

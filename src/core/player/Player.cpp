@@ -36,12 +36,11 @@ namespace pkt::core::player
 
 using namespace std;
 
-Player::Player(GameEvents* events, IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id, PlayerType type,
-               std::string name, int sC, bool aS, int mB)
-    : myHandAuditStore(ha), myPlayersStatisticsStore(ps), currentHand(0), myID(id), myType(type), myName(name),
-      myCardsValueInt(0), myCash(sC), mySet(0), myLastRelativeSet(0), myAction(PLAYER_ACTION_NONE), myButton(mB),
-      myActiveStatus(aS), myTurn(0), myCardsFlip(0), myRoundStartCash(0), lastMoneyWon(0), m_isSessionActive(false),
-      myEvents(events)
+Player::Player(GameEvents* events, IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id, std::string name, int sC,
+               bool aS, int mB)
+    : myHandAuditStore(ha), myPlayersStatisticsStore(ps), currentHand(0), myID(id), myName(name), myCardsValueInt(0),
+      myCash(sC), mySet(0), myLastRelativeSet(0), myAction(PLAYER_ACTION_NONE), myButton(mB), myActiveStatus(aS),
+      myTurn(0), myCardsFlip(0), myRoundStartCash(0), lastMoneyWon(0), m_isSessionActive(false), myEvents(events)
 {
     myRangeManager = std::make_unique<RangeManager>(myID, myPlayersStatisticsStore);
     myCurrentHandContext = std::make_unique<CurrentHandContext>();
@@ -238,11 +237,6 @@ CurrentHandActions& Player::getCurrentHandActions()
 void Player::setID(unsigned newId)
 {
     myID = newId;
-}
-
-PlayerType Player::getType() const
-{
-    return myType;
 }
 
 void Player::setName(const std::string& theValue)

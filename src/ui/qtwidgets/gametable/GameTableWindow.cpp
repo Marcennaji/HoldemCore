@@ -591,46 +591,12 @@ void GameTableWindow::refreshPlayerName()
         for (it_c = seatsList->begin(); it_c != seatsList->end(); ++it_c)
         {
 
-            // collect needed infos
-            //  bool guest = myStartWindow->getSession()->getClientPlayerInfo((*it_c)->getID()).isGuest;
-            bool guest = false;
-
-            bool computerPlayer = false;
-            if ((*it_c)->getType() == PLAYER_TYPE_COMPUTER)
-            {
-                computerPlayer = true;
-            }
             QString nick = QString::fromUtf8((*it_c)->getName().c_str());
 
-            // check SeatStates and refresh
-            switch (getCurrentSeatState((*it_c)))
-            {
-
-            case SEAT_ACTIVE:
-            {
-                playerNameLabelArray[(*it_c)->getID()]->setText(nick, false, guest, computerPlayer);
-            }
-            break;
-            case SEAT_AUTOFOLD:
-            {
-                playerNameLabelArray[(*it_c)->getID()]->setText(nick, true, guest, computerPlayer);
-            }
-            break;
-            case SEAT_STAYONTABLE:
-            {
-                playerNameLabelArray[(*it_c)->getID()]->setText(nick, true, guest, computerPlayer);
-            }
-            break;
-            case SEAT_CLEAR:
-            {
-                playerNameLabelArray[(*it_c)->getID()]->setText("");
-            }
-            break;
-            default:
-            {
-                playerNameLabelArray[(*it_c)->getID()]->setText("");
-            }
-            }
+            auto seatState = getCurrentSeatState((*it_c));
+            // Update player name label based on seat state
+            playerNameLabelArray[(*it_c)->getID()]->setText(
+                (seatState == SEAT_CLEAR || seatState == SEAT_UNDEFINED) ? "" : nick);
         }
     }
 }
@@ -3003,7 +2969,8 @@ void GameTableWindow::refreshHandsRanges()
 {
     const string style =
         "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; "
-        "text-indent:0px;\"><span style=\" font-family:'Ubuntu';  font-size:8pt; font-weight:400; color:#000000;\">";
+        "text-indent:0px;\"><span style=\" font-family:'Ubuntu';  font-size:8pt; font-weight:400; "
+        "color:#000000;\">";
     stringstream displayText;
 
     static map<char, string> colors;

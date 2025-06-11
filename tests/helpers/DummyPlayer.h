@@ -7,9 +7,7 @@ namespace pkt::test
 class DummyPlayer : public pkt::core::player::Player
 {
   public:
-    DummyPlayer(int id = 42)
-        : pkt::core::player::Player(nullptr, nullptr, nullptr, id, pkt::core::player::PLAYER_TYPE_COMPUTER, "Dummy",
-                                    1000, true, 0)
+    DummyPlayer(int id = 42) : pkt::core::player::Player(nullptr, nullptr, nullptr, id, "Dummy", 1000, true, 0)
     {
         setIsSessionActive(true);
     }
