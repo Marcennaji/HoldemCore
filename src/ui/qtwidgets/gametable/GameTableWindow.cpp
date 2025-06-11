@@ -314,7 +314,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
 
     // resize stop-button depending on translation
     QFontMetrics tempMetrics = this->fontMetrics();
-    int width = tempMetrics.horizontalAdvance((tr("Show cards")));
+    int width = tempMetrics.horizontalAdvance((tr("Pause before next hand")));
 
     // Clear Focus
 
@@ -419,7 +419,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     // connect(this, SIGNAL(signalRiverAnimation1()), this, SLOT(riverAnimation1()));
     connect(this, SIGNAL(signalRiverAnimation2()), this, SLOT(riverAnimation2()));
     // connect(this, SIGNAL(signalPostRiverAnimation1()), this, SLOT(postRiverAnimation1()));
-    // connect(this, SIGNAL(signalPostRiverRunAnimation1()), this, SLOT(postRiverRunAnimation1()));
+    connect(this, SIGNAL(signalPostRiverRunAnimation1()), this, SLOT(postRiverRunAnimation1()));
     // connect(this, SIGNAL(signalPostRiverShowCards(unsigned)), this, SLOT(showHoleCards(unsigned)));
     // connect(this, SIGNAL(signalFlipHoleCardsAllIn()), this, SLOT(flipHoleCardsAllIn()));
     // connect(this, SIGNAL(signalnextBettingRoundInitializeGui()), this, SLOT(nextBettingRoundInitializeGui()));
@@ -2371,10 +2371,10 @@ void GameTableWindow::postRiverRunAnimation6()
 
         pushButton_break->setDisabled(false);
         QFontMetrics tempMetrics = this->fontMetrics();
-        int width = tempMetrics.horizontalAdvance(tr("Start"));
+        int width = tempMetrics.horizontalAdvance(tr("Start new hand"));
 
         pushButton_break->setMinimumSize(width + 10, 20);
-        pushButton_break->setText(tr("Start"));
+        pushButton_break->setText(tr("Start new hand"));
         blinkingStartButtonAnimationTimer->start(500);
 
         return;
@@ -2458,9 +2458,9 @@ void GameTableWindow::startNewHand()
         pushButton_break->setDisabled(false);
 
         QFontMetrics tempMetrics = this->fontMetrics();
-        int width = tempMetrics.horizontalAdvance(tr("Start"));
+        int width = tempMetrics.horizontalAdvance(tr("Start new hand"));
         pushButton_break->setMinimumSize(width + 10, 20);
-        pushButton_break->setText(tr("Start"));
+        pushButton_break->setText(tr("Start new hand"));
         breakAfterCurrentHand = false;
         blinkingStartButtonAnimationTimer->start(500);
     }
@@ -2530,9 +2530,9 @@ void GameTableWindow::nextBettingRoundInitializeGui()
 
     blinkingStartButtonAnimationTimer->stop();
     QFontMetrics tempMetrics = this->fontMetrics();
-    int width = tempMetrics.horizontalAdvance(tr("Show cards"));
+    int width = tempMetrics.horizontalAdvance(tr("Pause before next hand"));
     pushButton_break->setMinimumSize(width + 10, 20);
-    pushButton_break->setText(tr("Show cards"));
+    pushButton_break->setText(tr("Pause before next hand"));
 
     horizontalSlider_bet->setDisabled(true);
     spinBox_betValue->setDisabled(true);
@@ -2598,26 +2598,23 @@ void GameTableWindow::setSpeeds()
 void GameTableWindow::breakButtonClicked()
 {
 
-    if (pushButton_break->text() == tr("Show cards"))
+    if (pushButton_break->text() == tr("Pause before next hand"))
     {
 
         pushButton_break->setDisabled(true);
         breakAfterCurrentHand = true;
-        myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->setCardsShown(true);
     }
-    else if (pushButton_break->text() == tr("Start"))
+    else if (pushButton_break->text() == tr("Start new hand"))
     {
-
-        myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->setCardsShown(false);
 
         blinkingStartButtonAnimationTimer->stop();
         // Set default Color
         myGameTableStyle->setBreakButtonStyle(pushButton_break, 0);
         QFontMetrics tempMetrics = this->fontMetrics();
-        int width = tempMetrics.horizontalAdvance(tr("Show cards"));
+        int width = tempMetrics.horizontalAdvance(tr("Pause before next hand"));
         pushButton_break->setMinimumSize(width + 10, 20);
 
-        pushButton_break->setText(tr("Show cards"));
+        pushButton_break->setText(tr("Pause before next hand"));
 
         if (currentGameOver)
         {
@@ -2759,9 +2756,9 @@ void GameTableWindow::GameModification()
     pushButton_break->show();
 
     QFontMetrics tempMetrics = this->fontMetrics();
-    int width = tempMetrics.horizontalAdvance(tr("Show cards"));
+    int width = tempMetrics.horizontalAdvance(tr("Pause before next hand"));
 
-    pushButton_break->setText(tr("Show cards"));
+    pushButton_break->setText(tr("Pause before next hand"));
     pushButton_break->setMinimumSize(width + 10, 20);
 }
 

@@ -133,4 +133,9 @@ void GuiBridgeWidgets::connectTo(pkt::core::GameEvents& events)
         QMetaObject::invokeMethod(
             myGameTableWindow, [this]() { myGameTableWindow->postRiverRunAnimation1(); }, Qt::DirectConnection);
     };
+    events.onPauseHand = [this]()
+    {
+        QMetaObject::invokeMethod(
+            myGameTableWindow, [this]() { myGameTableWindow->breakButtonClicked(); }, Qt::DirectConnection);
+    };
 }

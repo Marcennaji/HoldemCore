@@ -77,12 +77,18 @@ void BettingRoundPostRiver::postRiverRun()
 
     getHand()->getBoard()->setPot(0);
 
-    // logging
+    bool pauseHand = false;
     int nonfoldPlayersCounter = 0;
     for (it_c = getHand()->getActivePlayerList()->begin(); it_c != getHand()->getActivePlayerList()->end(); ++it_c)
     {
         if ((*it_c)->getAction() != PLAYER_ACTION_FOLD)
+        {
             nonfoldPlayersCounter++;
+            if ((*it_c)->getID() == 0)
+            {
+                pauseHand = true;
+            }
+        }
     }
 
     if (getHand()->getRankingStore())
@@ -99,7 +105,6 @@ void BettingRoundPostRiver::postRiverRun()
 
     if (getHand()->getCardsShown())
     {
-
         // show cards for players who didn't fold preflop
         for (it_c = getHand()->getActivePlayerList()->begin(); it_c != getHand()->getActivePlayerList()->end(); ++it_c)
         {
@@ -111,6 +116,10 @@ void BettingRoundPostRiver::postRiverRun()
                     myEvents->onShowHoleCards((*it_c)->getID());
         }
     }
+    // if the human player went at showdown with at least one opponent, enable pausing the hand so he can see the
+    // results
+    if (pauseHand && nonfoldPlayersCounter > 1 && myEvents && myEvents->onPauseHand)
+        myEvents->onPauseHand();
 }
 void BettingRoundPostRiver::setHighestCardsValue(int theValue)
 {
