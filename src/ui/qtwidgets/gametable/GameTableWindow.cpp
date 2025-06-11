@@ -3065,126 +3065,21 @@ void GameTableWindow::refreshGameTableStyle()
 
     myGameTableStyle->setTabWidgetStyle(tabWidget_Right, tabWidget_Right->getTabBar());
 
-    if (myGameTableStyle->getActionCallI18NString() == "NULL")
-    {
-        CallString = "Call";
-    }
-    else
-    {
-        CallString = myGameTableStyle->getActionCallI18NString();
-    }
-    if (myGameTableStyle->getActionCheckI18NString() == "NULL")
-    {
-        CheckString = "Check";
-    }
-    else
-    {
-        CheckString = myGameTableStyle->getActionCheckI18NString();
-    }
-    if (myGameTableStyle->getActionBetI18NString() == "NULL")
-    {
-        BetString = "Bet";
-    }
-    else
-    {
-        BetString = myGameTableStyle->getActionBetI18NString();
-    }
-    if (myGameTableStyle->getActionRaiseI18NString() == "NULL")
-    {
-        RaiseString = "Raise";
-    }
-    else
-    {
-        RaiseString = myGameTableStyle->getActionRaiseI18NString();
-    }
-    if (myGameTableStyle->getActionFoldI18NString() == "NULL")
-    {
-        FoldString = "Fold";
-    }
-    else
-    {
-        FoldString = myGameTableStyle->getActionFoldI18NString();
-    }
-    if (myGameTableStyle->getActionAllInI18NString() == "NULL")
-    {
-        AllInString = "All-In";
-    }
-    else
-    {
-        AllInString = myGameTableStyle->getActionAllInI18NString();
-    }
-    if (myGameTableStyle->getPotI18NString() == "NULL")
-    {
-        PotString = "Pot";
-    }
-    else
-    {
-        PotString = myGameTableStyle->getPotI18NString();
-    }
-    if (myGameTableStyle->getTotalI18NString() == "NULL")
-    {
-        TotalString = "Total";
-    }
-    else
-    {
-        TotalString = myGameTableStyle->getTotalI18NString();
-    }
-    if (myGameTableStyle->getBetsI18NString() == "NULL")
-    {
-        BetsString = "Bets";
-    }
-    else
-    {
-        BetsString = myGameTableStyle->getBetsI18NString();
-    }
-    if (myGameTableStyle->getGameI18NString() == "NULL")
-    {
-        GameString = "Game";
-    }
-    else
-    {
-        GameString = myGameTableStyle->getGameI18NString();
-    }
-    if (myGameTableStyle->getHandI18NString() == "NULL")
-    {
-        HandString = "Hand";
-    }
-    else
-    {
-        HandString = myGameTableStyle->getHandI18NString();
-    }
-    if (myGameTableStyle->getPreflopI18NString() == "NULL")
-    {
-        PreflopString = "Preflop";
-    }
-    else
-    {
-        PreflopString = myGameTableStyle->getPreflopI18NString();
-    }
-    if (myGameTableStyle->getFlopI18NString() == "NULL")
-    {
-        FlopString = "Flop";
-    }
-    else
-    {
-        FlopString = myGameTableStyle->getFlopI18NString();
-    }
-    if (myGameTableStyle->getTurnI18NString() == "NULL")
-    {
-        TurnString = "Turn";
-    }
-    else
-    {
-        TurnString = myGameTableStyle->getTurnI18NString();
-    }
-    if (myGameTableStyle->getRiverI18NString() == "NULL")
-    {
-        RiverString = "River";
-    }
-    else
-    {
-        RiverString = myGameTableStyle->getRiverI18NString();
-    }
+    CallString = "Call";
+    CheckString = "Check";
+    BetString = "Bet";
+    RaiseString = "Raise";
+    FoldString = "Fold";
+    AllInString = "All-In";
+    PotString = "Pot";
+    TotalString = "Total";
+    BetsString = "Bets";
+    GameString = "Game";
+    HandString = "Hand";
+    PreflopString = "Preflop";
+    FlopString = "Flop";
+    TurnString = "Turn";
+    RiverString = "River";
 
     label_Pot->setText(PotString);
     label_Total->setText(TotalString + ":");

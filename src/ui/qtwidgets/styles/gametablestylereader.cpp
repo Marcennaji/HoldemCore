@@ -2079,58 +2079,37 @@ QString GameTableStyleReader::getActionPic(int action)
     {
     case 1:
     {
-        if (ActionFoldI18NPic.endsWith("NULL"))
-            return myAppDataDir + "gfx/gui/misc/actionpics/action_fold.png";
-        else
-            return ActionFoldI18NPic;
+        return myAppDataDir + "gfx/gui/misc/actionpics/action_fold.png";
     }
     break;
     case 2:
     {
-        if (ActionCheckI18NPic.endsWith("NULL"))
-            return myAppDataDir + "gfx/gui/misc/actionpics/action_check.png";
-        else
-            return ActionCheckI18NPic;
+        return myAppDataDir + "gfx/gui/misc/actionpics/action_check.png";
     }
     break;
     case 3:
     {
-        if (ActionCallI18NPic.endsWith("NULL"))
-            return myAppDataDir + "gfx/gui/misc/actionpics/action_call.png";
-        else
-            return ActionCallI18NPic;
+        return myAppDataDir + "gfx/gui/misc/actionpics/action_call.png";
     }
     break;
     case 4:
     {
-        if (ActionBetI18NPic.endsWith("NULL"))
-            return myAppDataDir + "gfx/gui/misc/actionpics/action_bet.png";
-        else
-            return ActionBetI18NPic;
+        return myAppDataDir + "gfx/gui/misc/actionpics/action_bet.png";
     }
     break;
     case 5:
     {
-        if (ActionRaiseI18NPic.endsWith("NULL"))
-            return myAppDataDir + "gfx/gui/misc/actionpics/action_raise.png";
-        else
-            return ActionRaiseI18NPic;
+        return myAppDataDir + "gfx/gui/misc/actionpics/action_raise.png";
     }
     break;
     case 6:
     {
-        if (ActionAllInI18NPic.endsWith("NULL"))
-            return myAppDataDir + "gfx/gui/misc/actionpics/action_allin.png";
-        else
-            return ActionAllInI18NPic;
+        return myAppDataDir + "gfx/gui/misc/actionpics/action_allin.png";
     }
     break;
     case 7:
     {
-        if (ActionWinnerI18NPic.endsWith("NULL"))
-            return myAppDataDir + "gfx/gui/misc/actionpics/action_winner.png";
-        else
-            return ActionWinnerI18NPic;
+        return myAppDataDir + "gfx/gui/misc/actionpics/action_winner.png";
     }
     break;
     }

@@ -100,7 +100,7 @@ void BettingRoundPostRiver::postRiverRun()
     {
         getHand()->getPlayersStatisticsStore()->updatePlayersStatistics(getHand()->getActivePlayerList());
     }
-    if (myEvents && myEvents->onPostRiverAnimation)
+    if (myEvents && myEvents->onPostRiverRunAnimation)
         myEvents->onPostRiverRunAnimation();
 
     if (getHand()->getCardsShown())
