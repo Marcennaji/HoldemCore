@@ -419,7 +419,7 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
     // connect(this, SIGNAL(signalRiverAnimation1()), this, SLOT(riverAnimation1()));
     connect(this, SIGNAL(signalRiverAnimation2()), this, SLOT(riverAnimation2()));
     // connect(this, SIGNAL(signalPostRiverAnimation1()), this, SLOT(postRiverAnimation1()));
-    connect(this, SIGNAL(signalPostRiverRunAnimation1()), this, SLOT(postRiverRunAnimation1()));
+    // connect(this, SIGNAL(signalPostRiverRunAnimation1()), this, SLOT(postRiverRunAnimation1()));
     // connect(this, SIGNAL(signalPostRiverShowCards(unsigned)), this, SLOT(showHoleCards(unsigned)));
     // connect(this, SIGNAL(signalFlipHoleCardsAllIn()), this, SLOT(flipHoleCardsAllIn()));
     // connect(this, SIGNAL(signalnextBettingRoundInitializeGui()), this, SLOT(nextBettingRoundInitializeGui()));
@@ -591,7 +591,7 @@ void GameTableWindow::refreshPlayerName()
         for (it_c = seatsList->begin(); it_c != seatsList->end(); ++it_c)
         {
 
-            QString nick = QString::fromUtf8((*it_c)->getName().c_str());
+            QString nick = QString::fromUtf8(((*it_c)->getName() + " " + (*it_c)->getStrategyName()).c_str());
 
             auto seatState = getCurrentSeatState((*it_c));
             // Update player name label based on seat state
