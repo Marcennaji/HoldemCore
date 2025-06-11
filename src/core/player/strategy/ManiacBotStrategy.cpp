@@ -39,6 +39,7 @@ using namespace std;
 
 ManiacBotStrategy::ManiacBotStrategy() : IBotStrategy()
 {
+    setStrategyName("Maniac");
 
     // initialize utg starting range, in a full table
     int utgFullTableRange = 0;

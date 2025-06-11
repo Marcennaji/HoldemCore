@@ -39,6 +39,7 @@ using namespace std;
 
 TightAggressiveBotStrategy::TightAggressiveBotStrategy() : IBotStrategy()
 {
+    setStrategyName("TightAggressive");
 
     // initialize utg starting range, in a full table
     int utgFullTableRange = 0;

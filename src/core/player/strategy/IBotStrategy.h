@@ -27,6 +27,9 @@ class IBotStrategy
 
     float getPreflopCallingRange(CurrentHandContext&, bool deterministic = false) const;
 
+    const std::string& getStrategyName() const { return myStrategyName; }
+    void setStrategyName(const std::string& name) { myStrategyName = name; }
+
     virtual ~IBotStrategy() = default;
 
   protected:
@@ -39,6 +42,7 @@ class IBotStrategy
 
     bool myShouldCall = false;
     bool myShouldRaise = false;
+    std::string myStrategyName;
 
   private:
     // vector index is player position, value is range %

@@ -48,20 +48,6 @@ namespace pkt::core::player
 
 class IBotStrategy;
 
-static const char* TightAggressiveBotStrategyName[] = {"Tintin",  "Tonio", "Theo",  "Ted",  "Thor",
-                                                       "Taslima", "Tina",  "Tania", "Tata", "Timmy"};
-
-static const char* LooseAggressiveBotStrategyName[] = {"Louis", "Louane", "Ludovic", "Lucas", "Laure",
-                                                       "Leila", "Lino",   "Laurent", "Lucie", "Ludivine"};
-
-static const char* ManiacBotStrategyName[] = {"Maurice",  "Milou",    "Michou", "Maelle",  "Mokhtar",
-                                              "Mireille", "Marianne", "Momo",   "Maurane", "Maya"};
-
-static const char* UltraTightBotStrategyName[] = {"Ursula",  "Uri",    "Ulrich", "Ulysses", "Urbain",
-                                                  "Umberto", "Urania", "Ugo",    "Uma",     "Urso"};
-
-static const char* HumanPlayerName = "You";
-
 // values are odd %, according to the outs number. Array index is the number of outs
 static int outsOddsOneCard[] = {
     0,  2,  4,  6,  8,  11, /* 0 to 5 outs */
@@ -101,6 +87,8 @@ class Player
     IHand* getHand() const { return currentHand; }
     void setAction(PlayerAction theValue, bool blind = 0);
     PlayerAction getAction() const;
+
+    virtual std::string getStrategyName() const = 0;
 
     void setButton(int theValue);
     int getButton() const;

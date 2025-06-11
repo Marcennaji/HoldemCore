@@ -22,6 +22,10 @@
 #include "core/engine/EngineDefs.h"
 #include "core/engine/model/PlayerStatistics.h"
 #include "core/player/Player.h"
+#include "core/player/strategy/LooseAggressiveBotStrategy.h"
+#include "core/player/strategy/ManiacBotStrategy.h"
+#include "core/player/strategy/TightAggressiveBotStrategy.h"
+#include "core/player/strategy/UltraTightBotStrategy.h"
 
 #include <third_party/sqlite3/sqlite3.h>
 
@@ -101,7 +105,7 @@ void SqliteLogStore::createDatabase()
 
     // create stats table
     sql += "CREATE TABLE  IF NOT EXISTS PlayersStatistics (";
-    sql += "player_name VARCHAR NOT NULL";
+    sql += "strategy_name VARCHAR NOT NULL";
     sql += ", nb_players SMALLINT NOT NULL";
     sql += ", pf_hands LARGEINT ";
     // preflop stats :
@@ -144,24 +148,23 @@ void SqliteLogStore::createDatabase()
     sql += ", r_3Bets LARGEINT ";
     sql += ", r_4Bets LARGEINT ";
 
-    sql += ", PRIMARY KEY(player_name, nb_players));";
+    sql += ", PRIMARY KEY(strategy_name, nb_players));";
 
     exec_transaction();
 
-    for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
-    {
+    auto looseAggressiveStrategy = LooseAggressiveBotStrategy();
+    auto tightAggressiveStrategy = TightAggressiveBotStrategy();
+    auto maniacStrategy = ManiacBotStrategy();
+    auto ultraTightStrategy = UltraTightBotStrategy();
 
-        for (int j = 2; j <= MAX_NUMBER_OF_PLAYERS; j++)
-        {
-            InitializePlayersStatistics(TightAggressiveBotStrategyName[i], j);
-            InitializePlayersStatistics(LooseAggressiveBotStrategyName[i], j);
-            InitializePlayersStatistics(ManiacBotStrategyName[i], j);
-            InitializePlayersStatistics(UltraTightBotStrategyName[i], j);
-        }
-    }
     for (int j = 2; j <= MAX_NUMBER_OF_PLAYERS; j++)
     {
-        InitializePlayersStatistics(HumanPlayerName, j);
+        InitializePlayersStatistics("You", j); // human player
+        // initialize players statistics for all bot strategies
+        InitializePlayersStatistics(tightAggressiveStrategy.getStrategyName(), j);
+        InitializePlayersStatistics(looseAggressiveStrategy.getStrategyName(), j);
+        InitializePlayersStatistics(maniacStrategy.getStrategyName(), j);
+        InitializePlayersStatistics(ultraTightStrategy.getStrategyName(), j);
     }
 }
 
@@ -169,7 +172,7 @@ void SqliteLogStore::InitializePlayersStatistics(const string playerName, const 
 {
 
     sql += "INSERT OR REPLACE INTO PlayersStatistics (";
-    sql += "player_name,nb_players";
+    sql += "strategy_name,nb_players";
     sql += ",pf_hands,pf_checks,pf_calls,pf_raises,pf_3Bets,pf_call3Bets,pf_call3BetsOpportunities,pf_4Bets,pf_folds,"
            "pf_limps";
     sql += ",f_hands,f_checks,f_bets,f_calls,f_raises,f_3Bets,f_4Bets,f_folds,f_continuationBets,f_"
@@ -196,10 +199,10 @@ void SqliteLogStore::updateRankingGameLosers(PlayerList activePlayerList)
     {
         if ((*it_c)->getCash() == 0)
         {
-            sql += "INSERT OR IGNORE INTO Ranking VALUES ('" + (*it_c)->getName() + "', 0, 0, 0);";
-            const int lostStack = getIntegerValue((*it_c)->getName(), "Ranking", "lost_stack") + 1;
+            sql += "INSERT OR IGNORE INTO Ranking VALUES ('" + (*it_c)->getStrategyName() + "', 0, 0, 0);";
+            const int lostStack = getIntegerValue((*it_c)->getStrategyName(), "Ranking", "lost_stack") + 1;
             sql += "UPDATE Ranking SET lost_stack = " + std::to_string(lostStack);
-            sql += " WHERE player_name = '" + (*it_c)->getName() + "';";
+            sql += " WHERE strategy_name = '" + (*it_c)->getStrategyName() + "';";
         }
     }
 
@@ -222,10 +225,10 @@ void SqliteLogStore::updateRankingGameWinner(PlayerList activePlayerList)
         {
             if ((*it_c)->getCash() > 0)
             {
-                sql += "INSERT OR IGNORE INTO Ranking VALUES ('" + (*it_c)->getName() + "', 0, 0, 0);";
-                const int wonGame = getIntegerValue((*it_c)->getName(), "Ranking", "won_game") + 1;
+                sql += "INSERT OR IGNORE INTO Ranking VALUES ('" + (*it_c)->getStrategyName() + "', 0, 0, 0);";
+                const int wonGame = getIntegerValue((*it_c)->getStrategyName(), "Ranking", "won_game") + 1;
                 sql += "UPDATE Ranking SET won_game = " + std::to_string(wonGame);
-                sql += " WHERE player_name = '" + (*it_c)->getName() + "';";
+                sql += " WHERE strategy_name = '" + (*it_c)->getStrategyName() + "';";
             }
         }
     }
@@ -240,10 +243,10 @@ void SqliteLogStore::updateRankingPlayedGames(PlayerList activePlayerList)
     PlayerListConstIterator it_c;
     for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
     {
-        sql += "INSERT OR IGNORE INTO Ranking VALUES ('" + (*it_c)->getName() + "', 0, 0, 0);";
-        const int playedGames = getIntegerValue((*it_c)->getName(), "Ranking", "played_games") + 1;
+        sql += "INSERT OR IGNORE INTO Ranking VALUES ('" + (*it_c)->getStrategyName() + "', 0, 0, 0);";
+        const int playedGames = getIntegerValue((*it_c)->getStrategyName(), "Ranking", "played_games") + 1;
         sql += "UPDATE Ranking SET played_games = " + std::to_string(playedGames);
-        sql += " WHERE player_name = '" + (*it_c)->getName() + "';";
+        sql += " WHERE strategy_name = '" + (*it_c)->getStrategyName() + "';";
     }
 
     exec_transaction();
@@ -265,7 +268,7 @@ int SqliteLogStore::getIntegerValue(const std::string playerName, const std::str
 
         // read seat
         string sql_select =
-            "SELECT " + attributeName + " FROM " + tableName + " WHERE player_name = \"" + playerName + "\"";
+            "SELECT " + attributeName + " FROM " + tableName + " WHERE strategy_name = \"" + playerName + "\"";
         if (sqlite3_get_table(mySqliteLogDb, sql_select.c_str(), &result_Player, &nRow_Player, &nCol_Player, &errmsg) !=
             SQLITE_OK)
         {
@@ -294,11 +297,11 @@ void SqliteLogStore::createRankingTable()
 
     // create table if doesn't exist
     sql = "CREATE TABLE IF NOT EXISTS Ranking (";
-    sql += "player_name VARCHAR NOT NULL";
+    sql += "strategy_name VARCHAR NOT NULL";
     sql += ",lost_stack LARGEINT";
     sql += ",won_game LARGEINT";
     sql += ",played_games LARGEINT";
-    sql += ", PRIMARY KEY(player_name));";
+    sql += ", PRIMARY KEY(strategy_name));";
     exec_transaction();
 }
 void SqliteLogStore::updateUnplausibleHand(const std::string card1, const std::string card2, const bool human,
@@ -458,7 +461,8 @@ void SqliteLogStore::updatePlayersStatistics(PlayerList activePlayerList)
         sql += ",r_4Bets = " + std::to_string((*it_c)->getStatistics(i).getRiverStatistics().m_4Bets);
         sql += ",r_folds = " + std::to_string((*it_c)->getStatistics(i).getRiverStatistics().m_folds);
 
-        sql += " WHERE player_name = '" + (*it_c)->getName() + "' AND nb_players = " + std::to_string(i) + ";";
+        sql +=
+            " WHERE strategy_name = '" + (*it_c)->getStrategyName() + "' AND nb_players = " + std::to_string(i) + ";";
 
         exec_transaction();
     }
@@ -494,7 +498,7 @@ std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> SqliteLogStore::getPlaye
 
         char* errmsg = 0;
 
-        string sql_select = "SELECT * FROM PlayersStatistics WHERE player_name = '" + playerName + "';";
+        string sql_select = "SELECT * FROM PlayersStatistics WHERE strategy_name = '" + playerName + "';";
 
         sqlite3_stmt* stmt;
 

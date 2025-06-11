@@ -29,6 +29,8 @@ class HumanPlayer : public Player
                 int mB);
 
     ~HumanPlayer();
+
+    virtual std::string getStrategyName() const override { return "HumanPlayer"; }
 };
 
 } // namespace pkt::core::player

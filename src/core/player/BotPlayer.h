@@ -39,6 +39,10 @@ class BotPlayer : public Player
     void doFlopAction();
     void doTurnAction();
     void doRiverAction();
+    virtual std::string getStrategyName() const override
+    {
+        return myStrategy ? myStrategy->getStrategyName() : "Unknown Strategy";
+    }
 
     float getPreflopCallingRange(CurrentHandContext& context, bool deterministic) const override;
 

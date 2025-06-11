@@ -40,6 +40,8 @@ using namespace std;
 LooseAggressiveBotStrategy::LooseAggressiveBotStrategy() : IBotStrategy()
 {
 
+    setStrategyName("LooseAggressive");
+
     // initialize utg starting range, in a full table
     int utgFullTableRange = 0;
     Randomizer::GetRand(13, 15, 1, &utgFullTableRange);
