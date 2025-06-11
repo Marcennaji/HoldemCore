@@ -77,7 +77,7 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
 
     for (int i = 1; i < startData.numberOfPlayers; ++i)
     {
-        playerList->push_back(playerFactory->createBotPlayer(i, gameData.tableProfile));
+        playerList->push_back(playerFactory->createBotPlayer(i, gameData.tableProfile, gameData.startMoney));
     }
 
     // Shuffle bots but keep human first

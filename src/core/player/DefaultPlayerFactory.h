@@ -13,7 +13,7 @@ class DefaultPlayerFactory : public IPlayerFactory
                          StrategyAssigner* assigner);
 
     std::shared_ptr<Player> createHumanPlayer(int id, const std::string& name, int startMoney) override;
-    std::shared_ptr<Player> createBotPlayer(int id, TableProfile profile) override;
+    std::shared_ptr<Player> createBotPlayer(int id, TableProfile profile, int startMoney) override;
 
   private:
     GameEvents* myEvents;
