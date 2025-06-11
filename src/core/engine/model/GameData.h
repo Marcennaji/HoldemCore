@@ -25,17 +25,11 @@ namespace pkt::core
 {
 struct GameData
 {
-    GameData()
-        : maxNumberOfPlayers(0), startMoney(0), firstSmallBlind(0), guiSpeed(9), delayBetweenHandsSec(6),
-          playerActionTimeoutSec(20)
-    {
-    }
+    GameData() : maxNumberOfPlayers(0), startMoney(0), firstSmallBlind(0), guiSpeed(0) {}
     TableProfile tableProfile;
     int maxNumberOfPlayers;
     int startMoney;
     int firstSmallBlind;
     int guiSpeed;
-    int delayBetweenHandsSec;
-    int playerActionTimeoutSec;
 };
 } // namespace pkt::core

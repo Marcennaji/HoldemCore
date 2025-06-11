@@ -66,7 +66,7 @@ void StartWindow::startNewGame()
     else
         gameData.tableProfile = RANDOM_OPPONENTS;
 
-    gameData.guiSpeed = GAME_SPEED;
+    gameData.guiSpeed = spinBox_guiSpeed->value();
 
     StartData startData;
     int tmpDealerPos = 0;

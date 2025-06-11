@@ -475,6 +475,7 @@ void GameTableWindow::hideHoleCards()
 void GameTableWindow::initializeGui(int speed)
 {
     stopAllGuiTimers();
+    setGameSpeed(speed);
 
     label_Pot->setText(PotString);
 
