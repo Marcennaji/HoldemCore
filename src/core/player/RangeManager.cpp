@@ -34,7 +34,6 @@ std::string RangeManager::getEstimatedRange() const
     return myEstimatedRange;
 }
 
-// convert a range into a  list of real cards
 std::vector<std::string> RangeManager::getRangeAtomicValues(std::string ranges, const bool returnRange) const
 {
 
@@ -240,13 +239,13 @@ std::vector<std::string> RangeManager::getRangeAtomicValues(std::string ranges, 
                 continue;
             }
 
-            // if not a "suited/unsuited and above" range : range is a real hand, like Ad2c	or JhJd
+            // if not a "suited/unsuited and above" range :
 
             if (range[0] == range[2])
             {
-
                 // it's a pair, like JhJd
-                if (!returnRange)
+
+                if (returnRange)
                 {
                     string s;
                     s += range[0];
@@ -255,9 +254,11 @@ std::vector<std::string> RangeManager::getRangeAtomicValues(std::string ranges, 
                 }
                 else
                     result.push_back(token);
+
+                continue;
             }
 
-            // real hand but not a pair (like Ad2c) : don't modify it
+            // otherwise, it is a real hand but not a pair (like Ad2c) -> don't modify it
             result.push_back(token);
         }
     }
@@ -912,9 +913,9 @@ std::string RangeManager::substractRange(const std::string originRanges, const s
                 // cout << endl << "must remove " << originCard1 << originCard2 << endl;
 
                 vector<std::string> atomicRangesInSingleOriginRange = getRangeAtomicValues(singleOriginRange, true);
-                // atomicRangesInSingleOriginRange will now contain the singleOriginRange ranges, but without + or -
-                // signs. It may also contain real hands, like 5h4h. purpose : we will try to keep as few "real hands"
-                // as possible, for better display readability via the GUI
+                // atomicRangesInSingleOriginRange will now contain the singleOriginRange ranges, but converted to
+                // remove the + signs. It may also contain real hands, like 5h4h. purpose : we will try to keep as few
+                // "real hands" as possible, for better display readability via the GUI
 
                 for (vector<std::string>::const_iterator atomicOriginRange = atomicRangesInSingleOriginRange.begin();
                      atomicOriginRange != atomicRangesInSingleOriginRange.end(); atomicOriginRange++)

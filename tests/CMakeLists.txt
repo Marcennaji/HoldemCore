@@ -10,11 +10,12 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(strategy_tests
+add_executable(core_tests
     strategy/test_tight_aggressive.cpp
+    range/RangeManagerTest.cpp
 )
 
-target_include_directories(strategy_tests
+target_include_directories(core_tests
     PRIVATE
     ${PROJECT_SOURCE_DIR}/tests/strategy
     ${PROJECT_SOURCE_DIR}/tests/helpers
@@ -22,7 +23,7 @@ target_include_directories(strategy_tests
 )
 
 # Link with main engine and GoogleTest
-target_link_libraries(strategy_tests
+target_link_libraries(core_tests
     PRIVATE
     player
     engine
@@ -31,4 +32,4 @@ target_link_libraries(strategy_tests
 )
 
 include(GoogleTest)
-gtest_discover_tests(strategy_tests)
+gtest_discover_tests(core_tests)

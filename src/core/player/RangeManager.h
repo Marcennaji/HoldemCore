@@ -32,7 +32,12 @@ class RangeManager
     void setHand(IHand* hand) { myHand = hand; }
     void setEstimatedRange(const std::string& range);
     std::string getEstimatedRange() const;
+
+    // convert a range into a list of real cards, or a list of simplified ranges
+    // if returnRange is true, the range is processed and split, only to remove the + signs (if any)
+    // otherwise, if returnRange is false, it returns the atomic values of the range (the "real cards")
     std::vector<std::string> getRangeAtomicValues(std::string range, const bool returnRange = false) const;
+
     void computeEstimatedPreflopRange(CurrentHandContext&);
     int getStandardRaisingRange(int nbPlayers) const;
     int getStandardCallingRange(int nbPlayers) const;
