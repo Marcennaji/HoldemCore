@@ -34,236 +34,238 @@ std::string RangeManager::getEstimatedRange() const
     return myEstimatedRange;
 }
 
-std::vector<std::string> RangeManager::getRangeAtomicValues(std::string ranges, const bool returnRange) const
+std::vector<std::string> RangeManager::getRangeAtomicValues(const std::string& ranges, const bool returnRange) const
 {
-
-    vector<std::string> result;
+    std::vector<std::string> result;
 
     std::istringstream oss(ranges);
     std::string token;
 
-    while (getline(oss, token, ','))
+    while (std::getline(oss, token, ','))
     {
-
-        if (token.size() == 0)
+        if (token.empty())
             continue;
 
         if (token.size() == 1 || token.size() > 4)
         {
-            std::cout << "getRangeAtomicValues invalid range : " << token << endl;
+            std::cerr << "getRangeAtomicValues invalid range: " << token << std::endl;
             return result;
         }
 
         const char* range = token.c_str();
 
         if (token.size() == 2)
-        { // an exact pair, like 55 or AA
-
-            string s1;
-            s1 = range[0];
-            string s2;
-            s2 = range[1];
-
-            if (!returnRange)
-            {
-                result.push_back(s1 + 's' + s2 + 'd');
-                result.push_back(s1 + 's' + s2 + 'h');
-                result.push_back(s1 + 's' + s2 + 'c');
-                result.push_back(s1 + 'd' + s2 + 'h');
-                result.push_back(s1 + 'd' + s2 + 'c');
-                result.push_back(s1 + 'c' + s2 + 'h');
-            }
-            else
-                result.push_back(s1 + s2);
-
-            continue;
-        }
-
-        if (token.size() == 3)
         {
-
-            if (range[0] != range[1] && range[2] == 's')
-            { // range is an exact suited hand, like QJs
-
-                string s1;
-                s1 = range[0];
-                string s2;
-                s2 = range[1];
-
-                if (!returnRange)
-                {
-                    result.push_back(s1 + 's' + s2 + 's');
-                    result.push_back(s1 + 'd' + s2 + 'd');
-                    result.push_back(s1 + 'h' + s2 + 'h');
-                    result.push_back(s1 + 'c' + s2 + 'c');
-                }
-                else
-                    result.push_back(s1 + s2 + 's');
-
-                continue;
-            }
-
-            if (range[0] != range[1] && range[2] == 'o')
-            { // range is an exact offsuited cards, like KTo
-
-                string s1;
-                s1 = range[0];
-                string s2;
-                s2 = range[1];
-
-                if (!returnRange)
-                {
-                    result.push_back(s1 + 's' + s2 + 'd');
-                    result.push_back(s1 + 's' + s2 + 'c');
-                    result.push_back(s1 + 's' + s2 + 'h');
-
-                    result.push_back(s1 + 'd' + s2 + 's');
-                    result.push_back(s1 + 'd' + s2 + 'c');
-                    result.push_back(s1 + 'd' + s2 + 'h');
-
-                    result.push_back(s1 + 'h' + s2 + 'd');
-                    result.push_back(s1 + 'h' + s2 + 'c');
-                    result.push_back(s1 + 'h' + s2 + 's');
-
-                    result.push_back(s1 + 'c' + s2 + 'd');
-                    result.push_back(s1 + 'c' + s2 + 's');
-                    result.push_back(s1 + 'c' + s2 + 'h');
-                }
-                else
-                    result.push_back(s1 + s2 + 'o');
-
-                continue;
-            }
-
-            if (range[0] == range[1] && range[2] == '+')
-            { // range is a pair and above, like 99+
-                char c = range[0];
-
-                while (c != 'X')
-                {
-
-                    string s;
-                    s = c;
-
-                    if (!returnRange)
-                    {
-                        result.push_back(s + 's' + s + 'd');
-                        result.push_back(s + 's' + s + 'c');
-                        result.push_back(s + 's' + s + 'h');
-                        result.push_back(s + 'd' + s + 'c');
-                        result.push_back(s + 'd' + s + 'h');
-                        result.push_back(s + 'h' + s + 'c');
-                    }
-                    else
-                        result.push_back(s + s);
-
-                    // next value :
-                    c = incrementCardValue(c);
-                }
-                continue;
-            }
+            handleExactPair(range, returnRange, result);
         }
-
-        if (token.size() == 4)
+        else if (token.size() == 3)
         {
-
-            if (range[0] != range[1] && range[2] == 'o' && range[3] == '+')
-            {
-
-                // range is offsuited and above, like AQo+
-
-                string s1;
-                s1 = range[0];
-                char c = range[1];
-
-                while (c != range[0])
-                {
-
-                    string s2;
-                    s2 = c;
-
-                    if (!returnRange)
-                    {
-                        result.push_back(s1 + 's' + s2 + 'd');
-                        result.push_back(s1 + 's' + s2 + 'c');
-                        result.push_back(s1 + 's' + s2 + 'h');
-
-                        result.push_back(s1 + 'd' + s2 + 's');
-                        result.push_back(s1 + 'd' + s2 + 'c');
-                        result.push_back(s1 + 'd' + s2 + 'h');
-
-                        result.push_back(s1 + 'h' + s2 + 'd');
-                        result.push_back(s1 + 'h' + s2 + 'c');
-                        result.push_back(s1 + 'h' + s2 + 's');
-
-                        result.push_back(s1 + 'c' + s2 + 'd');
-                        result.push_back(s1 + 'c' + s2 + 's');
-                        result.push_back(s1 + 'c' + s2 + 'h');
-                    }
-                    else
-                        result.push_back(s1 + s2 + 'o');
-
-                    // next value :
-                    c = incrementCardValue(c);
-                }
-                continue;
-            }
-            if (range[0] != range[1] && range[2] == 's' && range[3] == '+')
-            {
-
-                // range is suited and above, like AQs+
-
-                string s1;
-                s1 = range[0];
-                char c = range[1];
-
-                while (c != range[0])
-                {
-
-                    string s2;
-                    s2 = c;
-
-                    if (!returnRange)
-                    {
-                        result.push_back(s1 + 's' + s2 + 's');
-                        result.push_back(s1 + 'd' + s2 + 'd');
-                        result.push_back(s1 + 'h' + s2 + 'h');
-                        result.push_back(s1 + 'c' + s2 + 'c');
-                    }
-                    else
-                        result.push_back(s1 + s2 + 's');
-
-                    // next value :
-                    c = incrementCardValue(c);
-                }
-                continue;
-            }
-
-            // if not a "suited/unsuited and above" range :
-
-            if (range[0] == range[2])
-            {
-                // it's a pair, like JhJd
-
-                if (returnRange)
-                {
-                    string s;
-                    s += range[0];
-                    s += range[0];
-                    result.push_back(s);
-                }
-                else
-                    result.push_back(token);
-
-                continue;
-            }
-
-            // otherwise, it is a real hand but not a pair (like Ad2c) -> don't modify it
-            result.push_back(token);
+            handleThreeCharRange(range, returnRange, result);
+        }
+        else if (token.size() == 4)
+        {
+            handleFourCharRange(range, returnRange, result);
         }
     }
 
     return result;
+}
+
+void RangeManager::handleExactPair(const char* range, const bool returnRange, std::vector<std::string>& result) const
+{
+    std::string s1(1, range[0]);
+    std::string s2(1, range[1]);
+
+    if (!returnRange)
+    {
+        result.push_back(s1 + 's' + s2 + 'd');
+        result.push_back(s1 + 's' + s2 + 'h');
+        result.push_back(s1 + 's' + s2 + 'c');
+        result.push_back(s1 + 'd' + s2 + 'h');
+        result.push_back(s1 + 'd' + s2 + 'c');
+        result.push_back(s1 + 'c' + s2 + 'h');
+    }
+    else
+    {
+        result.push_back(s1 + s2);
+    }
+}
+
+void RangeManager::handleThreeCharRange(const char* range, const bool returnRange,
+                                        std::vector<std::string>& result) const
+{
+    std::string s1(1, range[0]);
+    std::string s2(1, range[1]);
+
+    if (range[2] == 's')
+    {
+        handleSuitedRange(s1, s2, returnRange, result);
+    }
+    else if (range[2] == 'o')
+    {
+        handleOffsuitedRange(s1, s2, returnRange, result);
+    }
+    else if (range[0] == range[1] && range[2] == '+')
+    {
+        handlePairAndAboveRange(range[0], returnRange, result);
+    }
+}
+
+void RangeManager::handleFourCharRange(const char* range, const bool returnRange,
+                                       std::vector<std::string>& result) const
+{
+    std::string s1(1, range[0]);
+    char c = range[1];
+
+    if (range[2] == 'o' && range[3] == '+')
+    {
+        handleOffsuitedAndAboveRange(s1, c, returnRange, result);
+    }
+    else if (range[2] == 's' && range[3] == '+')
+    {
+        handleSuitedAndAboveRange(s1, c, returnRange, result);
+    }
+    else if (range[0] == range[2])
+    {
+        handleExactPairRange(range, returnRange, result);
+    }
+    else
+    {
+        result.push_back(range); // Real hand, not a pair
+    }
+}
+
+void RangeManager::handleSuitedRange(const std::string& s1, const std::string& s2, const bool returnRange,
+                                     std::vector<std::string>& result) const
+{
+    if (!returnRange)
+    {
+        result.push_back(s1 + 's' + s2 + 's');
+        result.push_back(s1 + 'd' + s2 + 'd');
+        result.push_back(s1 + 'h' + s2 + 'h');
+        result.push_back(s1 + 'c' + s2 + 'c');
+    }
+    else
+    {
+        result.push_back(s1 + s2 + 's');
+    }
+}
+
+void RangeManager::handleOffsuitedRange(const std::string& s1, const std::string& s2, const bool returnRange,
+                                        std::vector<std::string>& result) const
+{
+    if (!returnRange)
+    {
+        result.push_back(s1 + 's' + s2 + 'd');
+        result.push_back(s1 + 's' + s2 + 'c');
+        result.push_back(s1 + 's' + s2 + 'h');
+        result.push_back(s1 + 'd' + s2 + 's');
+        result.push_back(s1 + 'd' + s2 + 'c');
+        result.push_back(s1 + 'd' + s2 + 'h');
+        result.push_back(s1 + 'h' + s2 + 'd');
+        result.push_back(s1 + 'h' + s2 + 'c');
+        result.push_back(s1 + 'h' + s2 + 's');
+        result.push_back(s1 + 'c' + s2 + 'd');
+        result.push_back(s1 + 'c' + s2 + 's');
+        result.push_back(s1 + 'c' + s2 + 'h');
+    }
+    else
+    {
+        result.push_back(s1 + s2 + 'o');
+    }
+}
+
+void RangeManager::handlePairAndAboveRange(char c, const bool returnRange, std::vector<std::string>& result) const
+{
+    while (c != 'X')
+    {
+        std::string s(1, c);
+
+        if (!returnRange)
+        {
+            result.push_back(s + 's' + s + 'd');
+            result.push_back(s + 's' + s + 'c');
+            result.push_back(s + 's' + s + 'h');
+            result.push_back(s + 'd' + s + 'c');
+            result.push_back(s + 'd' + s + 'h');
+            result.push_back(s + 'h' + s + 'c');
+        }
+        else
+        {
+            result.push_back(s + s);
+        }
+
+        c = incrementCardValue(c);
+    }
+}
+
+void RangeManager::handleOffsuitedAndAboveRange(const std::string& s1, char c, const bool returnRange,
+                                                std::vector<std::string>& result) const
+{
+    while (c != s1[0])
+    {
+        std::string s2(1, c);
+
+        if (!returnRange)
+        {
+            result.push_back(s1 + 's' + s2 + 'd');
+            result.push_back(s1 + 's' + s2 + 'c');
+            result.push_back(s1 + 's' + s2 + 'h');
+            result.push_back(s1 + 'd' + s2 + 's');
+            result.push_back(s1 + 'd' + s2 + 'c');
+            result.push_back(s1 + 'd' + s2 + 'h');
+            result.push_back(s1 + 'h' + s2 + 'd');
+            result.push_back(s1 + 'h' + s2 + 'c');
+            result.push_back(s1 + 'h' + s2 + 's');
+            result.push_back(s1 + 'c' + s2 + 'd');
+            result.push_back(s1 + 'c' + s2 + 's');
+            result.push_back(s1 + 'c' + s2 + 'h');
+        }
+        else
+        {
+            result.push_back(s1 + s2 + 'o');
+        }
+
+        c = incrementCardValue(c);
+    }
+}
+
+void RangeManager::handleSuitedAndAboveRange(const std::string& s1, char c, const bool returnRange,
+                                             std::vector<std::string>& result) const
+{
+    while (c != s1[0])
+    {
+        std::string s2(1, c);
+
+        if (!returnRange)
+        {
+            result.push_back(s1 + 's' + s2 + 's');
+            result.push_back(s1 + 'd' + s2 + 'd');
+            result.push_back(s1 + 'h' + s2 + 'h');
+            result.push_back(s1 + 'c' + s2 + 'c');
+        }
+        else
+        {
+            result.push_back(s1 + s2 + 's');
+        }
+
+        c = incrementCardValue(c);
+    }
+}
+
+void RangeManager::handleExactPairRange(const char* range, const bool returnRange,
+                                        std::vector<std::string>& result) const
+{
+    if (returnRange)
+    {
+        std::string s(1, range[0]);
+        s += range[0];
+        result.push_back(s);
+    }
+    else
+    {
+        result.push_back(range);
+    }
 }
 
 char RangeManager::incrementCardValue(char c) const

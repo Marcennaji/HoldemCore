@@ -120,3 +120,95 @@ TEST_F(RangeManagerTest, ReturnRangeTrue)
     EXPECT_EQ(result[0], "99");
     EXPECT_EQ(result.back(), "AA");
 }
+
+TEST_F(RangeManagerTest, EmptyOriginRanges)
+{
+    std::string result = rangeManager->substractRange("", "AJo", "");
+    EXPECT_EQ(result, "");
+}
+
+TEST_F(RangeManagerTest, EmptyRangesToSubstract)
+{
+    std::string result = rangeManager->substractRange("AJo", "", "");
+    EXPECT_EQ(result, ",AJo");
+}
+
+TEST_F(RangeManagerTest, EmptyBoard)
+{
+    std::string result = rangeManager->substractRange("AJo", "AJo", "");
+    EXPECT_EQ(result, "");
+}
+
+TEST_F(RangeManagerTest, SubstractSingleRange)
+{
+    std::string result = rangeManager->substractRange("AJo,KQo", "AJo", "");
+    EXPECT_EQ(result, ",KQo");
+}
+
+TEST_F(RangeManagerTest, SubstractMultipleRanges)
+{
+    std::string result = rangeManager->substractRange("AJo,KQo,QJs", "AJo,KQo", "");
+    EXPECT_EQ(result, ",QJs");
+}
+
+TEST_F(RangeManagerTest, SubstractRealHand)
+{
+    std::string result = rangeManager->substractRange("AsKs,AhKh", "AsKs", "");
+    EXPECT_EQ(result, ",AhKh");
+}
+
+TEST_F(RangeManagerTest, SubstractWithBoardCards)
+{
+    // if the board contains As, then we can't have AsKs in the resulting range, after having substracted AhKh
+    // std::string result = rangeManager->substractRange("AsKs,AhKh", "AhKh", "As");
+    std::string result = rangeManager->substractRange("AsKs", "", "As");
+    EXPECT_EQ(result, "");
+}
+
+TEST_F(RangeManagerTest, KeepOriginRange)
+{
+    std::string result = rangeManager->substractRange("AJo,KQo", "QJs", "");
+    EXPECT_EQ(result, ",AJo,KQo");
+}
+
+TEST_F(RangeManagerTest, SubstractSuitedRanges)
+{
+    std::string result = rangeManager->substractRange("AJs,KJs,QJs", "AJs", "");
+    EXPECT_EQ(result, ",KJs,QJs");
+}
+
+TEST_F(RangeManagerTest, SubstractUnsuitedRanges)
+{
+    std::string result = rangeManager->substractRange("AJo,KJo,QJo", "KJo", "");
+    EXPECT_EQ(result, ",AJo,QJo");
+}
+
+TEST_F(RangeManagerTest, SubstractWithAtomicRanges)
+{
+    std::string result = rangeManager->substractRange("99+,AJo+", "99+", "");
+    EXPECT_EQ(result, ",AJo+");
+}
+
+TEST_F(RangeManagerTest, SubstractWithBoardImpact)
+{
+    std::string result = rangeManager->substractRange("AsKs,AhKh", "AhKh", "Ks");
+    EXPECT_EQ(result, ",AsKs");
+}
+
+TEST_F(RangeManagerTest, SubstractAllRanges)
+{
+    std::string result = rangeManager->substractRange("AJo,KQo,QJs", "AJo,KQo,QJs", "");
+    EXPECT_EQ(result, "");
+}
+
+TEST_F(RangeManagerTest, SubstractWithDuplicateRanges)
+{
+    std::string result = rangeManager->substractRange("AJo,AJo,KQo", "AJo", "");
+    EXPECT_EQ(result, ",KQo");
+}
+
+TEST_F(RangeManagerTest, SubstractWithComplexBoard)
+{
+    std::string result = rangeManager->substractRange("AsKs,AhKh,AdKd", "AhKh", "Ks,Ad");
+    EXPECT_EQ(result, ",AsKs");
+}
