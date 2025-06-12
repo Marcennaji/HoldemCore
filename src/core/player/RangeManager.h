@@ -36,14 +36,14 @@ class RangeManager
     // convert a range into a list of real cards, or a list of simplified ranges
     // if returnRange is true, the range is processed and split, only to remove the + signs (if any)
     // otherwise, if returnRange is false, it returns the atomic values of the range (the "real cards")
-    std::vector<std::string> getRangeAtomicValues(const std::string& ranges, const bool returnRange = false) const;
+    static std::vector<std::string> getRangeAtomicValues(const std::string& ranges, const bool returnRange = false);
 
     void computeEstimatedPreflopRange(CurrentHandContext&);
     int getStandardRaisingRange(int nbPlayers) const;
     int getStandardCallingRange(int nbPlayers) const;
-    std::string substractRange(const std::string startingRange, const std::string rangeToSubstract,
-                               const std::string board = "");
-    std::string getHandToRange(const std::string card1, const std::string card2) const;
+    std::string substractRange(const std::string& originRanges, const std::string& rangesToSubstract,
+                               const std::string& board = "") const;
+
     static std::string getStringRange(int nbPlayers, int range);
 
     void updateUnplausibleRangesGivenPreflopActions(CurrentHandContext&);
@@ -54,23 +54,25 @@ class RangeManager
   private:
     std::string computeEstimatedPreflopRangeFromLastRaiser(CurrentHandContext&) const;
     std::string computeEstimatedPreflopRangeFromCaller(CurrentHandContext&) const;
-    char incrementCardValue(char c) const;
+
     std::string getFilledRange(std::vector<std::string>& ranges, std::vector<float>& rangesValues,
                                const float rangeMax) const;
 
-    void handleExactPair(const char* range, const bool returnRange, std::vector<std::string>& result) const;
-    void handleThreeCharRange(const char* range, const bool returnRange, std::vector<std::string>& result) const;
-    void handleFourCharRange(const char* range, const bool returnRange, std::vector<std::string>& result) const;
-    void handleSuitedRange(const std::string& s1, const std::string& s2, const bool returnRange,
-                           std::vector<std::string>& result) const;
-    void handleOffsuitedRange(const std::string& s1, const std::string& s2, const bool returnRange,
-                              std::vector<std::string>& result) const;
-    void handlePairAndAboveRange(char c, const bool returnRange, std::vector<std::string>& result) const;
-    void handleOffsuitedAndAboveRange(const std::string& s1, char c, const bool returnRange,
-                                      std::vector<std::string>& result) const;
-    void handleSuitedAndAboveRange(const std::string& s1, char c, const bool returnRange,
-                                   std::vector<std::string>& result) const;
-    void handleExactPairRange(const char* range, const bool returnRange, std::vector<std::string>& result) const;
+    // getRangeAtomicValues helpers :
+    static void handleExactPair(const char* range, const bool returnRange, std::vector<std::string>& result);
+    static void handleThreeCharRange(const char* range, const bool returnRange, std::vector<std::string>& result);
+    static void handleFourCharRange(const char* range, const bool returnRange, std::vector<std::string>& result);
+    static void handleSuitedRange(const std::string& s1, const std::string& s2, const bool returnRange,
+                                  std::vector<std::string>& result);
+    static void handleOffsuitedRange(const std::string& s1, const std::string& s2, const bool returnRange,
+                                     std::vector<std::string>& result);
+    static void handlePairAndAboveRange(char c, const bool returnRange, std::vector<std::string>& result);
+    static void handleOffsuitedAndAboveRange(const std::string& s1, char c, const bool returnRange,
+                                             std::vector<std::string>& result);
+    static void handleSuitedAndAboveRange(const std::string& s1, char c, const bool returnRange,
+                                          std::vector<std::string>& result);
+    static void handleExactPairRange(const char* range, const bool returnRange, std::vector<std::string>& result);
+    static char incrementCardValue(char c);
 
     std::string myEstimatedRange;
     int myPlayerId;

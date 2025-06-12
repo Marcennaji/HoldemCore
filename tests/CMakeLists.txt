@@ -13,6 +13,7 @@ enable_testing()
 add_executable(core_tests
     strategy/test_tight_aggressive.cpp
     range/RangeManagerTest.cpp
+    range/RangeRefinerTest.cpp
 )
 
 target_include_directories(core_tests
