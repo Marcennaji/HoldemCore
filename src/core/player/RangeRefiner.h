@@ -12,42 +12,19 @@ class RangeRefiner
     static std::string substractRange(const std::string originRanges, const std::string rangesToSubstract,
                                       const std::string board);
 
-    // Preprocess the board to remove conflicting atomic ranges
-    static std::string preprocessBoardConflicts(const std::string& originRanges, const std::string& board);
-
-    // Process a single origin range
-    static void processSingleOriginRange(const std::string& singleOriginRange, const std::string& rangesToSubstract,
-                                         std::string& newRange);
-
-    // Remove previously included hand from the range
-    static void removePreviouslyIncludedHand(const std::string& originHand, std::string& newRange);
-
-    // Process atomic ranges within a single origin range
-    static void processAtomicRanges(const std::string& singleOriginRange, const std::string& rangesToSubstract,
-                                    std::string& newRange);
-
-    // Process a real hand (specific combination)
-    static void processRealHand(const std::string& atomicOriginRange, const std::string& rangesToSubstract,
-                                std::string& newRange);
-
-    // Process a range (suited or unsuited)
-    static void processRange(const std::string& atomicOriginRange, const std::string& rangesToSubstract,
-                             std::string& newRange);
-
-    // Check if a range is suited
-    static bool isSuitedRange(const std::vector<std::string>& handsInAtomicRange);
+    // Process real hands
+    static void processRealHands(const std::vector<std::string>& hands, const std::string& rangesToSubstract,
+                                 const std::string& board, std::string& newRange);
 
     // Process suited ranges
-    static void processSuitedRange(const std::vector<std::string>& handsInAtomicRange,
-                                   const std::string& rangesToSubstract, std::string& newRange,
-                                   const std::string& atomicOriginRange);
+    static void processSuitedRanges(const std::vector<std::string>& hands, const std::string& rangesToSubstract,
+                                    const std::string& board, const std::string& atomicOriginRange,
+                                    std::string& newRange);
 
     // Process unsuited ranges
-    static void processUnsuitedRange(const std::vector<std::string>& handsInAtomicRange,
-                                     const std::string& rangesToSubstract, std::string& newRange,
-                                     const std::string& atomicOriginRange);
-    static bool isRangeInSubstractList(const std::string& range, const std::string& rangesToSubstract);
-    static std::string joinRanges(const std::vector<std::string>& ranges);
+    static void processUnsuitedRanges(const std::vector<std::string>& hands, const std::string& rangesToSubstract,
+                                      const std::string& board, const std::string& atomicOriginRange,
+                                      std::string& newRange);
 };
 
 } // namespace pkt::core::player
