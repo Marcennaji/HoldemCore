@@ -2,6 +2,7 @@
 #pragma once
 
 #include <core/player/Player.h>
+#include <core/player/strategy/PreflopRangeCalculator.h>
 
 namespace pkt::core::player
 {
@@ -45,6 +46,8 @@ class IBotStrategy
     std::string myStrategyName;
 
   private:
+    std::shared_ptr<PreflopRangeCalculator> preflopRangeCalculator;
+
     // vector index is player position, value is range %
     std::vector<int> UTG_STARTING_RANGE;
     std::vector<int> UTG_PLUS_ONE_STARTING_RANGE;
