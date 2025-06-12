@@ -19,11 +19,8 @@
 #include "EngineFactory.h"
 
 #include <core/interfaces/ILogger.h>
-#include "BettingRoundFlop.h"
 #include "BettingRoundPostRiver.h"
 #include "BettingRoundPreflop.h"
-#include "BettingRoundRiver.h"
-#include "BettingRoundTurn.h"
 #include "Board.h"
 #include "Hand.h"
 #include "Randomizer.h"
@@ -66,11 +63,14 @@ std::vector<std::shared_ptr<IBettingRound>> EngineFactory::createBettingRound(IH
 
     myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundPreflop(myEvents, myLogger, hi, dP, sB)));
 
-    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundFlop(myEvents, myLogger, hi, dP, sB)));
+    myBettingRound.push_back(
+        std::shared_ptr<IBettingRound>(new BettingRound(myEvents, myLogger, hi, dP, sB, GAME_STATE_FLOP)));
 
-    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundTurn(myEvents, myLogger, hi, dP, sB)));
+    myBettingRound.push_back(
+        std::shared_ptr<IBettingRound>(new BettingRound(myEvents, myLogger, hi, dP, sB, GAME_STATE_TURN)));
 
-    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundRiver(myEvents, myLogger, hi, dP, sB)));
+    myBettingRound.push_back(
+        std::shared_ptr<IBettingRound>(new BettingRound(myEvents, myLogger, hi, dP, sB, GAME_STATE_RIVER)));
 
     myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundPostRiver(myEvents, myLogger, hi, dP, sB)));
 
