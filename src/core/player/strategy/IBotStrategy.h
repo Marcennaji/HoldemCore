@@ -30,15 +30,14 @@ class IBotStrategy
 
     const std::string& getStrategyName() const { return myStrategyName; }
     void setStrategyName(const std::string& name) { myStrategyName = name; }
-    std::unique_ptr<PreflopRangeCalculator>& getPreflopRangeCalculator() { return preflopRangeCalculator; }
+    const std::unique_ptr<PreflopRangeCalculator>& getPreflopRangeCalculator() const { return preflopRangeCalculator; }
 
     virtual ~IBotStrategy() = default;
 
   protected:
     void initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange);
-
     float getPreflopRaisingRange(CurrentHandContext&, bool deterministic = false) const;
-    int getRange(PlayerPosition p, int nbPlayers) const;
+
     int computePreflopRaiseAmount(CurrentHandContext&, bool deterministic = false);
     bool shouldPotControl(CurrentHandContext&, bool deterministic = false);
 
@@ -48,17 +47,5 @@ class IBotStrategy
 
   private:
     std::unique_ptr<PreflopRangeCalculator> preflopRangeCalculator;
-
-    // vector index is player position, value is range %
-    std::vector<int> UTG_STARTING_RANGE;
-    std::vector<int> UTG_PLUS_ONE_STARTING_RANGE;
-    std::vector<int> UTG_PLUS_TWO_STARTING_RANGE;
-    std::vector<int> MIDDLE_STARTING_RANGE;
-    std::vector<int> MIDDLE_PLUS_ONE_STARTING_RANGE;
-    std::vector<int> LATE_STARTING_RANGE;
-    std::vector<int> CUTOFF_STARTING_RANGE;
-    std::vector<int> BUTTON_STARTING_RANGE;
-    std::vector<int> SB_STARTING_RANGE;
-    std::vector<int> BB_STARTING_RANGE;
 };
 } // namespace pkt::core::player

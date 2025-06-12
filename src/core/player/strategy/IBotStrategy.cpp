@@ -11,80 +11,6 @@ namespace pkt::core::player
 
 void IBotStrategy::initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange)
 {
-
-    const float step = (float) (utgHeadsUpRange - utgFullTableRange) / 8;
-
-    // values are % best hands
-
-    UTG_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    UTG_STARTING_RANGE[2] = utgHeadsUpRange;
-    UTG_STARTING_RANGE[3] = utgHeadsUpRange - step;
-    UTG_STARTING_RANGE[4] = utgHeadsUpRange - (2 * step);
-    UTG_STARTING_RANGE[5] = utgHeadsUpRange - (3 * step);
-    UTG_STARTING_RANGE[6] = utgHeadsUpRange - (4 * step);
-    UTG_STARTING_RANGE[7] = utgFullTableRange + (3 * step);
-    UTG_STARTING_RANGE[8] = utgFullTableRange + (2 * step);
-    UTG_STARTING_RANGE[9] = utgFullTableRange + step;
-    UTG_STARTING_RANGE[10] = utgFullTableRange;
-
-    assert(UTG_STARTING_RANGE[7] < UTG_STARTING_RANGE[6]);
-
-    // we have the UTG starting ranges. Now, deduce the starting ranges for other positions :
-
-    UTG_PLUS_ONE_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < UTG_PLUS_ONE_STARTING_RANGE.size(); i++)
-    {
-        UTG_PLUS_ONE_STARTING_RANGE[i] = min(50, UTG_STARTING_RANGE[i] + 1);
-    }
-
-    UTG_PLUS_TWO_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < UTG_PLUS_TWO_STARTING_RANGE.size(); i++)
-    {
-        UTG_PLUS_TWO_STARTING_RANGE[i] = min(50, UTG_PLUS_ONE_STARTING_RANGE[i] + 1);
-    }
-
-    MIDDLE_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < MIDDLE_STARTING_RANGE.size(); i++)
-    {
-        MIDDLE_STARTING_RANGE[i] = min(50, UTG_PLUS_TWO_STARTING_RANGE[i] + 1);
-    }
-
-    MIDDLE_PLUS_ONE_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < MIDDLE_PLUS_ONE_STARTING_RANGE.size(); i++)
-    {
-        MIDDLE_PLUS_ONE_STARTING_RANGE[i] = min(50, MIDDLE_STARTING_RANGE[i] + 1);
-    }
-
-    LATE_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < LATE_STARTING_RANGE.size(); i++)
-    {
-        LATE_STARTING_RANGE[i] = min(50, MIDDLE_PLUS_ONE_STARTING_RANGE[i] + 1);
-    }
-
-    CUTOFF_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < CUTOFF_STARTING_RANGE.size(); i++)
-    {
-        CUTOFF_STARTING_RANGE[i] = min(50, LATE_STARTING_RANGE[i] + 1);
-    }
-
-    BUTTON_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < BUTTON_STARTING_RANGE.size(); i++)
-    {
-        BUTTON_STARTING_RANGE[i] = min(50, CUTOFF_STARTING_RANGE[i] + 1);
-    }
-
-    SB_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < SB_STARTING_RANGE.size(); i++)
-    {
-        SB_STARTING_RANGE[i] = CUTOFF_STARTING_RANGE[i];
-    }
-
-    BB_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < BB_STARTING_RANGE.size(); i++)
-    {
-        BB_STARTING_RANGE[i] = SB_STARTING_RANGE[i] + 1;
-    }
-
     preflopRangeCalculator->initializeRanges(utgHeadsUpRange, utgFullTableRange);
 }
 
@@ -109,7 +35,7 @@ float IBotStrategy::getPreflopRaisingRange(CurrentHandContext& context, bool det
     const std::string myCard2 = context.myCard2;
     const bool canBluff = context.myCanBluff;
 
-    float raisingRange = getRange(myPosition, nbPlayers) * 0.8;
+    float raisingRange = getPreflopRangeCalculator()->getRange(myPosition, nbPlayers) * 0.8;
 
 #ifdef LOG_POKER_EXEC
     cout << endl << "\t\tInitial raising range : " << raisingRange << endl;
@@ -290,47 +216,6 @@ float IBotStrategy::getPreflopRaisingRange(CurrentHandContext& context, bool det
     // assert(newRaisingRange == raisingRange);
 
     return raisingRange;
-}
-
-int IBotStrategy::getRange(PlayerPosition p, const int nbPlayers) const
-{
-
-    switch (p)
-    {
-
-    case UTG:
-        return UTG_STARTING_RANGE[nbPlayers];
-        break;
-    case UTG_PLUS_ONE:
-        return UTG_PLUS_ONE_STARTING_RANGE[nbPlayers];
-        break;
-    case UTG_PLUS_TWO:
-        return UTG_PLUS_TWO_STARTING_RANGE[nbPlayers];
-        break;
-    case MIDDLE:
-        return MIDDLE_STARTING_RANGE[nbPlayers];
-        break;
-    case MIDDLE_PLUS_ONE:
-        return MIDDLE_PLUS_ONE_STARTING_RANGE[nbPlayers];
-        break;
-    case LATE:
-        return LATE_STARTING_RANGE[nbPlayers];
-        break;
-    case CUTOFF:
-        return CUTOFF_STARTING_RANGE[nbPlayers];
-        break;
-    case BUTTON:
-        return BUTTON_STARTING_RANGE[nbPlayers];
-        break;
-    case SB:
-        return SB_STARTING_RANGE[nbPlayers];
-        break;
-    case BB:
-        return BB_STARTING_RANGE[nbPlayers];
-        break;
-    default:
-        return 0;
-    }
 }
 
 int IBotStrategy::computePreflopRaiseAmount(CurrentHandContext& ctx, bool deterministic)
