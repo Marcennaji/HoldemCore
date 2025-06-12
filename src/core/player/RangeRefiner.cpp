@@ -47,7 +47,8 @@ std::string RangeRefiner::substractRange(const std::string originRanges, const s
                     }
                     else
                     {
-                        // is a range like "AJo" (without the +), or "99"
+                        // is a range like "AJo" (without the +), or "99".
+                        // we need to get real cards from it
 
                         std::vector<std::string> handsInAtomicRange =
                             RangeManager::getRangeAtomicValues(atomicOriginRange);

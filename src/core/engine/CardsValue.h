@@ -31,7 +31,10 @@ namespace pkt::core
 class CardsValue
 {
   public:
-    static int cardsValue(int*, int*);
+    /// Evaluates the strength of a 7-card poker hand.
+    /// \param cards An array of 7 integers (0–51) representing cards.
+    /// \return A hand strength score where higher means better.
+    static int evaluateHand(const int* cards);
 
     static const std::string CardStringValue[];
     static std::map<std::string, int> CardStringOrdering;

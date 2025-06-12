@@ -212,7 +212,7 @@ Hand::Hand(GameEvents* events, ILogger* logger, std::shared_ptr<EngineFactory> f
         }
 
         (*it)->setCards(tempPlayerArray);
-        (*it)->setCardsValueInt(CardsValue::cardsValue(tempPlayerAndBoardArray, bestHandPos));
+        (*it)->setCardsValueInt(CardsValue::evaluateHand(tempPlayerAndBoardArray));
         (*it)->setBestHandPosition(bestHandPos);
         (*it)->setRoundStartCash((*it)->getCash());
         (*it)->getCurrentHandActions().reset();
