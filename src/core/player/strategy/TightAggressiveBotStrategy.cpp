@@ -54,7 +54,7 @@ TightAggressiveBotStrategy::~TightAggressiveBotStrategy()
 bool TightAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool deterministic)
 {
 
-    float callingRange = getPreflopCallingRange(ctx);
+    float callingRange = getPreflopRangeCalculator()->getPreflopCallingRange(ctx);
     if (callingRange == -1)
         return false; // never call : raise or fold
 

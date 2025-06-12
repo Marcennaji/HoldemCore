@@ -12,6 +12,8 @@ struct CurrentHandContext;
 class IBotStrategy
 {
   public:
+    IBotStrategy() : preflopRangeCalculator(std::make_unique<PreflopRangeCalculator>()) {}
+
     virtual bool preflopShouldCall(CurrentHandContext&, bool deterministic = false) = 0;
     virtual bool flopShouldCall(CurrentHandContext&, bool deterministic = false) = 0;
     virtual bool turnShouldCall(CurrentHandContext&, bool deterministic = false) = 0;
@@ -26,10 +28,9 @@ class IBotStrategy
     virtual int turnShouldBet(CurrentHandContext&, bool deterministic = false) = 0;
     virtual int riverShouldBet(CurrentHandContext&, bool deterministic = false) = 0;
 
-    float getPreflopCallingRange(CurrentHandContext&, bool deterministic = false) const;
-
     const std::string& getStrategyName() const { return myStrategyName; }
     void setStrategyName(const std::string& name) { myStrategyName = name; }
+    std::unique_ptr<PreflopRangeCalculator>& getPreflopRangeCalculator() { return preflopRangeCalculator; }
 
     virtual ~IBotStrategy() = default;
 
@@ -46,7 +47,7 @@ class IBotStrategy
     std::string myStrategyName;
 
   private:
-    std::shared_ptr<PreflopRangeCalculator> preflopRangeCalculator;
+    std::unique_ptr<PreflopRangeCalculator> preflopRangeCalculator;
 
     // vector index is player position, value is range %
     std::vector<int> UTG_STARTING_RANGE;

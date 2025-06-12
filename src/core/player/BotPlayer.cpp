@@ -416,7 +416,7 @@ void BotPlayer::evaluateBetAmount()
 
 float BotPlayer::getPreflopCallingRange(CurrentHandContext& context, bool deterministic) const
 {
-    return myStrategy->getPreflopCallingRange(context, deterministic);
+    return myStrategy->getPreflopRangeCalculator()->getPreflopCallingRange(context, deterministic);
 }
 
 } // namespace pkt::core::player

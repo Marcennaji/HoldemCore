@@ -12,8 +12,8 @@ struct CurrentHandContext;
 class PreflopRangeCalculator
 {
   public:
-    float getPreflopCallingRange(const CurrentHandContext& context, bool deterministic = false) const;
-    float getPreflopRaisingRange(const CurrentHandContext& context, bool deterministic = false) const;
+    float getPreflopCallingRange(CurrentHandContext& context, bool deterministic = false) const;
+    float getPreflopRaisingRange(CurrentHandContext& context, bool deterministic = false) const;
 
     int getRange(PlayerPosition p, int nbPlayers) const;
     void initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange);
@@ -38,6 +38,13 @@ class PreflopRangeCalculator
                                PlayerPosition myPosition, int nbRunningPlayers) const;
     float adjustForNoStats(float callingRange, int nbRaises) const;
     float adjustForBigBet(float callingRange, int potOdd, int myCash, int highestSet, int mySet, int smallBlind) const;
+    bool shouldAdjustForLooseRaiser(const CurrentHandContext& context, int nbCalls, int nbRaises) const;
+
+    // Determines if the player should call based on good odds
+    bool shouldCallForGoodOdds(int potOdd, int myM, PlayerPosition myPosition) const;
+
+    // Determines if the player should call when the raiser is all-in
+    bool shouldCallForAllIn(const CurrentHandContext& context, int potOdd, int nbRaises) const;
 };
 
 } // namespace pkt::core::player

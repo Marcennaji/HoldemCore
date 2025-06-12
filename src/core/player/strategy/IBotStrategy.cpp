@@ -84,170 +84,8 @@ void IBotStrategy::initializeRanges(const int utgHeadsUpRange, const int utgFull
     {
         BB_STARTING_RANGE[i] = SB_STARTING_RANGE[i] + 1;
     }
-}
 
-float IBotStrategy::getPreflopCallingRange(CurrentHandContext& context, bool deterministic) const
-{
-
-    const int nbRaises = context.preflopRaisesNumber;
-    const int nbCalls = context.preflopCallsNumber;
-    const int nbPlayers = context.nbPlayers;
-    const int nbRunningPlayers = context.nbRunningPlayers;
-    const PlayerPosition myPosition = context.myPosition;
-    std::vector<PlayerPosition> callersPositions = context.callersPositions;
-    const int potOdd = context.potOdd;
-    const int myCash = context.myCash;
-    const bool isPreflopBigBet = context.isPreflopBigBet;
-    const int highestSet = context.highestSet;
-    const int mySet = context.mySet;
-    const int smallBlind = context.smallBlind;
-    const int myM = context.myM;
-
-    float callingRange = getRange(myPosition, nbPlayers);
-
-#ifdef LOG_POKER_EXEC
-    cout << endl << "\t\tInitial calling range : " << callingRange << endl;
-#endif
-
-    if (nbRaises == 0 && nbCalls == 0 && myPosition != BUTTON && myPosition != SB)
-        // never limp if nobody has limped, except on button or small blind
-        return -1;
-
-    if (nbRaises == 0 && nbCalls > 0)
-    { // 1 or more players have limped, but nobody has raised
-#ifdef LOG_POKER_EXEC
-        cout << "\t\t1 or more players have limped, but nobody has raised. Adjusting callingRange : " << callingRange
-             << " * 1.2 = " << callingRange * 1.2 << endl;
-#endif
-        callingRange = callingRange * 1.2;
-    }
-
-    if (nbRaises == 0)
-    {
-        if (callingRange > 100)
-            callingRange = 100;
-#ifdef LOG_POKER_EXEC
-        cout << "\t\tStandard calling range : " << callingRange << "%" << endl;
-#endif
-        return callingRange;
-    }
-
-    // one or more players raised or re-raised :
-    std::shared_ptr<Player> lastRaiser = context.preflopLastRaiser;
-
-    PreflopStatistics raiserStats = lastRaiser->getStatistics(nbPlayers).getPreflopStatistics();
-
-    // if not enough hands, then try to use the statistics collected for (nbPlayers + 1), they should be more accurate
-    if (raiserStats.m_hands < MIN_HANDS_STATISTICS_ACCURATE && nbPlayers < 10 &&
-        lastRaiser->getStatistics(nbPlayers + 1).getPreflopStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE)
-        raiserStats = lastRaiser->getStatistics(nbPlayers + 1).getPreflopStatistics();
-
-    if (raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getPreflopRaise() != 0)
-    {
-
-        // adjust range according to the last raiser's stats
-        if ((myPosition == BUTTON || myPosition == CUTOFF) && nbRunningPlayers > 5)
-            callingRange = raiserStats.getPreflopRaise() * (nbPlayers > 3 ? 0.7 : 0.9);
-        else
-            callingRange = raiserStats.getPreflopRaise() * (nbPlayers > 3 ? 0.5 : 0.7);
-
-        if (nbRaises == 2) // 3bet
-            callingRange = raiserStats.getPreflop3Bet();
-        else if (nbRaises == 3) // 4bet
-            callingRange = raiserStats.getPreflop4Bet();
-        else if (nbRaises > 3) // 5bet or more
-            callingRange = raiserStats.getPreflop4Bet() * .5;
-
-#ifdef LOG_POKER_EXEC
-        cout << "\t\tadjusting callingRange to the last raiser's stats, value is now " << callingRange << endl;
-#endif
-    }
-    else
-    {
-        // no stats available for the raiser
-
-        if (nbRaises == 2) // 3bet
-            callingRange = callingRange / 2;
-        else if (nbRaises == 3) // 4bet
-            callingRange = callingRange / 3;
-        else if (nbRaises > 3) // 5bet or more
-            callingRange = callingRange / 4;
-
-#ifdef LOG_POKER_EXEC
-        cout << "\t\tno stats available, callingRange value is now " << callingRange << endl;
-#endif
-    }
-
-    // if big bet, tighten again
-    if (isPreflopBigBet)
-    {
-        const int highestSet = min(myCash, highestSet);
-
-        if (potOdd <= 70 && highestSet > smallBlind * 20 && highestSet - mySet > mySet * 6)
-            callingRange = 1.5;
-        else if ((potOdd > 70 && potOdd < 85) || (highestSet > smallBlind * 8 && highestSet < smallBlind * 10))
-            callingRange = callingRange * 0.7;
-        else if ((potOdd >= 85 && potOdd < 95) || (highestSet >= smallBlind * 10 && highestSet < smallBlind * 15))
-            callingRange = callingRange * 0.5;
-        else if ((potOdd >= 95 && potOdd < 99) || (highestSet >= smallBlind * 15 && highestSet < smallBlind * 20))
-            callingRange = callingRange * 0.3;
-        else if (potOdd >= 99)
-            callingRange = callingRange * 0.1;
-
-#ifdef LOG_POKER_EXEC
-        cout << "\t\tpot odd is " << potOdd << " : adjusting callingRange, value is now " << callingRange << endl;
-#endif
-    }
-
-    // if the player is being loose or agressive for every last hands, adjust our range, if nobody else has called or
-    // raised
-    if (lastRaiser->isInVeryLooseMode(nbPlayers) && (myPosition >= LATE || myPosition == SB || myPosition == BB) &&
-        nbCalls == 0 && nbRaises == 1)
-    {
-
-        if (callingRange < 20)
-        {
-            callingRange = 20;
-#ifdef LOG_POKER_EXEC
-            cout << "\t\toveragression detected, setting range to " << callingRange << endl;
-#endif
-        }
-    }
-
-    // call if odds are good
-    if (potOdd <= 30 && myM > 15 && (myPosition >= LATE || myPosition == SB || myPosition == BB))
-    {
-        callingRange = 40;
-#ifdef LOG_POKER_EXEC
-        cout << "\t\tsmall bet (pot odd is " << potOdd << ") : adjusting callingRange, value is now " << callingRange
-             << endl;
-#endif
-    }
-
-    // call if the raiser is allin, and not a big bet
-    if (myM > 10 && potOdd <= 20 && nbRaises < 2 && lastRaiser->getAction() == PLAYER_ACTION_ALLIN &&
-        (myPosition >= LATE || myPosition == SB || myPosition == BB))
-    {
-        callingRange = 100;
-#ifdef LOG_POKER_EXEC
-        cout << "\t\traiser allin and small bet (pot odd is " << potOdd << ") : adjusting callingRange, value is now "
-             << callingRange << endl;
-#endif
-    }
-
-    callingRange = ceil(callingRange);
-
-    if (callingRange < 1)
-        callingRange = 1;
-
-    if (callingRange > 100)
-        callingRange = 100;
-
-#ifdef LOG_POKER_EXEC
-    cout << "\t\tStandard calling range : " << callingRange << "%" << endl;
-#endif
-
-    return callingRange;
+    preflopRangeCalculator->initializeRanges(utgHeadsUpRange, utgFullTableRange);
 }
 
 float IBotStrategy::getPreflopRaisingRange(CurrentHandContext& context, bool deterministic) const
@@ -261,7 +99,7 @@ float IBotStrategy::getPreflopRaisingRange(CurrentHandContext& context, bool det
     const int potOdd = context.potOdd;
     const int myCash = context.myCash;
     const bool isPreflopBigBet = context.isPreflopBigBet;
-    const int highestSet = context.highestSet;
+    int highestSet = context.highestSet;
     const int mySet = context.mySet;
     const int smallBlind = context.smallBlind;
     const int myM = context.myM;
@@ -347,7 +185,7 @@ float IBotStrategy::getPreflopRaisingRange(CurrentHandContext& context, bool det
         if (isPreflopBigBet)
         {
 
-            const int highestSet = min(myCash, highestSet);
+            highestSet = min(myCash, highestSet);
 
             if (potOdd <= 70 && highestSet > smallBlind * 20 && highestSet - mySet > mySet * 6)
                 raisingRange = 1.5;
@@ -447,6 +285,9 @@ float IBotStrategy::getPreflopRaisingRange(CurrentHandContext& context, bool det
 #ifdef LOG_POKER_EXEC
     cout << "\t\tStandard raising range : " << raisingRange << "% : ";
 #endif
+
+    // float newRaisingRange = preflopRangeCalculator->getPreflopRaisingRange(context, deterministic);
+    // assert(newRaisingRange == raisingRange);
 
     return raisingRange;
 }
