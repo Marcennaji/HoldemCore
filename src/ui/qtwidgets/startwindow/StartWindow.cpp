@@ -22,7 +22,7 @@
 #include <core/engine/EngineDefs.h>
 #include <core/engine/Game.h>
 #include <core/engine/Randomizer.h>
-#include <core/engine/model/Gamedata.h>
+#include <core/engine/model/GameData.h>
 #include <core/player/Player.h>
 
 using namespace std;
