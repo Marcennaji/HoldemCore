@@ -28,8 +28,6 @@
 #include <QtGui>
 #include <QtWidgets/QApplication>
 
-#include <Wincon.h>
-
 #include <infra/AppDirectories.h>
 #include <infra/ConsoleLogger.h>
 #include <ui/qtwidgets/controller/GuiAppController.h>
@@ -74,17 +72,6 @@ int main(int argc, char** argv)
 
 #ifdef LOG_POKER_EXEC
 
-#ifdef LOG_POKER_CONSOLE
-
-    // output to console
-    AllocConsole();
-    freopen("conin$", "r", stdin);
-    freopen("conout$", "w", stdout);
-    freopen("conout$", "w", stderr);
-    printf("Debugging Window:\n");
-
-#else
-    // output to log file
     char buff[20];
     struct tm* sTm;
     time_t now = time(0);
@@ -97,8 +84,6 @@ int main(int argc, char** argv)
     std::ofstream out(filename);
     std::streambuf* coutbuf = std::cout.rdbuf();
     std::cout.rdbuf(out.rdbuf());
-
-#endif
 
 #endif
 
