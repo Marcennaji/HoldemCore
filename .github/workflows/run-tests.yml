@@ -17,25 +17,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up C++ environment
-      - name: Set up C++ environment
-        uses: actions/setup-cpp@v2
-        with:
-          compiler: clang
-          cpp-version: 17
-
-      # Step 3: Install dependencies
+      # Step 2: Install dependencies
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y cmake ninja-build
+        run: sudo apt-get update && sudo apt-get install -y cmake ninja-build clang g++-10
 
-      # Step 4: Configure the build
+      # Step 3: Configure the build
       - name: Configure CMake
-        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
 
-      # Step 5: Build the project
+      # Step 4: Build the project
       - name: Build
         run: cmake --build build
 
-      # Step 6: Run the tests
+      # Step 5: Run the tests
       - name: Run tests
         run: ctest --test-dir build --output-on-failure
