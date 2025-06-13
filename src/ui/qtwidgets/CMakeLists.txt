@@ -27,10 +27,13 @@ set(CMAKE_AUTOMOC ON)
 add_library(qtwidgets STATIC ${LIB_SOURCES} ${INCLUDE_HEADERS} ${UI_GENERATED_FILES})
 
 # Include directories
-target_include_directories(qtwidgets PUBLIC 
-    ${CMAKE_CURRENT_SOURCE_DIR} 
+target_include_directories(qtwidgets PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/ui/qtwidgets
+    ${CMAKE_SOURCE_DIR}/src/ui/qtwidgets/gametable
+    ${CMAKE_SOURCE_DIR}/src/ui/qtwidgets/startwindow
 )
 
 # Link Qt libraries

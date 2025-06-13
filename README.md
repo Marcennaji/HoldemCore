@@ -10,7 +10,7 @@ Cross-platform event-driven C++ engine with bot opponents, customizable strategi
 PokerTraining is an offline, open-source poker simulation tool designed to help players practice against various types of opponents.
 
 * Train against tight, loose, aggressive, or random bots
-* Analyze hand strength and opponent behavior
+* Customize your poker table : heads-up to 10 players, stack size, small blind value, opponents profiles...
 * Run entirely offline (desktop or mobile)
 
 ---

@@ -22,6 +22,7 @@
 
 #include <list>
 #include <sstream>
+#include <string>
 
 namespace Simulate
 {
@@ -628,15 +629,13 @@ void SimSdMulti(const Hand& shand, SimResults* results, size_t uboards, size_t h
 
 CardMask MakeCard(const char* s)
 {
-    char cs[] = "00";
-
-    std::strcpy(cs, s);
+    std::string cs = s;
 
     int c;
     CardMask hand;
     CardMask_RESET(hand);
 
-    StdDeck_stringToCard(cs, &c);
+    StdDeck_stringToCard(&cs[0], &c);
     StdDeck_CardMask_SET(hand, c);
 
     return hand;
