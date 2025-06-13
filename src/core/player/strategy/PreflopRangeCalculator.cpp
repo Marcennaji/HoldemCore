@@ -104,7 +104,7 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(CurrentHandContext& c
     float callingRange = getRange(myPosition, nbPlayers);
 
 #ifdef LOG_POKER_EXEC
-    cout << endl << "\t\ Initial calling range : " << callingRange << endl;
+    cout << endl << "\t\t Initial calling range : " << callingRange << endl;
 #endif
 
     // Handle no raises and no calls

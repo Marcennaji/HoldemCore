@@ -33,4 +33,4 @@ jobs:
 
       # Step 5: Run the tests
       - name: Run tests
-        run: ctest --test-dir build --output-on-failure
+        run: ./build/debug-widgets/tests/core_tests
