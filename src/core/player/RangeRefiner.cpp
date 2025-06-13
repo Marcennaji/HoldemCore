@@ -1,5 +1,5 @@
 #include "RangeRefiner.h"
-#include "RangeManager.h"
+#include "RangeParser.h"
 #include "core/player/Helpers.h"
 
 #include <cassert>
@@ -22,7 +22,7 @@ std::string RangeRefiner::deduceRange(const std::string originRanges, const std:
         if (singleOriginRange.empty())
             continue;
 
-        std::vector<std::string> cardsInOriginRange = RangeManager::getRangeAtomicValues(singleOriginRange);
+        std::vector<std::string> cardsInOriginRange = RangeParser::getRangeAtomicValues(singleOriginRange);
         bool keepOriginRange = true;
 
         for (const auto& originHand : cardsInOriginRange)
@@ -36,7 +36,7 @@ std::string RangeRefiner::deduceRange(const std::string originRanges, const std:
                 keepOriginRange = false;
 
                 std::vector<std::string> atomicRangesInSingleOriginRange =
-                    RangeManager::getRangeAtomicValues(singleOriginRange, true);
+                    RangeParser::getRangeAtomicValues(singleOriginRange, true);
 
                 for (const auto& atomicOriginRange : atomicRangesInSingleOriginRange)
                 {
@@ -51,7 +51,7 @@ std::string RangeRefiner::deduceRange(const std::string originRanges, const std:
                         // we need to get real cards from it
 
                         std::vector<std::string> handsInAtomicRange =
-                            RangeManager::getRangeAtomicValues(atomicOriginRange);
+                            RangeParser::getRangeAtomicValues(atomicOriginRange);
 
                         if (card1.at(1) == card2.at(1))
                         {

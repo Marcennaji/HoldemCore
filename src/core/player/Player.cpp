@@ -25,6 +25,7 @@
 #include <core/interfaces/ILogger.h>
 #include <core/interfaces/persistence/IHandAuditStore.h>
 #include <core/interfaces/persistence/IPlayersStatisticsStore.h>
+#include <core/player/RangeParser.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include <third_party/psim/psim.hpp>
 #include "Helpers.h"
@@ -848,7 +849,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
         opponent->getRangeManager()->computeEstimatedPreflopRange(*myCurrentHandContext);
     }
 
-    vector<std::string> ranges = myRangeManager->getRangeAtomicValues(opponent->myRangeManager->getEstimatedRange());
+    vector<std::string> ranges = RangeParser::getRangeAtomicValues(opponent->myRangeManager->getEstimatedRange());
 
     vector<std::string> newRanges;
 

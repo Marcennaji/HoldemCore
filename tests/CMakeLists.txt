@@ -12,7 +12,7 @@ enable_testing()
 
 add_executable(core_tests
     strategy/test_tight_aggressive.cpp
-    range/RangeManagerTest.cpp
+    range/RangeParserTest.cpp
     range/RangeRefinerTest.cpp
 )
 
