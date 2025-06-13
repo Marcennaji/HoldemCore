@@ -18,4 +18,4 @@ class IPlayersStatisticsStore
 
     virtual void updatePlayersStatistics(pkt::core::player::PlayerList activePlayerList) = 0;
 };
-} // namespace pkt::core
+} //  namespace pkt::core
