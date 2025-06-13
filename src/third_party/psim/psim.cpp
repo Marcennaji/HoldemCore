@@ -3,113 +3,114 @@
  * Copyright (C) 2025 Marc Ennaji                                            *
  *                                                                           *
  * This program is free software: you can redistribute it and/or modify      *
- * it under the terms of the GNU Affero General Public License as            *
- * published by the Free Software Foundation, either version 3 of the        *
- * License, or (at your option) any later version.                           *
+ * it under the terms of the MIT License                                     *
+
+
  *                                                                           *
  * This program is distributed in the hope that it will be useful,           *
  * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
- * GNU Affero General Public License for more details.                       *
+ * MIT License for more details.                                             *
  *                                                                           *
- * You should have received a copy of the GNU Affero General Public License  *
+ * You should have received a copy of the MIT License  *
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 #include "psim.hpp"
-#include "simulate.hpp"
 #include <cstdlib>
 #include <sstream>
-#include <vector>
 #include <string>
+#include <vector>
+#include "simulate.hpp"
 
-namespace 
+namespace
 {
-    ///Pass in hand array of ints and this'll process it into a useful structure.
-    Simulate::Hand IntsToHand(const int* hand)
-    {
-        size_t cards = 2;
+/// Pass in hand array of ints and this'll process it into a useful structure.
+Simulate::Hand IntsToHand(const int* hand)
+{
+    size_t cards = 2;
 
-        CardMask common;
-        CardMask_RESET(common);
+    CardMask common;
+    CardMask_RESET(common);
 
-        for (size_t card = 2; card < 7; ++card) //Loop through the common cards.
-            if (hand[card] >= 0 && hand[card] <= 51) //If it's a real card, set it.
-            {
-                CardMask_SET(common, hand[card]);
-                ++cards;
-            }
-
-        //Grab our hole cards.
-        CardMask fh, sh;
-        CardMask_RESET(fh); CardMask_RESET(sh);
-        CardMask_SET(fh, hand[0]); CardMask_SET(sh, hand[1]);
-
-        return Simulate::Hand(fh, sh, common, cards);
-    }
-
-
-    ///Pass in a string like "Ah Ad 2s Tc 4d 5h" and this'll process it into a useful structure.
-    Simulate::Hand StringToHand(const char* hand)
-    {
-        std::vector<CardMask> cardVec;
-        cardVec.reserve(7);
-
-        char cs[] = "00";
-
-        size_t len = std::strlen(hand);
-
-        for(size_t x = 0; x < len; ++x)
+    for (size_t card = 2; card < 7; ++card)      // Loop through the common cards.
+        if (hand[card] >= 0 && hand[card] <= 51) // If it's a real card, set it.
         {
-            char c = hand[x];
-
-            switch (c)
-            {
-                case 'A':
-                case 'a':
-                case 'K':
-                case 'k':
-                case 'Q':
-                case 'q':
-                case 'J':
-                case 'j':
-                case 'T':
-                case 't':
-                case '9':
-                case '8':
-                case '7':
-                case '6':
-                case '5':
-                case '4':
-                case '3':
-                case '2':
-                    cs[0] = c;
-                    break;
-
-                case 'S':
-                case 's':
-                case 'H':
-                case 'h':
-                case 'D':
-                case 'd':
-                case 'C':
-                case 'c':
-                    cs[1] = c;
-                    cardVec.push_back(Simulate::MakeCard(cs));
-                    break;
-            }
+            CardMask_SET(common, hand[card]);
+            ++cards;
         }
 
-        CardMask common;
-        CardMask_RESET(common);
+    // Grab our hole cards.
+    CardMask fh, sh;
+    CardMask_RESET(fh);
+    CardMask_RESET(sh);
+    CardMask_SET(fh, hand[0]);
+    CardMask_SET(sh, hand[1]);
 
-        for (size_t x = 2; x < cardVec.size(); x++)
-        {
-            CardMask_OR(common, common, cardVec[x]);
-        }
-
-        return Simulate::Hand(cardVec[0], cardVec[1], common, cardVec.size());
-    }
+    return Simulate::Hand(fh, sh, common, cards);
 }
+
+/// Pass in a string like "Ah Ad 2s Tc 4d 5h" and this'll process it into a useful structure.
+Simulate::Hand StringToHand(const char* hand)
+{
+    std::vector<CardMask> cardVec;
+    cardVec.reserve(7);
+
+    char cs[] = "00";
+
+    size_t len = std::strlen(hand);
+
+    for (size_t x = 0; x < len; ++x)
+    {
+        char c = hand[x];
+
+        switch (c)
+        {
+        case 'A':
+        case 'a':
+        case 'K':
+        case 'k':
+        case 'Q':
+        case 'q':
+        case 'J':
+        case 'j':
+        case 'T':
+        case 't':
+        case '9':
+        case '8':
+        case '7':
+        case '6':
+        case '5':
+        case '4':
+        case '3':
+        case '2':
+            cs[0] = c;
+            break;
+
+        case 'S':
+        case 's':
+        case 'H':
+        case 'h':
+        case 'D':
+        case 'd':
+        case 'C':
+        case 'c':
+            cs[1] = c;
+            cardVec.push_back(Simulate::MakeCard(cs));
+            break;
+        }
+    }
+
+    CardMask common;
+    CardMask_RESET(common);
+
+    for (size_t x = 2; x < cardVec.size(); x++)
+    {
+        CardMask_OR(common, common, cardVec[x]);
+    }
+
+    return Simulate::Hand(cardVec[0], cardVec[1], common, cardVec.size());
+}
+} // namespace
 
 void GetHandState(const char* hand, PostFlopState* state)
 {
@@ -117,13 +118,11 @@ void GetHandState(const char* hand, PostFlopState* state)
     Simulate::GetHandState(shand, state);
 }
 
-
 void GetHandState(const int* hand, PostFlopState* state)
 {
     Simulate::Hand shand = IntsToHand(hand);
     Simulate::GetHandState(shand, state);
 }
-
 
 unsigned int RankHand(const char* hand)
 {
@@ -131,13 +130,11 @@ unsigned int RankHand(const char* hand)
     return Simulate::RankHand(shand);
 }
 
-
 unsigned int RankHand(const int* hand)
 {
     Simulate::Hand shand = IntsToHand(hand);
     return Simulate::RankHand(shand);
 }
-
 
 void SimulateHand(const char* hand, SimResults* results, float lowRange, float highRange, unsigned int boards)
 {
@@ -145,22 +142,21 @@ void SimulateHand(const char* hand, SimResults* results, float lowRange, float h
     Simulate::SimulateHand(shand, results, lowRange, highRange, boards);
 }
 
-
 void SimulateHand(const int* hand, SimResults* results, float lowRange, float highRange, unsigned int boards)
 {
     Simulate::Hand shand = IntsToHand(hand);
     Simulate::SimulateHand(shand, results, lowRange, highRange, boards);
 }
 
-
-void SimulateHandMulti(const char* hand, SimResults* results, unsigned int boards, unsigned int hands, unsigned int numOpponents)
+void SimulateHandMulti(const char* hand, SimResults* results, unsigned int boards, unsigned int hands,
+                       unsigned int numOpponents)
 {
     Simulate::Hand shand = StringToHand(hand);
     Simulate::SimulateHandMulti(shand, results, boards, hands, numOpponents);
 }
 
-
-void SimulateHandMulti(const int* hand, SimResults* results, unsigned int boards, unsigned int hands, unsigned int numOpponents)
+void SimulateHandMulti(const int* hand, SimResults* results, unsigned int boards, unsigned int hands,
+                       unsigned int numOpponents)
 {
     Simulate::Hand shand = IntsToHand(hand);
     Simulate::SimulateHandMulti(shand, results, boards, hands, numOpponents);

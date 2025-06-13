@@ -33,6 +33,7 @@ PokerTraining is an offline, open-source poker simulation tool designed to help 
 * Clean separation of `BotPlayer` and `IBotStrategy`
 * Includes: TightAggressive, LooseAggressive, Maniac, UltraTight
 * Testable via `CurrentHandContext`
+* Easy to add your own poker bot, that would implement the simple IBotStrategy interface
 
 ### 4. **Range Management & Equity Evaluation**
 
@@ -104,7 +105,7 @@ src/
 │   └── qtwidgets/    # Qt Widgets UI (views, controllers)
 ├── server/           # WebSocket server (planned)
 ├── tests/            # GoogleTest tests
-└── third_party/      # DinoPokerTech, json, etc.
+└── third_party/      # hand simulation, sqlite3, etc.
 ```
 
 ---
