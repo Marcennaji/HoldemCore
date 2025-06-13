@@ -31,6 +31,10 @@ jobs:
       - name: Build
         run: cmake --build build
 
-      # Step 5: Run the tests
+      # Step 5: Debug - List directory structure
+      - name: List build directory
+        run: ls -R build
+
+      # Step 6: Run the tests
       - name: Run tests
-        run: ./build/debug-widgets/tests/core_tests
+        run: ./tests/core_tests
