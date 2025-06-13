@@ -1,13 +1,13 @@
 
-#include "RangePlausibilityChecker.h"
 #include <third_party/psim/psim.hpp>
+#include "HandPlausibilityChecker.h"
 #include "core/player/RangeEstimator.h"
 #include "core/player/typedefs.h"
 
 namespace pkt::core::player
 {
 
-bool RangePlausibilityChecker::isUnplausibleHandGivenFlopCheck(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(const PostFlopState& testedHand, CurrentHandContext& ctx)
 {
 
     const int nbPlayers = ctx.nbPlayers;
@@ -48,7 +48,7 @@ bool RangePlausibilityChecker::isUnplausibleHandGivenFlopCheck(const PostFlopSta
     return false;
 }
 
-bool RangePlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopState& testedHand, CurrentHandContext& ctx)
 {
 
     const int nbPlayers = ctx.nbPlayers;
@@ -146,7 +146,7 @@ bool RangePlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopState
     return false;
 }
 
-bool RangePlausibilityChecker::isUnplausibleHandGivenFlopCall(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(const PostFlopState& testedHand, CurrentHandContext& ctx)
 {
 
     const int nbPlayers = ctx.nbPlayers;
@@ -190,7 +190,7 @@ bool RangePlausibilityChecker::isUnplausibleHandGivenFlopCall(const PostFlopStat
     return false;
 }
 
-bool RangePlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopState& testedHand, CurrentHandContext& ctx)
 {
 
     const int nbPlayers = ctx.nbPlayers;
@@ -256,7 +256,7 @@ bool RangePlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopSta
     return false;
 }
 
-bool RangePlausibilityChecker::isUnplausibleHandGivenFlopAllin(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenFlopAllin(const PostFlopState& testedHand, CurrentHandContext& ctx)
 {
 
     const int nbPlayers = ctx.nbPlayers;
@@ -295,7 +295,7 @@ bool RangePlausibilityChecker::isUnplausibleHandGivenFlopAllin(const PostFlopSta
     return false;
 }
 
-bool RangePlausibilityChecker::isUnplausibleHandGivenTurnCheck(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCheck(const PostFlopState& testedHand, CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.myHavePosition;
@@ -326,7 +326,7 @@ bool RangePlausibilityChecker::isUnplausibleHandGivenTurnCheck(const PostFlopSta
     return false;
 }
 
-bool RangePlausibilityChecker::isUnplausibleHandGivenTurnBet(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenTurnBet(const PostFlopState& testedHand, CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.myHavePosition;
@@ -367,7 +367,7 @@ bool RangePlausibilityChecker::isUnplausibleHandGivenTurnBet(const PostFlopState
     return false;
 }
 
-bool RangePlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopState& testedHand, CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.myHavePosition;
@@ -429,7 +429,7 @@ bool RangePlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopStat
     return false;
 }
 
-bool RangePlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopState& testedHand, CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.myHavePosition;
@@ -481,7 +481,7 @@ bool RangePlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopSta
     return false;
 }
 
-bool RangePlausibilityChecker::isUnplausibleHandGivenTurnAllin(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenTurnAllin(const PostFlopState& testedHand, CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.myHavePosition;
@@ -514,8 +514,7 @@ bool RangePlausibilityChecker::isUnplausibleHandGivenTurnAllin(const PostFlopSta
     return false;
 }
 
-bool RangePlausibilityChecker::isUnplausibleHandGivenRiverCheck(const PostFlopState& testedHand,
-                                                                CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCheck(const PostFlopState& testedHand, CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.myHavePosition;
@@ -526,7 +525,7 @@ bool RangePlausibilityChecker::isUnplausibleHandGivenRiverCheck(const PostFlopSt
     return false;
 }
 
-bool RangePlausibilityChecker::isUnplausibleHandGivenRiverBet(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(const PostFlopState& testedHand, CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.myHavePosition;
@@ -571,7 +570,7 @@ bool RangePlausibilityChecker::isUnplausibleHandGivenRiverBet(const PostFlopStat
     return false;
 }
 
-bool RangePlausibilityChecker::isUnplausibleHandGivenRiverCall(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(const PostFlopState& testedHand, CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.myHavePosition;
@@ -611,8 +610,7 @@ bool RangePlausibilityChecker::isUnplausibleHandGivenRiverCall(const PostFlopSta
     return false;
 }
 
-bool RangePlausibilityChecker::isUnplausibleHandGivenRiverRaise(const PostFlopState& testedHand,
-                                                                CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(const PostFlopState& testedHand, CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.myHavePosition;
@@ -662,8 +660,7 @@ bool RangePlausibilityChecker::isUnplausibleHandGivenRiverRaise(const PostFlopSt
     return false;
 }
 
-bool RangePlausibilityChecker::isUnplausibleHandGivenRiverAllin(const PostFlopState& testedHand,
-                                                                CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenRiverAllin(const PostFlopState& testedHand, CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.myHavePosition;

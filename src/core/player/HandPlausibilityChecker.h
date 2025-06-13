@@ -13,7 +13,7 @@ namespace pkt::core::player
 
 class CurrentHandActions;
 
-class RangePlausibilityChecker
+class HandPlausibilityChecker
 {
   public:
     static bool isUnplausibleHandGivenFlopCheck(const PostFlopState& testedHand, CurrentHandContext& context);

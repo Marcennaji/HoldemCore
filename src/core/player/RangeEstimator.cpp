@@ -4,9 +4,9 @@
 #include <core/engine/model/Ranges.h>
 #include <core/interfaces/IHand.h>
 #include <core/interfaces/persistence/IPlayersStatisticsStore.h>
+#include <core/player/HandPlausibilityChecker.h>
 #include <core/player/Helpers.h>
 #include <core/player/Player.h>
-#include <core/player/RangePlausibilityChecker.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include "RangeParser.h"
 #include "RangeRefiner.h"
@@ -701,15 +701,15 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext&
         PlayerAction myAction = ctx.myCurrentHandActions.getFlopActions().back();
 
         if (myAction == PLAYER_ACTION_CALL)
-            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenFlopCall(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(r, ctx);
         else if (myAction == PLAYER_ACTION_CHECK)
-            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenFlopCheck(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(r, ctx);
         else if (myAction == PLAYER_ACTION_RAISE)
-            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenFlopRaise(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(r, ctx);
         else if (myAction == PLAYER_ACTION_BET)
-            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenFlopBet(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(r, ctx);
         else if (myAction == PLAYER_ACTION_ALLIN)
-            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenFlopAllin(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopAllin(r, ctx);
 
         if (removeHand)
         {
@@ -788,15 +788,15 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(CurrentHandContext&
         PlayerAction myAction = ctx.myCurrentHandActions.getTurnActions().back();
 
         if (myAction == PLAYER_ACTION_CALL)
-            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenTurnCall(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(r, ctx);
         else if (myAction == PLAYER_ACTION_CHECK)
-            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenTurnCheck(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnCheck(r, ctx);
         else if (myAction == PLAYER_ACTION_RAISE)
-            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenTurnRaise(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(r, ctx);
         else if (myAction == PLAYER_ACTION_BET)
-            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenTurnBet(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnBet(r, ctx);
         else if (myAction == PLAYER_ACTION_ALLIN)
-            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenTurnAllin(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnAllin(r, ctx);
 
         if (removeHand)
         {
@@ -873,15 +873,15 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(CurrentHandContext
         bool removeHand = false;
 
         if (ctx.myCurrentHandActions.getRiverActions().back() == PLAYER_ACTION_CALL)
-            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenRiverCall(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(r, ctx);
         else if (ctx.myCurrentHandActions.getRiverActions().back() == PLAYER_ACTION_CHECK)
-            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenRiverCheck(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverCheck(r, ctx);
         else if (ctx.myCurrentHandActions.getRiverActions().back() == PLAYER_ACTION_RAISE)
-            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenRiverRaise(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(r, ctx);
         else if (ctx.myCurrentHandActions.getRiverActions().back() == PLAYER_ACTION_BET)
-            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenRiverBet(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(r, ctx);
         else if (ctx.myCurrentHandActions.getRiverActions().back() == PLAYER_ACTION_ALLIN)
-            removeHand = RangePlausibilityChecker::isUnplausibleHandGivenRiverAllin(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverAllin(r, ctx);
 
         if (removeHand)
         {
