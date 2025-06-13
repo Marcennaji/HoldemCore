@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 
 #include <core/player/typedefs.h>
