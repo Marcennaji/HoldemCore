@@ -1,38 +1,113 @@
 # PokerTraining
 
-**PokerTraining** is a No-Limit Texas Hold'em training software that lets you play against up to 9 bot players, each with customizable and dynamic playing styles ranging from ultra-tight to loose-aggressive. Bots adjust their behavior in response to opponents' patterns, offering a more realistic and educational experience.
-
-## Features
-
-- **Player Statistics**  
-  Track and analyze both your performance and that of the AI opponents over time.
-
-  For each player — including both humans and bots — PokerTraining tracks detailed statistics across all four betting rounds (preflop, flop, turn, river). These include:
-
-  - **Preflop stats**:  
-    - Voluntarily Put Money in Pot (VPIP)  
-    - Preflop Raise (PFR)  
-    - 3-bet and 4-bet frequencies  
-    - 3-bet opportunities  
-    - Historical action patterns from recent hands
-
-  - **Postflop stats (Flop, Turn, River)**:  
-    - Aggression factor and aggression frequency  
-    - Continuation bet frequency (on the flop)  
-    - Counts of folds, checks, calls, bets, raises, and re-raises
-
-  - **Showdown tendency**:  
-    - Overall "Went to Showdown" (WTSD) frequency
-
-  These stats are calculated over time and resettable, allowing players to analyze trends, adapt strategy, and better understand both human and bot opponent behavior.
-
-- **Range Evaluation**  
-  Estimate the possible hand ranges of each player based on their actions in the current hand — great for learning range analysis and narrowing.
-
-- **Customizable AI Opponents**  
-  Configure each bot’s base playing style (tight, loose, aggressive, passive, etc.) and observe how they adapt throughout a session.
-
-- **Qt-Based GUI**  
-  A responsive and user-friendly graphical interface built with Qt, ensuring smooth interaction across platforms.
+**Texas Hold'em Poker Training Simulator**
+Cross-platform event-driven C++ engine with bot opponents, customizable strategies, and frontend-agnostic architecture.
 
 ---
+
+## 🎯 Project Goal
+
+PokerTraining is an offline, open-source poker simulation tool designed to help players practice against various types of opponents.
+
+* Train against tight, loose, aggressive, or random bots
+* Analyze hand strength and opponent behavior
+* Run entirely offline (desktop or mobile)
+
+---
+
+## 🧱 Architecture Highlights
+
+### 1. **Decoupled C++ Engine** (`src/core/`)
+
+* Fully independent of UI (no Qt dependency)
+* Handles game state, hand resolution, betting rounds
+* Event-driven via a plain `GameEvents` callback struct
+
+### 2. **Multiple Frontends (Planned)**
+
+* ✅ Qt Widgets UI (existing)
+* 🟡 Flutter/Web frontend (in progress)
+
+### 3. **Bot Strategies with Dependency Injection**
+
+* Clean separation of `BotPlayer` and `IBotStrategy`
+* Includes: TightAggressive, LooseAggressive, Maniac, UltraTight
+* Testable via `CurrentHandContext`
+
+### 4. **Range Management & Equity Evaluation**
+
+* Bot players estimates opponents ranges, based on the current hand actions and the historical stats (stored in DB)
+* Range pruning based on public signals and historical stats
+
+### 5. **Testing Infrastructure**
+
+* GoogleTest-based unit tests under `tests/core/...`
+* Focus on verifying strategy behavior & decision logic
+
+---
+
+## 🔧 Technologies Used
+
+* C++17
+* Qt Widgets (for current UI)
+* GoogleTest
+* uWebSockets (planned WebSocket server)
+* Flutter (planned UI)
+
+---
+
+## 🚧 Current Status
+
+This project is under **active refactoring**, with major milestones completed:
+
+✅ engine now headless, can be used by any GUI framework
+✅ `GameEvents` emit UI updates without UI dependency
+✅ Strategies refactored and unit-tested
+✅ Player creation uses a `PlayerFactory` and `StrategyAssigner`
+✅ Ready to be wrapped in WebSocket server for cross-platform frontends
+
+🔜 Next steps:
+
+* Build JSON-based WebSocket protocol
+* Develop Flutter UI for Android/Web
+* Extend range estimation with ML-ready datasets
+* Tend toward a 'A' Cppdepend rating, as well as a high scoring SonarQube
+
+---
+
+## 🙋 About Me
+
+I'm a senior freelance C++ / Python developer, and this project is both a portfolio piece and a real-world training tool.
+
+It demonstrates:
+
+* Domain-driven design in games
+* Code decoupling and modularization, applying the SOLID principles
+* Clean testing practices
+* Cross-platform architecture thinking
+
+📫 Feel free to reach out or contribute if you're interested in strategy simulation, bots, or frontends.
+
+---
+
+## 📁 Project Structure (Simplified)
+
+```
+src/
+├── core/             # Engine logic
+│   ├── engine/       # Hand, board, betting, evaluator
+│   ├── events/       # GameEvents definition
+│   ├── player/       # Player, BotPlayer, strategies
+│   ├── session/      # Session & Game management
+├── ui/
+│   └── qtwidgets/    # Qt Widgets UI (views, controllers)
+├── server/           # WebSocket server (planned)
+├── tests/            # GoogleTest tests
+└── third_party/      # DinoPokerTech, json, etc.
+```
+
+---
+
+## 📝 License
+
+MIT — free for use, learning, and contribution.
