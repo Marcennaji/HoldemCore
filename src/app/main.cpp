@@ -16,11 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.     *
  *****************************************************************************/
 
-#include <cstdlib>
-#include <ctime>
-#include <fstream>
-#include <iostream>
-
+#include <infra/AppDirectories.h>
+#include <infra/ConsoleLogger.h>
+#include <ui/qtwidgets/controller/GuiAppController.h>
+#include <ui/qtwidgets/startwindow/StartWindow.h>
 #include "core/session/Session.h"
 
 #include <QString>
@@ -28,21 +27,13 @@
 #include <QtGui>
 #include <QtWidgets/QApplication>
 
-#include <infra/AppDirectories.h>
-#include <infra/ConsoleLogger.h>
-#include <ui/qtwidgets/controller/GuiAppController.h>
-#include <ui/qtwidgets/startwindow/StartWindow.h>
-
-#ifdef LOG_POKER_EXEC
-#define _CRTDBG_MAP_ALLOC
-
-#include <crtdbg.h>
-
-#define ENABLE_LEAK_CHECK()                                                                                            \
-    {                                                                                                                  \
-        _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);                                                  \
-    }
-#endif
+#include <chrono>
+#include <cstdlib>
+#include <ctime>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -50,14 +41,6 @@ class StartWindow;
 
 int main(int argc, char** argv)
 {
-
-    // ENABLE_LEAK_CHECK();
-    //_CrtSetReportMode( _CRT_ERROR, _CRTDBG_MODE_DEBUG );
-    //_CrtSetBreakAlloc(49937);
-
-    /////// can be removed for non-qt-guis ////////////
-    // QtSingleApplication a( argc, argv );
-
     QApplication app(argc, argv);
     int* p = NULL;
     pkt::infra::AppDirectories dirs = pkt::infra::AppDirectories::initialize();
@@ -72,16 +55,14 @@ int main(int argc, char** argv)
 
 #ifdef LOG_POKER_EXEC
 
-    char buff[20];
-    struct tm* sTm;
-    time_t now = time(0);
-    sTm = gmtime(&now);
-    strftime(buff, sizeof(buff), "%Y-%m-%d %Hh%M", sTm);
-    string filename = dirs.logDir;
-    filename += "/pokertraining_hands_";
-    filename += buff;
-    filename += ".log";
-    std::ofstream out(filename);
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+    std::tm sTm = *std::gmtime(&now_c);
+
+    std::ostringstream filenameStream;
+    filenameStream << dirs.logDir << "/pokertraining_hands_" << std::put_time(&sTm, "%Y-%m-%d %Hh%M") << ".log";
+
+    std::ofstream out(filenameStream.str());
     std::streambuf* coutbuf = std::cout.rdbuf();
     std::cout.rdbuf(out.rdbuf());
 

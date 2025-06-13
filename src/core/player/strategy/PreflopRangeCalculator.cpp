@@ -104,7 +104,7 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(CurrentHandContext& c
     float callingRange = getRange(myPosition, nbPlayers);
 
 #ifdef LOG_POKER_EXEC
-    cout << endl << "\t\tPreflopRangeCalculator Initial calling range : " << callingRange << endl;
+    cout << endl << "\t\ Initial calling range : " << callingRange << endl;
 #endif
 
     // Handle no raises and no calls
@@ -157,8 +157,8 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(CurrentHandContext& c
 float PreflopRangeCalculator::adjustCallForLimpers(float callingRange) const
 {
 #ifdef LOG_POKER_EXEC
-    cout << "\t\tPreflopRangeCalculator 1 or more players have limped, but nobody has raised. Adjusting callingRange : "
-         << callingRange << " * 1.2 = " << callingRange * 1.2 << endl;
+    cout << "\t\t 1 or more players have limped, but nobody has raised. Adjusting callingRange : " << callingRange
+         << " * 1.2 = " << callingRange * 1.2 << endl;
 #endif
     return callingRange * 1.2;
 }
@@ -172,7 +172,7 @@ float PreflopRangeCalculator::clampCallingRange(float callingRange) const
         callingRange = 100;
 
 #ifdef LOG_POKER_EXEC
-    cout << "\t\tPreflopRangeCalculator Standard calling range : " << callingRange << "%" << endl;
+    cout << "\t\t Standard calling range : " << callingRange << "%" << endl;
 #endif
     return callingRange;
 }
@@ -256,7 +256,7 @@ float PreflopRangeCalculator::adjustCallForNoStats(float callingRange, int nbRai
     }
 
 #ifdef LOG_POKER_EXEC
-    cout << "\t\tPreflopRangeCalculator no stats available, callingRange value is now " << callingRange << endl;
+    cout << "\t\t no stats available, callingRange value is now " << callingRange << endl;
 #endif
     return callingRange;
 }
@@ -267,15 +267,6 @@ float PreflopRangeCalculator::adjustCallForBigBet(float callingRange, int potOdd
 
     const int highestSet = std::min(myCash, highestSetOrigin);
 
-#ifdef LOG_POKER_EXEC
-    cout << "PreflopRangeCalculator::adjustCallForBigBet Parameters:" << endl;
-    cout << "\tcallingRange: " << callingRange << endl;
-    cout << "\tpotOdd: " << potOdd << endl;
-    cout << "\tmyCash: " << myCash << endl;
-    cout << "\thighestSet: " << highestSet << endl;
-    cout << "\tmySet: " << mySet << endl;
-    cout << "\tsmallBlind: " << smallBlind << endl;
-#endif
     if (potOdd <= 70 && highestSet > smallBlind * 20 && highestSet - mySet > mySet * 6)
     {
         callingRange = 1.5f;
@@ -298,8 +289,7 @@ float PreflopRangeCalculator::adjustCallForBigBet(float callingRange, int potOdd
     }
 
 #ifdef LOG_POKER_EXEC
-    cout << "\t\tPreflopRangeCalculator pot odd is " << potOdd << " : adjusting callingRange, value is now "
-         << callingRange << endl;
+    cout << "\t\t pot odd is " << potOdd << " : adjusting callingRange, value is now " << callingRange << endl;
 #endif
     return callingRange;
 }
@@ -527,16 +517,6 @@ float PreflopRangeCalculator::adjustRaiseForBigBet(float raisingRange, int potOd
                                                    int mySet, int smallBlind) const
 {
     const int highestSet = std::min(myCash, highestSetOrigin);
-
-#ifdef LOG_POKER_EXEC
-    cout << "PreflopRangeCalculator::adjustRaiseForBigBet Parameters:" << endl;
-    cout << "\tcallingRange: " << raisingRange << endl;
-    cout << "\tpotOdd: " << potOdd << endl;
-    cout << "\tmyCash: " << myCash << endl;
-    cout << "\thighestSet: " << highestSet << endl;
-    cout << "\tmySet: " << mySet << endl;
-    cout << "\tsmallBlind: " << smallBlind << endl;
-#endif
 
     if (potOdd <= 70 && highestSet > smallBlind * 20 && highestSet - mySet > mySet * 6)
     {
