@@ -60,18 +60,19 @@ PokerTraining is an offline, open-source poker simulation tool designed to help 
 
 This project is under **active refactoring**, with major milestones completed:
 
-✅ engine now headless, can be used by any GUI framework
-✅ `GameEvents` emit UI updates without UI dependency
-✅ Strategies refactored and unit-tested
-✅ Player creation uses a `PlayerFactory` and `StrategyAssigner`
-✅ Ready to be wrapped in WebSocket server for cross-platform frontends
+✅ Engine now headless  
+✅ `GameEvents` emit UI updates without UI dependency  
+✅ Strategies refactored and unit-tested  
+✅ Player creation uses a `PlayerFactory` and `StrategyAssigner`  
+✅ Ready to be wrapped in WebSocket server for cross-platform frontends  
+
 
 🔜 Next steps:
 
 * Build JSON-based WebSocket protocol
 * Develop Flutter UI for Android/Web
 * Extend range estimation with ML-ready datasets
-* Tend toward a 'A' Cppdepend rating, as well as a high scoring SonarQube
+* Reach a 'A' Cppdepend overall rating, as well as a high scoring SonarQube
 
 ---
 
