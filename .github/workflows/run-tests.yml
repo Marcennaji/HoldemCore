@@ -37,4 +37,4 @@ jobs:
 
       # Step 6: Run the tests
       - name: Run tests
-        run: ./tests/core_tests
+        run: ./build/tests/core_tests
