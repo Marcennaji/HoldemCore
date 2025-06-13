@@ -26,6 +26,7 @@
 #include "Exception.h"
 #include "model/EngineError.h"
 
+#include <algorithm>
 #include <iostream>
 
 namespace pkt::core
