@@ -19,7 +19,9 @@ jobs:
 
       # Step 2: Install dependencies
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y cmake ninja-build clang g++-10
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build clang g++-10 qt6-base-dev qt6-tools-dev qt6-tools-dev-tools
 
       # Step 3: Configure the build
       - name: Configure CMake
