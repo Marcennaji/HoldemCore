@@ -1,7 +1,7 @@
 
 #include "RangePlausibilityChecker.h"
 #include <third_party/psim/psim.hpp>
-#include "core/player/RangeManager.h"
+#include "core/player/RangeEstimator.h"
 #include "core/player/typedefs.h"
 
 namespace pkt::core::player

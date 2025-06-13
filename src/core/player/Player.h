@@ -23,7 +23,7 @@
 #include <core/engine/model/PlayerStatistics.h>
 #include <core/interfaces/IHand.h>
 #include "CurrentHandActions.h"
-#include "RangeManager.h"
+#include "RangeEstimator.h"
 
 #include <third_party/psim/psim.hpp>
 
@@ -158,7 +158,7 @@ class Player
 
     bool isInVeryLooseMode(const int nbPlayers) const;
 
-    std::unique_ptr<RangeManager>& getRangeManager() { return myRangeManager; }
+    std::unique_ptr<RangeEstimator>& getRangeEstimator() { return myRangeEstimator; }
     int getPreflopPotOdd() const;
 
   protected:
@@ -206,7 +206,7 @@ class Player
     int myRoundStartCash;
     int lastMoneyWon;
     int myPreflopPotOdd;
-    std::unique_ptr<RangeManager> myRangeManager;
+    std::unique_ptr<RangeEstimator> myRangeEstimator;
 
     bool m_isSessionActive;
 };

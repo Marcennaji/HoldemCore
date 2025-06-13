@@ -1975,7 +1975,7 @@ void GameTableWindow::myActionDone()
         humanPlayer->updatePreflopStatistics();
         humanPlayer->updateCurrentHandContext(GAME_STATE_PREFLOP);
         if (humanPlayer->getAction() != PLAYER_ACTION_FOLD)
-            humanPlayer->getRangeManager()->updateUnplausibleRangesGivenPreflopActions(
+            humanPlayer->getRangeEstimator()->updateUnplausibleRangesGivenPreflopActions(
                 humanPlayer->getCurrentHandContext());
     }
     else if (currentState == GAME_STATE_FLOP)
@@ -1986,7 +1986,7 @@ void GameTableWindow::myActionDone()
             currentHand->setFlopLastRaiserID(humanPlayer->getID());
         humanPlayer->updateFlopStatistics();
         humanPlayer->updateCurrentHandContext(GAME_STATE_FLOP);
-        humanPlayer->getRangeManager()->updateUnplausibleRangesGivenFlopActions(humanPlayer->getCurrentHandContext());
+        humanPlayer->getRangeEstimator()->updateUnplausibleRangesGivenFlopActions(humanPlayer->getCurrentHandContext());
     }
     else if (currentState == GAME_STATE_TURN)
     {
@@ -1996,14 +1996,15 @@ void GameTableWindow::myActionDone()
             currentHand->setTurnLastRaiserID(humanPlayer->getID());
         humanPlayer->updateTurnStatistics();
         humanPlayer->updateCurrentHandContext(GAME_STATE_TURN);
-        humanPlayer->getRangeManager()->updateUnplausibleRangesGivenTurnActions(humanPlayer->getCurrentHandContext());
+        humanPlayer->getRangeEstimator()->updateUnplausibleRangesGivenTurnActions(humanPlayer->getCurrentHandContext());
     }
     else if (currentState == GAME_STATE_RIVER)
     {
         humanPlayer->getCurrentHandActions().getRiverActions().push_back(humanPlayer->getAction());
         humanPlayer->updateRiverStatistics();
         humanPlayer->updateCurrentHandContext(GAME_STATE_RIVER);
-        humanPlayer->getRangeManager()->updateUnplausibleRangesGivenRiverActions(humanPlayer->getCurrentHandContext());
+        humanPlayer->getRangeEstimator()->updateUnplausibleRangesGivenRiverActions(
+            humanPlayer->getCurrentHandContext());
     }
 
     disableMyButtons();
@@ -2992,7 +2993,7 @@ void GameTableWindow::refreshHandsRanges()
 
             displayText << style << "<b>" << ((*it_c)->getName()) << "</b> : ";
 
-            std::istringstream oss((*it_c)->getRangeManager()->getEstimatedRange());
+            std::istringstream oss((*it_c)->getRangeEstimator()->getEstimatedRange());
             std::string singleRange;
 
             while (getline(oss, singleRange, ','))

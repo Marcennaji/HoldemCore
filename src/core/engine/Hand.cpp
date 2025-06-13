@@ -218,7 +218,7 @@ Hand::Hand(GameEvents* events, ILogger* logger, std::shared_ptr<EngineFactory> f
         (*it)->setRoundStartCash((*it)->getCash());
         (*it)->getCurrentHandActions().reset();
         (*it)->setPosition();
-        (*it)->getRangeManager()->setEstimatedRange("");
+        (*it)->getRangeEstimator()->setEstimatedRange("");
 
         // error-check
         for (j = 0; j < 5; j++)

@@ -24,10 +24,10 @@ namespace pkt::core::player
 class Player;
 struct CurrentHandContext;
 
-class RangeManager
+class RangeEstimator
 {
   public:
-    RangeManager(int playerId, IPlayersStatisticsStore* statsStore);
+    RangeEstimator(int playerId, IPlayersStatisticsStore* statsStore);
 
     void setHand(IHand* hand) { myHand = hand; }
     void setEstimatedRange(const std::string& range);

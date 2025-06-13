@@ -200,7 +200,7 @@ int TightAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
     if (!speculativeHandedAdded && ctx.preflopCallsNumber == 0 && ctx.preflopRaisesNumber == 1 && raisingRange < 100 &&
         !(isCardsInRange(ctx.myCard1, ctx.myCard2, LOW_PAIRS + MEDIUM_PAIRS) && ctx.nbPlayers < 4) &&
         !(isCardsInRange(ctx.myCard1, ctx.myCard2, HIGH_PAIRS) && ctx.preflopCallsNumber > 0) &&
-        isCardsInRange(ctx.myCard1, ctx.myCard2, RangeManager::getStringRange(ctx.nbPlayers, 4)))
+        isCardsInRange(ctx.myCard1, ctx.myCard2, RangeEstimator::getStringRange(ctx.nbPlayers, 4)))
     {
 
         int rand = 0;

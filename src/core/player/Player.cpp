@@ -43,7 +43,7 @@ Player::Player(GameEvents* events, IHandAuditStore* ha, IPlayersStatisticsStore*
       myCash(sC), mySet(0), myLastRelativeSet(0), myAction(PLAYER_ACTION_NONE), myButton(mB), myActiveStatus(aS),
       myTurn(0), myCardsFlip(0), myRoundStartCash(0), lastMoneyWon(0), m_isSessionActive(false), myEvents(events)
 {
-    myRangeManager = std::make_unique<RangeManager>(myID, myPlayersStatisticsStore);
+    myRangeEstimator = std::make_unique<RangeEstimator>(myID, myPlayersStatisticsStore);
     myCurrentHandContext = std::make_unique<CurrentHandContext>();
     loadStatistics();
 
@@ -62,7 +62,7 @@ Player::Player(GameEvents* events, IHandAuditStore* ha, IPlayersStatisticsStore*
 void Player::setHand(IHand* br)
 {
     currentHand = br;
-    myRangeManager->setHand(br);
+    myRangeEstimator->setHand(br);
 }
 
 void Player::setIsSessionActive(bool active)
@@ -844,12 +844,12 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
     // compute winning hands % against my rank
     int nbWinningHands = 0;
 
-    if (opponent->myRangeManager->getEstimatedRange().size() == 0)
+    if (opponent->myRangeEstimator->getEstimatedRange().size() == 0)
     {
-        opponent->getRangeManager()->computeEstimatedPreflopRange(*myCurrentHandContext);
+        opponent->getRangeEstimator()->computeEstimatedPreflopRange(*myCurrentHandContext);
     }
 
-    vector<std::string> ranges = RangeParser::getRangeAtomicValues(opponent->myRangeManager->getEstimatedRange());
+    vector<std::string> ranges = RangeParser::getRangeAtomicValues(opponent->myRangeEstimator->getEstimatedRange());
 
     vector<std::string> newRanges;
 
@@ -930,18 +930,18 @@ void Player::logUnplausibleHands(GameState g)
     }
     // during dev phase : if some hands are not part of the estimated starting range for this player, insert them in a
     // database, for auditing purposes
-    if (!isCardsInRange(myCard1, myCard2, myRangeManager->getEstimatedRange()))
+    if (!isCardsInRange(myCard1, myCard2, myRangeEstimator->getEstimatedRange()))
     {
         std::cout << endl
                   << "\t" << myCard1 << " " << myCard2 << " isn't part of the plausible " << label << " range :\t"
-                  << myRangeManager->getEstimatedRange() << endl;
+                  << myRangeEstimator->getEstimatedRange() << endl;
         currentHand->getHandAuditStore()->updateUnplausibleHand(myCard1, myCard2, (myID == 0 ? true : false),
                                                                 bettingRound, nbPlayers);
     }
     else
         std::cout << endl
                   << "\t" << myCard1 << " " << myCard2 << " is part of the plausible " << label << " range :\t"
-                  << myRangeManager->getEstimatedRange() << endl;
+                  << myRangeEstimator->getEstimatedRange() << endl;
 }
 
 std::map<int, float> Player::evaluateOpponentsStrengths() const
@@ -1140,7 +1140,7 @@ void Player::updateCurrentHandContext(const GameState state)
 
 float Player::calculatePreflopCallingRange(CurrentHandContext& context, bool deterministic) const
 {
-    return myRangeManager->getStandardCallingRange(currentHand->getActivePlayerList()->size());
+    return myRangeEstimator->getStandardCallingRange(currentHand->getActivePlayerList()->size());
 }
 
 } // namespace pkt::core::player

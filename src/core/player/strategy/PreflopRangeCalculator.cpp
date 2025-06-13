@@ -445,7 +445,7 @@ float PreflopRangeCalculator::adjustRaiseForNoRaiser(const CurrentHandContext& c
     const std::string myCard1 = context.myCard1;
     const std::string myCard2 = context.myCard2;
 
-    if (!isCardsInRange(myCard1, myCard2, RangeManager::getStringRange(nbPlayers, raisingRange)) &&
+    if (!isCardsInRange(myCard1, myCard2, RangeEstimator::getStringRange(nbPlayers, raisingRange)) &&
         (myPosition == SB || myPosition == BUTTON || myPosition == CUTOFF) && canBluff)
     {
         int rand = 0;

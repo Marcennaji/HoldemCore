@@ -1,4 +1,4 @@
-#include "RangeManager.h"
+#include "RangeEstimator.h"
 
 #include <core/engine/model/PlayerStatistics.h>
 #include <core/engine/model/Ranges.h>
@@ -21,23 +21,23 @@ namespace pkt::core::player
 
 using namespace std;
 
-RangeManager::RangeManager(int playerId, IPlayersStatisticsStore* statsStore)
+RangeEstimator::RangeEstimator(int playerId, IPlayersStatisticsStore* statsStore)
     : myPlayerId(playerId), myHand(nullptr), myStatsStore(statsStore)
 {
     assert(myPlayerId >= 0);
 }
 
-void RangeManager::setEstimatedRange(const std::string& range)
+void RangeEstimator::setEstimatedRange(const std::string& range)
 {
     myEstimatedRange = range;
 }
 
-std::string RangeManager::getEstimatedRange() const
+std::string RangeEstimator::getEstimatedRange() const
 {
     return myEstimatedRange;
 }
 
-void RangeManager::computeEstimatedPreflopRange(CurrentHandContext& ctx)
+void RangeEstimator::computeEstimatedPreflopRange(CurrentHandContext& ctx)
 {
     using std::cout;
 
@@ -94,7 +94,7 @@ void RangeManager::computeEstimatedPreflopRange(CurrentHandContext& ctx)
     setEstimatedRange(estimatedRange);
 }
 
-std::string RangeManager::computeEstimatedPreflopRangeFromLastRaiser(CurrentHandContext& ctx) const
+std::string RangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(CurrentHandContext& ctx) const
 {
     using std::cout;
     const int nbPlayers = ctx.nbPlayers;
@@ -200,7 +200,7 @@ std::string RangeManager::computeEstimatedPreflopRangeFromLastRaiser(CurrentHand
     return getStringRange(nbPlayers, range);
 }
 
-string RangeManager::computeEstimatedPreflopRangeFromCaller(CurrentHandContext& ctx) const
+string RangeEstimator::computeEstimatedPreflopRangeFromCaller(CurrentHandContext& ctx) const
 {
     // the player is not the last raiser, but he has called a raise or limped in preflop
 
@@ -544,8 +544,8 @@ string RangeManager::computeEstimatedPreflopRangeFromCaller(CurrentHandContext& 
     else
         return getStringRange(nbPlayers, range);
 }
-string RangeManager::getFilledRange(std::vector<string>& ranges, std::vector<float>& rangesValues,
-                                    const float rangeMax) const
+string RangeEstimator::getFilledRange(std::vector<string>& ranges, std::vector<float>& rangesValues,
+                                      const float rangeMax) const
 {
 
     float remainingRange = rangeMax;
@@ -571,7 +571,7 @@ string RangeManager::getFilledRange(std::vector<string>& ranges, std::vector<flo
     else
         return estimatedRange;
 }
-int RangeManager::getStandardRaisingRange(int nbPlayers) const
+int RangeEstimator::getStandardRaisingRange(int nbPlayers) const
 {
 
     if (nbPlayers == 2)
@@ -593,12 +593,12 @@ int RangeManager::getStandardRaisingRange(int nbPlayers) const
     else
         return 15;
 }
-int RangeManager::getStandardCallingRange(int nbPlayers) const
+int RangeEstimator::getStandardCallingRange(int nbPlayers) const
 {
     return getStandardRaisingRange(nbPlayers) + 5;
 }
 
-std::string RangeManager::getStringRange(int nbPlayers, int range)
+std::string RangeEstimator::getStringRange(int nbPlayers, int range)
 {
 
     if (range > 100)
@@ -617,7 +617,7 @@ std::string RangeManager::getStringRange(int nbPlayers, int range)
         return TOP_RANGE_MORE_4_PLAYERS[range];
 }
 // purpose : remove some unplausible hands (to my opponents eyes), given what I did preflop
-void RangeManager::updateUnplausibleRangesGivenPreflopActions(CurrentHandContext& ctx)
+void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(CurrentHandContext& ctx)
 {
 
     computeEstimatedPreflopRange(ctx);
@@ -651,7 +651,7 @@ void RangeManager::updateUnplausibleRangesGivenPreflopActions(CurrentHandContext
 #endif
 }
 
-void RangeManager::updateUnplausibleRangesGivenFlopActions(CurrentHandContext& ctx)
+void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext& ctx)
 {
 
     const int nbPlayers = ctx.nbPlayers;
@@ -744,7 +744,7 @@ void RangeManager::updateUnplausibleRangesGivenFlopActions(CurrentHandContext& c
 }
 
 // purpose : remove some unplausible hands, who would normally be in the estimated preflop range
-void RangeManager::updateUnplausibleRangesGivenTurnActions(CurrentHandContext& ctx)
+void RangeEstimator::updateUnplausibleRangesGivenTurnActions(CurrentHandContext& ctx)
 {
 
     const int nbPlayers = ctx.nbPlayers;
@@ -831,7 +831,7 @@ void RangeManager::updateUnplausibleRangesGivenTurnActions(CurrentHandContext& c
 }
 
 // purpose : remove some unplausible hands, woul would normally be in the estimated preflop range
-void RangeManager::updateUnplausibleRangesGivenRiverActions(CurrentHandContext& ctx)
+void RangeEstimator::updateUnplausibleRangesGivenRiverActions(CurrentHandContext& ctx)
 {
 
     const int nbPlayers = ctx.nbPlayers;
@@ -915,8 +915,8 @@ void RangeManager::updateUnplausibleRangesGivenRiverActions(CurrentHandContext& 
 #endif
 }
 
-std::string RangeManager::deduceRange(const std::string& originRanges, const std::string& rangesToSubstract,
-                                      const std::string& board) const
+std::string RangeEstimator::deduceRange(const std::string& originRanges, const std::string& rangesToSubstract,
+                                        const std::string& board) const
 {
     return RangeRefiner::deduceRange(originRanges, rangesToSubstract, board);
 }
