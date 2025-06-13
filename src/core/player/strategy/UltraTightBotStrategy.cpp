@@ -54,7 +54,7 @@ UltraTightBotStrategy::~UltraTightBotStrategy()
 bool UltraTightBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool deterministic)
 {
 
-    float callingRange = getPreflopRangeCalculator()->getPreflopCallingRange(ctx);
+    float callingRange = getPreflopRangeCalculator()->calculatePreflopCallingRange(ctx);
     if (callingRange == -1)
         return false; // never call : raise or fold
 
@@ -119,7 +119,7 @@ bool UltraTightBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool dete
 int UltraTightBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool deterministic)
 {
 
-    float raisingRange = getPreflopRaisingRange(ctx);
+    float raisingRange = getPreflopRangeCalculator()->calculatePreflopRaisingRange(ctx);
 
     if (raisingRange == -1)
         return 0; // never raise : call or fold

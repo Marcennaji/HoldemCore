@@ -36,7 +36,6 @@ class IBotStrategy
 
   protected:
     void initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange);
-    float getPreflopRaisingRange(CurrentHandContext&, bool deterministic = false) const;
 
     int computePreflopRaiseAmount(CurrentHandContext&, bool deterministic = false);
     bool shouldPotControl(CurrentHandContext&, bool deterministic = false);

@@ -55,7 +55,7 @@ LooseAggressiveBotStrategy::~LooseAggressiveBotStrategy()
 bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool deterministic)
 {
 
-    float callingRange = getPreflopRangeCalculator()->getPreflopCallingRange(ctx);
+    float callingRange = getPreflopRangeCalculator()->calculatePreflopCallingRange(ctx);
     if (callingRange == -1)
         return false; // never call : raise or fold
 
@@ -142,7 +142,7 @@ bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool
 int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool deterministic)
 {
 
-    float raisingRange = getPreflopRaisingRange(ctx);
+    float raisingRange = getPreflopRangeCalculator()->calculatePreflopRaisingRange(ctx);
 
     if (raisingRange == -1)
         return 0; // never raise : call or fold

@@ -10,8 +10,8 @@ namespace pkt::core::player
 {
 using namespace std;
 
-std::string RangeRefiner::substractRange(const std::string originRanges, const std::string rangesToSubstract,
-                                         const std::string board)
+std::string RangeRefiner::deduceRange(const std::string originRanges, const std::string rangesToSubstract,
+                                      const std::string board)
 {
     std::istringstream oss(originRanges);
     std::string singleOriginRange;

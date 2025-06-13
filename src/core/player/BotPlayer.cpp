@@ -414,9 +414,9 @@ void BotPlayer::evaluateBetAmount()
     currentHand->getCurrentBettingRound()->setHighestSet(highestSet);
 }
 
-float BotPlayer::getPreflopCallingRange(CurrentHandContext& context, bool deterministic) const
+float BotPlayer::calculatePreflopCallingRange(CurrentHandContext& context, bool deterministic) const
 {
-    return myStrategy->getPreflopRangeCalculator()->getPreflopCallingRange(context, deterministic);
+    return myStrategy->getPreflopRangeCalculator()->calculatePreflopCallingRange(context, deterministic);
 }
 
 } // namespace pkt::core::player

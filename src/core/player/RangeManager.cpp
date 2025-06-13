@@ -334,10 +334,10 @@ void RangeManager::computeEstimatedPreflopRange(CurrentHandContext& ctx)
 
         if (preflop.m_hands >= MIN_HANDS_STATISTICS_ACCURATE)
             setEstimatedRange(
-                substractRange(ANY_CARDS_RANGE, getStringRange(ctx.nbPlayers, preflop.getPreflopRaise() * 0.8)));
+                deduceRange(ANY_CARDS_RANGE, getStringRange(ctx.nbPlayers, preflop.getPreflopRaise() * 0.8)));
         else
-            setEstimatedRange(substractRange(
-                ANY_CARDS_RANGE, getStringRange(ctx.nbPlayers, getStandardRaisingRange(ctx.nbPlayers) * 0.8)));
+            setEstimatedRange(deduceRange(ANY_CARDS_RANGE,
+                                          getStringRange(ctx.nbPlayers, getStandardRaisingRange(ctx.nbPlayers) * 0.8)));
 
         return;
     }
@@ -900,11 +900,10 @@ void RangeManager::updateUnplausibleRangesGivenPreflopActions(CurrentHandContext
     {
 
         if (preflop.m_hands >= MIN_HANDS_STATISTICS_ACCURATE)
-            setEstimatedRange(
-                substractRange(getEstimatedRange(), getStringRange(nbPlayers, preflop.getPreflopRaise())));
+            setEstimatedRange(deduceRange(getEstimatedRange(), getStringRange(nbPlayers, preflop.getPreflopRaise())));
         else
             setEstimatedRange(
-                substractRange(getEstimatedRange(), getStringRange(nbPlayers, getStandardRaisingRange(nbPlayers))));
+                deduceRange(getEstimatedRange(), getStringRange(nbPlayers, getStandardRaisingRange(nbPlayers))));
     }
 
     if (getEstimatedRange() == "")
@@ -988,7 +987,7 @@ void RangeManager::updateUnplausibleRangesGivenFlopActions(CurrentHandContext& c
         }
     }
 
-    setEstimatedRange(substractRange(getEstimatedRange(), unplausibleRanges, ctx.stringBoard));
+    setEstimatedRange(deduceRange(getEstimatedRange(), unplausibleRanges, ctx.stringBoard));
 
     if (getEstimatedRange() == "")
     {
@@ -1075,7 +1074,7 @@ void RangeManager::updateUnplausibleRangesGivenTurnActions(CurrentHandContext& c
         }
     }
 
-    setEstimatedRange(substractRange(getEstimatedRange(), unplausibleRanges, ctx.stringBoard));
+    setEstimatedRange(deduceRange(getEstimatedRange(), unplausibleRanges, ctx.stringBoard));
 
     if (getEstimatedRange() == "")
     {
@@ -1160,7 +1159,7 @@ void RangeManager::updateUnplausibleRangesGivenRiverActions(CurrentHandContext& 
         }
     }
 
-    setEstimatedRange(substractRange(getEstimatedRange(), unplausibleRanges, ctx.stringBoard));
+    setEstimatedRange(deduceRange(getEstimatedRange(), unplausibleRanges, ctx.stringBoard));
 
     if (getEstimatedRange() == "")
     {
@@ -1179,10 +1178,10 @@ void RangeManager::updateUnplausibleRangesGivenRiverActions(CurrentHandContext& 
 #endif
 }
 
-std::string RangeManager::substractRange(const std::string& originRanges, const std::string& rangesToSubstract,
-                                         const std::string& board) const
+std::string RangeManager::deduceRange(const std::string& originRanges, const std::string& rangesToSubstract,
+                                      const std::string& board) const
 {
-    return RangeRefiner::substractRange(originRanges, rangesToSubstract, board);
+    return RangeRefiner::deduceRange(originRanges, rangesToSubstract, board);
 }
 
 } // namespace pkt::core::player

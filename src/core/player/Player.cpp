@@ -1130,14 +1130,14 @@ void Player::updateCurrentHandContext(const GameState state)
 
     // player specific, hidden from the opponents :
     myCurrentHandContext->myCanBluff = canBluff(state);
-    myCurrentHandContext->myPreflopCallingRange = getPreflopCallingRange(*myCurrentHandContext);
+    myCurrentHandContext->myPreflopCallingRange = calculatePreflopCallingRange(*myCurrentHandContext);
     myCurrentHandContext->myHandSimulation = getHandSimulation();
     myCurrentHandContext->myCard1 = myCard1;
     myCurrentHandContext->myCard2 = myCard2;
     myCurrentHandContext->myPostFlopState = getPostFlopState();
 }
 
-float Player::getPreflopCallingRange(CurrentHandContext& context, bool deterministic) const
+float Player::calculatePreflopCallingRange(CurrentHandContext& context, bool deterministic) const
 {
     return myRangeManager->getStandardCallingRange(currentHand->getActivePlayerList()->size());
 }
