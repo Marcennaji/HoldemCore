@@ -33,17 +33,19 @@ PokerTraining is an offline, open-source poker simulation tool designed to help 
 * Clean separation of `BotPlayer` and `IBotStrategy`
 * Includes: TightAggressive, LooseAggressive, Maniac, UltraTight
 * Testable via `CurrentHandContext`
+* Bots might switch dynamically their strategies in a given game, depending on the context (stack size, etc)
 * Easy to add your own poker bot, that would implement the simple IBotStrategy interface
 
 ### 4. **Range Management & Equity Evaluation**
 
 * Bot players estimates opponents ranges, based on the current hand actions and the historical stats (stored in DB)
-* Range pruning based on public signals and historical stats
+* Opponents range pruning is based only on public signals and historical stats (fair game guaranteed !)
+* Sophisticated preflop call/raise range calculation, based on numerous parameters
 
 ### 5. **Testing Infrastructure**
 
 * GoogleTest-based unit tests under `tests/core/...`
-* Focus on verifying strategy behavior & decision logic
+* Focus on verifying strategy behavior, ranges calculation & decision logic
 
 ---
 
@@ -72,7 +74,6 @@ This project is under **active refactoring**, with major milestones completed:
 
 * Build JSON-based WebSocket protocol
 * Develop Flutter UI for Android/Web
-* Extend range estimation with ML-ready datasets
 * Reach a 'A' Cppdepend overall rating, as well as a high scoring SonarQube
 
 ---
@@ -84,11 +85,11 @@ I'm a senior freelance C++ / Python developer, and this project is both a portfo
 It demonstrates:
 
 * Domain-driven design in games
-* Code decoupling and modularization, applying the SOLID principles
+* Code decoupling and modularization, applying the SOLID and clean architecture principles
 * Clean testing practices
 * Cross-platform architecture thinking
 
-📫 Feel free to reach out or contribute if you're interested in strategy simulation, bots, or frontends.
+📫 Feel free to reach out or contribute if you're interested in poker strategy simulation, bots, or frontends.
 
 ---
 

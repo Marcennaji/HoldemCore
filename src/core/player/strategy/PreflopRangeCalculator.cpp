@@ -5,6 +5,8 @@
 #include "core/engine/model/PlayerPosition.h"
 #include "core/player/Helpers.h"
 
+#include <cmath>
+
 namespace pkt::core::player
 {
 using namespace std;
