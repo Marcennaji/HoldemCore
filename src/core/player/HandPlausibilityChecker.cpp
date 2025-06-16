@@ -1,7 +1,7 @@
 
-#include <third_party/psim/psim.hpp>
 #include "HandPlausibilityChecker.h"
-#include "core/player/RangeEstimator.h"
+#include <third_party/psim/psim.hpp>
+#include "core/player/range/RangeEstimator.h"
 #include "core/player/typedefs.h"
 
 namespace pkt::core::player

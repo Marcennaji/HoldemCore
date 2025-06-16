@@ -1,4 +1,4 @@
-#include "core/player/RangeRefiner.h"
+#include "core/player/range/RangeRefiner.h"
 #include <gtest/gtest.h>
 
 using namespace pkt::core::player;

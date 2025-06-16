@@ -11,7 +11,7 @@
 #include <core/interfaces/ILogger.h>
 #include <core/interfaces/persistence/IHandAuditStore.h>
 #include <core/interfaces/persistence/IPlayersStatisticsStore.h>
-#include <core/player/RangeParser.h>
+#include <core/player/range/RangeParser.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include <third_party/psim/psim.hpp>
 #include "Helpers.h"

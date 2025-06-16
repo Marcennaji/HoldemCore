@@ -10,7 +10,7 @@
 #include <core/interfaces/IHand.h>
 #include <core/interfaces/ILogger.h>
 #include "CurrentHandActions.h"
-#include "RangeEstimator.h"
+#include "range/RangeEstimator.h"
 
 #include <third_party/psim/psim.hpp>
 
