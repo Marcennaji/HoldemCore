@@ -55,9 +55,6 @@ class RangeEstimator
     void updateUnplausibleRangesGivenRiverActions(CurrentHandContext&);
 
   private:
-    std::string computeEstimatedPreflopRangeFromLastRaiser(CurrentHandContext&) const;
-    std::string computeEstimatedPreflopRangeFromCaller(CurrentHandContext&) const;
-
     std::unique_ptr<PreflopRangeEstimator> myPreflopRangeEstimator;
     std::string myEstimatedRange;
     int myPlayerId;
