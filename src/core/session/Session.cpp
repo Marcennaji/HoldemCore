@@ -66,10 +66,11 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
 
     auto engineFactory = std::make_shared<EngineFactory>(myEvents, myLogger);
 
-    auto strategyAssigner = std::make_unique<StrategyAssigner>(gameData.tableProfile, startData.numberOfPlayers - 1);
+    auto strategyAssigner =
+        std::make_unique<StrategyAssigner>(gameData.tableProfile, startData.numberOfPlayers - 1, myLogger);
 
-    auto playerFactory = std::make_unique<DefaultPlayerFactory>(myEvents, myHandAuditStore, myPlayersStatisticsStore,
-                                                                strategyAssigner.get());
+    auto playerFactory = std::make_unique<DefaultPlayerFactory>(myEvents, myLogger, myHandAuditStore,
+                                                                myPlayersStatisticsStore, strategyAssigner.get());
 
     auto playerList = std::make_shared<std::list<std::shared_ptr<Player>>>();
 

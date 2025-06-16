@@ -28,7 +28,7 @@ class GuiAppController
     QString myAppDataPath;
     QString myLogPath;
     QString myUserDataPath;
-    std::unique_ptr<pkt::infra::SqliteLogStore> myGameActionslogger;
+    std::unique_ptr<pkt::infra::SqliteLogStore> myDbStatisticsLogger;
     std::unique_ptr<GameTableWindow> myGameTableWindow;
     std::unique_ptr<pkt::core::Session> mySession;
     std::unique_ptr<pkt::core::GameEvents> myEvents;

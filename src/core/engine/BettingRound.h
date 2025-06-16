@@ -87,10 +87,10 @@ class BettingRound : public IBettingRound
     int getSmallBlind() const;
 
     GameEvents* myEvents;
+    ILogger* myLogger;
 
   private:
     IHand* myHand;
-    ILogger* myLogger;
 
     const GameState myBettingRoundID;
     int dealerPosition;

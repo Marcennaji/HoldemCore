@@ -26,6 +26,7 @@
 #include "core/player/strategy/ManiacBotStrategy.h"
 #include "core/player/strategy/TightAggressiveBotStrategy.h"
 #include "core/player/strategy/UltraTightBotStrategy.h"
+#include "infra/NullLogger.h"
 
 #include <third_party/sqlite3/sqlite3.h>
 
@@ -40,8 +41,9 @@ using namespace std;
 using namespace pkt::core;
 using namespace pkt::core::player;
 
-SqliteLogStore::SqliteLogStore(const std::string& logDir)
-    : mySqliteLogDb(0), mySqliteLogFileName(""), myLogDir(logDir), uniqueGameID(0), currentHandID(0), sql("")
+SqliteLogStore::SqliteLogStore(const std::string& logDir, ILogger* logger)
+    : mySqliteLogDb(0), mySqliteLogFileName(""), myLogDir(logDir), uniqueGameID(0), currentHandID(0), sql(""),
+      myLogger(logger)
 {
 }
 
@@ -152,10 +154,10 @@ void SqliteLogStore::createDatabase()
 
     exec_transaction();
 
-    auto looseAggressiveStrategy = LooseAggressiveBotStrategy();
-    auto tightAggressiveStrategy = TightAggressiveBotStrategy();
-    auto maniacStrategy = ManiacBotStrategy();
-    auto ultraTightStrategy = UltraTightBotStrategy();
+    auto looseAggressiveStrategy = LooseAggressiveBotStrategy(myLogger);
+    auto tightAggressiveStrategy = TightAggressiveBotStrategy(myLogger);
+    auto maniacStrategy = ManiacBotStrategy(myLogger);
+    auto ultraTightStrategy = UltraTightBotStrategy(myLogger);
 
     for (int j = 2; j <= MAX_NUMBER_OF_PLAYERS; j++)
     {

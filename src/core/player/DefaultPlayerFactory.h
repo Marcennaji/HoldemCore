@@ -9,7 +9,7 @@ namespace pkt::core::player
 class DefaultPlayerFactory : public IPlayerFactory
 {
   public:
-    DefaultPlayerFactory(GameEvents* events, IHandAuditStore* audit, IPlayersStatisticsStore* stats,
+    DefaultPlayerFactory(GameEvents* events, ILogger* logger, IHandAuditStore* audit, IPlayersStatisticsStore* stats,
                          StrategyAssigner* assigner);
 
     std::shared_ptr<Player> createHumanPlayer(int id, const std::string& name, int startMoney) override;
@@ -19,6 +19,7 @@ class DefaultPlayerFactory : public IPlayerFactory
     GameEvents* myEvents;
     IHandAuditStore* myAudit;
     IPlayersStatisticsStore* myStats;
+    ILogger* myLogger;
     StrategyAssigner* myStrategyAssigner;
 };
 } // namespace pkt::core::player

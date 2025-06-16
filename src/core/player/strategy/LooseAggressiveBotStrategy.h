@@ -28,7 +28,7 @@ class LooseAggressiveBotStrategy : public IBotStrategy
 {
 
   public:
-    LooseAggressiveBotStrategy();
+    LooseAggressiveBotStrategy(ILogger* myLogger);
 
     ~LooseAggressiveBotStrategy();
 

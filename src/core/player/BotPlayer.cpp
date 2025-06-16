@@ -20,6 +20,8 @@
 #include <core/player/strategy/IBotStrategy.h>
 #include "core/player/strategy/CurrentHandContext.h"
 
+#include <sstream>
+
 #ifndef max
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 #endif
@@ -28,9 +30,9 @@ namespace pkt::core::player
 
 using namespace std;
 
-BotPlayer::BotPlayer(GameEvents* events, IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id, std::string name,
-                     int sC, bool aS, int mB)
-    : Player(events, ha, ps, id, name, sC, aS, mB)
+BotPlayer::BotPlayer(GameEvents* events, ILogger* myLogger, IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id,
+                     std::string name, int sC, bool aS, int mB)
+    : Player(events, myLogger, ha, ps, id, name, sC, aS, mB)
 {
 }
 
@@ -71,27 +73,27 @@ void BotPlayer::action()
 
     myTurn = 0;
 
-#ifdef LOG_POKER_EXEC
-    cout << endl;
+    std::ostringstream logMessage;
+    logMessage << "\n";
     if (myAction == PLAYER_ACTION_FOLD)
-        cout << "FOLD";
+        logMessage << "FOLD";
     else if (myAction == PLAYER_ACTION_BET)
-        cout << "BET " << myBetAmount;
+        logMessage << "BET " << myBetAmount;
     else if (myAction == PLAYER_ACTION_RAISE)
-        cout << "RAISE " << myRaiseAmount;
+        logMessage << "RAISE " << myRaiseAmount;
     else if (myAction == PLAYER_ACTION_CALL)
-        cout << "CALL ";
+        logMessage << "CALL ";
     else if (myAction == PLAYER_ACTION_CHECK)
-        cout << "CHECK";
+        logMessage << "CHECK";
     else if (myAction == PLAYER_ACTION_ALLIN)
-        cout << "ALLIN ";
+        logMessage << "ALLIN ";
     else if (myAction == PLAYER_ACTION_NONE)
-        cout << "NONE";
+        logMessage << "NONE";
     else
-        cout << "undefined ?";
+        logMessage << "undefined ?";
 
-    cout << endl << "---------------------------------------------------------------------------------" << endl << endl;
-#endif
+    logMessage << "\n---------------------------------------------------------------------------------\n\n";
+    myLogger->info(logMessage.str());
 
     currentHand->setPreviousPlayerID(myID);
 
@@ -105,13 +107,15 @@ void BotPlayer::doPreflopAction()
 {
     updateCurrentHandContext(GAME_STATE_PREFLOP);
 
-#ifdef LOG_POKER_EXEC
-    cout << endl
-         << "\t" << getPositionLabel(myPosition) << "\t" << myName << "\t" << getCardsValueString() << "\t"
-         << "stack = " << myCash << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
-         << "\tpreflop raise : "
-         << getStatistics(myCurrentHandContext->nbPlayers).getPreflopStatistics().getPreflopRaise() << " % " << endl;
-#endif
+    std::ostringstream logMessage;
+    logMessage << "\n";
+    logMessage << "\t" << getPositionLabel(myPosition) << "\t" << myName << "\t" << getCardsValueString() << "\t"
+               << "stack = " << myCash
+               << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
+               << "\tpreflop raise : "
+               << getStatistics(myCurrentHandContext->nbPlayers).getPreflopStatistics().getPreflopRaise() << " % "
+               << "\n";
+    myLogger->info(logMessage.str());
 
     myBetAmount = 0;
     bool shouldCall = myStrategy->preflopShouldCall(*myCurrentHandContext);
@@ -154,13 +158,14 @@ void BotPlayer::doFlopAction()
 {
     updateCurrentHandContext(GAME_STATE_FLOP);
 
-#ifdef LOG_POKER_EXEC
-    cout << endl
-         << "\t" << getPositionLabel(myPosition) << "\t" << myName << "\t" << getCardsValueString() << "\t"
-         << "stack = " << myCash << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
-         << "\tPFR : " << getStatistics(myCurrentHandContext->nbPlayers).getPreflopStatistics().getPreflopRaise()
-         << endl;
-#endif
+    std::ostringstream logMessage;
+    logMessage << "\n";
+    logMessage << "\t" << getPositionLabel(myPosition) << "\t" << myName << "\t" << getCardsValueString() << "\t"
+               << "stack = " << myCash
+               << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
+               << "\tPFR : " << getStatistics(myCurrentHandContext->nbPlayers).getPreflopStatistics().getPreflopRaise()
+               << "\n";
+    myLogger->info(logMessage.str());
 
     myBetAmount = myStrategy->flopShouldBet(*myCurrentHandContext);
     bool shouldCall = myBetAmount ? false : myStrategy->flopShouldCall(*myCurrentHandContext);
@@ -199,13 +204,14 @@ void BotPlayer::doTurnAction()
 
     updateCurrentHandContext(GAME_STATE_TURN);
 
-#ifdef LOG_POKER_EXEC
-    cout << endl
-         << "\t" << getPositionLabel(myPosition) << "\t" << myName << "\t" << getCardsValueString() << "\t"
-         << "stack = " << myCash << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
-         << "\tPFR : " << getStatistics(myCurrentHandContext->nbPlayers).getPreflopStatistics().getPreflopRaise()
-         << endl;
-#endif
+    std::ostringstream logMessage;
+    logMessage << "\n";
+    logMessage << "\t" << getPositionLabel(myPosition) << "\t" << myName << "\t" << getCardsValueString() << "\t"
+               << "stack = " << myCash
+               << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
+               << "\tPFR : " << getStatistics(myCurrentHandContext->nbPlayers).getPreflopStatistics().getPreflopRaise()
+               << "\n";
+    myLogger->info(logMessage.str());
 
     myBetAmount = myStrategy->turnShouldBet(*myCurrentHandContext);
     bool shouldCall = myBetAmount ? false : myStrategy->turnShouldCall(*myCurrentHandContext);
@@ -244,13 +250,14 @@ void BotPlayer::doRiverAction()
 
     updateCurrentHandContext(GAME_STATE_RIVER);
 
-#ifdef LOG_POKER_EXEC
-    cout << endl
-         << "\t" << getPositionLabel(myPosition) << "\t" << myName << "\t" << getCardsValueString() << "\t"
-         << "stack = " << myCash << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
-         << "\tPFR : " << getStatistics(myCurrentHandContext->nbPlayers).getPreflopStatistics().getPreflopRaise()
-         << endl;
-#endif
+    std::ostringstream logMessage;
+    logMessage << "\n";
+    logMessage << "\t" << getPositionLabel(myPosition) << "\t" << myName << "\t" << getCardsValueString() << "\t"
+               << "stack = " << myCash
+               << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
+               << "\tPFR : " << getStatistics(myCurrentHandContext->nbPlayers).getPreflopStatistics().getPreflopRaise()
+               << "\n";
+    myLogger->info(logMessage.str());
 
     myBetAmount = myStrategy->riverShouldBet(*myCurrentHandContext);
     bool shouldCall = myBetAmount ? false : myStrategy->riverShouldCall(*myCurrentHandContext);

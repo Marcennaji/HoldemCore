@@ -46,9 +46,7 @@ void BettingRoundPreflop::run()
 
     if (getFirstRun())
     {
-#ifdef LOG_POKER_EXEC
-        cout << endl << endl << "************************* PREFLOP *************************" << endl << endl;
-#endif
+        myLogger->info("\n\n************************* PREFLOP *************************\n\n");
         PlayerListIterator it;
 
         // search bigBlindPosition in runningPlayerList

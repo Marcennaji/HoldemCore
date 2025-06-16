@@ -22,6 +22,7 @@
 #include <core/engine/EngineDefs.h>
 #include <core/engine/model/PlayerStatistics.h>
 #include <core/interfaces/IHand.h>
+#include <core/interfaces/ILogger.h>
 #include "CurrentHandActions.h"
 #include "RangeEstimator.h"
 
@@ -66,7 +67,8 @@ static int outsOddsTwoCard[] = {
 class Player
 {
   public:
-    Player(GameEvents*, IHandAuditStore*, IPlayersStatisticsStore*, int id, std::string name, int sC, bool aS, int mB);
+    Player(GameEvents*, ILogger*, IHandAuditStore*, IPlayersStatisticsStore*, int id, std::string name, int sC, bool aS,
+           int mB);
 
     virtual ~Player() = default;
 
@@ -207,6 +209,7 @@ class Player
     int lastMoneyWon;
     int myPreflopPotOdd;
     std::unique_ptr<RangeEstimator> myRangeEstimator;
+    ILogger* myLogger;
 
     bool m_isSessionActive;
 };

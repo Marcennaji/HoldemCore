@@ -47,10 +47,8 @@ Hand::Hand(GameEvents* events, ILogger* logger, std::shared_ptr<EngineFactory> f
 
     int i, j, k;
     PlayerListIterator it;
-#ifdef LOG_POKER_EXEC
-    cout << endl << "-------------------------------------------------------------" << endl << endl;
-    cout << endl << "HAND " << myID << endl;
-#endif
+    myLogger->info("\n-------------------------------------------------------------\n");
+    myLogger->info("\nHAND " + std::to_string(myID) + "\n");
 
     for (it = seatsList->begin(); it != seatsList->end(); ++it)
     {
@@ -72,119 +70,6 @@ Hand::Hand(GameEvents* events, ILogger* logger, std::shared_ptr<EngineFactory> f
     */
 
     Randomizer::ShuffleArrayNonDeterministic(cardsArray);
-
-#ifdef LOG_POKER_EXEC
-
-    static map<string, int> cardStringToInt;
-
-    cardStringToInt["2d"] = 0;
-    cardStringToInt["3d"] = 1;
-    cardStringToInt["4d"] = 2;
-    cardStringToInt["5d"] = 3;
-    cardStringToInt["6d"] = 4;
-    cardStringToInt["7d"] = 5;
-    cardStringToInt["8d"] = 6;
-    cardStringToInt["9d"] = 7;
-    cardStringToInt["Td"] = 8;
-    cardStringToInt["Jd"] = 9;
-    cardStringToInt["Qd"] = 10;
-    cardStringToInt["Kd"] = 11;
-    cardStringToInt["Ad"] = 12;
-
-    cardStringToInt["2h"] = 13;
-    cardStringToInt["3h"] = 14;
-    cardStringToInt["4h"] = 15;
-    cardStringToInt["5h"] = 16;
-    cardStringToInt["6h"] = 17;
-    cardStringToInt["7h"] = 18;
-    cardStringToInt["8h"] = 19;
-    cardStringToInt["9h"] = 20;
-    cardStringToInt["Th"] = 21;
-    cardStringToInt["Jh"] = 22;
-    cardStringToInt["Qh"] = 23;
-    cardStringToInt["Kh"] = 24;
-    cardStringToInt["Ah"] = 25;
-
-    cardStringToInt["2s"] = 26;
-    cardStringToInt["3s"] = 27;
-    cardStringToInt["4s"] = 28;
-    cardStringToInt["5s"] = 29;
-    cardStringToInt["6s"] = 30;
-    cardStringToInt["7s"] = 31;
-    cardStringToInt["8s"] = 32;
-    cardStringToInt["9s"] = 33;
-    cardStringToInt["Ts"] = 34;
-    cardStringToInt["Js"] = 35;
-    cardStringToInt["Qs"] = 36;
-    cardStringToInt["Ks"] = 37;
-    cardStringToInt["As"] = 38;
-
-    cardStringToInt["2c"] = 39;
-    cardStringToInt["3c"] = 40;
-    cardStringToInt["4c"] = 41;
-    cardStringToInt["5c"] = 42;
-    cardStringToInt["6c"] = 43;
-    cardStringToInt["7c"] = 44;
-    cardStringToInt["8c"] = 45;
-    cardStringToInt["9c"] = 46;
-    cardStringToInt["Tc"] = 47;
-    cardStringToInt["Jc"] = 48;
-    cardStringToInt["Qc"] = 49;
-    cardStringToInt["Kc"] = 50;
-    cardStringToInt["Ac"] = 51;
-
-    if (false)
-    { // put 'true', to test a particular board and players cards :
-
-        // board :
-        cardsArray[0] = cardStringToInt["Jd"];
-        cardsArray[1] = cardStringToInt["Jc"];
-        cardsArray[2] = cardStringToInt["Ts"];
-        cardsArray[3] = cardStringToInt["Ks"];
-        cardsArray[4] = cardStringToInt["2h"];
-
-        // player 1 (human)
-        cardsArray[5] = cardStringToInt["Kc"];
-        cardsArray[6] = cardStringToInt["Kh"];
-
-        // player 2
-        cardsArray[7] = cardStringToInt["As"];
-        cardsArray[8] = cardStringToInt["Qd"];
-
-        // player 3
-        cardsArray[9] = cardStringToInt["Ks"];
-        cardsArray[10] = cardStringToInt["Kc"];
-
-        // player 4
-        cardsArray[11] = cardStringToInt["Ah"];
-        cardsArray[12] = cardStringToInt["Ah"];
-
-        // player 5
-        cardsArray[13] = cardStringToInt["Qh"];
-        cardsArray[14] = cardStringToInt["Qs"];
-
-        // player 6
-        cardsArray[15] = cardStringToInt["2c"];
-        cardsArray[16] = cardStringToInt["2h"];
-
-        // player 7
-        cardsArray[17] = cardStringToInt["8d"];
-        cardsArray[18] = cardStringToInt["3d"];
-
-        // player 8
-        cardsArray[19] = cardStringToInt["9h"];
-        cardsArray[20] = cardStringToInt["4h"];
-
-        // player 9
-        cardsArray[21] = cardStringToInt["2s"];
-        cardsArray[22] = cardStringToInt["5s"];
-
-        // player 10
-        cardsArray[23] = cardStringToInt["3s"];
-        cardsArray[24] = cardStringToInt["7c"];
-    }
-
-#endif
 
     int tempBoardArray[5];
     int tempPlayerArray[2];

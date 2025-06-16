@@ -37,11 +37,12 @@ namespace pkt::core::player
 
 using namespace std;
 
-Player::Player(GameEvents* events, IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id, std::string name, int sC,
-               bool aS, int mB)
+Player::Player(GameEvents* events, ILogger* logger, IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id,
+               std::string name, int sC, bool aS, int mB)
     : myHandAuditStore(ha), myPlayersStatisticsStore(ps), currentHand(0), myID(id), myName(name), myCardsValueInt(0),
       myCash(sC), mySet(0), myLastRelativeSet(0), myAction(PLAYER_ACTION_NONE), myButton(mB), myActiveStatus(aS),
-      myTurn(0), myCardsFlip(0), myRoundStartCash(0), lastMoneyWon(0), m_isSessionActive(false), myEvents(events)
+      myTurn(0), myCardsFlip(0), myRoundStartCash(0), lastMoneyWon(0), m_isSessionActive(false), myEvents(events),
+      myLogger(logger)
 {
     myRangeEstimator = std::make_unique<RangeEstimator>(myID, myPlayersStatisticsStore);
     myCurrentHandContext = std::make_unique<CurrentHandContext>();
@@ -679,26 +680,14 @@ int Player::getPotOdd() const
 
     if (pot == 0)
     { // shouldn't happen, but...
-#ifdef LOG_POKER_EXEC
-        cout << endl
-             << "Error : Pot = " << currentHand->getBoard()->getPot() << " + " << currentHand->getBoard()->getSets()
-             << " = " << pot << endl;
-#endif
+        myLogger->error("Pot = " + std::to_string(currentHand->getBoard()->getPot()) + " + " +
+                        std::to_string(currentHand->getBoard()->getSets()) + " = " + std::to_string(pot));
         return 0;
     }
 
     int odd = (highestSet - mySet) * 100 / pot;
     if (odd < 0)
         odd = -odd; // happens if mySet > highestSet
-
-#ifdef LOG_POKER_EXEC
-    // cout << endl << "Pot odd computing : highest set = min(" << myCash << ", " <<
-    // currentHand->getCurrentBettingRound()->getHighestSet() << ") = " << highestSet
-    //		<< ", mySet = " << mySet
-    //		<< ", pot = " << currentHand->getBoard()->getPot() << " + " << currentHand->getBoard()->getSets() << " = "
-    //<< pot
-    //		<< ", pot odd = (" << highestSet << " - " << mySet << ") * 100 / " << pot << " = " << odd << endl;
-#endif
 
     return odd;
 }
@@ -733,23 +722,27 @@ const SimResults Player::getHandSimulation() const
 
     r.winRanged = 1 - maxOpponentsStrengths;
 
-#ifdef LOG_POKER_EXEC
-    cout << endl
-         << "\tsimulation with " << cards << " : " << endl
-         << "\t\twin at showdown is " << r.winSd << endl
-         << "\t\ttie at showdown is " << r.tieSd << endl
-         << "\t\twin now (against random hands)  is " << r.win << endl
-         << "\t\twin now (against ranged hands) is " << r.winRanged << endl;
+    std::ostringstream logMessage;
+    logMessage << "\n"
+               << "\tsimulation with " << cards << " : " << std::endl
+               << "\t\twin at showdown is " << r.winSd << std::endl
+               << "\t\ttie at showdown is " << r.tieSd << std::endl
+               << "\t\twin now (against random hands) is " << r.win << std::endl
+               << "\t\twin now (against ranged hands) is " << r.winRanged << std::endl;
+
     if (r.winRanged == 0)
-        cout << endl
-             << "\t\tr.winRanged = 1 - " << maxOpponentsStrengths << " = 0 : setting value to r.win / 4 = " << r.win / 4
-             << endl;
+    {
+        logMessage << "\n"
+                   << "\t\tr.winRanged = 1 - " << maxOpponentsStrengths
+                   << " = 0 : setting value to r.win / 4 = " << r.win / 4 << std::endl;
+    }
 
     if (getPotOdd() > 0)
-        cout << "\t\tpot odd is " << getPotOdd() << endl;
+    {
+        logMessage << "\t\tpot odd is " << getPotOdd() << std::endl;
+    }
 
-#endif
-
+    myLogger->info(logMessage.str());
     if (r.winRanged == 0)
         r.winRanged = r.win / 4;
 
@@ -819,12 +812,7 @@ float Player::getMaxOpponentsStrengths() const
     //		maxOpponentsStrengths = maxOpponentsStrengths * 3;
     //
     //	if (maxOpponentsStrengths > 1){
-    // #ifdef LOG_POKER_EXEC
-    //		cout << "\t\tmaxOpponentsStrengths is > 1 : origin value was " << originMaxOpponentsStrengths
-    //			<< ", nb raises is " << nbRaises
-    //			<< ", nb opponents is " << strenghts.size()
-    //			<< " --> setting value to 1" << endl;
-    // #endif
+
     //		maxOpponentsStrengths = 1;
     //	}
 
@@ -950,10 +938,6 @@ std::map<int, float> Player::evaluateOpponentsStrengths() const
     map<int, float> result;
     PlayerList players = currentHand->getActivePlayerList();
     const int nbPlayers = currentHand->getActivePlayerList()->size();
-
-#ifdef LOG_POKER_EXEC
-    cout << endl;
-#endif
 
     for (PlayerListIterator it = players->begin(); it != players->end(); ++it)
     {

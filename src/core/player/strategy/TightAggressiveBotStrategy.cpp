@@ -37,7 +37,7 @@ namespace pkt::core::player
 
 using namespace std;
 
-TightAggressiveBotStrategy::TightAggressiveBotStrategy() : IBotStrategy()
+TightAggressiveBotStrategy::TightAggressiveBotStrategy(ILogger* myLogger) : IBotStrategy(myLogger)
 {
     setStrategyName("TightAggressive");
 
@@ -82,9 +82,7 @@ bool TightAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool
 
         stringCallingRange += HIGH_SUITED_CONNECTORS;
 
-#ifdef LOG_POKER_EXEC
-        cout << "\t\tTAG adding high suited connectors to the initial calling range." << endl;
-#endif
+        myLogger->info("\t\tTAG adding high suited connectors to the initial calling range.");
     }
 
     // defend against 3bet bluffs :
@@ -102,16 +100,12 @@ bool TightAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool
             stringCallingRange += HIGH_SUITED_ACES;
             stringCallingRange += PAIRS;
 
-#ifdef LOG_POKER_EXEC
-            cout << "\t\tLAG defending against 3-bet : adding high suited connectors, high suited aces and pairs to "
-                    "the initial calling range."
-                 << endl;
-#endif
+            myLogger->info(
+                "\t\tTAG defending against 3-bet : adding high suited connectors, high suited aces and pairs to "
+                "the initial calling range.");
         }
     }
-#ifdef LOG_POKER_EXEC
-    cout << "\t\tLAG final calling range : " << stringCallingRange << endl;
-#endif
+    myLogger->info("\t\tTAG final calling range : " + stringCallingRange);
 
     return isCardsInRange(ctx.myCard1, ctx.myCard2, stringCallingRange);
 }

@@ -172,37 +172,24 @@ void BettingRound::run()
             switch (myBettingRoundID)
             {
             case GAME_STATE_FLOP:
-#ifdef LOG_POKER_EXEC
-                cout << endl
-                     << endl
-                     << "************************* FLOP " << CardsValue::CardStringValue[tempBoardCardsArray[0]] << " "
-                     << CardsValue::CardStringValue[tempBoardCardsArray[1]] << " "
-                     << CardsValue::CardStringValue[tempBoardCardsArray[2]] << "  *************************" << endl
-                     << endl;
-#endif
+                myLogger->info("************************* FLOP " + CardsValue::CardStringValue[tempBoardCardsArray[0]] +
+                               " " + CardsValue::CardStringValue[tempBoardCardsArray[1]] + " " +
+                               CardsValue::CardStringValue[tempBoardCardsArray[2]] + "  *************************");
                 break;
             case GAME_STATE_TURN:
-#ifdef LOG_POKER_EXEC
-                cout << endl
-                     << endl
-                     << "************************* TURN " << CardsValue::CardStringValue[tempBoardCardsArray[0]] << " "
-                     << CardsValue::CardStringValue[tempBoardCardsArray[1]] << " "
-                     << CardsValue::CardStringValue[tempBoardCardsArray[2]] << " "
-                     << CardsValue::CardStringValue[tempBoardCardsArray[3]] << "  *************************" << endl
-                     << endl;
-#endif
+                myLogger->info("************************* TURN " + CardsValue::CardStringValue[tempBoardCardsArray[0]] +
+                               " " + CardsValue::CardStringValue[tempBoardCardsArray[1]] + " " +
+                               CardsValue::CardStringValue[tempBoardCardsArray[2]] + " " +
+                               CardsValue::CardStringValue[tempBoardCardsArray[3]] + "  *************************");
+
                 break;
             case GAME_STATE_RIVER:
-#ifdef LOG_POKER_EXEC
-                cout << endl
-                     << endl
-                     << "************************* RIVER " << CardsValue::CardStringValue[tempBoardCardsArray[0]] << " "
-                     << CardsValue::CardStringValue[tempBoardCardsArray[1]] << " "
-                     << CardsValue::CardStringValue[tempBoardCardsArray[2]] << " "
-                     << CardsValue::CardStringValue[tempBoardCardsArray[3]] << " "
-                     << CardsValue::CardStringValue[tempBoardCardsArray[4]] << "  *************************" << endl
-                     << endl;
-#endif
+                myLogger->info("************************* RIVER " +
+                               CardsValue::CardStringValue[tempBoardCardsArray[0]] + " " +
+                               CardsValue::CardStringValue[tempBoardCardsArray[1]] + " " +
+                               CardsValue::CardStringValue[tempBoardCardsArray[2]] + " " +
+                               CardsValue::CardStringValue[tempBoardCardsArray[3]] + " " +
+                               CardsValue::CardStringValue[tempBoardCardsArray[4]] + "  *************************");
 
                 break;
             default:

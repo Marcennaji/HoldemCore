@@ -8,7 +8,8 @@
 namespace pkt::core::player
 {
 
-StrategyAssigner::StrategyAssigner(TableProfile profile, int botCount) : myProfile(profile), maxPerType(botCount / 3)
+StrategyAssigner::StrategyAssigner(TableProfile profile, int botCount, ILogger* logger)
+    : myProfile(profile), maxPerType(botCount / 3), myLogger(logger)
 {
 }
 
@@ -20,11 +21,11 @@ std::unique_ptr<IBotStrategy> StrategyAssigner::chooseStrategyFor(int botIndex)
     {
         if (rand % 2 == 0)
         {
-            return std::make_unique<TightAggressiveBotStrategy>();
+            return std::make_unique<TightAggressiveBotStrategy>(myLogger);
         }
         else
         {
-            return std::make_unique<UltraTightBotStrategy>();
+            return std::make_unique<UltraTightBotStrategy>(myLogger);
         }
     }
 
@@ -32,26 +33,26 @@ std::unique_ptr<IBotStrategy> StrategyAssigner::chooseStrategyFor(int botIndex)
     {
         if (rand % 2 == 0)
         {
-            return std::make_unique<LooseAggressiveBotStrategy>();
+            return std::make_unique<LooseAggressiveBotStrategy>(myLogger);
         }
         else
         {
-            return std::make_unique<ManiacBotStrategy>();
+            return std::make_unique<ManiacBotStrategy>(myLogger);
         }
     }
 
     // RANDOM_OPPONENTS profile
     if (rand < 3 && countManiac++ < maxPerType)
-        return std::make_unique<ManiacBotStrategy>();
+        return std::make_unique<ManiacBotStrategy>(myLogger);
     if (rand < 5 && countUltraTight++ < maxPerType)
-        return std::make_unique<UltraTightBotStrategy>();
+        return std::make_unique<UltraTightBotStrategy>(myLogger);
     if (rand < 9 && countLoose++ < maxPerType)
-        return std::make_unique<LooseAggressiveBotStrategy>();
+        return std::make_unique<LooseAggressiveBotStrategy>(myLogger);
     if (countTight++ < maxPerType)
-        return std::make_unique<TightAggressiveBotStrategy>();
+        return std::make_unique<TightAggressiveBotStrategy>(myLogger);
 
     // fallback
-    return std::make_unique<UltraTightBotStrategy>();
+    return std::make_unique<UltraTightBotStrategy>(myLogger);
 }
 
 } // namespace pkt::core::player

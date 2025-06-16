@@ -26,7 +26,7 @@ class UltraTightBotStrategy : public IBotStrategy
 {
 
   public:
-    UltraTightBotStrategy();
+    UltraTightBotStrategy(ILogger* myLogger);
 
     ~UltraTightBotStrategy();
 

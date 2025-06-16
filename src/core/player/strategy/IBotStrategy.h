@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <core/interfaces/ILogger.h>
 #include <core/player/Player.h>
 #include <core/player/strategy/PreflopRangeCalculator.h>
 
@@ -12,7 +13,10 @@ struct CurrentHandContext;
 class IBotStrategy
 {
   public:
-    IBotStrategy() : preflopRangeCalculator(std::make_unique<PreflopRangeCalculator>()) {}
+    IBotStrategy(ILogger* myLogger)
+        : myLogger(myLogger), preflopRangeCalculator(std::make_unique<PreflopRangeCalculator>())
+    {
+    }
 
     virtual bool preflopShouldCall(CurrentHandContext&, bool deterministic = false) = 0;
     virtual bool flopShouldCall(CurrentHandContext&, bool deterministic = false) = 0;
@@ -43,6 +47,7 @@ class IBotStrategy
     bool myShouldCall = false;
     bool myShouldRaise = false;
     std::string myStrategyName;
+    ILogger* myLogger;
 
   private:
     std::unique_ptr<PreflopRangeCalculator> preflopRangeCalculator;

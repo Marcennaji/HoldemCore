@@ -37,7 +37,7 @@ namespace pkt::core::player
 
 using namespace std;
 
-ManiacBotStrategy::ManiacBotStrategy() : IBotStrategy()
+ManiacBotStrategy::ManiacBotStrategy(ILogger* myLogger) : IBotStrategy(myLogger)
 {
     setStrategyName("Maniac");
 

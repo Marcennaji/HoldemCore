@@ -49,24 +49,9 @@ int main(int argc, char** argv)
     QString logPath = QString::fromStdString(dirs.logDir);
     QString userPath = QString::fromStdString(dirs.userDataDir);
 
-    auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
+    auto logger = std::make_shared<pkt::infra::ConsoleLogger>();
     GuiAppController controller(logger.get(), appPath, logPath, userPath);
     StartWindow* mainWindow = controller.createMainWindow();
-
-#ifdef LOG_POKER_EXEC
-
-    auto now = std::chrono::system_clock::now();
-    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
-    std::tm sTm = *std::gmtime(&now_c);
-
-    std::ostringstream filenameStream;
-    filenameStream << dirs.logDir << "/pokertraining_hands_" << std::put_time(&sTm, "%Y-%m-%d %Hh%M") << ".log";
-
-    std::ofstream out(filenameStream.str());
-    std::streambuf* coutbuf = std::cout.rdbuf();
-    std::cout.rdbuf(out.rdbuf());
-
-#endif
 
     return app.exec();
 }

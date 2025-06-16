@@ -321,23 +321,11 @@ bool isDrawingProbOk(const PostFlopState& postFlopState, const int potOdd)
     if (drawingProb > 0)
     {
 
-#ifdef LOG_POKER_EXEC
-        cout << endl
-             << "\t\tProbability to hit a draw : " << drawingProb << "%, implicit odd : " << implicitOdd
-             << ", pot odd : " << potOdd;
-#endif
-
         if (drawingProb + implicitOdd >= potOdd)
         {
-#ifdef LOG_POKER_EXEC
-            cout << " - Drawing prob is ok : " << drawingProb << " + " << implicitOdd << " > " << potOdd << endl;
-#endif
+
             return true;
         }
-#ifdef LOG_POKER_EXEC
-        else
-            cout << " - Drawing prob is not ok" << endl;
-#endif
     }
     return false;
 }

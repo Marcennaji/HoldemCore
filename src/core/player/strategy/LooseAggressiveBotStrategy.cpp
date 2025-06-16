@@ -37,7 +37,7 @@ namespace pkt::core::player
 
 using namespace std;
 
-LooseAggressiveBotStrategy::LooseAggressiveBotStrategy() : IBotStrategy()
+LooseAggressiveBotStrategy::LooseAggressiveBotStrategy(ILogger* myLogger) : IBotStrategy(myLogger)
 {
 
     setStrategyName("LooseAggressive");
