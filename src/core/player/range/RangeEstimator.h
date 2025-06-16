@@ -39,12 +39,13 @@ class RangeEstimator
     std::string getEstimatedRange() const;
 
     void computeEstimatedPreflopRange(CurrentHandContext&);
+
     static int getStandardRaisingRange(int nbPlayers);
     static int getStandardCallingRange(int nbPlayers);
-    std::string deduceRange(const std::string& originRanges, const std::string& rangesToSubstract,
-                            const std::string& board = "") const;
 
     static std::string getStringRange(int nbPlayers, int range);
+    static std::string getFilledRange(std::vector<std::string>& ranges, std::vector<float>& rangesValues,
+                                      const float rangeMax, int nbPlayers);
 
     void updateUnplausibleRangesGivenPreflopActions(CurrentHandContext&);
     void updateUnplausibleRangesGivenFlopActions(CurrentHandContext&);
@@ -54,9 +55,6 @@ class RangeEstimator
   private:
     std::string computeEstimatedPreflopRangeFromLastRaiser(CurrentHandContext&) const;
     std::string computeEstimatedPreflopRangeFromCaller(CurrentHandContext&) const;
-
-    std::string getFilledRange(std::vector<std::string>& ranges, std::vector<float>& rangesValues,
-                               const float rangeMax) const;
 
     std::string myEstimatedRange;
     int myPlayerId;

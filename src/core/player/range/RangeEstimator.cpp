@@ -5,9 +5,9 @@
 #include <core/interfaces/IHand.h>
 #include <core/interfaces/ILogger.h>
 #include <core/interfaces/persistence/IPlayersStatisticsStore.h>
-#include <core/player/HandPlausibilityChecker.h>
 #include <core/player/Helpers.h>
 #include <core/player/Player.h>
+#include <core/player/range/HandPlausibilityChecker.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include "RangeParser.h"
 #include "RangeRefiner.h"
@@ -66,11 +66,11 @@ void RangeEstimator::computeEstimatedPreflopRange(CurrentHandContext& ctx)
         myLogger->info("");
 
         if (preflop.m_hands >= MIN_HANDS_STATISTICS_ACCURATE)
-            setEstimatedRange(
-                deduceRange(ANY_CARDS_RANGE, getStringRange(ctx.nbPlayers, preflop.getPreflopRaise() * 0.8)));
+            setEstimatedRange(RangeRefiner::deduceRange(
+                ANY_CARDS_RANGE, getStringRange(ctx.nbPlayers, preflop.getPreflopRaise() * 0.8)));
         else
-            setEstimatedRange(deduceRange(ANY_CARDS_RANGE,
-                                          getStringRange(ctx.nbPlayers, getStandardRaisingRange(ctx.nbPlayers) * 0.8)));
+            setEstimatedRange(RangeRefiner::deduceRange(
+                ANY_CARDS_RANGE, getStringRange(ctx.nbPlayers, getStandardRaisingRange(ctx.nbPlayers) * 0.8)));
 
         return;
     }
@@ -477,13 +477,13 @@ string RangeEstimator::computeEstimatedPreflopRangeFromCaller(CurrentHandContext
     if (!isTopRange)
     {
         myLogger->info(" [ not a top range ] ");
-        return getFilledRange(ranges, rangesValues, range);
+        return getFilledRange(ranges, rangesValues, range, nbPlayers);
     }
     else
         return getStringRange(nbPlayers, range);
 }
 string RangeEstimator::getFilledRange(std::vector<string>& ranges, std::vector<float>& rangesValues,
-                                      const float rangeMax) const
+                                      const float rangeMax, int nbPlayers)
 {
 
     float remainingRange = rangeMax;
@@ -499,11 +499,7 @@ string RangeEstimator::getFilledRange(std::vector<string>& ranges, std::vector<f
     }
     if (remainingRange > 0)
     {
-        // there was not enough ranges to fill
-
-        myLogger->info("\t\t[ warning : not enough ranges to fill " + std::to_string(rangeMax) +
-                       "%, setting a top range ]");
-        const int nbPlayers = myHand->getActivePlayerList()->size();
+        // there was not enough ranges to fill, so we set a top range
         return getStringRange(nbPlayers, rangeMax);
     }
     else
@@ -573,10 +569,11 @@ void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(CurrentHandConte
     {
 
         if (preflop.m_hands >= MIN_HANDS_STATISTICS_ACCURATE)
-            setEstimatedRange(deduceRange(getEstimatedRange(), getStringRange(nbPlayers, preflop.getPreflopRaise())));
-        else
             setEstimatedRange(
-                deduceRange(getEstimatedRange(), getStringRange(nbPlayers, getStandardRaisingRange(nbPlayers))));
+                RangeRefiner::deduceRange(getEstimatedRange(), getStringRange(nbPlayers, preflop.getPreflopRaise())));
+        else
+            setEstimatedRange(RangeRefiner::deduceRange(getEstimatedRange(),
+                                                        getStringRange(nbPlayers, getStandardRaisingRange(nbPlayers))));
     }
 
     if (getEstimatedRange() == "")
@@ -652,7 +649,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext&
         }
     }
 
-    setEstimatedRange(deduceRange(getEstimatedRange(), unplausibleRanges, ctx.stringBoard));
+    setEstimatedRange(RangeRefiner::deduceRange(getEstimatedRange(), unplausibleRanges, ctx.stringBoard));
 
     if (getEstimatedRange() == "")
     {
@@ -731,7 +728,7 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(CurrentHandContext&
         }
     }
 
-    setEstimatedRange(deduceRange(getEstimatedRange(), unplausibleRanges, ctx.stringBoard));
+    setEstimatedRange(RangeRefiner::deduceRange(getEstimatedRange(), unplausibleRanges, ctx.stringBoard));
 
     if (getEstimatedRange() == "")
     {
@@ -809,7 +806,7 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(CurrentHandContext
         }
     }
 
-    setEstimatedRange(deduceRange(getEstimatedRange(), unplausibleRanges, ctx.stringBoard));
+    setEstimatedRange(RangeRefiner::deduceRange(getEstimatedRange(), unplausibleRanges, ctx.stringBoard));
 
     if (getEstimatedRange() == "")
     {
@@ -823,12 +820,6 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(CurrentHandContext
     if (unplausibleRanges != "")
         myLogger->info("\tRemoving unplausible ranges : " + unplausibleRanges);
     // logUnplausibleHands(GAME_STATE_RIVER);
-}
-
-std::string RangeEstimator::deduceRange(const std::string& originRanges, const std::string& rangesToSubstract,
-                                        const std::string& board) const
-{
-    return RangeRefiner::deduceRange(originRanges, rangesToSubstract, board);
 }
 
 } // namespace pkt::core::player
