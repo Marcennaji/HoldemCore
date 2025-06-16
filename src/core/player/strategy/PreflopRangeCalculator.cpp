@@ -103,9 +103,7 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(CurrentHandContext& c
 
     float callingRange = getRange(myPosition, nbPlayers);
 
-#ifdef LOG_POKER_EXEC
-    cout << endl << "\t\t Initial calling range : " << callingRange << endl;
-#endif
+    myLogger->info("Initial calling range : " + std::to_string(callingRange));
 
     // Handle no raises and no calls
     if (nbRaises == 0 && nbCalls == 0 && myPosition != BUTTON && myPosition != SB)
@@ -156,10 +154,8 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(CurrentHandContext& c
 }
 float PreflopRangeCalculator::adjustCallForLimpers(float callingRange) const
 {
-#ifdef LOG_POKER_EXEC
-    cout << "\t\t 1 or more players have limped, but nobody has raised. Adjusting callingRange : " << callingRange
-         << " * 1.2 = " << callingRange * 1.2 << endl;
-#endif
+    myLogger->info("1 or more players have limped, but nobody has raised. Adjusting callingRange : " +
+                   std::to_string(callingRange) + " * 1.2 = " + std::to_string(callingRange * 1.2));
     return callingRange * 1.2;
 }
 
@@ -171,9 +167,7 @@ float PreflopRangeCalculator::clampCallingRange(float callingRange) const
     if (callingRange > 100)
         callingRange = 100;
 
-#ifdef LOG_POKER_EXEC
-    cout << "\t\t Standard calling range : " << callingRange << "%" << endl;
-#endif
+    myLogger->info("Standard calling range : " + std::to_string(callingRange) + "%");
     return callingRange;
 }
 
@@ -233,10 +227,8 @@ float PreflopRangeCalculator::adjustCallForRaiserStats(float callingRange, const
         callingRange = raiserStats.getPreflop4Bet() * 0.5f;
     }
 
-#ifdef LOG_POKER_EXEC
-    cout << "\t\tPreflopRangeCalculatoradjusting callingRange to the last raiser's stats, value is now " << callingRange
-         << endl;
-#endif
+    myLogger->info("PreflopRangeCalculator adjusting callingRange to the last raiser's stats, value is now " +
+                   std::to_string(callingRange));
     return callingRange;
 }
 
@@ -255,9 +247,7 @@ float PreflopRangeCalculator::adjustCallForNoStats(float callingRange, int nbRai
         callingRange /= 4;
     }
 
-#ifdef LOG_POKER_EXEC
-    cout << "\t\t no stats available, callingRange value is now " << callingRange << endl;
-#endif
+    myLogger->info("No stats available, callingRange value is now " + std::to_string(callingRange));
     return callingRange;
 }
 
@@ -288,9 +278,8 @@ float PreflopRangeCalculator::adjustCallForBigBet(float callingRange, int potOdd
         callingRange *= 0.1f;
     }
 
-#ifdef LOG_POKER_EXEC
-    cout << "\t\t pot odd is " << potOdd << " : adjusting callingRange, value is now " << callingRange << endl;
-#endif
+    myLogger->info("Pot odd is " + std::to_string(potOdd) + " : adjusting callingRange, value is now " +
+                   std::to_string(callingRange));
     return callingRange;
 }
 
@@ -328,9 +317,7 @@ float PreflopRangeCalculator::calculatePreflopRaisingRange(CurrentHandContext& c
 
     float raisingRange = getRange(myPosition, nbPlayers) * 0.8;
 
-#ifdef LOG_POKER_EXEC
-    cout << endl << "\t\tInitial raising range : " << raisingRange << endl;
-#endif
+    myLogger->info("Initial raising range : " + std::to_string(raisingRange));
 
     if (nbRaises == 0 && nbCalls > 1 && nbPlayers > 3)
     {
@@ -352,10 +339,8 @@ float PreflopRangeCalculator::calculatePreflopRaisingRange(CurrentHandContext& c
 }
 float PreflopRangeCalculator::adjustRaiseForLimpers(float raisingRange) const
 {
-#ifdef LOG_POKER_EXEC
-    cout << "\t\t2 or more players have limped, but nobody has raised : tightening raising range to "
-         << raisingRange * 0.7 << endl;
-#endif
+    myLogger->info("2 or more players have limped, but nobody has raised : tightening raising range to " +
+                   std::to_string(raisingRange * 0.7));
     return raisingRange * 0.7;
 }
 
@@ -414,9 +399,7 @@ float PreflopRangeCalculator::adjustRaiseForRaiserStats(const PreflopStatistics&
         raisingRange = 0; // Raise with aces only
     }
 
-#ifdef LOG_POKER_EXEC
-    cout << "\t\tAdjusting raising range based on raiser stats, value is now " << raisingRange << endl;
-#endif
+    myLogger->info("Adjusting raising range based on raiser stats, value is now " + std::to_string(raisingRange));
 
     return raisingRange;
 }
@@ -431,9 +414,7 @@ float PreflopRangeCalculator::adjustRaiseForNoRaiserStats(float raisingRange, in
         raisingRange = 0; // 4-bet with aces only
     }
 
-#ifdef LOG_POKER_EXEC
-    cout << "\t\tNo stats available for raiser, adjusting raising range to " << raisingRange << endl;
-#endif
+    myLogger->info("No stats available for raiser, adjusting raising range to " + std::to_string(raisingRange));
 
     return raisingRange;
 }
@@ -454,9 +435,7 @@ float PreflopRangeCalculator::adjustRaiseForNoRaiser(const CurrentHandContext& c
         {
             raisingRange = 100;
 
-#ifdef LOG_POKER_EXEC
-            cout << "\t\tTrying to steal blinds, setting raising range to 100" << endl;
-#endif
+            myLogger->info("Trying to steal blinds, setting raising range to 100");
         }
     }
 
@@ -492,9 +471,8 @@ float PreflopRangeCalculator::adjustRaiseForStack(const CurrentHandContext& cont
         }
         raisingRange = std::max(f, raisingRange);
 
-#ifdef LOG_POKER_EXEC
-        cout << "\t\tHands left: " << handsLeft << ", minimum raising range set to " << f << endl;
-#endif
+        myLogger->info("Hands left: " + std::to_string(handsLeft) + ", minimum raising range set to " +
+                       std::to_string(f));
     }
 
     return raisingRange;
@@ -507,9 +485,7 @@ float PreflopRangeCalculator::clampRaiseRange(float raisingRange) const
     if (raisingRange > 100)
         raisingRange = 100;
 
-#ifdef LOG_POKER_EXEC
-    cout << "\t\tFinal raising range: " << raisingRange << "%" << endl;
-#endif
+    myLogger->info("Final raising range: " + std::to_string(raisingRange) + "%");
 
     return raisingRange;
 }
@@ -539,9 +515,7 @@ float PreflopRangeCalculator::adjustRaiseForBigBet(float raisingRange, int potOd
         raisingRange = std::min(1.0f, raisingRange * 0.2f);
     }
 
-#ifdef LOG_POKER_EXEC
-    cout << "\tAdjusted raising range for big bet: " << raisingRange << endl;
-#endif
+    myLogger->info("Adjusted raising range for big bet: " + std::to_string(raisingRange));
 
     return raisingRange;
 }

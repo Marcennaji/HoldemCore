@@ -62,9 +62,7 @@ bool ManiacBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool determin
     if (ctx.preflopRaisesNumber < 3)
     {
 
-#ifdef LOG_POKER_EXEC
-        cout << "\t\tLAG adding high pairs to the initial calling range." << endl;
-#endif
+        myLogger->info("\t\tManiac adding high pairs to the initial calling range.");
         stringCallingRange += HIGH_PAIRS;
     }
 
@@ -74,10 +72,8 @@ bool ManiacBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool determin
         lastRaiser->getCash() >= ctx.pot * 10 && !ctx.isPreflopBigBet)
     {
 
-#ifdef LOG_POKER_EXEC
-        cout << "\t\tLAG adding high suited connectors, high suited aces and pairs to the initial calling range."
-             << endl;
-#endif
+        myLogger->info(
+            "\t\tManiac adding high suited connectors, high suited aces and pairs to the initial calling range.");
         stringCallingRange += HIGH_SUITED_CONNECTORS;
         stringCallingRange += HIGH_SUITED_ACES;
         stringCallingRange += PAIRS;
@@ -88,11 +84,8 @@ bool ManiacBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool determin
             stringCallingRange += CONNECTORS;
             stringCallingRange += SUITED_ONE_GAPED;
             stringCallingRange += SUITED_TWO_GAPED;
-#ifdef LOG_POKER_EXEC
-            cout << "\t\tLAG adding suited connectors, suited one-gaped and suited two-gaped to the initial calling "
-                    "range."
-                 << endl;
-#endif
+            myLogger->info("\t\tManiac adding suited connectors, suited one-gaped and suited two-gaped to the initial "
+                           "calling range.");
         }
     }
 
@@ -111,16 +104,12 @@ bool ManiacBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool determin
             stringCallingRange += HIGH_SUITED_ACES;
             stringCallingRange += PAIRS;
 
-#ifdef LOG_POKER_EXEC
-            cout << "\t\tLAG defending against 3-bet : adding high suited connectors, high suited aces and pairs to "
-                    "the initial calling range."
-                 << endl;
-#endif
+            myLogger->info(
+                "\t\tManiac defending against 3-bet : adding high suited connectors, high suited aces and pairs to "
+                "the initial calling range.");
         }
     }
-#ifdef LOG_POKER_EXEC
-    cout << "\t\tLAG final calling range : " << stringCallingRange << endl;
-#endif
+    myLogger->info("\t\tManiac final calling range : " + stringCallingRange);
 
     return isCardsInRange(ctx.myCard1, ctx.myCard2, stringCallingRange);
 }
@@ -151,9 +140,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
 
     stringRaisingRange = RANGES_STRING[(int) raisingRange];
 
-#ifdef LOG_POKER_EXEC
-    cout << stringRaisingRange << endl;
-#endif
+    myLogger->info(stringRaisingRange);
 
     // determine when to 3-bet without a real hand
     bool speculativeHandedAdded = false;
@@ -175,9 +162,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
             {
 
                 speculativeHandedAdded = true;
-#ifdef LOG_POKER_EXEC
-                cout << "\t\tLAG trying to steal this bet";
-#endif
+                myLogger->info("\t\tManiac trying to steal this bet");
             }
             else
             {
@@ -186,9 +171,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
                 {
 
                     speculativeHandedAdded = true;
-#ifdef LOG_POKER_EXEC
-                    cout << "\t\tLAG adding this speculative hand to our initial raising range";
-#endif
+                    myLogger->info("\t\tManiac adding this speculative hand to our initial raising range");
                 }
                 else
                 {
@@ -201,9 +184,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
                         if (rand == 1)
                         {
                             speculativeHandedAdded = true;
-#ifdef LOG_POKER_EXEC
-                            cout << "\t\tLAG adding this junk hand to our initial raising range";
-#endif
+                            myLogger->info("\t\tManiac adding this junk hand to our initial raising range");
                         }
                     }
                 }
@@ -231,9 +212,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
                 if (rand == 1)
                 {
                     speculativeHandedAdded = true;
-#ifdef LOG_POKER_EXEC
-                    cout << "\t\tManiac adding this speculative hand to our initial raising range";
-#endif
+                    myLogger->info("\t\tManiac adding this speculative hand to our initial raising range");
                 }
             }
         }
@@ -253,9 +232,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
         Randomizer::GetRand(1, 10, 1, &rand);
         if (rand == 1)
         {
-#ifdef LOG_POKER_EXEC
-            cout << "\t\twon't raise, to hide the hand strength";
-#endif
+            myLogger->info("\t\twon't raise, to hide the hand strength");
             myShouldCall = true;
             return 0;
         }

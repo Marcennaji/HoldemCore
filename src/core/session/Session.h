@@ -34,6 +34,7 @@ class Session
     IRankingStore* getRankingStore() { return myRankingStore; }
     IPlayersStatisticsStore* getPlayersStatisticsStore() { return myPlayersStatisticsStore; }
     IHandAuditStore* getHandAuditStore() { return myHandAuditStore; }
+    ILogger* getLogger() { return myLogger; }
 
   private:
     int currentGameNum;

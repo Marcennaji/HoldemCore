@@ -3,6 +3,7 @@
 #include <core/engine/model/PlayerStatistics.h>
 #include <core/engine/model/Ranges.h>
 #include <core/interfaces/IHand.h>
+#include <core/interfaces/ILogger.h>
 #include <core/interfaces/persistence/IPlayersStatisticsStore.h>
 #include <core/player/HandPlausibilityChecker.h>
 #include <core/player/Helpers.h>
@@ -21,8 +22,8 @@ namespace pkt::core::player
 
 using namespace std;
 
-RangeEstimator::RangeEstimator(int playerId, IPlayersStatisticsStore* statsStore)
-    : myPlayerId(playerId), myHand(nullptr), myStatsStore(statsStore)
+RangeEstimator::RangeEstimator(int playerId, IPlayersStatisticsStore* statsStore, ILogger* logger)
+    : myPlayerId(playerId), myHand(nullptr), myStatsStore(statsStore), myLogger(logger)
 {
     assert(myPlayerId >= 0);
 }
@@ -41,33 +42,28 @@ void RangeEstimator::computeEstimatedPreflopRange(CurrentHandContext& ctx)
 {
     using std::cout;
 
-#ifdef LOG_POKER_EXEC
-    std::cout << endl << "\t\testimated range for " << ctx.myID << " : ";
-#endif
+    myLogger->info("\n\testimated range for " + std::to_string(ctx.myID) + " : ");
 
     PreflopStatistics preflop = ctx.myStatistics.getPreflopStatistics();
     const int nbPlayers = ctx.nbPlayers;
 
-#ifdef LOG_POKER_EXEC
-    std::cout << "  " << preflop.getVoluntaryPutMoneyInPot() << "/" << preflop.getPreflopRaise()
-              << ", 3B: " << preflop.getPreflop3Bet() << ", 4B: " << preflop.getPreflop4Bet()
-              << ", C3B: " << preflop.getPreflopCall3BetsFrequency() << ", pot odd: " << ctx.potOdd << " " << endl
-              << "\t\t";
-#endif
+    myLogger->info("  " + std::to_string(preflop.getVoluntaryPutMoneyInPot()) + "/" +
+                   std::to_string(preflop.getPreflopRaise()) + ", 3B: " + std::to_string(preflop.getPreflop3Bet()) +
+                   ", 4B: " + std::to_string(preflop.getPreflop4Bet()) +
+                   ", C3B: " + std::to_string(preflop.getPreflopCall3BetsFrequency()) +
+                   ", pot odd: " + std::to_string(ctx.potOdd) + " " + "\n\t\t");
 
     // if the player was BB and has checked preflop, then he can have anything, except his approximative BB raising
     // range
     if (myHand->getPreflopRaisesNumber() == 0 && ctx.myPosition == BB)
     {
 
-#ifdef LOG_POKER_EXEC
-        cout << "any cards except ";
+        myLogger->info("any cards except ");
         if (preflop.m_hands >= MIN_HANDS_STATISTICS_ACCURATE)
-            cout << getStringRange(nbPlayers, preflop.getPreflopRaise() * 0.8);
+            myLogger->info(getStringRange(nbPlayers, preflop.getPreflopRaise() * 0.8));
         else
-            cout << getStringRange(nbPlayers, getStandardRaisingRange(nbPlayers) * 0.8);
-        cout << endl;
-#endif
+            myLogger->info(getStringRange(nbPlayers, getStandardRaisingRange(nbPlayers) * 0.8));
+        myLogger->info("");
 
         if (preflop.m_hands >= MIN_HANDS_STATISTICS_ACCURATE)
             setEstimatedRange(
@@ -87,9 +83,7 @@ void RangeEstimator::computeEstimatedPreflopRange(CurrentHandContext& ctx)
     else
         estimatedRange = computeEstimatedPreflopRangeFromCaller(ctx);
 
-#ifdef LOG_POKER_EXEC
-    cout << " {" << estimatedRange << "}" << endl;
-#endif
+    myLogger->info(" {" + estimatedRange + "}");
 
     setEstimatedRange(estimatedRange);
 }
@@ -101,10 +95,7 @@ std::string RangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(CurrentHa
 
     float range = 0;
 
-#ifdef LOG_POKER_EXEC
-    cout << " [ player is last raiser ] " << endl << "\t\t";
-#endif
-
+    myLogger->info(" [ player is last raiser ] ");
     PreflopStatistics preflopOpponent = ctx.preflopLastRaiser->getStatistics(nbPlayers).getPreflopStatistics();
 
     if (ctx.myStatistics.getPreflopStatistics().m_hands >= MIN_HANDS_STATISTICS_ACCURATE)
@@ -140,9 +131,7 @@ std::string RangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(CurrentHa
     {
         range = getStandardRaisingRange(nbPlayers);
 
-#ifdef LOG_POKER_EXEC
-        cout << ", but not enough hands -> getting the standard range : " << range << endl << "\t\t";
-#endif
+        myLogger->info(", but not enough hands -> getting the standard range : " + std::to_string(range));
 
         if (myHand->getPreflopRaisesNumber() == 2)
             range = range * 0.3;
@@ -152,9 +141,7 @@ std::string RangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(CurrentHa
             range = range * 0.1;
     }
 
-#ifdef LOG_POKER_EXEC
-    cout << "range is " << range;
-#endif
+    myLogger->info("range is " + std::to_string(range));
 
     if (nbPlayers > 3)
     {
@@ -165,9 +152,7 @@ std::string RangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(CurrentHa
         else if (ctx.preflopLastRaiser->getPosition() == BUTTON || ctx.preflopLastRaiser->getPosition() == CUTOFF)
             range = range * 1.5;
 
-#ifdef LOG_POKER_EXEC
-        cout << ", position adjusted range is " << range << endl << "\t\t";
-#endif
+        myLogger->info(", position adjusted range is " + std::to_string(range));
     }
 
     // Adjust range for loose/aggressive mode
@@ -176,9 +161,7 @@ std::string RangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(CurrentHa
         if (range < 40)
         {
             range = 40;
-#ifdef LOG_POKER_EXEC
-            cout << "\t\toveragression detected, setting range to " << range << endl;
-#endif
+            myLogger->info("\t\toveragression detected, setting range to " + std::to_string(range));
         }
     }
 
@@ -193,9 +176,7 @@ std::string RangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(CurrentHa
     if (range > 100)
         range = 100;
 
-#ifdef LOG_POKER_EXEC
-    cout << endl << "\t\testimated range is " << range << " % ";
-#endif
+    myLogger->info("\n\t\testimated range is " + std::to_string(range) + " % ");
 
     return getStringRange(nbPlayers, range);
 }
@@ -228,15 +209,10 @@ string RangeEstimator::computeEstimatedPreflopRangeFromCaller(CurrentHandContext
     if (ctx.myStatistics.getPreflopStatistics().m_hands < MIN_HANDS_STATISTICS_ACCURATE)
     { // not enough hands, assume the opponent is an average tight player
         estimatedStartingRange = getStandardCallingRange(nbPlayers);
-#ifdef LOG_POKER_EXEC
-        cout << " [ not enough hands, getting the standard calling range ] ";
-#endif
+        myLogger->info(" [ not enough hands, getting the standard calling range ] ");
     }
 
-#ifdef LOG_POKER_EXEC
-    cout << " estimated starting range : " << estimatedStartingRange << endl << "\t\t";
-    ;
-#endif
+    myLogger->info(" estimated starting range : " + std::to_string(estimatedStartingRange));
 
     if (nbPlayers > 3)
     { // adjust roughly the range giving the player's position
@@ -250,10 +226,7 @@ string RangeEstimator::computeEstimatedPreflopRangeFromCaller(CurrentHandContext
     if (estimatedStartingRange > 100)
         estimatedStartingRange = 100;
 
-#ifdef LOG_POKER_EXEC
-    cout << ", position adjusted starting range : " << estimatedStartingRange << endl << "\t\t";
-    ;
-#endif
+    myLogger->info(", position adjusted starting range : " + std::to_string(estimatedStartingRange));
 
     // adjust roughly, given the pot odd the player had preflop
     const int potOdd = ctx.potOdd;
@@ -269,10 +242,7 @@ string RangeEstimator::computeEstimatedPreflopRangeFromCaller(CurrentHandContext
     else if (potOdd <= 20 && myHand->getPreflopRaisesNumber() < 2)
         estimatedStartingRange = 40;
 
-#ifdef LOG_POKER_EXEC
-    cout << ", pot odd adjusted starting range : " << estimatedStartingRange << endl << "\t\t";
-    ;
-#endif
+    myLogger->info(", pot odd adjusted starting range : " + std::to_string(estimatedStartingRange));
 
     range = estimatedStartingRange;
 
@@ -290,10 +260,7 @@ string RangeEstimator::computeEstimatedPreflopRangeFromCaller(CurrentHandContext
         if (range < 5)
             range = 5;
 
-#ifdef LOG_POKER_EXEC
-        cout << ", limp range : " << range << endl << "\t\t";
-        ;
-#endif
+        myLogger->info(", limp range : " + std::to_string(range));
     }
     else
 
@@ -304,20 +271,14 @@ string RangeEstimator::computeEstimatedPreflopRangeFromCaller(CurrentHandContext
                 ctx.myStatistics.getPreflopStatistics().getPreflop3Bet(); // a hand suitable to call but not to 3-bet
         if (range < 1)
             range = 1;
-#ifdef LOG_POKER_EXEC
-        cout << ", single bet call range : " << range << endl << "\t\t";
-        ;
-#endif
+        myLogger->info(", single bet call range : " + std::to_string(range));
         if (ctx.myStatistics.getPreflopStatistics().getVoluntaryPutMoneyInPot() -
                 ctx.myStatistics.getPreflopStatistics().getPreflopRaise() >
             15)
         {
             // loose player
             range = range / 2;
-#ifdef LOG_POKER_EXEC
-            cout << ", loose player adjusted range : " << range << endl << "\t\t";
-            ;
-#endif
+            myLogger->info(", loose player adjusted range : " + std::to_string(range));
         }
     }
     else
@@ -328,9 +289,8 @@ string RangeEstimator::computeEstimatedPreflopRangeFromCaller(CurrentHandContext
         if (ctx.myStatistics.getPreflopStatistics().m_hands < MIN_HANDS_STATISTICS_ACCURATE)
         { // not enough hands, assume the opponent is an average tight player
             range = estimatedStartingRange / 3;
-#ifdef LOG_POKER_EXEC
-            cout << ", 3-bet call range : " << range;
-#endif
+
+            myLogger->info(", 3-bet call range : " + std::to_string(range));
         }
         else
         {
@@ -348,22 +308,14 @@ string RangeEstimator::computeEstimatedPreflopRangeFromCaller(CurrentHandContext
                 if (range < lastRaiserStats.getPreflop3Bet() * 0.8)
                     range = lastRaiserStats.getPreflop3Bet() * 0.8;
 
-#ifdef LOG_POKER_EXEC
-                cout << ", 3-bet call range : " << range << endl << "\t\t";
-                ;
-#endif
+                myLogger->info(", 3-bet call range : " + std::to_string(range));
             }
             else
             {
                 // the player didn't raise the pot before, and there are already 2 raisers
                 range = ctx.myStatistics.getPreflopStatistics().getVoluntaryPutMoneyInPot() / 3;
-#ifdef LOG_POKER_EXEC
-                cout << ", 3-bet cold-call range : "
-                     << ctx.myStatistics.getPreflopStatistics().getVoluntaryPutMoneyInPot() << " / 3 = " << range
-                     << endl
-                     << "\t\t";
-                ;
-#endif
+                myLogger->info(", 3-bet cold-call range : " + std::to_string(range));
+                myLogger->info("\t\t");
             }
         }
     }
@@ -375,9 +327,8 @@ string RangeEstimator::computeEstimatedPreflopRangeFromCaller(CurrentHandContext
         if (ctx.myStatistics.getPreflopStatistics().m_hands < MIN_HANDS_STATISTICS_ACCURATE)
         { // not enough hands, assume the opponent is an average tight player
             range = estimatedStartingRange / 5;
-#ifdef LOG_POKER_EXEC
-            cout << ", 4-bet call range : " << range;
-#endif
+
+            myLogger->info(", 4-bet call range : " + std::to_string(range));
         }
         else
         {
@@ -387,19 +338,14 @@ string RangeEstimator::computeEstimatedPreflopRangeFromCaller(CurrentHandContext
                 // if the player is facing a 4-bet, after having bet
                 range = (ctx.myStatistics.getPreflopStatistics().getPreflop3Bet() *
                          ctx.myStatistics.getPreflopStatistics().getPreflopCall3BetsFrequency() / 100);
-#ifdef LOG_POKER_EXEC
-                cout << ", 4-bet call range : " << range << endl << "\t\t";
-                ;
-#endif
+                myLogger->info(", 4-bet call range : " + std::to_string(range));
             }
             else
             {
                 // the player didn't raise the pot before, and there are already 3 raisers
                 range = ctx.myStatistics.getPreflopStatistics().getVoluntaryPutMoneyInPot() / 6;
-#ifdef LOG_POKER_EXEC
-                cout << ", 4-bet cold-call range : " << range << endl << "\t\t";
-                ;
-#endif
+                myLogger->info(", 4-bet cold-call range : " + std::to_string(range));
+                myLogger->info("\t\t");
             }
         }
     }
@@ -416,13 +362,10 @@ string RangeEstimator::computeEstimatedPreflopRangeFromCaller(CurrentHandContext
             range = range * 0.3;
         else if (potOdd >= 99)
             range = range * 0.1;
-#ifdef LOG_POKER_EXEC
         if (potOdd > 70)
-            cout << ", 3-bet or more : readjusting range with the pot odd (" << potOdd << ") : range is now " << range
-                 << endl
-                 << "\t\t";
-        ;
-#endif
+            myLogger->info(", 3-bet or more : readjusting range with the pot odd (" + std::to_string(potOdd) +
+                           ") : range is now " + std::to_string(range));
+        myLogger->info("\t\t");
     }
 
     // if the last raiser was being loose or agressive for 8 hands or so, adjust the range for the caller of a raise
@@ -443,9 +386,8 @@ string RangeEstimator::computeEstimatedPreflopRangeFromCaller(CurrentHandContext
             {
                 range = 40;
             }
-#ifdef LOG_POKER_EXEC
-            cout << "\t\toveragression detected from the raiser, setting calling range to " << range << endl;
-#endif
+            myLogger->info("\t\toveragression detected from the raiser, setting calling range to " +
+                           std::to_string(range));
         }
     }
 
@@ -530,15 +472,11 @@ string RangeEstimator::computeEstimatedPreflopRangeFromCaller(CurrentHandContext
 
     range = ceil(range);
 
-#ifdef LOG_POKER_EXEC
-    cout << endl << "\t\testimated range is " << range << " % ";
-#endif
+    myLogger->info("\t\testimated range is " + std::to_string(range) + " % ");
 
     if (!isTopRange)
     {
-#ifdef LOG_POKER_EXEC
-        cout << " [ not a top range ] ";
-#endif
+        myLogger->info(" [ not a top range ] ");
         return getFilledRange(ranges, rangesValues, range);
     }
     else
@@ -562,9 +500,9 @@ string RangeEstimator::getFilledRange(std::vector<string>& ranges, std::vector<f
     if (remainingRange > 0)
     {
         // there was not enough ranges to fill
-#ifdef LOG_POKER_EXEC
-        cout << endl << "\t\t[ warning : not enough ranges to fill " << rangeMax << "%, setting a top range ]" << endl;
-#endif
+
+        myLogger->info("\t\t[ warning : not enough ranges to fill " + std::to_string(rangeMax) +
+                       "%, setting a top range ]");
         const int nbPlayers = myHand->getActivePlayerList()->size();
         return getStringRange(nbPlayers, rangeMax);
     }
@@ -623,10 +561,8 @@ void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(CurrentHandConte
     computeEstimatedPreflopRange(ctx);
     const string originalEstimatedRange = getEstimatedRange();
 
-#ifdef LOG_POKER_EXEC
-    std::cout << endl
-              << "\tPlausible range on preflop for player " << ctx.myID << " :\t" << getEstimatedRange() << endl;
-#endif
+    myLogger->info("\tPlausible range on preflop for player " + std::to_string(ctx.myID) + " :\t" +
+                   getEstimatedRange());
 
     const int nbPlayers = ctx.nbPlayers;
 
@@ -646,9 +582,7 @@ void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(CurrentHandConte
     if (getEstimatedRange() == "")
         setEstimatedRange(originalEstimatedRange);
 
-#ifdef LOG_POKER_EXEC
     // logUnplausibleHands(GAME_STATE_PREFLOP);
-#endif
 }
 
 void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext& ctx)
@@ -658,9 +592,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext&
     const string originalEstimatedRange = getEstimatedRange();
     string unplausibleRanges;
 
-#ifdef LOG_POKER_EXEC
-    std::cout << endl << "\tPlausible range on flop, before update :\t" << getEstimatedRange() << endl;
-#endif
+    myLogger->info("\tPlausible range on flop, before update :\t" + getEstimatedRange());
 
     // update my unplausible hands (unplausible to my opponents eyes), given what I did on flop
 
@@ -670,11 +602,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext&
 
     if (ctx.myIsInVeryLooseMode)
     {
-#ifdef LOG_POKER_EXEC
-        std::cout << endl
-                  << "\tSeems to be (temporarily ?) on very loose mode : estimated range is\t" << getEstimatedRange()
-                  << endl;
-#endif
+        myLogger->info("\tSeems to be (temporarily ?) on very loose mode : estimated range is\t" + getEstimatedRange());
         return;
     }
 
@@ -729,18 +657,16 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext&
     if (getEstimatedRange() == "")
     {
         // keep previous range
-#ifdef LOG_POKER_EXEC
-        cout << "\tCan't remove all plausible ranges, keeping last one" << endl;
-#endif
+
+        myLogger->info("\tCan't remove all plausible ranges, keeping last one");
+
         setEstimatedRange(originalEstimatedRange);
         unplausibleRanges = "";
     }
 
-#ifdef LOG_POKER_EXEC
     if (unplausibleRanges != "")
-        cout << "\tRemoving unplausible ranges : " << unplausibleRanges << endl;
+        myLogger->info("\tRemoving unplausible ranges : " + unplausibleRanges);
     // logUnplausibleHands(GAME_STATE_FLOP);
-#endif
 }
 
 // purpose : remove some unplausible hands, who would normally be in the estimated preflop range
@@ -753,9 +679,7 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(CurrentHandContext&
     const string originalEstimatedRange = getEstimatedRange();
     string unplausibleRanges;
 
-#ifdef LOG_POKER_EXEC
-    std::cout << endl << "\tPlausible range on turn, before update :\t" << getEstimatedRange() << endl;
-#endif
+    myLogger->info("\tPlausible range on turn, before update :\t" + getEstimatedRange());
 
     // update my unplausible hands (unplausible to my opponents eyes), given what I did on turn
 
@@ -764,11 +688,7 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(CurrentHandContext&
 
     if (ctx.myIsInVeryLooseMode)
     {
-#ifdef LOG_POKER_EXEC
-        std::cout << endl
-                  << "\tSeems to be (temporarily ?) on very loose mode : estimated range is\t" << getEstimatedRange()
-                  << endl;
-#endif
+        myLogger->info("\tSeems to be (temporarily ?) on very loose mode : estimated range is\t" + getEstimatedRange());
         return;
     }
 
@@ -816,18 +736,15 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(CurrentHandContext&
     if (getEstimatedRange() == "")
     {
         // keep previous range
-#ifdef LOG_POKER_EXEC
-        cout << "\tCan't remove all plausible ranges, keeping last one" << endl;
-#endif
+
+        myLogger->info("\tCan't remove all plausible ranges, keeping last one");
         setEstimatedRange(originalEstimatedRange);
         unplausibleRanges = "";
     }
 
-#ifdef LOG_POKER_EXEC
     if (unplausibleRanges != "")
-        cout << "\tRemoving unplausible ranges : " << unplausibleRanges << endl;
+        myLogger->info("\tRemoving unplausible ranges : " + unplausibleRanges);
     // logUnplausibleHands(GAME_STATE_TURN);
-#endif
 }
 
 // purpose : remove some unplausible hands, woul would normally be in the estimated preflop range
@@ -840,9 +757,7 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(CurrentHandContext
     const string originalEstimatedRange = getEstimatedRange();
     string unplausibleRanges;
 
-#ifdef LOG_POKER_EXEC
-    std::cout << endl << "\tPlausible range on river, before update :\t" << getEstimatedRange() << endl;
-#endif
+    myLogger->info("\tPlausible range on river, before update :\t" + getEstimatedRange());
 
     // update my unplausible hands (unplausible to my opponents eyes), given what I did on river
 
@@ -852,9 +767,7 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(CurrentHandContext
 
     if (ctx.myIsInVeryLooseMode)
     {
-#ifdef LOG_POKER_EXEC
-        std::cout << endl << "\tSeems to be on very loose mode : estimated range is\t" << getEstimatedRange() << endl;
-#endif
+        myLogger->info("\tSeems to be on very loose mode : estimated range is\t" + getEstimatedRange());
         return;
     }
 
@@ -901,18 +814,15 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(CurrentHandContext
     if (getEstimatedRange() == "")
     {
         // keep previous range
-#ifdef LOG_POKER_EXEC
-        cout << "\tCan't remove all plausible ranges, keeping last one" << endl;
-#endif
+
+        myLogger->info("\tCan't remove all plausible ranges, keeping last one");
         setEstimatedRange(originalEstimatedRange);
         unplausibleRanges = "";
     }
 
-#ifdef LOG_POKER_EXEC
     if (unplausibleRanges != "")
-        cout << "\tRemoving unplausible ranges : " << unplausibleRanges << endl;
+        myLogger->info("\tRemoving unplausible ranges : " + unplausibleRanges);
     // logUnplausibleHands(GAME_STATE_RIVER);
-#endif
 }
 
 std::string RangeEstimator::deduceRange(const std::string& originRanges, const std::string& rangesToSubstract,

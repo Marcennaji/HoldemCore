@@ -1942,16 +1942,13 @@ void GameTableWindow::myActionDone()
     std::shared_ptr<IHand> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
     const int nbPlayers = currentHand->getActivePlayerList()->size();
 
-#ifdef LOG_POKER_EXEC
+    ILogger* logger = myStartWindow->getSession()->getLogger();
 
-    cout << endl
-         << "\t" << humanPlayer->getPositionLabel(humanPlayer->getPosition()) << "\tHuman player"
-         << "\t" << humanPlayer->getCardsValueString() << "\t" << "stack = " << humanPlayer->getCash()
-         << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
-         << "\tPFR : " << humanPlayer->getStatistics(nbPlayers).getPreflopStatistics().getPreflopRaise() << endl
-         << endl;
-
-#endif
+    logger->info(
+        "\n\t" + humanPlayer->getPositionLabel(humanPlayer->getPosition()) + "\tHuman player" + "\t" +
+        humanPlayer->getCardsValueString() + "\t" + "stack = " + std::to_string(humanPlayer->getCash()) +
+        ", pot = " + std::to_string(currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()) +
+        "\tPFR : " + std::to_string(humanPlayer->getStatistics(nbPlayers).getPreflopStatistics().getPreflopRaise()));
 
     if (currentState == GAME_STATE_PREFLOP)
     {
@@ -2001,32 +1998,26 @@ void GameTableWindow::myActionDone()
     myActionIsRaise = 0;
     myActionIsBet = 0;
 
-#ifdef LOG_POKER_EXEC
-
     PlayerAction myAction = humanPlayer->getAction();
 
     if (myAction == PLAYER_ACTION_FOLD)
-        cout << "FOLD";
+        logger->info("FOLD");
     else if (myAction == PLAYER_ACTION_BET)
-        cout << "BET ";
+        logger->info("BET ");
     else if (myAction == PLAYER_ACTION_RAISE)
-        cout << "RAISE ";
+        logger->info("RAISE ");
     else if (myAction == PLAYER_ACTION_CALL)
-        cout << "CALL ";
+        logger->info("CALL ");
     else if (myAction == PLAYER_ACTION_CHECK)
-        cout << "CHECK";
+        logger->info("CHECK");
     else if (myAction == PLAYER_ACTION_ALLIN)
-        cout << "ALLIN ";
+        logger->info("ALLIN ");
     else if (myAction == PLAYER_ACTION_NONE)
-        cout << "NONE";
+        logger->info("NONE");
     else
-        cout << "undefined ?";
+        logger->info("undefined ?");
 
-    cout << endl
-         << endl
-         << "---------------------------------------------------------------------------------" << endl
-         << endl;
-#endif
+    logger->info("---------------------------------------------------------------------------------");
 }
 
 void GameTableWindow::activePlayerActionDone()

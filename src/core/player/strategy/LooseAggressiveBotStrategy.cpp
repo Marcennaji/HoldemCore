@@ -63,9 +63,7 @@ bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool
     if (ctx.preflopRaisesNumber < 3)
     {
 
-#ifdef LOG_POKER_EXEC
-        cout << "\t\tLAG adding high pairs to the initial calling range." << endl;
-#endif
+        myLogger->info("\t\tLAG adding high pairs to the initial calling range.");
         stringCallingRange += HIGH_PAIRS;
     }
 
@@ -75,10 +73,8 @@ bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool
         lastRaiser->getCash() >= ctx.pot * 10 && !ctx.isPreflopBigBet)
     {
 
-#ifdef LOG_POKER_EXEC
-        cout << "\t\tLAG adding high suited connectors, high suited aces and pairs to the initial calling range."
-             << endl;
-#endif
+        myLogger->info(
+            "\t\tLAG adding high suited connectors, high suited aces and pairs to the initial calling range.");
         stringCallingRange += HIGH_SUITED_CONNECTORS;
         stringCallingRange += HIGH_SUITED_ACES;
         stringCallingRange += PAIRS;
@@ -88,11 +84,8 @@ bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool
             stringCallingRange += SUITED_CONNECTORS;
             stringCallingRange += SUITED_ONE_GAPED;
             stringCallingRange += SUITED_TWO_GAPED;
-#ifdef LOG_POKER_EXEC
-            cout << "\t\tLAG adding suited connectors, suited one-gaped and suited two-gaped to the initial calling "
-                    "range."
-                 << endl;
-#endif
+            myLogger->info("\t\tLAG adding suited connectors, suited one-gaped and suited two-gaped to the initial "
+                           "calling range.");
         }
     }
 
@@ -111,16 +104,12 @@ bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool
             stringCallingRange += HIGH_SUITED_ACES;
             stringCallingRange += PAIRS;
 
-#ifdef LOG_POKER_EXEC
-            cout << "\t\tLAG defending against 3-bet : adding high suited connectors, high suited aces and pairs to "
-                    "the initial calling range."
-                 << endl;
-#endif
+            myLogger->info(
+                "\t\tLAG defending against 3-bet : adding high suited connectors, high suited aces and pairs to "
+                "the initial calling range.");
         }
     }
-#ifdef LOG_POKER_EXEC
-    cout << "\t\tLAG final calling range : " << stringCallingRange << endl;
-#endif
+    myLogger->info("\t\tLAG final calling range : " + stringCallingRange);
 
     return isCardsInRange(ctx.myCard1, ctx.myCard2, stringCallingRange);
 }
@@ -151,9 +140,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
 
     stringRaisingRange = RANGES_STRING[(int) raisingRange];
 
-#ifdef LOG_POKER_EXEC
-    cout << stringRaisingRange << endl;
-#endif
+    myLogger->info(stringRaisingRange);
 
     // determine when to 3-bet without a real hand
     bool speculativeHandedAdded = false;
@@ -174,9 +161,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
             {
 
                 speculativeHandedAdded = true;
-#ifdef LOG_POKER_EXEC
-                cout << "\t\tLAG trying to steal this bet";
-#endif
+                myLogger->info("\t\tLAG trying to steal this bet");
             }
             else
             {
@@ -186,9 +171,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
                 {
 
                     speculativeHandedAdded = true;
-#ifdef LOG_POKER_EXEC
-                    cout << "\t\tLAG adding this speculative hand to our initial raising range";
-#endif
+                    myLogger->info("\t\tLAG adding this speculative hand to our initial raising range");
                 }
                 else
                 {
@@ -201,9 +184,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
                         if (rand == 1)
                         {
                             speculativeHandedAdded = true;
-#ifdef LOG_POKER_EXEC
-                            cout << "\t\tLAG adding this junk hand to our initial raising range";
-#endif
+                            myLogger->info("\t\tLAG adding this junk hand to our initial raising range");
                         }
                     }
                 }
@@ -229,9 +210,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
             {
 
                 speculativeHandedAdded = true;
-#ifdef LOG_POKER_EXEC
-                cout << "\t\tLAG adding this speculative hand to our initial raising range";
-#endif
+                myLogger->info("\t\tLAG adding this speculative hand to our initial raising range");
             }
         }
     }
@@ -250,9 +229,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
         Randomizer::GetRand(1, 6, 1, &rand);
         if (rand == 1)
         {
-#ifdef LOG_POKER_EXEC
-            cout << "\t\twon't raise, to hide the hand strength";
-#endif
+            myLogger->info("\t\twon't raise, to hide the hand strength");
             myShouldCall = true;
             return 0;
         }

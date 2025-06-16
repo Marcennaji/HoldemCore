@@ -67,9 +67,8 @@ void SqliteLogStore::init()
             }
             else
             {
-#ifdef LOG_POKER_EXEC
-                cout << "warning : database does not exist, will be created" << endl;
-#endif
+
+                myLogger->info("warning : database does not exist, will be created");
             }
 
             // open sqlite-db

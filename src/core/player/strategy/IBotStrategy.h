@@ -18,7 +18,7 @@ class IBotStrategy
 {
   public:
     IBotStrategy(ILogger* myLogger)
-        : myLogger(myLogger), preflopRangeCalculator(std::make_unique<PreflopRangeCalculator>())
+        : myLogger(myLogger), myPreflopRangeCalculator(std::make_unique<PreflopRangeCalculator>(myLogger))
     {
     }
 
@@ -38,7 +38,10 @@ class IBotStrategy
 
     const std::string& getStrategyName() const { return myStrategyName; }
     void setStrategyName(const std::string& name) { myStrategyName = name; }
-    const std::unique_ptr<PreflopRangeCalculator>& getPreflopRangeCalculator() const { return preflopRangeCalculator; }
+    const std::unique_ptr<PreflopRangeCalculator>& getPreflopRangeCalculator() const
+    {
+        return myPreflopRangeCalculator;
+    }
 
     virtual ~IBotStrategy() = default;
 
@@ -54,6 +57,6 @@ class IBotStrategy
     ILogger* myLogger;
 
   private:
-    std::unique_ptr<PreflopRangeCalculator> preflopRangeCalculator;
+    std::unique_ptr<PreflopRangeCalculator> myPreflopRangeCalculator;
 };
 } // namespace pkt::core::player

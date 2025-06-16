@@ -122,9 +122,7 @@ int TightAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
 
     stringRaisingRange = RANGES_STRING[(int) raisingRange];
 
-#ifdef LOG_POKER_EXEC
-    cout << stringRaisingRange << endl;
-#endif
+    myLogger->info(stringRaisingRange);
 
     // determine when to 3-bet without a real hand
     bool speculativeHandedAdded = false;
@@ -151,9 +149,7 @@ int TightAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
                 if (!deterministic && rand == 2)
                 {
                     speculativeHandedAdded = true;
-#ifdef LOG_POKER_EXEC
-                    cout << "\t\tTAG trying to steal this bet";
-#endif
+                    myLogger->info("\t\tTAG trying to steal this bet");
                 }
             }
             else
@@ -164,9 +160,7 @@ int TightAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
                 {
 
                     speculativeHandedAdded = true;
-#ifdef LOG_POKER_EXEC
-                    cout << "\t\tLAG adding this speculative hand to our initial raising range";
-#endif
+                    myLogger->info("\t\tTAG adding this speculative hand to our initial raising range");
                 }
             }
         }
@@ -187,9 +181,7 @@ int TightAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
         Randomizer::GetRand(1, 8, 1, &rand);
         if (!deterministic && rand == 1)
         {
-#ifdef LOG_POKER_EXEC
-            cout << "\t\twon't raise, to hide the hand strength";
-#endif
+            myLogger->info("\t\twon't raise, to hide the hand strength");
             myShouldCall = true;
             return 0;
         }

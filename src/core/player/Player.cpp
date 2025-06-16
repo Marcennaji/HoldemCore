@@ -30,7 +30,7 @@ Player::Player(GameEvents* events, ILogger* logger, IHandAuditStore* ha, IPlayer
       myTurn(0), myCardsFlip(0), myRoundStartCash(0), lastMoneyWon(0), m_isSessionActive(false), myEvents(events),
       myLogger(logger)
 {
-    myRangeEstimator = std::make_unique<RangeEstimator>(myID, myPlayersStatisticsStore);
+    myRangeEstimator = std::make_unique<RangeEstimator>(myID, myPlayersStatisticsStore, myLogger);
     myCurrentHandContext = std::make_unique<CurrentHandContext>();
     loadStatistics();
 

@@ -11,7 +11,7 @@ namespace pkt::core::player
 
 void IBotStrategy::initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange)
 {
-    preflopRangeCalculator->initializeRanges(utgHeadsUpRange, utgFullTableRange);
+    myPreflopRangeCalculator->initializeRanges(utgHeadsUpRange, utgFullTableRange);
 }
 
 int IBotStrategy::computePreflopRaiseAmount(CurrentHandContext& ctx, bool deterministic)
@@ -116,10 +116,8 @@ bool IBotStrategy::shouldPotControl(CurrentHandContext& ctx, bool deterministic)
         }
     }
 
-#ifdef LOG_POKER_EXEC
     if (potControl)
-        cout << "\t\tShould control pot" << endl;
-#endif
+        myLogger->info("\t\tShould control pot");
 
     return potControl;
 }
