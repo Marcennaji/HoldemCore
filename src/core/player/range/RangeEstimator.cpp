@@ -40,7 +40,7 @@ std::string RangeEstimator::getEstimatedRange() const
 
 void RangeEstimator::computeEstimatedPreflopRange(CurrentHandContext& ctx)
 {
-    using std::cout;
+    string estimatedRange;
 
     myLogger->info("\n\testimated range for " + std::to_string(ctx.myID) + " : ");
 
@@ -66,24 +66,30 @@ void RangeEstimator::computeEstimatedPreflopRange(CurrentHandContext& ctx)
         myLogger->info("");
 
         if (preflop.m_hands >= MIN_HANDS_STATISTICS_ACCURATE)
-            setEstimatedRange(RangeRefiner::deduceRange(
-                ANY_CARDS_RANGE, getStringRange(ctx.nbPlayers, preflop.getPreflopRaise() * 0.8)));
+            estimatedRange = RangeRefiner::deduceRange(ANY_CARDS_RANGE,
+                                                       getStringRange(ctx.nbPlayers, preflop.getPreflopRaise() * 0.8));
         else
-            setEstimatedRange(RangeRefiner::deduceRange(
-                ANY_CARDS_RANGE, getStringRange(ctx.nbPlayers, getStandardRaisingRange(ctx.nbPlayers) * 0.8)));
+            estimatedRange = RangeRefiner::deduceRange(
+                ANY_CARDS_RANGE, getStringRange(ctx.nbPlayers, getStandardRaisingRange(ctx.nbPlayers) * 0.8));
+    }
+    else
+    {
 
-        return;
+        // if the player is the last raiser :
+        if (ctx.preflopLastRaiser && myPlayerId == ctx.preflopLastRaiser->getID())
+            estimatedRange = computeEstimatedPreflopRangeFromLastRaiser(ctx);
+        else
+            // if the player is the last caller :
+            estimatedRange = computeEstimatedPreflopRangeFromCaller(ctx);
     }
 
-    string estimatedRange;
+    myLogger->info("RangeEstimator : estimated range is {" + estimatedRange + "}");
 
-    // if the player is the last raiser :
-    if (ctx.preflopLastRaiser && ctx.myID == ctx.preflopLastRaiser->getID())
-        estimatedRange = computeEstimatedPreflopRangeFromLastRaiser(ctx);
-    else
-        estimatedRange = computeEstimatedPreflopRangeFromCaller(ctx);
-
-    myLogger->info(" {" + estimatedRange + "}");
+    string newEstimatedPreflopRange = myPreflopRangeEstimator->computeEstimatedPreflopRange(ctx);
+    if (newEstimatedPreflopRange != estimatedRange)
+    {
+        myLogger->info("Preflop range estimations are NOT consistent.");
+    }
 
     setEstimatedRange(estimatedRange);
 }
@@ -820,6 +826,12 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(CurrentHandContext
     if (unplausibleRanges != "")
         myLogger->info("\tRemoving unplausible ranges : " + unplausibleRanges);
     // logUnplausibleHands(GAME_STATE_RIVER);
+}
+
+void RangeEstimator::setHand(IHand* hand)
+{
+    myHand = hand;
+    myPreflopRangeEstimator = make_unique<PreflopRangeEstimator>(myHand, myLogger, myPlayerId);
 }
 
 } // namespace pkt::core::player

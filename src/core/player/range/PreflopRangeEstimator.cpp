@@ -27,23 +27,47 @@ string PreflopRangeEstimator::computeEstimatedPreflopRange(CurrentHandContext& c
     PreflopStatistics preflop = ctx.myStatistics.getPreflopStatistics();
     const int nbPlayers = ctx.nbPlayers;
 
+    myLogger->info("  " + std::to_string(preflop.getVoluntaryPutMoneyInPot()) + "/" +
+                   std::to_string(preflop.getPreflopRaise()) + ", 3B: " + std::to_string(preflop.getPreflop3Bet()) +
+                   ", 4B: " + std::to_string(preflop.getPreflop4Bet()) +
+                   ", C3B: " + std::to_string(preflop.getPreflopCall3BetsFrequency()) +
+                   ", pot odd: " + std::to_string(ctx.potOdd) + " " + "\n\t\t");
+
     // if the player was BB and has checked preflop, then he can have anything, except his approximative BB raising
     // range
     if (myHand->getPreflopRaisesNumber() == 0 && ctx.myPosition == BB)
     {
-        return RangeRefiner::deduceRange(
-            ANY_CARDS_RANGE, RangeEstimator::getStringRange(ctx.nbPlayers, preflop.getPreflopRaise() * 0.8));
+
+        myLogger->info("any cards except ");
+        if (preflop.m_hands >= MIN_HANDS_STATISTICS_ACCURATE)
+            myLogger->info(RangeEstimator::getStringRange(nbPlayers, preflop.getPreflopRaise() * 0.8));
+        else
+            myLogger->info(
+                RangeEstimator::getStringRange(nbPlayers, RangeEstimator::getStandardRaisingRange(nbPlayers) * 0.8));
+        myLogger->info("");
+
+        if (preflop.m_hands >= MIN_HANDS_STATISTICS_ACCURATE)
+            estimatedRange = RangeRefiner::deduceRange(
+                ANY_CARDS_RANGE, RangeEstimator::getStringRange(ctx.nbPlayers, preflop.getPreflopRaise() * 0.8));
+        else
+            estimatedRange = RangeRefiner::deduceRange(
+                ANY_CARDS_RANGE, RangeEstimator::getStringRange(
+                                     ctx.nbPlayers, RangeEstimator::getStandardRaisingRange(ctx.nbPlayers) * 0.8));
     }
     else
-        return RangeRefiner::deduceRange(
-            ANY_CARDS_RANGE, RangeEstimator::getStringRange(
-                                 ctx.nbPlayers, RangeEstimator::getStandardRaisingRange(ctx.nbPlayers) * 0.8));
+    {
 
-    // if the player is the last raiser :
-    if (ctx.preflopLastRaiser && ctx.myID == ctx.preflopLastRaiser->getID())
-        return computeEstimatedPreflopRangeFromLastRaiser(ctx);
-    else
-        return computeEstimatedPreflopRangeFromCaller(ctx);
+        // if the player is the last raiser :
+        if (ctx.preflopLastRaiser && myPlayerId == ctx.preflopLastRaiser->getID())
+            estimatedRange = computeEstimatedPreflopRangeFromLastRaiser(ctx);
+        else
+            // if the player is the last caller :
+            estimatedRange = computeEstimatedPreflopRangeFromCaller(ctx);
+    }
+
+    myLogger->info("PreflopRangeEstimator : estimated range is {" + estimatedRange + "}");
+
+    return estimatedRange;
 }
 
 std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(CurrentHandContext& ctx) const

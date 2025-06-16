@@ -6,6 +6,8 @@
 
 #include <core/engine/EngineDefs.h>
 #include <core/engine/model/PlayerStatistics.h>
+#include "PreflopRangeEstimator.h"
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -34,7 +36,7 @@ class RangeEstimator
   public:
     RangeEstimator(int playerId, IPlayersStatisticsStore* statsStore, ILogger*);
 
-    void setHand(IHand* hand) { myHand = hand; }
+    void setHand(IHand* hand);
     void setEstimatedRange(const std::string& range);
     std::string getEstimatedRange() const;
 
@@ -56,6 +58,7 @@ class RangeEstimator
     std::string computeEstimatedPreflopRangeFromLastRaiser(CurrentHandContext&) const;
     std::string computeEstimatedPreflopRangeFromCaller(CurrentHandContext&) const;
 
+    std::unique_ptr<PreflopRangeEstimator> myPreflopRangeEstimator;
     std::string myEstimatedRange;
     int myPlayerId;
     IHand* myHand;

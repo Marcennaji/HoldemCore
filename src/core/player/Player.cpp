@@ -46,10 +46,10 @@ Player::Player(GameEvents* events, ILogger* logger, IHandAuditStore* ha, IPlayer
     }
 }
 
-void Player::setHand(IHand* br)
+void Player::setHand(IHand* h)
 {
-    currentHand = br;
-    myRangeEstimator->setHand(br);
+    currentHand = h;
+    myRangeEstimator->setHand(h);
 }
 
 void Player::setIsSessionActive(bool active)
@@ -928,7 +928,8 @@ std::map<int, float> Player::evaluateOpponentsStrengths() const
     for (PlayerListIterator it = players->begin(); it != players->end(); ++it)
     {
 
-        if ((*it)->getID() == myID || (*it)->getAction() == PLAYER_ACTION_FOLD)
+        if ((*it)->getID() == myID || (*it)->getAction() == PLAYER_ACTION_FOLD ||
+            (*it)->getAction() == PLAYER_ACTION_NONE)
             continue;
 
         const float estimatedOpponentWinningHands = getOpponentWinningHandsPercentage((*it)->getID(), getStringBoard());
