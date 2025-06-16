@@ -509,7 +509,7 @@ string RangeEstimator::getFilledRange(std::vector<string>& ranges, std::vector<f
     else
         return estimatedRange;
 }
-int RangeEstimator::getStandardRaisingRange(int nbPlayers) const
+int RangeEstimator::getStandardRaisingRange(int nbPlayers)
 {
 
     if (nbPlayers == 2)
@@ -531,7 +531,7 @@ int RangeEstimator::getStandardRaisingRange(int nbPlayers) const
     else
         return 15;
 }
-int RangeEstimator::getStandardCallingRange(int nbPlayers) const
+int RangeEstimator::getStandardCallingRange(int nbPlayers)
 {
     return getStandardRaisingRange(nbPlayers) + 5;
 }

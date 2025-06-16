@@ -39,8 +39,8 @@ class RangeEstimator
     std::string getEstimatedRange() const;
 
     void computeEstimatedPreflopRange(CurrentHandContext&);
-    int getStandardRaisingRange(int nbPlayers) const;
-    int getStandardCallingRange(int nbPlayers) const;
+    static int getStandardRaisingRange(int nbPlayers);
+    static int getStandardCallingRange(int nbPlayers);
     std::string deduceRange(const std::string& originRanges, const std::string& rangesToSubstract,
                             const std::string& board = "") const;
 

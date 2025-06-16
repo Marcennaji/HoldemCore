@@ -6,15 +6,9 @@ using namespace pkt::core::player;
 class RangeRefinerTest : public ::testing::Test
 {
   protected:
-    void SetUp() override
-    {
-        // Setup code if needed
-    }
+    void SetUp() override {}
 
-    void TearDown() override
-    {
-        // Cleanup code if needed
-    }
+    void TearDown() override {}
 };
 
 TEST_F(RangeRefinerTest, EmptyOriginRanges)

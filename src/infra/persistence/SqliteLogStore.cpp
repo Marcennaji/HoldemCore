@@ -35,51 +35,45 @@ SqliteLogStore::SqliteLogStore(const std::string& logDir, ILogger* logger)
 
 SqliteLogStore::~SqliteLogStore()
 {
-    if (SQLITE_LOG)
-    {
-        sqlite3_close(mySqliteLogDb);
-    }
+
+    sqlite3_close(mySqliteLogDb);
 }
 
 void SqliteLogStore::init()
 {
 
-    if (SQLITE_LOG)
+    bool dirExists;
+
+    dirExists = std::filesystem::is_directory(myLogDir);
+
+    // check if logging path exist
+    if (myLogDir != "" && dirExists)
     {
 
-        bool dirExists;
+        mySqliteLogFileName.clear();
+        mySqliteLogFileName /= myLogDir;
+        mySqliteLogFileName /= string(SQL_LOG_FILE);
 
-        dirExists = std::filesystem::is_directory(myLogDir);
-
-        // check if logging path exist
-        if (myLogDir != "" && dirExists)
+        bool databaseExists = false;
+        if (FILE* file = fopen(mySqliteLogFileName.string().c_str(), "r"))
+        {
+            fclose(file);
+            databaseExists = true;
+        }
+        else
         {
 
-            mySqliteLogFileName.clear();
-            mySqliteLogFileName /= myLogDir;
-            mySqliteLogFileName /= string(SQL_LOG_FILE);
+            myLogger->info("warning : database does not exist, will be created");
+        }
 
-            bool databaseExists = false;
-            if (FILE* file = fopen(mySqliteLogFileName.string().c_str(), "r"))
-            {
-                fclose(file);
-                databaseExists = true;
-            }
-            else
-            {
+        // open sqlite-db
+        sqlite3_open(mySqliteLogFileName.string().c_str(), &mySqliteLogDb);
 
-                myLogger->info("warning : database does not exist, will be created");
-            }
+        if (mySqliteLogDb != 0)
+        {
 
-            // open sqlite-db
-            sqlite3_open(mySqliteLogFileName.string().c_str(), &mySqliteLogDb);
-
-            if (mySqliteLogDb != 0)
-            {
-
-                if (!databaseExists)
-                    createDatabase();
-            }
+            if (!databaseExists)
+                createDatabase();
         }
     }
 }
