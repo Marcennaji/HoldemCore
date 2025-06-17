@@ -56,21 +56,8 @@ int getBoardCardsHigherThan(std::string stringBoard, std::string card)
 
 bool isCardsInRange(string card1, string card2, string ranges)
 {
-
-    // process individual ranges, from a string looking like "33,66+,T8o,ATs+,QJs,JTs,AQo+, KcJh"
-
-    // card1 = "7h";
-    // card2 = "6h";
-    // ranges = "74s+";
-    // ranges = CUTOFF_STARTING_RANGE[10];
-
-    // first card must be the highest
-    if (CardsValue::CardStringOrdering[card1] < CardsValue::CardStringOrdering[card2])
-    {
-        string tmp = card1;
-        card1 = card2;
-        card2 = tmp;
-    }
+    // Ensure the first card is the highest
+    ensureHighestCard(card1, card2);
 
     const char* c1 = card1.c_str();
     const char* c2 = card2.c_str();
@@ -80,93 +67,94 @@ bool isCardsInRange(string card1, string card2, string ranges)
 
     while (getline(oss, token, ','))
     {
-
-        if (token.size() == 0)
+        if (token.empty())
             continue;
 
-        if (token.size() == 1 || token.size() > 4)
-        {
+        if (!isValidRange(token))
             return false;
-        }
+
         const char* range = token.c_str();
 
-        if (token.size() == 2)
-        { // an exact pair, like 55 or AA
+        if (isExactPair(c1, c2, range))
+            return true;
 
-            if (c1[0] == range[0] && c2[0] == range[1])
-            {
-                return true;
-            }
-        }
-        if (token.size() == 3)
-        {
+        if (isExactSuitedHand(c1, c2, range))
+            return true;
 
-            if (range[0] != range[1] && range[2] == 's')
-            { // range is an exact suited hand, like QJs or 56s
-                if (((c1[0] == range[0] && c2[0] == range[1]) || (c1[0] == range[1] && c2[0] == range[0])) &&
-                    (c1[1] == c2[1]))
-                {
-                    return true;
-                }
-            }
+        if (isExactOffsuitedHand(c1, c2, range))
+            return true;
 
-            if (range[0] != range[1] && range[2] == 'o')
-            { // range is an exact offsuited cards, like KTo or 24o
-                if (((c1[0] == range[0] && c2[0] == range[1]) || (c1[0] == range[1] && c2[0] == range[0])) &&
-                    (c1[1] != c2[1]))
-                {
-                    return true;
-                }
-            }
-            if (range[0] == range[1] && range[2] == '+')
-            { // range is a pair and above, like 99+
-                if (CardsValue::CardStringOrdering[card1] == CardsValue::CardStringOrdering[card2])
-                {
-                    // we have a pair. Is it above the minimum value ?
-                    if (CardsValue::CardStringOrdering[card1] >= CardsValue::CardStringOrdering[getFakeCard(range[0])])
-                        return true;
-                }
-            }
-        }
-        if (token.size() == 4)
-        {
+        if (isPairAndAbove(card1, card2, range))
+            return true;
 
-            if (range[0] != range[1] && range[2] == 'o' && range[3] == '+')
-            {
-                // range is offsuited and above, like AQo+
-                if (CardsValue::CardStringOrdering[card1] == CardsValue::CardStringOrdering[getFakeCard(range[0])] &&
-                    CardsValue::CardStringOrdering[card2] >= CardsValue::CardStringOrdering[getFakeCard(range[1])] &&
-                    CardsValue::CardStringOrdering[card2] < CardsValue::CardStringOrdering[card1] && c1[1] != c2[1])
-                    return true;
-            }
-            if (range[0] != range[1] && range[2] == 's' && range[3] == '+')
-            {
-                // range is suited and above, like AJs+
-                if (CardsValue::CardStringOrdering[card1] == CardsValue::CardStringOrdering[getFakeCard(range[0])] &&
-                    CardsValue::CardStringOrdering[card2] >= CardsValue::CardStringOrdering[getFakeCard(range[1])] &&
-                    CardsValue::CardStringOrdering[card2] < CardsValue::CardStringOrdering[card1] && c1[1] == c2[1])
-                    return true;
-            }
-            if (range[2] != 's' && range[2] != 'o')
-            {
-                // range is an exact hand, like AhKc
-                string exactCard1;
-                exactCard1 += range[0];
-                exactCard1 += range[1];
+        if (isOffsuitedAndAbove(card1, card2, c1, c2, range))
+            return true;
 
-                string exactCard2;
-                exactCard2 += range[2];
-                exactCard2 += range[3];
+        if (isSuitedAndAbove(card1, card2, c1, c2, range))
+            return true;
 
-                if ((card1 == exactCard1 && card2 == exactCard2) || (card1 == exactCard2 && card2 == exactCard1))
-                    return true;
-            }
-        }
+        if (isExactHand(card1, card2, range))
+            return true;
     }
 
     return false;
 }
+void ensureHighestCard(string& card1, string& card2)
+{
+    if (CardsValue::CardStringOrdering[card1] < CardsValue::CardStringOrdering[card2])
+    {
+        std::swap(card1, card2);
+    }
+}
+bool isValidRange(const std::string& token)
+{
+    return !(token.size() == 1 || token.size() > 4);
+}
+bool isExactPair(const char* c1, const char* c2, const char* range)
+{
+    return (strlen(range) == 2 && c1[0] == range[0] && c2[0] == range[1]);
+}
+bool isExactSuitedHand(const char* c1, const char* c2, const char* range)
+{
+    return (strlen(range) == 3 && range[2] == 's' &&
+            ((c1[0] == range[0] && c2[0] == range[1]) || (c1[0] == range[1] && c2[0] == range[0])) && (c1[1] == c2[1]));
+}
+bool isExactOffsuitedHand(const char* c1, const char* c2, const char* range)
+{
+    return (strlen(range) == 3 && range[2] == 'o' &&
+            ((c1[0] == range[0] && c2[0] == range[1]) || (c1[0] == range[1] && c2[0] == range[0])) && (c1[1] != c2[1]));
+}
+bool isPairAndAbove(const string& card1, const string& card2, const char* range)
+{
+    return (strlen(range) == 3 && range[0] == range[1] && range[2] == '+' &&
+            CardsValue::CardStringOrdering[card1] == CardsValue::CardStringOrdering[card2] &&
+            CardsValue::CardStringOrdering[card1] >= CardsValue::CardStringOrdering[getFakeCard(range[0])]);
+}
+bool isOffsuitedAndAbove(const string& card1, const string& card2, const char* c1, const char* c2, const char* range)
+{
+    return (strlen(range) == 4 && range[2] == 'o' && range[3] == '+' &&
+            CardsValue::CardStringOrdering[card1] == CardsValue::CardStringOrdering[getFakeCard(range[0])] &&
+            CardsValue::CardStringOrdering[card2] >= CardsValue::CardStringOrdering[getFakeCard(range[1])] &&
+            CardsValue::CardStringOrdering[card2] < CardsValue::CardStringOrdering[card1] && c1[1] != c2[1]);
+}
+bool isSuitedAndAbove(const string& card1, const string& card2, const char* c1, const char* c2, const char* range)
+{
+    return (strlen(range) == 4 && range[2] == 's' && range[3] == '+' &&
+            CardsValue::CardStringOrdering[card1] == CardsValue::CardStringOrdering[getFakeCard(range[0])] &&
+            CardsValue::CardStringOrdering[card2] >= CardsValue::CardStringOrdering[getFakeCard(range[1])] &&
+            CardsValue::CardStringOrdering[card2] < CardsValue::CardStringOrdering[card1] && c1[1] == c2[1]);
+}
+bool isExactHand(const string& card1, const string& card2, const char* range)
+{
+    if (strlen(range) == 4 && range[2] != 's' && range[2] != 'o')
+    {
+        string exactCard1 = {range[0], range[1]};
+        string exactCard2 = {range[2], range[3]};
 
+        return (card1 == exactCard1 && card2 == exactCard2) || (card1 == exactCard2 && card2 == exactCard1);
+    }
+    return false;
+}
 // returns a % chance, for a winning draw
 const int getDrawingProbability(const PostFlopState& postFlopState)
 {
