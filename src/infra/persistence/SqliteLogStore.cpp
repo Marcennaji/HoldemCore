@@ -551,77 +551,57 @@ void SqliteLogStore::processQueryResults(
 void SqliteLogStore::updatePlayerStatistics(PlayerStatistics& stats, const std::string& columnName, sqlite3_stmt* stmt,
                                             int nCol) const
 {
-    if (columnName == "pf_hands")
-        stats.m_preflopStatistics.m_hands = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "pf_folds")
-        stats.m_preflopStatistics.m_folds = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "pf_checks")
-        stats.m_preflopStatistics.m_checks = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "pf_calls")
-        stats.m_preflopStatistics.m_calls = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "pf_raises")
-        stats.m_preflopStatistics.m_raises = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "pf_limps")
-        stats.m_preflopStatistics.m_limps = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "pf_3Bets")
-        stats.m_preflopStatistics.m_3Bets = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "pf_call3Bets")
-        stats.m_preflopStatistics.m_call3Bets = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "pf_call3BetsOpportunities")
-        stats.m_preflopStatistics.m_call3BetsOpportunities = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "pf_4Bets")
-        stats.m_preflopStatistics.m_4Bets = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "f_hands")
-        stats.m_flopStatistics.m_hands = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "f_folds")
-        stats.m_flopStatistics.m_folds = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "f_checks")
-        stats.m_flopStatistics.m_checks = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "f_calls")
-        stats.m_flopStatistics.m_calls = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "f_raises")
-        stats.m_flopStatistics.m_raises = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "f_bets")
-        stats.m_flopStatistics.m_bets = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "f_3Bets")
-        stats.m_flopStatistics.m_3Bets = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "f_4Bets")
-        stats.m_flopStatistics.m_4Bets = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "f_continuationBets")
-        stats.m_flopStatistics.m_continuationBets = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "f_continuationBetsOpportunities")
-        stats.m_flopStatistics.m_continuationBetsOpportunities = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "t_hands")
-        stats.m_turnStatistics.m_hands = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "t_folds")
-        stats.m_turnStatistics.m_folds = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "t_checks")
-        stats.m_turnStatistics.m_checks = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "t_calls")
-        stats.m_turnStatistics.m_calls = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "t_raises")
-        stats.m_turnStatistics.m_raises = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "t_bets")
-        stats.m_turnStatistics.m_bets = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "t_3Bets")
-        stats.m_turnStatistics.m_3Bets = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "t_4Bets")
-        stats.m_turnStatistics.m_4Bets = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "r_hands")
-        stats.m_riverStatistics.m_hands = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "r_folds")
-        stats.m_riverStatistics.m_folds = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "r_checks")
-        stats.m_riverStatistics.m_checks = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "r_calls")
-        stats.m_riverStatistics.m_calls = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "r_raises")
-        stats.m_riverStatistics.m_raises = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "r_bets")
-        stats.m_riverStatistics.m_bets = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "r_3Bets")
-        stats.m_riverStatistics.m_3Bets = sqlite3_column_int(stmt, nCol);
-    else if (columnName == "r_4Bets")
-        stats.m_riverStatistics.m_4Bets = sqlite3_column_int(stmt, nCol);
+    static const std::unordered_map<std::string, std::function<void(PlayerStatistics&, int)>> columnMapping = {
+        // Preflop statistics
+        {"pf_hands", [](PlayerStatistics& s, int v) { s.m_preflopStatistics.m_hands = v; }},
+        {"pf_folds", [](PlayerStatistics& s, int v) { s.m_preflopStatistics.m_folds = v; }},
+        {"pf_checks", [](PlayerStatistics& s, int v) { s.m_preflopStatistics.m_checks = v; }},
+        {"pf_calls", [](PlayerStatistics& s, int v) { s.m_preflopStatistics.m_calls = v; }},
+        {"pf_raises", [](PlayerStatistics& s, int v) { s.m_preflopStatistics.m_raises = v; }},
+        {"pf_limps", [](PlayerStatistics& s, int v) { s.m_preflopStatistics.m_limps = v; }},
+        {"pf_3Bets", [](PlayerStatistics& s, int v) { s.m_preflopStatistics.m_3Bets = v; }},
+        {"pf_call3Bets", [](PlayerStatistics& s, int v) { s.m_preflopStatistics.m_call3Bets = v; }},
+        {"pf_call3BetsOpportunities",
+         [](PlayerStatistics& s, int v) { s.m_preflopStatistics.m_call3BetsOpportunities = v; }},
+        {"pf_4Bets", [](PlayerStatistics& s, int v) { s.m_preflopStatistics.m_4Bets = v; }},
+        // Flop statistics
+        {"f_hands", [](PlayerStatistics& s, int v) { s.m_flopStatistics.m_hands = v; }},
+        {"f_folds", [](PlayerStatistics& s, int v) { s.m_flopStatistics.m_folds = v; }},
+        {"f_checks", [](PlayerStatistics& s, int v) { s.m_flopStatistics.m_checks = v; }},
+        {"f_calls", [](PlayerStatistics& s, int v) { s.m_flopStatistics.m_calls = v; }},
+        {"f_raises", [](PlayerStatistics& s, int v) { s.m_flopStatistics.m_raises = v; }},
+        {"f_bets", [](PlayerStatistics& s, int v) { s.m_flopStatistics.m_bets = v; }},
+        {"f_3Bets", [](PlayerStatistics& s, int v) { s.m_flopStatistics.m_3Bets = v; }},
+        {"f_4Bets", [](PlayerStatistics& s, int v) { s.m_flopStatistics.m_4Bets = v; }},
+        {"f_continuationBets", [](PlayerStatistics& s, int v) { s.m_flopStatistics.m_continuationBets = v; }},
+        {"f_continuationBetsOpportunities",
+         [](PlayerStatistics& s, int v) { s.m_flopStatistics.m_continuationBetsOpportunities = v; }},
+        // Turn statistics
+        {"t_hands", [](PlayerStatistics& s, int v) { s.m_turnStatistics.m_hands = v; }},
+        {"t_folds", [](PlayerStatistics& s, int v) { s.m_turnStatistics.m_folds = v; }},
+        {"t_checks", [](PlayerStatistics& s, int v) { s.m_turnStatistics.m_checks = v; }},
+        {"t_calls", [](PlayerStatistics& s, int v) { s.m_turnStatistics.m_calls = v; }},
+        {"t_raises", [](PlayerStatistics& s, int v) { s.m_turnStatistics.m_raises = v; }},
+        {"t_bets", [](PlayerStatistics& s, int v) { s.m_turnStatistics.m_bets = v; }},
+        {"t_3Bets", [](PlayerStatistics& s, int v) { s.m_turnStatistics.m_3Bets = v; }},
+        {"t_4Bets", [](PlayerStatistics& s, int v) { s.m_turnStatistics.m_4Bets = v; }},
+        // River statistics
+        {"r_hands", [](PlayerStatistics& s, int v) { s.m_riverStatistics.m_hands = v; }},
+        {"r_folds", [](PlayerStatistics& s, int v) { s.m_riverStatistics.m_folds = v; }},
+        {"r_checks", [](PlayerStatistics& s, int v) { s.m_riverStatistics.m_checks = v; }},
+        {"r_calls", [](PlayerStatistics& s, int v) { s.m_riverStatistics.m_calls = v; }},
+        {"r_raises", [](PlayerStatistics& s, int v) { s.m_riverStatistics.m_raises = v; }},
+        {"r_bets", [](PlayerStatistics& s, int v) { s.m_riverStatistics.m_bets = v; }},
+        {"r_3Bets", [](PlayerStatistics& s, int v) { s.m_riverStatistics.m_3Bets = v; }},
+        {"r_4Bets", [](PlayerStatistics& s, int v) { s.m_riverStatistics.m_4Bets = v; }},
+    };
+
+    auto it = columnMapping.find(columnName);
+    if (it != columnMapping.end())
+    {
+        // we call the lambda function associated with the column name, passing the stats and the value
+        // from the sqlite statement
+        it->second(stats, sqlite3_column_int(stmt, nCol));
+    }
 }
 } // namespace pkt::infra
