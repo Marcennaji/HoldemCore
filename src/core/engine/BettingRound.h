@@ -76,6 +76,13 @@ class BettingRound : public IBettingRound
     ILogger* myLogger;
 
   private:
+    // helpers
+    void handleFirstRunGui();
+    void handleFirstRun();
+    void logBoardCards();
+    bool allBetsAreDone() const;
+    void proceedToNextBettingRound();
+
     IHand* myHand;
 
     const GameState myBettingRoundID;

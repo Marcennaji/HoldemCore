@@ -84,195 +84,205 @@ void BettingRound::nextPlayer()
 
 void BettingRound::run()
 {
-
     if (firstRunGui)
     {
-        firstRunGui = false;
-        myHand->setPreviousPlayerID(-1);
+        handleFirstRunGui();
+        return;
+    }
+    if (firstRun)
+    {
+        handleFirstRun();
+    }
 
-        if (myEvents && myEvents->onDealBettingRoundCards)
-            myEvents->onDealBettingRoundCards(myBettingRoundID);
+    logBoardCards();
+
+    bool allHighestSet = allBetsAreDone();
+
+    if (!firstRound && allHighestSet)
+    {
+        proceedToNextBettingRound();
     }
     else
     {
-
-        if (firstRun)
+        // determine next running player
+        PlayerListConstIterator currentPlayersTurnIt = myHand->getRunningPlayerIt(currentPlayersTurnId);
+        if (currentPlayersTurnIt == myHand->getRunningPlayerList()->end())
         {
-
-            firstRun = false;
-
-            if (!(myHand->getAllInCondition()))
-            {
-
-                PlayerListIterator it_1, it_2;
-
-                // running player before smallBlind
-                bool formerRunningPlayerFound = false;
-                if (myHand->getActivePlayerList()->size() > 2)
-                {
-
-                    it_1 = myHand->getActivePlayerIt(smallBlindPositionId);
-                    if (it_1 == myHand->getActivePlayerList()->end())
-                    {
-                        myLogger->error("ACTIVE_PLAYER_NOT_FOUND");
-                    }
-
-                    for (size_t i = 0; i < myHand->getActivePlayerList()->size(); i++)
-                    {
-
-                        if (it_1 == myHand->getActivePlayerList()->begin())
-                            it_1 = myHand->getActivePlayerList()->end();
-                        --it_1;
-
-                        it_2 = myHand->getRunningPlayerIt((*it_1)->getID());
-                        // running player found
-                        if (it_2 != myHand->getRunningPlayerList()->end())
-                        {
-                            firstRoundLastPlayersTurnId = (*it_2)->getID();
-                            formerRunningPlayerFound = true;
-                            break;
-                        }
-                    }
-                    if (!formerRunningPlayerFound)
-                    {
-                        myLogger->error("FORMER_RUNNING_PLAYER_NOT_FOUND");
-                    }
-                }
-                // heads up: bigBlind begins -> dealer/smallBlind is running player before bigBlind
-                else
-                {
-                    firstRoundLastPlayersTurnId = smallBlindPositionId;
-                }
-                currentPlayersTurnId = firstRoundLastPlayersTurnId;
-            }
+            myLogger->error("RUNNING_PLAYER_NOT_FOUND");
         }
 
-        // log the turned cards
-        if (!logBoardCardsDone)
+        ++currentPlayersTurnIt;
+        if (currentPlayersTurnIt == myHand->getRunningPlayerList()->end())
+            currentPlayersTurnIt = myHand->getRunningPlayerList()->begin();
+
+        currentPlayersTurnId = (*currentPlayersTurnIt)->getID();
+
+        // highlight active players groupbox and clear action
+        if (myEvents && myEvents->onRefreshPlayersActiveInactiveStyles)
+            myEvents->onRefreshPlayersActiveInactiveStyles(currentPlayersTurnId, 2);
+
+        if (myEvents && myEvents->onRefreshAction)
+            myEvents->onRefreshAction(currentPlayersTurnId, 0);
+
+        currentPlayersTurnIt = myHand->getRunningPlayerIt(currentPlayersTurnId);
+        if (currentPlayersTurnIt == myHand->getRunningPlayerList()->end())
         {
-
-            int tempBoardCardsArray[5];
-
-            myHand->getBoard()->getCards(tempBoardCardsArray);
-
-            switch (myBettingRoundID)
-            {
-            case GAME_STATE_FLOP:
-                myLogger->info("************************* FLOP " + CardsValue::CardStringValue[tempBoardCardsArray[0]] +
-                               " " + CardsValue::CardStringValue[tempBoardCardsArray[1]] + " " +
-                               CardsValue::CardStringValue[tempBoardCardsArray[2]] + "  *************************");
-                break;
-            case GAME_STATE_TURN:
-                myLogger->info("************************* TURN " + CardsValue::CardStringValue[tempBoardCardsArray[0]] +
-                               " " + CardsValue::CardStringValue[tempBoardCardsArray[1]] + " " +
-                               CardsValue::CardStringValue[tempBoardCardsArray[2]] + " " +
-                               CardsValue::CardStringValue[tempBoardCardsArray[3]] + "  *************************");
-
-                break;
-            case GAME_STATE_RIVER:
-                myLogger->info("************************* RIVER " +
-                               CardsValue::CardStringValue[tempBoardCardsArray[0]] + " " +
-                               CardsValue::CardStringValue[tempBoardCardsArray[1]] + " " +
-                               CardsValue::CardStringValue[tempBoardCardsArray[2]] + " " +
-                               CardsValue::CardStringValue[tempBoardCardsArray[3]] + " " +
-                               CardsValue::CardStringValue[tempBoardCardsArray[4]] + "  *************************");
-
-                break;
-            default:
-                myLogger->error("wrong myBettingRoundID");
-            }
-            logBoardCardsDone = true;
+            myLogger->error("RUNNING_PLAYER_NOT_FOUND");
         }
 
-        bool allHighestSet = true;
+        (*currentPlayersTurnIt)->setTurn(true);
 
-        PlayerListIterator it;
-        PlayerListIterator it_c;
-
-        for (it_c = myHand->getRunningPlayerList()->begin(); it_c != myHand->getRunningPlayerList()->end(); ++it_c)
+        if (currentPlayersTurnId == firstRoundLastPlayersTurnId)
         {
-            if (highestSet != (*it_c)->getSet())
-                allHighestSet = false;
+            firstRound = false;
         }
 
-        if (!firstRound && allHighestSet)
+        if (currentPlayersTurnId == 0)
         {
-
-            // go to next betting round
-            myHand->setCurrentRound(GameState(myBettingRoundID + 1));
-
-            for (it_c = myHand->getRunningPlayerList()->begin(); it_c != myHand->getRunningPlayerList()->end(); ++it_c)
-            {
-                (*it_c)->setAction(PLAYER_ACTION_NONE);
-            }
-
-            myHand->getBoard()->collectSets();
-            myHand->getBoard()->collectPot();
-
-            if (myEvents && myEvents->onPotUpdated)
-                myEvents->onPotUpdated(myHand->getBoard()->getPot());
-
-            if (myEvents && myEvents->onRefreshSet)
-                myEvents->onRefreshSet();
-
-            if (myEvents && myEvents->onRefreshCash)
-                myEvents->onRefreshCash();
-
-            for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
-            {
-                if (myEvents && myEvents->onRefreshAction)
-                    myEvents->onRefreshAction(i, PLAYER_ACTION_NONE);
-            }
-
-            myHand->switchRounds();
+            if (myEvents && myEvents->onDoHumanAction)
+                myEvents->onDoHumanAction();
         }
         else
         {
+            if (myEvents && myEvents->onBettingRoundAnimation)
+                myEvents->onBettingRoundAnimation(myBettingRoundID);
+        }
+    }
+}
 
-            // determine next running player
-            PlayerListConstIterator currentPlayersTurnIt = myHand->getRunningPlayerIt(currentPlayersTurnId);
-            if (currentPlayersTurnIt == myHand->getRunningPlayerList()->end())
+bool BettingRound::allBetsAreDone() const
+{
+    PlayerListIterator it_c;
+
+    for (it_c = myHand->getRunningPlayerList()->begin(); it_c != myHand->getRunningPlayerList()->end(); ++it_c)
+    {
+        if (highestSet != (*it_c)->getSet())
+            return false;
+    }
+    return true;
+}
+
+void BettingRound::proceedToNextBettingRound()
+{
+    PlayerListIterator it_c;
+    myHand->setCurrentRound(GameState(myBettingRoundID + 1));
+
+    for (it_c = myHand->getRunningPlayerList()->begin(); it_c != myHand->getRunningPlayerList()->end(); ++it_c)
+    {
+        (*it_c)->setAction(PLAYER_ACTION_NONE);
+    }
+
+    myHand->getBoard()->collectSets();
+    myHand->getBoard()->collectPot();
+
+    if (myEvents && myEvents->onPotUpdated)
+        myEvents->onPotUpdated(myHand->getBoard()->getPot());
+
+    if (myEvents && myEvents->onRefreshSet)
+        myEvents->onRefreshSet();
+
+    if (myEvents && myEvents->onRefreshCash)
+        myEvents->onRefreshCash();
+
+    for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
+    {
+        if (myEvents && myEvents->onRefreshAction)
+            myEvents->onRefreshAction(i, PLAYER_ACTION_NONE);
+    }
+
+    myHand->switchRounds();
+}
+
+void BettingRound::logBoardCards()
+{
+    if (!logBoardCardsDone)
+    {
+        int tempBoardCardsArray[5];
+        myHand->getBoard()->getCards(tempBoardCardsArray);
+
+        switch (myBettingRoundID)
+        {
+        case GAME_STATE_FLOP:
+            myLogger->info("************************* FLOP " + CardsValue::CardStringValue[tempBoardCardsArray[0]] +
+                           " " + CardsValue::CardStringValue[tempBoardCardsArray[1]] + " " +
+                           CardsValue::CardStringValue[tempBoardCardsArray[2]] + "  *************************");
+            break;
+        case GAME_STATE_TURN:
+            myLogger->info("************************* TURN " + CardsValue::CardStringValue[tempBoardCardsArray[0]] +
+                           " " + CardsValue::CardStringValue[tempBoardCardsArray[1]] + " " +
+                           CardsValue::CardStringValue[tempBoardCardsArray[2]] + " " +
+                           CardsValue::CardStringValue[tempBoardCardsArray[3]] + "  *************************");
+
+            break;
+        case GAME_STATE_RIVER:
+            myLogger->info("************************* RIVER " + CardsValue::CardStringValue[tempBoardCardsArray[0]] +
+                           " " + CardsValue::CardStringValue[tempBoardCardsArray[1]] + " " +
+                           CardsValue::CardStringValue[tempBoardCardsArray[2]] + " " +
+                           CardsValue::CardStringValue[tempBoardCardsArray[3]] + " " +
+                           CardsValue::CardStringValue[tempBoardCardsArray[4]] + "  *************************");
+
+            break;
+        default:
+            myLogger->error("wrong myBettingRoundID");
+        }
+        logBoardCardsDone = true;
+    }
+}
+
+void BettingRound::handleFirstRunGui()
+{
+    firstRunGui = false;
+    myHand->setPreviousPlayerID(-1);
+
+    if (myEvents && myEvents->onDealBettingRoundCards)
+    {
+        myEvents->onDealBettingRoundCards(myBettingRoundID);
+    }
+}
+void BettingRound::handleFirstRun()
+{
+    firstRun = false;
+
+    if (!(myHand->getAllInCondition()))
+    {
+        PlayerListIterator it_1, it_2;
+
+        // running player before smallBlind
+        bool formerRunningPlayerFound = false;
+        if (myHand->getActivePlayerList()->size() > 2)
+        {
+            it_1 = myHand->getActivePlayerIt(smallBlindPositionId);
+            if (it_1 == myHand->getActivePlayerList()->end())
             {
-                myLogger->error("RUNNING_PLAYER_NOT_FOUND");
+                myLogger->error("ACTIVE_PLAYER_NOT_FOUND");
             }
 
-            ++currentPlayersTurnIt;
-            if (currentPlayersTurnIt == myHand->getRunningPlayerList()->end())
-                currentPlayersTurnIt = myHand->getRunningPlayerList()->begin();
-
-            currentPlayersTurnId = (*currentPlayersTurnIt)->getID();
-
-            // highlight active players groupbox and clear action
-            if (myEvents && myEvents->onRefreshPlayersActiveInactiveStyles)
-                myEvents->onRefreshPlayersActiveInactiveStyles(currentPlayersTurnId, 2);
-
-            if (myEvents && myEvents->onRefreshAction)
-                myEvents->onRefreshAction(currentPlayersTurnId, 0);
-
-            currentPlayersTurnIt = myHand->getRunningPlayerIt(currentPlayersTurnId);
-            if (currentPlayersTurnIt == myHand->getRunningPlayerList()->end())
+            for (size_t i = 0; i < myHand->getActivePlayerList()->size(); i++)
             {
-                myLogger->error("RUNNING_PLAYER_NOT_FOUND");
+                if (it_1 == myHand->getActivePlayerList()->begin())
+                    it_1 = myHand->getActivePlayerList()->end();
+                --it_1;
+
+                it_2 = myHand->getRunningPlayerIt((*it_1)->getID());
+                // running player found
+                if (it_2 != myHand->getRunningPlayerList()->end())
+                {
+                    firstRoundLastPlayersTurnId = (*it_2)->getID();
+                    formerRunningPlayerFound = true;
+                    break;
+                }
             }
-
-            (*currentPlayersTurnIt)->setTurn(true);
-
-            if (currentPlayersTurnId == firstRoundLastPlayersTurnId)
+            if (!formerRunningPlayerFound)
             {
-                firstRound = false;
-            }
-
-            if (currentPlayersTurnId == 0)
-            {
-                if (myEvents && myEvents->onDoHumanAction)
-                    myEvents->onDoHumanAction();
-            }
-            else
-            {
-                if (myEvents && myEvents->onBettingRoundAnimation)
-                    myEvents->onBettingRoundAnimation(myBettingRoundID);
+                myLogger->error("FORMER_RUNNING_PLAYER_NOT_FOUND");
             }
         }
+        // heads up: bigBlind begins -> dealer/smallBlind is running player before bigBlind
+        else
+        {
+            firstRoundLastPlayersTurnId = smallBlindPositionId;
+        }
+        currentPlayersTurnId = firstRoundLastPlayersTurnId;
     }
 }
 GameState BettingRound::getBettingRoundID() const
