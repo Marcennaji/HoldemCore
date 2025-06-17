@@ -140,16 +140,16 @@ void SqliteLogStore::createDatabase()
 
     for (int j = 2; j <= MAX_NUMBER_OF_PLAYERS; j++)
     {
-        InitializePlayersStatistics("You", j); // human player
+        InitializeStrategyStatistics("You", j); // human player
         // initialize players statistics for all bot strategies
-        InitializePlayersStatistics(tightAggressiveStrategy.getStrategyName(), j);
-        InitializePlayersStatistics(looseAggressiveStrategy.getStrategyName(), j);
-        InitializePlayersStatistics(maniacStrategy.getStrategyName(), j);
-        InitializePlayersStatistics(ultraTightStrategy.getStrategyName(), j);
+        InitializeStrategyStatistics(tightAggressiveStrategy.getStrategyName(), j);
+        InitializeStrategyStatistics(looseAggressiveStrategy.getStrategyName(), j);
+        InitializeStrategyStatistics(maniacStrategy.getStrategyName(), j);
+        InitializeStrategyStatistics(ultraTightStrategy.getStrategyName(), j);
     }
 }
 
-void SqliteLogStore::InitializePlayersStatistics(const string playerName, const int nbPlayers)
+void SqliteLogStore::InitializeStrategyStatistics(const string playerName, const int nbPlayers)
 {
 
     sql += "INSERT OR REPLACE INTO PlayersStatistics (";

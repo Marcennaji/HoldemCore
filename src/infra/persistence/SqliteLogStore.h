@@ -4,8 +4,6 @@
 
 #pragma once
 
-#define SQLLITE_COMPLETE_LOG
-
 #include <core/interfaces/persistence/IHandAuditStore.h>
 #include <core/interfaces/persistence/IPlayersStatisticsStore.h>
 #include <core/interfaces/persistence/IRankingStore.h>
@@ -45,13 +43,12 @@ class SqliteLogStore : public core::IRankingStore, public core::IHandAuditStore,
     void updateUnplausibleHand(const std::string card1, const std::string card2, const bool human,
                                const char bettingRound, const int nbPlayers);
     void updatePlayersStatistics(PlayerList activePlayerList);
-    void InitializePlayersStatistics(const std::string playerName, const int nbPlayers);
-    std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> getPlayerStatistics(const std::string& playerName);
-    void createDatabase();
 
-    std::string getSqliteLogFileName() { return mySqliteLogFileName.string(); }
+    std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> getPlayerStatistics(const std::string& playerName);
 
   private:
+    void createDatabase();
+    void InitializeStrategyStatistics(const std::string playerName, const int nbPlayers);
     void exec_transaction();
     int getIntegerValue(const std::string playerName, const std::string tableName, const std::string attributeName);
     void createRankingTable();
