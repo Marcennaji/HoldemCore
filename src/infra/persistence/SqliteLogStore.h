@@ -21,6 +21,8 @@
 #define SQL_LOG_FILE "pokerTraining.db"
 
 struct sqlite3;
+struct sqlite3_stmt;
+
 namespace pkt::infra
 {
 
@@ -54,6 +56,14 @@ class SqliteLogStore : public core::IRankingStore, public core::IHandAuditStore,
     int getIntegerValue(const std::string playerName, const std::string tableName, const std::string attributeName);
     void createRankingTable();
     void createUnplausibleHandsTable();
+
+    bool validateLogDirectory(std::filesystem::path& sqliteLogFileName) const;
+    bool openDatabase(const std::filesystem::path& sqliteLogFileName, sqlite3*& db) const;
+    bool prepareStatement(sqlite3* db, const std::string& sql_select, sqlite3_stmt*& stmt) const;
+    void processQueryResults(sqlite3_stmt* stmt,
+                             std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1>& playerStatistics) const;
+    void updatePlayerStatistics(PlayerStatistics& stats, const std::string& columnName, sqlite3_stmt* stmt,
+                                int nCol) const;
 
     sqlite3* mySqliteLogDb;
     std::filesystem::path mySqliteLogFileName;

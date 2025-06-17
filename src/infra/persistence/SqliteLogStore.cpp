@@ -449,146 +449,179 @@ void SqliteLogStore::updatePlayersStatistics(PlayerList activePlayerList)
     }
 }
 
-std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> SqliteLogStore::getPlayerStatistics(const string& playerName)
+std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1>
+SqliteLogStore::getPlayerStatistics(const std::string& playerName)
 {
-
     std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> playerStatistics{};
 
     sqlite3* db;
     std::filesystem::path sqliteLogFileName;
 
-    bool dirExists = std::filesystem::is_directory(myLogDir);
-
-    // check if logging path exist
-    if (myLogDir != "" && dirExists)
+    if (!validateLogDirectory(sqliteLogFileName))
     {
-
-        sqliteLogFileName.clear();
-        sqliteLogFileName /= myLogDir;
-        sqliteLogFileName /= string(SQL_LOG_FILE);
-
-        // open sqlite-db
-        int rc = sqlite3_open(sqliteLogFileName.string().c_str(), &db);
-
-        if (rc)
-        {
-            fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-            sqlite3_close(db);
-            return playerStatistics;
-        }
-
-        char* errmsg = 0;
-
-        string sql_select = "SELECT * FROM PlayersStatistics WHERE strategy_name = '" + playerName + "';";
-
-        sqlite3_stmt* stmt;
-
-        rc = sqlite3_prepare_v2(db, sql_select.c_str(), -1, &stmt, 0);
-
-        if (rc == SQLITE_OK)
-        {
-
-            int nCols = sqlite3_column_count(stmt);
-
-            if (nCols)
-            {
-
-                while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
-                {
-
-                    int nbPlayers = 0;
-
-                    for (int nCol = 0; nCol < nCols; nCol++)
-                    {
-
-                        std::string columnName = sqlite3_column_name(stmt, nCol);
-
-                        if (columnName == "nb_players")
-                            nbPlayers = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "pf_hands")
-                            playerStatistics[nbPlayers].m_preflopStatistics.m_hands = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "pf_folds")
-                            playerStatistics[nbPlayers].m_preflopStatistics.m_folds = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "pf_checks")
-                            playerStatistics[nbPlayers].m_preflopStatistics.m_checks = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "pf_calls")
-                            playerStatistics[nbPlayers].m_preflopStatistics.m_calls = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "pf_raises")
-                            playerStatistics[nbPlayers].m_preflopStatistics.m_raises = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "pf_limps")
-                            playerStatistics[nbPlayers].m_preflopStatistics.m_limps = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "pf_3Bets")
-                            playerStatistics[nbPlayers].m_preflopStatistics.m_3Bets = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "pf_call3Bets")
-                            playerStatistics[nbPlayers].m_preflopStatistics.m_call3Bets =
-                                sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "pf_call3BetsOpportunities")
-                            playerStatistics[nbPlayers].m_preflopStatistics.m_call3BetsOpportunities =
-                                sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "pf_4Bets")
-                            playerStatistics[nbPlayers].m_preflopStatistics.m_4Bets = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "f_hands")
-                            playerStatistics[nbPlayers].m_flopStatistics.m_hands = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "f_folds")
-                            playerStatistics[nbPlayers].m_flopStatistics.m_folds = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "f_checks")
-                            playerStatistics[nbPlayers].m_flopStatistics.m_checks = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "f_calls")
-                            playerStatistics[nbPlayers].m_flopStatistics.m_calls = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "f_raises")
-                            playerStatistics[nbPlayers].m_flopStatistics.m_raises = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "f_bets")
-                            playerStatistics[nbPlayers].m_flopStatistics.m_bets = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "f_3Bets")
-                            playerStatistics[nbPlayers].m_flopStatistics.m_3Bets = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "f_4Bets")
-                            playerStatistics[nbPlayers].m_flopStatistics.m_4Bets = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "f_continuationBets")
-                            playerStatistics[nbPlayers].m_flopStatistics.m_continuationBets =
-                                sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "f_continuationBetsOpportunities")
-                            playerStatistics[nbPlayers].m_flopStatistics.m_continuationBetsOpportunities =
-                                sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "t_hands")
-                            playerStatistics[nbPlayers].m_turnStatistics.m_hands = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "t_folds")
-                            playerStatistics[nbPlayers].m_turnStatistics.m_folds = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "t_checks")
-                            playerStatistics[nbPlayers].m_turnStatistics.m_checks = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "t_calls")
-                            playerStatistics[nbPlayers].m_turnStatistics.m_calls = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "t_raises")
-                            playerStatistics[nbPlayers].m_turnStatistics.m_raises = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "t_bets")
-                            playerStatistics[nbPlayers].m_turnStatistics.m_bets = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "t_3Bets")
-                            playerStatistics[nbPlayers].m_turnStatistics.m_3Bets = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "t_4Bets")
-                            playerStatistics[nbPlayers].m_turnStatistics.m_4Bets = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "r_hands")
-                            playerStatistics[nbPlayers].m_riverStatistics.m_hands = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "r_folds")
-                            playerStatistics[nbPlayers].m_riverStatistics.m_folds = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "r_checks")
-                            playerStatistics[nbPlayers].m_riverStatistics.m_checks = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "r_calls")
-                            playerStatistics[nbPlayers].m_riverStatistics.m_calls = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "r_raises")
-                            playerStatistics[nbPlayers].m_riverStatistics.m_raises = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "r_bets")
-                            playerStatistics[nbPlayers].m_riverStatistics.m_bets = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "r_3Bets")
-                            playerStatistics[nbPlayers].m_riverStatistics.m_3Bets = sqlite3_column_int(stmt, nCol);
-                        else if (columnName == "r_4Bets")
-                            playerStatistics[nbPlayers].m_riverStatistics.m_4Bets = sqlite3_column_int(stmt, nCol);
-                    }
-                }
-            }
-            sqlite3_finalize(stmt);
-        }
-        sqlite3_close(db);
+        return playerStatistics;
     }
 
+    if (!openDatabase(sqliteLogFileName, db))
+    {
+        return playerStatistics;
+    }
+
+    std::string sql_select = "SELECT * FROM PlayersStatistics WHERE strategy_name = '" + playerName + "';";
+    sqlite3_stmt* stmt;
+
+    if (prepareStatement(db, sql_select, stmt))
+    {
+        processQueryResults(stmt, playerStatistics);
+        sqlite3_finalize(stmt);
+    }
+
+    sqlite3_close(db);
     return playerStatistics;
+}
+bool SqliteLogStore::validateLogDirectory(std::filesystem::path& sqliteLogFileName) const
+{
+    bool dirExists = std::filesystem::is_directory(myLogDir);
+
+    if (myLogDir.empty() || !dirExists)
+    {
+        return false;
+    }
+
+    sqliteLogFileName.clear();
+    sqliteLogFileName /= myLogDir;
+    sqliteLogFileName /= std::string(SQL_LOG_FILE);
+
+    return true;
+}
+bool SqliteLogStore::openDatabase(const std::filesystem::path& sqliteLogFileName, sqlite3*& db) const
+{
+    int rc = sqlite3_open(sqliteLogFileName.string().c_str(), &db);
+
+    if (rc)
+    {
+        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        return false;
+    }
+
+    return true;
+}
+bool SqliteLogStore::prepareStatement(sqlite3* db, const std::string& sql_select, sqlite3_stmt*& stmt) const
+{
+    int rc = sqlite3_prepare_v2(db, sql_select.c_str(), -1, &stmt, nullptr);
+
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
+        return false;
+    }
+
+    return true;
+}
+void SqliteLogStore::processQueryResults(
+    sqlite3_stmt* stmt, std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1>& playerStatistics) const
+{
+    int nCols = sqlite3_column_count(stmt);
+
+    if (nCols == 0)
+    {
+        return;
+    }
+
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        int nbPlayers = 0;
+
+        for (int nCol = 0; nCol < nCols; nCol++)
+        {
+            std::string columnName = sqlite3_column_name(stmt, nCol);
+
+            if (columnName == "nb_players")
+            {
+                nbPlayers = sqlite3_column_int(stmt, nCol);
+            }
+            else
+            {
+                updatePlayerStatistics(playerStatistics[nbPlayers], columnName, stmt, nCol);
+            }
+        }
+    }
+}
+void SqliteLogStore::updatePlayerStatistics(PlayerStatistics& stats, const std::string& columnName, sqlite3_stmt* stmt,
+                                            int nCol) const
+{
+    if (columnName == "pf_hands")
+        stats.m_preflopStatistics.m_hands = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "pf_folds")
+        stats.m_preflopStatistics.m_folds = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "pf_checks")
+        stats.m_preflopStatistics.m_checks = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "pf_calls")
+        stats.m_preflopStatistics.m_calls = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "pf_raises")
+        stats.m_preflopStatistics.m_raises = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "pf_limps")
+        stats.m_preflopStatistics.m_limps = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "pf_3Bets")
+        stats.m_preflopStatistics.m_3Bets = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "pf_call3Bets")
+        stats.m_preflopStatistics.m_call3Bets = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "pf_call3BetsOpportunities")
+        stats.m_preflopStatistics.m_call3BetsOpportunities = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "pf_4Bets")
+        stats.m_preflopStatistics.m_4Bets = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "f_hands")
+        stats.m_flopStatistics.m_hands = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "f_folds")
+        stats.m_flopStatistics.m_folds = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "f_checks")
+        stats.m_flopStatistics.m_checks = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "f_calls")
+        stats.m_flopStatistics.m_calls = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "f_raises")
+        stats.m_flopStatistics.m_raises = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "f_bets")
+        stats.m_flopStatistics.m_bets = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "f_3Bets")
+        stats.m_flopStatistics.m_3Bets = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "f_4Bets")
+        stats.m_flopStatistics.m_4Bets = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "f_continuationBets")
+        stats.m_flopStatistics.m_continuationBets = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "f_continuationBetsOpportunities")
+        stats.m_flopStatistics.m_continuationBetsOpportunities = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "t_hands")
+        stats.m_turnStatistics.m_hands = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "t_folds")
+        stats.m_turnStatistics.m_folds = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "t_checks")
+        stats.m_turnStatistics.m_checks = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "t_calls")
+        stats.m_turnStatistics.m_calls = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "t_raises")
+        stats.m_turnStatistics.m_raises = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "t_bets")
+        stats.m_turnStatistics.m_bets = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "t_3Bets")
+        stats.m_turnStatistics.m_3Bets = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "t_4Bets")
+        stats.m_turnStatistics.m_4Bets = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "r_hands")
+        stats.m_riverStatistics.m_hands = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "r_folds")
+        stats.m_riverStatistics.m_folds = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "r_checks")
+        stats.m_riverStatistics.m_checks = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "r_calls")
+        stats.m_riverStatistics.m_calls = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "r_raises")
+        stats.m_riverStatistics.m_raises = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "r_bets")
+        stats.m_riverStatistics.m_bets = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "r_3Bets")
+        stats.m_riverStatistics.m_3Bets = sqlite3_column_int(stmt, nCol);
+    else if (columnName == "r_4Bets")
+        stats.m_riverStatistics.m_4Bets = sqlite3_column_int(stmt, nCol);
 }
 } // namespace pkt::infra
