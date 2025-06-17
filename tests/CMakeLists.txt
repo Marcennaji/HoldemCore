@@ -14,6 +14,7 @@ add_executable(core_tests
     strategy/test_tight_aggressive.cpp
     range/RangeParserTest.cpp
     range/RangeRefinerTest.cpp
+    range/CardsInRangeTest.cpp
 )
 
 target_include_directories(core_tests
