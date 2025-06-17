@@ -8,6 +8,8 @@
 #include <core/interfaces/ILogger.h>
 #include <core/player/range/RangeRefiner.h>
 #include <core/player/strategy/CurrentHandContext.h>
+#include <string>
+#include <vector>
 
 namespace pkt::core::player
 {
@@ -37,26 +39,16 @@ string PreflopRangeEstimator::computeEstimatedPreflopRange(CurrentHandContext& c
     // range
     if (myHand->getPreflopRaisesNumber() == 0 && ctx.myPosition == BB)
     {
+        const float raiseFactor = (preflop.m_hands >= MIN_HANDS_STATISTICS_ACCURATE)
+                                      ? preflop.getPreflopRaise() * 0.8
+                                      : RangeEstimator::getStandardRaisingRange(nbPlayers) * 0.8;
 
-        myLogger->info("any cards except ");
-        if (preflop.m_hands >= MIN_HANDS_STATISTICS_ACCURATE)
-            myLogger->info(RangeEstimator::getStringRange(nbPlayers, preflop.getPreflopRaise() * 0.8));
-        else
-            myLogger->info(
-                RangeEstimator::getStringRange(nbPlayers, RangeEstimator::getStandardRaisingRange(nbPlayers) * 0.8));
-        myLogger->info("");
-
-        if (preflop.m_hands >= MIN_HANDS_STATISTICS_ACCURATE)
-            estimatedRange = RangeRefiner::deduceRange(
-                ANY_CARDS_RANGE, RangeEstimator::getStringRange(ctx.nbPlayers, preflop.getPreflopRaise() * 0.8));
-        else
-            estimatedRange = RangeRefiner::deduceRange(
-                ANY_CARDS_RANGE, RangeEstimator::getStringRange(
-                                     ctx.nbPlayers, RangeEstimator::getStandardRaisingRange(ctx.nbPlayers) * 0.8));
+        const string excludeRange = RangeEstimator::getStringRange(nbPlayers, raiseFactor);
+        myLogger->info("any cards except " + excludeRange + '\n');
+        estimatedRange = RangeRefiner::deduceRange(ANY_CARDS_RANGE, excludeRange);
     }
     else
     {
-
         // if the player is the last raiser :
         if (ctx.preflopLastRaiser && myPlayerId == ctx.preflopLastRaiser->getID())
             estimatedRange = computeEstimatedPreflopRangeFromLastRaiser(ctx);
@@ -164,216 +156,143 @@ std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(Cu
 
 std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromCaller(CurrentHandContext& ctx) const
 {
-    // the player is not the last raiser, but he has called a raise or limped in preflop
+    // The player is not the last raiser but has called a raise or limped in preflop
 
-    using std::cout;
     bool isTopRange = true;
-    std::vector<string> ranges;
+    std::vector<std::string> ranges;
     std::vector<float> rangesValues;
-    const int lastRaiserID = myHand->getPreflopLastRaiserID();
-    int opponentRaises = 0;
-    int opponentCalls = 0;
     const int nbPlayers = myHand->getActivePlayerList()->size();
     float range = 0;
 
-    for (std::vector<PlayerAction>::const_iterator i = ctx.myCurrentHandActions.getPreflopActions().begin();
-         i != ctx.myCurrentHandActions.getPreflopActions().end(); i++)
-    {
-        if (*i == PLAYER_ACTION_RAISE || *i == PLAYER_ACTION_ALLIN)
-            opponentRaises++;
-        else if (*i == PLAYER_ACTION_CALL)
-            opponentCalls++;
-    }
+    // Step 1: Analyze player actions
+    int raises = 0, calls = 0;
+    analyzePlayerActions(ctx, raises, calls);
 
+    float estimatedStartingRange = calculateStartingRange(ctx, nbPlayers);
+
+    range = adjustRangeForPosition(ctx, nbPlayers, estimatedStartingRange);
+
+    range = adjustRangeForPotOdds(ctx, range);
+
+    range = adjustRangeForPreflopRaises(ctx, raises, range);
+
+    range = handleLooseAggressiveOpponents(ctx, raises, range);
+
+    range = finalizeRange(range);
+
+    std::string rangeString = finalizeEstimatedRange(ctx, ranges, rangesValues, range, nbPlayers, isTopRange);
+
+    myLogger->info("Estimated range for player " + std::to_string(ctx.myID) + " is {" + rangeString + "}");
+    return rangeString;
+}
+void PreflopRangeEstimator::analyzePlayerActions(const CurrentHandContext& ctx, int& raises, int& calls) const
+{
+    for (const auto& action : ctx.myCurrentHandActions.getPreflopActions())
+    {
+        if (action == PLAYER_ACTION_RAISE || action == PLAYER_ACTION_ALLIN)
+            raises++;
+        else if (action == PLAYER_ACTION_CALL)
+            calls++;
+    }
+}
+float PreflopRangeEstimator::calculateStartingRange(const CurrentHandContext& ctx, int nbPlayers) const
+{
     float estimatedStartingRange = ctx.myStatistics.getPreflopStatistics().getVoluntaryPutMoneyInPot();
 
     if (ctx.myStatistics.getPreflopStatistics().m_hands < MIN_HANDS_STATISTICS_ACCURATE)
-    { // not enough hands, assume the opponent is an average tight player
+    {
         estimatedStartingRange = RangeEstimator::getStandardCallingRange(nbPlayers);
         myLogger->info(" [ not enough hands, getting the standard calling range ] ");
     }
 
     myLogger->info(" estimated starting range : " + std::to_string(estimatedStartingRange));
+    return estimatedStartingRange;
+}
+float PreflopRangeEstimator::adjustRangeForPosition(const CurrentHandContext& ctx, int nbPlayers,
+                                                    const float currentRange) const
+{
+    float range = currentRange;
 
     if (nbPlayers > 3)
-    { // adjust roughly the range giving the player's position
-
+    {
         if (ctx.myPosition == UTG || ctx.myPosition == UTG_PLUS_ONE || ctx.myPosition == UTG_PLUS_TWO)
-            estimatedStartingRange = estimatedStartingRange * 0.9;
+            range *= 0.9;
         else if (ctx.myPosition == BUTTON || ctx.myPosition == CUTOFF)
-            estimatedStartingRange = estimatedStartingRange * 1.4;
+            range *= 1.4;
     }
 
-    if (estimatedStartingRange > 100)
-        estimatedStartingRange = 100;
+    if (range > 100)
+        range = 100;
 
-    myLogger->info(", position adjusted starting range : " + std::to_string(estimatedStartingRange));
-
-    // adjust roughly, given the pot odd the player had preflop
+    myLogger->info("Position adjusted starting range : " + std::to_string(range));
+    return range;
+}
+float PreflopRangeEstimator::adjustRangeForPotOdds(const CurrentHandContext& ctx, const float currentRange) const
+{
     const int potOdd = ctx.potOdd;
+    float range = currentRange;
 
     if (potOdd > 70 && potOdd < 85)
-        estimatedStartingRange = estimatedStartingRange * 0.7;
+        range *= 0.7;
     else if (potOdd >= 85 && potOdd < 95)
-        estimatedStartingRange = estimatedStartingRange * 0.5;
+        range *= 0.5;
     else if (potOdd >= 95 && potOdd < 99)
-        estimatedStartingRange = estimatedStartingRange * 0.3;
+        range *= 0.3;
     else if (potOdd >= 99)
-        estimatedStartingRange = estimatedStartingRange * 0.1;
+        range *= 0.1;
     else if (potOdd <= 20 && myHand->getPreflopRaisesNumber() < 2)
-        estimatedStartingRange = 40;
+        range = 40;
 
-    myLogger->info(", pot odd adjusted starting range : " + std::to_string(estimatedStartingRange));
-
-    range = estimatedStartingRange;
-
-    if (myHand->getPreflopRaisesNumber() == 0 &&
-        ctx.myStatistics.getPreflopStatistics().m_hands >= MIN_HANDS_STATISTICS_ACCURATE)
-    { // limp
-
-        if (myHand->getRunningPlayerList()->size() > 3)
-            range = estimatedStartingRange -
-                    ctx.myStatistics.getPreflopStatistics()
-                        .getPreflopRaise(); // a hand suitable to call but not to raise ? or limp for deception
-        else
-            range = estimatedStartingRange;
-
-        if (range < 5)
-            range = 5;
-
-        myLogger->info(", limp range : " + std::to_string(range));
-    }
-    else
-
-        if (myHand->getPreflopRaisesNumber() == 1 &&
-            ctx.myStatistics.getPreflopStatistics().m_hands >= MIN_HANDS_STATISTICS_ACCURATE)
+    myLogger->info("Pot odd adjusted starting range : " + std::to_string(range));
+    return range;
+}
+float PreflopRangeEstimator::adjustRangeForPreflopRaises(const CurrentHandContext& ctx, int opponentRaises,
+                                                         const float currentRange) const
+{
+    float range = currentRange;
+    if (myHand->getPreflopRaisesNumber() == 0)
     {
-        range = estimatedStartingRange -
-                ctx.myStatistics.getPreflopStatistics().getPreflop3Bet(); // a hand suitable to call but not to 3-bet
-        if (range < 1)
-            range = 1;
-        myLogger->info(", single bet call range : " + std::to_string(range));
-        if (ctx.myStatistics.getPreflopStatistics().getVoluntaryPutMoneyInPot() -
-                ctx.myStatistics.getPreflopStatistics().getPreflopRaise() >
-            15)
-        {
-            // loose player
-            range = range / 2;
-            myLogger->info(", loose player adjusted range : " + std::to_string(range));
-        }
+        range = handleLimpRange(ctx, range);
     }
-    else
-
-        if (myHand->getPreflopRaisesNumber() == 2)
+    else if (myHand->getPreflopRaisesNumber() == 1)
     {
-
-        if (ctx.myStatistics.getPreflopStatistics().m_hands < MIN_HANDS_STATISTICS_ACCURATE)
-        { // not enough hands, assume the opponent is an average tight player
-            range = estimatedStartingRange / 3;
-
-            myLogger->info(", 3-bet call range : " + std::to_string(range));
-        }
-        else
-        {
-
-            if (opponentRaises == 1)
-            {
-                // if the player is being 3-betted
-                range = ctx.myStatistics.getPreflopStatistics().getPreflopRaise() *
-                        ctx.myStatistics.getPreflopStatistics().getPreflopCall3BetsFrequency() / 100;
-
-                // assume that the player will adapt his calling range to the raiser's 3-bet range
-                PreflopStatistics lastRaiserStats =
-                    ctx.preflopLastRaiser->getStatistics(ctx.nbPlayers).getPreflopStatistics();
-
-                if (range < lastRaiserStats.getPreflop3Bet() * 0.8)
-                    range = lastRaiserStats.getPreflop3Bet() * 0.8;
-
-                myLogger->info(", 3-bet call range : " + std::to_string(range));
-            }
-            else
-            {
-                // the player didn't raise the pot before, and there are already 2 raisers
-                range = ctx.myStatistics.getPreflopStatistics().getVoluntaryPutMoneyInPot() / 3;
-                myLogger->info(", 3-bet cold-call range : " + std::to_string(range));
-                myLogger->info("\t\t");
-            }
-        }
+        range = handleSingleRaiseRange(ctx, range);
     }
-    else
-
-        if (myHand->getPreflopRaisesNumber() > 2)
+    else if (myHand->getPreflopRaisesNumber() == 2)
     {
-
-        if (ctx.myStatistics.getPreflopStatistics().m_hands < MIN_HANDS_STATISTICS_ACCURATE)
-        { // not enough hands, assume the opponent is an average tight player
-            range = estimatedStartingRange / 5;
-
-            myLogger->info(", 4-bet call range : " + std::to_string(range));
-        }
-        else
-        {
-
-            if (opponentRaises > 0)
-            {
-                // if the player is facing a 4-bet, after having bet
-                range = (ctx.myStatistics.getPreflopStatistics().getPreflop3Bet() *
-                         ctx.myStatistics.getPreflopStatistics().getPreflopCall3BetsFrequency() / 100);
-                myLogger->info(", 4-bet call range : " + std::to_string(range));
-            }
-            else
-            {
-                // the player didn't raise the pot before, and there are already 3 raisers
-                range = ctx.myStatistics.getPreflopStatistics().getVoluntaryPutMoneyInPot() / 6;
-                myLogger->info(", 4-bet cold-call range : " + std::to_string(range));
-                myLogger->info("\t\t");
-            }
-        }
+        range = handleThreeBetRange(ctx, opponentRaises, range);
     }
-
-    if (myHand->getPreflopRaisesNumber() >= 2)
+    else if (myHand->getPreflopRaisesNumber() > 2)
     {
-
-        // adjust roughly, given the pot odd the player had preflop
-        if (potOdd > 70 && potOdd < 85)
-            range = range * 0.7;
-        else if (potOdd >= 85 && potOdd < 95)
-            range = range * 0.5;
-        else if (potOdd >= 95 && potOdd < 99)
-            range = range * 0.3;
-        else if (potOdd >= 99)
-            range = range * 0.1;
-        if (potOdd > 70)
-            myLogger->info(", 3-bet or more : readjusting range with the pot odd (" + std::to_string(potOdd) +
-                           ") : range is now " + std::to_string(range));
-        myLogger->info("\t\t");
+        range = handleFourBetOrMoreRange(ctx, opponentRaises, range);
     }
+    return range;
+}
+float PreflopRangeEstimator::handleLooseAggressiveOpponents(const CurrentHandContext& ctx, int opponentRaises,
+                                                            const float currentRange) const
+{
+    const int lastRaiserID = myHand->getPreflopLastRaiserID();
+    float range = currentRange;
 
-    // if the last raiser was being loose or agressive for 8 hands or so, adjust the range for the caller of a raise
     if (opponentRaises > 0 && lastRaiserID != -1 && myHand->getPreflopRaisesNumber() == 1)
     {
-
-        if (ctx.preflopLastRaiser->isInVeryLooseMode(nbPlayers))
+        if (ctx.preflopLastRaiser->isInVeryLooseMode(ctx.nbPlayers))
         {
-            if (nbPlayers > 6 && range < 20)
-            {
+            if (ctx.nbPlayers > 6 && range < 20)
                 range = 20;
-            }
-            else if (nbPlayers > 4 && range < 30)
-            {
+            else if (ctx.nbPlayers > 4 && range < 30)
                 range = 30;
-            }
-            else if (nbPlayers <= 4 && range < 40)
-            {
+            else if (ctx.nbPlayers <= 4 && range < 40)
                 range = 40;
-            }
-            myLogger->info("\t\toveragression detected from the raiser, setting calling range to " +
-                           std::to_string(range));
+
+            myLogger->info("Overagression detected from the raiser, setting calling range to " + std::to_string(range));
         }
     }
-
-    // add an error margin
-    range++;
+    return range;
+}
+float PreflopRangeEstimator::finalizeRange(const float currentRange) const
+{
+    float range = std::ceil(currentRange);
 
     if (range < 1)
         range = 1;
@@ -381,87 +300,131 @@ std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromCaller(Curren
     if (range > 100)
         range = 100;
 
-    if (potOdd < 75 && ctx.myStatistics.getPreflopStatistics().m_hands >= MIN_HANDS_STATISTICS_ACCURATE &&
-        ctx.myStatistics.getPreflopStatistics().getVoluntaryPutMoneyInPot() -
-                ctx.myStatistics.getPreflopStatistics().getPreflopRaise() <
-            10 &&
-        ctx.myStatistics.getPreflopStatistics().getPreflopRaise() > 5 && nbPlayers > 2)
-    {
-
-        if (opponentRaises == 0 && myHand->getPreflopRaisesNumber() == 0)
-        {
-            // the opponent limped
-            ranges.push_back(",QJo,JTo,T9o,98o,87o,76o,65o,QTo,KJo,KTo,");
-            rangesValues.push_back(9);
-            ranges.push_back(SUITED_CONNECTORS + ",QTs,J9s,");
-            rangesValues.push_back(SUITED_CONNECTORS_RANGE_VALUE + 0.6);
-            ranges.push_back(LOW_PAIRS);
-            rangesValues.push_back(LOW_PAIRS_RANGE_VALUE);
-            ranges.push_back(LOW_SUITED_ACES);
-            rangesValues.push_back(LOW_SUITED_ACES_RANGE_VALUE);
-            ranges.push_back(LOW_OFFSUITED_ACES);
-            rangesValues.push_back(LOW_OFFSUITED_ACES_RANGE_VALUE);
-            ranges.push_back(HIGH_OFFSUITED_CONNECTORS);
-            rangesValues.push_back(HIGH_OFFSUITED_CONNECTORS_RANGE_VALUE);
-            ranges.push_back(SUITED_ONE_GAPED);
-            rangesValues.push_back(SUITED_ONE_GAPED_RANGE_VALUE);
-            ranges.push_back(OFFSUITED_ONE_GAPED);
-            rangesValues.push_back(OFFSUITED_ONE_GAPED_RANGE_VALUE);
-            ranges.push_back(SUITED_TWO_GAPED);
-            rangesValues.push_back(SUITED_TWO_GAPED_RANGE_VALUE);
-            ranges.push_back(SUITED_BROADWAYS);
-            rangesValues.push_back(SUITED_BROADWAYS_RANGE_VALUE);
-            isTopRange = false;
-        }
-        else if (opponentRaises == 0 && myHand->getPreflopRaisesNumber() == 1 &&
-                 ctx.myStatistics.getPreflopStatistics().getPreflop3Bet() > 0)
-        {
-            // the opponent called a single standard bet
-            ranges.push_back(",77,88,99,87s,98s,T9s,JTs,");
-            rangesValues.push_back(2.6);
-            ranges.push_back(LOW_PAIRS);
-            rangesValues.push_back(LOW_PAIRS_RANGE_VALUE);
-            ranges.push_back(HIGH_OFFSUITED_CONNECTORS);
-            rangesValues.push_back(HIGH_OFFSUITED_CONNECTORS_RANGE_VALUE);
-            ranges.push_back(",66,TT,JJ,");
-            rangesValues.push_back(1.4);
-            ranges.push_back(SUITED_BROADWAYS);
-            rangesValues.push_back(SUITED_BROADWAYS_RANGE_VALUE);
-            ranges.push_back(",87s,98s,T9s,");
-            rangesValues.push_back(0.9);
-            ranges.push_back(",AQo,AJo,KQo,");
-            rangesValues.push_back(2.7);
-            ranges.push_back(LOW_SUITED_ACES);
-            rangesValues.push_back(LOW_SUITED_ACES_RANGE_VALUE);
-            ranges.push_back(HIGH_PAIRS);
-            rangesValues.push_back(HIGH_PAIRS_RANGE_VALUE); // hiding a strong hand is possible
-            ranges.push_back("AKo");
-            rangesValues.push_back(0.9);
-            ranges.push_back(HIGH_SUITED_ACES);
-            rangesValues.push_back(HIGH_SUITED_ACES_RANGE_VALUE);
-            ranges.push_back(SUITED_ONE_GAPED);
-            rangesValues.push_back(SUITED_ONE_GAPED_RANGE_VALUE);
-            ranges.push_back(OFFSUITED_ONE_GAPED);
-            rangesValues.push_back(OFFSUITED_ONE_GAPED_RANGE_VALUE);
-            ranges.push_back(SUITED_TWO_GAPED);
-            rangesValues.push_back(SUITED_TWO_GAPED_RANGE_VALUE);
-            ranges.push_back(OFFSUITED_BROADWAYS);
-            rangesValues.push_back(OFFSUITED_BROADWAYS_RANGE_VALUE);
-            isTopRange = false;
-        }
-    }
-
-    range = ceil(range);
-
-    myLogger->info("\t\testimated range is " + std::to_string(range) + " % ");
-
+    myLogger->info("Estimated range is " + std::to_string(range) + " % ");
+    return range;
+}
+std::string PreflopRangeEstimator::finalizeEstimatedRange(const CurrentHandContext& ctx,
+                                                          std::vector<std::string>& ranges,
+                                                          std::vector<float>& rangesValues, float range, int nbPlayers,
+                                                          bool isTopRange) const
+{
     if (!isTopRange)
     {
         myLogger->info(" [ not a top range ] ");
         return RangeEstimator::getFilledRange(ranges, rangesValues, range, nbPlayers);
     }
     else
+    {
         return RangeEstimator::getStringRange(nbPlayers, range);
+    }
+}
+
+float PreflopRangeEstimator::handleLimpRange(const CurrentHandContext& ctx, const float currentRange) const
+{
+    float range = currentRange;
+
+    if (myHand->getRunningPlayerList()->size() > 3)
+    {
+        range = currentRange - ctx.myStatistics.getPreflopStatistics().getPreflopRaise();
+        myLogger->info("Limp range adjusted for deception: " + std::to_string(range));
+    }
+    else
+    {
+        range = currentRange;
+    }
+
+    if (range < 5)
+        range = 5;
+
+    myLogger->info("Limp range : " + std::to_string(range));
+    return range;
+}
+float PreflopRangeEstimator::handleSingleRaiseRange(const CurrentHandContext& ctx, const float currentRange) const
+{
+
+    float range = currentRange - ctx.myStatistics.getPreflopStatistics().getPreflop3Bet();
+
+    if (range < 1)
+        range = 1;
+
+    myLogger->info("Single bet call range: " + std::to_string(range));
+
+    if (ctx.myStatistics.getPreflopStatistics().getVoluntaryPutMoneyInPot() -
+            ctx.myStatistics.getPreflopStatistics().getPreflopRaise() >
+        15)
+    {
+        // Loose player adjustment
+        range = range / 2;
+        myLogger->info("Loose player adjusted range: " + std::to_string(range));
+    }
+
+    return range;
+}
+float PreflopRangeEstimator::handleThreeBetRange(const CurrentHandContext& ctx, int opponentRaises,
+                                                 const float currentRange) const
+{
+
+    float range = currentRange;
+
+    if (ctx.myStatistics.getPreflopStatistics().m_hands < MIN_HANDS_STATISTICS_ACCURATE)
+    {
+        // Not enough hands, assume the opponent is an average tight player
+        range = currentRange / 3;
+        myLogger->info("3-bet call range (default): " + std::to_string(range));
+    }
+    else
+    {
+        if (opponentRaises == 1)
+        {
+            // Player is being 3-betted
+            range = ctx.myStatistics.getPreflopStatistics().getPreflopRaise() *
+                    ctx.myStatistics.getPreflopStatistics().getPreflopCall3BetsFrequency() / 100;
+
+            PreflopStatistics lastRaiserStats =
+                ctx.preflopLastRaiser->getStatistics(ctx.nbPlayers).getPreflopStatistics();
+
+            if (range < lastRaiserStats.getPreflop3Bet() * 0.8)
+                range = lastRaiserStats.getPreflop3Bet() * 0.8;
+
+            myLogger->info("3-bet call range: " + std::to_string(range));
+        }
+        else
+        {
+            // Cold-calling a 3-bet
+            range = ctx.myStatistics.getPreflopStatistics().getVoluntaryPutMoneyInPot() / 3;
+            myLogger->info("3-bet cold-call range: " + std::to_string(range));
+        }
+    }
+    return range;
+}
+float PreflopRangeEstimator::handleFourBetOrMoreRange(const CurrentHandContext& ctx, int opponentRaises,
+                                                      const float currentRange) const
+{
+    float range = currentRange;
+
+    if (ctx.myStatistics.getPreflopStatistics().m_hands < MIN_HANDS_STATISTICS_ACCURATE)
+    {
+        // Not enough hands, assume the opponent is an average tight player
+        range = currentRange / 5;
+        myLogger->info("4-bet call range (default): " + std::to_string(range));
+    }
+    else
+    {
+        if (opponentRaises > 0)
+        {
+            // Facing a 4-bet after having bet
+            range = ctx.myStatistics.getPreflopStatistics().getPreflop3Bet() *
+                    ctx.myStatistics.getPreflopStatistics().getPreflopCall3BetsFrequency() / 100;
+            myLogger->info("4-bet call range: " + std::to_string(range));
+        }
+        else
+        {
+            // Cold-calling a 4-bet
+            range = ctx.myStatistics.getPreflopStatistics().getVoluntaryPutMoneyInPot() / 6;
+            myLogger->info("4-bet cold-call range: " + std::to_string(range));
+        }
+    }
+    return range;
 }
 
 } // namespace pkt::core::player
