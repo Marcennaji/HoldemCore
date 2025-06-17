@@ -63,55 +63,32 @@ int IBotStrategy::computePreflopRaiseAmount(CurrentHandContext& ctx, bool determ
 
 bool IBotStrategy::shouldPotControl(CurrentHandContext& ctx, bool deterministic)
 {
-
     assert(ctx.gameState == GAME_STATE_FLOP || ctx.gameState == GAME_STATE_TURN);
 
-    bool potControl = false;
     const int bigBlind = ctx.smallBlind * 2;
+    const int potThreshold = (ctx.gameState == GAME_STATE_FLOP) ? bigBlind * 20 : bigBlind * 40;
+    bool potControl = false;
 
-    if (ctx.gameState == GAME_STATE_FLOP &&
-        !(ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() == ctx.myID && ctx.flopBetsOrRaisesNumber == 0))
+    if (ctx.pot >= potThreshold)
     {
+        if (ctx.myPostFlopState.IsPocketPair && !ctx.myPostFlopState.IsOverPair)
+            potControl = true;
 
-        if (ctx.pot >= bigBlind * 20)
+        if (ctx.myPostFlopState.IsFullHousePossible &&
+            !(ctx.myPostFlopState.IsTrips || ctx.myPostFlopState.IsFlush || ctx.myPostFlopState.IsFullHouse ||
+              ctx.myPostFlopState.IsQuads))
+            potControl = true;
+
+        if (ctx.gameState == GAME_STATE_FLOP)
         {
-
-            if (ctx.myPostFlopState.IsPocketPair && !ctx.myPostFlopState.IsOverPair)
-                potControl = true;
-
-            if (ctx.myPostFlopState.IsFullHousePossible &&
-                !(ctx.myPostFlopState.IsTrips || ctx.myPostFlopState.IsFlush || ctx.myPostFlopState.IsFullHouse ||
-                  ctx.myPostFlopState.IsQuads))
-                potControl = true;
-
             if ((ctx.myPostFlopState.IsOverPair || ctx.myPostFlopState.IsTopPair) && ctx.mySet > bigBlind * 20)
                 potControl = true;
         }
-    }
-    else
-
-        if (ctx.gameState == GAME_STATE_TURN)
-    {
-
-        if (ctx.pot >= bigBlind * 40)
+        else if (ctx.gameState == GAME_STATE_TURN)
         {
-
-            if (ctx.myPostFlopState.IsPocketPair && !ctx.myPostFlopState.IsOverPair)
-                potControl = true;
-
-            if (ctx.myPostFlopState.IsOverPair)
-                potControl = true;
-
-            if (ctx.myPostFlopState.IsFullHousePossible &&
-                !(ctx.myPostFlopState.IsTrips || ctx.myPostFlopState.IsFlush || ctx.myPostFlopState.IsFullHouse ||
-                  ctx.myPostFlopState.IsQuads))
-                potControl = true;
-
-            // 2 pairs
-            if (ctx.myPostFlopState.IsTwoPair && !ctx.myPostFlopState.IsFullHousePossible)
-                potControl = true;
-
-            if (ctx.myPostFlopState.IsTrips && ctx.mySet > bigBlind * 60)
+            if (ctx.myPostFlopState.IsOverPair ||
+                (ctx.myPostFlopState.IsTwoPair && !ctx.myPostFlopState.IsFullHousePossible) ||
+                (ctx.myPostFlopState.IsTrips && ctx.mySet > bigBlind * 60))
                 potControl = true;
         }
     }
