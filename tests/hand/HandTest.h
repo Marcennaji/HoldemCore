@@ -20,6 +20,7 @@ class HandTest : public ::testing::Test
     std::shared_ptr<pkt::core::EngineFactory> factory;
     std::shared_ptr<pkt::core::IHand> hand;
     std::shared_ptr<pkt::core::IBoard> board;
+    std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::Player>>> playerList;
 
     void SetUp() override;
 

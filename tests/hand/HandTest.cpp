@@ -10,6 +10,38 @@ using namespace pkt::core::player;
 namespace pkt::test
 {
 
+bool cardsAreUniqueAndValid(const std::shared_ptr<pkt::core::IHand>& hand,
+                            const std::shared_ptr<pkt::core::IBoard>& board,
+                            const pkt::core::player::PlayerList& players)
+{
+    std::vector<int> allCards;
+
+    // Collect board cards
+    int boardCards[5];
+    board->getCards(boardCards);
+    allCards.insert(allCards.end(), boardCards, boardCards + 5);
+
+    int cards[2];
+    // Collect players' hole cards
+    for (const auto& player : *players)
+    {
+        player->getCards(cards);
+        allCards.push_back(cards[0]);
+        allCards.push_back(cards[1]);
+    }
+
+    // Check range and uniqueness
+    std::set<int> cardSet;
+    for (int card : allCards)
+    {
+        if (card < 0 || card >= 52)
+            return false;
+        cardSet.insert(card);
+    }
+
+    return cardSet.size() == allCards.size();
+}
+
 void HandTest::SetUp()
 {
     factory = std::make_shared<EngineFactory>(events);
@@ -38,12 +70,12 @@ PlayerList HandTest::createPlayerList(size_t playerCount)
 void HandTest::initializeHandWithPlayers(PlayerList seatsList, size_t activePlayerCount)
 {
     // Create the active player list by selecting the first `activePlayerCount` players from the seats list
-    PlayerList activePlayerList = std::make_shared<std::list<std::shared_ptr<Player>>>(
-        seatsList->begin(), std::next(seatsList->begin(), activePlayerCount));
+    playerList = std::make_shared<std::list<std::shared_ptr<Player>>>(seatsList->begin(),
+                                                                      std::next(seatsList->begin(), activePlayerCount));
 
     board = factory->createBoard(1);
     // Create the Hand object with nullptrs for irrelevant parameters
-    hand = factory->createHand(factory, board, seatsList, activePlayerList, activePlayerList, 0,
+    hand = factory->createHand(factory, board, seatsList, playerList, playerList, 0,
                                static_cast<int>(activePlayerCount), 1, 10, 1000);
 }
 
@@ -58,4 +90,66 @@ TEST_F(HandTest, DealBoardCardsAndHoleCards_NoOverlap_2Players)
     hand->getBoard()->getCards(boardCards);
     ASSERT_EQ(sizeof(boardCards) / sizeof(boardCards[0]), 5);
 }
+
+TEST_F(HandTest, DealBoardCardsAndHoleCards_NoOverlap_2Players_FullTest)
+{
+    initializeHandForTesting(2);
+    hand->dealHoleCards(hand->dealBoardCards());
+    ASSERT_TRUE(cardsAreUniqueAndValid(hand, board, playerList));
+}
+
+TEST_F(HandTest, DealBoardCardsAndHoleCards_NoOverlap_3Players)
+{
+    initializeHandForTesting(3);
+    hand->dealHoleCards(hand->dealBoardCards());
+    ASSERT_TRUE(cardsAreUniqueAndValid(hand, board, playerList));
+}
+
+TEST_F(HandTest, DealBoardCardsAndHoleCards_NoOverlap_1Player)
+{
+    initializeHandForTesting(1);
+    hand->dealHoleCards(hand->dealBoardCards());
+    ASSERT_TRUE(cardsAreUniqueAndValid(hand, board, playerList));
+}
+
+TEST_F(HandTest, DealBoardCardsAndHoleCards_NoOverlap_MaxPlayers)
+{
+    initializeHandForTesting(MAX_NUMBER_OF_PLAYERS);
+    hand->dealHoleCards(hand->dealBoardCards());
+    ASSERT_TRUE(cardsAreUniqueAndValid(hand, board, playerList));
+}
+
+TEST_F(HandTest, AllDealtCards_AreWithinValidRange_4Players)
+{
+    initializeHandForTesting(4);
+    hand->dealHoleCards(hand->dealBoardCards());
+
+    int boardCards[5];
+    board->getCards(boardCards);
+    for (int card : boardCards)
+    {
+        ASSERT_GE(card, 0);
+        ASSERT_LT(card, 52);
+    }
+    int cards[2];
+    for (const auto& player : *playerList)
+    {
+        player->getCards(cards);
+        ASSERT_GE(cards[0], 0);
+        ASSERT_LT(cards[0], 52);
+        ASSERT_GE(cards[1], 0);
+        ASSERT_LT(cards[1], 52);
+    }
+}
+
+TEST_F(HandTest, DealCards_NoOverlap_OverMultipleRounds)
+{
+    for (int i = 0; i < 500; ++i)
+    {
+        initializeHandForTesting(6);
+        hand->dealHoleCards(hand->dealBoardCards());
+        ASSERT_TRUE(cardsAreUniqueAndValid(hand, board, playerList));
+    }
+}
+
 } // namespace pkt::test
