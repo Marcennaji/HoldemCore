@@ -22,12 +22,15 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b, PlayerList sl,
-           PlayerList apl, PlayerList rpl, int id, int sP, unsigned dP, int sB, int sC)
-    : myFactory(f), myBoard(b), seatsList(sl), activePlayerList(apl), runningPlayerList(rpl), myBettingRound(0),
-      myID(id), startQuantityPlayers(sP), dealerPosition(dP), smallBlindPosition(dP), bigBlindPosition(dP),
-      currentRound(GAME_STATE_PREFLOP), roundBeforePostRiver(GAME_STATE_PREFLOP), smallBlind(sB), startCash(sC),
-      previousPlayerID(-1), lastActionPlayerID(0), allInCondition(false), cardsShown(false), myEvents(events)
+Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
+           pkt::core::player::PlayerList seats, PlayerList activePlayers, PlayerList runningPlayers, int handId,
+           GameData gameData, StartData startData)
+    : myEvents(events), myFactory(factory), myBoard(board), seatsList(seats), activePlayerList(activePlayers),
+      runningPlayerList(runningPlayers), startQuantityPlayers(startData.numberOfPlayers),
+      dealerPosition(startData.startDealerPlayerId), smallBlindPosition(startData.startDealerPlayerId),
+      bigBlindPosition(startData.startDealerPlayerId), currentRound(GAME_STATE_PREFLOP),
+      roundBeforePostRiver(GAME_STATE_PREFLOP), smallBlind(gameData.firstSmallBlind), startCash(gameData.startMoney),
+      previousPlayerID(-1), lastActionPlayerID(0), allInCondition(false), cardsShown(false)
 {
 
     GlobalServices::instance().logger()->info("\n-------------------------------------------------------------\n");

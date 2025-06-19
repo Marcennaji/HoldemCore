@@ -6,6 +6,8 @@
 
 #include "EngineFactory.h"
 #include "Player.h"
+#include "core/engine/model/GameData.h"
+#include "core/engine/model/StartData.h"
 #include "core/interfaces/IBettingRound.h"
 #include "core/interfaces/IBoard.h"
 #include "core/interfaces/IHand.h"
@@ -18,8 +20,9 @@ namespace pkt::core
 class Hand : public IHand
 {
   public:
-    Hand(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard>, pkt::core::player::PlayerList,
-         pkt::core::player::PlayerList, pkt::core::player::PlayerList, int, int, unsigned, int, int);
+     Hand(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard>, pkt::core::player::PlayerList,
+         pkt::core::player::PlayerList, pkt::core::player::PlayerList, int handId, GameData gameData,
+         StartData startData);
     ~Hand();
 
     void start();

@@ -23,7 +23,7 @@ Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, con
     : myFactory(factory), myEvents(events), startQuantityPlayers(startData.numberOfPlayers),
       startCash(gameData.startMoney), startSmallBlind(gameData.firstSmallBlind), myGameID(gameId),
       currentSmallBlind(gameData.firstSmallBlind), currentHandID(0), dealerPosition(0), lastHandBlindsRaised(1),
-      lastTimeBlindsRaised(0), myGameData(gameData)
+      lastTimeBlindsRaised(0), myGameData(gameData), myStartData(startData)
 {
     dealerPosition = startData.startDealerPlayerId;
 
@@ -109,9 +109,8 @@ void Game::initHand()
     (*runningPlayerList) = (*activePlayerList);
 
     // create Hand
-    currentHand =
-        myFactory->createHand(myFactory, currentBoard, seatsList, activePlayerList, runningPlayerList, currentHandID,
-                              startQuantityPlayers, dealerPosition, currentSmallBlind, startCash);
+    currentHand = myFactory->createHand(myFactory, currentBoard, seatsList, activePlayerList, runningPlayerList,
+                                        currentHandID, myGameData, myStartData);
 
     bool nextDealerFound = false;
     PlayerListConstIterator dealerPositionIt = currentHand->getSeatIt(dealerPosition);

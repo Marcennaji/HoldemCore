@@ -29,10 +29,9 @@ EngineFactory::~EngineFactory()
 
 std::shared_ptr<IHand> EngineFactory::createHand(std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
                                                  pkt::core::player::PlayerList sl, pkt::core::player::PlayerList apl,
-                                                 pkt::core::player::PlayerList rpl, int id, int sP, int dP, int sB,
-                                                 int sC)
+                                                 pkt::core::player::PlayerList rpl, int id, GameData gd, StartData sd)
 {
-    return std::shared_ptr<IHand>(new Hand(myEvents, f, b, sl, apl, rpl, id, sP, dP, sB, sC));
+    return std::shared_ptr<IHand>(new Hand(myEvents, f, b, sl, apl, rpl, id, gd, sd));
 }
 
 std::shared_ptr<IBoard> EngineFactory::createBoard(unsigned dp)

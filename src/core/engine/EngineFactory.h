@@ -6,6 +6,8 @@
 
 #include "EngineFactory.h"
 
+#include "core/engine/model/GameData.h"
+#include "core/engine/model/StartData.h"
 #include "core/interfaces/IBoard.h"
 #include "core/interfaces/IHand.h"
 
@@ -26,8 +28,7 @@ class EngineFactory
 
     virtual std::shared_ptr<IHand> createHand(std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
                                               pkt::core::player::PlayerList sl, pkt::core::player::PlayerList apl,
-                                              pkt::core::player::PlayerList rpl, int id, int sP, int dP, int sB,
-                                              int sC);
+                                              pkt::core::player::PlayerList rpl, int id, GameData, StartData);
     virtual std::shared_ptr<IBoard> createBoard(unsigned dp);
     virtual std::vector<std::shared_ptr<IBettingRound>> createBettingRound(IHand* hi, unsigned dP, int sB);
 

@@ -1,5 +1,7 @@
 #include "HandTest.h"
 #include "DummyPlayer.h"
+#include "core/engine/model/GameData.h"
+#include "core/engine/model/StartData.h"
 
 #include <gtest/gtest.h>
 #include <memory>
@@ -54,29 +56,35 @@ void HandTest::TearDown()
 void HandTest::initializeHandForTesting(size_t activePlayerCount)
 {
     hand.reset();
-    core::player::PlayerList seatsList = createPlayerList(activePlayerCount);
-    initializeHandWithPlayers(seatsList, activePlayerCount);
+    createPlayerList(activePlayerCount);
+    initializeHandWithPlayers(activePlayerCount);
 }
 
-PlayerList HandTest::createPlayerList(size_t playerCount)
+void HandTest::createPlayerList(size_t playerCount)
 {
-    auto playerList = std::make_shared<std::list<std::shared_ptr<Player>>>();
+    playerList = std::make_shared<std::list<std::shared_ptr<Player>>>();
     for (size_t i = 0; i < playerCount; ++i)
     {
-        playerList->push_back(std::make_shared<DummyPlayer>(i + 1, events));
+        playerList->push_back(std::make_shared<DummyPlayer>(i, events));
     }
-    return playerList;
 }
-void HandTest::initializeHandWithPlayers(PlayerList seatsList, size_t activePlayerCount)
+void HandTest::initializeHandWithPlayers(size_t activePlayerCount)
 {
     // Create the active player list by selecting the first `activePlayerCount` players from the seats list
-    playerList = std::make_shared<std::list<std::shared_ptr<Player>>>(seatsList->begin(),
-                                                                      std::next(seatsList->begin(), activePlayerCount));
 
     board = factory->createBoard(1);
-    // Create the Hand object with nullptrs for irrelevant parameters
-    hand = factory->createHand(factory, board, seatsList, playerList, playerList, 0,
-                               static_cast<int>(activePlayerCount), 1, 10, 1000);
+
+    GameData gameData;
+    gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
+    gameData.startMoney = 1000;
+    gameData.firstSmallBlind = 10;
+    gameData.tableProfile = TableProfile::RANDOM_OPPONENTS;
+
+    StartData startData;
+    startData.startDealerPlayerId = 0;
+    startData.numberOfPlayers = static_cast<int>(activePlayerCount);
+
+    hand = factory->createHand(factory, board, playerList, playerList, playerList, 0, gameData, startData);
 }
 
 TEST_F(HandTest, DealBoardCardsAndHoleCards_NoOverlap_2Players)

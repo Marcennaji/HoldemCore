@@ -93,7 +93,8 @@ class Game
     unsigned dealerPosition;
     int lastHandBlindsRaised;
     int lastTimeBlindsRaised;
-    const GameData myGameData;
+    GameData myGameData;
+    StartData myStartData;
     std::list<int> blindsList;
 };
 

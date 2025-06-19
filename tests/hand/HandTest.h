@@ -30,7 +30,7 @@ class HandTest : public ::testing::Test
 
   private:
     // Helper function to create a PlayerList with mock players
-    core::player::PlayerList createPlayerList(size_t playerCount);
-    void initializeHandWithPlayers(core::player::PlayerList seatsList, size_t activePlayerCount);
+    void createPlayerList(size_t playerCount);
+    void initializeHandWithPlayers(size_t activePlayerCount);
 };
 } // namespace pkt::test
