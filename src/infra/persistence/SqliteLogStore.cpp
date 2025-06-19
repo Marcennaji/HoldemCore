@@ -253,7 +253,7 @@ int SqliteLogStore::getIntegerValue(const std::string playerName, const std::str
         if (sqlite3_get_table(mySqliteLogDb, sql_select.c_str(), &result_Player, &nRow_Player, &nCol_Player, &errmsg) !=
             SQLITE_OK)
         {
-            cout << "Error in statement: " << sql_select.c_str() << "[" << errmsg << "]." << endl;
+            myLogger->error("Error in statement: " + sql_select + "[" + errmsg + "].");
         }
         else
         {
@@ -263,9 +263,8 @@ int SqliteLogStore::getIntegerValue(const std::string playerName, const std::str
             }
             else
             {
-                cout << "Warning : no data for player " << playerName << " in table " << tableName
-                     << ". SQL query was :\n"
-                     << sql_select << endl;
+                myLogger->info("no data for player " + playerName + " in table " + tableName);
+                myLogger->info("SQL query was :\n" + sql_select);
             }
         }
         sqlite3_free_table(result_Player);
@@ -333,7 +332,7 @@ void SqliteLogStore::updateUnplausibleHand(const std::string card1, const std::s
         sql_select += " AND human_player = " + std::to_string(human) + ";";
         if (sqlite3_get_table(mySqliteLogDb, sql_select.c_str(), &result, &nRow, &nCol, &errmsg) != SQLITE_OK)
         {
-            cout << "Error in statement: " << sql_select.c_str() << "[" << errmsg << "]." << endl;
+            myLogger->error("Error in statement: " + sql_select + "[" + errmsg + "].");
         }
         else
         {
@@ -376,7 +375,7 @@ void SqliteLogStore::exec_transaction()
     // cout << endl << "SQL : " << sql_transaction << endl << endl;
     if (sqlite3_exec(mySqliteLogDb, sql_transaction.c_str(), 0, 0, &errmsg) != SQLITE_OK)
     {
-        cout << "Error in statement: " << sql_transaction.c_str() << "[" << errmsg << "]." << endl;
+        myLogger->error("Error in statement: " + sql_transaction + "[" + errmsg + "].");
         sqlite3_free(errmsg);
         errmsg = NULL;
     }

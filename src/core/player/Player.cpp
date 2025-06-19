@@ -816,7 +816,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 
         if ((*i).size() != 4)
         {
-            cout << "invalid hand : " << (*i) << endl;
+            myLogger->error("invalid hand : " + (*i));
             continue;
         }
         string s1 = (*i).substr(0, 2);
@@ -846,13 +846,12 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 
     for (vector<std::string>::const_iterator i = newRanges.begin(); i != newRanges.end(); i++)
     {
-        // cout << (*i) << endl;
         if (RankHand(((*i) + board).c_str()) > myRank)
             nbWinningHands++;
     }
     if (ranges.size() == 0)
     {
-        cout << "Error : no ranges for opponent " << opponentId << endl;
+        myLogger->error("no ranges for opponent " + std::to_string(opponentId));
         return 0;
     }
     assert(nbWinningHands / ranges.size() <= 1.0);
@@ -886,20 +885,6 @@ void Player::logUnplausibleHands(GameState g)
         label = "river";
         bettingRound = 'R';
     }
-    // during dev phase : if some hands are not part of the estimated starting range for this player, insert them in a
-    // database, for auditing purposes
-    if (!isCardsInRange(myCard1, myCard2, myRangeEstimator->getEstimatedRange()))
-    {
-        std::cout << endl
-                  << "\t" << myCard1 << " " << myCard2 << " isn't part of the plausible " << label << " range :\t"
-                  << myRangeEstimator->getEstimatedRange() << endl;
-        currentHand->getHandAuditStore()->updateUnplausibleHand(myCard1, myCard2, (myID == 0 ? true : false),
-                                                                bettingRound, nbPlayers);
-    }
-    else
-        std::cout << endl
-                  << "\t" << myCard1 << " " << myCard2 << " is part of the plausible " << label << " range :\t"
-                  << myRangeEstimator->getEstimatedRange() << endl;
 }
 
 std::map<int, float> Player::evaluateOpponentsStrengths() const

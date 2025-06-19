@@ -211,8 +211,6 @@ void Hand::assignButtons()
     {
         throw Exception(__FILE__, __LINE__, EngineError::NEXT_ACTIVE_PLAYER_NOT_FOUND);
     }
-
-    //        cout << "lAP-Button: " << lastActionPlayer << endl;
 }
 
 void Hand::setBlinds()

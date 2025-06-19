@@ -96,10 +96,7 @@ std::string RangeEstimator::getStringRange(int nbPlayers, int range)
 {
 
     if (range > 100)
-    { // should never happen, but...
-        cout << "warning : bad range in getStringRange : " << range << endl;
         range = 100;
-    }
 
     if (nbPlayers == 2)
         return TOP_RANGE_2_PLAYERS[range];

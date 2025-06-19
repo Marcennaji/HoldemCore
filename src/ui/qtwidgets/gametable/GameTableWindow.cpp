@@ -1010,7 +1010,6 @@ void GameTableWindow::dealBettingRoundCards(int myBettingRoundID)
     break;
     default:
     {
-        cout << "dealBettingRoundCards() Error" << endl;
     }
     }
 }
@@ -2078,7 +2077,6 @@ void GameTableWindow::bettingRoundAnimation(int myBettingRoundID)
     break;
     default:
     {
-        cout << "bettingRoundAnimation() Error" << endl;
     }
     }
 }

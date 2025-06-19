@@ -10,7 +10,6 @@ add_library(engine ${ENGINE_SOURCES})
 # Include directories for engine
 target_include_directories(engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/../events
 )
 
 # Link engine to core
