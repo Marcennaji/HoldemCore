@@ -8,11 +8,11 @@
 #include <core/engine/Randomizer.h>
 #include <core/engine/model/Ranges.h>
 #include <core/interfaces/IHand.h>
-#include <core/interfaces/ILogger.h>
 #include <core/interfaces/persistence/IHandAuditStore.h>
 #include <core/interfaces/persistence/IPlayersStatisticsStore.h>
 #include <core/player/range/RangeParser.h>
 #include <core/player/strategy/CurrentHandContext.h>
+#include <core/services/GlobalServices.h>
 #include <third_party/psim/psim.hpp>
 #include "Helpers.h"
 
@@ -23,14 +23,12 @@ namespace pkt::core::player
 
 using namespace std;
 
-Player::Player(const GameEvents& events, ILogger* logger, IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id,
-               std::string name, int sC, bool aS, int mB)
-    : myHandAuditStore(ha), myPlayersStatisticsStore(ps), currentHand(0), myID(id), myName(name), myCardsValueInt(0),
-      myCash(sC), mySet(0), myLastRelativeSet(0), myAction(PLAYER_ACTION_NONE), myButton(mB), myActiveStatus(aS),
-      myTurn(0), myCardsFlip(0), myRoundStartCash(0), lastMoneyWon(0), m_isSessionActive(false), myEvents(events),
-      myLogger(logger)
+Player::Player(const GameEvents& events, int id, std::string name, int sC, bool aS, int mB)
+    : currentHand(0), myID(id), myName(name), myCardsValueInt(0), myCash(sC), mySet(0), myLastRelativeSet(0),
+      myAction(PLAYER_ACTION_NONE), myButton(mB), myActiveStatus(aS), myTurn(0), myCardsFlip(0), myRoundStartCash(0),
+      lastMoneyWon(0), m_isSessionActive(false), myEvents(events)
 {
-    myRangeEstimator = std::make_unique<RangeEstimator>(myID, myPlayersStatisticsStore, myLogger);
+    myRangeEstimator = std::make_unique<RangeEstimator>(myID);
     myCurrentHandContext = std::make_unique<CurrentHandContext>();
     loadStatistics();
 
@@ -549,9 +547,9 @@ void Player::loadStatistics()
 {
 
     resetPlayerStatistics(); // reset stats to 0
-    if (myPlayersStatisticsStore)
-        myStatistics = myPlayersStatisticsStore->getPlayerStatistics(myName);
-    else
+
+    myStatistics = GlobalServices::instance().playersStatisticsStore()->getPlayerStatistics(myName);
+    if (myStatistics.empty())
         myStatistics.fill(PlayerStatistics());
 }
 
@@ -650,8 +648,9 @@ int Player::getPotOdd() const
 
     if (pot == 0)
     { // shouldn't happen, but...
-        myLogger->error("Pot = " + std::to_string(currentHand->getBoard()->getPot()) + " + " +
-                        std::to_string(currentHand->getBoard()->getSets()) + " = " + std::to_string(pot));
+        GlobalServices::instance().logger()->error("Pot = " + std::to_string(currentHand->getBoard()->getPot()) +
+                                                   " + " + std::to_string(currentHand->getBoard()->getSets()) + " = " +
+                                                   std::to_string(pot));
         return 0;
     }
 
@@ -712,7 +711,7 @@ const SimResults Player::getHandSimulation() const
         logMessage << "\t\tpot odd is " << getPotOdd() << std::endl;
     }
 
-    myLogger->info(logMessage.str());
+    GlobalServices::instance().logger()->info(logMessage.str());
     if (r.winRanged == 0)
         r.winRanged = r.win / 4;
 
@@ -816,7 +815,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 
         if ((*i).size() != 4)
         {
-            myLogger->error("invalid hand : " + (*i));
+            GlobalServices::instance().logger()->error("invalid hand : " + (*i));
             continue;
         }
         string s1 = (*i).substr(0, 2);
@@ -851,7 +850,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
     }
     if (ranges.size() == 0)
     {
-        myLogger->error("no ranges for opponent " + std::to_string(opponentId));
+        GlobalServices::instance().logger()->error("no ranges for opponent " + std::to_string(opponentId));
         return 0;
     }
     assert(nbWinningHands / ranges.size() <= 1.0);

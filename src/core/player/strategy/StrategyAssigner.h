@@ -10,7 +10,7 @@ namespace pkt::core::player
 class StrategyAssigner
 {
   public:
-    StrategyAssigner(TableProfile profile, int botCount, ILogger* logger);
+    StrategyAssigner(TableProfile profile, int botCount);
 
     std::unique_ptr<IBotStrategy> chooseStrategyFor(int botIndex);
 
@@ -21,7 +21,6 @@ class StrategyAssigner
     int countTight = 0;
     int countUltraTight = 0;
     int maxPerType;
-    ILogger* myLogger;
 };
 
 } // namespace pkt::core::player

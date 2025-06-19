@@ -8,9 +8,9 @@
 #include <core/engine/model/EngineError.h>
 #include <core/engine/model/Ranges.h>
 #include <core/interfaces/IHand.h>
-#include <core/interfaces/ILogger.h>
 #include <core/player/Helpers.h>
 #include <core/player/strategy/CurrentHandContext.h>
+#include <core/services/GlobalServices.h>
 #include "Exception.h"
 
 #include <fstream>
@@ -23,7 +23,7 @@ namespace pkt::core::player
 
 using namespace std;
 
-TightAggressiveBotStrategy::TightAggressiveBotStrategy(ILogger* myLogger) : IBotStrategy(myLogger)
+TightAggressiveBotStrategy::TightAggressiveBotStrategy() : IBotStrategy()
 {
     setStrategyName("TightAggressive");
 
@@ -68,7 +68,8 @@ bool TightAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool
 
         stringCallingRange += HIGH_SUITED_CONNECTORS;
 
-        myLogger->info("\t\tTAG adding high suited connectors to the initial calling range.");
+        GlobalServices::instance().logger()->info(
+            "\t\tTAG adding high suited connectors to the initial calling range.");
     }
 
     // defend against 3bet bluffs :
@@ -86,12 +87,12 @@ bool TightAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool
             stringCallingRange += HIGH_SUITED_ACES;
             stringCallingRange += PAIRS;
 
-            myLogger->info(
+            GlobalServices::instance().logger()->info(
                 "\t\tTAG defending against 3-bet : adding high suited connectors, high suited aces and pairs to "
                 "the initial calling range.");
         }
     }
-    myLogger->info("\t\tTAG final calling range : " + stringCallingRange);
+    GlobalServices::instance().logger()->info("\t\tTAG final calling range : " + stringCallingRange);
 
     return isCardsInRange(ctx.myCard1, ctx.myCard2, stringCallingRange);
 }
@@ -122,7 +123,7 @@ int TightAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
 
     stringRaisingRange = RANGES_STRING[(int) raisingRange];
 
-    myLogger->info(stringRaisingRange);
+    GlobalServices::instance().logger()->info(stringRaisingRange);
 
     // determine when to 3-bet without a real hand
     bool speculativeHandedAdded = false;
@@ -149,7 +150,7 @@ int TightAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
                 if (!deterministic && rand == 2)
                 {
                     speculativeHandedAdded = true;
-                    myLogger->info("\t\tTAG trying to steal this bet");
+                    GlobalServices::instance().logger()->info("\t\tTAG trying to steal this bet");
                 }
             }
             else
@@ -160,7 +161,8 @@ int TightAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
                 {
 
                     speculativeHandedAdded = true;
-                    myLogger->info("\t\tTAG adding this speculative hand to our initial raising range");
+                    GlobalServices::instance().logger()->info(
+                        "\t\tTAG adding this speculative hand to our initial raising range");
                 }
             }
         }
@@ -181,7 +183,7 @@ int TightAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
         Randomizer::GetRand(1, 8, 1, &rand);
         if (!deterministic && rand == 1)
         {
-            myLogger->info("\t\twon't raise, to hide the hand strength");
+            GlobalServices::instance().logger()->info("\t\twon't raise, to hide the hand strength");
             myShouldCall = true;
             return 0;
         }

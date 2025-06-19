@@ -8,7 +8,7 @@
 #include <core/engine/EngineDefs.h>
 #include <core/engine/model/PlayerStatistics.h>
 #include <core/interfaces/IHand.h>
-#include <core/interfaces/ILogger.h>
+
 #include "CurrentHandActions.h"
 #include "range/RangeEstimator.h"
 #include "strategy/CurrentHandContext.h"
@@ -25,8 +25,6 @@
 namespace pkt::core
 {
 class IHand;
-class IHandAuditStore;
-class IPlayersStatisticsStore;
 
 } // namespace pkt::core
 
@@ -53,8 +51,7 @@ static int outsOddsTwoCard[] = {
 class Player
 {
   public:
-    Player(const GameEvents&, ILogger*, IHandAuditStore*, IPlayersStatisticsStore*, int id, std::string name, int sC,
-           bool aS, int mB);
+    Player(const GameEvents&, int id, std::string name, int sC, bool aS, int mB);
 
     virtual ~Player() = default;
 
@@ -158,8 +155,6 @@ class Player
 
     // attributes
 
-    IHandAuditStore* myHandAuditStore;
-    IPlayersStatisticsStore* myPlayersStatisticsStore;
     IHand* currentHand;
     const GameEvents& myEvents;
 
@@ -191,7 +186,6 @@ class Player
     int lastMoneyWon;
     int myPreflopPotOdd;
     std::unique_ptr<RangeEstimator> myRangeEstimator;
-    ILogger* myLogger;
 
     bool m_isSessionActive;
 };

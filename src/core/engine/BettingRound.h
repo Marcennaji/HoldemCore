@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <core/interfaces/ILogger.h>
 #include "core/interfaces/IBettingRound.h"
 #include "core/interfaces/IHand.h"
 
@@ -15,7 +14,7 @@ class GameEvents;
 class BettingRound : public IBettingRound
 {
   public:
-    BettingRound(const GameEvents&, ILogger* logger, IHand* hi, unsigned dP, int sB, GameState gS);
+    BettingRound(const GameEvents&, IHand* hi, unsigned dP, int sB, GameState gS);
     ~BettingRound();
 
     GameState getBettingRoundID() const;
@@ -73,7 +72,6 @@ class BettingRound : public IBettingRound
     int getSmallBlind() const;
 
     const GameEvents& myEvents;
-    ILogger* myLogger;
 
   private:
     // helpers

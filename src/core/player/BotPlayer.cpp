@@ -4,6 +4,7 @@
 #include "BotPlayer.h"
 #include <core/player/strategy/CurrentHandContext.h>
 #include <core/player/strategy/IBotStrategy.h>
+#include <core/services/GlobalServices.h>
 #include "core/player/strategy/CurrentHandContext.h"
 
 #include <sstream>
@@ -16,9 +17,8 @@ namespace pkt::core::player
 
 using namespace std;
 
-BotPlayer::BotPlayer(const GameEvents& events, ILogger* myLogger, IHandAuditStore* ha, IPlayersStatisticsStore* ps,
-                     int id, std::string name, int sC, bool aS, int mB)
-    : Player(events, myLogger, ha, ps, id, name, sC, aS, mB)
+BotPlayer::BotPlayer(const GameEvents& events, int id, std::string name, int sC, bool aS, int mB)
+    : Player(events, id, name, sC, aS, mB)
 {
 }
 
@@ -79,7 +79,7 @@ void BotPlayer::action()
         logMessage << "undefined ?";
 
     logMessage << "\n---------------------------------------------------------------------------------\n\n";
-    myLogger->info(logMessage.str());
+    GlobalServices::instance().logger()->info(logMessage.str());
 
     currentHand->setPreviousPlayerID(myID);
 
@@ -101,7 +101,7 @@ void BotPlayer::doPreflopAction()
                << "\tpreflop raise : "
                << getStatistics(myCurrentHandContext->nbPlayers).getPreflopStatistics().getPreflopRaise() << " % "
                << "\n";
-    myLogger->info(logMessage.str());
+    GlobalServices::instance().logger()->info(logMessage.str());
 
     myBetAmount = 0;
     bool shouldCall = myStrategy->preflopShouldCall(*myCurrentHandContext);
@@ -151,7 +151,7 @@ void BotPlayer::doFlopAction()
                << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
                << "\tPFR : " << getStatistics(myCurrentHandContext->nbPlayers).getPreflopStatistics().getPreflopRaise()
                << "\n";
-    myLogger->info(logMessage.str());
+    GlobalServices::instance().logger()->info(logMessage.str());
 
     myBetAmount = myStrategy->flopShouldBet(*myCurrentHandContext);
     bool shouldCall = myBetAmount ? false : myStrategy->flopShouldCall(*myCurrentHandContext);
@@ -197,7 +197,7 @@ void BotPlayer::doTurnAction()
                << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
                << "\tPFR : " << getStatistics(myCurrentHandContext->nbPlayers).getPreflopStatistics().getPreflopRaise()
                << "\n";
-    myLogger->info(logMessage.str());
+    GlobalServices::instance().logger()->info(logMessage.str());
 
     myBetAmount = myStrategy->turnShouldBet(*myCurrentHandContext);
     bool shouldCall = myBetAmount ? false : myStrategy->turnShouldCall(*myCurrentHandContext);
@@ -243,7 +243,7 @@ void BotPlayer::doRiverAction()
                << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
                << "\tPFR : " << getStatistics(myCurrentHandContext->nbPlayers).getPreflopStatistics().getPreflopRaise()
                << "\n";
-    myLogger->info(logMessage.str());
+    GlobalServices::instance().logger()->info(logMessage.str());
 
     myBetAmount = myStrategy->riverShouldBet(*myCurrentHandContext);
     bool shouldCall = myBetAmount ? false : myStrategy->riverShouldCall(*myCurrentHandContext);

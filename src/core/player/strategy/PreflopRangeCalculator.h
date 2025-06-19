@@ -2,7 +2,6 @@
 
 #include <core/engine/model/PlayerPosition.h>
 #include <core/engine/model/PlayerStatistics.h>
-#include <core/interfaces/ILogger.h>
 
 #include <vector>
 
@@ -13,7 +12,7 @@ struct CurrentHandContext;
 class PreflopRangeCalculator
 {
   public:
-    PreflopRangeCalculator(pkt::core::ILogger* logger) { myLogger = logger; };
+    PreflopRangeCalculator() {};
     float calculatePreflopCallingRange(CurrentHandContext& context, bool deterministic = false) const;
     float calculatePreflopRaisingRange(CurrentHandContext& context, bool deterministic = false) const;
 
@@ -32,8 +31,6 @@ class PreflopRangeCalculator
     std::vector<int> BUTTON_STARTING_RANGE;
     std::vector<int> SB_STARTING_RANGE;
     std::vector<int> BB_STARTING_RANGE;
-
-    ILogger* myLogger;
 
     // calling range helper methods
     float adjustCallForLimpers(float callingRange) const;

@@ -8,8 +8,8 @@
 #include "model/ButtonState.h"
 #include "model/EngineError.h"
 
-#include <core/interfaces/ILogger.h>
 #include <core/player/BotPlayer.h>
+#include <core/services/GlobalServices.h>
 
 namespace pkt::core
 {
@@ -17,8 +17,8 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-BettingRound::BettingRound(const GameEvents& events, ILogger* logger, IHand* hi, unsigned dP, int sB, GameState gS)
-    : myLogger(logger), IBettingRound(), myHand(hi), myBettingRoundID(gS), dealerPosition(dP), smallBlindPosition(0),
+BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int sB, GameState gS)
+    : IBettingRound(), myHand(hi), myBettingRoundID(gS), dealerPosition(dP), smallBlindPosition(0),
       dealerPositionId(dP), smallBlindPositionId(0), bigBlindPositionId(0), smallBlind(sB), highestSet(0),
       minimumRaise(2 * sB), fullBetRule(false), firstRun(true), firstRunGui(true), firstRound(true),
       firstHeadsUpRound(true), currentPlayersTurnId(0), firstRoundLastPlayersTurnId(0), logBoardCardsDone(false),
@@ -40,7 +40,7 @@ BettingRound::BettingRound(const GameEvents& events, ILogger* logger, IHand* hi,
     }
     if (it_c == myHand->getActivePlayerList()->end())
     {
-        myLogger->error("ACTIVE_PLAYER_NOT_FOUND");
+        GlobalServices::instance().logger()->error("ACTIVE_PLAYER_NOT_FOUND");
     }
 
     // determine smallBlindPosition
@@ -54,7 +54,7 @@ BettingRound::BettingRound(const GameEvents& events, ILogger* logger, IHand* hi,
     }
     if (it_c == myHand->getActivePlayerList()->end())
     {
-        myLogger->error("ACTIVE_PLAYER_NOT_FOUND");
+        GlobalServices::instance().logger()->error("ACTIVE_PLAYER_NOT_FOUND");
     }
 }
 
@@ -64,7 +64,7 @@ BettingRound::~BettingRound()
 
 int BettingRound::getHighestCardsValue() const
 {
-    myLogger->error("getHighestCardsValue() in wrong BettingRound");
+    GlobalServices::instance().logger()->error("getHighestCardsValue() in wrong BettingRound");
     return 0;
 }
 
@@ -74,7 +74,7 @@ void BettingRound::nextPlayer()
     PlayerListConstIterator currentPlayersTurnConstIt = myHand->getRunningPlayerIt(currentPlayersTurnId);
     if (currentPlayersTurnConstIt == myHand->getRunningPlayerList()->end())
     {
-        myLogger->error("RUNNING_PLAYER_NOT_FOUND");
+        GlobalServices::instance().logger()->error("RUNNING_PLAYER_NOT_FOUND");
     }
 
     auto botPtr = std::dynamic_pointer_cast<BotPlayer>(*currentPlayersTurnConstIt);
@@ -108,7 +108,7 @@ void BettingRound::run()
         PlayerListConstIterator currentPlayersTurnIt = myHand->getRunningPlayerIt(currentPlayersTurnId);
         if (currentPlayersTurnIt == myHand->getRunningPlayerList()->end())
         {
-            myLogger->error("RUNNING_PLAYER_NOT_FOUND");
+            GlobalServices::instance().logger()->error("RUNNING_PLAYER_NOT_FOUND");
         }
 
         ++currentPlayersTurnIt;
@@ -127,7 +127,7 @@ void BettingRound::run()
         currentPlayersTurnIt = myHand->getRunningPlayerIt(currentPlayersTurnId);
         if (currentPlayersTurnIt == myHand->getRunningPlayerList()->end())
         {
-            myLogger->error("RUNNING_PLAYER_NOT_FOUND");
+            GlobalServices::instance().logger()->error("RUNNING_PLAYER_NOT_FOUND");
         }
 
         (*currentPlayersTurnIt)->setTurn(true);
@@ -203,27 +203,30 @@ void BettingRound::logBoardCards()
         switch (myBettingRoundID)
         {
         case GAME_STATE_FLOP:
-            myLogger->info("************************* FLOP " + CardsValue::CardStringValue[tempBoardCardsArray[0]] +
-                           " " + CardsValue::CardStringValue[tempBoardCardsArray[1]] + " " +
-                           CardsValue::CardStringValue[tempBoardCardsArray[2]] + "  *************************");
+            GlobalServices::instance().logger()->info(
+                "************************* FLOP " + CardsValue::CardStringValue[tempBoardCardsArray[0]] + " " +
+                CardsValue::CardStringValue[tempBoardCardsArray[1]] + " " +
+                CardsValue::CardStringValue[tempBoardCardsArray[2]] + "  *************************");
             break;
         case GAME_STATE_TURN:
-            myLogger->info("************************* TURN " + CardsValue::CardStringValue[tempBoardCardsArray[0]] +
-                           " " + CardsValue::CardStringValue[tempBoardCardsArray[1]] + " " +
-                           CardsValue::CardStringValue[tempBoardCardsArray[2]] + " " +
-                           CardsValue::CardStringValue[tempBoardCardsArray[3]] + "  *************************");
+            GlobalServices::instance().logger()->info(
+                "************************* TURN " + CardsValue::CardStringValue[tempBoardCardsArray[0]] + " " +
+                CardsValue::CardStringValue[tempBoardCardsArray[1]] + " " +
+                CardsValue::CardStringValue[tempBoardCardsArray[2]] + " " +
+                CardsValue::CardStringValue[tempBoardCardsArray[3]] + "  *************************");
 
             break;
         case GAME_STATE_RIVER:
-            myLogger->info("************************* RIVER " + CardsValue::CardStringValue[tempBoardCardsArray[0]] +
-                           " " + CardsValue::CardStringValue[tempBoardCardsArray[1]] + " " +
-                           CardsValue::CardStringValue[tempBoardCardsArray[2]] + " " +
-                           CardsValue::CardStringValue[tempBoardCardsArray[3]] + " " +
-                           CardsValue::CardStringValue[tempBoardCardsArray[4]] + "  *************************");
+            GlobalServices::instance().logger()->info(
+                "************************* RIVER " + CardsValue::CardStringValue[tempBoardCardsArray[0]] + " " +
+                CardsValue::CardStringValue[tempBoardCardsArray[1]] + " " +
+                CardsValue::CardStringValue[tempBoardCardsArray[2]] + " " +
+                CardsValue::CardStringValue[tempBoardCardsArray[3]] + " " +
+                CardsValue::CardStringValue[tempBoardCardsArray[4]] + "  *************************");
 
             break;
         default:
-            myLogger->error("wrong myBettingRoundID");
+            GlobalServices::instance().logger()->error("wrong myBettingRoundID");
         }
         logBoardCardsDone = true;
     }
@@ -254,7 +257,7 @@ void BettingRound::handleFirstRun()
             it_1 = myHand->getActivePlayerIt(smallBlindPositionId);
             if (it_1 == myHand->getActivePlayerList()->end())
             {
-                myLogger->error("ACTIVE_PLAYER_NOT_FOUND");
+                GlobalServices::instance().logger()->error("ACTIVE_PLAYER_NOT_FOUND");
             }
 
             for (size_t i = 0; i < myHand->getActivePlayerList()->size(); i++)
@@ -274,7 +277,7 @@ void BettingRound::handleFirstRun()
             }
             if (!formerRunningPlayerFound)
             {
-                myLogger->error("FORMER_RUNNING_PLAYER_NOT_FOUND");
+                GlobalServices::instance().logger()->error("FORMER_RUNNING_PLAYER_NOT_FOUND");
             }
         }
         // heads up: bigBlind begins -> dealer/smallBlind is running player before bigBlind

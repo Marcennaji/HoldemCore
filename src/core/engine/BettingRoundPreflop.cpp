@@ -8,6 +8,7 @@
 #include "model/EngineError.h"
 
 #include "core/interfaces/IHand.h"
+#include "core/services/GlobalServices.h"
 
 #include "Player.h"
 
@@ -17,8 +18,8 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-BettingRoundPreflop::BettingRoundPreflop(const GameEvents& events, ILogger* logger, IHand* hi, unsigned dP, int sB)
-    : BettingRound(events, logger, hi, dP, sB, GAME_STATE_PREFLOP)
+BettingRoundPreflop::BettingRoundPreflop(const GameEvents& events, IHand* hi, unsigned dP, int sB)
+    : BettingRound(events, hi, dP, sB, GAME_STATE_PREFLOP)
 {
     setHighestSet(2 * getSmallBlind());
 }
@@ -32,7 +33,8 @@ void BettingRoundPreflop::run()
 
     if (getFirstRun())
     {
-        myLogger->info("\n\n************************* PREFLOP *************************\n\n");
+        GlobalServices::instance().logger()->info(
+            "\n\n************************* PREFLOP *************************\n\n");
         PlayerListIterator it;
 
         // search bigBlindPosition in runningPlayerList

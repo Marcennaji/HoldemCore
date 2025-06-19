@@ -12,8 +12,7 @@ namespace pkt::test
 
 void HandTest::SetUp()
 {
-    logger = std::make_shared<pkt::core::NullLogger>();
-    factory = std::make_shared<EngineFactory>(events, logger.get());
+    factory = std::make_shared<EngineFactory>(events);
 }
 
 void HandTest::TearDown()
@@ -44,8 +43,8 @@ void HandTest::initializeHandWithPlayers(PlayerList seatsList, size_t activePlay
 
     board = factory->createBoard(1);
     // Create the Hand object with nullptrs for irrelevant parameters
-    hand = factory->createHand(factory, board, nullptr, nullptr, nullptr, seatsList, activePlayerList, activePlayerList,
-                               0, static_cast<int>(activePlayerCount), 1, 10, 1000);
+    hand = factory->createHand(factory, board, seatsList, activePlayerList, activePlayerList, 0,
+                               static_cast<int>(activePlayerCount), 1, 10, 1000);
 }
 
 TEST_F(HandTest, DealBoardCardsAndHoleCards_NoOverlap_2Players)

@@ -15,10 +15,6 @@
 namespace pkt::core
 {
 
-class IRankingStore;
-class IPlayersStatisticsStore;
-class IHandAuditStore;
-
 class IHand
 {
   public:
@@ -39,9 +35,6 @@ class IHand
     virtual std::shared_ptr<IBettingRound> getTurn() const = 0;
     virtual std::shared_ptr<IBettingRound> getRiver() const = 0;
     virtual std::shared_ptr<IBettingRound> getCurrentBettingRound() const = 0;
-    virtual IRankingStore* getRankingStore() const = 0;
-    virtual IPlayersStatisticsStore* getPlayersStatisticsStore() const = 0;
-    virtual IHandAuditStore* getHandAuditStore() const = 0;
 
     virtual void setID(int theValue) = 0;
     virtual int getID() const = 0;

@@ -8,9 +8,9 @@
 #include <core/engine/model/EngineError.h>
 #include <core/engine/model/Ranges.h>
 #include <core/interfaces/IHand.h>
-#include <core/interfaces/ILogger.h>
 #include <core/player/Helpers.h>
 #include <core/player/strategy/CurrentHandContext.h>
+#include <core/services/GlobalServices.h>
 #include "Exception.h"
 
 #include <fstream>
@@ -23,7 +23,7 @@ namespace pkt::core::player
 
 using namespace std;
 
-ManiacBotStrategy::ManiacBotStrategy(ILogger* myLogger) : IBotStrategy(myLogger)
+ManiacBotStrategy::ManiacBotStrategy() : IBotStrategy()
 {
     setStrategyName("Maniac");
 
@@ -62,7 +62,7 @@ bool ManiacBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool determin
     if (ctx.preflopRaisesNumber < 3)
     {
 
-        myLogger->info("\t\tManiac adding high pairs to the initial calling range.");
+        GlobalServices::instance().logger()->info("\t\tManiac adding high pairs to the initial calling range.");
         stringCallingRange += HIGH_PAIRS;
     }
 
@@ -72,7 +72,7 @@ bool ManiacBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool determin
         lastRaiser->getCash() >= ctx.pot * 10 && !ctx.isPreflopBigBet)
     {
 
-        myLogger->info(
+        GlobalServices::instance().logger()->info(
             "\t\tManiac adding high suited connectors, high suited aces and pairs to the initial calling range.");
         stringCallingRange += HIGH_SUITED_CONNECTORS;
         stringCallingRange += HIGH_SUITED_ACES;
@@ -84,8 +84,9 @@ bool ManiacBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool determin
             stringCallingRange += CONNECTORS;
             stringCallingRange += SUITED_ONE_GAPED;
             stringCallingRange += SUITED_TWO_GAPED;
-            myLogger->info("\t\tManiac adding suited connectors, suited one-gaped and suited two-gaped to the initial "
-                           "calling range.");
+            GlobalServices::instance().logger()->info(
+                "\t\tManiac adding suited connectors, suited one-gaped and suited two-gaped to the initial "
+                "calling range.");
         }
     }
 
@@ -104,12 +105,12 @@ bool ManiacBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool determin
             stringCallingRange += HIGH_SUITED_ACES;
             stringCallingRange += PAIRS;
 
-            myLogger->info(
+            GlobalServices::instance().logger()->info(
                 "\t\tManiac defending against 3-bet : adding high suited connectors, high suited aces and pairs to "
                 "the initial calling range.");
         }
     }
-    myLogger->info("\t\tManiac final calling range : " + stringCallingRange);
+    GlobalServices::instance().logger()->info("\t\tManiac final calling range : " + stringCallingRange);
 
     return isCardsInRange(ctx.myCard1, ctx.myCard2, stringCallingRange);
 }
@@ -140,7 +141,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
 
     stringRaisingRange = RANGES_STRING[(int) raisingRange];
 
-    myLogger->info(stringRaisingRange);
+    GlobalServices::instance().logger()->info(stringRaisingRange);
 
     // determine when to 3-bet without a real hand
     bool speculativeHandedAdded = false;
@@ -162,7 +163,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
             {
 
                 speculativeHandedAdded = true;
-                myLogger->info("\t\tManiac trying to steal this bet");
+                GlobalServices::instance().logger()->info("\t\tManiac trying to steal this bet");
             }
             else
             {
@@ -171,7 +172,8 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
                 {
 
                     speculativeHandedAdded = true;
-                    myLogger->info("\t\tManiac adding this speculative hand to our initial raising range");
+                    GlobalServices::instance().logger()->info(
+                        "\t\tManiac adding this speculative hand to our initial raising range");
                 }
                 else
                 {
@@ -184,7 +186,8 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
                         if (rand == 1)
                         {
                             speculativeHandedAdded = true;
-                            myLogger->info("\t\tManiac adding this junk hand to our initial raising range");
+                            GlobalServices::instance().logger()->info(
+                                "\t\tManiac adding this junk hand to our initial raising range");
                         }
                     }
                 }
@@ -212,7 +215,8 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
                 if (rand == 1)
                 {
                     speculativeHandedAdded = true;
-                    myLogger->info("\t\tManiac adding this speculative hand to our initial raising range");
+                    GlobalServices::instance().logger()->info(
+                        "\t\tManiac adding this speculative hand to our initial raising range");
                 }
             }
         }
@@ -232,7 +236,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
         Randomizer::GetRand(1, 10, 1, &rand);
         if (rand == 1)
         {
-            myLogger->info("\t\twon't raise, to hide the hand strength");
+            GlobalServices::instance().logger()->info("\t\twon't raise, to hide the hand strength");
             myShouldCall = true;
             return 0;
         }

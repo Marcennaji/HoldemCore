@@ -4,9 +4,7 @@
 
 #include "BettingRoundPostRiver.h"
 #include "core/interfaces/IHand.h"
-#include "core/interfaces/persistence/IHandAuditStore.h"
-#include "core/interfaces/persistence/IPlayersStatisticsStore.h"
-#include "core/interfaces/persistence/IRankingStore.h"
+#include "core/services/GlobalServices.h"
 
 #include "Player.h"
 
@@ -18,8 +16,8 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-BettingRoundPostRiver::BettingRoundPostRiver(const GameEvents& events, ILogger* logger, IHand* hi, int dP, int sB)
-    : BettingRound(events, logger, hi, dP, sB, GAME_STATE_POST_RIVER), highestCardsValue(0)
+BettingRoundPostRiver::BettingRoundPostRiver(const GameEvents& events, IHand* hi, int dP, int sB)
+    : BettingRound(events, hi, dP, sB, GAME_STATE_POST_RIVER), highestCardsValue(0)
 {
 }
 
@@ -77,15 +75,10 @@ void BettingRoundPostRiver::postRiverRun()
         }
     }
 
-    if (getHand()->getRankingStore())
-    {
-        getHand()->getRankingStore()->updateRankingGameLosers(getHand()->getActivePlayerList());
-        getHand()->getRankingStore()->updateRankingGameWinner(getHand()->getActivePlayerList());
-    }
-    if (getHand()->getPlayersStatisticsStore())
-    {
-        getHand()->getPlayersStatisticsStore()->updatePlayersStatistics(getHand()->getActivePlayerList());
-    }
+    GlobalServices::instance().rankingStore()->updateRankingGameLosers(getHand()->getActivePlayerList());
+    GlobalServices::instance().rankingStore()->updateRankingGameWinner(getHand()->getActivePlayerList());
+    GlobalServices::instance().playersStatisticsStore()->updatePlayersStatistics(getHand()->getActivePlayerList());
+
     if (myEvents.onPostRiverRunAnimation)
         myEvents.onPostRiverRunAnimation();
 

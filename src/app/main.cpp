@@ -35,8 +35,8 @@ int main(int argc, char** argv)
     QString logPath = QString::fromStdString(dirs.logDir);
     QString userPath = QString::fromStdString(dirs.userDataDir);
 
-    auto logger = std::make_shared<pkt::infra::ConsoleLogger>();
-    GuiAppController controller(logger.get(), appPath, logPath, userPath);
+    // auto logger = std::make_shared<pkt::infra::ConsoleLogger>();
+    GuiAppController controller(appPath, logPath, userPath);
     StartWindow* mainWindow = controller.createMainWindow();
 
     return app.exec();

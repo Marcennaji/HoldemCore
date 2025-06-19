@@ -2,7 +2,7 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 #include <QtWidgets/QLineEdit>
-#include <core/interfaces/ILogger.h>
+#include <core/services/GlobalServices.h>
 #include <cstdlib>
 #include <ui/qtwidgets/styles/gametablestylereader.h>
 

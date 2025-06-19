@@ -20,7 +20,7 @@ struct CurrentHandContext;
 class PreflopRangeEstimator
 {
   public:
-    PreflopRangeEstimator(IHand* hand, ILogger* logger, int playerId);
+    PreflopRangeEstimator(IHand* hand, int playerId);
 
     std::string computeEstimatedPreflopRange(CurrentHandContext& ctx);
     std::string computeEstimatedPreflopRangeFromLastRaiser(CurrentHandContext& ctx) const;
@@ -61,7 +61,6 @@ class PreflopRangeEstimator
     float handleFourBetOrMoreRange(const CurrentHandContext& ctx, int opponentRaises, const float currentRange) const;
 
     IHand* myHand;
-    ILogger* myLogger;
     int myPlayerId;
 };
 } // namespace pkt::core::player

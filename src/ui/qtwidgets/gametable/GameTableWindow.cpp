@@ -20,13 +20,13 @@
 
 #include <core/interfaces/IBoard.h>
 #include <core/interfaces/IHand.h>
-
 #include <core/player/HumanPlayer.h>
+#include <core/services/GlobalServices.h>
 
 #include <ui/qtwidgets/styles/carddeckstylereader.h>
 #include <ui/qtwidgets/styles/gametablestylereader.h>
 
-#include <core/interfaces/ILogger.h>
+#include <core/services/GlobalServices.h>
 
 #include <QtCore/qregularexpression.h>
 
@@ -1941,9 +1941,7 @@ void GameTableWindow::myActionDone()
     std::shared_ptr<IHand> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
     const int nbPlayers = currentHand->getActivePlayerList()->size();
 
-    ILogger* logger = myStartWindow->getSession()->getLogger();
-
-    logger->info(
+    GlobalServices::instance().logger()->info(
         "\n\t" + humanPlayer->getPositionLabel(humanPlayer->getPosition()) + "\tHuman player" + "\t" +
         humanPlayer->getCardsValueString() + "\t" + "stack = " + std::to_string(humanPlayer->getCash()) +
         ", pot = " + std::to_string(currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()) +
@@ -2000,23 +1998,24 @@ void GameTableWindow::myActionDone()
     PlayerAction myAction = humanPlayer->getAction();
 
     if (myAction == PLAYER_ACTION_FOLD)
-        logger->info("FOLD");
+        GlobalServices::instance().logger()->info("FOLD");
     else if (myAction == PLAYER_ACTION_BET)
-        logger->info("BET ");
+        GlobalServices::instance().logger()->info("BET ");
     else if (myAction == PLAYER_ACTION_RAISE)
-        logger->info("RAISE ");
+        GlobalServices::instance().logger()->info("RAISE ");
     else if (myAction == PLAYER_ACTION_CALL)
-        logger->info("CALL ");
+        GlobalServices::instance().logger()->info("CALL ");
     else if (myAction == PLAYER_ACTION_CHECK)
-        logger->info("CHECK");
+        GlobalServices::instance().logger()->info("CHECK");
     else if (myAction == PLAYER_ACTION_ALLIN)
-        logger->info("ALLIN ");
+        GlobalServices::instance().logger()->info("ALLIN ");
     else if (myAction == PLAYER_ACTION_NONE)
-        logger->info("NONE");
+        GlobalServices::instance().logger()->info("NONE");
     else
-        logger->info("undefined ?");
+        GlobalServices::instance().logger()->info("undefined ?");
 
-    logger->info("---------------------------------------------------------------------------------");
+    GlobalServices::instance().logger()->info(
+        "---------------------------------------------------------------------------------");
 }
 
 void GameTableWindow::activePlayerActionDone()

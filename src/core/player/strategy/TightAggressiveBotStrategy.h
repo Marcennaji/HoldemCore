@@ -12,7 +12,7 @@ class TightAggressiveBotStrategy : public IBotStrategy
 {
 
   public:
-    TightAggressiveBotStrategy(ILogger* myLogger);
+    TightAggressiveBotStrategy();
 
     ~TightAggressiveBotStrategy();
 

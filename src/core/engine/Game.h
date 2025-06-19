@@ -17,9 +17,6 @@ namespace pkt::core
 {
 
 struct GameEvents;
-class IRankingStore;
-class IPlayersStatisticsStore;
-class IHandAuditStore;
 class IHand;
 class IBoard;
 class EngineFactory;
@@ -29,8 +26,7 @@ class Game
 
   public:
     Game(const GameEvents&, std::shared_ptr<EngineFactory> factory, const pkt::core::player::PlayerList& playerList,
-         const GameData& gameData, const StartData& startData, int gameId, IRankingStore* rankingStore,
-         IPlayersStatisticsStore* playersStatisticsStore, IHandAuditStore* handAuditStore);
+         const GameData& gameData, const StartData& startData, int gameId);
 
     ~Game();
 
@@ -78,9 +74,6 @@ class Game
     std::shared_ptr<EngineFactory> myFactory;
 
     const GameEvents& myEvents;
-    IRankingStore* myRankingStore;
-    IPlayersStatisticsStore* myPlayersStatisticsStore;
-    IHandAuditStore* myHandAuditStore;
     std::shared_ptr<IHand> currentHand;
     std::shared_ptr<IBoard> currentBoard;
 

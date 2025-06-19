@@ -14,7 +14,7 @@ class IHand;
 class BettingRoundPostRiver : public BettingRound
 {
   public:
-    BettingRoundPostRiver(const GameEvents&, ILogger* logger, IHand*, int, int);
+    BettingRoundPostRiver(const GameEvents&, IHand*, int, int);
     ~BettingRoundPostRiver();
 
     void setHighestCardsValue(int theValue);

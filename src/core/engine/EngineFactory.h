@@ -6,7 +6,6 @@
 
 #include "EngineFactory.h"
 
-#include <core/interfaces/ILogger.h>
 #include "core/interfaces/IBoard.h"
 #include "core/interfaces/IHand.h"
 
@@ -22,11 +21,10 @@ namespace pkt::core
 class EngineFactory
 {
   public:
-    EngineFactory(const GameEvents&, ILogger*);
+    EngineFactory(const GameEvents&);
     ~EngineFactory();
 
     virtual std::shared_ptr<IHand> createHand(std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
-                                              IRankingStore* l, IPlayersStatisticsStore* ps, IHandAuditStore* hs,
                                               pkt::core::player::PlayerList sl, pkt::core::player::PlayerList apl,
                                               pkt::core::player::PlayerList rpl, int id, int sP, int dP, int sB,
                                               int sC);
@@ -34,7 +32,6 @@ class EngineFactory
     virtual std::vector<std::shared_ptr<IBettingRound>> createBettingRound(IHand* hi, unsigned dP, int sB);
 
   private:
-    ILogger* myLogger;
     const GameEvents& myEvents;
 };
 

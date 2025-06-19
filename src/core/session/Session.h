@@ -10,20 +10,16 @@
 #include <core/engine/EngineDefs.h>
 #include <core/engine/model/GameData.h>
 #include <core/engine/model/StartData.h>
-#include <core/interfaces/ILogger.h>
+
 #include "core/engine/GameEvents.h"
 namespace pkt::core
 {
 class Game;
-class IRankingStore;
-class IPlayersStatisticsStore;
-class IHandAuditStore;
-class QtToolsInterface;
 
 class Session
 {
   public:
-    Session(const GameEvents& events, ILogger*, IRankingStore*, IPlayersStatisticsStore*, IHandAuditStore*);
+    Session(const GameEvents& events);
 
     ~Session();
 
@@ -31,20 +27,11 @@ class Session
 
     std::shared_ptr<Game> getCurrentGame();
 
-    IRankingStore* getRankingStore() { return myRankingStore; }
-    IPlayersStatisticsStore* getPlayersStatisticsStore() { return myPlayersStatisticsStore; }
-    IHandAuditStore* getHandAuditStore() { return myHandAuditStore; }
-    ILogger* getLogger() { return myLogger; }
-
   private:
     int currentGameNum;
 
     std::shared_ptr<Game> currentGame;
     GameEvents myEvents;
-    ILogger* myLogger;
-    IRankingStore* myRankingStore;
-    IPlayersStatisticsStore* myPlayersStatisticsStore;
-    IHandAuditStore* myHandAuditStore;
 };
 
 } // namespace pkt::core

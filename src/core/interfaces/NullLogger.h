@@ -3,12 +3,13 @@
 // Licensed under the MIT License — see LICENSE file for details.
 
 #pragma once
-#include <core/interfaces/ILogger.h>
+
+#include "core/interfaces/ILogger.h"
 
 namespace pkt::core
 {
 
-class NullLogger : public core::ILogger
+class NullLogger : public ILogger
 {
   public:
     virtual void error(const std::string& msg) override {}

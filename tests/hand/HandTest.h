@@ -16,7 +16,6 @@ namespace pkt::test
 class HandTest : public ::testing::Test
 {
   protected:
-    std::shared_ptr<pkt::core::NullLogger> logger;
     const pkt::core::GameEvents events;
     std::shared_ptr<pkt::core::EngineFactory> factory;
     std::shared_ptr<pkt::core::IHand> hand;

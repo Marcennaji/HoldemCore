@@ -2,6 +2,7 @@
 #include <core/engine/Randomizer.h>
 #include <core/engine/model/Ranges.h>
 #include <core/player/Helpers.h>
+#include <core/services/GlobalServices.h>
 #include "CurrentHandContext.h"
 
 using namespace std;
@@ -94,7 +95,7 @@ bool IBotStrategy::shouldPotControl(CurrentHandContext& ctx, bool deterministic)
     }
 
     if (potControl)
-        myLogger->info("\t\tShould control pot");
+        GlobalServices::instance().logger()->info("\t\tShould control pot");
 
     return potControl;
 }

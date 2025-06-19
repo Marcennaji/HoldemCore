@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <core/interfaces/ILogger.h>
 #include "EngineFactory.h"
 #include "Player.h"
 #include "core/interfaces/IBettingRound.h"
@@ -15,15 +14,12 @@
 
 namespace pkt::core
 {
-class IRankingStore;
-class IPlayersStatisticsStore;
-class IHandAuditStore;
+
 class Hand : public IHand
 {
   public:
-    Hand(const GameEvents&, ILogger*, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard>, IRankingStore*,
-         IPlayersStatisticsStore*, IHandAuditStore*, pkt::core::player::PlayerList, pkt::core::player::PlayerList,
-         pkt::core::player::PlayerList, int, int, unsigned, int, int);
+    Hand(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard>, pkt::core::player::PlayerList,
+         pkt::core::player::PlayerList, pkt::core::player::PlayerList, int, int, unsigned, int, int);
     ~Hand();
 
     void start();
@@ -42,10 +38,6 @@ class Hand : public IHand
     std::shared_ptr<IBettingRound> getTurn() const { return myBettingRound[GAME_STATE_TURN]; }
     std::shared_ptr<IBettingRound> getRiver() const { return myBettingRound[GAME_STATE_RIVER]; }
     std::shared_ptr<IBettingRound> getCurrentBettingRound() const { return myBettingRound[currentRound]; }
-
-    IRankingStore* getRankingStore() const { return myRankingStore; }
-    IPlayersStatisticsStore* getPlayersStatisticsStore() const { return myPlayersStatisticsStore; }
-    IHandAuditStore* getHandAuditStore() const { return myHandAuditStore; }
 
     void setID(int theValue) { myID = theValue; }
     int getID() const { return myID; }
@@ -109,11 +101,6 @@ class Hand : public IHand
     std::shared_ptr<EngineFactory> myFactory;
     const GameEvents& myEvents;
     std::shared_ptr<IBoard> myBoard;
-
-    IRankingStore* myRankingStore;
-    IPlayersStatisticsStore* myPlayersStatisticsStore;
-    IHandAuditStore* myHandAuditStore;
-    ILogger* myLogger;
 
     pkt::core::player::PlayerList seatsList;         // all player
     pkt::core::player::PlayerList activePlayerList;  // all player who are not out

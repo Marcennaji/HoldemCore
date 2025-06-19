@@ -13,17 +13,13 @@ namespace pkt::core::player
 class DefaultPlayerFactory : public IPlayerFactory
 {
   public:
-    DefaultPlayerFactory(const GameEvents& events, ILogger* logger, IHandAuditStore* audit,
-                         IPlayersStatisticsStore* stats, StrategyAssigner* assigner);
+    DefaultPlayerFactory(const GameEvents& events, StrategyAssigner* assigner);
 
     std::shared_ptr<Player> createHumanPlayer(int id, const std::string& name, int startMoney) override;
     std::shared_ptr<Player> createBotPlayer(int id, TableProfile profile, int startMoney) override;
 
   private:
     const GameEvents& myEvents;
-    IHandAuditStore* myAudit;
-    IPlayersStatisticsStore* myStats;
-    ILogger* myLogger;
     StrategyAssigner* myStrategyAssigner;
 };
 } // namespace pkt::core::player

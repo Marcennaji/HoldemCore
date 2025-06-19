@@ -11,9 +11,6 @@ class DummyPlayer : public pkt::core::player::BotPlayer
   public:
     DummyPlayer(int id, const pkt::core::GameEvents& events)
         : pkt::core::player::BotPlayer(events,  // const GameEvents&
-                                       nullptr, // ILogger*
-                                       nullptr, // IHandAuditStore*
-                                       nullptr, // IPlayersStatisticsStore*
                                        id,      // Player ID
                                        "Dummy", // Player Name
                                        1000,    // Starting Cash

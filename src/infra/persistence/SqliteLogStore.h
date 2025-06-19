@@ -4,14 +4,11 @@
 
 #pragma once
 
-#include <core/interfaces/persistence/IHandAuditStore.h>
-#include <core/interfaces/persistence/IPlayersStatisticsStore.h>
-#include <core/interfaces/persistence/IRankingStore.h>
 #include <core/player/typedefs.h>
+#include <core/services/GlobalServices.h>
 #include "core/engine/EngineDefs.h"
 #include "core/engine/model/GameState.h"
 #include "core/engine/model/PlayerStatistics.h"
-#include "core/interfaces/ILogger.h"
 
 #include <filesystem>
 #include <string>
@@ -28,11 +25,11 @@ using core::ILogger;
 using core::PlayerStatistics;
 using core::player::PlayerList;
 
-class SqliteLogStore : public core::IRankingStore, public core::IHandAuditStore, public core::IPlayersStatisticsStore
+class SqliteLogStore
 {
 
   public:
-    SqliteLogStore(const std::string& logDir, ILogger*);
+    SqliteLogStore(const std::string& logDir);
 
     ~SqliteLogStore();
 
@@ -68,6 +65,5 @@ class SqliteLogStore : public core::IRankingStore, public core::IHandAuditStore,
     int currentHandID;
     std::string sql;
     std::string myLogDir;
-    ILogger* myLogger;
 };
 } // namespace pkt::infra

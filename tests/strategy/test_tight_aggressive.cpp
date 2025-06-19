@@ -9,10 +9,9 @@ using namespace pkt::core::player;
 class TightAggressiveStrategyTest : public StrategyTest
 {
   public:
-    TightAggressiveStrategyTest() : StrategyTest(), logger(), strategy(&logger) {}
+    TightAggressiveStrategyTest() : StrategyTest(), strategy() {}
 
   protected:
-    pkt::core::NullLogger logger;
     TightAggressiveBotStrategy strategy;
     const pkt::core::GameEvents events;
 };

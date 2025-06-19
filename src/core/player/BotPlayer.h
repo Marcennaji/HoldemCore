@@ -14,8 +14,7 @@ class BotPlayer : public Player
 {
 
   public:
-    BotPlayer(const GameEvents&, ILogger*, IHandAuditStore*, IPlayersStatisticsStore*, int id, std::string name, int sC,
-              bool aS, int mB);
+    BotPlayer(const GameEvents&, int id, std::string name, int sC, bool aS, int mB);
 
     ~BotPlayer();
 

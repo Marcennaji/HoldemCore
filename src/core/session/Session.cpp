@@ -8,13 +8,13 @@
 
 #include <core/engine/EngineFactory.h>
 #include <core/engine/Randomizer.h>
-#include <core/interfaces/ILogger.h>
 #include <core/player/BotPlayer.h>
 #include <core/player/HumanPlayer.h>
 #include <core/player/strategy/LooseAggressiveBotStrategy.h>
 #include <core/player/strategy/ManiacBotStrategy.h>
 #include <core/player/strategy/TightAggressiveBotStrategy.h>
 #include <core/player/strategy/UltraTightBotStrategy.h>
+#include <core/services/GlobalServices.h>
 #include "core/player/DefaultPlayerFactory.h"
 #include "core/player/Helpers.h"
 #include "core/player/strategy/StrategyAssigner.h"
@@ -29,10 +29,7 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-Session::Session(const GameEvents& events, ILogger* logger, IRankingStore* rs, IPlayersStatisticsStore* ps,
-                 IHandAuditStore* ha)
-    : myLogger(logger), currentGameNum(0), myRankingStore(rs), myPlayersStatisticsStore(ps), myHandAuditStore(ha),
-      myEvents(events)
+Session::Session(const GameEvents& events) : currentGameNum(0), myEvents(events)
 {
 }
 
@@ -50,13 +47,11 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
     if (myEvents.onInitializeGui)
         myEvents.onInitializeGui(gameData.guiSpeed);
 
-    auto engineFactory = std::make_shared<EngineFactory>(myEvents, myLogger);
+    auto engineFactory = std::make_shared<EngineFactory>(myEvents);
 
-    auto strategyAssigner =
-        std::make_unique<StrategyAssigner>(gameData.tableProfile, startData.numberOfPlayers - 1, myLogger);
+    auto strategyAssigner = std::make_unique<StrategyAssigner>(gameData.tableProfile, startData.numberOfPlayers - 1);
 
-    auto playerFactory = std::make_unique<DefaultPlayerFactory>(myEvents, myLogger, myHandAuditStore,
-                                                                myPlayersStatisticsStore, strategyAssigner.get());
+    auto playerFactory = std::make_unique<DefaultPlayerFactory>(myEvents, strategyAssigner.get());
 
     auto playerList = std::make_shared<std::list<std::shared_ptr<Player>>>();
 
@@ -78,8 +73,7 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
         p->setIsSessionActive(true);
     }
 
-    currentGame = std::make_unique<Game>(myEvents, engineFactory, playerList, gameData, startData, currentGameNum,
-                                         myRankingStore, myPlayersStatisticsStore, myHandAuditStore);
+    currentGame = std::make_unique<Game>(myEvents, engineFactory, playerList, gameData, startData, currentGameNum);
 
     currentGame->initHand();
     currentGame->startHand();

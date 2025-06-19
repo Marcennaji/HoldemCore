@@ -6,8 +6,7 @@
 
 #include "EngineFactory.h"
 #include "Exception.h"
-#include "core/interfaces/persistence/IHandAuditStore.h"
-#include "core/interfaces/persistence/IRankingStore.h"
+#include "core/services/GlobalServices.h"
 #include "model/EngineError.h"
 #include "model/StartData.h"
 
@@ -20,12 +19,11 @@ using namespace std;
 using namespace pkt::core::player;
 
 Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, const PlayerList& playerList,
-           const GameData& gameData, const StartData& startData, int gameId, IRankingStore* l,
-           IPlayersStatisticsStore* ps, IHandAuditStore* handAuditStore)
-    : myFactory(factory), myEvents(events), myRankingStore(l), myPlayersStatisticsStore(ps),
-      myHandAuditStore(handAuditStore), startQuantityPlayers(startData.numberOfPlayers), startCash(gameData.startMoney),
-      startSmallBlind(gameData.firstSmallBlind), myGameID(gameId), currentSmallBlind(gameData.firstSmallBlind),
-      currentHandID(0), dealerPosition(0), lastHandBlindsRaised(1), lastTimeBlindsRaised(0), myGameData(gameData)
+           const GameData& gameData, const StartData& startData, int gameId)
+    : myFactory(factory), myEvents(events), startQuantityPlayers(startData.numberOfPlayers),
+      startCash(gameData.startMoney), startSmallBlind(gameData.firstSmallBlind), myGameID(gameId),
+      currentSmallBlind(gameData.firstSmallBlind), currentHandID(0), dealerPosition(0), lastHandBlindsRaised(1),
+      lastTimeBlindsRaised(0), myGameData(gameData)
 {
     dealerPosition = startData.startDealerPlayerId;
 
@@ -56,7 +54,7 @@ Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, con
 
     currentBoard->setPlayerLists(seatsList, activePlayerList, runningPlayerList);
 
-    myRankingStore->updateRankingPlayedGames(activePlayerList);
+    GlobalServices::instance().rankingStore()->updateRankingPlayedGames(activePlayerList);
 }
 
 Game::~Game()
@@ -111,9 +109,9 @@ void Game::initHand()
     (*runningPlayerList) = (*activePlayerList);
 
     // create Hand
-    currentHand = myFactory->createHand(myFactory, currentBoard, myRankingStore, myPlayersStatisticsStore,
-                                        myHandAuditStore, seatsList, activePlayerList, runningPlayerList, currentHandID,
-                                        startQuantityPlayers, dealerPosition, currentSmallBlind, startCash);
+    currentHand =
+        myFactory->createHand(myFactory, currentBoard, seatsList, activePlayerList, runningPlayerList, currentHandID,
+                              startQuantityPlayers, dealerPosition, currentSmallBlind, startCash);
 
     bool nextDealerFound = false;
     PlayerListConstIterator dealerPositionIt = currentHand->getSeatIt(dealerPosition);

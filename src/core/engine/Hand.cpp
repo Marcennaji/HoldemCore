@@ -3,7 +3,7 @@
 // Licensed under the MIT License — see LICENSE file for details.
 
 #include "Hand.h"
-#include <core/interfaces/ILogger.h>
+#include <core/services/GlobalServices.h>
 #include "CardsValue.h"
 #include "GameEvents.h"
 #include "Randomizer.h"
@@ -22,18 +22,16 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-Hand::Hand(const GameEvents& events, ILogger* logger, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
-           IRankingStore* l, IPlayersStatisticsStore* ps, IHandAuditStore* ha, PlayerList sl, PlayerList apl,
-           PlayerList rpl, int id, int sP, unsigned dP, int sB, int sC)
-    : myLogger(logger), myFactory(f), myBoard(b), myRankingStore(l), myPlayersStatisticsStore(ps), myHandAuditStore(ha),
-      seatsList(sl), activePlayerList(apl), runningPlayerList(rpl), myBettingRound(0), myID(id),
-      startQuantityPlayers(sP), dealerPosition(dP), smallBlindPosition(dP), bigBlindPosition(dP),
+Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b, PlayerList sl,
+           PlayerList apl, PlayerList rpl, int id, int sP, unsigned dP, int sB, int sC)
+    : myFactory(f), myBoard(b), seatsList(sl), activePlayerList(apl), runningPlayerList(rpl), myBettingRound(0),
+      myID(id), startQuantityPlayers(sP), dealerPosition(dP), smallBlindPosition(dP), bigBlindPosition(dP),
       currentRound(GAME_STATE_PREFLOP), roundBeforePostRiver(GAME_STATE_PREFLOP), smallBlind(sB), startCash(sC),
       previousPlayerID(-1), lastActionPlayerID(0), allInCondition(false), cardsShown(false), myEvents(events)
 {
 
-    myLogger->info("\n-------------------------------------------------------------\n");
-    myLogger->info("\nHAND " + std::to_string(myID) + "\n");
+    GlobalServices::instance().logger()->info("\n-------------------------------------------------------------\n");
+    GlobalServices::instance().logger()->info("\nHAND " + std::to_string(myID) + "\n");
 
     for (auto it = seatsList->begin(); it != seatsList->end(); ++it)
     {

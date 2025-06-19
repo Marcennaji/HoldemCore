@@ -6,7 +6,7 @@
 
 #include "core/interfaces/IHand.h"
 
-#include <core/interfaces/ILogger.h>
+#include <core/services/GlobalServices.h>
 #include "Exception.h"
 #include "Player.h"
 #include "model/EngineError.h"

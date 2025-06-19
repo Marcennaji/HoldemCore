@@ -16,13 +16,9 @@ class BettingRoundPreflop : public BettingRound
 {
 
   public:
-    BettingRoundPreflop(const GameEvents&, ILogger* logger, IHand*, unsigned, int);
+    BettingRoundPreflop(const GameEvents&, IHand*, unsigned, int);
     ~BettingRoundPreflop();
 
     void run();
-
-  private:
-    // 	PlayerListIterator bigBlindPositionIt; // iterator for activePlayerList
-    // 	unsigned bigBlindPositionId;
 };
 } // namespace pkt::core

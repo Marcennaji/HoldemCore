@@ -17,8 +17,6 @@ struct PostFlopState;
 namespace pkt::core
 {
 class IHand;
-class IPlayersStatisticsStore;
-class ILogger;
 
 struct PreflopStatistics;
 struct FlopStatistics;
@@ -34,7 +32,7 @@ struct CurrentHandContext;
 class RangeEstimator
 {
   public:
-    RangeEstimator(int playerId, IPlayersStatisticsStore* statsStore, ILogger*);
+    RangeEstimator(int playerId);
 
     void setHand(IHand* hand);
     void setEstimatedRange(const std::string& range);
@@ -59,7 +57,5 @@ class RangeEstimator
     std::string myEstimatedRange;
     int myPlayerId;
     IHand* myHand;
-    IPlayersStatisticsStore* myStatsStore;
-    ILogger* myLogger;
 };
 } // namespace pkt::core::player

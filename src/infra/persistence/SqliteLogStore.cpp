@@ -27,9 +27,8 @@ using namespace std;
 using namespace pkt::core;
 using namespace pkt::core::player;
 
-SqliteLogStore::SqliteLogStore(const std::string& logDir, ILogger* logger)
-    : mySqliteLogDb(0), mySqliteLogFileName(""), myLogDir(logDir), uniqueGameID(0), currentHandID(0), sql(""),
-      myLogger(logger)
+SqliteLogStore::SqliteLogStore(const std::string& logDir)
+    : mySqliteLogDb(0), mySqliteLogFileName(""), myLogDir(logDir), uniqueGameID(0), currentHandID(0), sql("")
 {
 }
 
@@ -63,7 +62,7 @@ void SqliteLogStore::init()
         else
         {
 
-            myLogger->info("warning : database does not exist, will be created");
+            GlobalServices::instance().logger()->info("warning : database does not exist, will be created");
         }
 
         // open sqlite-db
@@ -133,10 +132,10 @@ void SqliteLogStore::createDatabase()
 
     exec_transaction();
 
-    auto looseAggressiveStrategy = LooseAggressiveBotStrategy(myLogger);
-    auto tightAggressiveStrategy = TightAggressiveBotStrategy(myLogger);
-    auto maniacStrategy = ManiacBotStrategy(myLogger);
-    auto ultraTightStrategy = UltraTightBotStrategy(myLogger);
+    auto looseAggressiveStrategy = LooseAggressiveBotStrategy();
+    auto tightAggressiveStrategy = TightAggressiveBotStrategy();
+    auto maniacStrategy = ManiacBotStrategy();
+    auto ultraTightStrategy = UltraTightBotStrategy();
 
     for (int j = 2; j <= MAX_NUMBER_OF_PLAYERS; j++)
     {
@@ -253,7 +252,7 @@ int SqliteLogStore::getIntegerValue(const std::string playerName, const std::str
         if (sqlite3_get_table(mySqliteLogDb, sql_select.c_str(), &result_Player, &nRow_Player, &nCol_Player, &errmsg) !=
             SQLITE_OK)
         {
-            myLogger->error("Error in statement: " + sql_select + "[" + errmsg + "].");
+            GlobalServices::instance().logger()->error("Error in statement: " + sql_select + "[" + errmsg + "].");
         }
         else
         {
@@ -263,8 +262,9 @@ int SqliteLogStore::getIntegerValue(const std::string playerName, const std::str
             }
             else
             {
-                myLogger->info("no data for player " + playerName + " in table " + tableName);
-                myLogger->info("SQL query was :\n" + sql_select);
+                GlobalServices::instance().logger()->info("no data for player " + playerName + " in table " +
+                                                          tableName);
+                GlobalServices::instance().logger()->info("SQL query was :\n" + sql_select);
             }
         }
         sqlite3_free_table(result_Player);
@@ -332,7 +332,7 @@ void SqliteLogStore::updateUnplausibleHand(const std::string card1, const std::s
         sql_select += " AND human_player = " + std::to_string(human) + ";";
         if (sqlite3_get_table(mySqliteLogDb, sql_select.c_str(), &result, &nRow, &nCol, &errmsg) != SQLITE_OK)
         {
-            myLogger->error("Error in statement: " + sql_select + "[" + errmsg + "].");
+            GlobalServices::instance().logger()->error("Error in statement: " + sql_select + "[" + errmsg + "].");
         }
         else
         {
@@ -375,7 +375,7 @@ void SqliteLogStore::exec_transaction()
     // cout << endl << "SQL : " << sql_transaction << endl << endl;
     if (sqlite3_exec(mySqliteLogDb, sql_transaction.c_str(), 0, 0, &errmsg) != SQLITE_OK)
     {
-        myLogger->error("Error in statement: " + sql_transaction + "[" + errmsg + "].");
+        GlobalServices::instance().logger()->error("Error in statement: " + sql_transaction + "[" + errmsg + "].");
         sqlite3_free(errmsg);
         errmsg = NULL;
     }

@@ -3,7 +3,7 @@
 // Licensed under the MIT License — see LICENSE file for details.
 #include "carddeckstylereader.h"
 #include <core/engine/EngineDefs.h>
-#include <core/interfaces/ILogger.h>
+#include <core/services/GlobalServices.h>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>

@@ -12,7 +12,7 @@ class ManiacBotStrategy : public IBotStrategy
 {
 
   public:
-    ManiacBotStrategy(ILogger* myLogger);
+    ManiacBotStrategy();
 
     ~ManiacBotStrategy();
 

@@ -2,7 +2,7 @@
 #pragma once
 
 #include <core/engine/GameEvents.h>
-#include <core/interfaces/ILogger.h>
+
 #include <core/session/Session.h>
 #include <infra/persistence/SqliteLogStore.h>
 
@@ -18,8 +18,7 @@ class GuiBridgeWidgets;
 class GuiAppController
 {
   public:
-    GuiAppController(pkt::core::ILogger* logger, const QString& appPath, const QString& logPath,
-                     const QString& userDataPath);
+    GuiAppController(const QString& appPath, const QString& logPath, const QString& userDataPath);
     ~GuiAppController();
 
     StartWindow* createMainWindow();
