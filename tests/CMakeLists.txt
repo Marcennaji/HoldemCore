@@ -15,6 +15,7 @@ add_executable(core_tests
     range/RangeParserTest.cpp
     range/RangeRefinerTest.cpp
     range/CardsInRangeTest.cpp
+    hand/HandTest.cpp
 )
 
 target_include_directories(core_tests

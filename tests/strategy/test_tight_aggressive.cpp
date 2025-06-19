@@ -1,7 +1,7 @@
 #include <core/player/strategy/TightAggressiveBotStrategy.h>
 #include <gtest/gtest.h>
-#include <infra/NullLogger.h>
 #include "StrategyTest.h"
+#include "core/interfaces/NullLogger.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;
@@ -12,7 +12,7 @@ class TightAggressiveStrategyTest : public StrategyTest
     TightAggressiveStrategyTest() : StrategyTest(), logger(), strategy(&logger) {}
 
   protected:
-    pkt::infra::NullLogger logger;
+    pkt::core::NullLogger logger;
     TightAggressiveBotStrategy strategy;
 };
 

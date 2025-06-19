@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <random>
 
 namespace pkt::core
 {
@@ -31,80 +32,23 @@ Hand::Hand(GameEvents* events, ILogger* logger, std::shared_ptr<EngineFactory> f
       previousPlayerID(-1), lastActionPlayerID(0), allInCondition(false), cardsShown(false), myEvents(events)
 {
 
-    int i, j, k;
-    PlayerListIterator it;
     myLogger->info("\n-------------------------------------------------------------\n");
     myLogger->info("\nHAND " + std::to_string(myID) + "\n");
 
-    for (it = seatsList->begin(); it != seatsList->end(); ++it)
+    for (auto it = seatsList->begin(); it != seatsList->end(); ++it)
     {
         (*it)->setHand(this);
-        // set myFlipCards 0
         (*it)->setCardsFlip(0);
     }
 
-    // generate cards and assign to board and player
-    vector<int> cardsArray = {0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17,
-                              18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
-                              36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51};
-
-    /*
-    0 to 12 --> 2d to Ad
-    13 to 25 --> 2h to Ah
-    26 to 38 --> 2s to As
-    39 to 51 --> 2c to Ac
-    */
-
-    Randomizer::ShuffleArrayNonDeterministic(cardsArray);
-
-    int tempBoardArray[5];
-    int tempPlayerArray[2];
-    int tempPlayerAndBoardArray[7];
-    int bestHandPos[5];
-    int sBluff;
-    for (i = 0; i < 5; i++)
-    {
-        tempBoardArray[i] = cardsArray[i];
-        tempPlayerAndBoardArray[i + 2] = cardsArray[i];
-    }
-
-    k = 0;
-
-    myBoard->setCards(tempBoardArray);
-
-    for (it = activePlayerList->begin(); it != activePlayerList->end(); ++it, k++)
-    {
-
-        (*it)->getBestHandPosition(bestHandPos);
-
-        for (j = 0; j < 2; j++)
-        {
-            tempPlayerArray[j] = cardsArray[2 * k + j + 5];
-            tempPlayerAndBoardArray[j] = cardsArray[2 * k + j + 5];
-        }
-
-        (*it)->setCards(tempPlayerArray);
-        (*it)->setCardsValueInt(CardsValue::evaluateHand(tempPlayerAndBoardArray));
-        (*it)->setBestHandPosition(bestHandPos);
-        (*it)->setRoundStartCash((*it)->getCash());
-        (*it)->getCurrentHandActions().reset();
-        (*it)->setPosition();
-        (*it)->getRangeEstimator()->setEstimatedRange("");
-
-        // error-check
-        for (j = 0; j < 5; j++)
-        {
-            if (bestHandPos[j] == -1)
-            {
-                myLogger->error("ERROR getBestHandPosition");
-            }
-        }
-    }
+    initAndShuffleDeck();
+    size_t cardsArrayIndex = dealBoardCards(); // we need to deal the board first,
+                                               // so that the players can use it to evaluate their hands
+    dealHoleCards(cardsArrayIndex);
 
     preflopLastRaiserID = -1;
 
     // determine dealer, SB, BB
-
     assignButtons();
 
     setBlinds();
@@ -114,6 +58,60 @@ Hand::Hand(GameEvents* events, ILogger* logger, std::shared_ptr<EngineFactory> f
 
 Hand::~Hand()
 {
+}
+
+void Hand::initAndShuffleDeck()
+{
+    cardsArray = {0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17,
+                  18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+                  36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51};
+
+    std::random_device rd;  // Non-deterministic random number generator
+    std::mt19937 rng(rd()); // Seed the Mersenne Twister random number generator
+    std::shuffle(cardsArray.begin(), cardsArray.end(), rng);
+}
+
+void Hand::dealHoleCards(size_t cardsArrayIndex)
+{
+    int i, j, k = 0;
+    int tempPlayerArray[2];
+    int tempPlayerAndBoardArray[7];
+
+    // init the first 5 cards of the board
+    // NB. cardsArray has already 5 board cards
+    for (i = 0; i < 5; i++)
+    {
+        tempPlayerAndBoardArray[i] = cardsArray[i];
+    }
+
+    for (auto it = activePlayerList->begin(); it != activePlayerList->end(); ++it, k++)
+    {
+        for (j = 0; j < 2; j++)
+        {
+            tempPlayerArray[j] = cardsArray[2 * k + j + 5];
+            tempPlayerAndBoardArray[j] = cardsArray[2 * k + j + 5];
+        }
+
+        (*it)->setCards(tempPlayerArray);
+        (*it)->setCardsValueInt(CardsValue::evaluateHand(tempPlayerAndBoardArray));
+        (*it)->setRoundStartCash((*it)->getCash());
+        (*it)->getCurrentHandActions().reset();
+        (*it)->setPosition();
+        (*it)->getRangeEstimator()->setEstimatedRange("");
+    }
+}
+size_t Hand::dealBoardCards()
+{
+    int tempBoardArray[5];
+    size_t cardsArrayIndex = 0;
+
+    for (size_t i = 0; i < 5; ++i) // The board consists of 5 cards (Flop, Turn, River)
+    {
+        tempBoardArray[i] = cardsArray[cardsArrayIndex++];
+    }
+
+    myBoard->setCards(tempBoardArray);
+    return cardsArrayIndex;
 }
 
 void Hand::start()

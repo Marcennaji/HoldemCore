@@ -24,11 +24,19 @@ Board::Board(unsigned dp) : IBoard(), pot(0), sets(0), dealerPosition(dp), allIn
 
 Board::~Board()
 {
-    seatsList->clear();
-    activePlayerList->clear();
-    runningPlayerList->clear();
+    if (seatsList)
+    {
+        seatsList->clear();
+    }
+    if (activePlayerList)
+    {
+        activePlayerList->clear();
+    }
+    if (runningPlayerList)
+    {
+        runningPlayerList->clear();
+    }
 }
-
 void Board::setPlayerLists(PlayerList sl, PlayerList apl, PlayerList rpl)
 {
     seatsList = sl;

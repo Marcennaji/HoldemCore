@@ -7,12 +7,12 @@
 #include "core/engine/CardsValue.h"
 #include "core/engine/EngineDefs.h"
 #include "core/engine/model/PlayerStatistics.h"
+#include "core/interfaces/NullLogger.h"
 #include "core/player/Player.h"
 #include "core/player/strategy/LooseAggressiveBotStrategy.h"
 #include "core/player/strategy/ManiacBotStrategy.h"
 #include "core/player/strategy/TightAggressiveBotStrategy.h"
 #include "core/player/strategy/UltraTightBotStrategy.h"
-#include "infra/NullLogger.h"
 
 #include <third_party/sqlite3/sqlite3.h>
 

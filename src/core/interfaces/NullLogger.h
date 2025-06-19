@@ -5,7 +5,7 @@
 #pragma once
 #include <core/interfaces/ILogger.h>
 
-namespace pkt::infra
+namespace pkt::core
 {
 
 class NullLogger : public core::ILogger
@@ -16,4 +16,4 @@ class NullLogger : public core::ILogger
     virtual void verbose(const std::string& msg, int level = 1) override {}
 };
 
-} // namespace pkt::infra
+} // namespace pkt::core

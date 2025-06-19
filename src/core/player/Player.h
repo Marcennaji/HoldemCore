@@ -11,6 +11,7 @@
 #include <core/interfaces/ILogger.h>
 #include "CurrentHandActions.h"
 #include "range/RangeEstimator.h"
+#include "strategy/CurrentHandContext.h"
 
 #include <third_party/psim/psim.hpp>
 
@@ -26,7 +27,6 @@ namespace pkt::core
 class IHand;
 class IHandAuditStore;
 class IPlayersStatisticsStore;
-struct CurrentHandContext;
 
 } // namespace pkt::core
 
@@ -94,9 +94,6 @@ class Player
 
     void setCardsValueInt(int theValue);
     int getCardsValueInt() const;
-
-    void setBestHandPosition(int* theValue);
-    void getBestHandPosition(int* theValue) const;
 
     void setRoundStartCash(int theValue);
     int getRoundStartCash() const;
@@ -178,7 +175,6 @@ class Player
     PlayerPosition myPosition;
     std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> myStatistics;
     int myCardsValueInt;
-    int myBestHandPosition[5];
 
     int myCards[2];
     std::string myCard1;

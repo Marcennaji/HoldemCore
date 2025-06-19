@@ -39,11 +39,6 @@ Player::Player(GameEvents* events, ILogger* logger, IHandAuditStore* ha, IPlayer
     {
         myCards[i] = -1;
     }
-
-    for (i = 0; i < 5; i++)
-    {
-        myBestHandPosition[i] = -1;
-    }
 }
 
 void Player::setHand(IHand* h)
@@ -335,17 +330,6 @@ void Player::setCardsValueInt(int theValue)
 int Player::getCardsValueInt() const
 {
     return myCardsValueInt;
-}
-
-void Player::setBestHandPosition(int* theValue)
-{
-    for (int i = 0; i < 5; i++)
-        myBestHandPosition[i] = theValue[i];
-}
-void Player::getBestHandPosition(int* theValue) const
-{
-    for (int i = 0; i < 5; i++)
-        theValue[i] = myBestHandPosition[i];
 }
 
 void Player::setRoundStartCash(int theValue)

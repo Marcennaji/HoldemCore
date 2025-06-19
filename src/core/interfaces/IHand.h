@@ -25,6 +25,9 @@ class IHand
     virtual ~IHand() {};
 
     virtual void start() = 0;
+    virtual size_t dealBoardCards() = 0;
+    virtual void dealHoleCards(size_t lastArrayIndex) = 0;
+    virtual void initAndShuffleDeck() = 0;
 
     virtual pkt::core::player::PlayerList getSeatsList() const = 0;
     virtual pkt::core::player::PlayerList getActivePlayerList() const = 0;

@@ -11,7 +11,6 @@ namespace pkt::core
 class Randomizer
 {
   public:
-    static void ShuffleArrayNonDeterministic(std::vector<int>&);
     static void GetRand(int minValue, int maxValue, unsigned count, int* out);
 };
 } // namespace pkt::core

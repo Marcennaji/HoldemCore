@@ -28,6 +28,10 @@ class Hand : public IHand
 
     void start();
 
+    size_t dealBoardCards();
+    void dealHoleCards(size_t lastArrayIndex);
+    void initAndShuffleDeck();
+
     pkt::core::player::PlayerList getSeatsList() const { return seatsList; }
     pkt::core::player::PlayerList getActivePlayerList() const { return activePlayerList; }
     pkt::core::player::PlayerList getRunningPlayerList() const { return runningPlayerList; }
@@ -115,6 +119,8 @@ class Hand : public IHand
     pkt::core::player::PlayerList runningPlayerList; // all player who are not folded, not all in and not out
 
     std::vector<std::shared_ptr<IBettingRound>> myBettingRound;
+
+    std::vector<int> cardsArray;
 
     int myID;
     int startQuantityPlayers;
