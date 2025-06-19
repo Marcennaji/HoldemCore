@@ -23,7 +23,7 @@ namespace pkt::core::player
 
 using namespace std;
 
-Player::Player(GameEvents* events, ILogger* logger, IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id,
+Player::Player(const GameEvents& events, ILogger* logger, IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id,
                std::string name, int sC, bool aS, int mB)
     : myHandAuditStore(ha), myPlayersStatisticsStore(ps), currentHand(0), myID(id), myName(name), myCardsValueInt(0),
       myCash(sC), mySet(0), myLastRelativeSet(0), myAction(PLAYER_ACTION_NONE), myButton(mB), myActiveStatus(aS),

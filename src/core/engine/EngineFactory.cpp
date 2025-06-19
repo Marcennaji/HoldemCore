@@ -19,10 +19,9 @@
 namespace pkt::core
 {
 
-EngineFactory::EngineFactory(GameEvents* events, ILogger* logger) : myLogger(logger), myEvents(events)
+EngineFactory::EngineFactory(const GameEvents& events, ILogger* logger) : myLogger(logger), myEvents(events)
 {
     assert(myLogger != nullptr);
-    assert(myEvents != nullptr);
 }
 
 EngineFactory::~EngineFactory()

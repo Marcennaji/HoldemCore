@@ -14,6 +14,7 @@ class TightAggressiveStrategyTest : public StrategyTest
   protected:
     pkt::core::NullLogger logger;
     TightAggressiveBotStrategy strategy;
+    const pkt::core::GameEvents events;
 };
 
 // --- Preflop ---
@@ -50,7 +51,7 @@ TEST_F(TightAggressiveStrategyTest, Preflop_InPosition_CallsWithOdds)
     ctx.myPosition = PlayerPosition::BUTTON;
     ctx.myHandSimulation.winSd = 0.6f;
     ctx.preflopRaisesNumber = 1;
-    ctx.preflopLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2);
+    ctx.preflopLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events);
     ctx.myHavePosition = true;
     EXPECT_TRUE(strategy.preflopShouldCall(ctx, true));
 }
@@ -65,7 +66,7 @@ TEST_F(TightAggressiveStrategyTest, Flop_HighEquity_Raises)
     ctx.stringBoard = "2h 3d 7c";
     ctx.myPosition = PlayerPosition::BUTTON;
     ctx.flopBetsOrRaisesNumber = 1;
-    ctx.flopLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2);
+    ctx.flopLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events);
     ctx.myHavePosition = true;
 
     ctx.myHandSimulation.win = 0.92f;
@@ -92,7 +93,7 @@ TEST_F(TightAggressiveStrategyTest, Turn_HighEquity_Raises)
     ctx.myHandSimulation.winRanged = 0.95f;
     ctx.myPosition = PlayerPosition::BUTTON;
     ctx.turnBetsOrRaisesNumber = 1;
-    ctx.turnLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2);
+    ctx.turnLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events);
 
     EXPECT_GT(strategy.turnShouldRaise(ctx, true), 0);
 }
@@ -104,7 +105,7 @@ TEST_F(TightAggressiveStrategyTest, Turn_LowEquity_DoesNotRaise)
     ctx.myHandSimulation.winRanged = 0.4f;
     ctx.myPosition = PlayerPosition::BUTTON;
     ctx.turnBetsOrRaisesNumber = 1;
-    ctx.turnLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2);
+    ctx.turnLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events);
 
     EXPECT_EQ(strategy.turnShouldRaise(ctx, true), 0);
 }

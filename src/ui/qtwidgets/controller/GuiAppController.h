@@ -31,6 +31,6 @@ class GuiAppController
     std::unique_ptr<pkt::infra::SqliteLogStore> myDbStatisticsLogger;
     std::unique_ptr<GameTableWindow> myGameTableWindow;
     std::unique_ptr<pkt::core::Session> mySession;
-    std::unique_ptr<pkt::core::GameEvents> myEvents;
+    pkt::core::GameEvents myEvents;
     std::unique_ptr<GuiBridgeWidgets> myBridge;
 };

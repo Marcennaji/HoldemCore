@@ -21,7 +21,7 @@ class IHandAuditStore;
 class Hand : public IHand
 {
   public:
-    Hand(GameEvents*, ILogger*, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard>, IRankingStore*,
+    Hand(const GameEvents&, ILogger*, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard>, IRankingStore*,
          IPlayersStatisticsStore*, IHandAuditStore*, pkt::core::player::PlayerList, pkt::core::player::PlayerList,
          pkt::core::player::PlayerList, int, int, unsigned, int, int);
     ~Hand();
@@ -107,8 +107,9 @@ class Hand : public IHand
 
   private:
     std::shared_ptr<EngineFactory> myFactory;
-    GameEvents* myEvents;
+    const GameEvents& myEvents;
     std::shared_ptr<IBoard> myBoard;
+
     IRankingStore* myRankingStore;
     IPlayersStatisticsStore* myPlayersStatisticsStore;
     IHandAuditStore* myHandAuditStore;

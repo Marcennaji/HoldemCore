@@ -29,7 +29,7 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-Session::Session(GameEvents* events, ILogger* logger, IRankingStore* rs, IPlayersStatisticsStore* ps,
+Session::Session(const GameEvents& events, ILogger* logger, IRankingStore* rs, IPlayersStatisticsStore* ps,
                  IHandAuditStore* ha)
     : myLogger(logger), currentGameNum(0), myRankingStore(rs), myPlayersStatisticsStore(ps), myHandAuditStore(ha),
       myEvents(events)
@@ -45,10 +45,10 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
     currentGame.reset();
     currentGameNum++;
 
-    if (myEvents && myEvents->onHideHoleCards)
-        myEvents->onHideHoleCards();
-    if (myEvents && myEvents->onInitializeGui)
-        myEvents->onInitializeGui(gameData.guiSpeed);
+    if (myEvents.onHideHoleCards)
+        myEvents.onHideHoleCards();
+    if (myEvents.onInitializeGui)
+        myEvents.onInitializeGui(gameData.guiSpeed);
 
     auto engineFactory = std::make_shared<EngineFactory>(myEvents, myLogger);
 

@@ -17,7 +17,7 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-BettingRoundPreflop::BettingRoundPreflop(GameEvents* events, ILogger* logger, IHand* hi, unsigned dP, int sB)
+BettingRoundPreflop::BettingRoundPreflop(const GameEvents& events, ILogger* logger, IHand* hi, unsigned dP, int sB)
     : BettingRound(events, logger, hi, dP, sB, GAME_STATE_PREFLOP)
 {
     setHighestSet(2 * getSmallBlind());
@@ -158,19 +158,19 @@ void BettingRoundPreflop::run()
         getHand()->getBoard()->collectSets();
         getHand()->getBoard()->collectPot();
 
-        if (myEvents && myEvents->onPotUpdated)
-            myEvents->onPotUpdated(getHand()->getBoard()->getPot());
+        if (myEvents.onPotUpdated)
+            myEvents.onPotUpdated(getHand()->getBoard()->getPot());
 
-        if (myEvents && myEvents->onRefreshSet)
-            myEvents->onRefreshSet();
+        if (myEvents.onRefreshSet)
+            myEvents.onRefreshSet();
 
-        if (myEvents && myEvents->onRefreshCash)
-            myEvents->onRefreshCash();
+        if (myEvents.onRefreshCash)
+            myEvents.onRefreshCash();
 
         for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
         {
-            if (myEvents && myEvents->onRefreshAction)
-                myEvents->onRefreshAction(i, PLAYER_ACTION_NONE);
+            if (myEvents.onRefreshAction)
+                myEvents.onRefreshAction(i, PLAYER_ACTION_NONE);
         }
 
         getHand()->switchRounds();
@@ -191,21 +191,21 @@ void BettingRoundPreflop::run()
         (*currentPlayersTurnIt)->setTurn(true);
 
         // highlight active players groupbox and clear action
-        if (myEvents && myEvents->onRefreshPlayersActiveInactiveStyles)
-            myEvents->onRefreshPlayersActiveInactiveStyles(getCurrentPlayersTurnId(), 2);
+        if (myEvents.onRefreshPlayersActiveInactiveStyles)
+            myEvents.onRefreshPlayersActiveInactiveStyles(getCurrentPlayersTurnId(), 2);
 
-        if (myEvents && myEvents->onRefreshAction)
-            myEvents->onRefreshAction(getCurrentPlayersTurnId(), PLAYER_ACTION_NONE);
+        if (myEvents.onRefreshAction)
+            myEvents.onRefreshAction(getCurrentPlayersTurnId(), PLAYER_ACTION_NONE);
 
         if (getCurrentPlayersTurnId() == 0)
         {
-            if (myEvents && myEvents->onDoHumanAction)
-                myEvents->onDoHumanAction();
+            if (myEvents.onDoHumanAction)
+                myEvents.onDoHumanAction();
         }
         else
         {
-            if (myEvents && myEvents->onBettingRoundAnimation)
-                myEvents->onBettingRoundAnimation(getBettingRoundID());
+            if (myEvents.onBettingRoundAnimation)
+                myEvents.onBettingRoundAnimation(getBettingRoundID());
         }
     }
 }

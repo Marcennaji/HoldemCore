@@ -53,8 +53,8 @@ static int outsOddsTwoCard[] = {
 class Player
 {
   public:
-    Player(GameEvents*, ILogger*, IHandAuditStore*, IPlayersStatisticsStore*, int id, std::string name, int sC, bool aS,
-           int mB);
+    Player(const GameEvents&, ILogger*, IHandAuditStore*, IPlayersStatisticsStore*, int id, std::string name, int sC,
+           bool aS, int mB);
 
     virtual ~Player() = default;
 
@@ -161,7 +161,7 @@ class Player
     IHandAuditStore* myHandAuditStore;
     IPlayersStatisticsStore* myPlayersStatisticsStore;
     IHand* currentHand;
-    GameEvents* myEvents;
+    const GameEvents& myEvents;
 
     CurrentHandActions myCurrentHandActions;
     std::unique_ptr<CurrentHandContext> myCurrentHandContext;

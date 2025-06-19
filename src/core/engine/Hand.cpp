@@ -22,7 +22,7 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-Hand::Hand(GameEvents* events, ILogger* logger, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
+Hand::Hand(const GameEvents& events, ILogger* logger, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
            IRankingStore* l, IPlayersStatisticsStore* ps, IHandAuditStore* ha, PlayerList sl, PlayerList apl,
            PlayerList rpl, int id, int sP, unsigned dP, int sB, int sC)
     : myLogger(logger), myFactory(f), myBoard(b), myRankingStore(l), myPlayersStatisticsStore(ps), myHandAuditStore(ha),
@@ -116,16 +116,16 @@ size_t Hand::dealBoardCards()
 
 void Hand::start()
 {
-    if (myEvents && myEvents->onDealHoleCards)
-        myEvents->onDealHoleCards();
+    if (myEvents.onDealHoleCards)
+        myEvents.onDealHoleCards();
 
     getBoard()->collectSets();
 
-    if (myEvents && myEvents->onPotUpdated)
-        myEvents->onPotUpdated(getBoard()->getPot());
+    if (myEvents.onPotUpdated)
+        myEvents.onPotUpdated(getBoard()->getPot());
 
-    if (myEvents && myEvents->onActivePlayerActionDone)
-        myEvents->onActivePlayerActionDone();
+    if (myEvents.onActivePlayerActionDone)
+        myEvents.onActivePlayerActionDone();
 }
 
 void Hand::assignButtons()
@@ -316,11 +316,11 @@ void Hand::switchRounds()
     if (nonFoldPlayerCounter == 1)
     {
         myBoard->collectPot();
-        if (myEvents && myEvents->onPotUpdated)
-            myEvents->onPotUpdated(myBoard->getPot());
+        if (myEvents.onPotUpdated)
+            myEvents.onPotUpdated(myBoard->getPot());
 
-        if (myEvents && myEvents->onRefreshSet)
-            myEvents->onRefreshSet();
+        if (myEvents.onRefreshSet)
+            myEvents.onRefreshSet();
         ;
         currentRound = GAME_STATE_POST_RIVER;
     }
@@ -397,14 +397,14 @@ void Hand::switchRounds()
     {
         myBoard->collectPot();
 
-        if (myEvents && myEvents->onPotUpdated)
-            myEvents->onPotUpdated(myBoard->getPot());
+        if (myEvents.onPotUpdated)
+            myEvents.onPotUpdated(myBoard->getPot());
 
-        if (myEvents && myEvents->onRefreshSet)
-            myEvents->onRefreshSet();
+        if (myEvents.onRefreshSet)
+            myEvents.onRefreshSet();
 
-        if (myEvents && myEvents->onFlipHoleCardsAllIn)
-            myEvents->onFlipHoleCardsAllIn();
+        if (myEvents.onFlipHoleCardsAllIn)
+            myEvents.onFlipHoleCardsAllIn();
 
         if (currentRound < GAME_STATE_POST_RIVER)
         { // do not increment past 4
@@ -425,12 +425,12 @@ void Hand::switchRounds()
     if (it_c != activePlayerList->end())
     {
         // lastPlayersTurn is active
-        if (myEvents && myEvents->onRefreshPlayersActiveInactiveStyles)
-            myEvents->onRefreshPlayersActiveInactiveStyles(previousPlayerID, 1);
+        if (myEvents.onRefreshPlayersActiveInactiveStyles)
+            myEvents.onRefreshPlayersActiveInactiveStyles(previousPlayerID, 1);
     }
 
-    if (myEvents && myEvents->onRefreshTableDescriptiveLabels)
-        myEvents->onRefreshTableDescriptiveLabels(getCurrentRound());
+    if (myEvents.onRefreshTableDescriptiveLabels)
+        myEvents.onRefreshTableDescriptiveLabels(getCurrentRound());
 
     if (currentRound < GAME_STATE_POST_RIVER)
     {
@@ -441,32 +441,32 @@ void Hand::switchRounds()
     {
     case GAME_STATE_PREFLOP:
     {
-        if (myEvents && myEvents->onPreflopAnimation)
-            myEvents->onPreflopAnimation();
+        if (myEvents.onPreflopAnimation)
+            myEvents.onPreflopAnimation();
     }
     break;
     case GAME_STATE_FLOP:
     {
-        if (myEvents && myEvents->onFlopAnimation)
-            myEvents->onFlopAnimation();
+        if (myEvents.onFlopAnimation)
+            myEvents.onFlopAnimation();
     }
     break;
     case GAME_STATE_TURN:
     {
-        if (myEvents && myEvents->onTurnAnimation)
-            myEvents->onTurnAnimation();
+        if (myEvents.onTurnAnimation)
+            myEvents.onTurnAnimation();
     }
     break;
     case GAME_STATE_RIVER:
     {
-        if (myEvents && myEvents->onRiverAnimation)
-            myEvents->onRiverAnimation();
+        if (myEvents.onRiverAnimation)
+            myEvents.onRiverAnimation();
     }
     break;
     case GAME_STATE_POST_RIVER:
     {
-        if (myEvents && myEvents->onPostRiverAnimation)
-            myEvents->onPostRiverAnimation();
+        if (myEvents.onPostRiverAnimation)
+            myEvents.onPostRiverAnimation();
     }
     break;
     default:

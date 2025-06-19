@@ -23,7 +23,7 @@ class QtToolsInterface;
 class Session
 {
   public:
-    Session(GameEvents* events, ILogger*, IRankingStore*, IPlayersStatisticsStore*, IHandAuditStore*);
+    Session(const GameEvents& events, ILogger*, IRankingStore*, IPlayersStatisticsStore*, IHandAuditStore*);
 
     ~Session();
 
@@ -40,7 +40,7 @@ class Session
     int currentGameNum;
 
     std::shared_ptr<Game> currentGame;
-    GameEvents* myEvents;
+    GameEvents myEvents;
     ILogger* myLogger;
     IRankingStore* myRankingStore;
     IPlayersStatisticsStore* myPlayersStatisticsStore;

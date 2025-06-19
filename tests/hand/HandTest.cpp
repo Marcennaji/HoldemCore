@@ -13,8 +13,7 @@ namespace pkt::test
 void HandTest::SetUp()
 {
     logger = std::make_shared<pkt::core::NullLogger>();
-    events = std::make_shared<GameEvents>();
-    factory = std::make_shared<EngineFactory>(events.get(), logger.get());
+    factory = std::make_shared<EngineFactory>(events, logger.get());
 }
 
 void HandTest::TearDown()
@@ -33,7 +32,7 @@ PlayerList HandTest::createPlayerList(size_t playerCount)
     auto playerList = std::make_shared<std::list<std::shared_ptr<Player>>>();
     for (size_t i = 0; i < playerCount; ++i)
     {
-        playerList->push_back(std::make_shared<DummyPlayer>(i + 1));
+        playerList->push_back(std::make_shared<DummyPlayer>(i + 1, events));
     }
     return playerList;
 }

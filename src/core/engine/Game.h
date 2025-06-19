@@ -28,7 +28,7 @@ class Game
 {
 
   public:
-    Game(GameEvents*, std::shared_ptr<EngineFactory> factory, const pkt::core::player::PlayerList& playerList,
+    Game(const GameEvents&, std::shared_ptr<EngineFactory> factory, const pkt::core::player::PlayerList& playerList,
          const GameData& gameData, const StartData& startData, int gameId, IRankingStore* rankingStore,
          IPlayersStatisticsStore* playersStatisticsStore, IHandAuditStore* handAuditStore);
 
@@ -77,7 +77,7 @@ class Game
   private:
     std::shared_ptr<EngineFactory> myFactory;
 
-    GameEvents* myEvents;
+    const GameEvents& myEvents;
     IRankingStore* myRankingStore;
     IPlayersStatisticsStore* myPlayersStatisticsStore;
     IHandAuditStore* myHandAuditStore;

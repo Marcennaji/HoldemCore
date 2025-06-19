@@ -13,16 +13,14 @@ GuiAppController::GuiAppController(pkt::core::ILogger* logger, const QString& ap
 {
     assert(logger != nullptr);
 
-    myEvents = std::make_unique<pkt::core::GameEvents>();
-
     myDbStatisticsLogger = std::make_unique<pkt::infra::SqliteLogStore>(myLogPath.toStdString(), logger);
     myDbStatisticsLogger->init();
 
     myGameTableWindow = std::make_unique<GameTableWindow>(myUserDataPath.toStdString());
     myBridge = std::make_unique<GuiBridgeWidgets>(myGameTableWindow.get());
-    myBridge->connectTo(*myEvents);
+    myBridge->connectTo(myEvents);
 
-    mySession = std::make_unique<pkt::core::Session>(myEvents.get(), logger, myDbStatisticsLogger.get(),
+    mySession = std::make_unique<pkt::core::Session>(myEvents, logger, myDbStatisticsLogger.get(),
                                                      myDbStatisticsLogger.get(), myDbStatisticsLogger.get());
 }
 

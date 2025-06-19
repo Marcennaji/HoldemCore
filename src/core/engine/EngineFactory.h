@@ -22,7 +22,7 @@ namespace pkt::core
 class EngineFactory
 {
   public:
-    EngineFactory(GameEvents*, ILogger*);
+    EngineFactory(const GameEvents&, ILogger*);
     ~EngineFactory();
 
     virtual std::shared_ptr<IHand> createHand(std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
@@ -35,7 +35,7 @@ class EngineFactory
 
   private:
     ILogger* myLogger;
-    GameEvents* myEvents;
+    const GameEvents& myEvents;
 };
 
 } // namespace pkt::core

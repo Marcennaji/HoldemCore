@@ -15,7 +15,7 @@ class GameEvents;
 class BettingRound : public IBettingRound
 {
   public:
-    BettingRound(GameEvents*, ILogger* logger, IHand* hi, unsigned dP, int sB, GameState gS);
+    BettingRound(const GameEvents&, ILogger* logger, IHand* hi, unsigned dP, int sB, GameState gS);
     ~BettingRound();
 
     GameState getBettingRoundID() const;
@@ -72,7 +72,7 @@ class BettingRound : public IBettingRound
     void setSmallBlind(int theValue);
     int getSmallBlind() const;
 
-    GameEvents* myEvents;
+    const GameEvents& myEvents;
     ILogger* myLogger;
 
   private:

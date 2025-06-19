@@ -18,7 +18,7 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-BettingRoundPostRiver::BettingRoundPostRiver(GameEvents* events, ILogger* logger, IHand* hi, int dP, int sB)
+BettingRoundPostRiver::BettingRoundPostRiver(const GameEvents& events, ILogger* logger, IHand* hi, int dP, int sB)
     : BettingRound(events, logger, hi, dP, sB, GAME_STATE_POST_RIVER), highestCardsValue(0)
 {
 }
@@ -86,8 +86,8 @@ void BettingRoundPostRiver::postRiverRun()
     {
         getHand()->getPlayersStatisticsStore()->updatePlayersStatistics(getHand()->getActivePlayerList());
     }
-    if (myEvents && myEvents->onPostRiverRunAnimation)
-        myEvents->onPostRiverRunAnimation();
+    if (myEvents.onPostRiverRunAnimation)
+        myEvents.onPostRiverRunAnimation();
 
     if (getHand()->getCardsShown())
     {
@@ -98,14 +98,14 @@ void BettingRoundPostRiver::postRiverRun()
             if ((*it_c)->getCurrentHandActions().getPreflopActions().size() > 0 &&
                 (*it_c)->getCurrentHandActions().getPreflopActions().at(0) != PLAYER_ACTION_FOLD)
 
-                if (myEvents && myEvents->onShowHoleCards)
-                    myEvents->onShowHoleCards((*it_c)->getID());
+                if (myEvents.onShowHoleCards)
+                    myEvents.onShowHoleCards((*it_c)->getID());
         }
     }
     // if the human player went at showdown with at least one opponent, enable pausing the hand so he can see the
     // results
-    if (pauseHand && nonfoldPlayersCounter > 1 && myEvents && myEvents->onPauseHand)
-        myEvents->onPauseHand();
+    if (pauseHand && nonfoldPlayersCounter > 1 && myEvents.onPauseHand)
+        myEvents.onPauseHand();
 }
 void BettingRoundPostRiver::setHighestCardsValue(int theValue)
 {

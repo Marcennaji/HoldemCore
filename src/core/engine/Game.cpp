@@ -19,7 +19,7 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-Game::Game(GameEvents* events, std::shared_ptr<EngineFactory> factory, const PlayerList& playerList,
+Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, const PlayerList& playerList,
            const GameData& gameData, const StartData& startData, int gameId, IRankingStore* l,
            IPlayersStatisticsStore* ps, IHandAuditStore* handAuditStore)
     : myFactory(factory), myEvents(events), myRankingStore(l), myPlayersStatisticsStore(ps),
@@ -145,8 +145,8 @@ void Game::initHand()
 
 void Game::startHand()
 {
-    if (myEvents && myEvents->onNextBettingRoundInitializeGui)
-        myEvents->onNextBettingRoundInitializeGui();
+    if (myEvents.onNextBettingRoundInitializeGui)
+        myEvents.onNextBettingRoundInitializeGui();
 
     currentHand->start();
 }

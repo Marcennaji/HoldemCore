@@ -17,7 +17,7 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-BettingRound::BettingRound(GameEvents* events, ILogger* logger, IHand* hi, unsigned dP, int sB, GameState gS)
+BettingRound::BettingRound(const GameEvents& events, ILogger* logger, IHand* hi, unsigned dP, int sB, GameState gS)
     : myLogger(logger), IBettingRound(), myHand(hi), myBettingRoundID(gS), dealerPosition(dP), smallBlindPosition(0),
       dealerPositionId(dP), smallBlindPositionId(0), bigBlindPositionId(0), smallBlind(sB), highestSet(0),
       minimumRaise(2 * sB), fullBetRule(false), firstRun(true), firstRunGui(true), firstRound(true),
@@ -118,11 +118,11 @@ void BettingRound::run()
         currentPlayersTurnId = (*currentPlayersTurnIt)->getID();
 
         // highlight active players groupbox and clear action
-        if (myEvents && myEvents->onRefreshPlayersActiveInactiveStyles)
-            myEvents->onRefreshPlayersActiveInactiveStyles(currentPlayersTurnId, 2);
+        if (myEvents.onRefreshPlayersActiveInactiveStyles)
+            myEvents.onRefreshPlayersActiveInactiveStyles(currentPlayersTurnId, 2);
 
-        if (myEvents && myEvents->onRefreshAction)
-            myEvents->onRefreshAction(currentPlayersTurnId, 0);
+        if (myEvents.onRefreshAction)
+            myEvents.onRefreshAction(currentPlayersTurnId, 0);
 
         currentPlayersTurnIt = myHand->getRunningPlayerIt(currentPlayersTurnId);
         if (currentPlayersTurnIt == myHand->getRunningPlayerList()->end())
@@ -139,13 +139,13 @@ void BettingRound::run()
 
         if (currentPlayersTurnId == 0)
         {
-            if (myEvents && myEvents->onDoHumanAction)
-                myEvents->onDoHumanAction();
+            if (myEvents.onDoHumanAction)
+                myEvents.onDoHumanAction();
         }
         else
         {
-            if (myEvents && myEvents->onBettingRoundAnimation)
-                myEvents->onBettingRoundAnimation(myBettingRoundID);
+            if (myEvents.onBettingRoundAnimation)
+                myEvents.onBettingRoundAnimation(myBettingRoundID);
         }
     }
 }
@@ -175,19 +175,19 @@ void BettingRound::proceedToNextBettingRound()
     myHand->getBoard()->collectSets();
     myHand->getBoard()->collectPot();
 
-    if (myEvents && myEvents->onPotUpdated)
-        myEvents->onPotUpdated(myHand->getBoard()->getPot());
+    if (myEvents.onPotUpdated)
+        myEvents.onPotUpdated(myHand->getBoard()->getPot());
 
-    if (myEvents && myEvents->onRefreshSet)
-        myEvents->onRefreshSet();
+    if (myEvents.onRefreshSet)
+        myEvents.onRefreshSet();
 
-    if (myEvents && myEvents->onRefreshCash)
-        myEvents->onRefreshCash();
+    if (myEvents.onRefreshCash)
+        myEvents.onRefreshCash();
 
     for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
     {
-        if (myEvents && myEvents->onRefreshAction)
-            myEvents->onRefreshAction(i, PLAYER_ACTION_NONE);
+        if (myEvents.onRefreshAction)
+            myEvents.onRefreshAction(i, PLAYER_ACTION_NONE);
     }
 
     myHand->switchRounds();
@@ -234,9 +234,9 @@ void BettingRound::handleFirstRunGui()
     firstRunGui = false;
     myHand->setPreviousPlayerID(-1);
 
-    if (myEvents && myEvents->onDealBettingRoundCards)
+    if (myEvents.onDealBettingRoundCards)
     {
-        myEvents->onDealBettingRoundCards(myBettingRoundID);
+        myEvents.onDealBettingRoundCards(myBettingRoundID);
     }
 }
 void BettingRound::handleFirstRun()

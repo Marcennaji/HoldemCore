@@ -6,7 +6,7 @@
 namespace pkt::core::player
 {
 
-DefaultPlayerFactory::DefaultPlayerFactory(GameEvents* events, ILogger* logger, IHandAuditStore* audit,
+DefaultPlayerFactory::DefaultPlayerFactory(const GameEvents& events, ILogger* logger, IHandAuditStore* audit,
                                            IPlayersStatisticsStore* stats, StrategyAssigner* assigner)
     : myEvents(events), myLogger(logger), myAudit(audit), myStats(stats), myStrategyAssigner(assigner)
 {

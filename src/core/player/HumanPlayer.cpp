@@ -12,8 +12,8 @@ namespace pkt::core::player
 
 using namespace std;
 
-HumanPlayer::HumanPlayer(GameEvents* events, ILogger* logger, IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id,
-                         std::string name, int sC, bool aS, int mB)
+HumanPlayer::HumanPlayer(const GameEvents& events, ILogger* logger, IHandAuditStore* ha, IPlayersStatisticsStore* ps,
+                         int id, std::string name, int sC, bool aS, int mB)
     : Player(events, logger, ha, ps, id, name, sC, aS, mB)
 {
 }

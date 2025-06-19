@@ -16,8 +16,8 @@ namespace pkt::core::player
 
 using namespace std;
 
-BotPlayer::BotPlayer(GameEvents* events, ILogger* myLogger, IHandAuditStore* ha, IPlayersStatisticsStore* ps, int id,
-                     std::string name, int sC, bool aS, int mB)
+BotPlayer::BotPlayer(const GameEvents& events, ILogger* myLogger, IHandAuditStore* ha, IPlayersStatisticsStore* ps,
+                     int id, std::string name, int sC, bool aS, int mB)
     : Player(events, myLogger, ha, ps, id, name, sC, aS, mB)
 {
 }
@@ -54,8 +54,8 @@ void BotPlayer::action()
 
     evaluateBetAmount(); // original bet amount may be modified
     currentHand->getBoard()->collectSets();
-    if (myEvents && myEvents->onPotUpdated)
-        myEvents->onPotUpdated(currentHand->getBoard()->getPot());
+    if (myEvents.onPotUpdated)
+        myEvents.onPotUpdated(currentHand->getBoard()->getPot());
 
     myTurn = 0;
 
@@ -83,8 +83,8 @@ void BotPlayer::action()
 
     currentHand->setPreviousPlayerID(myID);
 
-    if (myEvents && myEvents->onActivePlayerActionDone)
-        myEvents->onActivePlayerActionDone();
+    if (myEvents.onActivePlayerActionDone)
+        myEvents.onActivePlayerActionDone();
 
     // currentHand->getGuiInterface()->showCards(myID);//test
 }

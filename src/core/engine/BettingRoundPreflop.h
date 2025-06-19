@@ -16,7 +16,7 @@ class BettingRoundPreflop : public BettingRound
 {
 
   public:
-    BettingRoundPreflop(GameEvents*, ILogger* logger, IHand*, unsigned, int);
+    BettingRoundPreflop(const GameEvents&, ILogger* logger, IHand*, unsigned, int);
     ~BettingRoundPreflop();
 
     void run();
