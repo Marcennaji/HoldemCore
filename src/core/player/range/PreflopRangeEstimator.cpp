@@ -3,6 +3,7 @@
 // Licensed under the MIT License — see LICENSE file for details.
 
 #include "PreflopRangeEstimator.h"
+#include <cmath>
 #include <core/engine/model/Ranges.h>
 #include <core/interfaces/IHand.h>
 #include <core/player/range/RangeRefiner.h>
