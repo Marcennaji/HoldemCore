@@ -37,7 +37,7 @@ class GlobalServices
     }
 
   private:
-    GlobalServices() {};
+    GlobalServices();
 
     std::shared_ptr<ILogger> logger_;
     std::shared_ptr<IRankingStore> rankingStore_;

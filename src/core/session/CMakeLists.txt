@@ -14,6 +14,7 @@ target_link_libraries(core_session
     engine
     infra
     player
+    service
     psim
     sqlite
     tiny

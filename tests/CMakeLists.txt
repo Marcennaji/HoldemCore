@@ -30,6 +30,7 @@ target_link_libraries(core_tests
     PRIVATE
     player
     engine
+    service
     psim
     gtest_main
 )
