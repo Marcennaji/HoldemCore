@@ -9,9 +9,9 @@ namespace pkt::core
 
 struct StartData
 {
-    StartData() : startDealerPlayerId(0), numberOfPlayers(0) {}
-    unsigned startDealerPlayerId;
-    int numberOfPlayers;
+    StartData() {}
+    unsigned startDealerPlayerId{0};
+    int numberOfPlayers{0};
 };
 
 } // namespace pkt::core

@@ -29,7 +29,7 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-Session::Session(const GameEvents& events) : currentGameNum(0), myEvents(events)
+Session::Session(const GameEvents& events) : myCurrentGameNum(0), myEvents(events)
 {
 }
 
@@ -39,8 +39,8 @@ Session::~Session()
 
 void Session::startGame(const GameData& gameData, const StartData& startData)
 {
-    currentGame.reset();
-    currentGameNum++;
+    myCurrentGame.reset();
+    myCurrentGameNum++;
 
     if (myEvents.onHideHoleCards)
         myEvents.onHideHoleCards();
@@ -73,14 +73,14 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
         p->setIsSessionActive(true);
     }
 
-    currentGame = std::make_unique<Game>(myEvents, engineFactory, playerList, gameData, startData, currentGameNum);
+    myCurrentGame = std::make_unique<Game>(myEvents, engineFactory, playerList, gameData, startData, myCurrentGameNum);
 
-    currentGame->initHand();
-    currentGame->startHand();
+    myCurrentGame->initHand();
+    myCurrentGame->startHand();
 }
 
 std::shared_ptr<Game> Session::getCurrentGame()
 {
-    return currentGame;
+    return myCurrentGame;
 }
 } // namespace pkt::core

@@ -11,11 +11,11 @@ namespace pkt::core
 {
 struct GameData
 {
-    GameData() : maxNumberOfPlayers(0), startMoney(0), firstSmallBlind(0), guiSpeed(0) {}
+    GameData() {}
     TableProfile tableProfile;
-    int maxNumberOfPlayers;
-    int startMoney;
-    int firstSmallBlind;
-    int guiSpeed;
+    int maxNumberOfPlayers{0};
+    int startMoney{0};
+    int firstSmallBlind{0};
+    int guiSpeed{0};
 };
 } // namespace pkt::core

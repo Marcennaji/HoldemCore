@@ -5,9 +5,7 @@
 #pragma once
 
 #include <memory>
-#include <string>
 
-#include <core/engine/EngineDefs.h>
 #include <core/engine/model/GameData.h>
 #include <core/engine/model/StartData.h>
 
@@ -28,9 +26,9 @@ class Session
     std::shared_ptr<Game> getCurrentGame();
 
   private:
-    int currentGameNum;
+    int myCurrentGameNum;
 
-    std::shared_ptr<Game> currentGame;
+    std::shared_ptr<Game> myCurrentGame;
     GameEvents myEvents;
 };
 
