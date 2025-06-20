@@ -84,30 +84,30 @@ class BettingRound : public IBettingRound
     IHand* myHand;
 
     const GameState myBettingRoundID;
-    int dealerPosition;
-    int smallBlindPosition;
+    int myDealerPosition;
+    int mySmallBlindPosition;
 
-    unsigned dealerPositionId;
-    unsigned smallBlindPositionId;
-    unsigned bigBlindPositionId;
+    unsigned myDealerPositionId;
+    unsigned mySmallBlindPositionId;
+    unsigned myBigBlindPositionId;
 
-    int smallBlind;
-    int highestSet;
-    int minimumRaise;
-    bool fullBetRule;
+    int mySmallBlind;
+    int myHighestSet;
+    int myMinimumRaise;
+    bool myFullBetRule;
 
-    bool firstRun;
-    bool firstRunGui; // HACK
-    bool firstRound;
-    bool firstHeadsUpRound;
+    bool myFirstRun;
+    bool myFirstRunGui; // HACK
+    bool myFirstRound;
+    bool myFirstHeadsUpRound;
 
-    pkt::core::player::PlayerListIterator currentPlayersTurnIt; // iterator for runningPlayerList
-    pkt::core::player::PlayerListIterator lastPlayersTurnIt;    // iterator for runningPlayerList
+    pkt::core::player::PlayerListIterator myCurrentPlayersTurnIt; // iterator for runningPlayerList
+    pkt::core::player::PlayerListIterator myLastPlayersTurnIt;    // iterator for runningPlayerList
 
-    unsigned currentPlayersTurnId;
-    unsigned firstRoundLastPlayersTurnId;
+    unsigned myCurrentPlayersTurnId;
+    unsigned myFirstRoundLastPlayersTurnId;
 
-    bool logBoardCardsDone;
+    bool myLogBoardCardsDone;
 };
 
 } // namespace pkt::core

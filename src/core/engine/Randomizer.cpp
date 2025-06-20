@@ -19,7 +19,7 @@ std::mt19937 g_rand_engine(g_rand_device());
 namespace pkt::core
 {
 
-void Randomizer::GetRand(int minValue, int maxValue, unsigned count, int* out)
+void Randomizer::getRand(int minValue, int maxValue, unsigned count, int* out)
 {
     uniform_int_distribution<int> dist(minValue, maxValue);
 

@@ -17,7 +17,7 @@ class IBoard
 {
 
   public:
-    virtual ~IBoard() {};
+    virtual ~IBoard() = default;
     //
     virtual void setPlayerLists(pkt::core::player::PlayerList, pkt::core::player::PlayerList,
                                 pkt::core::player::PlayerList) = 0;

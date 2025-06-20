@@ -18,7 +18,7 @@ namespace pkt::core
 class IHand
 {
   public:
-    virtual ~IHand() {};
+    virtual ~IHand() = default;
 
     virtual void start() = 0;
     virtual size_t dealBoardCards() = 0;

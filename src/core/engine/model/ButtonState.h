@@ -9,9 +9,9 @@ namespace pkt::core
 
 enum Button
 {
-    BUTTON_NONE = 0,
-    BUTTON_DEALER,
-    BUTTON_SMALL_BLIND,
-    BUTTON_BIG_BLIND
+    ButtonNone = 0,
+    ButtonDealer,
+    ButtonSmallBlind,
+    ButtonBigBlind
 };
 } // namespace pkt::core

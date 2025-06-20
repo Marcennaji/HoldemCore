@@ -144,18 +144,16 @@ struct PostFlopState
 
 
 ///Retuns some useful information about a hand.
-EXPORT void GetHandState(const char* hand, PostFlopState* results);
-void GetHandState(const int* hand, PostFlopState* results);
-
+EXPORT void getHandState(const char* hand, PostFlopState* results);
+void getHandState(const int* hand, PostFlopState* results);
 
 ///Converts a hand state to a string telling us in plain english what we have.
 //EXPORT const char* GetHandStateBrief(const PostFlopState* state);
 
 
 ///Ranks a hand, a higher ranked hand beats any lower ranked hand.
-EXPORT unsigned int RankHand(const char* hand);
-unsigned int RankHand(const int* hand);
-
+EXPORT unsigned int rankHand(const char* hand);
+unsigned int rankHand(const int* hand);
 
 ///Run ours simulations on a hand.
 /**
@@ -164,9 +162,10 @@ or >= the total number of boards, a full enumeration is performed.
 lowRange - highRange is the cards to evaluate for an oppenent. For example, setting low to .9 and high to 1
 would only evaluate the best 10% of the starting hole cards for the opponent.
 */
-EXPORT void SimulateHand(const char* hand, SimResults* results, float lowRange = 0, float highRange = 1, unsigned int boards = 0);
-void SimulateHand(const int* hand, SimResults* results, float lowRange = 0, float highRange = 1, unsigned int boards = 0);
-
+EXPORT void simulateHand(const char* hand, SimResults* results, float lowRange = 0, float highRange = 1,
+                         unsigned int boards = 0);
+void simulateHand(const int* hand, SimResults* results, float lowRange = 0, float highRange = 1,
+                  unsigned int boards = 0);
 
 ///Run ours simulations on a hand against mulitple opponents. (Currently doesn't figure current strength, only SD and draws)
 /**
@@ -174,15 +173,16 @@ Boards is the number of boards to see with Monte Carlo simulation.
 Hands is the number of hands to simulate per opponent per board.
 numOpponents is the number of Opponents.
 */
-EXPORT void SimulateHandMulti(const char* hand, SimResults* results, unsigned int boards = 2000, unsigned int hands = 500, unsigned int numOpponents = 9);
-void SimulateHandMulti(const int* hand, SimResults* results, unsigned int boards = 2000, unsigned int hands = 500, unsigned int numOpponents = 9);
+EXPORT void simulateHandMulti(const char* hand, SimResults* results, unsigned int boards = 2000,
+                              unsigned int hands = 500, unsigned int numOpponents = 9);
+void simulateHandMulti(const int* hand, SimResults* results, unsigned int boards = 2000, unsigned int hands = 500,
+                       unsigned int numOpponents = 9);
 
 // my exports adds
-void GetHandState(const char* hand, PostFlopState* state);
-unsigned int RankHand(const char* hand);
-void SimulateHandMulti(const char* hand, SimResults* results, unsigned int boards, unsigned int hands, unsigned int numOpponents);
-void SimulateHand(const char* hand, SimResults* results, float lowRange, float highRange, unsigned int boards);
-
-
+void getHandState(const char* hand, PostFlopState* state);
+unsigned int rankHand(const char* hand);
+void simulateHandMulti(const char* hand, SimResults* results, unsigned int boards, unsigned int hands,
+                       unsigned int numOpponents);
+void simulateHand(const char* hand, SimResults* results, float lowRange, float highRange, unsigned int boards);
 
 #endif

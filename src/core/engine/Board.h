@@ -53,19 +53,19 @@ class Board : public IBoard
     void setPlayerNeedToShowCards(const std::list<unsigned>& p);
 
   private:
-    pkt::core::player::PlayerList seatsList;
-    pkt::core::player::PlayerList activePlayerList;
-    pkt::core::player::PlayerList runningPlayerList;
+    pkt::core::player::PlayerList mySeatsList;
+    pkt::core::player::PlayerList myActivePlayerList;
+    pkt::core::player::PlayerList myRunningPlayerList;
 
-    std::list<unsigned> winners;
-    std::list<unsigned> playerNeedToShowCards;
+    std::list<unsigned> myWinners;
+    std::list<unsigned> myPlayerNeedToShowCards;
 
     int myCards[5];
-    int pot;
-    int sets;
-    unsigned dealerPosition;
-    bool allInCondition;
-    unsigned lastActionPlayerID;
+    int myPot;
+    int mySets;
+    unsigned myDealerPosition;
+    bool myAllInCondition;
+    unsigned myLastActionPlayerId;
 };
 
 } // namespace pkt::core

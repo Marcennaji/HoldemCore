@@ -14,7 +14,7 @@ namespace pkt::core
 class IBettingRound
 {
   public:
-    virtual ~IBettingRound() {};
+    virtual ~IBettingRound() = default;
 
     virtual GameState getBettingRoundID() const = 0;
 

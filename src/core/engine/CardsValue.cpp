@@ -25,7 +25,7 @@ std::map<std::string, int> CardsValue::CardStringOrdering = {
 
 int CardsValue::evaluateHand(const int* cards)
 {
-    return static_cast<int>(RankHand(cards));
+    return static_cast<int>(rankHand(cards));
 }
 
 } // namespace pkt::core

@@ -12,10 +12,10 @@ enum PlayerPosition
     SB = 1,
     BB = 2,
     UTG = 3,
-    UTG_PLUS_ONE = 4,
-    UTG_PLUS_TWO = 5,
+    UtgPlusOne = 4,
+    UtgPlusTwo = 5,
     MIDDLE = 6,
-    MIDDLE_PLUS_ONE = 7,
+    MiddlePlusOne = 7,
     LATE = 8,
     CUTOFF = 9,
     BUTTON = 10

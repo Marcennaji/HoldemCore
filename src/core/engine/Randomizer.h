@@ -11,6 +11,6 @@ namespace pkt::core
 class Randomizer
 {
   public:
-    static void GetRand(int minValue, int maxValue, unsigned count, int* out);
+    static void getRand(int minValue, int maxValue, unsigned count, int* out);
 };
 } // namespace pkt::core

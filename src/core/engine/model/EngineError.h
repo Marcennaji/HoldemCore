@@ -9,14 +9,14 @@ namespace pkt::core
 
 enum class EngineError
 {
-    SEAT_NOT_FOUND = 10001,
-    ACTIVE_PLAYER_NOT_FOUND = 10002,
-    RUNNING_PLAYER_NOT_FOUND = 10003,
-    DEALER_NOT_FOUND = 10004,
-    CURRENT_PLAYER_NOT_FOUND = 10005,
-    NEXT_DEALER_NOT_FOUND = 10010,
-    NEXT_ACTIVE_PLAYER_NOT_FOUND = 10011,
-    FORMER_RUNNING_PLAYER_NOT_FOUND = 10012,
-    PLAYER_ACTION_ERROR = 10030
+    SeatNotFound = 10001,
+    ActivePlayerNotFound = 10002,
+    RunningPlayerNotFound = 10003,
+    DealerNotFound = 10004,
+    CurrentPlayerNotFound = 10005,
+    NextDealerNotFound = 10010,
+    NextActivePlayerNotFound = 10011,
+    FormerRunningPlayerNotFound = 10012,
+    PlayerActionError = 10030
 };
 } // namespace pkt::core

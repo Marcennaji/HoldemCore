@@ -23,6 +23,7 @@ def run_clang_tidy(file_path, build_dir, checks):
         str(file_path),
         "-p", str(build_dir),
         "-fix",
+        "-fix-it",
         f"-checks={checks}"
     ])
     if result.returncode != 0:

@@ -11,28 +11,28 @@ namespace pkt::core
 using namespace std;
 
 Exception::Exception(const char* sourcefile, int sourceline, EngineError errorId, int osErrorCode)
-    : m_errorId(errorId), m_osErrorCode(osErrorCode)
+    : myMErrorId(errorId), myMOsErrorCode(osErrorCode)
 {
     ostringstream msgStream;
     msgStream << sourcefile << " (" << sourceline << "): Error " << static_cast<const int>(errorId);
     if (osErrorCode)
+    {
         msgStream << " (system error " << osErrorCode << ")";
-    m_msg = msgStream.str();
+    }
+    myMMsg = msgStream.str();
 }
 
-Exception::Exception(const char* sourcefile, int sourceline, EngineError errorId) : m_errorId(errorId)
+Exception::Exception(const char* sourcefile, int sourceline, EngineError errorId) : myMErrorId(errorId)
 {
     ostringstream msgStream;
     msgStream << sourcefile << " (" << sourceline << "): Error " << static_cast<const int>(errorId);
-    m_msg = msgStream.str();
+    myMMsg = msgStream.str();
 }
 
-Exception::~Exception() throw()
-{
-}
+Exception::~Exception() throw() = default;
 
 const char* Exception::what() const throw()
 {
-    return m_msg.c_str();
+    return myMMsg.c_str();
 }
 } // namespace pkt::core

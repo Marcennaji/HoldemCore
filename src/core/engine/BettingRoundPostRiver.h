@@ -23,7 +23,7 @@ class BettingRoundPostRiver : public BettingRound
     void postRiverRun();
 
   private:
-    int highestCardsValue;
+    int myHighestCardsValue;
 };
 
 } // namespace pkt::core

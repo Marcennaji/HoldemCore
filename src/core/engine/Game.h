@@ -36,33 +36,35 @@ class Game
     std::shared_ptr<IHand> getCurrentHand();
     const std::shared_ptr<IHand> getCurrentHand() const;
 
-    pkt::core::player::PlayerList getSeatsList() const { return seatsList; }
-    pkt::core::player::PlayerList getActivePlayerList() const { return activePlayerList; }
-    pkt::core::player::PlayerList getRunningPlayerList() const { return runningPlayerList; }
+    pkt::core::player::PlayerList getSeatsList() const { return mySeatsList; }
+    pkt::core::player::PlayerList getActivePlayerList() const { return myActivePlayerList; }
+    pkt::core::player::PlayerList getRunningPlayerList() const { return myRunningPlayerList; }
 
-    void setStartQuantityPlayers(int theValue) { startQuantityPlayers = theValue; }
-    int getStartQuantityPlayers() const { return startQuantityPlayers; }
+    void setStartQuantityPlayers(int theValue) { myStartQuantityPlayers = theValue; }
+    int getStartQuantityPlayers() const { return myStartQuantityPlayers; }
 
-    void setStartSmallBlind(int theValue) { startSmallBlind = theValue; }
-    int getStartSmallBlind() const { return startSmallBlind; }
+    void setStartSmallBlind(int theValue) { myStartSmallBlind = theValue; }
+    int getStartSmallBlind() const { return myStartSmallBlind; }
 
-    void setStartCash(int theValue) { startCash = theValue; }
-    int getStartCash() const { return startCash; }
+    void setStartCash(int theValue) { myStartCash = theValue; }
+    int getStartCash() const { return myStartCash; }
 
     int getGameID() const { return myGameID; }
 
-    void setCurrentSmallBlind(int theValue) { currentSmallBlind = theValue; }
-    int getCurrentSmallBlind() const { return currentSmallBlind; }
+    void setCurrentSmallBlind(int theValue) { myCurrentSmallBlind = theValue; }
+    int getCurrentSmallBlind() const { return myCurrentSmallBlind; }
 
-    void setCurrentHandID(int theValue) { currentHandID = theValue; }
-    int getCurrentHandID() const { return currentHandID; }
+    void setCurrentHandID(int theValue) { myCurrentHandId = theValue; }
+    int getCurrentHandID() const { return myCurrentHandId; }
 
-    unsigned getDealerPosition() const { return dealerPosition; }
+    unsigned getDealerPosition() const { return myDealerPosition; }
 
     void replaceDealer(unsigned oldDealer, unsigned newDealer)
     {
-        if (dealerPosition == oldDealer)
-            dealerPosition = newDealer;
+        if (myDealerPosition == oldDealer)
+        {
+            myDealerPosition = newDealer;
+        }
     }
 
     std::shared_ptr<pkt::core::player::Player> getPlayerByUniqueId(unsigned id);
@@ -74,28 +76,28 @@ class Game
     std::shared_ptr<EngineFactory> myFactory;
 
     const GameEvents& myEvents;
-    std::shared_ptr<IHand> currentHand;
-    std::shared_ptr<IBoard> currentBoard;
+    std::shared_ptr<IHand> myCurrentHand;
+    std::shared_ptr<IBoard> myCurrentBoard;
 
-    pkt::core::player::PlayerList seatsList;
-    pkt::core::player::PlayerList activePlayerList;  // used seats
-    pkt::core::player::PlayerList runningPlayerList; // nonfolded and nonallin active players
+    pkt::core::player::PlayerList mySeatsList;
+    pkt::core::player::PlayerList myActivePlayerList;  // used seats
+    pkt::core::player::PlayerList myRunningPlayerList; // nonfolded and nonallin active players
 
     // start variables
-    int startQuantityPlayers;
-    int startCash;
-    int startSmallBlind;
+    int myStartQuantityPlayers;
+    int myStartCash;
+    int myStartSmallBlind;
     int myGameID;
 
     // running variables
-    int currentSmallBlind;
-    int currentHandID;
-    unsigned dealerPosition;
-    int lastHandBlindsRaised;
-    int lastTimeBlindsRaised;
+    int myCurrentSmallBlind;
+    int myCurrentHandId;
+    unsigned myDealerPosition;
+    int myLastHandBlindsRaised;
+    int myLastTimeBlindsRaised;
     GameData myGameData;
     StartData myStartData;
-    std::list<int> blindsList;
+    std::list<int> myBlindsList;
 };
 
 } // namespace pkt::core
