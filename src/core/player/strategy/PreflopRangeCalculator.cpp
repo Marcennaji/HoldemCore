@@ -165,9 +165,13 @@ float PreflopRangeCalculator::clampCallingRange(float callingRange) const
 {
     callingRange = std::ceil(callingRange);
     if (callingRange < 1)
+    {
         callingRange = 1;
+    }
     if (callingRange > 100)
+    {
         callingRange = 100;
+    }
 
     GlobalServices::instance().logger()->info("Standard calling range : " + std::to_string(callingRange) + "%");
     return callingRange;
@@ -468,7 +472,9 @@ float PreflopRangeCalculator::adjustRaiseForStack(const CurrentHandContext& cont
 
     int handsLeft = myM * nbPlayers;
     if (handsLeft < 1)
+    {
         handsLeft = 1;
+    }
 
     if (handsLeft < 90)
     {
@@ -489,9 +495,13 @@ float PreflopRangeCalculator::clampRaiseRange(float raisingRange) const
 {
     raisingRange = std::ceil(raisingRange);
     if (raisingRange < 0)
+    {
         raisingRange = 0;
+    }
     if (raisingRange > 100)
+    {
         raisingRange = 100;
+    }
 
     GlobalServices::instance().logger()->info("Final raising range: " + std::to_string(raisingRange) + "%");
 

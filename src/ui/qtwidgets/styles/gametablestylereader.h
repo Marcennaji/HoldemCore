@@ -7,6 +7,8 @@
 #include <QtCore>
 #include <QtGui>
 #include <QtWidgets/QPlainTextEdit>
+#include <QtWidgets/QSpinBox>
+#include <QtWidgets/QTextBrowser>
 #include <core/engine/EngineDefs.h>
 #include <string>
 #include <third_party/tiny/tinyxml.h>

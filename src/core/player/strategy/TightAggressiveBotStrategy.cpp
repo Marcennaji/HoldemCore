@@ -33,36 +33,44 @@ TightAggressiveBotStrategy::TightAggressiveBotStrategy() : IBotStrategy()
     initializeRanges(45, utgFullTableRange);
 }
 
-TightAggressiveBotStrategy::~TightAggressiveBotStrategy()
-{
-}
+TightAggressiveBotStrategy::~TightAggressiveBotStrategy() = default;
 
 bool TightAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool deterministic)
 {
 
     float callingRange = getPreflopRangeCalculator()->calculatePreflopCallingRange(ctx);
     if (callingRange == -1)
+    {
         return false; // never call : raise or fold
+    }
 
     string stringCallingRange;
 
-    const char** RANGES_STRING;
+    const char** rangesString;
 
     if (ctx.nbPlayers == 2)
-        RANGES_STRING = TOP_RANGE_2_PLAYERS;
+    {
+        rangesString = TOP_RANGE_2_PLAYERS;
+    }
     else if (ctx.nbPlayers == 3)
-        RANGES_STRING = TOP_RANGE_3_PLAYERS;
+    {
+        rangesString = TOP_RANGE_3_PLAYERS;
+    }
     else if (ctx.nbPlayers == 4)
-        RANGES_STRING = TOP_RANGE_4_PLAYERS;
+    {
+        rangesString = TOP_RANGE_4_PLAYERS;
+    }
     else
-        RANGES_STRING = TOP_RANGE_MORE_4_PLAYERS;
+    {
+        rangesString = TOP_RANGE_MORE_4_PLAYERS;
+    }
 
-    stringCallingRange = RANGES_STRING[(int) callingRange];
+    stringCallingRange = rangesString[(int) callingRange];
 
     std::shared_ptr<Player> lastRaiser = ctx.preflopLastRaiser;
 
     if (ctx.nbRunningPlayers > 2 && ctx.preflopRaisesNumber + ctx.preflopCallsNumber > 1 &&
-        ctx.preflopRaisesNumber == 1 && ctx.myPosition >= LATE && ctx.myCash >= ctx.pot * 10 && lastRaiser != NULL &&
+        ctx.preflopRaisesNumber == 1 && ctx.myPosition >= LATE && ctx.myCash >= ctx.pot * 10 && lastRaiser != nullptr &&
         lastRaiser->getCash() >= ctx.pot * 20 && !ctx.isPreflopBigBet)
     {
 
@@ -75,7 +83,7 @@ bool TightAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool
     // defend against 3bet bluffs :
     if (ctx.preflopRaisesNumber == 2 && ctx.myCurrentHandActions.getPreflopActions().size() > 0 &&
         ctx.myCurrentHandActions.getPreflopActions().back() == PlayerActionRaise && ctx.myCash >= ctx.pot * 10 &&
-        lastRaiser != NULL && lastRaiser->getCash() >= ctx.pot * 10 && !ctx.isPreflopBigBet)
+        lastRaiser != nullptr && lastRaiser->getCash() >= ctx.pot * 10 && !ctx.isPreflopBigBet)
     {
 
         int rand = 0;
@@ -103,25 +111,37 @@ int TightAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
     float raisingRange = getPreflopRangeCalculator()->calculatePreflopRaisingRange(ctx);
 
     if (raisingRange == -1)
+    {
         return 0; // never raise : call or fold
+    }
 
     if (ctx.preflopRaisesNumber > 1)
+    {
         return 0; // never 4-bet : call or fold
+    }
 
     string stringRaisingRange;
 
-    const char** RANGES_STRING;
+    const char** rangesString;
 
     if (ctx.nbPlayers == 2)
-        RANGES_STRING = TOP_RANGE_2_PLAYERS;
+    {
+        rangesString = TOP_RANGE_2_PLAYERS;
+    }
     else if (ctx.nbPlayers == 3)
-        RANGES_STRING = TOP_RANGE_3_PLAYERS;
+    {
+        rangesString = TOP_RANGE_3_PLAYERS;
+    }
     else if (ctx.nbPlayers == 4)
-        RANGES_STRING = TOP_RANGE_4_PLAYERS;
+    {
+        rangesString = TOP_RANGE_4_PLAYERS;
+    }
     else
-        RANGES_STRING = TOP_RANGE_MORE_4_PLAYERS;
+    {
+        rangesString = TOP_RANGE_MORE_4_PLAYERS;
+    }
 
-    stringRaisingRange = RANGES_STRING[(int) raisingRange];
+    stringRaisingRange = rangesString[(int) raisingRange];
 
     GlobalServices::instance().logger()->info(stringRaisingRange);
 
@@ -169,7 +189,9 @@ int TightAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
     }
 
     if (!speculativeHandedAdded && !isCardsInRange(ctx.myCard1, ctx.myCard2, stringRaisingRange))
+    {
         return 0;
+    }
 
     // sometimes, just call a single raise instead of raising, even with a strong hand
     // nb. raising range 100 means that I want to steal a bet or BB
@@ -196,10 +218,14 @@ int TightAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool dete
 {
 
     if (ctx.flopBetsOrRaisesNumber > 0)
+    {
         return 0;
+    }
 
     if (shouldPotControl(ctx, deterministic))
+    {
         return 0;
+    }
 
     // donk bets :
     if (ctx.flopBetsOrRaisesNumber > 0 && ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getId() != ctx.myID)
@@ -240,7 +266,9 @@ int TightAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool dete
 
     // don't bet if in position, and pretty good drawing probs
     if (getDrawingProbability(ctx.myPostFlopState) > 20 && ctx.myHavePosition)
+    {
         return 0;
+    }
 
     // if pretty good hand
     if (ctx.myHandSimulation.winRanged > 0.6 || ctx.myHandSimulation.win > 0.94)
@@ -255,25 +283,35 @@ int TightAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool dete
         int rand = 0;
         Randomizer::getRand(1, 7, 1, &rand);
         if (!deterministic && rand == 3 && !ctx.myHavePosition && ctx.preflopLastRaiser->getId() != ctx.myID)
+        {
             return 0; // may check-raise or check-call
+        }
 
         // if no raise preflop, or if more than 1 opponent
         if (ctx.preflopRaisesNumber == 0 || ctx.nbRunningPlayers > 2)
         {
 
             if (ctx.nbRunningPlayers < 4)
+            {
                 return ctx.pot * 0.6;
+            }
             else
+            {
                 return ctx.pot;
+            }
         }
 
         // if i have raised preflop, bet
         if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getId() == ctx.myID)
         {
             if (ctx.nbRunningPlayers < 4)
+            {
                 return ctx.pot * 0.6;
+            }
             else
+            {
                 return ctx.pot;
+            }
         }
     }
     else
@@ -283,7 +321,9 @@ int TightAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool dete
 
         // if there was a lot of action preflop, and i was not the last raiser : don't bet
         if (ctx.preflopRaisesNumber > 1 && ctx.preflopLastRaiser->getId() != ctx.myID)
+        {
             return 0;
+        }
 
         // if I was the last raiser preflop, I may bet with not much
         if (ctx.preflopLastRaiser->getId() == ctx.myID && ctx.nbRunningPlayers < 4 && ctx.myCash > ctx.pot * 5 &&
@@ -300,19 +340,29 @@ bool TightAggressiveBotStrategy::flopShouldCall(CurrentHandContext& ctx, bool de
 {
 
     if (ctx.flopBetsOrRaisesNumber == 0)
+    {
         return false;
+    }
 
     if (isDrawingProbOk(ctx.myPostFlopState, ctx.potOdd))
+    {
         return true;
+    }
 
     if (ctx.myHandSimulation.winRanged == 1 && ctx.myHandSimulation.win > 0.5)
+    {
         return true;
+    }
 
     if (ctx.myHandSimulation.winRanged * 100 < ctx.potOdd && ctx.myHandSimulation.win < 0.94)
+    {
         return false;
+    }
 
     if (ctx.myHandSimulation.winRanged < 0.25 && ctx.myHandSimulation.win < 0.3)
+    {
         return false;
+    }
 
     return true;
 }
@@ -323,22 +373,34 @@ int TightAggressiveBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool de
     const int nbRaises = ctx.flopBetsOrRaisesNumber;
 
     if (nbRaises == 0)
+    {
         return 0;
+    }
 
     if (shouldPotControl(ctx, deterministic))
+    {
         return 0;
+    }
 
     if (nbRaises == 1 && ctx.myHandSimulation.win < 0.90)
+    {
         return false;
+    }
 
     if (nbRaises == 2 && ctx.myHandSimulation.win < 0.95)
+    {
         return 0;
+    }
 
     if (nbRaises == 3 && ctx.myHandSimulation.win < 0.98)
+    {
         return 0;
+    }
 
     if (nbRaises > 3 && ctx.myHandSimulation.win != 1)
+    {
         return 0;
+    }
 
     if ((isDrawingProbOk(ctx.myPostFlopState, ctx.potOdd) || ctx.myHavePosition) && ctx.nbRunningPlayers == 2 &&
         !(ctx.myHandSimulation.winRanged * 100 < ctx.potOdd) && ctx.myCanBluff && nbRaises < 2)
@@ -388,14 +450,20 @@ int TightAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool dete
     const int nbRaises = ctx.turnBetsOrRaisesNumber;
 
     if (nbRaises > 0)
+    {
         return 0;
+    }
 
     if (shouldPotControl(ctx, deterministic))
+    {
         return 0;
+    }
 
     if (ctx.flopBetsOrRaisesNumber > 1 && !ctx.myFlopIsAggressor && ctx.myHandSimulation.winRanged < 0.75 &&
         ctx.myHandSimulation.win < 0.9)
+    {
         return 0;
+    }
 
     if (ctx.flopBetsOrRaisesNumber == 0 && ctx.myHavePosition && ctx.nbRunningPlayers < 4 &&
         getDrawingProbability(ctx.myPostFlopState) < 9 && ctx.myCash > pot * 4)
@@ -409,10 +477,14 @@ int TightAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool dete
     }
 
     if (ctx.myCash < ctx.pot * 4 && ctx.myHandSimulation.winRanged < 0.6 && ctx.myHandSimulation.win < 0.9)
+    {
         return 0;
+    }
 
     if (ctx.myHandSimulation.winRanged < 0.6 && ctx.myHandSimulation.win < 0.9 && !ctx.myHavePosition)
+    {
         return 0;
+    }
 
     if (ctx.myHandSimulation.winRanged > 0.5 && ctx.myHandSimulation.win > 0.7 && ctx.myHavePosition)
     {
@@ -448,10 +520,14 @@ int TightAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool dete
 bool TightAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx, bool deterministic)
 {
     if (ctx.turnBetsOrRaisesNumber == 0)
+    {
         return false;
+    }
 
     if (isDrawingProbOk(ctx.myPostFlopState, ctx.potOdd))
+    {
         return true;
+    }
 
     TurnStatistics raiserStats = ctx.turnLastRaiser->getStatistics(ctx.nbPlayers).getTurnStatistics();
 
@@ -459,8 +535,10 @@ bool TightAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx, bool de
     if (raiserStats.m_hands < MIN_HANDS_STATISTICS_ACCURATE && ctx.nbPlayers < 10 &&
         ctx.turnLastRaiser->getStatistics(ctx.nbPlayers + 1).getTurnStatistics().m_hands >
             MIN_HANDS_STATISTICS_ACCURATE)
+    {
 
         raiserStats = ctx.turnLastRaiser->getStatistics(ctx.nbPlayers + 1).getTurnStatistics();
+    }
 
     if (ctx.myHandSimulation.winRanged * 100 < ctx.potOdd && ctx.myHandSimulation.winRanged < 0.94)
     {
@@ -470,28 +548,42 @@ bool TightAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx, bool de
     if (ctx.turnBetsOrRaisesNumber == 2 && ctx.myHandSimulation.winRanged < 0.8 && ctx.myHandSimulation.win < 0.9)
     {
         if (raiserStats.m_hands <= MIN_HANDS_STATISTICS_ACCURATE)
+        {
             return false;
+        }
         if (raiserStats.getAgressionFrequency() < 20)
+        {
             return false;
+        }
     }
     if (ctx.turnBetsOrRaisesNumber > 2 && ctx.myHandSimulation.winRanged < 0.9 && ctx.myHandSimulation.win < 0.95)
     {
         if (raiserStats.m_hands <= MIN_HANDS_STATISTICS_ACCURATE)
+        {
             return false;
+        }
         if (raiserStats.getAgressionFrequency() < 20)
+        {
             return false;
+        }
     }
 
     if (ctx.myHandSimulation.winRanged < 0.6 && ctx.myHandSimulation.win < 0.95 &&
         (ctx.flopBetsOrRaisesNumber > 0 || raiserStats.getAgressionFrequency() < 30))
+    {
         return false;
+    }
 
     if (!ctx.myPreflopIsAggressor && !ctx.myFlopIsAggressor && ctx.myHandSimulation.winRanged < 0.8 &&
         ctx.myHandSimulation.win < 0.95 && raiserStats.getAgressionFrequency() < 30 && !ctx.myHavePosition)
+    {
         return false;
+    }
 
     if (ctx.myHandSimulation.winRanged < 0.25 && ctx.myHandSimulation.win < 0.95)
+    {
         return false;
+    }
 
     return true;
 }
@@ -499,23 +591,33 @@ bool TightAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx, bool de
 int TightAggressiveBotStrategy::turnShouldRaise(CurrentHandContext& ctx, bool deterministic)
 {
     if (ctx.turnBetsOrRaisesNumber == 0)
+    {
         return 0;
+    }
 
     if (shouldPotControl(ctx, deterministic))
+    {
         return 0;
+    }
 
     if (ctx.turnBetsOrRaisesNumber == 2 && ctx.myHandSimulation.win < 0.98)
+    {
         return 0;
+    }
 
     if (ctx.turnBetsOrRaisesNumber > 2 && ctx.myHandSimulation.win != 1)
+    {
         return 0;
+    }
 
     if (ctx.myHandSimulation.winRanged > 0.98 && ctx.myHandSimulation.win > 0.98 && ctx.myHandSimulation.winSd > 0.9)
     {
         int rand = 0;
         Randomizer::getRand(1, 3, 1, &rand);
         if (!deterministic && rand == 1)
+        {
             return 0; // very strong hand, slow play, just call
+        }
     }
 
     if (ctx.myHandSimulation.win == 1 || (ctx.myHandSimulation.winRanged == 1 && ctx.turnBetsOrRaisesNumber < 3))
@@ -524,7 +626,9 @@ int TightAggressiveBotStrategy::turnShouldRaise(CurrentHandContext& ctx, bool de
     }
 
     if (ctx.myHandSimulation.winRanged * 100 < ctx.potOdd && ctx.myHandSimulation.winRanged < 0.94)
+    {
         return 0;
+    }
 
     if (ctx.myHandSimulation.winRanged > 0.9 && ctx.myHandSimulation.win > 0.9 && ctx.turnBetsOrRaisesNumber == 1 &&
         ctx.flopBetsOrRaisesNumber < 2)
@@ -544,7 +648,9 @@ int TightAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool det
 {
 
     if (ctx.riverBetsOrRaisesNumber > 0)
+    {
         return 0;
+    }
 
     // blocking bet if my chances to win are weak, but not ridiculous
     if (!ctx.myHavePosition && ctx.myHandSimulation.winRanged < 0.7 && ctx.myHandSimulation.winRanged > 0.4 &&
@@ -576,7 +682,9 @@ int TightAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool det
     }
 
     if (ctx.myHandSimulation.winSd < .94 && ctx.turnBetsOrRaisesNumber > 0 && !ctx.myTurnIsAggressor)
+    {
         return false;
+    }
 
     int rand = 0;
     Randomizer::getRand(40, 80, 1, &rand);
@@ -630,7 +738,9 @@ bool TightAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx, bool d
     const int nbRaises = ctx.riverBetsOrRaisesNumber;
 
     if (nbRaises == 0)
+    {
         return false;
+    }
 
     RiverStatistics raiserStats = ctx.lastVPIPPlayer->getStatistics(ctx.nbPlayers).getRiverStatistics();
 
@@ -638,26 +748,34 @@ bool TightAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx, bool d
     if (raiserStats.m_hands < MIN_HANDS_STATISTICS_ACCURATE && ctx.nbPlayers < 10 &&
         ctx.lastVPIPPlayer->getStatistics(ctx.nbPlayers + 1).getTurnStatistics().m_hands >
             MIN_HANDS_STATISTICS_ACCURATE)
+    {
         raiserStats = ctx.lastVPIPPlayer->getStatistics(ctx.nbPlayers + 1).getRiverStatistics();
+    }
 
     if (ctx.myHandSimulation.winRanged * 100 < ctx.potOdd && ctx.myHandSimulation.winRanged < 0.94)
     {
         if (raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getAgressionFrequency() < 40)
+        {
             return false;
+        }
     }
 
     if (ctx.myHandSimulation.winRanged < .7 && nbRaises == 1)
     {
         if (raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE &&
             ctx.lastVPIPPlayer->getStatistics(ctx.nbPlayers).getWentToShowDown() < 40)
+        {
             return false;
+        }
     }
 
     if (ctx.myHandSimulation.winRanged < .9 && nbRaises > 1)
     {
         if (raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE &&
             ctx.lastVPIPPlayer->getStatistics(ctx.nbPlayers).getWentToShowDown() < 40)
+        {
             return false;
+        }
     }
 
     // if hazardous call may cost me my stack, don't call even with good odds
@@ -667,7 +785,9 @@ bool TightAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx, bool d
 
         if (raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE &&
             ctx.lastVPIPPlayer->getStatistics(ctx.nbPlayers).getWentToShowDown() < 50)
+        {
             return false;
+        }
     }
 
     // assume that if there was more than 1 player to play after the raiser and he is not a maniac, he shouldn't bluff
@@ -693,7 +813,9 @@ bool TightAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx, bool d
     }*/
 
     if (raiserStats.m_hands <= MIN_HANDS_STATISTICS_ACCURATE && ctx.potOdd * 1.5 > ctx.myHandSimulation.winRanged * 100)
+    {
         return false;
+    }
 
     return true;
 }
@@ -702,7 +824,9 @@ int TightAggressiveBotStrategy::riverShouldRaise(CurrentHandContext& ctx, bool d
 {
 
     if (ctx.riverBetsOrRaisesNumber == 0)
+    {
         return 0;
+    }
 
     //  TODO : analyze previous actions, and determine if we must bet for value, without the nuts
     if (ctx.riverBetsOrRaisesNumber < 3 && ctx.myHandSimulation.winRanged > .98 && ctx.myHandSimulation.winSd > 0.5)

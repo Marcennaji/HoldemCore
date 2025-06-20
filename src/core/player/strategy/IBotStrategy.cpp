@@ -33,12 +33,18 @@ int IBotStrategy::computePreflopRaiseAmount(CurrentHandContext& ctx, bool determ
         if (nbPlayers > 4)
         { // adjust for position
             if (ctx.myPosition < MIDDLE)
+            {
                 myRaiseAmount += bigBlind;
+            }
             if (ctx.myPosition == BUTTON)
+            {
                 myRaiseAmount -= ctx.smallBlind;
+            }
         }
-        if (ctx.preflopCallsNumber > 0) // increase raise amount if there are limpers
+        if (ctx.preflopCallsNumber > 0)
+        { // increase raise amount if there are limpers
             myRaiseAmount += (ctx.preflopCallsNumber * bigBlind);
+        }
     }
     else
     {
@@ -57,7 +63,9 @@ int IBotStrategy::computePreflopRaiseAmount(CurrentHandContext& ctx, bool determ
 
     // if i would be commited in the pot with the computed amount, just go allin preflop
     if (myRaiseAmount > (ctx.myCash * 0.3))
+    {
         myRaiseAmount = ctx.myCash;
+    }
 
     return myRaiseAmount;
 }
@@ -73,29 +81,39 @@ bool IBotStrategy::shouldPotControl(CurrentHandContext& ctx, bool deterministic)
     if (ctx.pot >= potThreshold)
     {
         if (ctx.myPostFlopState.IsPocketPair && !ctx.myPostFlopState.IsOverPair)
+        {
             potControl = true;
+        }
 
         if (ctx.myPostFlopState.IsFullHousePossible &&
             !(ctx.myPostFlopState.IsTrips || ctx.myPostFlopState.IsFlush || ctx.myPostFlopState.IsFullHouse ||
               ctx.myPostFlopState.IsQuads))
+        {
             potControl = true;
+        }
 
         if (ctx.gameState == GameStateFlop)
         {
             if ((ctx.myPostFlopState.IsOverPair || ctx.myPostFlopState.IsTopPair) && ctx.mySet > bigBlind * 20)
+            {
                 potControl = true;
+            }
         }
         else if (ctx.gameState == GameStateTurn)
         {
             if (ctx.myPostFlopState.IsOverPair ||
                 (ctx.myPostFlopState.IsTwoPair && !ctx.myPostFlopState.IsFullHousePossible) ||
                 (ctx.myPostFlopState.IsTrips && ctx.mySet > bigBlind * 60))
+            {
                 potControl = true;
+            }
         }
     }
 
     if (potControl)
+    {
         GlobalServices::instance().logger()->info("\t\tShould control pot");
+    }
 
     return potControl;
 }

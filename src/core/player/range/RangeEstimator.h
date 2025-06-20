@@ -56,6 +56,6 @@ class RangeEstimator
     std::unique_ptr<PreflopRangeEstimator> myPreflopRangeEstimator;
     std::string myEstimatedRange;
     int myPlayerId;
-    IHand* myHand;
+    IHand* myHand{nullptr};
 };
 } // namespace pkt::core::player

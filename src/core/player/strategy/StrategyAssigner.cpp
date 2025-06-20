@@ -8,7 +8,7 @@
 namespace pkt::core::player
 {
 
-StrategyAssigner::StrategyAssigner(TableProfile profile, int botCount) : myProfile(profile), maxPerType(botCount / 3)
+StrategyAssigner::StrategyAssigner(TableProfile profile, int botCount) : myProfile(profile), myMaxPerType(botCount / 3)
 {
 }
 
@@ -41,14 +41,22 @@ std::unique_ptr<IBotStrategy> StrategyAssigner::chooseStrategyFor(int botIndex)
     }
 
     // RandomOpponents profile
-    if (rand < 3 && countManiac++ < maxPerType)
+    if (rand < 3 && myCountManiac++ < myMaxPerType)
+    {
         return std::make_unique<ManiacBotStrategy>();
-    if (rand < 5 && countUltraTight++ < maxPerType)
+    }
+    if (rand < 5 && myCountUltraTight++ < myMaxPerType)
+    {
         return std::make_unique<UltraTightBotStrategy>();
-    if (rand < 9 && countLoose++ < maxPerType)
+    }
+    if (rand < 9 && myCountLoose++ < myMaxPerType)
+    {
         return std::make_unique<LooseAggressiveBotStrategy>();
-    if (countTight++ < maxPerType)
+    }
+    if (myCountTight++ < myMaxPerType)
+    {
         return std::make_unique<TightAggressiveBotStrategy>();
+    }
 
     // fallback
     return std::make_unique<UltraTightBotStrategy>();

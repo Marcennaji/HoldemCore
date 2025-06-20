@@ -24,9 +24,7 @@ namespace pkt::core::player
 using namespace std;
 
 Player::Player(const GameEvents& events, int id, std::string name, int sC, bool aS, int mB)
-    : currentHand(0), myID(id), myName(name), myCardsValueInt(0), myCash(sC), mySet(0), myLastRelativeSet(0),
-      myAction(PlayerActionNone), myButton(mB), myActiveStatus(aS), myTurn(0), myCardsFlip(0), myRoundStartCash(0),
-      lastMoneyWon(0), m_isSessionActive(false), myEvents(events)
+    : myID(id), myName(name), myCash(sC), myButton(mB), myActiveStatus(aS), myEvents(events)
 {
     myRangeEstimator = std::make_unique<RangeEstimator>(myID);
     myCurrentHandContext = std::make_unique<CurrentHandContext>();
@@ -119,12 +117,14 @@ void Player::setPosition()
     };
 
     if (myID == dealerPosition)
+    {
         myPosition = BUTTON;
+    }
     else
     {
 
         // get my relative position from the dealer
-        PlayerListIterator it_c;
+        PlayerListIterator itC;
         PlayerList players = currentHand->getActivePlayerList();
 
         int pos = 0;
@@ -133,14 +133,20 @@ void Player::setPosition()
         {
 
             bool dealerFound = false;
-            for (it_c = players->begin(); it_c != players->end(); ++it_c)
+            for (itC = players->begin(); itC != players->end(); ++itC)
             {
-                if ((*it_c)->getId() == dealerPosition)
+                if ((*itC)->getId() == dealerPosition)
+                {
                     dealerFound = true;
+                }
                 else if (dealerFound)
+                {
                     pos++;
-                if ((*it_c)->getId() == myID)
+                }
+                if ((*itC)->getId() == myID)
+                {
                     break;
+                }
             }
             myPosition = onDealerPositionPlus[pos][nbPlayers];
         }
@@ -148,15 +154,21 @@ void Player::setPosition()
         {
             // myId < dealerPosition
             bool myPositionFound = false;
-            for (it_c = players->begin(); it_c != players->end(); ++it_c)
+            for (itC = players->begin(); itC != players->end(); ++itC)
             {
 
-                if ((*it_c)->getId() == myID)
+                if ((*itC)->getId() == myID)
+                {
                     myPositionFound = true;
+                }
                 else if (myPositionFound)
+                {
                     pos++;
-                if ((*it_c)->getId() == dealerPosition)
+                }
+                if ((*itC)->getId() == dealerPosition)
+                {
                     break;
+                }
             }
             myPosition = onDealerPositionMinus[pos][nbPlayers];
         }
@@ -290,7 +302,9 @@ void Player::setCards(int* theValue)
 {
 
     for (int i = 0; i < 2; i++)
+    {
         myCards[i] = theValue[i];
+    }
 
     // will contain human-readable string, i.e "Qc" or "Ts"
     myCard1 = CardsValue::CardStringValue[myCards[0]];
@@ -300,7 +314,9 @@ void Player::getCards(int* theValue) const
 {
     int i;
     for (i = 0; i < 2; i++)
+    {
         theValue[i] = myCards[i];
+    }
 }
 
 void Player::setTurn(bool theValue)
@@ -362,7 +378,9 @@ void Player::resetPlayerStatistics()
 {
 
     for (int i = 0; i <= MAX_NUMBER_OF_PLAYERS; i++)
+    {
         myStatistics[i].reset();
+    }
 }
 
 void Player::updatePreflopStatistics()
@@ -399,25 +417,33 @@ void Player::updatePreflopStatistics()
 
     myStatistics[nbPlayers].m_preflopStatistics.addLastAction(myAction); // keep track of the last 10 actions
 
-    if (myAction == PlayerActionCall && currentHand->getRaisersPositions().size() == 0) //
+    if (myAction == PlayerActionCall && currentHand->getRaisersPositions().size() == 0)
+    { //
         myStatistics[nbPlayers].m_preflopStatistics.m_limps++;
+    }
 
     int playerRaises = 0;
     for (std::vector<PlayerAction>::const_iterator i = myCurrentHandActions.m_preflopActions.begin();
          i != myCurrentHandActions.m_preflopActions.end(); i++)
     {
         if (*i == PlayerActionRaise || *i == PlayerActionAllin)
+        {
             playerRaises++;
+        }
     }
 
     if (myAction == PlayerActionRaise || myAction == PlayerActionAllin)
     {
 
         if (playerRaises == 1 && currentHand->getRaisersPositions().size() == 2)
+        {
             myStatistics[nbPlayers].m_preflopStatistics.m_3Bets++;
+        }
 
         if (playerRaises == 2 || (playerRaises == 1 && currentHand->getRaisersPositions().size() == 3))
+        {
             myStatistics[nbPlayers].m_preflopStatistics.m_4Bets++;
+        }
     }
     else
     {
@@ -428,7 +454,9 @@ void Player::updatePreflopStatistics()
             myStatistics[nbPlayers].m_preflopStatistics.m_call3BetsOpportunities++;
 
             if (myAction == PlayerActionCall)
+            {
                 myStatistics[nbPlayers].m_preflopStatistics.m_call3Bets++;
+            }
         }
     }
 }
@@ -438,7 +466,9 @@ void Player::updateFlopStatistics()
     const int nbPlayers = currentHand->getActivePlayerList()->size();
 
     if (myCurrentHandActions.m_flopActions.size() == 1)
+    {
         myStatistics[nbPlayers].m_flopStatistics.m_hands++;
+    }
 
     switch (myAction)
     {
@@ -464,14 +494,18 @@ void Player::updateFlopStatistics()
         break;
     }
     if (myAction == PlayerActionRaise && currentHand->getRaisersPositions().size() > 1)
+    {
         myStatistics[nbPlayers].m_flopStatistics.m_3Bets++;
+    }
 
     // continuation bets
     if (currentHand->getPreflopLastRaiserId() == myID)
     {
         myStatistics[nbPlayers].m_flopStatistics.m_continuationBetsOpportunities++;
         if (myAction == PlayerActionBet)
+        {
             myStatistics[nbPlayers].m_flopStatistics.m_continuationBets++;
+        }
     }
 }
 void Player::updateTurnStatistics()
@@ -480,7 +514,9 @@ void Player::updateTurnStatistics()
     const int nbPlayers = currentHand->getActivePlayerList()->size();
 
     if (myCurrentHandActions.m_turnActions.size() == 1)
+    {
         myStatistics[nbPlayers].m_turnStatistics.m_hands++;
+    }
 
     switch (myAction)
     {
@@ -506,7 +542,9 @@ void Player::updateTurnStatistics()
         break;
     }
     if (myAction == PlayerActionRaise && currentHand->getRaisersPositions().size() > 1)
+    {
         myStatistics[nbPlayers].m_turnStatistics.m_3Bets++;
+    }
 }
 void Player::updateRiverStatistics()
 {
@@ -514,7 +552,9 @@ void Player::updateRiverStatistics()
     const int nbPlayers = currentHand->getActivePlayerList()->size();
 
     if (myCurrentHandActions.m_riverActions.size() == 1)
+    {
         myStatistics[nbPlayers].m_riverStatistics.m_hands++;
+    }
 
     switch (myAction)
     {
@@ -540,7 +580,9 @@ void Player::updateRiverStatistics()
         break;
     }
     if (myAction == PlayerActionRaise && currentHand->getRaisersPositions().size() > 1)
+    {
         myStatistics[nbPlayers].m_riverStatistics.m_3Bets++;
+    }
 }
 
 void Player::loadStatistics()
@@ -550,7 +592,9 @@ void Player::loadStatistics()
 
     myStatistics = GlobalServices::instance().playersStatisticsStore()->getPlayerStatistics(myName);
     if (myStatistics.empty())
+    {
         myStatistics.fill(PlayerStatistics());
+    }
 }
 
 const PostFlopState Player::getPostFlopState() const
@@ -572,7 +616,9 @@ bool Player::checkIfINeedToShowCards() const
          ++it)
     {
         if (*it == myID)
+        {
             return true;
+        }
     }
 
     return false;
@@ -583,13 +629,21 @@ std::string Player::getStringBoard() const
     int cardsOnBoard;
 
     if (currentHand->getCurrentRound() == GameStateFlop)
+    {
         cardsOnBoard = 3;
+    }
     else if (currentHand->getCurrentRound() == GameStateTurn)
+    {
         cardsOnBoard = 4;
+    }
     else if (currentHand->getCurrentRound() == GameStateRiver)
+    {
         cardsOnBoard = 5;
+    }
     else
+    {
         cardsOnBoard = 0;
+    }
 
     std::string stringBoard;
     int board[5];
@@ -610,13 +664,15 @@ bool Player::getHavePosition(PlayerPosition myPos, PlayerList runningPlayers)
 
     bool havePosition = true;
 
-    PlayerListConstIterator it_c;
+    PlayerListConstIterator itC;
 
-    for (it_c = runningPlayers->begin(); it_c != runningPlayers->end(); ++it_c)
+    for (itC = runningPlayers->begin(); itC != runningPlayers->end(); ++itC)
     {
 
-        if ((*it_c)->getPosition() > myPos)
+        if ((*itC)->getPosition() > myPos)
+        {
             havePosition = false;
+        }
     }
 
     return havePosition;
@@ -656,7 +712,9 @@ int Player::getPotOdd() const
 
     int odd = (highestSet - mySet) * 100 / pot;
     if (odd < 0)
+    {
         odd = -odd; // happens if mySet > highestSet
+    }
 
     return odd;
 }
@@ -666,9 +724,13 @@ float Player::getM() const
 
     int blinds = currentHand->getSmallBlind() + (currentHand->getSmallBlind() * 2); // assume for now that BB is 2 * SB
     if (blinds > 0 && myCash > 0)
+    {
         return (float) myCash / blinds;
+    }
     else
+    {
         return 0;
+    }
 }
 
 const SimResults Player::getHandSimulation() const
@@ -713,7 +775,9 @@ const SimResults Player::getHandSimulation() const
 
     GlobalServices::instance().logger()->info(logMessage.str());
     if (r.winRanged == 0)
+    {
         r.winRanged = r.win / 4;
+    }
 
     return r;
 }
@@ -731,7 +795,9 @@ float Player::getMaxOpponentsStrengths() const
 
         assert(i->second <= 1.0);
         if (i->second > maxOpponentsStrengths)
+        {
             maxOpponentsStrengths = i->second;
+        }
 
         opponentID = i->first;
     }
@@ -824,7 +890,9 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
         // delete hands that can't exist, given the board (we prefer to filter it here, instead of removing them from
         // the estimated range, for a better GUI readablity (avoid to list numerous particular hands, via the GUI)
         if (board.find(s1) != string::npos || board.find(s2) != string::npos)
+        {
             continue;
+        }
 
         // delete hands that can't exist, given the player's cards (if they are supposed to be known)
         if (opponentId != myID)
@@ -846,7 +914,9 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
     for (vector<std::string>::const_iterator i = newRanges.begin(); i != newRanges.end(); i++)
     {
         if (rankHand(((*i) + board).c_str()) > myRank)
+        {
             nbWinningHands++;
+        }
     }
     if (ranges.size() == 0)
     {
@@ -897,7 +967,9 @@ std::map<int, float> Player::evaluateOpponentsStrengths() const
     {
 
         if ((*it)->getId() == myID || (*it)->getAction() == PlayerActionFold || (*it)->getAction() == PlayerActionNone)
+        {
             continue;
+        }
 
         const float estimatedOpponentWinningHands = getOpponentWinningHandsPercentage((*it)->getId(), getStringBoard());
         assert(estimatedOpponentWinningHands <= 1.0);
@@ -912,12 +984,16 @@ bool Player::isPreflopBigBet() const
 {
 
     if (getPotOdd() > 70)
+    {
         return true;
+    }
 
     const int highestSet = min(myCash, currentHand->getCurrentBettingRound()->getHighestSet());
 
     if (highestSet > currentHand->getSmallBlind() * 8 && highestSet - mySet > mySet * 6)
+    {
         return true;
+    }
 
     return false;
 }
@@ -926,16 +1002,24 @@ bool Player::isAgressor(const GameState gameState) const
 {
 
     if (gameState == GameStatePreflop && currentHand->getPreflopLastRaiserId() == myID)
+    {
         return true;
+    }
 
     if (gameState == GameStateFlop && currentHand->getFlopLastRaiserId() == myID)
+    {
         return true;
+    }
 
     if (gameState == GameStateTurn && currentHand->getTurnLastRaiserId() == myID)
+    {
         return true;
+    }
 
     if (gameState == GameStateRiver && currentHand->getLastRaiserId() == myID)
+    {
         return true;
+    }
 
     return false;
 }
@@ -951,14 +1035,18 @@ bool Player::canBluff(const GameState gameState) const
     PlayerList players = currentHand->getRunningPlayerList();
 
     if (players->size() == 1)
+    {
         // all other players are allin
         return false;
+    }
 
     for (PlayerListIterator it = players->begin(); it != players->end(); ++it)
     {
 
         if ((*it)->getId() == myID)
+        {
             continue;
+        }
 
         PreflopStatistics preflopStats = (*it)->getStatistics(nbPlayers).getPreflopStatistics();
 
@@ -966,21 +1054,29 @@ bool Player::canBluff(const GameState gameState) const
         // accurate
         if (preflopStats.m_hands < MIN_HANDS_STATISTICS_ACCURATE && nbPlayers < 10 &&
             (*it)->getStatistics(nbPlayers + 1).getPreflopStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE)
+        {
 
             preflopStats = (*it)->getStatistics(nbPlayers + 1).getPreflopStatistics();
+        }
 
         if ((*it)->getStatistics(nbPlayers).getWentToShowDown() >= 40 &&
             preflopStats.getVoluntaryPutMoneyInPot() - preflopStats.getPreflopRaise() > 15 &&
             preflopStats.getVoluntaryPutMoneyInPot() > 20)
+        {
             return false; // seems to be a calling station
+        }
 
         if ((*it)->getCash() < currentHand->getBoard()->getPot() * 3)
+        {
             return false;
+        }
 
         if (gameState == GameStatePreflop)
         {
             if (preflopStats.getPreflopCall3BetsFrequency() > 40)
+            {
                 return false;
+            }
         }
     }
 
@@ -1006,9 +1102,13 @@ bool Player::isInVeryLooseMode(const int nbPlayers) const
     if (preflop.getLastActionsNumber(PlayerActionAllin) + preflop.getLastActionsNumber(PlayerActionRaise) +
             preflop.getLastActionsNumber(PlayerActionCall) >
         PreflopStatistics::LAST_ACTIONS_STACK_SIZE * 0.8)
+    {
         return true;
+    }
     else
+    {
         return false;
+    }
 }
 
 void Player::updateCurrentHandContext(const GameState state)
@@ -1041,15 +1141,25 @@ void Player::updateCurrentHandContext(const GameState state)
     {
 
         if (*i == PlayerActionRaise)
+        {
             myCurrentHandContext->nbRaises++;
+        }
         else if (*i == PlayerActionBet)
+        {
             myCurrentHandContext->nbBets++;
+        }
         else if (*i == PlayerActionCheck)
+        {
             myCurrentHandContext->nbChecks++;
+        }
         else if (*i == PlayerActionCall)
+        {
             myCurrentHandContext->nbCalls++;
+        }
         else if (*i == PlayerActionAllin)
+        {
             myCurrentHandContext->nbAllins++;
+        }
     }
 
     // Player-specific, visible from the opponents :

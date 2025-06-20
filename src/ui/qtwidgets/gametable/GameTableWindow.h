@@ -49,7 +49,7 @@ enum SeatState
     SEAT_CLEAR
 };
 
-class GameTableWindow : public QMainWindow, public Ui::GameTable
+class GameTableWindow : public QMainWindow, public Ui::gameTable
 {
     Q_OBJECT
 

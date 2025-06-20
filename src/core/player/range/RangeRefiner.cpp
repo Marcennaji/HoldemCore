@@ -20,7 +20,9 @@ std::string RangeRefiner::deduceRange(const std::string originRanges, const std:
     while (getline(oss, singleOriginRange, ','))
     {
         if (singleOriginRange.empty())
+        {
             continue;
+        }
 
         std::vector<std::string> cardsInOriginRange = RangeParser::getRangeAtomicValues(singleOriginRange);
         bool keepOriginRange = true;

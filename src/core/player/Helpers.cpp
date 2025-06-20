@@ -19,7 +19,9 @@ void shufflePlayers(std::list<std::shared_ptr<Player>>& players, unsigned humanI
     std::vector<std::shared_ptr<Player>> v(players.begin(), players.end());
     auto it = std::find_if(v.begin(), v.end(), [=](auto& p) { return p->getId() == humanId; });
     if (it != v.end())
+    {
         std::swap(v.front(), *it);
+    }
 
     std::mt19937 rng(std::time(nullptr));
     std::shuffle(v.begin() + 1, v.end(), rng);
@@ -49,7 +51,9 @@ int getBoardCardsHigherThan(std::string stringBoard, std::string card)
     {
 
         if (CardsValue::CardStringOrdering[boardCard] > CardsValue::CardStringOrdering[card])
+        {
             n++;
+        }
     }
     return n;
 }
@@ -68,33 +72,51 @@ bool isCardsInRange(string card1, string card2, string ranges)
     while (getline(oss, token, ','))
     {
         if (token.empty())
+        {
             continue;
+        }
 
         if (!isValidRange(token))
+        {
             return false;
+        }
 
         const char* range = token.c_str();
 
         if (isExactPair(c1, c2, range))
+        {
             return true;
+        }
 
         if (isExactSuitedHand(c1, c2, range))
+        {
             return true;
+        }
 
         if (isExactOffsuitedHand(c1, c2, range))
+        {
             return true;
+        }
 
         if (isPairAndAbove(card1, card2, range))
+        {
             return true;
+        }
 
         if (isOffsuitedAndAbove(card1, card2, c1, c2, range))
+        {
             return true;
+        }
 
         if (isSuitedAndAbove(card1, card2, c1, c2, range))
+        {
             return true;
+        }
 
         if (isExactHand(card1, card2, range))
+        {
             return true;
+        }
     }
 
     return false;
@@ -160,22 +182,32 @@ const int getDrawingProbability(const PostFlopState& postFlopState)
 {
 
     if (!postFlopState.UsesFirst && !postFlopState.UsesSecond)
+    {
         return 0;
+    }
 
     int outs = 0;
 
     // do not count outs for straight or flush, is the board is paired
 
     if (!postFlopState.IsFullHousePossible)
+    {
         outs = postFlopState.StraightOuts + postFlopState.FlushOuts + postFlopState.BetterOuts;
+    }
     else
+    {
         outs = postFlopState.BetterOuts;
+    }
 
     if (outs == 0)
+    {
         return 0;
+    }
 
     if (outs > 20)
+    {
         outs = 20;
+    }
 
     // if the last raiser is allin on flop : we must count our odds for the turn AND the river
     // TODO : this is not correct, as we must also take into account the other players actions, and their stacks

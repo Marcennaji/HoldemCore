@@ -51,10 +51,14 @@ string PreflopRangeEstimator::computeEstimatedPreflopRange(CurrentHandContext& c
     {
         // if the player is the last raiser :
         if (ctx.preflopLastRaiser && myPlayerId == ctx.preflopLastRaiser->getId())
+        {
             estimatedRange = computeEstimatedPreflopRangeFromLastRaiser(ctx);
+        }
         else
+        {
             // if the player is the last caller :
             estimatedRange = computeEstimatedPreflopRangeFromCaller(ctx);
+        }
     }
 
     GlobalServices::instance().logger()->info("PreflopRangeEstimator : estimated range is {" + estimatedRange + "}");
@@ -83,20 +87,32 @@ std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(Cu
             if (preflopOpponent.m_hands >= MIN_HANDS_STATISTICS_ACCURATE)
             {
                 if (myHand->getPreflopRaisesNumber() == 2)
+                {
                     range = preflopOpponent.getPreflopRaise() * 0.7;
+                }
                 else if (myHand->getPreflopRaisesNumber() == 3)
+                {
                     range = preflopOpponent.getPreflop3Bet() * 0.7;
+                }
                 else if (myHand->getPreflopRaisesNumber() > 3)
+                {
                     range = preflopOpponent.getPreflop4Bet() / (myHand->getPreflopRaisesNumber() / 2);
+                }
             }
             else
             {
                 if (myHand->getPreflopRaisesNumber() == 2)
+                {
                     range = preflopOpponent.getPreflopRaise();
+                }
                 else if (myHand->getPreflopRaisesNumber() == 3)
+                {
                     range = preflopOpponent.getPreflop3Bet();
+                }
                 else if (myHand->getPreflopRaisesNumber() > 3)
+                {
                     range = preflopOpponent.getPreflop4Bet() / (myHand->getPreflopRaisesNumber() / 2);
+                }
             }
         }
     }
@@ -108,11 +124,17 @@ std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(Cu
                                                   std::to_string(range));
 
         if (myHand->getPreflopRaisesNumber() == 2)
+        {
             range = range * 0.3;
+        }
         else if (myHand->getPreflopRaisesNumber() == 3)
+        {
             range = range * 0.2;
+        }
         else if (myHand->getPreflopRaisesNumber() > 3)
+        {
             range = range * 0.1;
+        }
     }
 
     GlobalServices::instance().logger()->info("range is " + std::to_string(range));
@@ -122,9 +144,13 @@ std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(Cu
         // Adjust range based on position
         if (ctx.preflopLastRaiser->getPosition() == UTG || ctx.preflopLastRaiser->getPosition() == UtgPlusOne ||
             ctx.preflopLastRaiser->getPosition() == UtgPlusTwo)
+        {
             range = range * 0.9;
+        }
         else if (ctx.preflopLastRaiser->getPosition() == BUTTON || ctx.preflopLastRaiser->getPosition() == CUTOFF)
+        {
             range = range * 1.5;
+        }
 
         GlobalServices::instance().logger()->info(", position adjusted range is " + std::to_string(range));
     }
@@ -146,10 +172,14 @@ std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(Cu
     range = ceil(range);
 
     if (range < 1)
+    {
         range = 1;
+    }
 
     if (range > 100)
+    {
         range = 100;
+    }
 
     GlobalServices::instance().logger()->info("\n\t\testimated range is " + std::to_string(range) + " % ");
 
@@ -193,9 +223,13 @@ void PreflopRangeEstimator::analyzePlayerActions(const CurrentHandContext& ctx, 
     for (const auto& action : ctx.myCurrentHandActions.getPreflopActions())
     {
         if (action == PlayerActionRaise || action == PlayerActionAllin)
+        {
             raises++;
+        }
         else if (action == PlayerActionCall)
+        {
             calls++;
+        }
     }
 }
 float PreflopRangeEstimator::calculateStartingRange(const CurrentHandContext& ctx, int nbPlayers) const
@@ -219,13 +253,19 @@ float PreflopRangeEstimator::adjustRangeForPosition(const CurrentHandContext& ct
     if (nbPlayers > 3)
     {
         if (ctx.myPosition == UTG || ctx.myPosition == UtgPlusOne || ctx.myPosition == UtgPlusTwo)
+        {
             range *= 0.9;
+        }
         else if (ctx.myPosition == BUTTON || ctx.myPosition == CUTOFF)
+        {
             range *= 1.4;
+        }
     }
 
     if (range > 100)
+    {
         range = 100;
+    }
 
     GlobalServices::instance().logger()->info("Position adjusted starting range : " + std::to_string(range));
     return range;
@@ -236,15 +276,25 @@ float PreflopRangeEstimator::adjustRangeForPotOdds(const CurrentHandContext& ctx
     float range = currentRange;
 
     if (potOdd > 70 && potOdd < 85)
+    {
         range *= 0.7;
+    }
     else if (potOdd >= 85 && potOdd < 95)
+    {
         range *= 0.5;
+    }
     else if (potOdd >= 95 && potOdd < 99)
+    {
         range *= 0.3;
+    }
     else if (potOdd >= 99)
+    {
         range *= 0.1;
+    }
     else if (potOdd <= 20 && myHand->getPreflopRaisesNumber() < 2)
+    {
         range = 40;
+    }
 
     GlobalServices::instance().logger()->info("Pot odd adjusted starting range : " + std::to_string(range));
     return range;
@@ -282,11 +332,17 @@ float PreflopRangeEstimator::handleLooseAggressiveOpponents(const CurrentHandCon
         if (ctx.preflopLastRaiser->isInVeryLooseMode(ctx.nbPlayers))
         {
             if (ctx.nbPlayers > 6 && range < 20)
+            {
                 range = 20;
+            }
             else if (ctx.nbPlayers > 4 && range < 30)
+            {
                 range = 30;
+            }
             else if (ctx.nbPlayers <= 4 && range < 40)
+            {
                 range = 40;
+            }
 
             GlobalServices::instance().logger()->info(
                 "Overagression detected from the raiser, setting calling range to " + std::to_string(range));
@@ -299,10 +355,14 @@ float PreflopRangeEstimator::finalizeRange(const float currentRange) const
     float range = std::ceil(currentRange);
 
     if (range < 1)
+    {
         range = 1;
+    }
 
     if (range > 100)
+    {
         range = 100;
+    }
 
     GlobalServices::instance().logger()->info("Estimated range is " + std::to_string(range) + " % ");
     return range;
@@ -338,7 +398,9 @@ float PreflopRangeEstimator::handleLimpRange(const CurrentHandContext& ctx, cons
     }
 
     if (range < 5)
+    {
         range = 5;
+    }
 
     GlobalServices::instance().logger()->info("Limp range : " + std::to_string(range));
     return range;
@@ -349,7 +411,9 @@ float PreflopRangeEstimator::handleSingleRaiseRange(const CurrentHandContext& ct
     float range = currentRange - ctx.myStatistics.getPreflopStatistics().getPreflop3Bet();
 
     if (range < 1)
+    {
         range = 1;
+    }
 
     GlobalServices::instance().logger()->info("Single bet call range: " + std::to_string(range));
 
@@ -388,7 +452,9 @@ float PreflopRangeEstimator::handleThreeBetRange(const CurrentHandContext& ctx, 
                 ctx.preflopLastRaiser->getStatistics(ctx.nbPlayers).getPreflopStatistics();
 
             if (range < lastRaiserStats.getPreflop3Bet() * 0.8)
+            {
                 range = lastRaiserStats.getPreflop3Bet() * 0.8;
+            }
 
             GlobalServices::instance().logger()->info("3-bet call range: " + std::to_string(range));
         }

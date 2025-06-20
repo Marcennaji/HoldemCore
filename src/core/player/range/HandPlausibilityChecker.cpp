@@ -28,22 +28,30 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(const PostFlopStat
              testedHand.IsTopPair || testedHand.IsOverPair ||
              (testedHand.IsTwoPair && !testedHand.IsFullHousePossible)) &&
             testedHand.IsFlushDrawPossible && testedHand.IsStraightDrawPossible)
+        {
             return true;
+        }
 
         // on a non-paired board, he would'nt slow play a straigth, a set or 2 pairs, if a flush draw is possible
         if (!testedHand.IsFullHousePossible && (testedHand.IsTrips || testedHand.IsStraight || testedHand.IsTwoPair) &&
             testedHand.IsFlushDrawPossible)
+        {
             return true;
+        }
 
         // wouldn't be passive with a decent hand, on position, if more than 1 opponent
         if (!testedHand.IsFullHousePossible &&
             (testedHand.IsTopPair || testedHand.IsOverPair || testedHand.IsTwoPair || testedHand.IsTrips) &&
             ctx.nbRunningPlayers > 2)
+        {
             return true;
+        }
 
         // on a paired board, he wouldn't check if he has a pocket overpair
         if (testedHand.IsFullHousePossible && testedHand.IsOverPair)
+        {
             return true;
+        }
     }
     return false;
 }
@@ -57,13 +65,19 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopState&
 
     if (flop.getAgressionFactor() > 3 && flop.getAgressionFrequency() > 50 &&
         flop.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
+    {
         return false; // he is very agressive, so don't make any guess
+    }
 
     if (ctx.myIsInVeryLooseMode)
+    {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
+    }
 
     if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    {
         return true;
+    }
 
     // the player made a donk bet on the flop, and is not a maniac player : he should have at least a middle or top pair
     // or a draw
@@ -71,7 +85,9 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopState&
     {
 
         if (testedHand.IsOverCards || testedHand.StraightOuts >= 8 || testedHand.FlushOuts >= 8)
+        {
             return (ctx.nbRunningPlayers > 2 ? true : false);
+        }
 
         if (!((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight ||
               testedHand.IsFlush || testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads ||
@@ -79,16 +95,22 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopState&
         {
 
             if (testedHand.IsNoPair)
+            {
                 return true;
+            }
 
             if (testedHand.IsOnePair)
             {
 
                 if (testedHand.IsFullHousePossible)
+                {
                     return true;
+                }
 
                 if (!testedHand.IsMiddlePair && !testedHand.IsTopPair && !testedHand.IsOverPair)
+                {
                     return true;
+                }
             }
         }
     }
@@ -98,7 +120,9 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopState&
     {
 
         if (testedHand.IsOverCards || testedHand.StraightOuts >= 8 || testedHand.FlushOuts >= 8)
+        {
             return true;
+        }
 
         if (!((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight ||
               testedHand.IsFlush || testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads ||
@@ -106,16 +130,22 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopState&
         {
 
             if (testedHand.IsNoPair)
+            {
                 return true;
+            }
 
             if (testedHand.IsOnePair)
             {
 
                 if (testedHand.IsFullHousePossible)
+                {
                     return true;
+                }
 
                 if (!testedHand.IsMiddlePair && !testedHand.IsTopPair && !testedHand.IsOverPair)
+                {
                     return true;
+                }
             }
         }
     }
@@ -130,16 +160,22 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopState&
         {
 
             if (testedHand.IsNoPair)
+            {
                 return true;
+            }
 
             if (testedHand.IsOnePair)
             {
 
                 if (testedHand.IsFullHousePossible)
+                {
                     return true;
+                }
 
                 if (!testedHand.IsTopPair && !testedHand.IsOverPair)
+                {
                     return true;
+                }
             }
         }
     }
@@ -154,13 +190,19 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(const PostFlopState
     auto& flop = ctx.myStatistics.getFlopStatistics();
 
     if (ctx.potOdd < 20)
+    {
         return false;
+    }
 
     if (ctx.myIsInVeryLooseMode)
+    {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
+    }
 
     if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    {
         return true;
+    }
 
     if (ctx.flopBetsOrRaisesNumber > 0 && ctx.myCurrentHandActions.getFlopActions().back() == PlayerActionCall &&
         !(ctx.myStatistics.getWentToShowDown() > 35 &&
@@ -174,17 +216,25 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(const PostFlopState
         {
 
             if (testedHand.IsNoPair)
+            {
                 return true;
+            }
 
             if (ctx.flopBetsOrRaisesNumber > 1 && testedHand.IsOnePair && !testedHand.IsTopPair &&
                 !testedHand.IsOverPair)
+            {
                 return true;
+            }
 
             if (ctx.flopBetsOrRaisesNumber > 2 && (testedHand.IsOnePair || testedHand.IsOverCards))
+            {
                 return true;
+            }
 
             if (ctx.nbRunningPlayers > 2 && testedHand.IsOnePair && !testedHand.IsTopPair && !testedHand.IsOverPair)
+            {
                 return true;
+            }
         }
     }
     return false;
@@ -199,13 +249,19 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopStat
 
     if (flop.getAgressionFactor() > 3 && flop.getAgressionFrequency() > 50 &&
         flop.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
+    {
         return false; // he is usually very agressive, so don't make any guess
+    }
 
     if (ctx.myIsInVeryLooseMode)
+    {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
+    }
 
     if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    {
         return true;
+    }
 
     // the player has check-raised the flop, and is not a maniac player : he should have at least a top pair or a draw
     if (ctx.nbChecks == 1)
@@ -213,7 +269,9 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopStat
 
         if ((testedHand.IsOverCards || testedHand.FlushOuts >= 8 || testedHand.StraightOuts >= 8) &&
             ctx.nbRunningPlayers > 2)
+        {
             return true;
+        }
 
         if (!((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight ||
               testedHand.IsFlush || testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads ||
@@ -221,11 +279,15 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopStat
         {
 
             if (testedHand.IsNoPair)
+            {
                 return true;
+            }
 
             if (testedHand.IsOnePair && !testedHand.IsFullHousePossible && !testedHand.IsTopPair &&
                 !testedHand.IsOverPair)
+            {
                 return true;
+            }
         }
     }
 
@@ -239,17 +301,25 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopStat
         {
 
             if (testedHand.IsNoPair || (testedHand.IsOnePair && testedHand.IsFullHousePossible))
+            {
                 return true;
+            }
 
             if (testedHand.IsOnePair && !testedHand.IsFullHousePossible &&
                 !testedHand.IsTopPair & !testedHand.IsOverPair)
+            {
                 return true;
+            }
 
             if (ctx.flopBetsOrRaisesNumber > 3 && (testedHand.IsOnePair))
+            {
                 return true;
+            }
 
             if (ctx.flopBetsOrRaisesNumber > 4 && (testedHand.IsTwoPair))
+            {
                 return true;
+            }
         }
     }
 
@@ -264,33 +334,49 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopAllin(const PostFlopStat
     auto& flop = ctx.myStatistics.getFlopStatistics();
 
     if (ctx.potOdd < 20)
+    {
         return false;
+    }
 
     if (flop.getAgressionFactor() > 3 && flop.getAgressionFrequency() > 50 &&
         flop.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
+    {
         return false; // he is usually very agressive, so don't make any guess
+    }
 
     if (ctx.myIsInVeryLooseMode)
+    {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
+    }
 
     if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    {
         return true;
+    }
 
     if (!((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight || testedHand.IsFlush ||
           testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads || testedHand.IsStFlush))
     {
 
         if (testedHand.IsNoPair || (testedHand.IsOnePair && testedHand.IsFullHousePossible))
+        {
             return true;
+        }
 
         if (testedHand.IsOnePair && !testedHand.IsFullHousePossible && !testedHand.IsTopPair & !testedHand.IsOverPair)
+        {
             return true;
+        }
 
         if (ctx.flopBetsOrRaisesNumber > 3 && (testedHand.IsOnePair))
+        {
             return true;
+        }
 
         if (ctx.flopBetsOrRaisesNumber > 4 && (testedHand.IsTwoPair))
+        {
             return true;
+        }
     }
     return false;
 }
@@ -307,20 +393,26 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCheck(const PostFlopStat
     {
 
         if (testedHand.IsPocketPair && testedHand.IsOverPair)
+        {
             return true;
+        }
 
         // woudn't slow play a medium hand on a dangerous board, if there was no action on flop
         if (((testedHand.UsesFirst || testedHand.UsesSecond) && ctx.flopBetsOrRaisesNumber == 0 &&
                  testedHand.IsTopPair ||
              (testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsTrips) &&
             testedHand.IsFlushDrawPossible)
+        {
             return true;
+        }
 
         // wouldn't be passive with a decent hand, on position, if more than 1 opponent
         if (((testedHand.UsesFirst || testedHand.UsesSecond) &&
              ((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsTrips)) &&
             ctx.nbRunningPlayers > 2)
+        {
             return true;
+        }
     }
 
     return false;
@@ -334,13 +426,19 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnBet(const PostFlopState&
 
     if (turn.getAgressionFactor() > 3 && turn.getAgressionFrequency() > 50 &&
         turn.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
+    {
         return false; // he is usually very agressive, so don't make any guess
+    }
 
     if (ctx.myIsInVeryLooseMode)
+    {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
+    }
 
     if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    {
         return true;
+    }
 
     // the player made a donk bet on turn, and is not a maniac player : he should have at least a top pair
     if (!bHavePosition && !ctx.myFlopIsAggressor && ctx.flopBetsOrRaisesNumber > 0)
@@ -348,7 +446,9 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnBet(const PostFlopState&
 
         if ((testedHand.IsOverCards || testedHand.FlushOuts >= 8 || testedHand.StraightOuts >= 8) &&
             ctx.nbRunningPlayers > 2)
+        {
             return true;
+        }
 
         if (!((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight ||
               testedHand.IsFlush || testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads ||
@@ -356,11 +456,15 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnBet(const PostFlopState&
         {
 
             if (testedHand.IsNoPair)
+            {
                 return true;
+            }
 
             if (testedHand.IsOnePair && !testedHand.IsTopPair && !testedHand.IsOverPair &&
                 !testedHand.IsFullHousePossible)
+            {
                 return true;
+            }
         }
     }
 
@@ -374,13 +478,19 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopState
     auto& turn = ctx.myStatistics.getTurnStatistics();
 
     if (ctx.potOdd < 20)
+    {
         return false;
+    }
 
     if (ctx.myIsInVeryLooseMode)
+    {
         return false; // he is (temporarily ?) very loose, so don't make any guess
+    }
 
     if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    {
         return true;
+    }
 
     // the player called a bet on flop and turn, and he is not loose
     if (ctx.turnBetsOrRaisesNumber > 0 && ctx.flopBetsOrRaisesNumber > 0 &&
@@ -395,14 +505,20 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopState
         {
 
             if (testedHand.IsNoPair || (testedHand.IsOnePair && testedHand.IsFullHousePossible))
+            {
                 return true;
+            }
 
             if (testedHand.IsOnePair && !testedHand.IsTopPair && !testedHand.IsOverPair &&
                 !testedHand.IsFullHousePossible)
+            {
                 return true;
+            }
 
             if (ctx.turnBetsOrRaisesNumber > 2 && testedHand.IsOnePair)
+            {
                 return true;
+            }
         }
     }
     // the player called a raise on turn, and is not loose : he has at least a top pair or a good draw
@@ -418,11 +534,15 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopState
         {
 
             if (testedHand.IsNoPair || (testedHand.IsOnePair && testedHand.IsFullHousePossible))
+            {
                 return true;
+            }
 
             if (testedHand.IsOnePair && !testedHand.IsTopPair && !testedHand.IsFullHousePossible &&
                 !testedHand.IsOverPair)
+            {
                 return true;
+            }
         }
     }
 
@@ -437,13 +557,19 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopStat
 
     if (turn.getAgressionFactor() > 3 && turn.getAgressionFrequency() > 50 &&
         turn.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
+    {
         return false; // he is very agressive, so don't make any guess
+    }
 
     if (ctx.myIsInVeryLooseMode)
+    {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
+    }
 
     if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    {
         return true;
+    }
 
     // if nobody has bet the flop, he should at least have a top pair
     if (ctx.flopBetsOrRaisesNumber == 0)
@@ -452,9 +578,13 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopStat
         if (testedHand.IsTopPair || testedHand.IsOverPair ||
             (testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight || testedHand.IsFlush ||
             testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads || testedHand.IsStFlush)
+        {
             return false;
+        }
         else
+        {
             return true;
+        }
     }
     // if he was not the agressor on flop, and an other player has bet the flop, then he should have at least a top pair
     if (!ctx.myFlopIsAggressor && ctx.flopBetsOrRaisesNumber > 0)
@@ -463,20 +593,28 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopStat
         if (testedHand.IsTopPair || testedHand.IsOverPair ||
             (testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight || testedHand.IsFlush ||
             testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads || testedHand.IsStFlush)
+        {
             return false;
+        }
         else
+        {
             return true;
+        }
     }
     // the player has raised twice the turn, and is not a maniac player : he should have at least two pairs
     if (ctx.nbRaises == 2 &&
         !((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight || testedHand.IsFlush ||
           testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads || testedHand.IsStFlush))
+    {
         return true;
+    }
 
     // the player has raised 3 times the turn, and is not a maniac player : he should have better than a set
     if (ctx.nbRaises > 2 && !(testedHand.IsStraight || testedHand.IsFlush || testedHand.IsFullHouse ||
                               testedHand.IsQuads || testedHand.IsStFlush))
+    {
         return true;
+    }
 
     return false;
 }
@@ -488,28 +626,40 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnAllin(const PostFlopStat
     auto& turn = ctx.myStatistics.getTurnStatistics();
 
     if (ctx.potOdd < 20)
+    {
         return false;
+    }
 
     if (turn.getAgressionFactor() > 3 && turn.getAgressionFrequency() > 50 &&
         turn.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
+    {
         return false; // he is usually very agressive, so don't make any guess
+    }
 
     if (ctx.myIsInVeryLooseMode)
+    {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
+    }
 
     if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    {
         return true;
+    }
 
     // the player has raised twice the turn, and is not a maniac player : he should have at least two pairs
     if (ctx.nbRaises == 2 &&
         !((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight || testedHand.IsFlush ||
           testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads || testedHand.IsStFlush))
+    {
         return true;
+    }
 
     // the player has raised 3 times the turn, and is not a maniac player : he should have better than a set
     if (ctx.nbRaises > 2 && !(testedHand.IsStraight || testedHand.IsFlush || testedHand.IsFullHouse ||
                               testedHand.IsQuads || testedHand.IsStFlush))
+    {
         return true;
+    }
 
     return false;
 }
@@ -533,13 +683,19 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(const PostFlopState
 
     if (river.getAgressionFactor() > 3 && river.getAgressionFrequency() > 50 &&
         river.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
+    {
         return false; // he is usually very agressive, so don't make any guess
+    }
 
     if (ctx.myIsInVeryLooseMode)
+    {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
+    }
 
     if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    {
         return true;
+    }
 
     // the player has bet the river, was not the agressor on turn and river, and is not a maniac player : he should
     // have at least 2 pairs
@@ -549,9 +705,13 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(const PostFlopState
 
         if ((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight || testedHand.IsFlush ||
             testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads || testedHand.IsStFlush)
+        {
             return false;
+        }
         else
+        {
             return true;
+        }
     }
 
     // the player has bet the river, is out of position on a multi-players pot, in a hand with some action, and is
@@ -563,9 +723,13 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(const PostFlopState
 
         if ((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight || testedHand.IsFlush ||
             testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads || testedHand.IsStFlush)
+        {
             return false;
+        }
         else
+        {
             return true;
+        }
     }
     return false;
 }
@@ -577,17 +741,25 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(const PostFlopStat
     auto& river = ctx.myStatistics.getRiverStatistics();
 
     if (ctx.potOdd < 20)
+    {
         return false;
+    }
 
     if (river.getAgressionFactor() > 3 && river.getAgressionFrequency() > 50 &&
         river.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
+    {
         return false; // he is usually very agressive, so don't make any guess
+    }
 
     if (ctx.myIsInVeryLooseMode)
+    {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
+    }
 
     if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    {
         return true;
+    }
 
     // the player has called the river on a multi-players pot, and is not a loose player : he should have at least a
     // top pair
@@ -600,10 +772,14 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(const PostFlopStat
         {
 
             if (testedHand.IsNoPair || (testedHand.IsOnePair && testedHand.IsFullHousePossible))
+            {
                 return true;
+            }
 
             if (testedHand.IsOnePair && !testedHand.IsTopPair & !testedHand.IsOverPair)
+            {
                 return true;
+            }
         }
     }
 
@@ -618,20 +794,30 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(const PostFlopSta
 
     if (river.getAgressionFactor() > 3 && river.getAgressionFrequency() > 50 &&
         river.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
+    {
         return false; // he is usually very agressive, so don't make any guess
+    }
 
     if (ctx.myIsInVeryLooseMode)
+    {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
+    }
 
     // the player has raised the river, and is not a maniac player : he should have at least 2 pairs
     if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    {
         return true;
+    }
 
     if (testedHand.IsStraight || testedHand.IsFlush || testedHand.IsFullHouse || testedHand.IsTrips ||
         testedHand.IsQuads || testedHand.IsStFlush || (testedHand.IsTwoPair && !testedHand.IsFullHousePossible))
+    {
         return false;
+    }
     else
+    {
         return true;
+    }
 
     // the player has raised the river, is out of position on a multi-players pot, in a hand with some action, and
     // is not a maniac player : he should have at least a set
@@ -642,20 +828,28 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(const PostFlopSta
 
         if (testedHand.IsStraight || testedHand.IsFlush || testedHand.IsFullHouse || testedHand.IsTrips ||
             testedHand.IsQuads || testedHand.IsStFlush)
+        {
             return false;
+        }
         else
+        {
             return true;
+        }
     }
 
     // the player has raised twice the river, and is not a maniac player : he should have at least trips
     if (ctx.nbRaises == 2 && !(testedHand.IsStraight || testedHand.IsFlush || testedHand.IsFullHouse ||
                                testedHand.IsTrips || testedHand.IsQuads || testedHand.IsStFlush))
+    {
         return true;
+    }
 
     // the player has raised 3 times the river, and is not a maniac player : he should have better than a set
     if (ctx.nbRaises > 2 && !(testedHand.IsStraight || testedHand.IsFlush || testedHand.IsFullHouse ||
                               testedHand.IsQuads || testedHand.IsStFlush))
+    {
         return true;
+    }
 
     return false;
 }
@@ -667,23 +861,33 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverAllin(const PostFlopSta
     auto& river = ctx.myStatistics.getRiverStatistics();
 
     if (ctx.potOdd < 20)
+    {
         return false;
+    }
 
     if (river.getAgressionFactor() > 3 && river.getAgressionFrequency() > 50 &&
         river.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
+    {
         return false; // he is usually very agressive, so don't make any guess
+    }
 
     if (ctx.myIsInVeryLooseMode)
+    {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
+    }
 
     if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    {
         return true;
+    }
 
     // the player has raised twice or more the river, and is not a maniac player : he should have at least a
     // straight
     if (ctx.nbRaises > 1 && !(testedHand.IsStraight || testedHand.IsFlush || testedHand.IsFullHouse ||
                               testedHand.IsQuads || testedHand.IsStFlush))
+    {
         return true;
+    }
 
     return false;
 }

@@ -22,7 +22,7 @@ namespace pkt::core::player
 
 using namespace std;
 
-RangeEstimator::RangeEstimator(int playerId) : myPlayerId(playerId), myHand(nullptr)
+RangeEstimator::RangeEstimator(int playerId) : myPlayerId(playerId)
 {
     assert(myPlayerId >= 0);
 }
@@ -62,29 +62,49 @@ string RangeEstimator::getFilledRange(std::vector<string>& ranges, std::vector<f
         return getStringRange(nbPlayers, rangeMax);
     }
     else
+    {
         return estimatedRange;
+    }
 }
 int RangeEstimator::getStandardRaisingRange(int nbPlayers)
 {
 
     if (nbPlayers == 2)
+    {
         return 39;
+    }
     else if (nbPlayers == 3)
+    {
         return 36;
+    }
     else if (nbPlayers == 4)
+    {
         return 33;
+    }
     else if (nbPlayers == 5)
+    {
         return 30;
+    }
     else if (nbPlayers == 6)
+    {
         return 27;
+    }
     else if (nbPlayers == 7)
+    {
         return 24;
+    }
     else if (nbPlayers == 8)
+    {
         return 21;
+    }
     else if (nbPlayers == 9)
+    {
         return 18;
+    }
     else
+    {
         return 15;
+    }
 }
 int RangeEstimator::getStandardCallingRange(int nbPlayers)
 {
@@ -95,16 +115,26 @@ std::string RangeEstimator::getStringRange(int nbPlayers, int range)
 {
 
     if (range > 100)
+    {
         range = 100;
+    }
 
     if (nbPlayers == 2)
+    {
         return TOP_RANGE_2_PLAYERS[range];
+    }
     else if (nbPlayers == 3)
+    {
         return TOP_RANGE_3_PLAYERS[range];
+    }
     else if (nbPlayers == 4)
+    {
         return TOP_RANGE_4_PLAYERS[range];
+    }
     else
+    {
         return TOP_RANGE_MORE_4_PLAYERS[range];
+    }
 }
 // purpose : remove some unplausible hands (to my opponents eyes), given what I did preflop
 void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(CurrentHandContext& ctx)
@@ -125,15 +155,21 @@ void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(CurrentHandConte
     {
 
         if (preflop.m_hands >= MIN_HANDS_STATISTICS_ACCURATE)
+        {
             setEstimatedRange(
                 RangeRefiner::deduceRange(getEstimatedRange(), getStringRange(nbPlayers, preflop.getPreflopRaise())));
+        }
         else
+        {
             setEstimatedRange(RangeRefiner::deduceRange(getEstimatedRange(),
                                                         getStringRange(nbPlayers, getStandardRaisingRange(nbPlayers))));
+        }
     }
 
     if (getEstimatedRange() == "")
+    {
         setEstimatedRange(originalEstimatedRange);
+    }
 
     // logUnplausibleHands(GameStatePreflop);
 }
@@ -183,15 +219,25 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext&
         PlayerAction myAction = ctx.myCurrentHandActions.getFlopActions().back();
 
         if (myAction == PlayerActionCall)
+        {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(r, ctx);
+        }
         else if (myAction == PlayerActionCheck)
+        {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(r, ctx);
+        }
         else if (myAction == PlayerActionRaise)
+        {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(r, ctx);
+        }
         else if (myAction == PlayerActionBet)
+        {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(r, ctx);
+        }
         else if (myAction == PlayerActionAllin)
+        {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopAllin(r, ctx);
+        }
 
         if (removeHand)
         {
@@ -202,7 +248,9 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext&
             newUnplausibleRange += ",";
 
             if (unplausibleRanges.find(newUnplausibleRange) == string::npos)
+            {
                 unplausibleRanges += newUnplausibleRange;
+            }
         }
     }
 
@@ -219,7 +267,9 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext&
     }
 
     if (unplausibleRanges != "")
+    {
         GlobalServices::instance().logger()->info("\tRemoving unplausible ranges : " + unplausibleRanges);
+    }
     // logUnplausibleHands(GameStateFlop);
 }
 
@@ -263,15 +313,25 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(CurrentHandContext&
         PlayerAction myAction = ctx.myCurrentHandActions.getTurnActions().back();
 
         if (myAction == PlayerActionCall)
+        {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(r, ctx);
+        }
         else if (myAction == PlayerActionCheck)
+        {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnCheck(r, ctx);
+        }
         else if (myAction == PlayerActionRaise)
+        {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(r, ctx);
+        }
         else if (myAction == PlayerActionBet)
+        {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnBet(r, ctx);
+        }
         else if (myAction == PlayerActionAllin)
+        {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnAllin(r, ctx);
+        }
 
         if (removeHand)
         {
@@ -282,7 +342,9 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(CurrentHandContext&
             newUnplausibleRange += ",";
 
             if (unplausibleRanges.find(newUnplausibleRange) == string::npos)
+            {
                 unplausibleRanges += newUnplausibleRange;
+            }
         }
     }
 
@@ -298,7 +360,9 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(CurrentHandContext&
     }
 
     if (unplausibleRanges != "")
+    {
         GlobalServices::instance().logger()->info("\tRemoving unplausible ranges : " + unplausibleRanges);
+    }
     // logUnplausibleHands(GameStateTurn);
 }
 
@@ -342,15 +406,25 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(CurrentHandContext
         bool removeHand = false;
 
         if (ctx.myCurrentHandActions.getRiverActions().back() == PlayerActionCall)
+        {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(r, ctx);
+        }
         else if (ctx.myCurrentHandActions.getRiverActions().back() == PlayerActionCheck)
+        {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverCheck(r, ctx);
+        }
         else if (ctx.myCurrentHandActions.getRiverActions().back() == PlayerActionRaise)
+        {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(r, ctx);
+        }
         else if (ctx.myCurrentHandActions.getRiverActions().back() == PlayerActionBet)
+        {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(r, ctx);
+        }
         else if (ctx.myCurrentHandActions.getRiverActions().back() == PlayerActionAllin)
+        {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverAllin(r, ctx);
+        }
 
         if (removeHand)
         {
@@ -361,7 +435,9 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(CurrentHandContext
             newUnplausibleRange += ",";
 
             if (unplausibleRanges.find(newUnplausibleRange) == string::npos)
+            {
                 unplausibleRanges += newUnplausibleRange;
+            }
         }
     }
 
@@ -377,7 +453,9 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(CurrentHandContext
     }
 
     if (unplausibleRanges != "")
+    {
         GlobalServices::instance().logger()->info("\tRemoving unplausible ranges : " + unplausibleRanges);
+    }
     // logUnplausibleHands(GameStateRiver);
 }
 

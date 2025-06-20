@@ -16,7 +16,9 @@ std::vector<std::string> RangeParser::getRangeAtomicValues(const std::string& ra
     while (std::getline(oss, token, ','))
     {
         if (token.empty())
+        {
             continue;
+        }
 
         if (token.size() == 1 || token.size() > 4)
         {

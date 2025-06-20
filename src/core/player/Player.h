@@ -155,7 +155,7 @@ class Player
 
     // attributes
 
-    IHand* currentHand;
+    IHand* currentHand{nullptr};
     const GameEvents& myEvents;
 
     CurrentHandActions myCurrentHandActions;
@@ -169,24 +169,24 @@ class Player
     // vars
     PlayerPosition myPosition;
     std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> myStatistics;
-    int myCardsValueInt;
+    int myCardsValueInt{0};
 
     int myCards[2];
     std::string myCard1;
     std::string myCard2;
     int myCash;
-    int mySet;
-    int myLastRelativeSet;
-    PlayerAction myAction;
+    int mySet{0};
+    int myLastRelativeSet{0};
+    PlayerAction myAction{PlayerActionNone};
     int myButton;        // 0 = none, 1 = dealer, 2 =small, 3 = big
     bool myActiveStatus; // 0 = inactive, 1 = active
-    bool myTurn;         // 0 = no, 1 = yes
-    bool myCardsFlip;    // 0 = cards are not fliped, 1 = cards are already flipped,
-    int myRoundStartCash;
-    int lastMoneyWon;
+    bool myTurn{0};      // 0 = no, 1 = yes
+    bool myCardsFlip{0}; // 0 = cards are not fliped, 1 = cards are already flipped,
+    int myRoundStartCash{0};
+    int lastMoneyWon{0};
     int myPreflopPotOdd;
     std::unique_ptr<RangeEstimator> myRangeEstimator;
 
-    bool m_isSessionActive;
+    bool m_isSessionActive{false};
 };
 } // namespace pkt::core::player

@@ -16,11 +16,11 @@ class StrategyAssigner
 
   private:
     TableProfile myProfile;
-    int countManiac = 0;
-    int countLoose = 0;
-    int countTight = 0;
-    int countUltraTight = 0;
-    int maxPerType;
+    int myCountManiac = 0;
+    int myCountLoose = 0;
+    int myCountTight = 0;
+    int myCountUltraTight = 0;
+    int myMaxPerType;
 };
 
 } // namespace pkt::core::player

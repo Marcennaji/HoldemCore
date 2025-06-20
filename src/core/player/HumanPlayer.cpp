@@ -17,8 +17,6 @@ HumanPlayer::HumanPlayer(const GameEvents& events, int id, std::string name, int
 {
 }
 
-HumanPlayer::~HumanPlayer()
-{
-}
+HumanPlayer::~HumanPlayer() = default;
 
 } // namespace pkt::core::player
