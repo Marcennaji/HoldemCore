@@ -91,10 +91,10 @@ class Game
 
     // running variables
     int myCurrentSmallBlind;
-    int myCurrentHandId;
-    unsigned myDealerPosition;
-    int myLastHandBlindsRaised;
-    int myLastTimeBlindsRaised;
+    int myCurrentHandId{0};
+    unsigned myDealerPosition{0};
+    int myLastHandBlindsRaised{1};
+    int myLastTimeBlindsRaised{0};
     GameData myGameData;
     StartData myStartData;
     std::list<int> myBlindsList;

@@ -61,11 +61,11 @@ class Board : public IBoard
     std::list<unsigned> myPlayerNeedToShowCards;
 
     int myCards[5];
-    int myPot;
-    int mySets;
+    int myPot{0};
+    int mySets{0};
     unsigned myDealerPosition;
-    bool myAllInCondition;
-    unsigned myLastActionPlayerId;
+    bool myAllInCondition{false};
+    unsigned myLastActionPlayerId{0};
 };
 
 } // namespace pkt::core

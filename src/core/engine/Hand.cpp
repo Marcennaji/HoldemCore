@@ -28,10 +28,9 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
     : myEvents(events), myFactory(factory), myBoard(board), mySeatsList(seats), myActivePlayerList(activePlayers),
       myRunningPlayerList(runningPlayers), myStartQuantityPlayers(startData.numberOfPlayers),
       myDealerPosition(startData.startDealerPlayerId), mySmallBlindPosition(startData.startDealerPlayerId),
-      myBigBlindPosition(startData.startDealerPlayerId), myCurrentRound(GameStatePreflop),
-      myRoundBeforePostRiver(GameStatePreflop), mySmallBlind(gameData.firstSmallBlind),
-      myStartCash(gameData.startMoney), myPreviousPlayerId(-1), myLastActionPlayerId(0), myAllInCondition(false),
-      myCardsShown(false)
+      myBigBlindPosition(startData.startDealerPlayerId), mySmallBlind(gameData.firstSmallBlind),
+      myStartCash(gameData.startMoney)
+
 {
 
     GlobalServices::instance().logger()->info("\n-------------------------------------------------------------\n");
@@ -58,9 +57,7 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
     myBettingRound = myFactory->createBettingRound(this, myDealerPosition, mySmallBlind);
 }
 
-Hand::~Hand()
-{
-}
+Hand::~Hand() = default;
 
 void Hand::initAndShuffleDeck()
 {
@@ -119,15 +116,21 @@ size_t Hand::dealBoardCards()
 void Hand::start()
 {
     if (myEvents.onDealHoleCards)
+    {
         myEvents.onDealHoleCards();
+    }
 
     getBoard()->collectSets();
 
     if (myEvents.onPotUpdated)
+    {
         myEvents.onPotUpdated(getBoard()->getPot());
+    }
 
     if (myEvents.onActivePlayerActionDone)
+    {
         myEvents.onActivePlayerActionDone();
+    }
 }
 
 void Hand::assignButtons()
@@ -135,7 +138,7 @@ void Hand::assignButtons()
 
     size_t i;
     PlayerListIterator it;
-    PlayerListConstIterator it_c;
+    PlayerListConstIterator itC;
 
     // delete all buttons
     for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
@@ -165,7 +168,9 @@ void Hand::assignButtons()
 
         ++dealerPositionIt;
         if (dealerPositionIt == mySeatsList->end())
+        {
             dealerPositionIt = mySeatsList->begin();
+        }
 
         it = getActivePlayerIt((*dealerPositionIt)->getId());
         if (it != myActivePlayerList->end())
@@ -191,7 +196,9 @@ void Hand::assignButtons()
 
             ++it;
             if (it == myActivePlayerList->end())
+            {
                 it = myActivePlayerList->begin();
+            }
 
             if (myActivePlayerList->size() > 2)
             {
@@ -218,50 +225,50 @@ void Hand::assignButtons()
 void Hand::setBlinds()
 {
 
-    PlayerListConstIterator it_c;
+    PlayerListConstIterator itC;
 
     // do sets --> TODO switch?
-    for (it_c = myRunningPlayerList->begin(); it_c != myRunningPlayerList->end(); ++it_c)
+    for (itC = myRunningPlayerList->begin(); itC != myRunningPlayerList->end(); ++itC)
     {
 
         // small blind
-        if ((*it_c)->getButton() == ButtonSmallBlind)
+        if ((*itC)->getButton() == ButtonSmallBlind)
         {
 
             // All in ?
-            if ((*it_c)->getCash() <= mySmallBlind)
+            if ((*itC)->getCash() <= mySmallBlind)
             {
 
-                (*it_c)->setSet((*it_c)->getCash());
+                (*itC)->setSet((*itC)->getCash());
                 // 1 to do not log this
-                (*it_c)->setAction(PlayerActionAllin, 1);
+                (*itC)->setAction(PlayerActionAllin, 1);
             }
             else
             {
-                (*it_c)->setSet(mySmallBlind);
+                (*itC)->setSet(mySmallBlind);
             }
         }
     }
 
     // do sets --> TODO switch?
-    for (it_c = myRunningPlayerList->begin(); it_c != myRunningPlayerList->end(); ++it_c)
+    for (itC = myRunningPlayerList->begin(); itC != myRunningPlayerList->end(); ++itC)
     {
 
         // big blind
-        if ((*it_c)->getButton() == ButtonBigBlind)
+        if ((*itC)->getButton() == ButtonBigBlind)
         {
 
             // all in ?
-            if ((*it_c)->getCash() <= 2 * mySmallBlind)
+            if ((*itC)->getCash() <= 2 * mySmallBlind)
             {
 
-                (*it_c)->setSet((*it_c)->getCash());
+                (*itC)->setSet((*itC)->getCash());
                 // 1 to do not log this
-                (*it_c)->setAction(PlayerActionAllin, 1);
+                (*itC)->setAction(PlayerActionAllin, 1);
             }
             else
             {
-                (*it_c)->setSet(2 * mySmallBlind);
+                (*itC)->setSet(2 * mySmallBlind);
             }
         }
     }
@@ -270,8 +277,8 @@ void Hand::setBlinds()
 void Hand::switchRounds()
 {
 
-    PlayerListIterator it, it_1;
-    PlayerListConstIterator it_c;
+    PlayerListIterator it, it1;
+    PlayerListConstIterator itC;
 
     // refresh runningPlayerList
     for (it = myRunningPlayerList->begin(); it != myRunningPlayerList->end();)
@@ -283,11 +290,13 @@ void Hand::switchRounds()
             if (!(myRunningPlayerList->empty()))
             {
 
-                it_1 = it;
-                if (it_1 == myRunningPlayerList->begin())
-                    it_1 = myRunningPlayerList->end();
-                --it_1;
-                getCurrentBettingRound()->setCurrentPlayersTurnId((*it_1)->getId());
+                it1 = it;
+                if (it1 == myRunningPlayerList->begin())
+                {
+                    it1 = myRunningPlayerList->end();
+                }
+                --it1;
+                getCurrentBettingRound()->setCurrentPlayersTurnId((*it1)->getId());
             }
         }
         else
@@ -298,18 +307,22 @@ void Hand::switchRounds()
 
     // determine number of all in players
     int allInPlayersCounter = 0;
-    for (it_c = myActivePlayerList->begin(); it_c != myActivePlayerList->end(); ++it_c)
+    for (itC = myActivePlayerList->begin(); itC != myActivePlayerList->end(); ++itC)
     {
-        if ((*it_c)->getAction() == PlayerActionAllin)
+        if ((*itC)->getAction() == PlayerActionAllin)
+        {
             allInPlayersCounter++;
+        }
     }
 
     // determine number of non-fold players
     int nonFoldPlayerCounter = 0;
-    for (it_c = myActivePlayerList->begin(); it_c != myActivePlayerList->end(); ++it_c)
+    for (itC = myActivePlayerList->begin(); itC != myActivePlayerList->end(); ++itC)
     {
-        if ((*it_c)->getAction() != PlayerActionFold)
+        if ((*itC)->getAction() != PlayerActionFold)
+        {
             nonFoldPlayerCounter++;
+        }
     }
 
     // if only one player non-fold -> distribute pot
@@ -317,11 +330,14 @@ void Hand::switchRounds()
     {
         myBoard->collectPot();
         if (myEvents.onPotUpdated)
+        {
             myEvents.onPotUpdated(myBoard->getPot());
+        }
 
         if (myEvents.onRefreshSet)
+        {
             myEvents.onRefreshSet();
-        ;
+        };
         myCurrentRound = GameStatePostRiver;
     }
 
@@ -341,10 +357,10 @@ void Hand::switchRounds()
         if (allInPlayersCounter + 1 == nonFoldPlayerCounter)
         {
 
-            for (it_c = myRunningPlayerList->begin(); it_c != myRunningPlayerList->end(); ++it_c)
+            for (itC = myRunningPlayerList->begin(); itC != myRunningPlayerList->end(); ++itC)
             {
 
-                if ((*it_c)->getSet() >= myBettingRound[myCurrentRound]->getHighestSet())
+                if ((*itC)->getSet() >= myBettingRound[myCurrentRound]->getHighestSet())
                 {
                     myAllInCondition = true;
                     myBoard->setAllInCondition(true);
@@ -354,23 +370,23 @@ void Hand::switchRounds()
             // exception
             // no.1: if in first Preflop Round next player is small blind and only all-in-big-blind with less than
             // smallblind amount and other all-in players with less than small blind are nonfold too -> preflop is over
-            PlayerListConstIterator smallBlindIt_c =
+            PlayerListConstIterator smallBlindItC =
                 getRunningPlayerIt(myBettingRound[myCurrentRound]->getSmallBlindPositionId());
-            PlayerListConstIterator bigBlindIt_c =
+            PlayerListConstIterator bigBlindItC =
                 getActivePlayerIt(myBettingRound[myCurrentRound]->getBigBlindPositionId());
-            if (smallBlindIt_c != myRunningPlayerList->end() && bigBlindIt_c != myActivePlayerList->end() &&
+            if (smallBlindItC != myRunningPlayerList->end() && bigBlindItC != myActivePlayerList->end() &&
                 myCurrentRound == GameStatePreflop && myBettingRound[myCurrentRound]->getFirstRound())
             {
                 // determine player who are all in with less than small blind amount
                 int tempCounter = 0;
-                for (it_c = myActivePlayerList->begin(); it_c != myActivePlayerList->end(); ++it_c)
+                for (itC = myActivePlayerList->begin(); itC != myActivePlayerList->end(); ++itC)
                 {
-                    if ((*it_c)->getAction() == PlayerActionAllin && (*it_c)->getSet() <= mySmallBlind)
+                    if ((*itC)->getAction() == PlayerActionAllin && (*itC)->getSet() <= mySmallBlind)
                     {
                         tempCounter++;
                     }
                 }
-                if ((*bigBlindIt_c)->getSet() <= mySmallBlind && tempCounter == allInPlayersCounter)
+                if ((*bigBlindItC)->getSet() <= mySmallBlind && tempCounter == allInPlayersCounter)
                 {
                     myAllInCondition = true;
                     myBoard->setAllInCondition(true);
@@ -378,11 +394,11 @@ void Hand::switchRounds()
             }
 
             // no.2: heads up -> detect player who is all in and bb but could set less than sb
-            for (it_c = myActivePlayerList->begin(); it_c != myActivePlayerList->end(); ++it_c)
+            for (itC = myActivePlayerList->begin(); itC != myActivePlayerList->end(); ++itC)
             {
 
-                if (myActivePlayerList->size() == 2 && (*it_c)->getAction() == PlayerActionAllin &&
-                    (*it_c)->getButton() == ButtonBigBlind && (*it_c)->getSet() <= mySmallBlind &&
+                if (myActivePlayerList->size() == 2 && (*itC)->getAction() == PlayerActionAllin &&
+                    (*itC)->getButton() == ButtonBigBlind && (*itC)->getSet() <= mySmallBlind &&
                     myCurrentRound == GameStatePreflop)
                 {
                     myAllInCondition = true;
@@ -398,13 +414,19 @@ void Hand::switchRounds()
         myBoard->collectPot();
 
         if (myEvents.onPotUpdated)
+        {
             myEvents.onPotUpdated(myBoard->getPot());
+        }
 
         if (myEvents.onRefreshSet)
+        {
             myEvents.onRefreshSet();
+        }
 
         if (myEvents.onFlipHoleCardsAllIn)
+        {
             myEvents.onFlipHoleCardsAllIn();
+        }
 
         if (myCurrentRound < GameStatePostRiver) // do not increment past 4
         {
@@ -424,16 +446,20 @@ void Hand::switchRounds()
     }
 
     // unhighlight current players groupbox
-    it_c = getActivePlayerIt(myPreviousPlayerId);
-    if (it_c != myActivePlayerList->end())
+    itC = getActivePlayerIt(myPreviousPlayerId);
+    if (itC != myActivePlayerList->end())
     {
         // lastPlayersTurn is active
         if (myEvents.onRefreshPlayersActiveInactiveStyles)
+        {
             myEvents.onRefreshPlayersActiveInactiveStyles(myPreviousPlayerId, 1);
+        }
     }
 
     if (myEvents.onRefreshTableDescriptiveLabels)
+    {
         myEvents.onRefreshTableDescriptiveLabels(getCurrentRound());
+    }
 
     if (myCurrentRound < GameStatePostRiver)
     {
@@ -445,31 +471,41 @@ void Hand::switchRounds()
     case GameStatePreflop:
     {
         if (myEvents.onPreflopAnimation)
+        {
             myEvents.onPreflopAnimation();
+        }
     }
     break;
     case GameStateFlop:
     {
         if (myEvents.onFlopAnimation)
+        {
             myEvents.onFlopAnimation();
+        }
     }
     break;
     case GameStateTurn:
     {
         if (myEvents.onTurnAnimation)
+        {
             myEvents.onTurnAnimation();
+        }
     }
     break;
     case GameStateRiver:
     {
         if (myEvents.onRiverAnimation)
+        {
             myEvents.onRiverAnimation();
+        }
     }
     break;
     case GameStatePostRiver:
     {
         if (myEvents.onPostRiverAnimation)
+        {
             myEvents.onPostRiverAnimation();
+        }
     }
     break;
     default:
@@ -544,7 +580,9 @@ int Hand::getPreflopCallsNumber()
         const std::vector<PlayerAction>& actions = (*it)->getCurrentHandActions().getPreflopActions();
 
         if (find(actions.begin(), actions.end(), PlayerActionCall) != actions.end())
+        {
             calls++;
+        }
     }
     return calls;
 }
@@ -560,8 +598,12 @@ int Hand::getPreflopRaisesNumber()
 
         for (std::vector<PlayerAction>::const_iterator itAction = actions.begin(); itAction != actions.end();
              itAction++)
+        {
             if ((*itAction) == PlayerActionRaise || (*itAction) == PlayerActionAllin)
+            {
                 raises++;
+            }
+        }
     }
 
     return raises;
@@ -578,8 +620,12 @@ int Hand::getFlopBetsOrRaisesNumber()
 
         for (std::vector<PlayerAction>::const_iterator itAction = actions.begin(); itAction != actions.end();
              itAction++)
+        {
             if ((*itAction) == PlayerActionRaise || (*itAction) == PlayerActionAllin || (*itAction) == PlayerActionBet)
+            {
                 bets++;
+            }
+        }
     }
 
     return bets;
@@ -596,8 +642,12 @@ int Hand::getTurnBetsOrRaisesNumber()
 
         for (std::vector<PlayerAction>::const_iterator itAction = actions.begin(); itAction != actions.end();
              itAction++)
+        {
             if ((*itAction) == PlayerActionRaise || (*itAction) == PlayerActionAllin || (*itAction) == PlayerActionBet)
+            {
                 bets++;
+            }
+        }
     }
 
     return bets;
@@ -614,8 +664,12 @@ int Hand::getRiverBetsOrRaisesNumber()
 
         for (std::vector<PlayerAction>::const_iterator itAction = actions.begin(); itAction != actions.end();
              itAction++)
+        {
             if ((*itAction) == PlayerActionRaise || (*itAction) == PlayerActionAllin || (*itAction) == PlayerActionBet)
+            {
                 bets++;
+            }
+        }
     }
 
     return bets;
@@ -625,13 +679,15 @@ std::vector<PlayerPosition> Hand::getRaisersPositions()
 
     std::vector<PlayerPosition> positions;
 
-    PlayerListIterator it_c;
+    PlayerListIterator itC;
 
-    for (it_c = myActivePlayerList->begin(); it_c != myActivePlayerList->end(); ++it_c)
+    for (itC = myActivePlayerList->begin(); itC != myActivePlayerList->end(); ++itC)
     { // note that all in players are not "running" any more
 
-        if ((*it_c)->getAction() == PlayerActionRaise || (*it_c)->getAction() == PlayerActionAllin)
-            positions.push_back((*it_c)->getPosition());
+        if ((*itC)->getAction() == PlayerActionRaise || (*itC)->getAction() == PlayerActionAllin)
+        {
+            positions.push_back((*itC)->getPosition());
+        }
     }
     return positions;
 }
@@ -641,13 +697,15 @@ std::vector<PlayerPosition> Hand::getCallersPositions()
 
     std::vector<PlayerPosition> positions;
 
-    PlayerListIterator it_c;
+    PlayerListIterator itC;
 
-    for (it_c = myRunningPlayerList->begin(); it_c != myRunningPlayerList->end(); ++it_c)
+    for (itC = myRunningPlayerList->begin(); itC != myRunningPlayerList->end(); ++itC)
     {
 
-        if ((*it_c)->getAction() == PlayerActionCall)
-            positions.push_back((*it_c)->getPosition());
+        if ((*itC)->getAction() == PlayerActionCall)
+        {
+            positions.push_back((*itC)->getPosition());
+        }
     }
     return positions;
 }
@@ -667,7 +725,9 @@ int Hand::getLastRaiserId()
             if (lastRaiser != myActivePlayerList->end())
             {
                 if ((*lastRaiser)->getPosition() < (*it)->getPosition())
+                {
                     lastRaiser = it;
+                }
             }
             else
             {
@@ -676,7 +736,9 @@ int Hand::getLastRaiserId()
         }
     }
     if (lastRaiser != myActivePlayerList->end())
+    {
         return (*lastRaiser)->getId();
+    }
 
     // if no raiser was found, look for the one who have bet (if any)
 
@@ -684,12 +746,18 @@ int Hand::getLastRaiserId()
     {
 
         if ((*it)->getAction() == PlayerActionBet)
+        {
             lastRaiser = it;
+        }
     }
     if (lastRaiser != myActivePlayerList->end())
+    {
         return (*lastRaiser)->getId();
+    }
     else
+    {
         return -1;
+    }
 }
 int Hand::getPreflopLastRaiserId()
 {

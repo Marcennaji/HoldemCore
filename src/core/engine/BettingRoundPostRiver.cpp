@@ -17,13 +17,11 @@ using namespace std;
 using namespace pkt::core::player;
 
 BettingRoundPostRiver::BettingRoundPostRiver(const GameEvents& events, IHand* hi, int dP, int sB)
-    : BettingRound(events, hi, dP, sB, GameStatePostRiver), myHighestCardsValue(0)
+    : BettingRound(events, hi, dP, sB, GameStatePostRiver)
 {
 }
 
-BettingRoundPostRiver::~BettingRoundPostRiver()
-{
-}
+BettingRoundPostRiver::~BettingRoundPostRiver() = default;
 
 void BettingRoundPostRiver::run()
 {
@@ -32,24 +30,24 @@ void BettingRoundPostRiver::run()
 void BettingRoundPostRiver::postRiverRun()
 {
 
-    PlayerListConstIterator it_c;
+    PlayerListConstIterator itC;
     PlayerListIterator it;
 
     // who is the winner
-    for (it_c = getHand()->getActivePlayerList()->begin(); it_c != getHand()->getActivePlayerList()->end(); ++it_c)
+    for (itC = getHand()->getActivePlayerList()->begin(); itC != getHand()->getActivePlayerList()->end(); ++itC)
     {
 
-        if ((*it_c)->getAction() != PlayerActionFold && (*it_c)->getCardsValueInt() > myHighestCardsValue)
+        if ((*itC)->getAction() != PlayerActionFold && (*itC)->getCardsValueInt() > myHighestCardsValue)
         {
-            myHighestCardsValue = (*it_c)->getCardsValueInt();
+            myHighestCardsValue = (*itC)->getCardsValueInt();
         }
     }
 
     int potPlayers = 0;
 
-    for (it_c = getHand()->getActivePlayerList()->begin(); it_c != getHand()->getActivePlayerList()->end(); ++it_c)
+    for (itC = getHand()->getActivePlayerList()->begin(); itC != getHand()->getActivePlayerList()->end(); ++itC)
     {
-        if ((*it_c)->getAction() != PlayerActionFold)
+        if ((*itC)->getAction() != PlayerActionFold)
         {
             potPlayers++;
         }
@@ -63,12 +61,12 @@ void BettingRoundPostRiver::postRiverRun()
 
     bool pauseHand = false;
     int nonfoldPlayersCounter = 0;
-    for (it_c = getHand()->getActivePlayerList()->begin(); it_c != getHand()->getActivePlayerList()->end(); ++it_c)
+    for (itC = getHand()->getActivePlayerList()->begin(); itC != getHand()->getActivePlayerList()->end(); ++itC)
     {
-        if ((*it_c)->getAction() != PlayerActionFold)
+        if ((*itC)->getAction() != PlayerActionFold)
         {
             nonfoldPlayersCounter++;
-            if ((*it_c)->getId() == 0)
+            if ((*itC)->getId() == 0)
             {
                 pauseHand = true;
             }
@@ -80,25 +78,33 @@ void BettingRoundPostRiver::postRiverRun()
     GlobalServices::instance().playersStatisticsStore()->updatePlayersStatistics(getHand()->getActivePlayerList());
 
     if (myEvents.onPostRiverRunAnimation)
+    {
         myEvents.onPostRiverRunAnimation();
+    }
 
     if (getHand()->getCardsShown())
     {
         // show cards for players who didn't fold preflop
-        for (it_c = getHand()->getActivePlayerList()->begin(); it_c != getHand()->getActivePlayerList()->end(); ++it_c)
+        for (itC = getHand()->getActivePlayerList()->begin(); itC != getHand()->getActivePlayerList()->end(); ++itC)
         {
 
-            if ((*it_c)->getCurrentHandActions().getPreflopActions().size() > 0 &&
-                (*it_c)->getCurrentHandActions().getPreflopActions().at(0) != PlayerActionFold)
+            if ((*itC)->getCurrentHandActions().getPreflopActions().size() > 0 &&
+                (*itC)->getCurrentHandActions().getPreflopActions().at(0) != PlayerActionFold)
+            {
 
                 if (myEvents.onShowHoleCards)
-                    myEvents.onShowHoleCards((*it_c)->getId());
+                {
+                    myEvents.onShowHoleCards((*itC)->getId());
+                }
+            }
         }
     }
     // if the human player went at showdown with at least one opponent, enable pausing the hand so he can see the
     // results
     if (pauseHand && nonfoldPlayersCounter > 1 && myEvents.onPauseHand)
+    {
         myEvents.onPauseHand();
+    }
 }
 void BettingRoundPostRiver::setHighestCardsValue(int theValue)
 {

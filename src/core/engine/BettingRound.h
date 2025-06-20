@@ -85,29 +85,29 @@ class BettingRound : public IBettingRound
 
     const GameState myBettingRoundID;
     int myDealerPosition;
-    int mySmallBlindPosition;
+    int mySmallBlindPosition{0};
 
     unsigned myDealerPositionId;
-    unsigned mySmallBlindPositionId;
-    unsigned myBigBlindPositionId;
+    unsigned mySmallBlindPositionId{0};
+    unsigned myBigBlindPositionId{0};
 
     int mySmallBlind;
-    int myHighestSet;
+    int myHighestSet{0};
     int myMinimumRaise;
-    bool myFullBetRule;
+    bool myFullBetRule{false};
 
-    bool myFirstRun;
-    bool myFirstRunGui; // HACK
-    bool myFirstRound;
-    bool myFirstHeadsUpRound;
+    bool myFirstRun{true};
+    bool myFirstRunGui{true}; // HACK
+    bool myFirstRound{true};
+    bool myFirstHeadsUpRound{true};
 
     pkt::core::player::PlayerListIterator myCurrentPlayersTurnIt; // iterator for runningPlayerList
     pkt::core::player::PlayerListIterator myLastPlayersTurnIt;    // iterator for runningPlayerList
 
-    unsigned myCurrentPlayersTurnId;
-    unsigned myFirstRoundLastPlayersTurnId;
+    unsigned myCurrentPlayersTurnId{0};
+    unsigned myFirstRoundLastPlayersTurnId{0};
 
-    bool myLogBoardCardsDone;
+    bool myLogBoardCardsDone{false};
 };
 
 } // namespace pkt::core

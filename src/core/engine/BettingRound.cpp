@@ -18,49 +18,44 @@ using namespace std;
 using namespace pkt::core::player;
 
 BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int sB, GameState gS)
-    : IBettingRound(), myHand(hi), myBettingRoundID(gS), myDealerPosition(dP), mySmallBlindPosition(0),
-      myDealerPositionId(dP), mySmallBlindPositionId(0), myBigBlindPositionId(0), mySmallBlind(sB), myHighestSet(0),
-      myMinimumRaise(2 * sB), myFullBetRule(false), myFirstRun(true), myFirstRunGui(true), myFirstRound(true),
-      myFirstHeadsUpRound(true), myCurrentPlayersTurnId(0), myFirstRoundLastPlayersTurnId(0),
-      myLogBoardCardsDone(false), myEvents(events)
+    : IBettingRound(), myHand(hi), myBettingRoundID(gS), myDealerPosition(dP), myDealerPositionId(dP), mySmallBlind(sB),
+      myMinimumRaise(2 * sB), myEvents(events)
 {
     myCurrentPlayersTurnIt = myHand->getRunningPlayerList()->begin();
     myLastPlayersTurnIt = myHand->getRunningPlayerList()->begin();
 
-    PlayerListConstIterator it_c;
+    PlayerListConstIterator itC;
 
     // determine bigBlindPosition
-    for (it_c = myHand->getActivePlayerList()->begin(); it_c != myHand->getActivePlayerList()->end(); ++it_c)
+    for (itC = myHand->getActivePlayerList()->begin(); itC != myHand->getActivePlayerList()->end(); ++itC)
     {
-        if ((*it_c)->getButton() == ButtonBigBlind)
+        if ((*itC)->getButton() == ButtonBigBlind)
         {
-            myBigBlindPositionId = (*it_c)->getId();
+            myBigBlindPositionId = (*itC)->getId();
             break;
         }
     }
-    if (it_c == myHand->getActivePlayerList()->end())
+    if (itC == myHand->getActivePlayerList()->end())
     {
         GlobalServices::instance().logger()->error("ACTIVE_PLAYER_NOT_FOUND");
     }
 
     // determine smallBlindPosition
-    for (it_c = myHand->getActivePlayerList()->begin(); it_c != myHand->getActivePlayerList()->end(); ++it_c)
+    for (itC = myHand->getActivePlayerList()->begin(); itC != myHand->getActivePlayerList()->end(); ++itC)
     {
-        if ((*it_c)->getButton() == ButtonSmallBlind)
+        if ((*itC)->getButton() == ButtonSmallBlind)
         {
-            mySmallBlindPositionId = (*it_c)->getId();
+            mySmallBlindPositionId = (*itC)->getId();
             break;
         }
     }
-    if (it_c == myHand->getActivePlayerList()->end())
+    if (itC == myHand->getActivePlayerList()->end())
     {
         GlobalServices::instance().logger()->error("ACTIVE_PLAYER_NOT_FOUND");
     }
 }
 
-BettingRound::~BettingRound()
-{
-}
+BettingRound::~BettingRound() = default;
 
 int BettingRound::getHighestCardsValue() const
 {
@@ -79,7 +74,9 @@ void BettingRound::nextPlayer()
 
     auto botPtr = std::dynamic_pointer_cast<BotPlayer>(*currentPlayersTurnConstIt);
     if (botPtr)
+    {
         botPtr->action();
+    }
 }
 
 void BettingRound::run()
@@ -113,16 +110,22 @@ void BettingRound::run()
 
         ++currentPlayersTurnIt;
         if (currentPlayersTurnIt == myHand->getRunningPlayerList()->end())
+        {
             currentPlayersTurnIt = myHand->getRunningPlayerList()->begin();
+        }
 
         myCurrentPlayersTurnId = (*currentPlayersTurnIt)->getId();
 
         // highlight active players groupbox and clear action
         if (myEvents.onRefreshPlayersActiveInactiveStyles)
+        {
             myEvents.onRefreshPlayersActiveInactiveStyles(myCurrentPlayersTurnId, 2);
+        }
 
         if (myEvents.onRefreshAction)
+        {
             myEvents.onRefreshAction(myCurrentPlayersTurnId, 0);
+        }
 
         currentPlayersTurnIt = myHand->getRunningPlayerIt(myCurrentPlayersTurnId);
         if (currentPlayersTurnIt == myHand->getRunningPlayerList()->end())
@@ -140,54 +143,68 @@ void BettingRound::run()
         if (myCurrentPlayersTurnId == 0)
         {
             if (myEvents.onDoHumanAction)
+            {
                 myEvents.onDoHumanAction();
+            }
         }
         else
         {
             if (myEvents.onBettingRoundAnimation)
+            {
                 myEvents.onBettingRoundAnimation(myBettingRoundID);
+            }
         }
     }
 }
 
 bool BettingRound::allBetsAreDone() const
 {
-    PlayerListIterator it_c;
+    PlayerListIterator itC;
 
-    for (it_c = myHand->getRunningPlayerList()->begin(); it_c != myHand->getRunningPlayerList()->end(); ++it_c)
+    for (itC = myHand->getRunningPlayerList()->begin(); itC != myHand->getRunningPlayerList()->end(); ++itC)
     {
-        if (myHighestSet != (*it_c)->getSet())
+        if (myHighestSet != (*itC)->getSet())
+        {
             return false;
+        }
     }
     return true;
 }
 
 void BettingRound::proceedToNextBettingRound()
 {
-    PlayerListIterator it_c;
+    PlayerListIterator itC;
     myHand->setCurrentRound(GameState(myBettingRoundID + 1));
 
-    for (it_c = myHand->getRunningPlayerList()->begin(); it_c != myHand->getRunningPlayerList()->end(); ++it_c)
+    for (itC = myHand->getRunningPlayerList()->begin(); itC != myHand->getRunningPlayerList()->end(); ++itC)
     {
-        (*it_c)->setAction(PlayerActionNone);
+        (*itC)->setAction(PlayerActionNone);
     }
 
     myHand->getBoard()->collectSets();
     myHand->getBoard()->collectPot();
 
     if (myEvents.onPotUpdated)
+    {
         myEvents.onPotUpdated(myHand->getBoard()->getPot());
+    }
 
     if (myEvents.onRefreshSet)
+    {
         myEvents.onRefreshSet();
+    }
 
     if (myEvents.onRefreshCash)
+    {
         myEvents.onRefreshCash();
+    }
 
     for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
     {
         if (myEvents.onRefreshAction)
+        {
             myEvents.onRefreshAction(i, PlayerActionNone);
+        }
     }
 
     myHand->switchRounds();
@@ -248,29 +265,31 @@ void BettingRound::handleFirstRun()
 
     if (!(myHand->getAllInCondition()))
     {
-        PlayerListIterator it_1, it_2;
+        PlayerListIterator it1, it2;
 
         // running player before smallBlind
         bool formerRunningPlayerFound = false;
         if (myHand->getActivePlayerList()->size() > 2)
         {
-            it_1 = myHand->getActivePlayerIt(mySmallBlindPositionId);
-            if (it_1 == myHand->getActivePlayerList()->end())
+            it1 = myHand->getActivePlayerIt(mySmallBlindPositionId);
+            if (it1 == myHand->getActivePlayerList()->end())
             {
                 GlobalServices::instance().logger()->error("ACTIVE_PLAYER_NOT_FOUND");
             }
 
             for (size_t i = 0; i < myHand->getActivePlayerList()->size(); i++)
             {
-                if (it_1 == myHand->getActivePlayerList()->begin())
-                    it_1 = myHand->getActivePlayerList()->end();
-                --it_1;
-
-                it_2 = myHand->getRunningPlayerIt((*it_1)->getId());
-                // running player found
-                if (it_2 != myHand->getRunningPlayerList()->end())
+                if (it1 == myHand->getActivePlayerList()->begin())
                 {
-                    myFirstRoundLastPlayersTurnId = (*it_2)->getId();
+                    it1 = myHand->getActivePlayerList()->end();
+                }
+                --it1;
+
+                it2 = myHand->getRunningPlayerIt((*it1)->getId());
+                // running player found
+                if (it2 != myHand->getRunningPlayerList()->end())
+                {
+                    myFirstRoundLastPlayersTurnId = (*it2)->getId();
                     formerRunningPlayerFound = true;
                     break;
                 }

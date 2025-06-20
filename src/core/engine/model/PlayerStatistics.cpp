@@ -41,7 +41,9 @@ float PlayerStatistics::getWentToShowDown() const
 {
 
     if ((m_riverStatistics.m_hands - m_riverStatistics.m_folds) == 0)
+    {
         return 0;
+    }
 
     return ((m_riverStatistics.m_hands - m_riverStatistics.m_folds) * 100) / (m_flopStatistics.m_hands);
 }
@@ -50,15 +52,21 @@ void PreflopStatistics::addLastAction(PlayerAction p)
 {
     m_lastActions.push_back(p);
     if (m_lastActions.size() > LAST_ACTIONS_STACK_SIZE)
+    {
         m_lastActions.pop_front();
+    }
 }
 int PreflopStatistics::getLastActionsNumber(PlayerAction p) const
 {
 
     int result = 0;
     for (int i = 0; i < m_lastActions.size(); i++)
+    {
         if (m_lastActions.at(i) == p)
+        {
             result++;
+        }
+    }
 
     return result;
 }
@@ -80,7 +88,9 @@ float PreflopStatistics::getVoluntaryPutMoneyInPot() const
 {
 
     if (m_hands == 0 || (m_raises + m_calls == 0))
+    {
         return 0;
+    }
 
     float f = (float) ((m_raises + m_calls) * 100) / (float) m_hands;
 
@@ -91,7 +101,9 @@ float PreflopStatistics::getPreflopRaise() const
 {
 
     if (m_hands == 0 || m_raises == 0)
+    {
         return 0;
+    }
 
     float f = (float) ((m_raises * 100) / (float) m_hands);
 
@@ -101,7 +113,9 @@ float PreflopStatistics::getPreflop3Bet() const
 {
 
     if (m_hands == 0 || m_3Bets == 0)
+    {
         return 0;
+    }
 
     float f = (float) ((m_3Bets * 100) / (float) m_hands);
 
@@ -111,7 +125,9 @@ float PreflopStatistics::getPreflop4Bet() const
 {
 
     if (m_hands == 0 || m_4Bets == 0)
+    {
         return 0;
+    }
 
     float f = (float) ((m_4Bets * 100) / (float) m_hands);
 
@@ -121,7 +137,9 @@ float PreflopStatistics::getPreflopCall3BetsFrequency() const
 {
 
     if (m_call3BetsOpportunities == 0)
+    {
         return 0;
+    }
 
     float f = (float) (m_call3Bets) / (float) (m_call3BetsOpportunities) * 100;
 
@@ -146,7 +164,9 @@ float FlopStatistics::getAgressionFactor() const
 {
 
     if (m_raises + m_bets == 0 || m_calls == 0)
+    {
         return 0;
+    }
 
     return (float) (m_raises + m_bets) / (float) m_calls;
 }
@@ -155,10 +175,14 @@ float FlopStatistics::getAgressionFrequency() const
 {
 
     if ((float) (m_raises + m_bets + m_calls + m_checks + m_folds) == 0.0)
+    {
         return 0.0;
+    }
 
     if ((float) (m_raises + m_bets) == 0.0)
+    {
         return 0.0;
+    }
 
     return (float) (m_raises + m_bets) / (float) (m_raises + m_bets + m_calls + m_checks + m_folds) * 100;
 }
@@ -167,7 +191,9 @@ float FlopStatistics::getContinuationBetFrequency() const
 {
 
     if (m_continuationBetsOpportunities == 0)
+    {
         return 0;
+    }
 
     return (float) (m_continuationBets) / (float) (m_continuationBetsOpportunities) * 100;
 }
@@ -189,10 +215,14 @@ float TurnStatistics::getAgressionFrequency() const
 {
 
     if ((float) (m_raises + m_bets + m_calls + m_checks + m_folds) == 0.0)
+    {
         return 0.0;
+    }
 
     if ((float) (m_raises + m_bets) == 0.0)
+    {
         return 0.0;
+    }
 
     return (float) (m_raises + m_bets) / (float) (m_raises + m_bets + m_calls + m_checks + m_folds) * 100;
 }
@@ -201,7 +231,9 @@ float TurnStatistics::getAgressionFactor() const
 {
 
     if (m_raises + m_bets == 0 || m_calls == 0)
+    {
         return 0;
+    }
 
     return (float) (m_raises + m_bets) / (float) m_calls;
 }
@@ -221,10 +253,14 @@ float RiverStatistics::getAgressionFrequency() const
 {
 
     if ((float) (m_raises + m_bets + m_calls + m_checks + m_folds) == 0.0)
+    {
         return 0.0;
+    }
 
     if ((float) (m_raises + m_bets) == 0.0)
+    {
         return 0.0;
+    }
 
     return (float) (m_raises + m_bets) / (float) (m_raises + m_bets + m_calls + m_checks + m_folds) * 100;
 }
@@ -232,7 +268,9 @@ float RiverStatistics::getAgressionFactor() const
 {
 
     if (m_raises + m_bets == 0 || m_calls == 0)
+    {
         return 0;
+    }
 
     return (float) (m_raises + m_bets) / (float) m_calls;
 }

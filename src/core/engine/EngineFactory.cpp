@@ -23,9 +23,7 @@ EngineFactory::EngineFactory(const GameEvents& events) : myEvents(events)
 {
 }
 
-EngineFactory::~EngineFactory()
-{
-}
+EngineFactory::~EngineFactory() = default;
 
 std::shared_ptr<IHand> EngineFactory::createHand(std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
                                                  pkt::core::player::PlayerList sl, pkt::core::player::PlayerList apl,

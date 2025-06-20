@@ -118,18 +118,18 @@ class Hand : public IHand
     unsigned myDealerPosition;
     unsigned mySmallBlindPosition;
     unsigned myBigBlindPosition;
-    GameState myCurrentRound;
-    GameState myRoundBeforePostRiver;
+    GameState myCurrentRound{GameStatePreflop};
+    GameState myRoundBeforePostRiver{GameStatePreflop};
     int mySmallBlind;
     int myStartCash;
 
-    int myPreviousPlayerId;
+    int myPreviousPlayerId{-1};
     int myPreflopLastRaiserId;
     int myFlopLastRaiserId;
     int myTurnLastRaiserId;
-    unsigned myLastActionPlayerId;
+    unsigned myLastActionPlayerId{0};
 
-    bool myAllInCondition;
-    bool myCardsShown;
+    bool myAllInCondition{false};
+    bool myCardsShown{false};
 };
 } // namespace pkt::core

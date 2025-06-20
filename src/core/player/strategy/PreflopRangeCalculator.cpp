@@ -19,73 +19,73 @@ void PreflopRangeCalculator::initializeRanges(const int utgHeadsUpRange, const i
 
     // values are % best hands
 
-    UTG_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    UTG_STARTING_RANGE[2] = utgHeadsUpRange;
-    UTG_STARTING_RANGE[3] = utgHeadsUpRange - step;
-    UTG_STARTING_RANGE[4] = utgHeadsUpRange - (2 * step);
-    UTG_STARTING_RANGE[5] = utgHeadsUpRange - (3 * step);
-    UTG_STARTING_RANGE[6] = utgHeadsUpRange - (4 * step);
-    UTG_STARTING_RANGE[7] = utgFullTableRange + (3 * step);
-    UTG_STARTING_RANGE[8] = utgFullTableRange + (2 * step);
-    UTG_STARTING_RANGE[9] = utgFullTableRange + step;
-    UTG_STARTING_RANGE[10] = utgFullTableRange;
+    myUtgStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    myUtgStartingRange[2] = utgHeadsUpRange;
+    myUtgStartingRange[3] = utgHeadsUpRange - step;
+    myUtgStartingRange[4] = utgHeadsUpRange - (2 * step);
+    myUtgStartingRange[5] = utgHeadsUpRange - (3 * step);
+    myUtgStartingRange[6] = utgHeadsUpRange - (4 * step);
+    myUtgStartingRange[7] = utgFullTableRange + (3 * step);
+    myUtgStartingRange[8] = utgFullTableRange + (2 * step);
+    myUtgStartingRange[9] = utgFullTableRange + step;
+    myUtgStartingRange[10] = utgFullTableRange;
 
-    assert(UTG_STARTING_RANGE[7] < UTG_STARTING_RANGE[6]);
+    assert(myUtgStartingRange[7] < myUtgStartingRange[6]);
 
     // we have the UTG starting ranges. Now, deduce the starting ranges for other positions :
 
-    UtgPlusOne_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < UtgPlusOne_STARTING_RANGE.size(); i++)
+    myUtgPlusOneStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    for (int i = 2; i < myUtgPlusOneStartingRange.size(); i++)
     {
-        UtgPlusOne_STARTING_RANGE[i] = min(50, UTG_STARTING_RANGE[i] + 1);
+        myUtgPlusOneStartingRange[i] = min(50, myUtgStartingRange[i] + 1);
     }
 
-    UtgPlusTwo_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < UtgPlusTwo_STARTING_RANGE.size(); i++)
+    myUtgPlusTwoStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    for (int i = 2; i < myUtgPlusTwoStartingRange.size(); i++)
     {
-        UtgPlusTwo_STARTING_RANGE[i] = min(50, UtgPlusOne_STARTING_RANGE[i] + 1);
+        myUtgPlusTwoStartingRange[i] = min(50, myUtgPlusOneStartingRange[i] + 1);
     }
 
-    MIDDLE_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < MIDDLE_STARTING_RANGE.size(); i++)
+    myMiddleStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    for (int i = 2; i < myMiddleStartingRange.size(); i++)
     {
-        MIDDLE_STARTING_RANGE[i] = min(50, UtgPlusTwo_STARTING_RANGE[i] + 1);
+        myMiddleStartingRange[i] = min(50, myUtgPlusTwoStartingRange[i] + 1);
     }
 
-    MiddlePlusOne_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < MiddlePlusOne_STARTING_RANGE.size(); i++)
+    myMiddlePlusOneStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    for (int i = 2; i < myMiddlePlusOneStartingRange.size(); i++)
     {
-        MiddlePlusOne_STARTING_RANGE[i] = min(50, MIDDLE_STARTING_RANGE[i] + 1);
+        myMiddlePlusOneStartingRange[i] = min(50, myMiddleStartingRange[i] + 1);
     }
 
-    LATE_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < LATE_STARTING_RANGE.size(); i++)
+    myLateStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    for (int i = 2; i < myLateStartingRange.size(); i++)
     {
-        LATE_STARTING_RANGE[i] = min(50, MiddlePlusOne_STARTING_RANGE[i] + 1);
+        myLateStartingRange[i] = min(50, myMiddlePlusOneStartingRange[i] + 1);
     }
 
-    CUTOFF_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < CUTOFF_STARTING_RANGE.size(); i++)
+    myCutoffStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    for (int i = 2; i < myCutoffStartingRange.size(); i++)
     {
-        CUTOFF_STARTING_RANGE[i] = min(50, LATE_STARTING_RANGE[i] + 1);
+        myCutoffStartingRange[i] = min(50, myLateStartingRange[i] + 1);
     }
 
-    BUTTON_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < BUTTON_STARTING_RANGE.size(); i++)
+    myButtonStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    for (int i = 2; i < myButtonStartingRange.size(); i++)
     {
-        BUTTON_STARTING_RANGE[i] = min(50, CUTOFF_STARTING_RANGE[i] + 1);
+        myButtonStartingRange[i] = min(50, myCutoffStartingRange[i] + 1);
     }
 
-    SB_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < SB_STARTING_RANGE.size(); i++)
+    mySmallBlindStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    for (int i = 2; i < mySmallBlindStartingRange.size(); i++)
     {
-        SB_STARTING_RANGE[i] = CUTOFF_STARTING_RANGE[i];
+        mySmallBlindStartingRange[i] = myCutoffStartingRange[i];
     }
 
-    BB_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < BB_STARTING_RANGE.size(); i++)
+    myBigBlindStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    for (int i = 2; i < myBigBlindStartingRange.size(); i++)
     {
-        BB_STARTING_RANGE[i] = SB_STARTING_RANGE[i] + 1;
+        myBigBlindStartingRange[i] = mySmallBlindStartingRange[i] + 1;
     }
 }
 
@@ -534,34 +534,34 @@ int PreflopRangeCalculator::getRange(PlayerPosition p, const int nbPlayers) cons
     {
 
     case UTG:
-        return UTG_STARTING_RANGE[nbPlayers];
+        return myUtgStartingRange[nbPlayers];
         break;
     case UtgPlusOne:
-        return UtgPlusOne_STARTING_RANGE[nbPlayers];
+        return myUtgPlusOneStartingRange[nbPlayers];
         break;
     case UtgPlusTwo:
-        return UtgPlusTwo_STARTING_RANGE[nbPlayers];
+        return myUtgPlusTwoStartingRange[nbPlayers];
         break;
     case MIDDLE:
-        return MIDDLE_STARTING_RANGE[nbPlayers];
+        return myMiddleStartingRange[nbPlayers];
         break;
     case MiddlePlusOne:
-        return MiddlePlusOne_STARTING_RANGE[nbPlayers];
+        return myMiddlePlusOneStartingRange[nbPlayers];
         break;
     case LATE:
-        return LATE_STARTING_RANGE[nbPlayers];
+        return myLateStartingRange[nbPlayers];
         break;
     case CUTOFF:
-        return CUTOFF_STARTING_RANGE[nbPlayers];
+        return myCutoffStartingRange[nbPlayers];
         break;
     case BUTTON:
-        return BUTTON_STARTING_RANGE[nbPlayers];
+        return myButtonStartingRange[nbPlayers];
         break;
     case SB:
-        return SB_STARTING_RANGE[nbPlayers];
+        return mySmallBlindStartingRange[nbPlayers];
         break;
     case BB:
-        return BB_STARTING_RANGE[nbPlayers];
+        return myBigBlindStartingRange[nbPlayers];
         break;
     default:
         return 0;

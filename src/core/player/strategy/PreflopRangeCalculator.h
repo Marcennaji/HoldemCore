@@ -12,7 +12,7 @@ struct CurrentHandContext;
 class PreflopRangeCalculator
 {
   public:
-    PreflopRangeCalculator() {};
+    PreflopRangeCalculator() = default;
     float calculatePreflopCallingRange(CurrentHandContext& context, bool deterministic = false) const;
     float calculatePreflopRaisingRange(CurrentHandContext& context, bool deterministic = false) const;
 
@@ -21,16 +21,16 @@ class PreflopRangeCalculator
 
   private:
     // Vector index is player position, value is range %
-    std::vector<int> UTG_STARTING_RANGE;
-    std::vector<int> UtgPlusOne_STARTING_RANGE;
-    std::vector<int> UtgPlusTwo_STARTING_RANGE;
-    std::vector<int> MIDDLE_STARTING_RANGE;
-    std::vector<int> MiddlePlusOne_STARTING_RANGE;
-    std::vector<int> LATE_STARTING_RANGE;
-    std::vector<int> CUTOFF_STARTING_RANGE;
-    std::vector<int> BUTTON_STARTING_RANGE;
-    std::vector<int> SB_STARTING_RANGE;
-    std::vector<int> BB_STARTING_RANGE;
+    std::vector<int> myUtgStartingRange;
+    std::vector<int> myUtgPlusOneStartingRange;
+    std::vector<int> myUtgPlusTwoStartingRange;
+    std::vector<int> myMiddleStartingRange;
+    std::vector<int> myMiddlePlusOneStartingRange;
+    std::vector<int> myLateStartingRange;
+    std::vector<int> myCutoffStartingRange;
+    std::vector<int> myButtonStartingRange;
+    std::vector<int> mySmallBlindStartingRange;
+    std::vector<int> myBigBlindStartingRange;
 
     // calling range helper methods
     float adjustCallForLimpers(float callingRange) const;

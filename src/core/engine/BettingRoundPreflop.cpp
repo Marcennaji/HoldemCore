@@ -24,9 +24,7 @@ BettingRoundPreflop::BettingRoundPreflop(const GameEvents& events, IHand* hi, un
     setHighestSet(2 * getSmallBlind());
 }
 
-BettingRoundPreflop::~BettingRoundPreflop()
-{
-}
+BettingRoundPreflop::~BettingRoundPreflop() = default;
 
 void BettingRoundPreflop::run()
 {
@@ -64,7 +62,9 @@ void BettingRoundPreflop::run()
                     }
 
                     if (it == getHand()->getActivePlayerList()->begin())
+                    {
                         it = getHand()->getActivePlayerList()->end();
+                    }
                     --it;
 
                     setFirstRoundLastPlayersTurnId((*it)->getId());
@@ -116,12 +116,12 @@ void BettingRoundPreflop::run()
     }
 
     bool allHighestSet = true;
-    PlayerListConstIterator it_c;
+    PlayerListConstIterator itC;
 
     // check if all running players have same sets (else allHighestSet = false)
-    for (it_c = getHand()->getRunningPlayerList()->begin(); it_c != getHand()->getRunningPlayerList()->end(); ++it_c)
+    for (itC = getHand()->getRunningPlayerList()->begin(); itC != getHand()->getRunningPlayerList()->end(); ++itC)
     {
-        if (getHighestSet() != (*it_c)->getSet())
+        if (getHighestSet() != (*itC)->getSet())
         {
             allHighestSet = false;
             break;
@@ -137,7 +137,9 @@ void BettingRoundPreflop::run()
 
     ++currentPlayersTurnIt;
     if (currentPlayersTurnIt == getHand()->getRunningPlayerList()->end())
+    {
         currentPlayersTurnIt = getHand()->getRunningPlayerList()->begin();
+    }
 
     setCurrentPlayersTurnId((*currentPlayersTurnIt)->getId());
 
@@ -150,10 +152,9 @@ void BettingRoundPreflop::run()
         getHand()->setCurrentRound(GameStateFlop);
 
         // Action loeschen und ActionButtons refresh
-        for (it_c = getHand()->getRunningPlayerList()->begin(); it_c != getHand()->getRunningPlayerList()->end();
-             ++it_c)
+        for (itC = getHand()->getRunningPlayerList()->begin(); itC != getHand()->getRunningPlayerList()->end(); ++itC)
         {
-            (*it_c)->setAction(PlayerActionNone);
+            (*itC)->setAction(PlayerActionNone);
         }
 
         // Sets in den Pot verschieben und Sets = 0 und Pot-refresh
@@ -161,18 +162,26 @@ void BettingRoundPreflop::run()
         getHand()->getBoard()->collectPot();
 
         if (myEvents.onPotUpdated)
+        {
             myEvents.onPotUpdated(getHand()->getBoard()->getPot());
+        }
 
         if (myEvents.onRefreshSet)
+        {
             myEvents.onRefreshSet();
+        }
 
         if (myEvents.onRefreshCash)
+        {
             myEvents.onRefreshCash();
+        }
 
         for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
         {
             if (myEvents.onRefreshAction)
+            {
                 myEvents.onRefreshAction(i, PlayerActionNone);
+            }
         }
 
         getHand()->switchRounds();
@@ -194,20 +203,28 @@ void BettingRoundPreflop::run()
 
         // highlight active players groupbox and clear action
         if (myEvents.onRefreshPlayersActiveInactiveStyles)
+        {
             myEvents.onRefreshPlayersActiveInactiveStyles(getCurrentPlayersTurnId(), 2);
+        }
 
         if (myEvents.onRefreshAction)
+        {
             myEvents.onRefreshAction(getCurrentPlayersTurnId(), PlayerActionNone);
+        }
 
         if (getCurrentPlayersTurnId() == 0)
         {
             if (myEvents.onDoHumanAction)
+            {
                 myEvents.onDoHumanAction();
+            }
         }
         else
         {
             if (myEvents.onBettingRoundAnimation)
+            {
                 myEvents.onBettingRoundAnimation(getBettingRoundID());
+            }
         }
     }
 }

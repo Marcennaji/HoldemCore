@@ -112,41 +112,41 @@ bool isValidRange(const std::string& token)
 }
 bool isExactPair(const char* c1, const char* c2, const char* range)
 {
-    return (strlen(range) == 2 && c1[0] == range[0] && c2[0] == range[1]);
+    return (std::strlen(range) == 2 && c1[0] == range[0] && c2[0] == range[1]);
 }
 bool isExactSuitedHand(const char* c1, const char* c2, const char* range)
 {
-    return (strlen(range) == 3 && range[2] == 's' &&
+    return (std::strlen(range) == 3 && range[2] == 's' &&
             ((c1[0] == range[0] && c2[0] == range[1]) || (c1[0] == range[1] && c2[0] == range[0])) && (c1[1] == c2[1]));
 }
 bool isExactOffsuitedHand(const char* c1, const char* c2, const char* range)
 {
-    return (strlen(range) == 3 && range[2] == 'o' &&
+    return (std::strlen(range) == 3 && range[2] == 'o' &&
             ((c1[0] == range[0] && c2[0] == range[1]) || (c1[0] == range[1] && c2[0] == range[0])) && (c1[1] != c2[1]));
 }
 bool isPairAndAbove(const string& card1, const string& card2, const char* range)
 {
-    return (strlen(range) == 3 && range[0] == range[1] && range[2] == '+' &&
+    return (std::strlen(range) == 3 && range[0] == range[1] && range[2] == '+' &&
             CardsValue::CardStringOrdering[card1] == CardsValue::CardStringOrdering[card2] &&
             CardsValue::CardStringOrdering[card1] >= CardsValue::CardStringOrdering[getFakeCard(range[0])]);
 }
 bool isOffsuitedAndAbove(const string& card1, const string& card2, const char* c1, const char* c2, const char* range)
 {
-    return (strlen(range) == 4 && range[2] == 'o' && range[3] == '+' &&
+    return (std::strlen(range) == 4 && range[2] == 'o' && range[3] == '+' &&
             CardsValue::CardStringOrdering[card1] == CardsValue::CardStringOrdering[getFakeCard(range[0])] &&
             CardsValue::CardStringOrdering[card2] >= CardsValue::CardStringOrdering[getFakeCard(range[1])] &&
             CardsValue::CardStringOrdering[card2] < CardsValue::CardStringOrdering[card1] && c1[1] != c2[1]);
 }
 bool isSuitedAndAbove(const string& card1, const string& card2, const char* c1, const char* c2, const char* range)
 {
-    return (strlen(range) == 4 && range[2] == 's' && range[3] == '+' &&
+    return (std::strlen(range) == 4 && range[2] == 's' && range[3] == '+' &&
             CardsValue::CardStringOrdering[card1] == CardsValue::CardStringOrdering[getFakeCard(range[0])] &&
             CardsValue::CardStringOrdering[card2] >= CardsValue::CardStringOrdering[getFakeCard(range[1])] &&
             CardsValue::CardStringOrdering[card2] < CardsValue::CardStringOrdering[card1] && c1[1] == c2[1]);
 }
 bool isExactHand(const string& card1, const string& card2, const char* range)
 {
-    if (strlen(range) == 4 && range[2] != 's' && range[2] != 'o')
+    if (std::strlen(range) == 4 && range[2] != 's' && range[2] != 'o')
     {
         string exactCard1 = {range[0], range[1]};
         string exactCard2 = {range[2], range[3]};
