@@ -6,7 +6,7 @@ namespace pkt::core::player
 void CurrentHandContext::reset()
 {
     // Common data
-    gameState = GAME_STATE_NONE;
+    gameState = GameStateNone;
     preflopRaisesNumber = 0;
     preflopCallsNumber = 0;
     flopBetsOrRaisesNumber = 0;

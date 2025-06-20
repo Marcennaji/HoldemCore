@@ -127,7 +127,7 @@ void Board::distributePot()
             for (it_c = seatsList->begin(), j = 0; it_c != seatsList->end(); ++it_c, j++)
             {
                 if ((*it_c)->getActiveStatus() && (*it_c)->getCardsValueInt() > highestCardsValue &&
-                    (*it_c)->getAction() != PLAYER_ACTION_FOLD && playerSets[j] >= potLevel[0])
+                    (*it_c)->getAction() != PlayerActionFold && playerSets[j] >= potLevel[0])
                 {
                     highestCardsValue = (*it_c)->getCardsValueInt();
                 }
@@ -137,7 +137,7 @@ void Board::distributePot()
             for (it_c = seatsList->begin(), j = 0; it_c != seatsList->end(); ++it_c, j++)
             {
                 if ((*it_c)->getActiveStatus() && highestCardsValue == (*it_c)->getCardsValueInt() &&
-                    (*it_c)->getAction() != PLAYER_ACTION_FOLD && playerSets[j] >= potLevel[0])
+                    (*it_c)->getAction() != PlayerActionFold && playerSets[j] >= potLevel[0])
                 {
                     potLevel.push_back((*it_c)->getID());
                 }
@@ -288,7 +288,7 @@ void Board::determinePlayerNeedToShowCards()
 
         for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
         {
-            if ((*it_c)->getAction() != PLAYER_ACTION_FOLD)
+            if ((*it_c)->getAction() != PlayerActionFold)
             {
                 playerNeedToShowCards.push_back((*it_c)->getID());
             }
@@ -308,7 +308,7 @@ void Board::determinePlayerNeedToShowCards()
         // search lastActionPlayer
         for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
         {
-            if ((*it_c)->getID() == lastActionPlayerID && (*it_c)->getAction() != PLAYER_ACTION_FOLD)
+            if ((*it_c)->getID() == lastActionPlayerID && (*it_c)->getAction() != PlayerActionFold)
             {
                 lastActionPlayerIt = it_c;
                 break;
@@ -319,7 +319,7 @@ void Board::determinePlayerNeedToShowCards()
         {
             for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
             {
-                if ((*it_c)->getAction() != PLAYER_ACTION_FOLD)
+                if ((*it_c)->getAction() != PlayerActionFold)
                 {
                     lastActionPlayerIt = it_c;
                     break;
@@ -349,7 +349,7 @@ void Board::determinePlayerNeedToShowCards()
             if (it_c == activePlayerList->end())
                 it_c = activePlayerList->begin();
 
-            if ((*it_c)->getAction() != PLAYER_ACTION_FOLD)
+            if ((*it_c)->getAction() != PlayerActionFold)
             {
 
                 for (level_it = level.begin(); level_it != level.end(); ++level_it)

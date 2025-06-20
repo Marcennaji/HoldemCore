@@ -45,11 +45,11 @@ std::vector<std::shared_ptr<IBettingRound>> EngineFactory::createBettingRound(IH
 
     myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundPreflop(myEvents, hi, dP, sB)));
 
-    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRound(myEvents, hi, dP, sB, GAME_STATE_FLOP)));
+    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRound(myEvents, hi, dP, sB, GameStateFlop)));
 
-    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRound(myEvents, hi, dP, sB, GAME_STATE_TURN)));
+    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRound(myEvents, hi, dP, sB, GameStateTurn)));
 
-    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRound(myEvents, hi, dP, sB, GAME_STATE_RIVER)));
+    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRound(myEvents, hi, dP, sB, GameStateRiver)));
 
     myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundPostRiver(myEvents, hi, dP, sB)));
 

@@ -20,7 +20,7 @@ namespace pkt::core
 class Hand : public IHand
 {
   public:
-     Hand(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard>, pkt::core::player::PlayerList,
+    Hand(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard>, pkt::core::player::PlayerList,
          pkt::core::player::PlayerList, pkt::core::player::PlayerList, int handId, GameData gameData,
          StartData startData);
     ~Hand();
@@ -36,10 +36,10 @@ class Hand : public IHand
     pkt::core::player::PlayerList getRunningPlayerList() const { return runningPlayerList; }
 
     std::shared_ptr<IBoard> getBoard() const { return myBoard; }
-    std::shared_ptr<IBettingRound> getPreflop() const { return myBettingRound[GAME_STATE_PREFLOP]; }
-    std::shared_ptr<IBettingRound> getFlop() const { return myBettingRound[GAME_STATE_FLOP]; }
-    std::shared_ptr<IBettingRound> getTurn() const { return myBettingRound[GAME_STATE_TURN]; }
-    std::shared_ptr<IBettingRound> getRiver() const { return myBettingRound[GAME_STATE_RIVER]; }
+    std::shared_ptr<IBettingRound> getPreflop() const { return myBettingRound[GameStatePreflop]; }
+    std::shared_ptr<IBettingRound> getFlop() const { return myBettingRound[GameStateFlop]; }
+    std::shared_ptr<IBettingRound> getTurn() const { return myBettingRound[GameStateTurn]; }
+    std::shared_ptr<IBettingRound> getRiver() const { return myBettingRound[GameStateRiver]; }
     std::shared_ptr<IBettingRound> getCurrentBettingRound() const { return myBettingRound[currentRound]; }
 
     void setID(int theValue) { myID = theValue; }

@@ -20,7 +20,7 @@ class TightAggressiveStrategyTest : public StrategyTest
 
 TEST_F(TightAggressiveStrategyTest, Preflop_StrongPair_Raises)
 {
-    ctx.gameState = GAME_STATE_PREFLOP;
+    ctx.gameState = GameStatePreflop;
     ctx.myCard1 = "Ah";
     ctx.myCard2 = "Ad";
     EXPECT_GT(strategy.preflopShouldRaise(ctx, true), 0);
@@ -28,7 +28,7 @@ TEST_F(TightAggressiveStrategyTest, Preflop_StrongPair_Raises)
 
 TEST_F(TightAggressiveStrategyTest, Preflop_SuitedBroadway_Raises)
 {
-    ctx.gameState = GAME_STATE_PREFLOP;
+    ctx.gameState = GameStatePreflop;
     ctx.myCard1 = "Ks";
     ctx.myCard2 = "Qs";
     EXPECT_GT(strategy.preflopShouldRaise(ctx, true), 0);
@@ -36,7 +36,7 @@ TEST_F(TightAggressiveStrategyTest, Preflop_SuitedBroadway_Raises)
 
 TEST_F(TightAggressiveStrategyTest, Preflop_Trash_DoesNotRaise)
 {
-    ctx.gameState = GAME_STATE_PREFLOP;
+    ctx.gameState = GameStatePreflop;
     ctx.myCard1 = "7d";
     ctx.myCard2 = "2c";
     EXPECT_EQ(strategy.preflopShouldRaise(ctx, true), 0);
@@ -44,7 +44,7 @@ TEST_F(TightAggressiveStrategyTest, Preflop_Trash_DoesNotRaise)
 
 TEST_F(TightAggressiveStrategyTest, Preflop_InPosition_CallsWithOdds)
 {
-    ctx.gameState = GAME_STATE_PREFLOP;
+    ctx.gameState = GameStatePreflop;
     ctx.myCard1 = "8h";
     ctx.myCard2 = "9h";
     ctx.myPosition = PlayerPosition::BUTTON;
@@ -59,7 +59,7 @@ TEST_F(TightAggressiveStrategyTest, Preflop_InPosition_CallsWithOdds)
 
 TEST_F(TightAggressiveStrategyTest, Flop_HighEquity_Raises)
 {
-    ctx.gameState = GAME_STATE_FLOP;
+    ctx.gameState = GameStateFlop;
     ctx.myCard1 = "Jh";
     ctx.myCard2 = "Js";
     ctx.stringBoard = "2h 3d 7c";
@@ -77,7 +77,7 @@ TEST_F(TightAggressiveStrategyTest, Flop_HighEquity_Raises)
 
 TEST_F(TightAggressiveStrategyTest, Flop_LowEquity_Folds)
 {
-    ctx.gameState = GAME_STATE_FLOP;
+    ctx.gameState = GameStateFlop;
     ctx.myHandSimulation.winSd = 0.2f;
     ctx.potOdd = 10;
     EXPECT_FALSE(strategy.flopShouldCall(ctx, true));
@@ -87,7 +87,7 @@ TEST_F(TightAggressiveStrategyTest, Flop_LowEquity_Folds)
 
 TEST_F(TightAggressiveStrategyTest, Turn_HighEquity_Raises)
 {
-    ctx.gameState = GAME_STATE_TURN;
+    ctx.gameState = GameStateTurn;
     ctx.myHandSimulation.win = 0.95f;
     ctx.myHandSimulation.winRanged = 0.95f;
     ctx.myPosition = PlayerPosition::BUTTON;
@@ -99,7 +99,7 @@ TEST_F(TightAggressiveStrategyTest, Turn_HighEquity_Raises)
 
 TEST_F(TightAggressiveStrategyTest, Turn_LowEquity_DoesNotRaise)
 {
-    ctx.gameState = GAME_STATE_TURN;
+    ctx.gameState = GameStateTurn;
     ctx.myHandSimulation.win = 0.4f;
     ctx.myHandSimulation.winRanged = 0.4f;
     ctx.myPosition = PlayerPosition::BUTTON;
@@ -111,7 +111,7 @@ TEST_F(TightAggressiveStrategyTest, Turn_LowEquity_DoesNotRaise)
 
 TEST_F(TightAggressiveStrategyTest, Turn_LowEquity_Folds)
 {
-    ctx.gameState = GAME_STATE_TURN;
+    ctx.gameState = GameStateTurn;
     ctx.myHandSimulation.winSd = 0.1f;
     ctx.potOdd = 10;
     EXPECT_FALSE(strategy.turnShouldCall(ctx, true));
@@ -121,7 +121,7 @@ TEST_F(TightAggressiveStrategyTest, Turn_LowEquity_Folds)
 
 TEST_F(TightAggressiveStrategyTest, River_Nuts_Raises)
 {
-    ctx.gameState = GAME_STATE_RIVER;
+    ctx.gameState = GameStateRiver;
     ctx.myHandSimulation.winSd = 1.0f;
     ctx.myHandSimulation.win = 1.0f;
     ctx.myHandSimulation.winRanged = 1.0f;
@@ -133,7 +133,7 @@ TEST_F(TightAggressiveStrategyTest, River_Nuts_Raises)
 
 TEST_F(TightAggressiveStrategyTest, River_ZeroEquity_Folds)
 {
-    ctx.gameState = GAME_STATE_RIVER;
+    ctx.gameState = GameStateRiver;
     ctx.myHandSimulation.winSd = 0.0f;
     EXPECT_FALSE(strategy.riverShouldCall(ctx, true));
 }
@@ -142,7 +142,7 @@ TEST_F(TightAggressiveStrategyTest, River_ZeroEquity_Folds)
 
 TEST_F(TightAggressiveStrategyTest, ZeroCash_CannotRaise)
 {
-    ctx.gameState = GAME_STATE_PREFLOP;
+    ctx.gameState = GameStatePreflop;
     ctx.myHandSimulation.winSd = 0.5f;
     ctx.myCash = 0;
     EXPECT_FALSE(strategy.preflopShouldCall(ctx, true));
@@ -151,7 +151,7 @@ TEST_F(TightAggressiveStrategyTest, ZeroCash_CannotRaise)
 
 TEST_F(TightAggressiveStrategyTest, NoBluff_DisablesBluffing)
 {
-    ctx.gameState = GAME_STATE_FLOP;
+    ctx.gameState = GameStateFlop;
     ctx.myHavePosition = true;
     ctx.myCanBluff = false;
     ctx.myHandSimulation.winSd = 0.4f;

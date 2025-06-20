@@ -39,7 +39,7 @@ void BettingRoundPostRiver::postRiverRun()
     for (it_c = getHand()->getActivePlayerList()->begin(); it_c != getHand()->getActivePlayerList()->end(); ++it_c)
     {
 
-        if ((*it_c)->getAction() != PLAYER_ACTION_FOLD && (*it_c)->getCardsValueInt() > highestCardsValue)
+        if ((*it_c)->getAction() != PlayerActionFold && (*it_c)->getCardsValueInt() > highestCardsValue)
         {
             highestCardsValue = (*it_c)->getCardsValueInt();
         }
@@ -49,7 +49,7 @@ void BettingRoundPostRiver::postRiverRun()
 
     for (it_c = getHand()->getActivePlayerList()->begin(); it_c != getHand()->getActivePlayerList()->end(); ++it_c)
     {
-        if ((*it_c)->getAction() != PLAYER_ACTION_FOLD)
+        if ((*it_c)->getAction() != PlayerActionFold)
         {
             potPlayers++;
         }
@@ -65,7 +65,7 @@ void BettingRoundPostRiver::postRiverRun()
     int nonfoldPlayersCounter = 0;
     for (it_c = getHand()->getActivePlayerList()->begin(); it_c != getHand()->getActivePlayerList()->end(); ++it_c)
     {
-        if ((*it_c)->getAction() != PLAYER_ACTION_FOLD)
+        if ((*it_c)->getAction() != PlayerActionFold)
         {
             nonfoldPlayersCounter++;
             if ((*it_c)->getID() == 0)
@@ -89,7 +89,7 @@ void BettingRoundPostRiver::postRiverRun()
         {
 
             if ((*it_c)->getCurrentHandActions().getPreflopActions().size() > 0 &&
-                (*it_c)->getCurrentHandActions().getPreflopActions().at(0) != PLAYER_ACTION_FOLD)
+                (*it_c)->getCurrentHandActions().getPreflopActions().at(0) != PlayerActionFold)
 
                 if (myEvents.onShowHoleCards)
                     myEvents.onShowHoleCards((*it_c)->getID());

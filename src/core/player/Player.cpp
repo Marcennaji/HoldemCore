@@ -25,7 +25,7 @@ using namespace std;
 
 Player::Player(const GameEvents& events, int id, std::string name, int sC, bool aS, int mB)
     : currentHand(0), myID(id), myName(name), myCardsValueInt(0), myCash(sC), mySet(0), myLastRelativeSet(0),
-      myAction(PLAYER_ACTION_NONE), myButton(mB), myActiveStatus(aS), myTurn(0), myCardsFlip(0), myRoundStartCash(0),
+      myAction(PlayerActionNone), myButton(mB), myActiveStatus(aS), myTurn(0), myCardsFlip(0), myRoundStartCash(0),
       lastMoneyWon(0), m_isSessionActive(false), myEvents(events)
 {
     myRangeEstimator = std::make_unique<RangeEstimator>(myID);
@@ -78,14 +78,14 @@ void Player::setPosition()
         {UNKNOWN, UNKNOWN, BB, SB, SB, SB, SB, SB, SB, SB, SB},                     // my position = dealer + 1
         {UNKNOWN, UNKNOWN, UNKNOWN, BB, BB, BB, BB, BB, BB, BB, BB},                // my position = dealer + 2
         {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, CUTOFF, UTG, UTG, UTG, UTG, UTG, UTG}, // my position = dealer + 3
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, CUTOFF, MIDDLE, MIDDLE, UTG_PLUS_ONE, UTG_PLUS_ONE,
-         UTG_PLUS_ONE}, // my position = dealer + 4
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, CUTOFF, LATE, MIDDLE, UTG_PLUS_TWO,
-         UTG_PLUS_TWO}, // my position = dealer + 5
+        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, CUTOFF, MIDDLE, MIDDLE, UtgPlusOne, UtgPlusOne,
+         UtgPlusOne}, // my position = dealer + 4
+        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, CUTOFF, LATE, MIDDLE, UtgPlusTwo,
+         UtgPlusTwo}, // my position = dealer + 5
         {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, CUTOFF, LATE, MIDDLE,
          MIDDLE}, // my position = dealer + 6
         {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, CUTOFF, LATE,
-         MIDDLE_PLUS_ONE}, // my position = dealer + 7
+         MiddlePlusOne}, // my position = dealer + 7
         {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, CUTOFF,
          LATE}, // my position = dealer + 8
         {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN,
@@ -101,14 +101,14 @@ void Player::setPosition()
          BUTTON},                                                                           // my position = dealer
         {UNKNOWN, UNKNOWN, BB, BB, CUTOFF, CUTOFF, CUTOFF, CUTOFF, CUTOFF, CUTOFF, CUTOFF}, // my position = dealer - 1
         {UNKNOWN, UNKNOWN, UNKNOWN, SB, BB, UTG, MIDDLE, LATE, LATE, LATE, LATE},           // my position = dealer - 2
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, SB, BB, UTG, MIDDLE, MIDDLE, MIDDLE_PLUS_ONE,
-         MIDDLE_PLUS_ONE}, // my position = dealer - 3
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, SB, BB, UTG, UTG_PLUS_ONE, UTG_PLUS_TWO,
+        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, SB, BB, UTG, MIDDLE, MIDDLE, MiddlePlusOne,
+         MiddlePlusOne}, // my position = dealer - 3
+        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, SB, BB, UTG, UtgPlusOne, UtgPlusTwo,
          MIDDLE}, // my position = dealer - 4
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, SB, BB, UTG, UTG_PLUS_ONE,
-         UTG_PLUS_TWO}, // my position = dealer - 5
+        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, SB, BB, UTG, UtgPlusOne,
+         UtgPlusTwo}, // my position = dealer - 5
         {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, SB, BB, UTG,
-         UTG_PLUS_ONE}, // my position = dealer - 6
+         UtgPlusOne}, // my position = dealer - 6
         {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, SB, BB,
          UTG}, // my position = dealer - 7
         {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, SB,
@@ -173,17 +173,17 @@ std::string Player::getPositionLabel(PlayerPosition p) const
     case UTG:
         return "UTG";
         break;
-    case UTG_PLUS_ONE:
-        return "UTG_PLUS_ONE";
+    case UtgPlusOne:
+        return "UtgPlusOne";
         break;
-    case UTG_PLUS_TWO:
-        return "UTG_PLUS_TWO";
+    case UtgPlusTwo:
+        return "UtgPlusTwo";
         break;
     case MIDDLE:
         return "MIDDLE";
         break;
-    case MIDDLE_PLUS_ONE:
-        return "MIDDLE_PLUS_ONE";
+    case MiddlePlusOne:
+        return "MiddlePlusOne";
         break;
     case LATE:
         return "LATE";
@@ -378,19 +378,19 @@ void Player::updatePreflopStatistics()
 
     switch (myAction)
     {
-    case PLAYER_ACTION_ALLIN:
+    case PlayerActionAllin:
         myStatistics[nbPlayers].m_preflopStatistics.m_raises++;
         break;
-    case PLAYER_ACTION_RAISE:
+    case PlayerActionRaise:
         myStatistics[nbPlayers].m_preflopStatistics.m_raises++;
         break;
-    case PLAYER_ACTION_FOLD:
+    case PlayerActionFold:
         myStatistics[nbPlayers].m_preflopStatistics.m_folds++;
         break;
-    case PLAYER_ACTION_CHECK:
+    case PlayerActionCheck:
         myStatistics[nbPlayers].m_preflopStatistics.m_checks++;
         break;
-    case PLAYER_ACTION_CALL:
+    case PlayerActionCall:
         myStatistics[nbPlayers].m_preflopStatistics.m_calls++;
         break;
     default:
@@ -399,18 +399,18 @@ void Player::updatePreflopStatistics()
 
     myStatistics[nbPlayers].m_preflopStatistics.AddLastAction(myAction); // keep track of the last 10 actions
 
-    if (myAction == PLAYER_ACTION_CALL && currentHand->getRaisersPositions().size() == 0) //
+    if (myAction == PlayerActionCall && currentHand->getRaisersPositions().size() == 0) //
         myStatistics[nbPlayers].m_preflopStatistics.m_limps++;
 
     int playerRaises = 0;
     for (std::vector<PlayerAction>::const_iterator i = myCurrentHandActions.m_preflopActions.begin();
          i != myCurrentHandActions.m_preflopActions.end(); i++)
     {
-        if (*i == PLAYER_ACTION_RAISE || *i == PLAYER_ACTION_ALLIN)
+        if (*i == PlayerActionRaise || *i == PlayerActionAllin)
             playerRaises++;
     }
 
-    if (myAction == PLAYER_ACTION_RAISE || myAction == PLAYER_ACTION_ALLIN)
+    if (myAction == PlayerActionRaise || myAction == PlayerActionAllin)
     {
 
         if (playerRaises == 1 && currentHand->getRaisersPositions().size() == 2)
@@ -427,7 +427,7 @@ void Player::updatePreflopStatistics()
 
             myStatistics[nbPlayers].m_preflopStatistics.m_call3BetsOpportunities++;
 
-            if (myAction == PLAYER_ACTION_CALL)
+            if (myAction == PlayerActionCall)
                 myStatistics[nbPlayers].m_preflopStatistics.m_call3Bets++;
         }
     }
@@ -442,35 +442,35 @@ void Player::updateFlopStatistics()
 
     switch (myAction)
     {
-    case PLAYER_ACTION_ALLIN:
+    case PlayerActionAllin:
         myStatistics[nbPlayers].m_flopStatistics.m_raises++;
         break;
-    case PLAYER_ACTION_RAISE:
+    case PlayerActionRaise:
         myStatistics[nbPlayers].m_flopStatistics.m_raises++;
         break;
-    case PLAYER_ACTION_FOLD:
+    case PlayerActionFold:
         myStatistics[nbPlayers].m_flopStatistics.m_folds++;
         break;
-    case PLAYER_ACTION_CHECK:
+    case PlayerActionCheck:
         myStatistics[nbPlayers].m_flopStatistics.m_checks++;
         break;
-    case PLAYER_ACTION_CALL:
+    case PlayerActionCall:
         myStatistics[nbPlayers].m_flopStatistics.m_calls++;
         break;
-    case PLAYER_ACTION_BET:
+    case PlayerActionBet:
         myStatistics[nbPlayers].m_flopStatistics.m_bets++;
         break;
     default:
         break;
     }
-    if (myAction == PLAYER_ACTION_RAISE && currentHand->getRaisersPositions().size() > 1)
+    if (myAction == PlayerActionRaise && currentHand->getRaisersPositions().size() > 1)
         myStatistics[nbPlayers].m_flopStatistics.m_3Bets++;
 
     // continuation bets
     if (currentHand->getPreflopLastRaiserID() == myID)
     {
         myStatistics[nbPlayers].m_flopStatistics.m_continuationBetsOpportunities++;
-        if (myAction == PLAYER_ACTION_BET)
+        if (myAction == PlayerActionBet)
             myStatistics[nbPlayers].m_flopStatistics.m_continuationBets++;
     }
 }
@@ -484,28 +484,28 @@ void Player::updateTurnStatistics()
 
     switch (myAction)
     {
-    case PLAYER_ACTION_ALLIN:
+    case PlayerActionAllin:
         myStatistics[nbPlayers].m_turnStatistics.m_raises++;
         break;
-    case PLAYER_ACTION_RAISE:
+    case PlayerActionRaise:
         myStatistics[nbPlayers].m_turnStatistics.m_raises++;
         break;
-    case PLAYER_ACTION_FOLD:
+    case PlayerActionFold:
         myStatistics[nbPlayers].m_turnStatistics.m_folds++;
         break;
-    case PLAYER_ACTION_CHECK:
+    case PlayerActionCheck:
         myStatistics[nbPlayers].m_turnStatistics.m_checks++;
         break;
-    case PLAYER_ACTION_CALL:
+    case PlayerActionCall:
         myStatistics[nbPlayers].m_turnStatistics.m_calls++;
         break;
-    case PLAYER_ACTION_BET:
+    case PlayerActionBet:
         myStatistics[nbPlayers].m_turnStatistics.m_bets++;
         break;
     default:
         break;
     }
-    if (myAction == PLAYER_ACTION_RAISE && currentHand->getRaisersPositions().size() > 1)
+    if (myAction == PlayerActionRaise && currentHand->getRaisersPositions().size() > 1)
         myStatistics[nbPlayers].m_turnStatistics.m_3Bets++;
 }
 void Player::updateRiverStatistics()
@@ -518,28 +518,28 @@ void Player::updateRiverStatistics()
 
     switch (myAction)
     {
-    case PLAYER_ACTION_ALLIN:
+    case PlayerActionAllin:
         myStatistics[nbPlayers].m_riverStatistics.m_raises++;
         break;
-    case PLAYER_ACTION_RAISE:
+    case PlayerActionRaise:
         myStatistics[nbPlayers].m_riverStatistics.m_raises++;
         break;
-    case PLAYER_ACTION_FOLD:
+    case PlayerActionFold:
         myStatistics[nbPlayers].m_riverStatistics.m_folds++;
         break;
-    case PLAYER_ACTION_CHECK:
+    case PlayerActionCheck:
         myStatistics[nbPlayers].m_riverStatistics.m_checks++;
         break;
-    case PLAYER_ACTION_CALL:
+    case PlayerActionCall:
         myStatistics[nbPlayers].m_riverStatistics.m_calls++;
         break;
-    case PLAYER_ACTION_BET:
+    case PlayerActionBet:
         myStatistics[nbPlayers].m_riverStatistics.m_bets++;
         break;
     default:
         break;
     }
-    if (myAction == PLAYER_ACTION_RAISE && currentHand->getRaisersPositions().size() > 1)
+    if (myAction == PlayerActionRaise && currentHand->getRaisersPositions().size() > 1)
         myStatistics[nbPlayers].m_riverStatistics.m_3Bets++;
 }
 
@@ -582,11 +582,11 @@ std::string Player::getStringBoard() const
 
     int cardsOnBoard;
 
-    if (currentHand->getCurrentRound() == GAME_STATE_FLOP)
+    if (currentHand->getCurrentRound() == GameStateFlop)
         cardsOnBoard = 3;
-    else if (currentHand->getCurrentRound() == GAME_STATE_TURN)
+    else if (currentHand->getCurrentRound() == GameStateTurn)
         cardsOnBoard = 4;
-    else if (currentHand->getCurrentRound() == GAME_STATE_RIVER)
+    else if (currentHand->getCurrentRound() == GameStateRiver)
         cardsOnBoard = 5;
     else
         cardsOnBoard = 0;
@@ -864,22 +864,22 @@ void Player::logUnplausibleHands(GameState g)
     string label;
     char bettingRound;
 
-    if (g == GAME_STATE_PREFLOP)
+    if (g == GameStatePreflop)
     {
         label = "preflop";
         bettingRound = 'P';
     }
-    else if (g == GAME_STATE_FLOP)
+    else if (g == GameStateFlop)
     {
         label = "flop";
         bettingRound = 'F';
     }
-    else if (g == GAME_STATE_TURN)
+    else if (g == GameStateTurn)
     {
         label = "turn";
         bettingRound = 'T';
     }
-    else if (g == GAME_STATE_RIVER)
+    else if (g == GameStateRiver)
     {
         label = "river";
         bettingRound = 'R';
@@ -896,8 +896,7 @@ std::map<int, float> Player::evaluateOpponentsStrengths() const
     for (PlayerListIterator it = players->begin(); it != players->end(); ++it)
     {
 
-        if ((*it)->getID() == myID || (*it)->getAction() == PLAYER_ACTION_FOLD ||
-            (*it)->getAction() == PLAYER_ACTION_NONE)
+        if ((*it)->getID() == myID || (*it)->getAction() == PlayerActionFold || (*it)->getAction() == PlayerActionNone)
             continue;
 
         const float estimatedOpponentWinningHands = getOpponentWinningHandsPercentage((*it)->getID(), getStringBoard());
@@ -926,16 +925,16 @@ bool Player::isPreflopBigBet() const
 bool Player::isAgressor(const GameState gameState) const
 {
 
-    if (gameState == GAME_STATE_PREFLOP && currentHand->getPreflopLastRaiserID() == myID)
+    if (gameState == GameStatePreflop && currentHand->getPreflopLastRaiserID() == myID)
         return true;
 
-    if (gameState == GAME_STATE_FLOP && currentHand->getFlopLastRaiserID() == myID)
+    if (gameState == GameStateFlop && currentHand->getFlopLastRaiserID() == myID)
         return true;
 
-    if (gameState == GAME_STATE_TURN && currentHand->getTurnLastRaiserID() == myID)
+    if (gameState == GameStateTurn && currentHand->getTurnLastRaiserID() == myID)
         return true;
 
-    if (gameState == GAME_STATE_RIVER && currentHand->getLastRaiserID() == myID)
+    if (gameState == GameStateRiver && currentHand->getLastRaiserID() == myID)
         return true;
 
     return false;
@@ -978,7 +977,7 @@ bool Player::canBluff(const GameState gameState) const
         if ((*it)->getCash() < currentHand->getBoard()->getPot() * 3)
             return false;
 
-        if (gameState == GAME_STATE_PREFLOP)
+        if (gameState == GameStatePreflop)
         {
             if (preflopStats.getPreflopCall3BetsFrequency() > 40)
                 return false;
@@ -1004,8 +1003,8 @@ bool Player::isInVeryLooseMode(const int nbPlayers) const
 
     PreflopStatistics preflop = stats.getPreflopStatistics();
 
-    if (preflop.GetLastActionsNumber(PLAYER_ACTION_ALLIN) + preflop.GetLastActionsNumber(PLAYER_ACTION_RAISE) +
-            preflop.GetLastActionsNumber(PLAYER_ACTION_CALL) >
+    if (preflop.GetLastActionsNumber(PlayerActionAllin) + preflop.GetLastActionsNumber(PlayerActionRaise) +
+            preflop.GetLastActionsNumber(PlayerActionCall) >
         PreflopStatistics::LAST_ACTIONS_STACK_SIZE * 0.8)
         return true;
     else
@@ -1041,15 +1040,15 @@ void Player::updateCurrentHandContext(const GameState state)
          i != myCurrentHandActions.m_flopActions.end(); i++)
     {
 
-        if (*i == PLAYER_ACTION_RAISE)
+        if (*i == PlayerActionRaise)
             myCurrentHandContext->nbRaises++;
-        else if (*i == PLAYER_ACTION_BET)
+        else if (*i == PlayerActionBet)
             myCurrentHandContext->nbBets++;
-        else if (*i == PLAYER_ACTION_CHECK)
+        else if (*i == PlayerActionCheck)
             myCurrentHandContext->nbChecks++;
-        else if (*i == PLAYER_ACTION_CALL)
+        else if (*i == PlayerActionCall)
             myCurrentHandContext->nbCalls++;
-        else if (*i == PLAYER_ACTION_ALLIN)
+        else if (*i == PlayerActionAllin)
             myCurrentHandContext->nbAllins++;
     }
 
@@ -1059,10 +1058,10 @@ void Player::updateCurrentHandContext(const GameState state)
     myCurrentHandContext->myM = static_cast<int>(getM());
     myCurrentHandContext->myCurrentHandActions = myCurrentHandActions;
     myCurrentHandContext->myHavePosition = Player::getHavePosition(myPosition, currentHand->getRunningPlayerList());
-    myCurrentHandContext->myPreflopIsAggressor = isAgressor(GAME_STATE_PREFLOP);
-    myCurrentHandContext->myFlopIsAggressor = isAgressor(GAME_STATE_FLOP);
-    myCurrentHandContext->myTurnIsAggressor = isAgressor(GAME_STATE_TURN);
-    myCurrentHandContext->myRiverIsAggressor = isAgressor(GAME_STATE_RIVER);
+    myCurrentHandContext->myPreflopIsAggressor = isAgressor(GameStatePreflop);
+    myCurrentHandContext->myFlopIsAggressor = isAgressor(GameStateFlop);
+    myCurrentHandContext->myTurnIsAggressor = isAgressor(GameStateTurn);
+    myCurrentHandContext->myRiverIsAggressor = isAgressor(GameStateRiver);
     myCurrentHandContext->myStatistics = getStatistics(currentHand->getActivePlayerList()->size());
     myCurrentHandContext->myID = myID;
     myCurrentHandContext->myIsInVeryLooseMode = isInVeryLooseMode(currentHand->getActivePlayerList()->size());

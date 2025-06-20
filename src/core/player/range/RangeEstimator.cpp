@@ -121,7 +121,7 @@ void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(CurrentHandConte
     PreflopStatistics preflop = ctx.myStatistics.getPreflopStatistics();
 
     // if no raise and the BB checks :
-    if (ctx.myCurrentHandActions.getPreflopActions().back() == PLAYER_ACTION_CHECK)
+    if (ctx.myCurrentHandActions.getPreflopActions().back() == PlayerActionCheck)
     {
 
         if (preflop.m_hands >= MIN_HANDS_STATISTICS_ACCURATE)
@@ -135,7 +135,7 @@ void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(CurrentHandConte
     if (getEstimatedRange() == "")
         setEstimatedRange(originalEstimatedRange);
 
-    // logUnplausibleHands(GAME_STATE_PREFLOP);
+    // logUnplausibleHands(GameStatePreflop);
 }
 
 void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext& ctx)
@@ -182,15 +182,15 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext&
 
         PlayerAction myAction = ctx.myCurrentHandActions.getFlopActions().back();
 
-        if (myAction == PLAYER_ACTION_CALL)
+        if (myAction == PlayerActionCall)
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(r, ctx);
-        else if (myAction == PLAYER_ACTION_CHECK)
+        else if (myAction == PlayerActionCheck)
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(r, ctx);
-        else if (myAction == PLAYER_ACTION_RAISE)
+        else if (myAction == PlayerActionRaise)
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(r, ctx);
-        else if (myAction == PLAYER_ACTION_BET)
+        else if (myAction == PlayerActionBet)
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(r, ctx);
-        else if (myAction == PLAYER_ACTION_ALLIN)
+        else if (myAction == PlayerActionAllin)
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopAllin(r, ctx);
 
         if (removeHand)
@@ -220,7 +220,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext&
 
     if (unplausibleRanges != "")
         GlobalServices::instance().logger()->info("\tRemoving unplausible ranges : " + unplausibleRanges);
-    // logUnplausibleHands(GAME_STATE_FLOP);
+    // logUnplausibleHands(GameStateFlop);
 }
 
 // purpose : remove some unplausible hands, who would normally be in the estimated preflop range
@@ -262,15 +262,15 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(CurrentHandContext&
         bool removeHand = false;
         PlayerAction myAction = ctx.myCurrentHandActions.getTurnActions().back();
 
-        if (myAction == PLAYER_ACTION_CALL)
+        if (myAction == PlayerActionCall)
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(r, ctx);
-        else if (myAction == PLAYER_ACTION_CHECK)
+        else if (myAction == PlayerActionCheck)
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnCheck(r, ctx);
-        else if (myAction == PLAYER_ACTION_RAISE)
+        else if (myAction == PlayerActionRaise)
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(r, ctx);
-        else if (myAction == PLAYER_ACTION_BET)
+        else if (myAction == PlayerActionBet)
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnBet(r, ctx);
-        else if (myAction == PLAYER_ACTION_ALLIN)
+        else if (myAction == PlayerActionAllin)
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnAllin(r, ctx);
 
         if (removeHand)
@@ -299,7 +299,7 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(CurrentHandContext&
 
     if (unplausibleRanges != "")
         GlobalServices::instance().logger()->info("\tRemoving unplausible ranges : " + unplausibleRanges);
-    // logUnplausibleHands(GAME_STATE_TURN);
+    // logUnplausibleHands(GameStateTurn);
 }
 
 // purpose : remove some unplausible hands, woul would normally be in the estimated preflop range
@@ -341,15 +341,15 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(CurrentHandContext
 
         bool removeHand = false;
 
-        if (ctx.myCurrentHandActions.getRiverActions().back() == PLAYER_ACTION_CALL)
+        if (ctx.myCurrentHandActions.getRiverActions().back() == PlayerActionCall)
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(r, ctx);
-        else if (ctx.myCurrentHandActions.getRiverActions().back() == PLAYER_ACTION_CHECK)
+        else if (ctx.myCurrentHandActions.getRiverActions().back() == PlayerActionCheck)
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverCheck(r, ctx);
-        else if (ctx.myCurrentHandActions.getRiverActions().back() == PLAYER_ACTION_RAISE)
+        else if (ctx.myCurrentHandActions.getRiverActions().back() == PlayerActionRaise)
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(r, ctx);
-        else if (ctx.myCurrentHandActions.getRiverActions().back() == PLAYER_ACTION_BET)
+        else if (ctx.myCurrentHandActions.getRiverActions().back() == PlayerActionBet)
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(r, ctx);
-        else if (ctx.myCurrentHandActions.getRiverActions().back() == PLAYER_ACTION_ALLIN)
+        else if (ctx.myCurrentHandActions.getRiverActions().back() == PlayerActionAllin)
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverAllin(r, ctx);
 
         if (removeHand)
@@ -378,7 +378,7 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(CurrentHandContext
 
     if (unplausibleRanges != "")
         GlobalServices::instance().logger()->info("\tRemoving unplausible ranges : " + unplausibleRanges);
-    // logUnplausibleHands(GAME_STATE_RIVER);
+    // logUnplausibleHands(GameStateRiver);
 }
 
 void RangeEstimator::setHand(IHand* hand)

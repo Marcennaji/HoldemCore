@@ -32,7 +32,7 @@ BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int
     // determine bigBlindPosition
     for (it_c = myHand->getActivePlayerList()->begin(); it_c != myHand->getActivePlayerList()->end(); ++it_c)
     {
-        if ((*it_c)->getButton() == BUTTON_BIG_BLIND)
+        if ((*it_c)->getButton() == ButtonBigBlind)
         {
             bigBlindPositionId = (*it_c)->getID();
             break;
@@ -46,7 +46,7 @@ BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int
     // determine smallBlindPosition
     for (it_c = myHand->getActivePlayerList()->begin(); it_c != myHand->getActivePlayerList()->end(); ++it_c)
     {
-        if ((*it_c)->getButton() == BUTTON_SMALL_BLIND)
+        if ((*it_c)->getButton() == ButtonSmallBlind)
         {
             smallBlindPositionId = (*it_c)->getID();
             break;
@@ -169,7 +169,7 @@ void BettingRound::proceedToNextBettingRound()
 
     for (it_c = myHand->getRunningPlayerList()->begin(); it_c != myHand->getRunningPlayerList()->end(); ++it_c)
     {
-        (*it_c)->setAction(PLAYER_ACTION_NONE);
+        (*it_c)->setAction(PlayerActionNone);
     }
 
     myHand->getBoard()->collectSets();
@@ -187,7 +187,7 @@ void BettingRound::proceedToNextBettingRound()
     for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
     {
         if (myEvents.onRefreshAction)
-            myEvents.onRefreshAction(i, PLAYER_ACTION_NONE);
+            myEvents.onRefreshAction(i, PlayerActionNone);
     }
 
     myHand->switchRounds();
@@ -202,13 +202,13 @@ void BettingRound::logBoardCards()
 
         switch (myBettingRoundID)
         {
-        case GAME_STATE_FLOP:
+        case GameStateFlop:
             GlobalServices::instance().logger()->info(
                 "************************* FLOP " + CardsValue::CardStringValue[tempBoardCardsArray[0]] + " " +
                 CardsValue::CardStringValue[tempBoardCardsArray[1]] + " " +
                 CardsValue::CardStringValue[tempBoardCardsArray[2]] + "  *************************");
             break;
-        case GAME_STATE_TURN:
+        case GameStateTurn:
             GlobalServices::instance().logger()->info(
                 "************************* TURN " + CardsValue::CardStringValue[tempBoardCardsArray[0]] + " " +
                 CardsValue::CardStringValue[tempBoardCardsArray[1]] + " " +
@@ -216,7 +216,7 @@ void BettingRound::logBoardCards()
                 CardsValue::CardStringValue[tempBoardCardsArray[3]] + "  *************************");
 
             break;
-        case GAME_STATE_RIVER:
+        case GameStateRiver:
             GlobalServices::instance().logger()->info(
                 "************************* RIVER " + CardsValue::CardStringValue[tempBoardCardsArray[0]] + " " +
                 CardsValue::CardStringValue[tempBoardCardsArray[1]] + " " +

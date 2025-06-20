@@ -22,10 +22,10 @@ class PreflopRangeCalculator
   private:
     // Vector index is player position, value is range %
     std::vector<int> UTG_STARTING_RANGE;
-    std::vector<int> UTG_PLUS_ONE_STARTING_RANGE;
-    std::vector<int> UTG_PLUS_TWO_STARTING_RANGE;
+    std::vector<int> UtgPlusOne_STARTING_RANGE;
+    std::vector<int> UtgPlusTwo_STARTING_RANGE;
     std::vector<int> MIDDLE_STARTING_RANGE;
-    std::vector<int> MIDDLE_PLUS_ONE_STARTING_RANGE;
+    std::vector<int> MiddlePlusOne_STARTING_RANGE;
     std::vector<int> LATE_STARTING_RANGE;
     std::vector<int> CUTOFF_STARTING_RANGE;
     std::vector<int> BUTTON_STARTING_RANGE;

@@ -619,7 +619,7 @@ void GameTableWindow::refreshAction(int playerID, int playerAction)
                     QPixmap::fromImage(QImage(myGameTableStyle->getActionPic((*it_c)->getAction()))));
             }
 
-            if ((*it_c)->getAction() == PLAYER_ACTION_FOLD)
+            if ((*it_c)->getAction() == PlayerActionFold)
             {
 
                 if ((*it_c)->getID() != 0)
@@ -1189,10 +1189,9 @@ void GameTableWindow::provideMyActions(int mode)
 
     // really disabled buttons if human player is fold/all-in or server-autofold... and not called from
     // dealBettingRoundcards
-    if ((mode != 0 &&
-         (humanPlayer->getAction() == PLAYER_ACTION_ALLIN || humanPlayer->getAction() == PLAYER_ACTION_FOLD ||
-          (humanPlayer->getSet() == currentHand->getCurrentBettingRound()->getHighestSet() &&
-           (humanPlayer->getAction() != PLAYER_ACTION_NONE)))) ||
+    if ((mode != 0 && (humanPlayer->getAction() == PlayerActionAllin || humanPlayer->getAction() == PlayerActionFold ||
+                       (humanPlayer->getSet() == currentHand->getCurrentBettingRound()->getHighestSet() &&
+                        (humanPlayer->getAction() != PlayerActionNone)))) ||
         !humanPlayer->isSessionActive() /*server-autofold*/)
     {
 
@@ -1277,12 +1276,12 @@ void GameTableWindow::provideMyActions(int mode)
 
         if (mode == 0)
         {
-            if (humanPlayer->getAction() != PLAYER_ACTION_FOLD)
+            if (humanPlayer->getAction() != PlayerActionFold)
             {
                 pushButtonBetRaiseString = BetString + "\n$" + QString("%L1").arg(getBetAmount());
                 pushButtonCallCheckString = CheckString;
-                if ((activePlayerList->size() > 2 && humanPlayer->getButton() == BUTTON_SMALL_BLIND) ||
-                    (activePlayerList->size() <= 2 && humanPlayer->getButton() == BUTTON_BIG_BLIND))
+                if ((activePlayerList->size() > 2 && humanPlayer->getButton() == ButtonSmallBlind) ||
+                    (activePlayerList->size() <= 2 && humanPlayer->getButton() == ButtonBigBlind))
                 {
                     pushButtonFoldString = FoldString;
                 }
@@ -1387,7 +1386,7 @@ void GameTableWindow::doHumanAction()
         myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getCurrentBettingRound()->getBettingRoundID();
     std::shared_ptr<IHand> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
     std::shared_ptr<Player> humanPlayer = currentHand->getSeatsList()->front();
-    if (currentState == GAME_STATE_PREFLOP)
+    if (currentState == GameStatePreflop)
         humanPlayer->setPreflopPotOdd(humanPlayer->getPotOdd());
 
     horizontalSlider_bet->setEnabled(true);
@@ -1478,7 +1477,7 @@ void GameTableWindow::myFold()
 
         std::shared_ptr<IHand> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
         std::shared_ptr<Player> humanPlayer = currentHand->getSeatsList()->front();
-        humanPlayer->setAction(PLAYER_ACTION_FOLD);
+        humanPlayer->setAction(PlayerActionFold);
         humanPlayer->setTurn(0);
 
         // set that i was the last active player. need this for unhighlighting groupbox
@@ -1494,7 +1493,7 @@ void GameTableWindow::myCheck()
     std::shared_ptr<IHand> currentHand = myStartWindow->getSession()->getCurrentGame()->getCurrentHand();
     std::shared_ptr<Player> humanPlayer = currentHand->getSeatsList()->front();
     humanPlayer->setTurn(0);
-    humanPlayer->setAction(PLAYER_ACTION_CHECK);
+    humanPlayer->setAction(PlayerActionCheck);
 
     // set that i was the last active player. need this for unhighlighting groupbox
     currentHand->setPreviousPlayerID(0);
@@ -1565,12 +1564,12 @@ void GameTableWindow::myCall()
 
         humanPlayer->setSet(humanPlayer->getCash());
         humanPlayer->setCash(0);
-        humanPlayer->setAction(PLAYER_ACTION_ALLIN);
+        humanPlayer->setAction(PlayerActionAllin);
     }
     else
     {
         humanPlayer->setSet(tempHighestSet - humanPlayer->getSet());
-        humanPlayer->setAction(PLAYER_ACTION_CALL);
+        humanPlayer->setAction(PlayerActionCall);
     }
     humanPlayer->setTurn(0);
 
@@ -1606,7 +1605,7 @@ void GameTableWindow::mySet()
 
             humanPlayer->setSet(humanPlayer->getCash());
             humanPlayer->setCash(0);
-            humanPlayer->setAction(PLAYER_ACTION_ALLIN);
+            humanPlayer->setAction(PlayerActionAllin);
 
             // full bet rule
             if (currentHand->getCurrentBettingRound()->getHighestSet() +
@@ -1622,7 +1621,7 @@ void GameTableWindow::mySet()
             // do not if allIn
             if (humanPlayer->getAction() != 6)
             {
-                humanPlayer->setAction(PLAYER_ACTION_RAISE);
+                humanPlayer->setAction(PlayerActionRaise);
             }
             myActionIsRaise = 0;
 
@@ -1635,7 +1634,7 @@ void GameTableWindow::mySet()
             // do not if allIn
             if (humanPlayer->getAction() != 6)
             {
-                humanPlayer->setAction(PLAYER_ACTION_BET);
+                humanPlayer->setAction(PlayerActionBet);
             }
             myActionIsBet = 0;
 
@@ -1669,7 +1668,7 @@ void GameTableWindow::myAllIn()
 
         humanPlayer->setSet(humanPlayer->getCash());
         humanPlayer->setCash(0);
-        humanPlayer->setAction(PLAYER_ACTION_ALLIN);
+        humanPlayer->setAction(PlayerActionAllin);
 
         // full bet rule
         if (currentHand->getCurrentBettingRound()->getHighestSet() +
@@ -1947,42 +1946,42 @@ void GameTableWindow::myActionDone()
         ", pot = " + std::to_string(currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()) +
         "\tPFR : " + std::to_string(humanPlayer->getStatistics(nbPlayers).getPreflopStatistics().getPreflopRaise()));
 
-    if (currentState == GAME_STATE_PREFLOP)
+    if (currentState == GameStatePreflop)
     {
         humanPlayer->getCurrentHandActions().getPreflopActions().push_back(humanPlayer->getAction());
-        if (humanPlayer->getAction() == PLAYER_ACTION_RAISE || humanPlayer->getAction() == PLAYER_ACTION_ALLIN)
+        if (humanPlayer->getAction() == PlayerActionRaise || humanPlayer->getAction() == PlayerActionAllin)
             currentHand->setPreflopLastRaiserID(humanPlayer->getID());
         humanPlayer->updatePreflopStatistics();
-        humanPlayer->updateCurrentHandContext(GAME_STATE_PREFLOP);
-        if (humanPlayer->getAction() != PLAYER_ACTION_FOLD)
+        humanPlayer->updateCurrentHandContext(GameStatePreflop);
+        if (humanPlayer->getAction() != PlayerActionFold)
             humanPlayer->getRangeEstimator()->updateUnplausibleRangesGivenPreflopActions(
                 humanPlayer->getCurrentHandContext());
     }
-    else if (currentState == GAME_STATE_FLOP)
+    else if (currentState == GameStateFlop)
     {
         humanPlayer->getCurrentHandActions().getFlopActions().push_back(humanPlayer->getAction());
-        if (humanPlayer->getAction() == PLAYER_ACTION_BET || humanPlayer->getAction() == PLAYER_ACTION_RAISE ||
-            humanPlayer->getAction() == PLAYER_ACTION_ALLIN)
+        if (humanPlayer->getAction() == PlayerActionBet || humanPlayer->getAction() == PlayerActionRaise ||
+            humanPlayer->getAction() == PlayerActionAllin)
             currentHand->setFlopLastRaiserID(humanPlayer->getID());
         humanPlayer->updateFlopStatistics();
-        humanPlayer->updateCurrentHandContext(GAME_STATE_FLOP);
+        humanPlayer->updateCurrentHandContext(GameStateFlop);
         humanPlayer->getRangeEstimator()->updateUnplausibleRangesGivenFlopActions(humanPlayer->getCurrentHandContext());
     }
-    else if (currentState == GAME_STATE_TURN)
+    else if (currentState == GameStateTurn)
     {
         humanPlayer->getCurrentHandActions().getTurnActions().push_back(humanPlayer->getAction());
-        if (humanPlayer->getAction() == PLAYER_ACTION_BET || humanPlayer->getAction() == PLAYER_ACTION_RAISE ||
-            humanPlayer->getAction() == PLAYER_ACTION_ALLIN)
+        if (humanPlayer->getAction() == PlayerActionBet || humanPlayer->getAction() == PlayerActionRaise ||
+            humanPlayer->getAction() == PlayerActionAllin)
             currentHand->setTurnLastRaiserID(humanPlayer->getID());
         humanPlayer->updateTurnStatistics();
-        humanPlayer->updateCurrentHandContext(GAME_STATE_TURN);
+        humanPlayer->updateCurrentHandContext(GameStateTurn);
         humanPlayer->getRangeEstimator()->updateUnplausibleRangesGivenTurnActions(humanPlayer->getCurrentHandContext());
     }
-    else if (currentState == GAME_STATE_RIVER)
+    else if (currentState == GameStateRiver)
     {
         humanPlayer->getCurrentHandActions().getRiverActions().push_back(humanPlayer->getAction());
         humanPlayer->updateRiverStatistics();
-        humanPlayer->updateCurrentHandContext(GAME_STATE_RIVER);
+        humanPlayer->updateCurrentHandContext(GameStateRiver);
         humanPlayer->getRangeEstimator()->updateUnplausibleRangesGivenRiverActions(
             humanPlayer->getCurrentHandContext());
     }
@@ -1997,19 +1996,19 @@ void GameTableWindow::myActionDone()
 
     PlayerAction myAction = humanPlayer->getAction();
 
-    if (myAction == PLAYER_ACTION_FOLD)
+    if (myAction == PlayerActionFold)
         GlobalServices::instance().logger()->info("FOLD");
-    else if (myAction == PLAYER_ACTION_BET)
+    else if (myAction == PlayerActionBet)
         GlobalServices::instance().logger()->info("BET ");
-    else if (myAction == PLAYER_ACTION_RAISE)
+    else if (myAction == PlayerActionRaise)
         GlobalServices::instance().logger()->info("RAISE ");
-    else if (myAction == PLAYER_ACTION_CALL)
+    else if (myAction == PlayerActionCall)
         GlobalServices::instance().logger()->info("CALL ");
-    else if (myAction == PLAYER_ACTION_CHECK)
+    else if (myAction == PlayerActionCheck)
         GlobalServices::instance().logger()->info("CHECK");
-    else if (myAction == PLAYER_ACTION_ALLIN)
+    else if (myAction == PlayerActionAllin)
         GlobalServices::instance().logger()->info("ALLIN ");
-    else if (myAction == PLAYER_ACTION_NONE)
+    else if (myAction == PlayerActionNone)
         GlobalServices::instance().logger()->info("NONE");
     else
         GlobalServices::instance().logger()->info("undefined ?");
@@ -2184,7 +2183,7 @@ void GameTableWindow::postRiverRunAnimation2()
     PlayerList activePlayerList = currentGame->getActivePlayerList();
     for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
     {
-        if ((*it_c)->getAction() != PLAYER_ACTION_FOLD)
+        if ((*it_c)->getAction() != PlayerActionFold)
             nonfoldPlayersCounter++;
     }
 
@@ -2196,7 +2195,7 @@ void GameTableWindow::postRiverRunAnimation2()
 
             for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
             {
-                if ((*it_c)->getAction() != PLAYER_ACTION_FOLD && (*it_c)->checkIfINeedToShowCards())
+                if ((*it_c)->getAction() != PlayerActionFold && (*it_c)->checkIfINeedToShowCards())
                 {
 
                     showHoleCards((*it_c)->getID());
@@ -2208,7 +2207,7 @@ void GameTableWindow::postRiverRunAnimation2()
         {
             for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
             {
-                if ((*it_c)->getAction() != PLAYER_ACTION_FOLD)
+                if ((*it_c)->getAction() != PlayerActionFold)
                 {
                     (*it_c)->setCardsFlip(1);
                 }
@@ -2234,7 +2233,7 @@ void GameTableWindow::postRiverRunAnimation3()
     PlayerList activePlayerList = currentHand->getActivePlayerList();
     for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
     {
-        if ((*it_c)->getAction() != PLAYER_ACTION_FOLD)
+        if ((*it_c)->getAction() != PlayerActionFold)
         {
             nonfoldPlayerCounter++;
         }
@@ -2244,7 +2243,7 @@ void GameTableWindow::postRiverRunAnimation3()
 
     for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
     {
-        if ((*it_c)->getAction() != PLAYER_ACTION_FOLD &&
+        if ((*it_c)->getAction() != PlayerActionFold &&
             (*it_c)->getCardsValueInt() == currentHand->getCurrentBettingRound()->getHighestCardsValue())
         {
 
@@ -2283,7 +2282,7 @@ void GameTableWindow::postRiverRunAnimation5()
             for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
             {
 
-                if ((*it_c)->getAction() != PLAYER_ACTION_FOLD &&
+                if ((*it_c)->getAction() != PlayerActionFold &&
                     (*it_c)->getCardsValueInt() == currentHand->getCurrentBettingRound()->getHighestCardsValue())
                 {
 
@@ -2298,7 +2297,7 @@ void GameTableWindow::postRiverRunAnimation5()
             for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
             {
 
-                if ((*it_c)->getAction() != PLAYER_ACTION_FOLD &&
+                if ((*it_c)->getAction() != PlayerActionFold &&
                     (*it_c)->getCardsValueInt() == currentHand->getCurrentBettingRound()->getHighestCardsValue())
                 {
 
@@ -2392,7 +2391,7 @@ void GameTableWindow::flipHoleCardsAllIn()
 
     std::shared_ptr<Game> currentGame = myStartWindow->getSession()->getCurrentGame();
 
-    if (!flipHoleCardsAllInAlreadyDone && currentGame->getCurrentHand()->getCurrentRound() < GAME_STATE_RIVER)
+    if (!flipHoleCardsAllInAlreadyDone && currentGame->getCurrentHand()->getCurrentRound() < GameStateRiver)
     {
         // Aktive Spieler zählen --> wenn nur noch einer nicht-folded dann keine Karten umdrehen
         int nonfoldPlayersCounter = 0;
@@ -2400,7 +2399,7 @@ void GameTableWindow::flipHoleCardsAllIn()
         PlayerList activePlayerList = currentGame->getActivePlayerList();
         for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
         {
-            if ((*it_c)->getAction() != PLAYER_ACTION_FOLD)
+            if ((*it_c)->getAction() != PlayerActionFold)
                 nonfoldPlayersCounter++;
         }
 
@@ -2408,7 +2407,7 @@ void GameTableWindow::flipHoleCardsAllIn()
         {
             for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
             {
-                if ((*it_c)->getAction() != PLAYER_ACTION_FOLD)
+                if ((*it_c)->getAction() != PlayerActionFold)
                 {
 
                     showHoleCards((*it_c)->getID());
@@ -2750,7 +2749,7 @@ void GameTableWindow::updateHumanPlayerButtonsState(int mode)
     }
     else
     {
-        if (currentHand->getSeatsList()->front()->getAction() != PLAYER_ACTION_ALLIN)
+        if (currentHand->getSeatsList()->front()->getAction() != PlayerActionAllin)
         { // dont show pre-actions after flip cards when allin
             myButtonsCheckable(true);
             provideMyActions(mode);
@@ -2962,7 +2961,7 @@ void GameTableWindow::refreshHandsRanges()
     {
 
         if ((*it_c)->getCurrentHandActions().getPreflopActions().size() > 0 &&
-            (*it_c)->getCurrentHandActions().getPreflopActions().front() != PLAYER_ACTION_FOLD)
+            (*it_c)->getCurrentHandActions().getPreflopActions().front() != PlayerActionFold)
         {
 
             displayText << style << "<b>" << ((*it_c)->getName()) << "</b> : ";

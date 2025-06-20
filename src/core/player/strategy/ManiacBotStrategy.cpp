@@ -92,7 +92,7 @@ bool ManiacBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool determin
 
     // defend against 3bet bluffs :
     if (ctx.preflopRaisesNumber == 2 && ctx.myCurrentHandActions.getPreflopActions().size() > 0 &&
-        ctx.myCurrentHandActions.getPreflopActions().back() == PLAYER_ACTION_RAISE && ctx.myCash >= ctx.pot * 10 &&
+        ctx.myCurrentHandActions.getPreflopActions().back() == PlayerActionRaise && ctx.myCash >= ctx.pot * 10 &&
         lastRaiser != NULL && lastRaiser->getCash() >= ctx.pot * 10 && !ctx.isPreflopBigBet)
     {
 
@@ -151,7 +151,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
         PreflopStatistics raiserStats = ctx.preflopLastRaiser->getStatistics(ctx.nbPlayers).getPreflopStatistics();
 
         if (!isCardsInRange(ctx.myCard1, ctx.myCard2, stringRaisingRange) && ctx.myM > 20 &&
-            ctx.myCash > ctx.highestSet * 20 && ctx.myPosition > UTG_PLUS_TWO &&
+            ctx.myCash > ctx.highestSet * 20 && ctx.myPosition > UtgPlusTwo &&
             raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE &&
             ctx.myPosition > ctx.preflopLastRaiser->getPosition() &&
             ctx.preflopLastRaiser->getCash() > ctx.highestSet * 10 && !ctx.isPreflopBigBet &&
@@ -201,7 +201,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
 
         if (!isCardsInRange(ctx.myCard1, ctx.myCard2, stringRaisingRange) &&
             !isCardsInRange(ctx.myCard1, ctx.myCard2, OFFSUITED_BROADWAYS) && ctx.myM > 20 &&
-            ctx.myCash > ctx.highestSet * 60 && ctx.myPosition > MIDDLE_PLUS_ONE &&
+            ctx.myCash > ctx.highestSet * 60 && ctx.myPosition > MiddlePlusOne &&
             raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE &&
             ctx.myPosition > ctx.preflopLastRaiser->getPosition() &&
             ctx.preflopLastRaiser->getCash() > ctx.highestSet * 20 && !ctx.isPreflopBigBet &&

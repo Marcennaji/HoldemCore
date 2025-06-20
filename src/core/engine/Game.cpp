@@ -86,7 +86,7 @@ void Game::initHand()
     // set player action none
     for (it = seatsList->begin(); it != seatsList->end(); ++it)
     {
-        (*it)->setAction(PLAYER_ACTION_NONE);
+        (*it)->setAction(PlayerActionNone);
     }
 
     // set player with empty cash inactive

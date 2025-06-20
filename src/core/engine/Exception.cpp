@@ -11,7 +11,7 @@ namespace pkt::core
 using namespace std;
 
 Exception::Exception(const char* sourcefile, int sourceline, EngineError errorId, int osErrorCode)
-    : myMErrorId(errorId), myMOsErrorCode(osErrorCode)
+    : myErrorId(errorId), myOsErrorCode(osErrorCode)
 {
     ostringstream msgStream;
     msgStream << sourcefile << " (" << sourceline << "): Error " << static_cast<const int>(errorId);
@@ -19,20 +19,20 @@ Exception::Exception(const char* sourcefile, int sourceline, EngineError errorId
     {
         msgStream << " (system error " << osErrorCode << ")";
     }
-    myMMsg = msgStream.str();
+    myMsg = msgStream.str();
 }
 
-Exception::Exception(const char* sourcefile, int sourceline, EngineError errorId) : myMErrorId(errorId)
+Exception::Exception(const char* sourcefile, int sourceline, EngineError errorId) : myErrorId(errorId)
 {
     ostringstream msgStream;
     msgStream << sourcefile << " (" << sourceline << "): Error " << static_cast<const int>(errorId);
-    myMMsg = msgStream.str();
+    myMsg = msgStream.str();
 }
 
 Exception::~Exception() throw() = default;
 
 const char* Exception::what() const throw()
 {
-    return myMMsg.c_str();
+    return myMsg.c_str();
 }
 } // namespace pkt::core

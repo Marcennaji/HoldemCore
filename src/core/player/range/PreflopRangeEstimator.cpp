@@ -120,8 +120,8 @@ std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(Cu
     if (nbPlayers > 3)
     {
         // Adjust range based on position
-        if (ctx.preflopLastRaiser->getPosition() == UTG || ctx.preflopLastRaiser->getPosition() == UTG_PLUS_ONE ||
-            ctx.preflopLastRaiser->getPosition() == UTG_PLUS_TWO)
+        if (ctx.preflopLastRaiser->getPosition() == UTG || ctx.preflopLastRaiser->getPosition() == UtgPlusOne ||
+            ctx.preflopLastRaiser->getPosition() == UtgPlusTwo)
             range = range * 0.9;
         else if (ctx.preflopLastRaiser->getPosition() == BUTTON || ctx.preflopLastRaiser->getPosition() == CUTOFF)
             range = range * 1.5;
@@ -192,9 +192,9 @@ void PreflopRangeEstimator::analyzePlayerActions(const CurrentHandContext& ctx, 
 {
     for (const auto& action : ctx.myCurrentHandActions.getPreflopActions())
     {
-        if (action == PLAYER_ACTION_RAISE || action == PLAYER_ACTION_ALLIN)
+        if (action == PlayerActionRaise || action == PlayerActionAllin)
             raises++;
-        else if (action == PLAYER_ACTION_CALL)
+        else if (action == PlayerActionCall)
             calls++;
     }
 }
@@ -218,7 +218,7 @@ float PreflopRangeEstimator::adjustRangeForPosition(const CurrentHandContext& ct
 
     if (nbPlayers > 3)
     {
-        if (ctx.myPosition == UTG || ctx.myPosition == UTG_PLUS_ONE || ctx.myPosition == UTG_PLUS_TWO)
+        if (ctx.myPosition == UTG || ctx.myPosition == UtgPlusOne || ctx.myPosition == UtgPlusTwo)
             range *= 0.9;
         else if (ctx.myPosition == BUTTON || ctx.myPosition == CUTOFF)
             range *= 1.4;

@@ -179,7 +179,7 @@ const int getDrawingProbability(const PostFlopState& postFlopState)
 
     // if the last raiser is allin on flop : we must count our odds for the turn AND the river
     // TODO : this is not correct, as we must also take into account the other players actions, and their stacks
-    /*if (currentHand->getCurrentRound() == GAME_STATE_FLOP)
+    /*if (currentHand->getCurrentRound() == GameStateFlop)
     {
         const int lastRaiserID = currentHand->getLastRaiserID();
 
@@ -190,7 +190,7 @@ const int getDrawingProbability(const PostFlopState& postFlopState)
 
             for (std::vector<PlayerAction>::const_iterator itAction = actions.begin(); itAction != actions.end();
                  itAction++)
-                if ((*itAction) == PLAYER_ACTION_ALLIN)
+                if ((*itAction) == PlayerActionAllin)
                     return outsOddsTwoCard[outs];
         }
     }*/

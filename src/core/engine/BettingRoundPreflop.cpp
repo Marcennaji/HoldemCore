@@ -19,7 +19,7 @@ using namespace std;
 using namespace pkt::core::player;
 
 BettingRoundPreflop::BettingRoundPreflop(const GameEvents& events, IHand* hi, unsigned dP, int sB)
-    : BettingRound(events, hi, dP, sB, GAME_STATE_PREFLOP)
+    : BettingRound(events, hi, dP, sB, GameStatePreflop)
 {
     setHighestSet(2 * getSmallBlind());
 }
@@ -147,13 +147,13 @@ void BettingRoundPreflop::run()
 
         // Preflop nicht dran, weil wir nicht mehr in erster PreflopRunde und alle Sets gleich sind
         // also gehe in Flop
-        getHand()->setCurrentRound(GAME_STATE_FLOP);
+        getHand()->setCurrentRound(GameStateFlop);
 
         // Action loeschen und ActionButtons refresh
         for (it_c = getHand()->getRunningPlayerList()->begin(); it_c != getHand()->getRunningPlayerList()->end();
              ++it_c)
         {
-            (*it_c)->setAction(PLAYER_ACTION_NONE);
+            (*it_c)->setAction(PlayerActionNone);
         }
 
         // Sets in den Pot verschieben und Sets = 0 und Pot-refresh
@@ -172,7 +172,7 @@ void BettingRoundPreflop::run()
         for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
         {
             if (myEvents.onRefreshAction)
-                myEvents.onRefreshAction(i, PLAYER_ACTION_NONE);
+                myEvents.onRefreshAction(i, PlayerActionNone);
         }
 
         getHand()->switchRounds();
@@ -197,7 +197,7 @@ void BettingRoundPreflop::run()
             myEvents.onRefreshPlayersActiveInactiveStyles(getCurrentPlayersTurnId(), 2);
 
         if (myEvents.onRefreshAction)
-            myEvents.onRefreshAction(getCurrentPlayersTurnId(), PLAYER_ACTION_NONE);
+            myEvents.onRefreshAction(getCurrentPlayersTurnId(), PlayerActionNone);
 
         if (getCurrentPlayersTurnId() == 0)
         {

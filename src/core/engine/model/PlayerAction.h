@@ -19,32 +19,4 @@ enum PlayerAction
     PlayerActionAllin
 };
 
-enum PlayerActionCode
-{
-    ActionCodeValid = 0,
-    ActionCodeInvalidState,
-    ActionCodeNotYourTurn,
-    ActionCodeNotAllowed
-};
-
-enum PlayerActionLog
-{
-    LogActionNone = 0,
-    LogActionDealer,     // starts as dealer
-    LogActionSmallBlind, // posts small blind
-    LogActionBigBlind,   // posts big blind
-    LogActionFold,       // folds
-    LogActionCheck,      // checks
-    LogActionCall,       // calls
-    LogActionBet,        // bets
-    LogActionAllIn,      // is all in with
-    LogActionShow,       // shows
-    LogActionHas,        // has
-    LogActionWin,        // wins
-    LogActionWinSidePot, // wins (side pot)
-    LogActionSitOut,     // sits out
-    LogActionWinGame,    // wins game
-    LogActionAdmin,      // is game admin now
-    LogActionJoin        // has joined the game
-};
 } // namespace pkt::core

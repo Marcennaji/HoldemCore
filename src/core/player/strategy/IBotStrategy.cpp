@@ -64,10 +64,10 @@ int IBotStrategy::computePreflopRaiseAmount(CurrentHandContext& ctx, bool determ
 
 bool IBotStrategy::shouldPotControl(CurrentHandContext& ctx, bool deterministic)
 {
-    assert(ctx.gameState == GAME_STATE_FLOP || ctx.gameState == GAME_STATE_TURN);
+    assert(ctx.gameState == GameStateFlop || ctx.gameState == GameStateTurn);
 
     const int bigBlind = ctx.smallBlind * 2;
-    const int potThreshold = (ctx.gameState == GAME_STATE_FLOP) ? bigBlind * 20 : bigBlind * 40;
+    const int potThreshold = (ctx.gameState == GameStateFlop) ? bigBlind * 20 : bigBlind * 40;
     bool potControl = false;
 
     if (ctx.pot >= potThreshold)
@@ -80,12 +80,12 @@ bool IBotStrategy::shouldPotControl(CurrentHandContext& ctx, bool deterministic)
               ctx.myPostFlopState.IsQuads))
             potControl = true;
 
-        if (ctx.gameState == GAME_STATE_FLOP)
+        if (ctx.gameState == GameStateFlop)
         {
             if ((ctx.myPostFlopState.IsOverPair || ctx.myPostFlopState.IsTopPair) && ctx.mySet > bigBlind * 20)
                 potControl = true;
         }
-        else if (ctx.gameState == GAME_STATE_TURN)
+        else if (ctx.gameState == GameStateTurn)
         {
             if (ctx.myPostFlopState.IsOverPair ||
                 (ctx.myPostFlopState.IsTwoPair && !ctx.myPostFlopState.IsFullHousePossible) ||

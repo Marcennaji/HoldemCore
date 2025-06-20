@@ -74,7 +74,7 @@ bool TightAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool
 
     // defend against 3bet bluffs :
     if (ctx.preflopRaisesNumber == 2 && ctx.myCurrentHandActions.getPreflopActions().size() > 0 &&
-        ctx.myCurrentHandActions.getPreflopActions().back() == PLAYER_ACTION_RAISE && ctx.myCash >= ctx.pot * 10 &&
+        ctx.myCurrentHandActions.getPreflopActions().back() == PlayerActionRaise && ctx.myCash >= ctx.pot * 10 &&
         lastRaiser != NULL && lastRaiser->getCash() >= ctx.pot * 10 && !ctx.isPreflopBigBet)
     {
 
@@ -133,7 +133,7 @@ int TightAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
         PreflopStatistics raiserStats = ctx.preflopLastRaiser->getStatistics(ctx.nbPlayers).getPreflopStatistics();
 
         if (!isCardsInRange(ctx.myCard1, ctx.myCard2, stringRaisingRange) && ctx.myM > 20 &&
-            ctx.myCash > ctx.highestSet * 20 && ctx.myPosition > MIDDLE_PLUS_ONE &&
+            ctx.myCash > ctx.highestSet * 20 && ctx.myPosition > MiddlePlusOne &&
             raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE &&
             ctx.myPosition > ctx.preflopLastRaiser->getPosition() &&
             ctx.preflopLastRaiser->getCash() > ctx.highestSet * 10 && !ctx.isPreflopBigBet &&

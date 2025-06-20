@@ -162,7 +162,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(const PostFlopState
     if (!testedHand.UsesFirst && !testedHand.UsesSecond)
         return true;
 
-    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.myCurrentHandActions.getFlopActions().back() == PLAYER_ACTION_CALL &&
+    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.myCurrentHandActions.getFlopActions().back() == PlayerActionCall &&
         !(ctx.myStatistics.getWentToShowDown() > 35 &&
           ctx.myStatistics.getRiverStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE))
     {
@@ -406,7 +406,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopState
         }
     }
     // the player called a raise on turn, and is not loose : he has at least a top pair or a good draw
-    if (ctx.turnBetsOrRaisesNumber > 1 && ctx.myCurrentHandActions.getTurnActions().back() == PLAYER_ACTION_CALL &&
+    if (ctx.turnBetsOrRaisesNumber > 1 && ctx.myCurrentHandActions.getTurnActions().back() == PlayerActionCall &&
         !(ctx.myStatistics.getWentToShowDown() > 35 &&
           ctx.myStatistics.getRiverStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE))
     {

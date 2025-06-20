@@ -34,34 +34,34 @@ void PreflopRangeCalculator::initializeRanges(const int utgHeadsUpRange, const i
 
     // we have the UTG starting ranges. Now, deduce the starting ranges for other positions :
 
-    UTG_PLUS_ONE_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < UTG_PLUS_ONE_STARTING_RANGE.size(); i++)
+    UtgPlusOne_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    for (int i = 2; i < UtgPlusOne_STARTING_RANGE.size(); i++)
     {
-        UTG_PLUS_ONE_STARTING_RANGE[i] = min(50, UTG_STARTING_RANGE[i] + 1);
+        UtgPlusOne_STARTING_RANGE[i] = min(50, UTG_STARTING_RANGE[i] + 1);
     }
 
-    UTG_PLUS_TWO_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < UTG_PLUS_TWO_STARTING_RANGE.size(); i++)
+    UtgPlusTwo_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    for (int i = 2; i < UtgPlusTwo_STARTING_RANGE.size(); i++)
     {
-        UTG_PLUS_TWO_STARTING_RANGE[i] = min(50, UTG_PLUS_ONE_STARTING_RANGE[i] + 1);
+        UtgPlusTwo_STARTING_RANGE[i] = min(50, UtgPlusOne_STARTING_RANGE[i] + 1);
     }
 
     MIDDLE_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
     for (int i = 2; i < MIDDLE_STARTING_RANGE.size(); i++)
     {
-        MIDDLE_STARTING_RANGE[i] = min(50, UTG_PLUS_TWO_STARTING_RANGE[i] + 1);
+        MIDDLE_STARTING_RANGE[i] = min(50, UtgPlusTwo_STARTING_RANGE[i] + 1);
     }
 
-    MIDDLE_PLUS_ONE_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < MIDDLE_PLUS_ONE_STARTING_RANGE.size(); i++)
+    MiddlePlusOne_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    for (int i = 2; i < MiddlePlusOne_STARTING_RANGE.size(); i++)
     {
-        MIDDLE_PLUS_ONE_STARTING_RANGE[i] = min(50, MIDDLE_STARTING_RANGE[i] + 1);
+        MiddlePlusOne_STARTING_RANGE[i] = min(50, MIDDLE_STARTING_RANGE[i] + 1);
     }
 
     LATE_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
     for (int i = 2; i < LATE_STARTING_RANGE.size(); i++)
     {
-        LATE_STARTING_RANGE[i] = min(50, MIDDLE_PLUS_ONE_STARTING_RANGE[i] + 1);
+        LATE_STARTING_RANGE[i] = min(50, MiddlePlusOne_STARTING_RANGE[i] + 1);
     }
 
     CUTOFF_STARTING_RANGE.resize(MAX_NUMBER_OF_PLAYERS + 1);
@@ -308,7 +308,7 @@ bool PreflopRangeCalculator::shouldCallForAllIn(const CurrentHandContext& contex
     std::shared_ptr<Player> lastRaiser = context.preflopLastRaiser;
     const PlayerPosition myPosition = context.myPosition;
 
-    return context.myM > 10 && potOdd <= 20 && nbRaises < 2 && lastRaiser->getAction() == PLAYER_ACTION_ALLIN &&
+    return context.myM > 10 && potOdd <= 20 && nbRaises < 2 && lastRaiser->getAction() == PlayerActionAllin &&
            (myPosition >= LATE || myPosition == SB || myPosition == BB);
 }
 
@@ -536,17 +536,17 @@ int PreflopRangeCalculator::getRange(PlayerPosition p, const int nbPlayers) cons
     case UTG:
         return UTG_STARTING_RANGE[nbPlayers];
         break;
-    case UTG_PLUS_ONE:
-        return UTG_PLUS_ONE_STARTING_RANGE[nbPlayers];
+    case UtgPlusOne:
+        return UtgPlusOne_STARTING_RANGE[nbPlayers];
         break;
-    case UTG_PLUS_TWO:
-        return UTG_PLUS_TWO_STARTING_RANGE[nbPlayers];
+    case UtgPlusTwo:
+        return UtgPlusTwo_STARTING_RANGE[nbPlayers];
         break;
     case MIDDLE:
         return MIDDLE_STARTING_RANGE[nbPlayers];
         break;
-    case MIDDLE_PLUS_ONE:
-        return MIDDLE_PLUS_ONE_STARTING_RANGE[nbPlayers];
+    case MiddlePlusOne:
+        return MiddlePlusOne_STARTING_RANGE[nbPlayers];
         break;
     case LATE:
         return LATE_STARTING_RANGE[nbPlayers];

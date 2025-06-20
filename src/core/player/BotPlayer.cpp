@@ -32,19 +32,19 @@ void BotPlayer::action()
     switch (currentHand->getCurrentRound())
     {
 
-    case GAME_STATE_PREFLOP:
+    case GameStatePreflop:
         doPreflopAction();
         break;
 
-    case GAME_STATE_FLOP:
+    case GameStateFlop:
         doFlopAction();
         break;
 
-    case GAME_STATE_TURN:
+    case GameStateTurn:
         doTurnAction();
         break;
 
-    case GAME_STATE_RIVER:
+    case GameStateRiver:
         doRiverAction();
         break;
 
@@ -61,19 +61,19 @@ void BotPlayer::action()
 
     std::ostringstream logMessage;
     logMessage << "\n";
-    if (myAction == PLAYER_ACTION_FOLD)
+    if (myAction == PlayerActionFold)
         logMessage << "FOLD";
-    else if (myAction == PLAYER_ACTION_BET)
+    else if (myAction == PlayerActionBet)
         logMessage << "BET " << myBetAmount;
-    else if (myAction == PLAYER_ACTION_RAISE)
+    else if (myAction == PlayerActionRaise)
         logMessage << "RAISE " << myRaiseAmount;
-    else if (myAction == PLAYER_ACTION_CALL)
+    else if (myAction == PlayerActionCall)
         logMessage << "CALL ";
-    else if (myAction == PLAYER_ACTION_CHECK)
+    else if (myAction == PlayerActionCheck)
         logMessage << "CHECK";
-    else if (myAction == PLAYER_ACTION_ALLIN)
+    else if (myAction == PlayerActionAllin)
         logMessage << "ALLIN ";
-    else if (myAction == PLAYER_ACTION_NONE)
+    else if (myAction == PlayerActionNone)
         logMessage << "NONE";
     else
         logMessage << "undefined ?";
@@ -91,7 +91,7 @@ void BotPlayer::action()
 
 void BotPlayer::doPreflopAction()
 {
-    updateCurrentHandContext(GAME_STATE_PREFLOP);
+    updateCurrentHandContext(GameStatePreflop);
 
     std::ostringstream logMessage;
     logMessage << "\n";
@@ -115,34 +115,34 @@ void BotPlayer::doPreflopAction()
     // if last to speak, and nobody has raised : I can check
     if (currentHand->getPreflopRaisesNumber() == 0 && !myRaiseAmount && myPosition == BB)
     {
-        myAction = PLAYER_ACTION_CHECK;
+        myAction = PlayerActionCheck;
     }
     else
     {
         if (myBetAmount > 0)
-            myAction = PLAYER_ACTION_BET;
+            myAction = PlayerActionBet;
         else if (shouldCall)
-            myAction = PLAYER_ACTION_CALL;
+            myAction = PlayerActionCall;
         else if (myRaiseAmount > 0)
-            myAction = PLAYER_ACTION_RAISE;
+            myAction = PlayerActionRaise;
         else
-            myAction = PLAYER_ACTION_FOLD;
+            myAction = PlayerActionFold;
     }
 
-    if (myAction == PLAYER_ACTION_RAISE || myAction != PLAYER_ACTION_ALLIN)
+    if (myAction == PlayerActionRaise || myAction != PlayerActionAllin)
         currentHand->setPreflopLastRaiserID(myID);
 
     myCurrentHandActions.m_preflopActions.push_back(myAction);
 
     updatePreflopStatistics();
-    updateCurrentHandContext(GAME_STATE_PREFLOP);
+    updateCurrentHandContext(GameStatePreflop);
 
-    if (myAction != PLAYER_ACTION_FOLD)
+    if (myAction != PlayerActionFold)
         myRangeEstimator->updateUnplausibleRangesGivenPreflopActions(*myCurrentHandContext);
 }
 void BotPlayer::doFlopAction()
 {
-    updateCurrentHandContext(GAME_STATE_FLOP);
+    updateCurrentHandContext(GameStateFlop);
 
     std::ostringstream logMessage;
     logMessage << "\n";
@@ -161,34 +161,34 @@ void BotPlayer::doFlopAction()
         shouldCall = false;
 
     if (currentHand->getFlopBetsOrRaisesNumber() == 0 && !myRaiseAmount && !myBetAmount)
-        myAction = PLAYER_ACTION_CHECK;
+        myAction = PlayerActionCheck;
     else
     {
         if (myBetAmount)
-            myAction = PLAYER_ACTION_BET;
+            myAction = PlayerActionBet;
         else if (shouldCall)
-            myAction = PLAYER_ACTION_CALL;
+            myAction = PlayerActionCall;
         else if (myRaiseAmount)
-            myAction = PLAYER_ACTION_RAISE;
+            myAction = PlayerActionRaise;
         else
-            myAction = PLAYER_ACTION_FOLD;
+            myAction = PlayerActionFold;
     }
 
-    if (myAction == PLAYER_ACTION_BET || myAction == PLAYER_ACTION_RAISE || myAction == PLAYER_ACTION_ALLIN)
+    if (myAction == PlayerActionBet || myAction == PlayerActionRaise || myAction == PlayerActionAllin)
         currentHand->setFlopLastRaiserID(myID);
 
     myCurrentHandActions.m_flopActions.push_back(myAction);
 
     updateFlopStatistics();
-    updateCurrentHandContext(GAME_STATE_FLOP);
+    updateCurrentHandContext(GameStateFlop);
 
-    if (myAction != PLAYER_ACTION_FOLD)
+    if (myAction != PlayerActionFold)
         myRangeEstimator->updateUnplausibleRangesGivenFlopActions(*myCurrentHandContext);
 }
 void BotPlayer::doTurnAction()
 {
 
-    updateCurrentHandContext(GAME_STATE_TURN);
+    updateCurrentHandContext(GameStateTurn);
 
     std::ostringstream logMessage;
     logMessage << "\n";
@@ -207,34 +207,34 @@ void BotPlayer::doTurnAction()
         shouldCall = false;
 
     if (currentHand->getTurnBetsOrRaisesNumber() == 0 && !myRaiseAmount && !myBetAmount)
-        myAction = PLAYER_ACTION_CHECK;
+        myAction = PlayerActionCheck;
     else
     {
         if (myBetAmount)
-            myAction = PLAYER_ACTION_BET;
+            myAction = PlayerActionBet;
         else if (shouldCall)
-            myAction = PLAYER_ACTION_CALL;
+            myAction = PlayerActionCall;
         else if (myRaiseAmount)
-            myAction = PLAYER_ACTION_RAISE;
+            myAction = PlayerActionRaise;
         else
-            myAction = PLAYER_ACTION_FOLD;
+            myAction = PlayerActionFold;
     }
 
-    if (myAction == PLAYER_ACTION_BET || myAction == PLAYER_ACTION_RAISE || myAction == PLAYER_ACTION_ALLIN)
+    if (myAction == PlayerActionBet || myAction == PlayerActionRaise || myAction == PlayerActionAllin)
         currentHand->setTurnLastRaiserID(myID);
 
     myCurrentHandActions.m_turnActions.push_back(myAction);
 
     updateTurnStatistics();
-    updateCurrentHandContext(GAME_STATE_TURN);
+    updateCurrentHandContext(GameStateTurn);
 
-    if (myAction != PLAYER_ACTION_FOLD)
+    if (myAction != PlayerActionFold)
         myRangeEstimator->updateUnplausibleRangesGivenTurnActions(*myCurrentHandContext);
 }
 void BotPlayer::doRiverAction()
 {
 
-    updateCurrentHandContext(GAME_STATE_RIVER);
+    updateCurrentHandContext(GameStateRiver);
 
     std::ostringstream logMessage;
     logMessage << "\n";
@@ -253,25 +253,25 @@ void BotPlayer::doRiverAction()
         shouldCall = false;
 
     if (currentHand->getRiverBetsOrRaisesNumber() == 0 && !myRaiseAmount && !myBetAmount)
-        myAction = PLAYER_ACTION_CHECK;
+        myAction = PlayerActionCheck;
     else
     {
         if (myBetAmount)
-            myAction = PLAYER_ACTION_BET;
+            myAction = PlayerActionBet;
         else if (shouldCall)
-            myAction = PLAYER_ACTION_CALL;
+            myAction = PlayerActionCall;
         else if (myRaiseAmount)
-            myAction = PLAYER_ACTION_RAISE;
+            myAction = PlayerActionRaise;
         else
-            myAction = PLAYER_ACTION_FOLD;
+            myAction = PlayerActionFold;
     }
 
     myCurrentHandActions.m_riverActions.push_back(myAction);
 
     updateRiverStatistics();
-    updateCurrentHandContext(GAME_STATE_RIVER);
+    updateCurrentHandContext(GameStateRiver);
 
-    if (myAction != PLAYER_ACTION_FOLD)
+    if (myAction != PlayerActionFold)
         myRangeEstimator->updateUnplausibleRangesGivenRiverActions(*myCurrentHandContext);
 }
 void BotPlayer::evaluateBetAmount()
@@ -279,7 +279,7 @@ void BotPlayer::evaluateBetAmount()
 
     int highestSet = currentHand->getCurrentBettingRound()->getHighestSet();
 
-    if (myAction == PLAYER_ACTION_CALL)
+    if (myAction == PlayerActionCall)
     {
 
         // all in
@@ -287,7 +287,7 @@ void BotPlayer::evaluateBetAmount()
         {
             mySet += myCash;
             myCash = 0;
-            myAction = PLAYER_ACTION_ALLIN;
+            myAction = PlayerActionAllin;
         }
         else
         {
@@ -296,7 +296,7 @@ void BotPlayer::evaluateBetAmount()
         }
     }
 
-    if (myAction == PLAYER_ACTION_BET)
+    if (myAction == PlayerActionBet)
     {
 
         // if short stack, just go allin
@@ -313,7 +313,7 @@ void BotPlayer::evaluateBetAmount()
             currentHand->getCurrentBettingRound()->setMinimumRaise(myCash);
             mySet = myCash;
             myCash = 0;
-            myAction = PLAYER_ACTION_ALLIN;
+            myAction = PlayerActionAllin;
             highestSet = mySet;
         }
         else
@@ -326,7 +326,7 @@ void BotPlayer::evaluateBetAmount()
         currentHand->setLastActionPlayerID(myID);
     }
 
-    if (myAction == PLAYER_ACTION_RAISE)
+    if (myAction == PlayerActionRaise)
     {
 
         // short stack, just go allin
@@ -340,13 +340,13 @@ void BotPlayer::evaluateBetAmount()
             {
                 mySet += myCash;
                 myCash = 0;
-                myAction = PLAYER_ACTION_ALLIN;
+                myAction = PlayerActionAllin;
             }
             else
             {
                 myCash = myCash - highestSet + mySet;
                 mySet = highestSet;
-                myAction = PLAYER_ACTION_CALL;
+                myAction = PlayerActionCall;
             }
         }
         else
@@ -366,7 +366,7 @@ void BotPlayer::evaluateBetAmount()
                         // only call all-in
                         mySet += myCash;
                         myCash = 0;
-                        myAction = PLAYER_ACTION_ALLIN;
+                        myAction = PlayerActionAllin;
                     }
                     else
                     {
@@ -378,7 +378,7 @@ void BotPlayer::evaluateBetAmount()
                         mySet += myCash;
                         currentHand->getCurrentBettingRound()->setMinimumRaise(mySet - highestSet);
                         myCash = 0;
-                        myAction = PLAYER_ACTION_ALLIN;
+                        myAction = PlayerActionAllin;
                         highestSet = mySet;
                     }
                 }
@@ -389,7 +389,7 @@ void BotPlayer::evaluateBetAmount()
                     mySet += myCash;
                     currentHand->getCurrentBettingRound()->setMinimumRaise(mySet - highestSet);
                     myCash = 0;
-                    myAction = PLAYER_ACTION_ALLIN;
+                    myAction = PlayerActionAllin;
                     highestSet = mySet;
                 }
             }
