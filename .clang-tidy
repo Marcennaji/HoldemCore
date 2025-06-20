@@ -28,10 +28,10 @@ CheckOptions:
   - { key: readability-identifier-naming.LocalVariableCase, value: camelBack }
 
   # Members
-  - { key: readability-identifier-naming.PrivateMemberCase, value: camelBack }
+  - { key: readability-identifier-naming.PrivateMemberCase, value: CamelCase }
   - { key: readability-identifier-naming.PrivateMemberPrefix, value: my }
 
   # Optional: Static Members
   - { key: readability-identifier-naming.StaticMemberPrefix, value: s_ }
-  - { key: readability-identifier-naming.StaticMemberCase, value: CamelCase }
+  - { key: readability-identifier-naming.StaticMemberCase, value: camelBack }
 
