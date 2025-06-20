@@ -29,7 +29,7 @@ ManiacBotStrategy::ManiacBotStrategy() : IBotStrategy()
 
     // initialize utg starting range, in a full table
     int utgFullTableRange = 0;
-    Randomizer::GetRand(30, 35, 1, &utgFullTableRange);
+    Randomizer::getRand(30, 35, 1, &utgFullTableRange);
     initializeRanges(50, utgFullTableRange);
 }
 
@@ -97,7 +97,7 @@ bool ManiacBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool determin
     {
 
         int rand = 0;
-        Randomizer::GetRand(1, 3, 1, &rand);
+        Randomizer::getRand(1, 3, 1, &rand);
         if (rand == 1)
         {
 
@@ -182,7 +182,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
                     {
 
                         int rand = 0;
-                        Randomizer::GetRand(1, 3, 1, &rand);
+                        Randomizer::getRand(1, 3, 1, &rand);
                         if (rand == 1)
                         {
                             speculativeHandedAdded = true;
@@ -211,7 +211,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
             if (ctx.myCanBluff && ctx.myPosition > LATE && raiserStats.getPreflop3Bet() > 8)
             {
                 int rand = 0;
-                Randomizer::GetRand(1, 5, 1, &rand);
+                Randomizer::getRand(1, 5, 1, &rand);
                 if (rand == 1)
                 {
                     speculativeHandedAdded = true;
@@ -233,7 +233,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
     {
 
         int rand = 0;
-        Randomizer::GetRand(1, 10, 1, &rand);
+        Randomizer::getRand(1, 10, 1, &rand);
         if (rand == 1)
         {
             GlobalServices::instance().logger()->info("\t\twon't raise, to hide the hand strength");
@@ -255,7 +255,7 @@ int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic
         return 0;
 
     // donk bets :
-    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() != ctx.myID)
+    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getId() != ctx.myID)
     {
         if (ctx.preflopLastRaiser->getPosition() > ctx.myPosition)
         {
@@ -263,7 +263,7 @@ int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic
             if (getDrawingProbability(ctx.myPostFlopState) > 25)
             {
                 int rand = 0;
-                Randomizer::GetRand(1, 2, 1, &rand);
+                Randomizer::getRand(1, 2, 1, &rand);
                 if (rand == 1)
                 {
                     return ctx.pot * 0.6;
@@ -282,7 +282,7 @@ int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic
             {
 
                 int rand = 0;
-                Randomizer::GetRand(1, 2, 1, &rand);
+                Randomizer::getRand(1, 2, 1, &rand);
                 if (rand == 1)
                 {
                     return ctx.pot * 0.6;
@@ -316,7 +316,7 @@ int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic
         }
 
         // if i have raised preflop, bet
-        if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() == ctx.myID)
+        if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getId() == ctx.myID)
         {
             return ctx.pot * 0.8;
         }
@@ -327,11 +327,11 @@ int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic
         ///////////  if bad flop for me
 
         // if there was a lot of action preflop, and i was not the last raiser : don't bet
-        if (ctx.preflopRaisesNumber > 2 && ctx.preflopLastRaiser->getID() != ctx.myID)
+        if (ctx.preflopRaisesNumber > 2 && ctx.preflopLastRaiser->getId() != ctx.myID)
             return 0;
 
         // if I was the last raiser preflop, I may bet with not much
-        if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() == ctx.myID && ctx.nbRunningPlayers < 4 &&
+        if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getId() == ctx.myID && ctx.nbRunningPlayers < 4 &&
             ctx.myCash > ctx.pot * 4 && ctx.myCanBluff)
         {
             if (ctx.myHandSimulation.winRanged > 0.15 && ctx.myHandSimulation.win > 0.3)
@@ -380,7 +380,7 @@ int ManiacBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool determinist
     {
 
         int rand = 0;
-        Randomizer::GetRand(1, 3, 1, &rand);
+        Randomizer::getRand(1, 3, 1, &rand);
         if (rand == 2)
         {
             return ctx.pot * 2;
@@ -401,7 +401,7 @@ int ManiacBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool determinist
     {
 
         int rand = 0;
-        Randomizer::GetRand(1, 2, 1, &rand);
+        Randomizer::getRand(1, 2, 1, &rand);
         if (rand == 2)
         {
             return ctx.pot;
@@ -574,7 +574,7 @@ int ManiacBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool deterministi
         ctx.myHandSimulation.winSd > 0.4)
     {
         int rand = 0;
-        Randomizer::GetRand(1, 2, 1, &rand);
+        Randomizer::getRand(1, 2, 1, &rand);
         if (rand == 1)
         {
             return ctx.pot * 0.33;
@@ -590,7 +590,7 @@ int ManiacBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool deterministi
         {
 
             int rand = 0;
-            Randomizer::GetRand(1, 4, 1, &rand);
+            Randomizer::getRand(1, 4, 1, &rand);
             if (rand == 1)
             {
                 return ctx.pot * 0.8;
@@ -599,13 +599,13 @@ int ManiacBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool deterministi
     }
 
     int rand = 0;
-    Randomizer::GetRand(40, 90, 1, &rand);
+    Randomizer::getRand(40, 90, 1, &rand);
     float coeff = (float) rand / (float) 100;
 
     if (ctx.myHandSimulation.winSd > .9 || (ctx.myHavePosition && ctx.myHandSimulation.winSd > .85))
     {
         int rand = 0;
-        Randomizer::GetRand(1, 5, 1, &rand);
+        Randomizer::getRand(1, 5, 1, &rand);
         if (rand != 1 || ctx.myHavePosition)
         {
             return ctx.pot * coeff;
@@ -615,7 +615,7 @@ int ManiacBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool deterministi
         (ctx.myHandSimulation.winRanged > .8 || (ctx.myHavePosition && ctx.myHandSimulation.winRanged > .7)))
     {
         int rand = 0;
-        Randomizer::GetRand(1, 3, 1, &rand);
+        Randomizer::getRand(1, 3, 1, &rand);
         if (rand == 1 || ctx.myHavePosition)
         {
             return ctx.pot * coeff;

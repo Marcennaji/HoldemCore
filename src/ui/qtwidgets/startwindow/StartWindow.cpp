@@ -46,11 +46,11 @@ void StartWindow::startNewGame()
     gameData.firstSmallBlind = spinBox_smallBlind->value();
 
     if (radioButton_opponentsLooseAggressive->isChecked())
-        gameData.tableProfile = LARGE_AGRESSIVE_OPPONENTS;
+        gameData.tableProfile = LargeAgressiveOpponents;
     else if (radioButton_opponentsTightAggressive->isChecked())
-        gameData.tableProfile = TIGHT_AGRESSIVE_OPPONENTS;
+        gameData.tableProfile = TightAgressiveOpponents;
     else
-        gameData.tableProfile = RANDOM_OPPONENTS;
+        gameData.tableProfile = RandomOpponents;
 
     gameData.guiSpeed = spinBox_guiSpeed->value();
 
@@ -58,7 +58,7 @@ void StartWindow::startNewGame()
     int tmpDealerPos = 0;
     startData.numberOfPlayers = gameData.maxNumberOfPlayers;
 
-    Randomizer::GetRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
+    Randomizer::getRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
     startData.startDealerPlayerId = static_cast<unsigned>(tmpDealerPos);
 
     myGameTableWindow->GameModification();

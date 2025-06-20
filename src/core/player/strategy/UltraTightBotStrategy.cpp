@@ -29,7 +29,7 @@ UltraTightBotStrategy::UltraTightBotStrategy() : IBotStrategy()
 
     // initialize utg starting range, in a full table
     int utgFullTableRange = 0;
-    Randomizer::GetRand(1, 2, 1, &utgFullTableRange);
+    Randomizer::getRand(1, 2, 1, &utgFullTableRange);
     initializeRanges(40, utgFullTableRange);
 }
 
@@ -79,7 +79,7 @@ bool UltraTightBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool dete
     {
 
         int rand = 0;
-        Randomizer::GetRand(1, 5, 1, &rand);
+        Randomizer::getRand(1, 5, 1, &rand);
         if (rand == 1)
         {
 
@@ -145,7 +145,7 @@ int UltraTightBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool dete
             {
 
                 int rand = 0;
-                Randomizer::GetRand(1, 5, 1, &rand);
+                Randomizer::getRand(1, 5, 1, &rand);
                 if (rand == 2)
                 {
                     speculativeHandedAdded = true;
@@ -178,7 +178,7 @@ int UltraTightBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool dete
     {
 
         int rand = 0;
-        Randomizer::GetRand(1, 8, 1, &rand);
+        Randomizer::getRand(1, 8, 1, &rand);
         if (rand == 1)
         {
             GlobalServices::instance().logger()->info("\t\twon't raise, to hide the hand strength");
@@ -204,7 +204,7 @@ int UltraTightBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool determini
         return false;
 
     // donk bets :
-    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() != ctx.myID)
+    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getId() != ctx.myID)
     {
         if (ctx.preflopLastRaiser->getPosition() > ctx.myPosition)
         {
@@ -212,7 +212,7 @@ int UltraTightBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool determini
             if (getDrawingProbability(ctx.myPostFlopState) > 25)
             {
                 int rand = 0;
-                Randomizer::GetRand(1, 2, 1, &rand);
+                Randomizer::getRand(1, 2, 1, &rand);
                 if (rand == 1)
                 {
                     return ctx.pot * 0.6;
@@ -231,7 +231,7 @@ int UltraTightBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool determini
             {
 
                 int rand = 0;
-                Randomizer::GetRand(1, 4, 1, &rand);
+                Randomizer::getRand(1, 4, 1, &rand);
                 if (rand == 1)
                 {
                     return ctx.pot * 0.6;
@@ -251,9 +251,9 @@ int UltraTightBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool determini
         }
 
         int rand = 0;
-        Randomizer::GetRand(1, 7, 1, &rand);
+        Randomizer::getRand(1, 7, 1, &rand);
         if (rand == 3 && !ctx.myHavePosition && ctx.preflopRaisesNumber > 0 &&
-            ctx.preflopLastRaiser->getID() != ctx.myID)
+            ctx.preflopLastRaiser->getId() != ctx.myID)
             return 0; // may check-raise or check-call
 
         // if no raise preflop, or if more than 1 opponent
@@ -267,7 +267,7 @@ int UltraTightBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool determini
         }
 
         // if i have raised preflop, bet
-        if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() == ctx.myID)
+        if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getId() == ctx.myID)
         {
             if (ctx.nbRunningPlayers < 4)
                 return ctx.pot * 0.6;
@@ -280,15 +280,15 @@ int UltraTightBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool determini
         ///////////  if bad flop for me
 
         // if there was a lot of action preflop, and i was not the last raiser : don't bet
-        if (ctx.preflopRaisesNumber > 1 && ctx.preflopLastRaiser->getID() != ctx.myID)
+        if (ctx.preflopRaisesNumber > 1 && ctx.preflopLastRaiser->getId() != ctx.myID)
             return 0;
 
         int rand = 0;
-        Randomizer::GetRand(1, 2, 1, &rand);
+        Randomizer::getRand(1, 2, 1, &rand);
         if (rand == 1)
         {
             // if I was the last raiser preflop, bet if i have a big enough stack
-            if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() == ctx.myID && ctx.nbRunningPlayers < 4 &&
+            if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getId() == ctx.myID && ctx.nbRunningPlayers < 4 &&
                 ctx.myCash > ctx.pot * 5 && ctx.myCanBluff)
             {
                 return ctx.pot * 0.6;
@@ -347,7 +347,7 @@ int UltraTightBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool determi
     {
 
         int rand = 0;
-        Randomizer::GetRand(1, 6, 1, &rand);
+        Randomizer::getRand(1, 6, 1, &rand);
         if (rand == 2)
         {
             return ctx.pot;
@@ -361,7 +361,7 @@ int UltraTightBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool determi
         {
 
             int rand = 0;
-            Randomizer::GetRand(1, 8, 1, &rand);
+            Randomizer::getRand(1, 8, 1, &rand);
             if (rand == 2 && ctx.myHandSimulation.winRanged > 0.3)
             {
                 return ctx.pot;
@@ -402,7 +402,7 @@ int UltraTightBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool determini
         getDrawingProbability(ctx.myPostFlopState) < 9 && ctx.myCash > pot * 4)
     {
         int rand = 0;
-        Randomizer::GetRand(1, 3, 1, &rand);
+        Randomizer::getRand(1, 3, 1, &rand);
         if (rand == 1)
         {
             return pot * 0.6;
@@ -423,7 +423,7 @@ int UltraTightBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool determini
     if (getDrawingProbability(ctx.myPostFlopState) > 20 && !ctx.myHavePosition)
     {
         int rand = 0;
-        Randomizer::GetRand(1, 5, 1, &rand);
+        Randomizer::getRand(1, 5, 1, &rand);
         if (rand == 1)
         {
             return pot * 0.6;
@@ -435,7 +435,7 @@ int UltraTightBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool determini
         if (ctx.myHavePosition && ctx.myCanBluff)
         {
             int rand = 0;
-            Randomizer::GetRand(1, 3, 1, &rand);
+            Randomizer::getRand(1, 3, 1, &rand);
             if (rand == 2)
             {
                 return pot * 0.6;
@@ -515,7 +515,7 @@ int UltraTightBotStrategy::turnShouldRaise(CurrentHandContext& ctx, bool determi
     if (ctx.myHandSimulation.winRanged > 0.98 && ctx.myHandSimulation.win > 0.98 && ctx.myHandSimulation.winSd > 0.9)
     {
         int rand = 0;
-        Randomizer::GetRand(1, 3, 1, &rand);
+        Randomizer::getRand(1, 3, 1, &rand);
         if (rand == 1)
             return 0; // very strong hand, slow play, just call
     }
@@ -553,7 +553,7 @@ int UltraTightBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool determin
         ctx.myHandSimulation.winSd > 0.4)
     {
         int rand = 0;
-        Randomizer::GetRand(1, 2, 1, &rand);
+        Randomizer::getRand(1, 2, 1, &rand);
         if (rand == 1)
         {
             return ctx.pot * 0.33;
@@ -569,7 +569,7 @@ int UltraTightBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool determin
         {
 
             int rand = 0;
-            Randomizer::GetRand(1, 4, 1, &rand);
+            Randomizer::getRand(1, 4, 1, &rand);
             if (rand == 1)
             {
                 return ctx.pot * 0.8;
@@ -581,13 +581,13 @@ int UltraTightBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool determin
         return false;
 
     int rand = 0;
-    Randomizer::GetRand(40, 80, 1, &rand);
+    Randomizer::getRand(40, 80, 1, &rand);
     float coeff = (float) rand / (float) 100;
 
     if (ctx.myHandSimulation.winSd > .94 || (ctx.myHavePosition && ctx.myHandSimulation.winSd > .9))
     {
         int rand = 0;
-        Randomizer::GetRand(1, 5, 1, &rand);
+        Randomizer::getRand(1, 5, 1, &rand);
         if (rand != 1 || ctx.myHavePosition)
         {
             return ctx.pot * coeff;
@@ -597,7 +597,7 @@ int UltraTightBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool determin
         (ctx.myHavePosition && ctx.myHandSimulation.winRanged > .75) && ctx.myHandSimulation.winSd > 0.5)
     {
         int rand = 0;
-        Randomizer::GetRand(1, 7, 1, &rand);
+        Randomizer::getRand(1, 7, 1, &rand);
         if (rand != 1 || ctx.myHavePosition)
         {
             return ctx.pot * coeff;
@@ -609,7 +609,7 @@ int UltraTightBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool determin
         ctx.myHandSimulation.winSd > 0.5 && ctx.turnBetsOrRaisesNumber == 0)
     {
         int rand = 0;
-        Randomizer::GetRand(1, 2, 1, &rand);
+        Randomizer::getRand(1, 2, 1, &rand);
         if (rand == 1 || ctx.myHavePosition)
         {
             return ctx.pot * coeff;

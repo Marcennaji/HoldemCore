@@ -17,53 +17,54 @@ namespace pkt::core
 {
 using namespace pkt::core::player;
 
-Board::Board(unsigned dp) : IBoard(), pot(0), sets(0), dealerPosition(dp), allInCondition(false), lastActionPlayerID(0)
+Board::Board(unsigned dp)
+    : IBoard(), myPot(0), mySets(0), myDealerPosition(dp), myAllInCondition(false), myLastActionPlayerId(0)
 {
     myCards[0] = myCards[1] = myCards[2] = myCards[3] = myCards[4] = 0;
 }
 
 Board::~Board()
 {
-    if (seatsList)
+    if (mySeatsList)
     {
-        seatsList->clear();
+        mySeatsList->clear();
     }
-    if (activePlayerList)
+    if (myActivePlayerList)
     {
-        activePlayerList->clear();
+        myActivePlayerList->clear();
     }
-    if (runningPlayerList)
+    if (myRunningPlayerList)
     {
-        runningPlayerList->clear();
+        myRunningPlayerList->clear();
     }
 }
 void Board::setPlayerLists(PlayerList sl, PlayerList apl, PlayerList rpl)
 {
-    seatsList = sl;
-    activePlayerList = apl;
-    runningPlayerList = rpl;
+    mySeatsList = sl;
+    myActivePlayerList = apl;
+    myRunningPlayerList = rpl;
 }
 
 void Board::collectSets()
 {
 
-    sets = 0;
+    mySets = 0;
 
     PlayerListConstIterator it_c;
-    for (it_c = seatsList->begin(); it_c != seatsList->end(); ++it_c)
+    for (it_c = mySeatsList->begin(); it_c != mySeatsList->end(); ++it_c)
     {
-        sets += (*it_c)->getSet();
+        mySets += (*it_c)->getSet();
     }
 }
 
 void Board::collectPot()
 {
 
-    pot += sets;
-    sets = 0;
+    myPot += mySets;
+    mySets = 0;
 
     PlayerListIterator it;
-    for (it = seatsList->begin(); it != seatsList->end(); ++it)
+    for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
         (*it)->setSetNull();
     }
@@ -72,7 +73,7 @@ void Board::collectPot()
 void Board::distributePot()
 {
 
-    winners.clear();
+    myWinners.clear();
 
     size_t i, j, k, l;
     PlayerListIterator it;
@@ -80,7 +81,7 @@ void Board::distributePot()
 
     // filling player sets vector
     std::vector<unsigned> playerSets;
-    for (it = seatsList->begin(); it != seatsList->end(); ++it)
+    for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
         if ((*it)->getActiveStatus())
         {
@@ -124,7 +125,7 @@ void Board::distributePot()
             potLevel.push_back((playerSetsSort.size() - i) * potLevel[0]);
 
             // determine level highestCardsValue
-            for (it_c = seatsList->begin(), j = 0; it_c != seatsList->end(); ++it_c, j++)
+            for (it_c = mySeatsList->begin(), j = 0; it_c != mySeatsList->end(); ++it_c, j++)
             {
                 if ((*it_c)->getActiveStatus() && (*it_c)->getCardsValueInt() > highestCardsValue &&
                     (*it_c)->getAction() != PlayerActionFold && playerSets[j] >= potLevel[0])
@@ -134,12 +135,12 @@ void Board::distributePot()
             }
 
             // level winners
-            for (it_c = seatsList->begin(), j = 0; it_c != seatsList->end(); ++it_c, j++)
+            for (it_c = mySeatsList->begin(), j = 0; it_c != mySeatsList->end(); ++it_c, j++)
             {
                 if ((*it_c)->getActiveStatus() && highestCardsValue == (*it_c)->getCardsValueInt() &&
                     (*it_c)->getAction() != PlayerActionFold && playerSets[j] >= potLevel[0])
                 {
-                    potLevel.push_back((*it_c)->getID());
+                    potLevel.push_back((*it_c)->getId());
                 }
             }
 
@@ -158,21 +159,21 @@ void Board::distributePot()
                 for (j = 2; j < potLevel.size(); j++)
                 {
                     // find seat with potLevel[j]-ID
-                    for (it = seatsList->begin(); it != seatsList->end(); ++it)
+                    for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
                     {
-                        if ((*it)->getID() == potLevel[j])
+                        if ((*it)->getId() == potLevel[j])
                         {
                             break;
                         }
                     }
-                    if (it == seatsList->end())
+                    if (it == mySeatsList->end())
                     {
-                        throw Exception(__FILE__, __LINE__, EngineError::SEAT_NOT_FOUND);
+                        throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
                     }
                     (*it)->setCash((*it)->getCash() + ((potLevel[1]) / winnerCount));
 
                     // filling winners vector
-                    winners.push_back((*it)->getID());
+                    myWinners.push_back((*it)->getId());
                     (*it)->setLastMoneyWon((*it)->getLastMoneyWon() + (potLevel[1]) / winnerCount);
                 }
             }
@@ -182,16 +183,16 @@ void Board::distributePot()
             {
 
                 // find Seat with dealerPosition
-                for (it = seatsList->begin(); it != seatsList->end(); ++it)
+                for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
                 {
-                    if ((*it)->getID() == dealerPosition)
+                    if ((*it)->getId() == myDealerPosition)
                     {
                         break;
                     }
                 }
-                if (it == seatsList->end())
+                if (it == mySeatsList->end())
                 {
-                    throw Exception(__FILE__, __LINE__, EngineError::SEAT_NOT_FOUND);
+                    throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
                 }
 
                 for (j = 0; j < winnerCount; j++)
@@ -203,12 +204,12 @@ void Board::distributePot()
                     {
 
                         ++it;
-                        if (it == seatsList->end())
-                            it = seatsList->begin();
+                        if (it == mySeatsList->end())
+                            it = mySeatsList->begin();
 
                         for (l = 2; l < potLevel.size(); l++)
                         {
-                            if ((*it)->getID() == potLevel[l])
+                            if ((*it)->getId() == potLevel[l])
                                 winnerHit = true;
                         }
                     }
@@ -217,14 +218,14 @@ void Board::distributePot()
                     {
                         (*it)->setCash((*it)->getCash() + (int) ((potLevel[1]) / winnerCount) + 1);
                         // filling winners vector
-                        winners.push_back((*it)->getID());
+                        myWinners.push_back((*it)->getId());
                         (*it)->setLastMoneyWon((*it)->getLastMoneyWon() + ((potLevel[1]) / winnerCount) + 1);
                     }
                     else
                     {
                         (*it)->setCash((*it)->getCash() + (int) ((potLevel[1]) / winnerCount));
                         // filling winners vector
-                        winners.push_back((*it)->getID());
+                        myWinners.push_back((*it)->getId());
                         (*it)->setLastMoneyWon((*it)->getLastMoneyWon() + (potLevel[1]) / winnerCount);
                     }
                 }
@@ -244,9 +245,9 @@ void Board::distributePot()
             sort(playerSetsSort.begin(), playerSetsSort.end());
 
             // pot refresh
-            pot -= potLevel[1];
+            myPot -= potLevel[1];
 
-            if (pot == 0)
+            if (myPot == 0)
                 break;
 
             // clear potLevel
@@ -255,21 +256,21 @@ void Board::distributePot()
     }
 
     // winners sort and unique
-    winners.sort();
-    winners.unique();
+    myWinners.sort();
+    myWinners.unique();
 
-    if (pot != 0)
+    if (myPot != 0)
     {
 
         std::list<unsigned>::iterator it_int;
 
-        for (it_int = winners.begin(); it_int != winners.end(); ++it_int)
+        for (it_int = myWinners.begin(); it_int != myWinners.end(); ++it_int)
         {
 
-            for (it = seatsList->begin(); it != seatsList->end(); ++it)
+            for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
             {
-                if ((*it)->getID() == (*it_int))
-                    (*it)->setCash((*it)->getCash() + (pot / winners.size()));
+                if ((*it)->getId() == (*it_int))
+                    (*it)->setCash((*it)->getCash() + (myPot / myWinners.size()));
             }
         }
     }
@@ -278,19 +279,19 @@ void Board::distributePot()
 void Board::determinePlayerNeedToShowCards()
 {
 
-    playerNeedToShowCards.clear();
+    myPlayerNeedToShowCards.clear();
 
     // in All In Condition everybody have to show the cards
-    if (allInCondition)
+    if (myAllInCondition)
     {
 
         PlayerListConstIterator it_c;
 
-        for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+        for (it_c = myActivePlayerList->begin(); it_c != myActivePlayerList->end(); ++it_c)
         {
             if ((*it_c)->getAction() != PlayerActionFold)
             {
-                playerNeedToShowCards.push_back((*it_c)->getID());
+                myPlayerNeedToShowCards.push_back((*it_c)->getId());
             }
         }
     }
@@ -306,18 +307,18 @@ void Board::determinePlayerNeedToShowCards()
         PlayerListConstIterator it_c;
 
         // search lastActionPlayer
-        for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+        for (it_c = myActivePlayerList->begin(); it_c != myActivePlayerList->end(); ++it_c)
         {
-            if ((*it_c)->getID() == lastActionPlayerID && (*it_c)->getAction() != PlayerActionFold)
+            if ((*it_c)->getId() == myLastActionPlayerId && (*it_c)->getAction() != PlayerActionFold)
             {
                 lastActionPlayerIt = it_c;
                 break;
             }
         }
 
-        if (it_c == activePlayerList->end())
+        if (it_c == myActivePlayerList->end())
         {
-            for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+            for (it_c = myActivePlayerList->begin(); it_c != myActivePlayerList->end(); ++it_c)
             {
                 if ((*it_c)->getAction() != PlayerActionFold)
                 {
@@ -328,7 +329,7 @@ void Board::determinePlayerNeedToShowCards()
         }
 
         // the player who has done the last action has to show his cards first
-        playerNeedToShowCards.push_back((*lastActionPlayerIt)->getID());
+        myPlayerNeedToShowCards.push_back((*lastActionPlayerIt)->getId());
 
         std::pair<int, int> level_tmp;
         // get position und cardsValue of the player who show his cards first
@@ -343,11 +344,11 @@ void Board::determinePlayerNeedToShowCards()
         it_c = lastActionPlayerIt;
         ++it_c;
 
-        for (unsigned i = 0; i < activePlayerList->size(); i++)
+        for (unsigned i = 0; i < myActivePlayerList->size(); i++)
         {
 
-            if (it_c == activePlayerList->end())
-                it_c = activePlayerList->begin();
+            if (it_c == myActivePlayerList->end())
+                it_c = myActivePlayerList->begin();
 
             if ((*it_c)->getAction() != PlayerActionFold)
             {
@@ -360,7 +361,7 @@ void Board::determinePlayerNeedToShowCards()
                         ++next_level_it;
                         if (next_level_it == level.end())
                         {
-                            playerNeedToShowCards.push_back((*it_c)->getID());
+                            myPlayerNeedToShowCards.push_back((*it_c)->getId());
                             level_tmp.first = (*it_c)->getCardsValueInt();
                             level_tmp.second = (*it_c)->getRoundStartCash() - (*it_c)->getCash();
                             level.push_back(level_tmp);
@@ -377,7 +378,7 @@ void Board::determinePlayerNeedToShowCards()
                             if (next_level_it == level.end() ||
                                 (*it_c)->getRoundStartCash() - (*it_c)->getCash() > (*next_level_it).second)
                             {
-                                playerNeedToShowCards.push_back((*it_c)->getID());
+                                myPlayerNeedToShowCards.push_back((*it_c)->getId());
                                 if ((*it_c)->getRoundStartCash() - (*it_c)->getCash() > (*level_it).second)
                                 {
                                     (*level_it).second = (*it_c)->getRoundStartCash() - (*it_c)->getCash();
@@ -389,7 +390,7 @@ void Board::determinePlayerNeedToShowCards()
                         {
                             if ((*it_c)->getRoundStartCash() - (*it_c)->getCash() > (*level_it).second)
                             {
-                                playerNeedToShowCards.push_back((*it_c)->getID());
+                                myPlayerNeedToShowCards.push_back((*it_c)->getId());
                                 level_tmp.first = (*it_c)->getCardsValueInt();
                                 level_tmp.second = (*it_c)->getRoundStartCash() - (*it_c)->getCash();
 
@@ -409,8 +410,8 @@ void Board::determinePlayerNeedToShowCards()
     }
 
     // sort and unique the list
-    playerNeedToShowCards.sort();
-    playerNeedToShowCards.unique();
+    myPlayerNeedToShowCards.sort();
+    myPlayerNeedToShowCards.unique();
 }
 void Board::setCards(int* theValue)
 {
@@ -427,45 +428,45 @@ void Board::getCards(int* theValue)
 
 void Board::setAllInCondition(bool theValue)
 {
-    allInCondition = theValue;
+    myAllInCondition = theValue;
 }
-void Board::setLastActionPlayerID(unsigned theValue)
+void Board::setLastActionPlayerId(unsigned theValue)
 {
-    lastActionPlayerID = theValue;
+    myLastActionPlayerId = theValue;
 }
 
 int Board::getPot() const
 {
-    return pot;
+    return myPot;
 }
 void Board::setPot(int theValue)
 {
-    pot = theValue;
+    myPot = theValue;
 }
 int Board::getSets() const
 {
-    return sets;
+    return mySets;
 }
 void Board::setSets(int theValue)
 {
-    sets = theValue;
+    mySets = theValue;
 }
 
 std::list<unsigned> Board::getWinners() const
 {
-    return winners;
+    return myWinners;
 }
 void Board::setWinners(const std::list<unsigned>& w)
 {
-    winners = w;
+    myWinners = w;
 }
 
 std::list<unsigned> Board::getPlayerNeedToShowCards() const
 {
-    return playerNeedToShowCards;
+    return myPlayerNeedToShowCards;
 }
 void Board::setPlayerNeedToShowCards(const std::list<unsigned>& p)
 {
-    playerNeedToShowCards = p;
+    myPlayerNeedToShowCards = p;
 }
 } // namespace pkt::core

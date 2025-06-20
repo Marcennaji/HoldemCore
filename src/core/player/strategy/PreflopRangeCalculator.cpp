@@ -438,7 +438,7 @@ float PreflopRangeCalculator::adjustRaiseForNoRaiser(const CurrentHandContext& c
         (myPosition == SB || myPosition == BUTTON || myPosition == CUTOFF) && canBluff)
     {
         int rand = 0;
-        Randomizer::GetRand(1, 3, 1, &rand);
+        Randomizer::getRand(1, 3, 1, &rand);
         if (!deterministic && rand == 2)
         {
             raisingRange = 100;

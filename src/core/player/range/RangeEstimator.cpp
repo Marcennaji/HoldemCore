@@ -170,7 +170,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext&
 
         std::string stringHand = s1 + " " + s2;
         PostFlopState r;
-        GetHandState((stringHand + ctx.stringBoard).c_str(), &r);
+        getHandState((stringHand + ctx.stringBoard).c_str(), &r);
 
         bool removeHand = false;
 
@@ -257,7 +257,7 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(CurrentHandContext&
 
         std::string stringHand = s1 + " " + s2;
         PostFlopState r;
-        GetHandState((stringHand + ctx.stringBoard).c_str(), &r);
+        getHandState((stringHand + ctx.stringBoard).c_str(), &r);
 
         bool removeHand = false;
         PlayerAction myAction = ctx.myCurrentHandActions.getTurnActions().back();
@@ -337,7 +337,7 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(CurrentHandContext
 
         std::string stringHand = s1 + " " + s2;
         PostFlopState r;
-        GetHandState((stringHand + ctx.stringBoard).c_str(), &r);
+        getHandState((stringHand + ctx.stringBoard).c_str(), &r);
 
         bool removeHand = false;
 

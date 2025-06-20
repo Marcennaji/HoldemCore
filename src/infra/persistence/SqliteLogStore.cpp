@@ -28,7 +28,7 @@ using namespace pkt::core;
 using namespace pkt::core::player;
 
 SqliteLogStore::SqliteLogStore(const std::string& logDir)
-    : mySqliteLogDb(0), mySqliteLogFileName(""), myLogDir(logDir), uniqueGameID(0), currentHandID(0), sql("")
+    : mySqliteLogDb(0), mySqliteLogFileName(""), myLogDir(logDir), myUniqueGameId(0), myCurrentHandId(0), mySql("")
 {
 }
 
@@ -84,53 +84,53 @@ void SqliteLogStore::createDatabase()
     createUnplausibleHandsTable();
 
     // create stats table
-    sql += "CREATE TABLE  IF NOT EXISTS PlayersStatistics (";
-    sql += "strategy_name VARCHAR NOT NULL";
-    sql += ", nb_players SMALLINT NOT NULL";
-    sql += ", pf_hands LARGEINT ";
+    mySql += "CREATE TABLE  IF NOT EXISTS PlayersStatistics (";
+    mySql += "strategy_name VARCHAR NOT NULL";
+    mySql += ", nb_players SMALLINT NOT NULL";
+    mySql += ", pf_hands LARGEINT ";
     // preflop stats :
-    sql += ", pf_folds LARGEINT ";
-    sql += ", pf_limps LARGEINT ";
-    sql += ", pf_checks LARGEINT ";
-    sql += ", pf_calls LARGEINT ";
-    sql += ", pf_raises LARGEINT ";
-    sql += ", pf_3Bets LARGEINT ";
-    sql += ", pf_call3Bets LARGEINT ";
-    sql += ", pf_call3BetsOpportunities LARGEINT ";
-    sql += ", pf_4Bets LARGEINT ";
+    mySql += ", pf_folds LARGEINT ";
+    mySql += ", pf_limps LARGEINT ";
+    mySql += ", pf_checks LARGEINT ";
+    mySql += ", pf_calls LARGEINT ";
+    mySql += ", pf_raises LARGEINT ";
+    mySql += ", pf_3Bets LARGEINT ";
+    mySql += ", pf_call3Bets LARGEINT ";
+    mySql += ", pf_call3BetsOpportunities LARGEINT ";
+    mySql += ", pf_4Bets LARGEINT ";
     // flop stats :
-    sql += ", f_hands LARGEINT ";
-    sql += ", f_folds LARGEINT ";
-    sql += ", f_checks LARGEINT ";
-    sql += ", f_bets LARGEINT ";
-    sql += ", f_calls LARGEINT ";
-    sql += ", f_raises LARGEINT ";
-    sql += ", f_3Bets LARGEINT ";
-    sql += ", f_4Bets LARGEINT ";
-    sql += ", f_continuationBets LARGEINT ";
-    sql += ", f_continuationBetsOpportunities LARGEINT ";
+    mySql += ", f_hands LARGEINT ";
+    mySql += ", f_folds LARGEINT ";
+    mySql += ", f_checks LARGEINT ";
+    mySql += ", f_bets LARGEINT ";
+    mySql += ", f_calls LARGEINT ";
+    mySql += ", f_raises LARGEINT ";
+    mySql += ", f_3Bets LARGEINT ";
+    mySql += ", f_4Bets LARGEINT ";
+    mySql += ", f_continuationBets LARGEINT ";
+    mySql += ", f_continuationBetsOpportunities LARGEINT ";
     // turn stats :
-    sql += ", t_hands LARGEINT ";
-    sql += ", t_folds LARGEINT ";
-    sql += ", t_checks LARGEINT ";
-    sql += ", t_calls LARGEINT ";
-    sql += ", t_bets LARGEINT ";
-    sql += ", t_raises LARGEINT ";
-    sql += ", t_3Bets LARGEINT ";
-    sql += ", t_4Bets LARGEINT ";
+    mySql += ", t_hands LARGEINT ";
+    mySql += ", t_folds LARGEINT ";
+    mySql += ", t_checks LARGEINT ";
+    mySql += ", t_calls LARGEINT ";
+    mySql += ", t_bets LARGEINT ";
+    mySql += ", t_raises LARGEINT ";
+    mySql += ", t_3Bets LARGEINT ";
+    mySql += ", t_4Bets LARGEINT ";
     // river stats :
-    sql += ", r_hands LARGEINT ";
-    sql += ", r_folds LARGEINT ";
-    sql += ", r_bets LARGEINT ";
-    sql += ", r_checks LARGEINT ";
-    sql += ", r_calls LARGEINT ";
-    sql += ", r_raises LARGEINT ";
-    sql += ", r_3Bets LARGEINT ";
-    sql += ", r_4Bets LARGEINT ";
+    mySql += ", r_hands LARGEINT ";
+    mySql += ", r_folds LARGEINT ";
+    mySql += ", r_bets LARGEINT ";
+    mySql += ", r_checks LARGEINT ";
+    mySql += ", r_calls LARGEINT ";
+    mySql += ", r_raises LARGEINT ";
+    mySql += ", r_3Bets LARGEINT ";
+    mySql += ", r_4Bets LARGEINT ";
 
-    sql += ", PRIMARY KEY(strategy_name, nb_players));";
+    mySql += ", PRIMARY KEY(strategy_name, nb_players));";
 
-    exec_transaction();
+    execTransaction();
 
     auto looseAggressiveStrategy = LooseAggressiveBotStrategy();
     auto tightAggressiveStrategy = TightAggressiveBotStrategy();
@@ -139,34 +139,34 @@ void SqliteLogStore::createDatabase()
 
     for (int j = 2; j <= MAX_NUMBER_OF_PLAYERS; j++)
     {
-        InitializeStrategyStatistics("You", j); // human player
+        initializeStrategyStatistics("You", j); // human player
         // initialize players statistics for all bot strategies
-        InitializeStrategyStatistics(tightAggressiveStrategy.getStrategyName(), j);
-        InitializeStrategyStatistics(looseAggressiveStrategy.getStrategyName(), j);
-        InitializeStrategyStatistics(maniacStrategy.getStrategyName(), j);
-        InitializeStrategyStatistics(ultraTightStrategy.getStrategyName(), j);
+        initializeStrategyStatistics(tightAggressiveStrategy.getStrategyName(), j);
+        initializeStrategyStatistics(looseAggressiveStrategy.getStrategyName(), j);
+        initializeStrategyStatistics(maniacStrategy.getStrategyName(), j);
+        initializeStrategyStatistics(ultraTightStrategy.getStrategyName(), j);
     }
 }
 
-void SqliteLogStore::InitializeStrategyStatistics(const string playerName, const int nbPlayers)
+void SqliteLogStore::initializeStrategyStatistics(const string playerName, const int nbPlayers)
 {
 
-    sql += "INSERT OR REPLACE INTO PlayersStatistics (";
-    sql += "strategy_name,nb_players";
-    sql += ",pf_hands,pf_checks,pf_calls,pf_raises,pf_3Bets,pf_call3Bets,pf_call3BetsOpportunities,pf_4Bets,pf_folds,"
-           "pf_limps";
-    sql += ",f_hands,f_checks,f_bets,f_calls,f_raises,f_3Bets,f_4Bets,f_folds,f_continuationBets,f_"
-           "continuationBetsOpportunities";
-    sql += ",t_hands,t_checks,t_bets,t_calls,t_raises,t_3Bets,t_4Bets,t_folds";
-    sql += ",r_hands,r_checks,r_bets,r_calls,r_raises,r_3Bets,r_4Bets,r_folds";
-    sql += ") VALUES (";
-    sql += "'";
-    sql += playerName;
-    sql += "',";
-    sql += std::to_string(nbPlayers);
-    sql += ",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);";
+    mySql += "INSERT OR REPLACE INTO PlayersStatistics (";
+    mySql += "strategy_name,nb_players";
+    mySql += ",pf_hands,pf_checks,pf_calls,pf_raises,pf_3Bets,pf_call3Bets,pf_call3BetsOpportunities,pf_4Bets,pf_folds,"
+             "pf_limps";
+    mySql += ",f_hands,f_checks,f_bets,f_calls,f_raises,f_3Bets,f_4Bets,f_folds,f_continuationBets,f_"
+             "continuationBetsOpportunities";
+    mySql += ",t_hands,t_checks,t_bets,t_calls,t_raises,t_3Bets,t_4Bets,t_folds";
+    mySql += ",r_hands,r_checks,r_bets,r_calls,r_raises,r_3Bets,r_4Bets,r_folds";
+    mySql += ") VALUES (";
+    mySql += "'";
+    mySql += playerName;
+    mySql += "',";
+    mySql += std::to_string(nbPlayers);
+    mySql += ",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);";
 
-    exec_transaction();
+    execTransaction();
 }
 
 void SqliteLogStore::updateRankingGameLosers(PlayerList activePlayerList)
@@ -179,14 +179,14 @@ void SqliteLogStore::updateRankingGameLosers(PlayerList activePlayerList)
     {
         if ((*it_c)->getCash() == 0)
         {
-            sql += "INSERT OR IGNORE INTO Ranking VALUES ('" + (*it_c)->getStrategyName() + "', 0, 0, 0);";
+            mySql += "INSERT OR IGNORE INTO Ranking VALUES ('" + (*it_c)->getStrategyName() + "', 0, 0, 0);";
             const int lostStack = getIntegerValue((*it_c)->getStrategyName(), "Ranking", "lost_stack") + 1;
-            sql += "UPDATE Ranking SET lost_stack = " + std::to_string(lostStack);
-            sql += " WHERE strategy_name = '" + (*it_c)->getStrategyName() + "';";
+            mySql += "UPDATE Ranking SET lost_stack = " + std::to_string(lostStack);
+            mySql += " WHERE strategy_name = '" + (*it_c)->getStrategyName() + "';";
         }
     }
 
-    exec_transaction();
+    execTransaction();
 }
 void SqliteLogStore::updateRankingGameWinner(PlayerList activePlayerList)
 {
@@ -205,15 +205,15 @@ void SqliteLogStore::updateRankingGameWinner(PlayerList activePlayerList)
         {
             if ((*it_c)->getCash() > 0)
             {
-                sql += "INSERT OR IGNORE INTO Ranking VALUES ('" + (*it_c)->getStrategyName() + "', 0, 0, 0);";
+                mySql += "INSERT OR IGNORE INTO Ranking VALUES ('" + (*it_c)->getStrategyName() + "', 0, 0, 0);";
                 const int wonGame = getIntegerValue((*it_c)->getStrategyName(), "Ranking", "won_game") + 1;
-                sql += "UPDATE Ranking SET won_game = " + std::to_string(wonGame);
-                sql += " WHERE strategy_name = '" + (*it_c)->getStrategyName() + "';";
+                mySql += "UPDATE Ranking SET won_game = " + std::to_string(wonGame);
+                mySql += " WHERE strategy_name = '" + (*it_c)->getStrategyName() + "';";
             }
         }
     }
 
-    exec_transaction();
+    execTransaction();
 }
 void SqliteLogStore::updateRankingPlayedGames(PlayerList activePlayerList)
 {
@@ -223,13 +223,13 @@ void SqliteLogStore::updateRankingPlayedGames(PlayerList activePlayerList)
     PlayerListConstIterator it_c;
     for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
     {
-        sql += "INSERT OR IGNORE INTO Ranking VALUES ('" + (*it_c)->getStrategyName() + "', 0, 0, 0);";
+        mySql += "INSERT OR IGNORE INTO Ranking VALUES ('" + (*it_c)->getStrategyName() + "', 0, 0, 0);";
         const int playedGames = getIntegerValue((*it_c)->getStrategyName(), "Ranking", "played_games") + 1;
-        sql += "UPDATE Ranking SET played_games = " + std::to_string(playedGames);
-        sql += " WHERE strategy_name = '" + (*it_c)->getStrategyName() + "';";
+        mySql += "UPDATE Ranking SET played_games = " + std::to_string(playedGames);
+        mySql += " WHERE strategy_name = '" + (*it_c)->getStrategyName() + "';";
     }
 
-    exec_transaction();
+    execTransaction();
 }
 int SqliteLogStore::getIntegerValue(const std::string playerName, const std::string tableName,
                                     const std::string attributeName)
@@ -276,13 +276,13 @@ void SqliteLogStore::createRankingTable()
 {
 
     // create table if doesn't exist
-    sql = "CREATE TABLE IF NOT EXISTS Ranking (";
-    sql += "strategy_name VARCHAR NOT NULL";
-    sql += ",lost_stack LARGEINT";
-    sql += ",won_game LARGEINT";
-    sql += ",played_games LARGEINT";
-    sql += ", PRIMARY KEY(strategy_name));";
-    exec_transaction();
+    mySql = "CREATE TABLE IF NOT EXISTS Ranking (";
+    mySql += "strategy_name VARCHAR NOT NULL";
+    mySql += ",lost_stack LARGEINT";
+    mySql += ",won_game LARGEINT";
+    mySql += ",played_games LARGEINT";
+    mySql += ", PRIMARY KEY(strategy_name));";
+    execTransaction();
 }
 void SqliteLogStore::updateUnplausibleHand(const std::string card1, const std::string card2, const bool human,
                                            const char bettingRound, const int nbPlayers)
@@ -311,8 +311,8 @@ void SqliteLogStore::updateUnplausibleHand(const std::string card1, const std::s
     }
 
     int losers = 0;
-    sql += "INSERT OR IGNORE INTO UnplausibleHands VALUES ('" + hand.str() + "','" + bettingRound + "'," +
-           std::to_string(nbPlayers) + (human ? ", 1" : ", 0") + ", 0);";
+    mySql += "INSERT OR IGNORE INTO UnplausibleHands VALUES ('" + hand.str() + "','" + bettingRound + "'," +
+             std::to_string(nbPlayers) + (human ? ", 1" : ", 0") + ", 0);";
 
     // get previous count value
     int previousCount = 0;
@@ -344,34 +344,34 @@ void SqliteLogStore::updateUnplausibleHand(const std::string card1, const std::s
         sqlite3_free_table(result);
     }
 
-    sql += "UPDATE UnplausibleHands SET hands_count = " + std::to_string(++previousCount);
-    sql += " WHERE hand = '" + hand.str() + "'";
-    sql += " AND betting_round = '" + std::to_string(bettingRound) + "'";
-    sql += " AND nb_players = " + std::to_string(nbPlayers);
-    sql += " AND human_player = " + std::to_string(human) + ";";
+    mySql += "UPDATE UnplausibleHands SET hands_count = " + std::to_string(++previousCount);
+    mySql += " WHERE hand = '" + hand.str() + "'";
+    mySql += " AND betting_round = '" + std::to_string(bettingRound) + "'";
+    mySql += " AND nb_players = " + std::to_string(nbPlayers);
+    mySql += " AND human_player = " + std::to_string(human) + ";";
 
-    exec_transaction();
+    execTransaction();
 }
 void SqliteLogStore::createUnplausibleHandsTable()
 {
 
     // create table if doesn't exist
-    sql = "CREATE TABLE IF NOT EXISTS UnplausibleHands (";
-    sql += "hand CHAR(3) NOT NULL";
-    sql += ",betting_round CHAR";
-    sql += ",nb_players INT";
-    sql += ",human_player CHAR";
-    sql += ",hands_count LARGEINT DEFAULT 0";
-    sql += ", PRIMARY KEY(hand, betting_round, nb_players, human_player));";
-    exec_transaction();
+    mySql = "CREATE TABLE IF NOT EXISTS UnplausibleHands (";
+    mySql += "hand CHAR(3) NOT NULL";
+    mySql += ",betting_round CHAR";
+    mySql += ",nb_players INT";
+    mySql += ",human_player CHAR";
+    mySql += ",hands_count LARGEINT DEFAULT 0";
+    mySql += ", PRIMARY KEY(hand, betting_round, nb_players, human_player));";
+    execTransaction();
 }
 
-void SqliteLogStore::exec_transaction()
+void SqliteLogStore::execTransaction()
 {
     char* errmsg = NULL;
 
-    string sql_transaction = "BEGIN;" + sql + "COMMIT;";
-    sql = "";
+    string sql_transaction = "BEGIN;" + mySql + "COMMIT;";
+    mySql = "";
     // cout << endl << "SQL : " << sql_transaction << endl << endl;
     if (sqlite3_exec(mySqliteLogDb, sql_transaction.c_str(), 0, 0, &errmsg) != SQLITE_OK)
     {
@@ -396,55 +396,55 @@ void SqliteLogStore::updatePlayersStatistics(PlayerList activePlayerList)
             return;
         }
 
-        sql = "UPDATE PlayersStatistics SET ";
+        mySql = "UPDATE PlayersStatistics SET ";
 
-        sql += "pf_hands = " + std::to_string((*it_c)->getStatistics(i).getPreflopStatistics().m_hands);
-        sql += ",pf_checks = " + std::to_string((*it_c)->getStatistics(i).getPreflopStatistics().m_checks);
-        sql += ",pf_calls = " + std::to_string((*it_c)->getStatistics(i).getPreflopStatistics().m_calls);
-        sql += ",pf_raises = " + std::to_string((*it_c)->getStatistics(i).getPreflopStatistics().m_raises);
-        sql += ",pf_3Bets = " + std::to_string((*it_c)->getStatistics(i).getPreflopStatistics().m_3Bets);
-        sql += ",pf_call3Bets = " + std::to_string((*it_c)->getStatistics(i).getPreflopStatistics().m_call3Bets);
-        sql += ",pf_call3BetsOpportunities = " +
-               std::to_string((*it_c)->getStatistics(i).getPreflopStatistics().m_call3BetsOpportunities);
-        sql += ",pf_4Bets = " + std::to_string((*it_c)->getStatistics(i).getPreflopStatistics().m_4Bets);
-        sql += ",pf_folds = " + std::to_string((*it_c)->getStatistics(i).getPreflopStatistics().m_folds);
-        sql += ",pf_limps = " + std::to_string((*it_c)->getStatistics(i).getPreflopStatistics().m_limps);
+        mySql += "pf_hands = " + std::to_string((*it_c)->getStatistics(i).getPreflopStatistics().m_hands);
+        mySql += ",pf_checks = " + std::to_string((*it_c)->getStatistics(i).getPreflopStatistics().m_checks);
+        mySql += ",pf_calls = " + std::to_string((*it_c)->getStatistics(i).getPreflopStatistics().m_calls);
+        mySql += ",pf_raises = " + std::to_string((*it_c)->getStatistics(i).getPreflopStatistics().m_raises);
+        mySql += ",pf_3Bets = " + std::to_string((*it_c)->getStatistics(i).getPreflopStatistics().m_3Bets);
+        mySql += ",pf_call3Bets = " + std::to_string((*it_c)->getStatistics(i).getPreflopStatistics().m_call3Bets);
+        mySql += ",pf_call3BetsOpportunities = " +
+                 std::to_string((*it_c)->getStatistics(i).getPreflopStatistics().m_call3BetsOpportunities);
+        mySql += ",pf_4Bets = " + std::to_string((*it_c)->getStatistics(i).getPreflopStatistics().m_4Bets);
+        mySql += ",pf_folds = " + std::to_string((*it_c)->getStatistics(i).getPreflopStatistics().m_folds);
+        mySql += ",pf_limps = " + std::to_string((*it_c)->getStatistics(i).getPreflopStatistics().m_limps);
 
-        sql += ",f_hands = " + std::to_string((*it_c)->getStatistics(i).getFlopStatistics().m_hands);
-        sql += ",f_bets = " + std::to_string((*it_c)->getStatistics(i).getFlopStatistics().m_bets);
-        sql += ",f_checks = " + std::to_string((*it_c)->getStatistics(i).getFlopStatistics().m_checks);
-        sql += ",f_calls = " + std::to_string((*it_c)->getStatistics(i).getFlopStatistics().m_calls);
-        sql += ",f_raises = " + std::to_string((*it_c)->getStatistics(i).getFlopStatistics().m_raises);
-        sql += ",f_3Bets = " + std::to_string((*it_c)->getStatistics(i).getFlopStatistics().m_3Bets);
-        sql += ",f_4Bets = " + std::to_string((*it_c)->getStatistics(i).getFlopStatistics().m_4Bets);
-        sql += ",f_folds = " + std::to_string((*it_c)->getStatistics(i).getFlopStatistics().m_folds);
-        sql +=
+        mySql += ",f_hands = " + std::to_string((*it_c)->getStatistics(i).getFlopStatistics().m_hands);
+        mySql += ",f_bets = " + std::to_string((*it_c)->getStatistics(i).getFlopStatistics().m_bets);
+        mySql += ",f_checks = " + std::to_string((*it_c)->getStatistics(i).getFlopStatistics().m_checks);
+        mySql += ",f_calls = " + std::to_string((*it_c)->getStatistics(i).getFlopStatistics().m_calls);
+        mySql += ",f_raises = " + std::to_string((*it_c)->getStatistics(i).getFlopStatistics().m_raises);
+        mySql += ",f_3Bets = " + std::to_string((*it_c)->getStatistics(i).getFlopStatistics().m_3Bets);
+        mySql += ",f_4Bets = " + std::to_string((*it_c)->getStatistics(i).getFlopStatistics().m_4Bets);
+        mySql += ",f_folds = " + std::to_string((*it_c)->getStatistics(i).getFlopStatistics().m_folds);
+        mySql +=
             ",f_continuationBets = " + std::to_string((*it_c)->getStatistics(i).getFlopStatistics().m_continuationBets);
-        sql += ",f_continuationBetsOpportunities = " +
-               std::to_string((*it_c)->getStatistics(i).getFlopStatistics().m_continuationBetsOpportunities);
+        mySql += ",f_continuationBetsOpportunities = " +
+                 std::to_string((*it_c)->getStatistics(i).getFlopStatistics().m_continuationBetsOpportunities);
 
-        sql += ",t_hands = " + std::to_string((*it_c)->getStatistics(i).getTurnStatistics().m_hands);
-        sql += ",t_checks = " + std::to_string((*it_c)->getStatistics(i).getTurnStatistics().m_checks);
-        sql += ",t_bets = " + std::to_string((*it_c)->getStatistics(i).getTurnStatistics().m_bets);
-        sql += ",t_calls = " + std::to_string((*it_c)->getStatistics(i).getTurnStatistics().m_calls);
-        sql += ",t_raises = " + std::to_string((*it_c)->getStatistics(i).getTurnStatistics().m_raises);
-        sql += ",t_3Bets = " + std::to_string((*it_c)->getStatistics(i).getTurnStatistics().m_3Bets);
-        sql += ",t_4Bets = " + std::to_string((*it_c)->getStatistics(i).getTurnStatistics().m_4Bets);
-        sql += ",t_folds = " + std::to_string((*it_c)->getStatistics(i).getTurnStatistics().m_folds);
+        mySql += ",t_hands = " + std::to_string((*it_c)->getStatistics(i).getTurnStatistics().m_hands);
+        mySql += ",t_checks = " + std::to_string((*it_c)->getStatistics(i).getTurnStatistics().m_checks);
+        mySql += ",t_bets = " + std::to_string((*it_c)->getStatistics(i).getTurnStatistics().m_bets);
+        mySql += ",t_calls = " + std::to_string((*it_c)->getStatistics(i).getTurnStatistics().m_calls);
+        mySql += ",t_raises = " + std::to_string((*it_c)->getStatistics(i).getTurnStatistics().m_raises);
+        mySql += ",t_3Bets = " + std::to_string((*it_c)->getStatistics(i).getTurnStatistics().m_3Bets);
+        mySql += ",t_4Bets = " + std::to_string((*it_c)->getStatistics(i).getTurnStatistics().m_4Bets);
+        mySql += ",t_folds = " + std::to_string((*it_c)->getStatistics(i).getTurnStatistics().m_folds);
 
-        sql += ",r_hands = " + std::to_string((*it_c)->getStatistics(i).getRiverStatistics().m_hands);
-        sql += ",r_checks = " + std::to_string((*it_c)->getStatistics(i).getRiverStatistics().m_checks);
-        sql += ",r_bets = " + std::to_string((*it_c)->getStatistics(i).getRiverStatistics().m_bets);
-        sql += ",r_calls = " + std::to_string((*it_c)->getStatistics(i).getRiverStatistics().m_calls);
-        sql += ",r_raises = " + std::to_string((*it_c)->getStatistics(i).getRiverStatistics().m_raises);
-        sql += ",r_3Bets = " + std::to_string((*it_c)->getStatistics(i).getRiverStatistics().m_3Bets);
-        sql += ",r_4Bets = " + std::to_string((*it_c)->getStatistics(i).getRiverStatistics().m_4Bets);
-        sql += ",r_folds = " + std::to_string((*it_c)->getStatistics(i).getRiverStatistics().m_folds);
+        mySql += ",r_hands = " + std::to_string((*it_c)->getStatistics(i).getRiverStatistics().m_hands);
+        mySql += ",r_checks = " + std::to_string((*it_c)->getStatistics(i).getRiverStatistics().m_checks);
+        mySql += ",r_bets = " + std::to_string((*it_c)->getStatistics(i).getRiverStatistics().m_bets);
+        mySql += ",r_calls = " + std::to_string((*it_c)->getStatistics(i).getRiverStatistics().m_calls);
+        mySql += ",r_raises = " + std::to_string((*it_c)->getStatistics(i).getRiverStatistics().m_raises);
+        mySql += ",r_3Bets = " + std::to_string((*it_c)->getStatistics(i).getRiverStatistics().m_3Bets);
+        mySql += ",r_4Bets = " + std::to_string((*it_c)->getStatistics(i).getRiverStatistics().m_4Bets);
+        mySql += ",r_folds = " + std::to_string((*it_c)->getStatistics(i).getRiverStatistics().m_folds);
 
-        sql +=
+        mySql +=
             " WHERE strategy_name = '" + (*it_c)->getStrategyName() + "' AND nb_players = " + std::to_string(i) + ";";
 
-        exec_transaction();
+        execTransaction();
     }
 }
 

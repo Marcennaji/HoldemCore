@@ -50,7 +50,7 @@ string PreflopRangeEstimator::computeEstimatedPreflopRange(CurrentHandContext& c
     else
     {
         // if the player is the last raiser :
-        if (ctx.preflopLastRaiser && myPlayerId == ctx.preflopLastRaiser->getID())
+        if (ctx.preflopLastRaiser && myPlayerId == ctx.preflopLastRaiser->getId())
             estimatedRange = computeEstimatedPreflopRangeFromLastRaiser(ctx);
         else
             // if the player is the last caller :
@@ -274,10 +274,10 @@ float PreflopRangeEstimator::adjustRangeForPreflopRaises(const CurrentHandContex
 float PreflopRangeEstimator::handleLooseAggressiveOpponents(const CurrentHandContext& ctx, int opponentRaises,
                                                             const float currentRange) const
 {
-    const int lastRaiserID = myHand->getPreflopLastRaiserID();
+    const int lastRaiserId = myHand->getPreflopLastRaiserId();
     float range = currentRange;
 
-    if (opponentRaises > 0 && lastRaiserID != -1 && myHand->getPreflopRaisesNumber() == 1)
+    if (opponentRaises > 0 && lastRaiserId != -1 && myHand->getPreflopRaisesNumber() == 1)
     {
         if (ctx.preflopLastRaiser->isInVeryLooseMode(ctx.nbPlayers))
         {

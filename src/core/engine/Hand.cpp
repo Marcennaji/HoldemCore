@@ -25,18 +25,19 @@ using namespace pkt::core::player;
 Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
            pkt::core::player::PlayerList seats, PlayerList activePlayers, PlayerList runningPlayers, int handId,
            GameData gameData, StartData startData)
-    : myEvents(events), myFactory(factory), myBoard(board), seatsList(seats), activePlayerList(activePlayers),
-      runningPlayerList(runningPlayers), startQuantityPlayers(startData.numberOfPlayers),
-      dealerPosition(startData.startDealerPlayerId), smallBlindPosition(startData.startDealerPlayerId),
-      bigBlindPosition(startData.startDealerPlayerId), currentRound(GameStatePreflop),
-      roundBeforePostRiver(GameStatePreflop), smallBlind(gameData.firstSmallBlind), startCash(gameData.startMoney),
-      previousPlayerID(-1), lastActionPlayerID(0), allInCondition(false), cardsShown(false)
+    : myEvents(events), myFactory(factory), myBoard(board), mySeatsList(seats), myActivePlayerList(activePlayers),
+      myRunningPlayerList(runningPlayers), myStartQuantityPlayers(startData.numberOfPlayers),
+      myDealerPosition(startData.startDealerPlayerId), mySmallBlindPosition(startData.startDealerPlayerId),
+      myBigBlindPosition(startData.startDealerPlayerId), myCurrentRound(GameStatePreflop),
+      myRoundBeforePostRiver(GameStatePreflop), mySmallBlind(gameData.firstSmallBlind),
+      myStartCash(gameData.startMoney), myPreviousPlayerId(-1), myLastActionPlayerId(0), myAllInCondition(false),
+      myCardsShown(false)
 {
 
     GlobalServices::instance().logger()->info("\n-------------------------------------------------------------\n");
     GlobalServices::instance().logger()->info("\nHAND " + std::to_string(myID) + "\n");
 
-    for (auto it = seatsList->begin(); it != seatsList->end(); ++it)
+    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
         (*it)->setHand(this);
         (*it)->setCardsFlip(0);
@@ -47,14 +48,14 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
                                                // so that the players can use it to evaluate their hands
     dealHoleCards(cardsArrayIndex);
 
-    preflopLastRaiserID = -1;
+    myPreflopLastRaiserId = -1;
 
     // determine dealer, SB, BB
     assignButtons();
 
     setBlinds();
 
-    myBettingRound = myFactory->createBettingRound(this, dealerPosition, smallBlind);
+    myBettingRound = myFactory->createBettingRound(this, myDealerPosition, mySmallBlind);
 }
 
 Hand::~Hand()
@@ -63,13 +64,13 @@ Hand::~Hand()
 
 void Hand::initAndShuffleDeck()
 {
-    cardsArray = {0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17,
-                  18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
-                  36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51};
+    myCardsArray = {0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17,
+                    18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+                    36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51};
 
     std::random_device rd;  // Non-deterministic random number generator
     std::mt19937 rng(rd()); // Seed the Mersenne Twister random number generator
-    std::shuffle(cardsArray.begin(), cardsArray.end(), rng);
+    std::shuffle(myCardsArray.begin(), myCardsArray.end(), rng);
 }
 
 void Hand::dealHoleCards(size_t cardsArrayIndex)
@@ -82,15 +83,15 @@ void Hand::dealHoleCards(size_t cardsArrayIndex)
     // NB. cardsArray has already 5 board cards
     for (i = 0; i < 5; i++)
     {
-        tempPlayerAndBoardArray[i] = cardsArray[i];
+        tempPlayerAndBoardArray[i] = myCardsArray[i];
     }
 
-    for (auto it = activePlayerList->begin(); it != activePlayerList->end(); ++it, k++)
+    for (auto it = myActivePlayerList->begin(); it != myActivePlayerList->end(); ++it, k++)
     {
         for (j = 0; j < 2; j++)
         {
-            tempPlayerArray[j] = cardsArray[2 * k + j + 5];
-            tempPlayerAndBoardArray[j] = cardsArray[2 * k + j + 5];
+            tempPlayerArray[j] = myCardsArray[2 * k + j + 5];
+            tempPlayerAndBoardArray[j] = myCardsArray[2 * k + j + 5];
         }
 
         (*it)->setCards(tempPlayerArray);
@@ -108,7 +109,7 @@ size_t Hand::dealBoardCards()
 
     for (size_t i = 0; i < 5; ++i) // The board consists of 5 cards (Flop, Turn, River)
     {
-        tempBoardArray[i] = cardsArray[cardsArrayIndex++];
+        tempBoardArray[i] = myCardsArray[cardsArrayIndex++];
     }
 
     myBoard->setCards(tempBoardArray);
@@ -137,72 +138,72 @@ void Hand::assignButtons()
     PlayerListConstIterator it_c;
 
     // delete all buttons
-    for (it = seatsList->begin(); it != seatsList->end(); ++it)
+    for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
         (*it)->setButton(ButtonNone);
     }
 
     // assign dealer button
-    it = getSeatIt(dealerPosition);
-    if (it == seatsList->end())
+    it = getSeatIt(myDealerPosition);
+    if (it == mySeatsList->end())
     {
-        throw Exception(__FILE__, __LINE__, EngineError::SEAT_NOT_FOUND);
+        throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
     }
     (*it)->setButton(ButtonDealer);
 
     // assign Small Blind next to dealer. ATTENTION: in heads up it is big blind
     // assign big blind next to small blind. ATTENTION: in heads up it is small blind
     bool nextActivePlayerFound = false;
-    PlayerListIterator dealerPositionIt = getSeatIt(dealerPosition);
-    if (dealerPositionIt == seatsList->end())
+    PlayerListIterator dealerPositionIt = getSeatIt(myDealerPosition);
+    if (dealerPositionIt == mySeatsList->end())
     {
-        throw Exception(__FILE__, __LINE__, EngineError::SEAT_NOT_FOUND);
+        throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
     }
 
-    for (i = 0; i < seatsList->size(); i++)
+    for (i = 0; i < mySeatsList->size(); i++)
     {
 
         ++dealerPositionIt;
-        if (dealerPositionIt == seatsList->end())
-            dealerPositionIt = seatsList->begin();
+        if (dealerPositionIt == mySeatsList->end())
+            dealerPositionIt = mySeatsList->begin();
 
-        it = getActivePlayerIt((*dealerPositionIt)->getID());
-        if (it != activePlayerList->end())
+        it = getActivePlayerIt((*dealerPositionIt)->getId());
+        if (it != myActivePlayerList->end())
         {
             nextActivePlayerFound = true;
-            if (activePlayerList->size() > 2)
+            if (myActivePlayerList->size() > 2)
             {
                 // small blind normal
                 (*it)->setButton(2);
-                smallBlindPosition = (*it)->getID();
+                mySmallBlindPosition = (*it)->getId();
             }
             else
             {
                 // big blind in heads up
                 (*it)->setButton(3);
-                bigBlindPosition = (*it)->getID();
+                myBigBlindPosition = (*it)->getId();
                 // lastPlayerAction for showing cards
             }
 
             // first player after dealer have to show his cards first (in showdown)
-            lastActionPlayerID = (*it)->getID();
-            myBoard->setLastActionPlayerID(lastActionPlayerID);
+            myLastActionPlayerId = (*it)->getId();
+            myBoard->setLastActionPlayerId(myLastActionPlayerId);
 
             ++it;
-            if (it == activePlayerList->end())
-                it = activePlayerList->begin();
+            if (it == myActivePlayerList->end())
+                it = myActivePlayerList->begin();
 
-            if (activePlayerList->size() > 2)
+            if (myActivePlayerList->size() > 2)
             {
                 // big blind normal
                 (*it)->setButton(3);
-                bigBlindPosition = (*it)->getID();
+                myBigBlindPosition = (*it)->getId();
             }
             else
             {
                 // small blind in heads up
                 (*it)->setButton(2);
-                smallBlindPosition = (*it)->getID();
+                mySmallBlindPosition = (*it)->getId();
             }
 
             break;
@@ -210,7 +211,7 @@ void Hand::assignButtons()
     }
     if (!nextActivePlayerFound)
     {
-        throw Exception(__FILE__, __LINE__, EngineError::NEXT_ACTIVE_PLAYER_NOT_FOUND);
+        throw Exception(__FILE__, __LINE__, EngineError::NextActivePlayerNotFound);
     }
 }
 
@@ -220,7 +221,7 @@ void Hand::setBlinds()
     PlayerListConstIterator it_c;
 
     // do sets --> TODO switch?
-    for (it_c = runningPlayerList->begin(); it_c != runningPlayerList->end(); ++it_c)
+    for (it_c = myRunningPlayerList->begin(); it_c != myRunningPlayerList->end(); ++it_c)
     {
 
         // small blind
@@ -228,7 +229,7 @@ void Hand::setBlinds()
         {
 
             // All in ?
-            if ((*it_c)->getCash() <= smallBlind)
+            if ((*it_c)->getCash() <= mySmallBlind)
             {
 
                 (*it_c)->setSet((*it_c)->getCash());
@@ -237,13 +238,13 @@ void Hand::setBlinds()
             }
             else
             {
-                (*it_c)->setSet(smallBlind);
+                (*it_c)->setSet(mySmallBlind);
             }
         }
     }
 
     // do sets --> TODO switch?
-    for (it_c = runningPlayerList->begin(); it_c != runningPlayerList->end(); ++it_c)
+    for (it_c = myRunningPlayerList->begin(); it_c != myRunningPlayerList->end(); ++it_c)
     {
 
         // big blind
@@ -251,7 +252,7 @@ void Hand::setBlinds()
         {
 
             // all in ?
-            if ((*it_c)->getCash() <= 2 * smallBlind)
+            if ((*it_c)->getCash() <= 2 * mySmallBlind)
             {
 
                 (*it_c)->setSet((*it_c)->getCash());
@@ -260,7 +261,7 @@ void Hand::setBlinds()
             }
             else
             {
-                (*it_c)->setSet(2 * smallBlind);
+                (*it_c)->setSet(2 * mySmallBlind);
             }
         }
     }
@@ -273,20 +274,20 @@ void Hand::switchRounds()
     PlayerListConstIterator it_c;
 
     // refresh runningPlayerList
-    for (it = runningPlayerList->begin(); it != runningPlayerList->end();)
+    for (it = myRunningPlayerList->begin(); it != myRunningPlayerList->end();)
     {
         if ((*it)->getAction() == PlayerActionFold || (*it)->getAction() == PlayerActionAllin)
         {
 
-            it = runningPlayerList->erase(it);
-            if (!(runningPlayerList->empty()))
+            it = myRunningPlayerList->erase(it);
+            if (!(myRunningPlayerList->empty()))
             {
 
                 it_1 = it;
-                if (it_1 == runningPlayerList->begin())
-                    it_1 = runningPlayerList->end();
+                if (it_1 == myRunningPlayerList->begin())
+                    it_1 = myRunningPlayerList->end();
                 --it_1;
-                getCurrentBettingRound()->setCurrentPlayersTurnId((*it_1)->getID());
+                getCurrentBettingRound()->setCurrentPlayersTurnId((*it_1)->getId());
             }
         }
         else
@@ -297,7 +298,7 @@ void Hand::switchRounds()
 
     // determine number of all in players
     int allInPlayersCounter = 0;
-    for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+    for (it_c = myActivePlayerList->begin(); it_c != myActivePlayerList->end(); ++it_c)
     {
         if ((*it_c)->getAction() == PlayerActionAllin)
             allInPlayersCounter++;
@@ -305,7 +306,7 @@ void Hand::switchRounds()
 
     // determine number of non-fold players
     int nonFoldPlayerCounter = 0;
-    for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+    for (it_c = myActivePlayerList->begin(); it_c != myActivePlayerList->end(); ++it_c)
     {
         if ((*it_c)->getAction() != PlayerActionFold)
             nonFoldPlayerCounter++;
@@ -321,7 +322,7 @@ void Hand::switchRounds()
         if (myEvents.onRefreshSet)
             myEvents.onRefreshSet();
         ;
-        currentRound = GAME_STATE_POST_RIVER;
+        myCurrentRound = GameStatePostRiver;
     }
 
     // check for all in condition
@@ -332,7 +333,7 @@ void Hand::switchRounds()
         // 1) all players all in
         if (allInPlayersCounter == nonFoldPlayerCounter)
         {
-            allInCondition = true;
+            myAllInCondition = true;
             myBoard->setAllInCondition(true);
         }
 
@@ -340,12 +341,12 @@ void Hand::switchRounds()
         if (allInPlayersCounter + 1 == nonFoldPlayerCounter)
         {
 
-            for (it_c = runningPlayerList->begin(); it_c != runningPlayerList->end(); ++it_c)
+            for (it_c = myRunningPlayerList->begin(); it_c != myRunningPlayerList->end(); ++it_c)
             {
 
-                if ((*it_c)->getSet() >= myBettingRound[currentRound]->getHighestSet())
+                if ((*it_c)->getSet() >= myBettingRound[myCurrentRound]->getHighestSet())
                 {
-                    allInCondition = true;
+                    myAllInCondition = true;
                     myBoard->setAllInCondition(true);
                 }
             }
@@ -354,37 +355,37 @@ void Hand::switchRounds()
             // no.1: if in first Preflop Round next player is small blind and only all-in-big-blind with less than
             // smallblind amount and other all-in players with less than small blind are nonfold too -> preflop is over
             PlayerListConstIterator smallBlindIt_c =
-                getRunningPlayerIt(myBettingRound[currentRound]->getSmallBlindPositionId());
+                getRunningPlayerIt(myBettingRound[myCurrentRound]->getSmallBlindPositionId());
             PlayerListConstIterator bigBlindIt_c =
-                getActivePlayerIt(myBettingRound[currentRound]->getBigBlindPositionId());
-            if (smallBlindIt_c != runningPlayerList->end() && bigBlindIt_c != activePlayerList->end() &&
-                currentRound == GameStatePreflop && myBettingRound[currentRound]->getFirstRound())
+                getActivePlayerIt(myBettingRound[myCurrentRound]->getBigBlindPositionId());
+            if (smallBlindIt_c != myRunningPlayerList->end() && bigBlindIt_c != myActivePlayerList->end() &&
+                myCurrentRound == GameStatePreflop && myBettingRound[myCurrentRound]->getFirstRound())
             {
                 // determine player who are all in with less than small blind amount
                 int tempCounter = 0;
-                for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+                for (it_c = myActivePlayerList->begin(); it_c != myActivePlayerList->end(); ++it_c)
                 {
-                    if ((*it_c)->getAction() == PlayerActionAllin && (*it_c)->getSet() <= smallBlind)
+                    if ((*it_c)->getAction() == PlayerActionAllin && (*it_c)->getSet() <= mySmallBlind)
                     {
                         tempCounter++;
                     }
                 }
-                if ((*bigBlindIt_c)->getSet() <= smallBlind && tempCounter == allInPlayersCounter)
+                if ((*bigBlindIt_c)->getSet() <= mySmallBlind && tempCounter == allInPlayersCounter)
                 {
-                    allInCondition = true;
+                    myAllInCondition = true;
                     myBoard->setAllInCondition(true);
                 }
             }
 
             // no.2: heads up -> detect player who is all in and bb but could set less than sb
-            for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+            for (it_c = myActivePlayerList->begin(); it_c != myActivePlayerList->end(); ++it_c)
             {
 
-                if (activePlayerList->size() == 2 && (*it_c)->getAction() == PlayerActionAllin &&
-                    (*it_c)->getButton() == ButtonBigBlind && (*it_c)->getSet() <= smallBlind &&
-                    currentRound == GameStatePreflop)
+                if (myActivePlayerList->size() == 2 && (*it_c)->getAction() == PlayerActionAllin &&
+                    (*it_c)->getButton() == ButtonBigBlind && (*it_c)->getSet() <= mySmallBlind &&
+                    myCurrentRound == GameStatePreflop)
                 {
-                    allInCondition = true;
+                    myAllInCondition = true;
                     myBoard->setAllInCondition(true);
                 }
             }
@@ -392,7 +393,7 @@ void Hand::switchRounds()
     }
 
     // special routine
-    if (allInCondition)
+    if (myAllInCondition)
     {
         myBoard->collectPot();
 
@@ -405,13 +406,16 @@ void Hand::switchRounds()
         if (myEvents.onFlipHoleCardsAllIn)
             myEvents.onFlipHoleCardsAllIn();
 
-        if (currentRound < GAME_STATE_POST_RIVER)
+        if (myCurrentRound < GameStatePostRiver) // do not increment past 4
+        {
+            myCurrentRound = GameState(myCurrentRound + 1);
+        }
         { // do not increment past 4
-            currentRound = GameState(currentRound + 1);
+            myCurrentRound = GameState(myCurrentRound + 1);
         }
 
         // log board cards for allin
-        if (currentRound >= GameStateFlop)
+        if (myCurrentRound >= GameStateFlop)
         {
             int tempBoardCardsArray[5];
 
@@ -420,23 +424,23 @@ void Hand::switchRounds()
     }
 
     // unhighlight current players groupbox
-    it_c = getActivePlayerIt(previousPlayerID);
-    if (it_c != activePlayerList->end())
+    it_c = getActivePlayerIt(myPreviousPlayerId);
+    if (it_c != myActivePlayerList->end())
     {
         // lastPlayersTurn is active
         if (myEvents.onRefreshPlayersActiveInactiveStyles)
-            myEvents.onRefreshPlayersActiveInactiveStyles(previousPlayerID, 1);
+            myEvents.onRefreshPlayersActiveInactiveStyles(myPreviousPlayerId, 1);
     }
 
     if (myEvents.onRefreshTableDescriptiveLabels)
         myEvents.onRefreshTableDescriptiveLabels(getCurrentRound());
 
-    if (currentRound < GAME_STATE_POST_RIVER)
+    if (myCurrentRound < GameStatePostRiver)
     {
-        roundBeforePostRiver = currentRound;
+        myRoundBeforePostRiver = myCurrentRound;
     }
 
-    switch (currentRound)
+    switch (myCurrentRound)
     {
     case GameStatePreflop:
     {
@@ -462,7 +466,7 @@ void Hand::switchRounds()
             myEvents.onRiverAnimation();
     }
     break;
-    case GAME_STATE_POST_RIVER:
+    case GameStatePostRiver:
     {
         if (myEvents.onPostRiverAnimation)
             myEvents.onPostRiverAnimation();
@@ -479,9 +483,9 @@ PlayerListIterator Hand::getSeatIt(unsigned uniqueId) const
 
     PlayerListIterator it;
 
-    for (it = seatsList->begin(); it != seatsList->end(); ++it)
+    for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
-        if ((*it)->getID() == uniqueId)
+        if ((*it)->getId() == uniqueId)
         {
             break;
         }
@@ -495,9 +499,9 @@ PlayerListIterator Hand::getActivePlayerIt(unsigned uniqueId) const
 
     PlayerListIterator it;
 
-    for (it = activePlayerList->begin(); it != activePlayerList->end(); ++it)
+    for (it = myActivePlayerList->begin(); it != myActivePlayerList->end(); ++it)
     {
-        if ((*it)->getID() == uniqueId)
+        if ((*it)->getId() == uniqueId)
         {
             break;
         }
@@ -511,10 +515,10 @@ PlayerListIterator Hand::getRunningPlayerIt(unsigned uniqueId) const
 
     PlayerListIterator it;
 
-    for (it = runningPlayerList->begin(); it != runningPlayerList->end(); ++it)
+    for (it = myRunningPlayerList->begin(); it != myRunningPlayerList->end(); ++it)
     {
 
-        if ((*it)->getID() == uniqueId)
+        if ((*it)->getId() == uniqueId)
         {
             break;
         }
@@ -523,10 +527,10 @@ PlayerListIterator Hand::getRunningPlayerIt(unsigned uniqueId) const
     return it;
 }
 
-void Hand::setLastActionPlayerID(unsigned theValue)
+void Hand::setLastActionPlayerId(unsigned theValue)
 {
-    lastActionPlayerID = theValue;
-    myBoard->setLastActionPlayerID(theValue);
+    myLastActionPlayerId = theValue;
+    myBoard->setLastActionPlayerId(theValue);
 }
 
 int Hand::getPreflopCallsNumber()
@@ -534,7 +538,7 @@ int Hand::getPreflopCallsNumber()
 
     int calls = 0;
 
-    for (PlayerListIterator it = activePlayerList->begin(); it != activePlayerList->end(); ++it)
+    for (PlayerListIterator it = myActivePlayerList->begin(); it != myActivePlayerList->end(); ++it)
     {
 
         const std::vector<PlayerAction>& actions = (*it)->getCurrentHandActions().getPreflopActions();
@@ -549,7 +553,7 @@ int Hand::getPreflopRaisesNumber()
 
     int raises = 0;
 
-    for (PlayerListIterator it = activePlayerList->begin(); it != activePlayerList->end(); ++it)
+    for (PlayerListIterator it = myActivePlayerList->begin(); it != myActivePlayerList->end(); ++it)
     {
 
         const std::vector<PlayerAction>& actions = (*it)->getCurrentHandActions().getPreflopActions();
@@ -567,7 +571,7 @@ int Hand::getFlopBetsOrRaisesNumber()
 
     int bets = 0;
 
-    for (PlayerListIterator it = activePlayerList->begin(); it != activePlayerList->end(); ++it)
+    for (PlayerListIterator it = myActivePlayerList->begin(); it != myActivePlayerList->end(); ++it)
     {
 
         const std::vector<PlayerAction>& actions = (*it)->getCurrentHandActions().getFlopActions();
@@ -585,7 +589,7 @@ int Hand::getTurnBetsOrRaisesNumber()
 
     int bets = 0;
 
-    for (PlayerListIterator it = activePlayerList->begin(); it != activePlayerList->end(); ++it)
+    for (PlayerListIterator it = myActivePlayerList->begin(); it != myActivePlayerList->end(); ++it)
     {
 
         const std::vector<PlayerAction>& actions = (*it)->getCurrentHandActions().getTurnActions();
@@ -603,7 +607,7 @@ int Hand::getRiverBetsOrRaisesNumber()
 
     int bets = 0;
 
-    for (PlayerListIterator it = activePlayerList->begin(); it != activePlayerList->end(); ++it)
+    for (PlayerListIterator it = myActivePlayerList->begin(); it != myActivePlayerList->end(); ++it)
     {
 
         const std::vector<PlayerAction>& actions = (*it)->getCurrentHandActions().getRiverActions();
@@ -623,7 +627,7 @@ std::vector<PlayerPosition> Hand::getRaisersPositions()
 
     PlayerListIterator it_c;
 
-    for (it_c = activePlayerList->begin(); it_c != activePlayerList->end(); ++it_c)
+    for (it_c = myActivePlayerList->begin(); it_c != myActivePlayerList->end(); ++it_c)
     { // note that all in players are not "running" any more
 
         if ((*it_c)->getAction() == PlayerActionRaise || (*it_c)->getAction() == PlayerActionAllin)
@@ -639,7 +643,7 @@ std::vector<PlayerPosition> Hand::getCallersPositions()
 
     PlayerListIterator it_c;
 
-    for (it_c = runningPlayerList->begin(); it_c != runningPlayerList->end(); ++it_c)
+    for (it_c = myRunningPlayerList->begin(); it_c != myRunningPlayerList->end(); ++it_c)
     {
 
         if ((*it_c)->getAction() == PlayerActionCall)
@@ -647,12 +651,12 @@ std::vector<PlayerPosition> Hand::getCallersPositions()
     }
     return positions;
 }
-int Hand::getLastRaiserID()
+int Hand::getLastRaiserId()
 {
 
-    PlayerListIterator lastRaiser = activePlayerList->end();
+    PlayerListIterator lastRaiser = myActivePlayerList->end();
 
-    PlayerList players = activePlayerList;
+    PlayerList players = myActivePlayerList;
 
     for (PlayerListIterator it = players->begin(); it != players->end(); ++it)
     {
@@ -660,7 +664,7 @@ int Hand::getLastRaiserID()
         if ((*it)->getAction() == PlayerActionRaise || (*it)->getAction() == PlayerActionAllin)
         {
 
-            if (lastRaiser != activePlayerList->end())
+            if (lastRaiser != myActivePlayerList->end())
             {
                 if ((*lastRaiser)->getPosition() < (*it)->getPosition())
                     lastRaiser = it;
@@ -671,8 +675,8 @@ int Hand::getLastRaiserID()
             }
         }
     }
-    if (lastRaiser != activePlayerList->end())
-        return (*lastRaiser)->getID();
+    if (lastRaiser != myActivePlayerList->end())
+        return (*lastRaiser)->getId();
 
     // if no raiser was found, look for the one who have bet (if any)
 
@@ -682,36 +686,36 @@ int Hand::getLastRaiserID()
         if ((*it)->getAction() == PlayerActionBet)
             lastRaiser = it;
     }
-    if (lastRaiser != activePlayerList->end())
-        return (*lastRaiser)->getID();
+    if (lastRaiser != myActivePlayerList->end())
+        return (*lastRaiser)->getId();
     else
         return -1;
 }
-int Hand::getPreflopLastRaiserID()
+int Hand::getPreflopLastRaiserId()
 {
-    return preflopLastRaiserID;
+    return myPreflopLastRaiserId;
 }
 
-void Hand::setPreflopLastRaiserID(int id)
+void Hand::setPreflopLastRaiserId(int id)
 {
-    preflopLastRaiserID = id;
+    myPreflopLastRaiserId = id;
 }
-int Hand::getFlopLastRaiserID()
+int Hand::getFlopLastRaiserId()
 {
-    return flopLastRaiserID;
-}
-
-void Hand::setFlopLastRaiserID(int id)
-{
-    flopLastRaiserID = id;
-}
-int Hand::getTurnLastRaiserID()
-{
-    return turnLastRaiserID;
+    return myFlopLastRaiserId;
 }
 
-void Hand::setTurnLastRaiserID(int id)
+void Hand::setFlopLastRaiserId(int id)
 {
-    turnLastRaiserID = id;
+    myFlopLastRaiserId = id;
+}
+int Hand::getTurnLastRaiserId()
+{
+    return myTurnLastRaiserId;
+}
+
+void Hand::setTurnLastRaiserId(int id)
+{
+    myTurnLastRaiserId = id;
 }
 } // namespace pkt::core

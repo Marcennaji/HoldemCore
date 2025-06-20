@@ -60,14 +60,14 @@ void BettingRoundPreflop::run()
                     it = getHand()->getActivePlayerIt(getSmallBlindPositionId());
                     if (it == getHand()->getActivePlayerList()->end())
                     {
-                        throw Exception(__FILE__, __LINE__, EngineError::ACTIVE_PLAYER_NOT_FOUND);
+                        throw Exception(__FILE__, __LINE__, EngineError::ActivePlayerNotFound);
                     }
 
                     if (it == getHand()->getActivePlayerList()->begin())
                         it = getHand()->getActivePlayerList()->end();
                     --it;
 
-                    setFirstRoundLastPlayersTurnId((*it)->getID());
+                    setFirstRoundLastPlayersTurnId((*it)->getId());
                 }
                 // smallBlindPlayer found in runningPlayerList -> running player before first action player
                 else
@@ -132,14 +132,14 @@ void BettingRoundPreflop::run()
     PlayerListConstIterator currentPlayersTurnIt = getHand()->getRunningPlayerIt(getCurrentPlayersTurnId());
     if (currentPlayersTurnIt == getHand()->getRunningPlayerList()->end())
     {
-        throw Exception(__FILE__, __LINE__, EngineError::RUNNING_PLAYER_NOT_FOUND);
+        throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
     }
 
     ++currentPlayersTurnIt;
     if (currentPlayersTurnIt == getHand()->getRunningPlayerList()->end())
         currentPlayersTurnIt = getHand()->getRunningPlayerList()->begin();
 
-    setCurrentPlayersTurnId((*currentPlayersTurnIt)->getID());
+    setCurrentPlayersTurnId((*currentPlayersTurnIt)->getId());
 
     // prfen, ob Preflop wirklich dran ist
     if (!getFirstRound() && allHighestSet && getHand()->getRunningPlayerList()->size() != 1)
@@ -188,7 +188,7 @@ void BettingRoundPreflop::run()
         currentPlayersTurnIt = getHand()->getRunningPlayerIt(getCurrentPlayersTurnId());
         if (currentPlayersTurnIt == getHand()->getRunningPlayerList()->end())
         {
-            throw Exception(__FILE__, __LINE__, EngineError::RUNNING_PLAYER_NOT_FOUND);
+            throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
         }
         (*currentPlayersTurnIt)->setTurn(true);
 

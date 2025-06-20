@@ -10,9 +10,9 @@ namespace pkt::core
 {
 
 GlobalServices::GlobalServices()
-    : logger_(std::make_shared<NullLogger>()), rankingStore_(std::make_shared<NullRankingStore>()),
-      handAuditStore_(std::make_shared<NullHandAuditStore>()),
-      playersStatisticsStore_(std::make_shared<NullPlayersStatisticsStore>())
+    : myLogger(std::make_shared<NullLogger>()), myRankingStore(std::make_shared<NullRankingStore>()),
+      myHandAuditStore(std::make_shared<NullHandAuditStore>()),
+      myPlayersStatisticsStore(std::make_shared<NullPlayersStatisticsStore>())
 {
 }
 

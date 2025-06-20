@@ -81,7 +81,7 @@ void BotPlayer::action()
     logMessage << "\n---------------------------------------------------------------------------------\n\n";
     GlobalServices::instance().logger()->info(logMessage.str());
 
-    currentHand->setPreviousPlayerID(myID);
+    currentHand->setPreviousPlayerId(myID);
 
     if (myEvents.onActivePlayerActionDone)
         myEvents.onActivePlayerActionDone();
@@ -130,7 +130,7 @@ void BotPlayer::doPreflopAction()
     }
 
     if (myAction == PlayerActionRaise || myAction != PlayerActionAllin)
-        currentHand->setPreflopLastRaiserID(myID);
+        currentHand->setPreflopLastRaiserId(myID);
 
     myCurrentHandActions.m_preflopActions.push_back(myAction);
 
@@ -175,7 +175,7 @@ void BotPlayer::doFlopAction()
     }
 
     if (myAction == PlayerActionBet || myAction == PlayerActionRaise || myAction == PlayerActionAllin)
-        currentHand->setFlopLastRaiserID(myID);
+        currentHand->setFlopLastRaiserId(myID);
 
     myCurrentHandActions.m_flopActions.push_back(myAction);
 
@@ -221,7 +221,7 @@ void BotPlayer::doTurnAction()
     }
 
     if (myAction == PlayerActionBet || myAction == PlayerActionRaise || myAction == PlayerActionAllin)
-        currentHand->setTurnLastRaiserID(myID);
+        currentHand->setTurnLastRaiserId(myID);
 
     myCurrentHandActions.m_turnActions.push_back(myAction);
 
@@ -323,7 +323,7 @@ void BotPlayer::evaluateBetAmount()
             mySet = myBetAmount;
             highestSet = mySet;
         }
-        currentHand->setLastActionPlayerID(myID);
+        currentHand->setLastActionPlayerId(myID);
     }
 
     if (myAction == PlayerActionRaise)
@@ -373,7 +373,7 @@ void BotPlayer::evaluateBetAmount()
                         // raise, but not enough --> full bet rule
                         currentHand->getCurrentBettingRound()->setFullBetRule(true);
                         // lastPlayerAction für Karten umblättern reihenfolge setzrn
-                        currentHand->setLastActionPlayerID(myID);
+                        currentHand->setLastActionPlayerId(myID);
 
                         mySet += myCash;
                         currentHand->getCurrentBettingRound()->setMinimumRaise(mySet - highestSet);
@@ -384,7 +384,7 @@ void BotPlayer::evaluateBetAmount()
                 }
                 else
                 {
-                    currentHand->setLastActionPlayerID(myID);
+                    currentHand->setLastActionPlayerId(myID);
 
                     mySet += myCash;
                     currentHand->getCurrentBettingRound()->setMinimumRaise(mySet - highestSet);
@@ -399,7 +399,7 @@ void BotPlayer::evaluateBetAmount()
                 myCash = myCash + mySet - highestSet - myRaiseAmount;
                 mySet = highestSet + myRaiseAmount;
                 highestSet = mySet;
-                currentHand->setLastActionPlayerID(myID);
+                currentHand->setLastActionPlayerId(myID);
             }
         }
     }

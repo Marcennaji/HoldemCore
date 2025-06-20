@@ -36,8 +36,8 @@ class IHand
     virtual std::shared_ptr<IBettingRound> getRiver() const = 0;
     virtual std::shared_ptr<IBettingRound> getCurrentBettingRound() const = 0;
 
-    virtual void setID(int theValue) = 0;
-    virtual int getID() const = 0;
+    virtual void setId(int theValue) = 0;
+    virtual int getId() const = 0;
 
     virtual void setStartQuantityPlayers(int theValue) = 0;
     virtual int getStartQuantityPlayers() const = 0;
@@ -58,11 +58,11 @@ class IHand
     virtual void setStartCash(int theValue) = 0;
     virtual int getStartCash() const = 0;
 
-    virtual void setPreviousPlayerID(int theValue) = 0;
-    virtual int getPreviousPlayerID() const = 0;
+    virtual void setPreviousPlayerId(int theValue) = 0;
+    virtual int getPreviousPlayerId() const = 0;
 
-    virtual void setLastActionPlayerID(unsigned theValue) = 0;
-    virtual unsigned getLastActionPlayerID() const = 0;
+    virtual void setLastActionPlayerId(unsigned theValue) = 0;
+    virtual unsigned getLastActionPlayerId() const = 0;
 
     virtual void setCardsShown(bool theValue) = 0;
     virtual bool getCardsShown() const = 0;
@@ -77,13 +77,13 @@ class IHand
 
     virtual std::vector<PlayerPosition> getRaisersPositions() = 0;
     virtual std::vector<PlayerPosition> getCallersPositions() = 0;
-    virtual int getLastRaiserID() = 0;
-    virtual int getPreflopLastRaiserID() = 0;
-    virtual void setPreflopLastRaiserID(int id) = 0;
-    virtual int getFlopLastRaiserID() = 0;
-    virtual void setFlopLastRaiserID(int id) = 0;
-    virtual int getTurnLastRaiserID() = 0;
-    virtual void setTurnLastRaiserID(int id) = 0;
+    virtual int getLastRaiserId() = 0;
+    virtual int getPreflopLastRaiserId() = 0;
+    virtual void setPreflopLastRaiserId(int id) = 0;
+    virtual int getFlopLastRaiserId() = 0;
+    virtual void setFlopLastRaiserId(int id) = 0;
+    virtual int getTurnLastRaiserId() = 0;
+    virtual void setTurnLastRaiserId(int id) = 0;
 
   protected:
     virtual pkt::core::player::PlayerListIterator getSeatIt(unsigned) const = 0;

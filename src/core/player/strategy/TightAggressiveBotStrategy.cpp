@@ -29,7 +29,7 @@ TightAggressiveBotStrategy::TightAggressiveBotStrategy() : IBotStrategy()
 
     // initialize utg starting range, in a full table
     int utgFullTableRange = 0;
-    Randomizer::GetRand(2, 3, 1, &utgFullTableRange);
+    Randomizer::getRand(2, 3, 1, &utgFullTableRange);
     initializeRanges(45, utgFullTableRange);
 }
 
@@ -79,7 +79,7 @@ bool TightAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool
     {
 
         int rand = 0;
-        Randomizer::GetRand(1, 4, 1, &rand);
+        Randomizer::getRand(1, 4, 1, &rand);
         if (!deterministic && rand == 1)
         {
 
@@ -146,7 +146,7 @@ int TightAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
             {
 
                 int rand = 0;
-                Randomizer::GetRand(1, 2, 1, &rand);
+                Randomizer::getRand(1, 2, 1, &rand);
                 if (!deterministic && rand == 2)
                 {
                     speculativeHandedAdded = true;
@@ -180,7 +180,7 @@ int TightAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
     {
 
         int rand = 0;
-        Randomizer::GetRand(1, 8, 1, &rand);
+        Randomizer::getRand(1, 8, 1, &rand);
         if (!deterministic && rand == 1)
         {
             GlobalServices::instance().logger()->info("\t\twon't raise, to hide the hand strength");
@@ -202,7 +202,7 @@ int TightAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool dete
         return 0;
 
     // donk bets :
-    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() != ctx.myID)
+    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getId() != ctx.myID)
     {
         if (ctx.preflopLastRaiser->getPosition() > ctx.myPosition)
         {
@@ -210,7 +210,7 @@ int TightAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool dete
             if (getDrawingProbability(ctx.myPostFlopState) > 25)
             {
                 int rand = 0;
-                Randomizer::GetRand(1, 2, 1, &rand);
+                Randomizer::getRand(1, 2, 1, &rand);
                 if (!deterministic && rand == 1)
                 {
                     return ctx.pot * 0.6;
@@ -229,7 +229,7 @@ int TightAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool dete
             {
 
                 int rand = 0;
-                Randomizer::GetRand(1, 3, 1, &rand);
+                Randomizer::getRand(1, 3, 1, &rand);
                 if (!deterministic && rand == 1)
                 {
                     return ctx.pot * 0.6;
@@ -253,8 +253,8 @@ int TightAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool dete
         }
 
         int rand = 0;
-        Randomizer::GetRand(1, 7, 1, &rand);
-        if (!deterministic && rand == 3 && !ctx.myHavePosition && ctx.preflopLastRaiser->getID() != ctx.myID)
+        Randomizer::getRand(1, 7, 1, &rand);
+        if (!deterministic && rand == 3 && !ctx.myHavePosition && ctx.preflopLastRaiser->getId() != ctx.myID)
             return 0; // may check-raise or check-call
 
         // if no raise preflop, or if more than 1 opponent
@@ -268,7 +268,7 @@ int TightAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool dete
         }
 
         // if i have raised preflop, bet
-        if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getID() == ctx.myID)
+        if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getId() == ctx.myID)
         {
             if (ctx.nbRunningPlayers < 4)
                 return ctx.pot * 0.6;
@@ -282,11 +282,11 @@ int TightAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool dete
         ///////////  if bad flop for me
 
         // if there was a lot of action preflop, and i was not the last raiser : don't bet
-        if (ctx.preflopRaisesNumber > 1 && ctx.preflopLastRaiser->getID() != ctx.myID)
+        if (ctx.preflopRaisesNumber > 1 && ctx.preflopLastRaiser->getId() != ctx.myID)
             return 0;
 
         // if I was the last raiser preflop, I may bet with not much
-        if (ctx.preflopLastRaiser->getID() == ctx.myID && ctx.nbRunningPlayers < 4 && ctx.myCash > ctx.pot * 5 &&
+        if (ctx.preflopLastRaiser->getId() == ctx.myID && ctx.nbRunningPlayers < 4 && ctx.myCash > ctx.pot * 5 &&
             ctx.myCanBluff)
         {
 
@@ -345,7 +345,7 @@ int TightAggressiveBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool de
     {
 
         int rand = 0;
-        Randomizer::GetRand(1, 4, 1, &rand);
+        Randomizer::getRand(1, 4, 1, &rand);
         if (!deterministic && rand == 2)
         {
             return ctx.pot;
@@ -359,7 +359,7 @@ int TightAggressiveBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool de
         {
 
             int rand = 0;
-            Randomizer::GetRand(1, 6, 1, &rand);
+            Randomizer::getRand(1, 6, 1, &rand);
             if (!deterministic && rand == 2 && ctx.myHandSimulation.winRanged > 0.3 && ctx.myHandSimulation.win > 0.3)
             {
                 return ctx.pot;
@@ -401,7 +401,7 @@ int TightAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool dete
         getDrawingProbability(ctx.myPostFlopState) < 9 && ctx.myCash > pot * 4)
     {
         int rand = 0;
-        Randomizer::GetRand(1, 2, 1, &rand);
+        Randomizer::getRand(1, 2, 1, &rand);
         if (!deterministic && rand == 1)
         {
             return pot * 0.6;
@@ -422,7 +422,7 @@ int TightAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool dete
     if (getDrawingProbability(ctx.myPostFlopState) > 20 && !ctx.myHavePosition)
     {
         int rand = 0;
-        Randomizer::GetRand(1, 3, 1, &rand);
+        Randomizer::getRand(1, 3, 1, &rand);
         if (!deterministic && rand == 1)
         {
             return pot * 0.6;
@@ -434,7 +434,7 @@ int TightAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool dete
         if (ctx.myHavePosition && ctx.myCanBluff)
         {
             int rand = 0;
-            Randomizer::GetRand(1, 3, 1, &rand);
+            Randomizer::getRand(1, 3, 1, &rand);
             if (!deterministic && rand == 2)
             {
                 return pot * 0.6;
@@ -513,7 +513,7 @@ int TightAggressiveBotStrategy::turnShouldRaise(CurrentHandContext& ctx, bool de
     if (ctx.myHandSimulation.winRanged > 0.98 && ctx.myHandSimulation.win > 0.98 && ctx.myHandSimulation.winSd > 0.9)
     {
         int rand = 0;
-        Randomizer::GetRand(1, 3, 1, &rand);
+        Randomizer::getRand(1, 3, 1, &rand);
         if (!deterministic && rand == 1)
             return 0; // very strong hand, slow play, just call
     }
@@ -551,7 +551,7 @@ int TightAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool det
         ctx.myHandSimulation.winSd > 0.4)
     {
         int rand = 0;
-        Randomizer::GetRand(1, 2, 1, &rand);
+        Randomizer::getRand(1, 2, 1, &rand);
         if (!deterministic && rand == 1)
         {
             return ctx.pot * 0.33;
@@ -567,7 +567,7 @@ int TightAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool det
         {
 
             int rand = 0;
-            Randomizer::GetRand(1, 4, 1, &rand);
+            Randomizer::getRand(1, 4, 1, &rand);
             if (!deterministic && rand == 1)
             {
                 return ctx.pot * 0.8;
@@ -579,13 +579,13 @@ int TightAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool det
         return false;
 
     int rand = 0;
-    Randomizer::GetRand(40, 80, 1, &rand);
+    Randomizer::getRand(40, 80, 1, &rand);
     float coeff = (float) rand / (float) 100;
 
     if (ctx.myHandSimulation.winSd > .94 || (ctx.myHavePosition && ctx.myHandSimulation.winSd > .9))
     {
         int rand = 0;
-        Randomizer::GetRand(1, 6, 1, &rand);
+        Randomizer::getRand(1, 6, 1, &rand);
         if (!deterministic && rand != 1 || ctx.myHavePosition)
         {
             return ctx.pot * coeff;
@@ -595,7 +595,7 @@ int TightAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool det
         (ctx.myHandSimulation.winRanged > .9 || (ctx.myHavePosition && ctx.myHandSimulation.winRanged > .8)))
     {
         int rand = 0;
-        Randomizer::GetRand(1, 3, 1, &rand);
+        Randomizer::getRand(1, 3, 1, &rand);
         if (!deterministic && (rand == 1 || ctx.myHavePosition))
         {
             return ctx.pot * coeff;
@@ -605,7 +605,7 @@ int TightAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool det
         ctx.turnBetsOrRaisesNumber == 0)
     {
         int rand = 0;
-        Randomizer::GetRand(1, 6, 1, &rand);
+        Randomizer::getRand(1, 6, 1, &rand);
         if (!deterministic && rand == 1)
         {
             return ctx.pot * coeff;
@@ -615,7 +615,7 @@ int TightAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool det
         ctx.turnBetsOrRaisesNumber == 0)
     {
         int rand = 0;
-        Randomizer::GetRand(1, 3, 1, &rand);
+        Randomizer::getRand(1, 3, 1, &rand);
         if (!deterministic && rand != 1)
         {
             return ctx.pot * coeff;

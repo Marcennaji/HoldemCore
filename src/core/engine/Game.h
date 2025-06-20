@@ -49,7 +49,7 @@ class Game
     void setStartCash(int theValue) { myStartCash = theValue; }
     int getStartCash() const { return myStartCash; }
 
-    int getGameID() const { return myGameID; }
+    int getGameId() const { return myGameId; }
 
     void setCurrentSmallBlind(int theValue) { myCurrentSmallBlind = theValue; }
     int getCurrentSmallBlind() const { return myCurrentSmallBlind; }
@@ -87,7 +87,7 @@ class Game
     int myStartQuantityPlayers;
     int myStartCash;
     int myStartSmallBlind;
-    int myGameID;
+    int myGameId;
 
     // running variables
     int myCurrentSmallBlind;

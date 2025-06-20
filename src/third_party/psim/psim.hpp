@@ -2,11 +2,10 @@
 #define PSIM_HPP
 
 /* This program is free software. It comes without any warranty, to
-* the extent permitted by applicable law. You can redistribute it
-* and/or modify it under the terms of the Do What The Fuck You Want
-* To Public License, Version 2, as published by Sam Hocevar. See
-* http://sam.zoy.org/wtfpl/COPYING for more details. */
-
+ * the extent permitted by applicable law. You can redistribute it
+ * and/or modify it under the terms of the Do What The Fuck You Want
+ * To Public License, Version 2, as published by Sam Hocevar. See
+ * http://sam.zoy.org/wtfpl/COPYING for more details. */
 
 /// \file PSim is used to simulate hand strength, and return general info about a hand.
 /** \file
@@ -33,16 +32,16 @@
 
     Version History:
 
-	March 2008 version 1.3
-    Fixed bug in GetHandState() not counting outs correctly for already strong hands.
+    March 2008 version 1.3
+    Fixed bug in getHandState() not counting outs correctly for already strong hands.
     Added IsStraightPossible and IsStraightDrawPossible to PostFlopState.
     Added the hand state stuff into the java interface. I do believe it's complete now.
 
     February 2008 version 1.2
-    Fixed bug in SimulateHandMulti() allowing opponents to share crads. (typical error of ~ 3%)
+    Fixed bug in simulateHandMulti() allowing opponents to share crads. (typical error of ~ 3%)
     Removed the simulate draw function. Simulate hand already does 94%, 90%, and the current %.
-	Now including compiled DLL again.
-	Now including AutoIt example.
+    Now including compiled DLL again.
+    Now including AutoIt example.
 
     February 2008 version 1.1
     Add int[] hand interfaces to all functions.
@@ -54,108 +53,104 @@
 
 #include <string>
 
-///Comment out to not count the number of hands evaluated.
+/// Comment out to not count the number of hands evaluated.
 #define CountEvaluations
 
-
-///Get our exports correct. For a shared library (recommended) don't do anything.
+/// Get our exports correct. For a shared library (recommended) don't do anything.
 #ifdef BUILD_DLL
-    #define EXPORT extern "C" __declspec(dllexport) __stdcall
+#define EXPORT extern "C" __declspec(dllexport) __stdcall
 #else
-    #ifdef IMPORT_DLL
-        #define EXPORT extern "C" __declspec(dllimport) __stdcall
-    #else
-        #define EXPORT
-    #endif
+#ifdef IMPORT_DLL
+#define EXPORT extern "C" __declspec(dllimport) __stdcall
+#else
+#define EXPORT
+#endif
 #endif
 
-
-///Simulation results for a hand.
+/// Simulation results for a hand.
 struct SimResults
 {
-    ///What percent of hands will our hand beat right now? (enumerates/simulates all opponent cards)
+    /// What percent of hands will our hand beat right now? (enumerates/simulates all opponent cards)
     float win;
     float tie;
     float lose;
 
-    ///What percent of hands will our hand beat right now? (enumerates against the opponents supposed ranges)
+    /// What percent of hands will our hand beat right now? (enumerates against the opponents supposed ranges)
     float winRanged;
 
-    ///What percent of hands will our hand beat at showdown? (enumerates/simulates all unknown board + opponent cards)
+    /// What percent of hands will our hand beat at showdown? (enumerates/simulates all unknown board + opponent cards)
     float winSd;
     float tieSd;
     float loseSd;
 
-    ///The chance that our hand will be at least as good as it is now by the showdown.
+    /// The chance that our hand will be at least as good as it is now by the showdown.
     float dNow;
 
-    ///The chance that our hand will be able to beat or tie 94% of hands by the showdown.
+    /// The chance that our hand will be able to beat or tie 94% of hands by the showdown.
     float d94;
 
-    ///Same as D94, only 90.
+    /// Same as D94, only 90.
     float d90;
 
-    #ifdef CountEvaluations
-        ///Will count the number of evaluations we ran for our simulation.
-        int evaluations;
-    #endif
+#ifdef CountEvaluations
+    /// Will count the number of evaluations we ran for our simulation.
+    int evaluations;
+#endif
 };
 
-///General info about a post flop hand.
+/// General info about a post flop hand.
 struct PostFlopState
 {
-    ///Do we use our hole cards ? NB. kickers are not seen as "used cards"
-    bool UsesFirst: 1;
-	bool UsesSecond: 1;
+    /// Do we use our hole cards ? NB. kickers are not seen as "used cards"
+    bool UsesFirst : 1;
+    bool UsesSecond : 1;
 
-    ///What is our actual hand rank?
-    bool IsNoPair: 1;
-    bool IsOnePair: 1;
-	bool IsPocketPair: 1;
-    bool IsTwoPair: 1;
-    bool IsTrips: 1;
-    bool IsStraight: 1;
-    bool IsFlush: 1;
-    bool IsFullHouse: 1;
-    bool IsQuads: 1;
-    bool IsStFlush: 1;
+    /// What is our actual hand rank?
+    bool IsNoPair : 1;
+    bool IsOnePair : 1;
+    bool IsPocketPair : 1;
+    bool IsTwoPair : 1;
+    bool IsTrips : 1;
+    bool IsStraight : 1;
+    bool IsFlush : 1;
+    bool IsFullHouse : 1;
+    bool IsQuads : 1;
+    bool IsStFlush : 1;
 
-    bool IsTopPair: 1; ///<We paired the highest card one the board with one in our hand.
-    bool IsMiddlePair: 1; ///<We paired the board, but it's not top or bottom pair. (may be 2nd best, 3rd best, etc.)
-    bool IsBottomPair: 1; ///<We paired the lowest card one the board with one in our hand.
-    bool IsOverPair: 1; ///<We have a pocket pair, and it's bigger than any card on the board.
-    bool IsOverCards: 1; ///<We just have two nonpaired cards bigger than anything on the board.
+    bool IsTopPair : 1;    ///< We paired the highest card one the board with one in our hand.
+    bool IsMiddlePair : 1; ///< We paired the board, but it's not top or bottom pair. (may be 2nd best, 3rd best, etc.)
+    bool IsBottomPair : 1; ///< We paired the lowest card one the board with one in our hand.
+    bool IsOverPair : 1;   ///< We have a pocket pair, and it's bigger than any card on the board.
+    bool IsOverCards : 1;  ///< We just have two nonpaired cards bigger than anything on the board.
 
-    bool IsStraightDrawPossible: 1; ///<Could someone have 4 to a straight?
-    bool IsStraightPossible: 1; ///Could someone have a straight?
+    bool IsStraightDrawPossible : 1; ///< Could someone have 4 to a straight?
+    bool IsStraightPossible : 1;     /// Could someone have a straight?
 
-    bool IsFlushDrawPossible: 1; ///<Could someone have 4 to a suit?
-    bool IsFlushPossible: 1; ///<Could someone have 5 to a suit?
+    bool IsFlushDrawPossible : 1; ///< Could someone have 4 to a suit?
+    bool IsFlushPossible : 1;     ///< Could someone have 5 to a suit?
 
-    bool IsFullHousePossible: 1; ///<Is a fullhouse or quads possible?
+    bool IsFullHousePossible : 1; ///< Is a fullhouse or quads possible?
 
-    bool Is3Flush: 1; ///<Do we have exactly 3 cards to a flush?
-    bool Is4Flush: 1; ///<Do we have exactly 4 cards to a flush?
+    bool Is3Flush : 1; ///< Do we have exactly 3 cards to a flush?
+    bool Is4Flush : 1; ///< Do we have exactly 4 cards to a flush?
 
-    unsigned int FlushOuts: 4; ///<How many cards will give us flush?
-    unsigned int StraightOuts: 4; ///<How many cards will give us straight?
-    unsigned int BetterOuts: 4; ///<How many cards will give us a fullhouse or better?
+    unsigned int FlushOuts : 4;    ///< How many cards will give us flush?
+    unsigned int StraightOuts : 4; ///< How many cards will give us straight?
+    unsigned int BetterOuts : 4;   ///< How many cards will give us a fullhouse or better?
 };
 
-
-///Retuns some useful information about a hand.
+/// Retuns some useful information about a hand.
 EXPORT void getHandState(const char* hand, PostFlopState* results);
 void getHandState(const int* hand, PostFlopState* results);
 
-///Converts a hand state to a string telling us in plain english what we have.
-//EXPORT const char* GetHandStateBrief(const PostFlopState* state);
+/// Converts a hand state to a string telling us in plain english what we have.
+// EXPORT const char* getHandStateBrief(const PostFlopState* state);
 
-
-///Ranks a hand, a higher ranked hand beats any lower ranked hand.
+/// Ranks a hand, a higher ranked hand beats any lower ranked hand.
 EXPORT unsigned int rankHand(const char* hand);
 unsigned int rankHand(const int* hand);
 
-///Run ours simulations on a hand.
+/// Run ours simulations on a hand.
 /**
 Boards is the maximum number of boards to see with Monte Carlo simulation. If boards is 0,
 or >= the total number of boards, a full enumeration is performed.
@@ -167,7 +162,8 @@ EXPORT void simulateHand(const char* hand, SimResults* results, float lowRange =
 void simulateHand(const int* hand, SimResults* results, float lowRange = 0, float highRange = 1,
                   unsigned int boards = 0);
 
-///Run ours simulations on a hand against mulitple opponents. (Currently doesn't figure current strength, only SD and draws)
+/// Run ours simulations on a hand against mulitple opponents. (Currently doesn't figure current strength, only SD and
+/// draws)
 /**
 Boards is the number of boards to see with Monte Carlo simulation.
 Hands is the number of hands to simulate per opponent per board.

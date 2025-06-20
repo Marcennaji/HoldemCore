@@ -69,7 +69,7 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
     int id = 0;
     for (auto& p : *playerList)
     {
-        p->setID(id++);
+        p->setId(id++);
         p->setIsSessionActive(true);
     }
 

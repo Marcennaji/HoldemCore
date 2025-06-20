@@ -135,11 +135,11 @@ void Player::setPosition()
             bool dealerFound = false;
             for (it_c = players->begin(); it_c != players->end(); ++it_c)
             {
-                if ((*it_c)->getID() == dealerPosition)
+                if ((*it_c)->getId() == dealerPosition)
                     dealerFound = true;
                 else if (dealerFound)
                     pos++;
-                if ((*it_c)->getID() == myID)
+                if ((*it_c)->getId() == myID)
                     break;
             }
             myPosition = onDealerPositionPlus[pos][nbPlayers];
@@ -151,11 +151,11 @@ void Player::setPosition()
             for (it_c = players->begin(); it_c != players->end(); ++it_c)
             {
 
-                if ((*it_c)->getID() == myID)
+                if ((*it_c)->getId() == myID)
                     myPositionFound = true;
                 else if (myPositionFound)
                     pos++;
-                if ((*it_c)->getID() == dealerPosition)
+                if ((*it_c)->getId() == dealerPosition)
                     break;
             }
             myPosition = onDealerPositionMinus[pos][nbPlayers];
@@ -206,7 +206,7 @@ std::string Player::getPositionLabel(PlayerPosition p) const
     }
 }
 
-int Player::getID() const
+int Player::getId() const
 {
     return myID;
 }
@@ -215,7 +215,7 @@ CurrentHandActions& Player::getCurrentHandActions()
     return myCurrentHandActions;
 }
 
-void Player::setID(unsigned newId)
+void Player::setId(unsigned newId)
 {
     myID = newId;
 }
@@ -397,7 +397,7 @@ void Player::updatePreflopStatistics()
         break;
     }
 
-    myStatistics[nbPlayers].m_preflopStatistics.AddLastAction(myAction); // keep track of the last 10 actions
+    myStatistics[nbPlayers].m_preflopStatistics.addLastAction(myAction); // keep track of the last 10 actions
 
     if (myAction == PlayerActionCall && currentHand->getRaisersPositions().size() == 0) //
         myStatistics[nbPlayers].m_preflopStatistics.m_limps++;
@@ -467,7 +467,7 @@ void Player::updateFlopStatistics()
         myStatistics[nbPlayers].m_flopStatistics.m_3Bets++;
 
     // continuation bets
-    if (currentHand->getPreflopLastRaiserID() == myID)
+    if (currentHand->getPreflopLastRaiserId() == myID)
     {
         myStatistics[nbPlayers].m_flopStatistics.m_continuationBetsOpportunities++;
         if (myAction == PlayerActionBet)
@@ -561,7 +561,7 @@ const PostFlopState Player::getPostFlopState() const
 
     PostFlopState r;
 
-    GetHandState((stringHand + stringBoard).c_str(), &r);
+    getHandState((stringHand + stringBoard).c_str(), &r);
 
     return r;
 }
@@ -629,7 +629,7 @@ std::shared_ptr<Player> Player::getPlayerByUniqueId(unsigned id) const
     PlayerListIterator end = currentHand->getSeatsList()->end();
     while (i != end)
     {
-        if ((*i)->getID() == id)
+        if ((*i)->getId() == id)
         {
             tmpPlayer = *i;
             break;
@@ -677,14 +677,14 @@ const SimResults Player::getHandSimulation() const
     SimResults r;
     const string cards = (getCardsValueString() + getStringBoard()).c_str();
 
-    SimulateHand(cards.c_str(), &r, 0, 1, 0);
+    simulateHand(cards.c_str(), &r, 0, 1, 0);
 
     float win = r.win; // save the value
 
     const int nbOpponents = std::max(1, (int) currentHand->getRunningPlayerList()->size() -
                                             1); // note that allin opponents are not "running" any more
-    SimulateHandMulti(cards.c_str(), &r, 200, 100, nbOpponents);
-    r.win = win; // because SimulateHandMulti doesn't compute 'win'
+    simulateHandMulti(cards.c_str(), &r, 200, 100, nbOpponents);
+    r.win = win; // because simulateHandMulti doesn't compute 'win'
 
     // evaluate my strength against my opponents's guessed ranges :
     float maxOpponentsStrengths = getMaxOpponentsStrengths();
@@ -796,7 +796,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 
     std::shared_ptr<Player> opponent = getPlayerByUniqueId(opponentId);
 
-    const int myRank = RankHand((myCard1 + myCard2 + board).c_str());
+    const int myRank = rankHand((myCard1 + myCard2 + board).c_str());
 
     // compute winning hands % against my rank
     int nbWinningHands = 0;
@@ -845,7 +845,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 
     for (vector<std::string>::const_iterator i = newRanges.begin(); i != newRanges.end(); i++)
     {
-        if (RankHand(((*i) + board).c_str()) > myRank)
+        if (rankHand(((*i) + board).c_str()) > myRank)
             nbWinningHands++;
     }
     if (ranges.size() == 0)
@@ -896,13 +896,13 @@ std::map<int, float> Player::evaluateOpponentsStrengths() const
     for (PlayerListIterator it = players->begin(); it != players->end(); ++it)
     {
 
-        if ((*it)->getID() == myID || (*it)->getAction() == PlayerActionFold || (*it)->getAction() == PlayerActionNone)
+        if ((*it)->getId() == myID || (*it)->getAction() == PlayerActionFold || (*it)->getAction() == PlayerActionNone)
             continue;
 
-        const float estimatedOpponentWinningHands = getOpponentWinningHandsPercentage((*it)->getID(), getStringBoard());
+        const float estimatedOpponentWinningHands = getOpponentWinningHandsPercentage((*it)->getId(), getStringBoard());
         assert(estimatedOpponentWinningHands <= 1.0);
 
-        result[(*it)->getID()] = estimatedOpponentWinningHands;
+        result[(*it)->getId()] = estimatedOpponentWinningHands;
     }
 
     return result;
@@ -925,16 +925,16 @@ bool Player::isPreflopBigBet() const
 bool Player::isAgressor(const GameState gameState) const
 {
 
-    if (gameState == GameStatePreflop && currentHand->getPreflopLastRaiserID() == myID)
+    if (gameState == GameStatePreflop && currentHand->getPreflopLastRaiserId() == myID)
         return true;
 
-    if (gameState == GameStateFlop && currentHand->getFlopLastRaiserID() == myID)
+    if (gameState == GameStateFlop && currentHand->getFlopLastRaiserId() == myID)
         return true;
 
-    if (gameState == GameStateTurn && currentHand->getTurnLastRaiserID() == myID)
+    if (gameState == GameStateTurn && currentHand->getTurnLastRaiserId() == myID)
         return true;
 
-    if (gameState == GameStateRiver && currentHand->getLastRaiserID() == myID)
+    if (gameState == GameStateRiver && currentHand->getLastRaiserId() == myID)
         return true;
 
     return false;
@@ -957,7 +957,7 @@ bool Player::canBluff(const GameState gameState) const
     for (PlayerListIterator it = players->begin(); it != players->end(); ++it)
     {
 
-        if ((*it)->getID() == myID)
+        if ((*it)->getId() == myID)
             continue;
 
         PreflopStatistics preflopStats = (*it)->getStatistics(nbPlayers).getPreflopStatistics();
@@ -1003,8 +1003,8 @@ bool Player::isInVeryLooseMode(const int nbPlayers) const
 
     PreflopStatistics preflop = stats.getPreflopStatistics();
 
-    if (preflop.GetLastActionsNumber(PlayerActionAllin) + preflop.GetLastActionsNumber(PlayerActionRaise) +
-            preflop.GetLastActionsNumber(PlayerActionCall) >
+    if (preflop.getLastActionsNumber(PlayerActionAllin) + preflop.getLastActionsNumber(PlayerActionRaise) +
+            preflop.getLastActionsNumber(PlayerActionCall) >
         PreflopStatistics::LAST_ACTIONS_STACK_SIZE * 0.8)
         return true;
     else
@@ -1017,21 +1017,21 @@ void Player::updateCurrentHandContext(const GameState state)
     // general (and shared) game state
     myCurrentHandContext->gameState = state;
     myCurrentHandContext->nbRunningPlayers = currentHand->getRunningPlayerList()->size();
-    myCurrentHandContext->lastVPIPPlayer = getPlayerByUniqueId(currentHand->getLastRaiserID());
+    myCurrentHandContext->lastVPIPPlayer = getPlayerByUniqueId(currentHand->getLastRaiserId());
     myCurrentHandContext->callersPositions = currentHand->getCallersPositions();
     myCurrentHandContext->pot = currentHand->getBoard()->getPot();
     myCurrentHandContext->potOdd = getPotOdd();
     myCurrentHandContext->sets = currentHand->getBoard()->getSets();
     myCurrentHandContext->highestSet = currentHand->getCurrentBettingRound()->getHighestSet();
     myCurrentHandContext->stringBoard = getStringBoard();
-    myCurrentHandContext->preflopLastRaiser = getPlayerByUniqueId(currentHand->getPreflopLastRaiserID());
+    myCurrentHandContext->preflopLastRaiser = getPlayerByUniqueId(currentHand->getPreflopLastRaiserId());
     myCurrentHandContext->preflopRaisesNumber = currentHand->getPreflopRaisesNumber();
     myCurrentHandContext->preflopCallsNumber = currentHand->getPreflopCallsNumber();
     myCurrentHandContext->isPreflopBigBet = isPreflopBigBet();
     myCurrentHandContext->flopBetsOrRaisesNumber = currentHand->getFlopBetsOrRaisesNumber();
-    myCurrentHandContext->flopLastRaiser = getPlayerByUniqueId(currentHand->getFlopLastRaiserID());
+    myCurrentHandContext->flopLastRaiser = getPlayerByUniqueId(currentHand->getFlopLastRaiserId());
     myCurrentHandContext->turnBetsOrRaisesNumber = currentHand->getTurnBetsOrRaisesNumber();
-    myCurrentHandContext->turnLastRaiser = getPlayerByUniqueId(currentHand->getTurnLastRaiserID());
+    myCurrentHandContext->turnLastRaiser = getPlayerByUniqueId(currentHand->getTurnLastRaiserId());
     myCurrentHandContext->riverBetsOrRaisesNumber = currentHand->getRiverBetsOrRaisesNumber();
     myCurrentHandContext->nbPlayers = currentHand->getActivePlayerList()->size();
     myCurrentHandContext->smallBlind = currentHand->getSmallBlind();

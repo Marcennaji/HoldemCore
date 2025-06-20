@@ -42,8 +42,8 @@ class Hand : public IHand
     std::shared_ptr<IBettingRound> getRiver() const { return myBettingRound[GameStateRiver]; }
     std::shared_ptr<IBettingRound> getCurrentBettingRound() const { return myBettingRound[myCurrentRound]; }
 
-    void setID(int theValue) { myID = theValue; }
-    int getID() const { return myID; }
+    void setId(int theValue) { myID = theValue; }
+    int getId() const { return myID; }
 
     void setStartQuantityPlayers(int theValue) { myStartQuantityPlayers = theValue; }
     int getStartQuantityPlayers() const { return myStartQuantityPlayers; }
@@ -64,12 +64,12 @@ class Hand : public IHand
     void setStartCash(int theValue) { myStartCash = theValue; }
     int getStartCash() const { return myStartCash; }
 
-    void setPreviousPlayerID(int theValue) { myPreviousPlayerId = theValue; }
-    int getPreviousPlayerID() const { return myPreviousPlayerId; }
+    void setPreviousPlayerId(int theValue) { myPreviousPlayerId = theValue; }
+    int getPreviousPlayerId() const { return myPreviousPlayerId; }
 
-    void setLastActionPlayerID(unsigned theValue);
+    void setLastActionPlayerId(unsigned theValue);
 
-    unsigned getLastActionPlayerID() const { return myLastActionPlayerId; }
+    unsigned getLastActionPlayerId() const { return myLastActionPlayerId; }
 
     void setCardsShown(bool theValue) { myCardsShown = theValue; }
     bool getCardsShown() const { return myCardsShown; }
@@ -87,13 +87,13 @@ class Hand : public IHand
 
     std::vector<PlayerPosition> getRaisersPositions();
     std::vector<PlayerPosition> getCallersPositions();
-    int getLastRaiserID();
-    int getPreflopLastRaiserID();
-    void setPreflopLastRaiserID(int id);
-    int getFlopLastRaiserID();
-    void setFlopLastRaiserID(int id);
-    int getTurnLastRaiserID();
-    void setTurnLastRaiserID(int id);
+    int getLastRaiserId();
+    int getPreflopLastRaiserId();
+    void setPreflopLastRaiserId(int id);
+    int getFlopLastRaiserId();
+    void setFlopLastRaiserId(int id);
+    int getTurnLastRaiserId();
+    void setTurnLastRaiserId(int id);
 
   protected:
     pkt::core::player::PlayerListIterator getSeatIt(unsigned) const;

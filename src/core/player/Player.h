@@ -55,8 +55,8 @@ class Player
 
     virtual ~Player() = default;
 
-    int getID() const;
-    void setID(unsigned newId);
+    int getId() const;
+    void setId(unsigned newId);
 
     void setName(const std::string& theValue);
     std::string getName() const;

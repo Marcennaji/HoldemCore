@@ -17,7 +17,7 @@ using namespace std;
 using namespace pkt::core::player;
 
 BettingRoundPostRiver::BettingRoundPostRiver(const GameEvents& events, IHand* hi, int dP, int sB)
-    : BettingRound(events, hi, dP, sB, GAME_STATE_POST_RIVER), highestCardsValue(0)
+    : BettingRound(events, hi, dP, sB, GameStatePostRiver), myHighestCardsValue(0)
 {
 }
 
@@ -39,9 +39,9 @@ void BettingRoundPostRiver::postRiverRun()
     for (it_c = getHand()->getActivePlayerList()->begin(); it_c != getHand()->getActivePlayerList()->end(); ++it_c)
     {
 
-        if ((*it_c)->getAction() != PlayerActionFold && (*it_c)->getCardsValueInt() > highestCardsValue)
+        if ((*it_c)->getAction() != PlayerActionFold && (*it_c)->getCardsValueInt() > myHighestCardsValue)
         {
-            highestCardsValue = (*it_c)->getCardsValueInt();
+            myHighestCardsValue = (*it_c)->getCardsValueInt();
         }
     }
 
@@ -68,7 +68,7 @@ void BettingRoundPostRiver::postRiverRun()
         if ((*it_c)->getAction() != PlayerActionFold)
         {
             nonfoldPlayersCounter++;
-            if ((*it_c)->getID() == 0)
+            if ((*it_c)->getId() == 0)
             {
                 pauseHand = true;
             }
@@ -92,7 +92,7 @@ void BettingRoundPostRiver::postRiverRun()
                 (*it_c)->getCurrentHandActions().getPreflopActions().at(0) != PlayerActionFold)
 
                 if (myEvents.onShowHoleCards)
-                    myEvents.onShowHoleCards((*it_c)->getID());
+                    myEvents.onShowHoleCards((*it_c)->getId());
         }
     }
     // if the human player went at showdown with at least one opponent, enable pausing the hand so he can see the
@@ -102,10 +102,10 @@ void BettingRoundPostRiver::postRiverRun()
 }
 void BettingRoundPostRiver::setHighestCardsValue(int theValue)
 {
-    highestCardsValue = theValue;
+    myHighestCardsValue = theValue;
 }
 int BettingRoundPostRiver::getHighestCardsValue() const
 {
-    return highestCardsValue;
+    return myHighestCardsValue;
 }
 } // namespace pkt::core

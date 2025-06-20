@@ -48,7 +48,7 @@ unsigned int BoardsToEnumerate(unsigned int cardsToDraw)
     }
 }
 
-void GetHandState(const Hand& shand, PostFlopState* state)
+void getHandState(const Hand& shand, PostFlopState* state)
 {
     ZeroPostFlopState(state);
 
@@ -272,7 +272,7 @@ void GetHandState(const Hand& shand, PostFlopState* state)
     }
 }
 
-const std::string GetHandStateBrief(const PostFlopState* state)
+const std::string getHandStateBrief(const PostFlopState* state)
 {
     static std::ostringstream out;
 
@@ -364,7 +364,7 @@ const std::string GetHandStateBrief(const PostFlopState* state)
     return out.str();
 }
 
-unsigned int RankHand(const Hand& shand)
+unsigned int rankHand(const Hand& shand)
 {
     CardMask e; // Used to hold a hand we are evaluating.
 
@@ -373,13 +373,13 @@ unsigned int RankHand(const Hand& shand)
     return Hand_EVAL_N(e, shand.size);
 }
 
-void SimulateHand(const Hand& shand, SimResults* results, float lowRange, float highRange, unsigned int boards)
+void simulateHand(const Hand& shand, SimResults* results, float lowRange, float highRange, unsigned int boards)
 {
     SimCurrent(shand, results, lowRange, highRange);
     // SimSd(shand, results, lowRange, highRange, boards);
 }
 
-void SimulateHandMulti(const Hand& shand, SimResults* results, unsigned int boards, unsigned int hands,
+void simulateHandMulti(const Hand& shand, SimResults* results, unsigned int boards, unsigned int hands,
                        unsigned int numOpponents)
 {
     // TODO add the current state. Will this really get done? Do I care?

@@ -18,14 +18,14 @@ using namespace std;
 using namespace pkt::core::player;
 
 BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int sB, GameState gS)
-    : IBettingRound(), myHand(hi), myBettingRoundID(gS), dealerPosition(dP), smallBlindPosition(0),
-      dealerPositionId(dP), smallBlindPositionId(0), bigBlindPositionId(0), smallBlind(sB), highestSet(0),
-      minimumRaise(2 * sB), fullBetRule(false), firstRun(true), firstRunGui(true), firstRound(true),
-      firstHeadsUpRound(true), currentPlayersTurnId(0), firstRoundLastPlayersTurnId(0), logBoardCardsDone(false),
-      myEvents(events)
+    : IBettingRound(), myHand(hi), myBettingRoundID(gS), myDealerPosition(dP), mySmallBlindPosition(0),
+      myDealerPositionId(dP), mySmallBlindPositionId(0), myBigBlindPositionId(0), mySmallBlind(sB), myHighestSet(0),
+      myMinimumRaise(2 * sB), myFullBetRule(false), myFirstRun(true), myFirstRunGui(true), myFirstRound(true),
+      myFirstHeadsUpRound(true), myCurrentPlayersTurnId(0), myFirstRoundLastPlayersTurnId(0),
+      myLogBoardCardsDone(false), myEvents(events)
 {
-    currentPlayersTurnIt = myHand->getRunningPlayerList()->begin();
-    lastPlayersTurnIt = myHand->getRunningPlayerList()->begin();
+    myCurrentPlayersTurnIt = myHand->getRunningPlayerList()->begin();
+    myLastPlayersTurnIt = myHand->getRunningPlayerList()->begin();
 
     PlayerListConstIterator it_c;
 
@@ -34,7 +34,7 @@ BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int
     {
         if ((*it_c)->getButton() == ButtonBigBlind)
         {
-            bigBlindPositionId = (*it_c)->getID();
+            myBigBlindPositionId = (*it_c)->getId();
             break;
         }
     }
@@ -48,7 +48,7 @@ BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int
     {
         if ((*it_c)->getButton() == ButtonSmallBlind)
         {
-            smallBlindPositionId = (*it_c)->getID();
+            mySmallBlindPositionId = (*it_c)->getId();
             break;
         }
     }
@@ -71,7 +71,7 @@ int BettingRound::getHighestCardsValue() const
 void BettingRound::nextPlayer()
 {
 
-    PlayerListConstIterator currentPlayersTurnConstIt = myHand->getRunningPlayerIt(currentPlayersTurnId);
+    PlayerListConstIterator currentPlayersTurnConstIt = myHand->getRunningPlayerIt(myCurrentPlayersTurnId);
     if (currentPlayersTurnConstIt == myHand->getRunningPlayerList()->end())
     {
         GlobalServices::instance().logger()->error("RUNNING_PLAYER_NOT_FOUND");
@@ -84,12 +84,12 @@ void BettingRound::nextPlayer()
 
 void BettingRound::run()
 {
-    if (firstRunGui)
+    if (myFirstRunGui)
     {
         handleFirstRunGui();
         return;
     }
-    if (firstRun)
+    if (myFirstRun)
     {
         handleFirstRun();
     }
@@ -98,14 +98,14 @@ void BettingRound::run()
 
     bool allHighestSet = allBetsAreDone();
 
-    if (!firstRound && allHighestSet)
+    if (!myFirstRound && allHighestSet)
     {
         proceedToNextBettingRound();
     }
     else
     {
         // determine next running player
-        PlayerListConstIterator currentPlayersTurnIt = myHand->getRunningPlayerIt(currentPlayersTurnId);
+        PlayerListConstIterator currentPlayersTurnIt = myHand->getRunningPlayerIt(myCurrentPlayersTurnId);
         if (currentPlayersTurnIt == myHand->getRunningPlayerList()->end())
         {
             GlobalServices::instance().logger()->error("RUNNING_PLAYER_NOT_FOUND");
@@ -115,16 +115,16 @@ void BettingRound::run()
         if (currentPlayersTurnIt == myHand->getRunningPlayerList()->end())
             currentPlayersTurnIt = myHand->getRunningPlayerList()->begin();
 
-        currentPlayersTurnId = (*currentPlayersTurnIt)->getID();
+        myCurrentPlayersTurnId = (*currentPlayersTurnIt)->getId();
 
         // highlight active players groupbox and clear action
         if (myEvents.onRefreshPlayersActiveInactiveStyles)
-            myEvents.onRefreshPlayersActiveInactiveStyles(currentPlayersTurnId, 2);
+            myEvents.onRefreshPlayersActiveInactiveStyles(myCurrentPlayersTurnId, 2);
 
         if (myEvents.onRefreshAction)
-            myEvents.onRefreshAction(currentPlayersTurnId, 0);
+            myEvents.onRefreshAction(myCurrentPlayersTurnId, 0);
 
-        currentPlayersTurnIt = myHand->getRunningPlayerIt(currentPlayersTurnId);
+        currentPlayersTurnIt = myHand->getRunningPlayerIt(myCurrentPlayersTurnId);
         if (currentPlayersTurnIt == myHand->getRunningPlayerList()->end())
         {
             GlobalServices::instance().logger()->error("RUNNING_PLAYER_NOT_FOUND");
@@ -132,12 +132,12 @@ void BettingRound::run()
 
         (*currentPlayersTurnIt)->setTurn(true);
 
-        if (currentPlayersTurnId == firstRoundLastPlayersTurnId)
+        if (myCurrentPlayersTurnId == myFirstRoundLastPlayersTurnId)
         {
-            firstRound = false;
+            myFirstRound = false;
         }
 
-        if (currentPlayersTurnId == 0)
+        if (myCurrentPlayersTurnId == 0)
         {
             if (myEvents.onDoHumanAction)
                 myEvents.onDoHumanAction();
@@ -156,7 +156,7 @@ bool BettingRound::allBetsAreDone() const
 
     for (it_c = myHand->getRunningPlayerList()->begin(); it_c != myHand->getRunningPlayerList()->end(); ++it_c)
     {
-        if (highestSet != (*it_c)->getSet())
+        if (myHighestSet != (*it_c)->getSet())
             return false;
     }
     return true;
@@ -195,7 +195,7 @@ void BettingRound::proceedToNextBettingRound()
 
 void BettingRound::logBoardCards()
 {
-    if (!logBoardCardsDone)
+    if (!myLogBoardCardsDone)
     {
         int tempBoardCardsArray[5];
         myHand->getBoard()->getCards(tempBoardCardsArray);
@@ -228,14 +228,14 @@ void BettingRound::logBoardCards()
         default:
             GlobalServices::instance().logger()->error("wrong myBettingRoundID");
         }
-        logBoardCardsDone = true;
+        myLogBoardCardsDone = true;
     }
 }
 
 void BettingRound::handleFirstRunGui()
 {
-    firstRunGui = false;
-    myHand->setPreviousPlayerID(-1);
+    myFirstRunGui = false;
+    myHand->setPreviousPlayerId(-1);
 
     if (myEvents.onDealBettingRoundCards)
     {
@@ -244,7 +244,7 @@ void BettingRound::handleFirstRunGui()
 }
 void BettingRound::handleFirstRun()
 {
-    firstRun = false;
+    myFirstRun = false;
 
     if (!(myHand->getAllInCondition()))
     {
@@ -254,7 +254,7 @@ void BettingRound::handleFirstRun()
         bool formerRunningPlayerFound = false;
         if (myHand->getActivePlayerList()->size() > 2)
         {
-            it_1 = myHand->getActivePlayerIt(smallBlindPositionId);
+            it_1 = myHand->getActivePlayerIt(mySmallBlindPositionId);
             if (it_1 == myHand->getActivePlayerList()->end())
             {
                 GlobalServices::instance().logger()->error("ACTIVE_PLAYER_NOT_FOUND");
@@ -266,11 +266,11 @@ void BettingRound::handleFirstRun()
                     it_1 = myHand->getActivePlayerList()->end();
                 --it_1;
 
-                it_2 = myHand->getRunningPlayerIt((*it_1)->getID());
+                it_2 = myHand->getRunningPlayerIt((*it_1)->getId());
                 // running player found
                 if (it_2 != myHand->getRunningPlayerList()->end())
                 {
-                    firstRoundLastPlayersTurnId = (*it_2)->getID();
+                    myFirstRoundLastPlayersTurnId = (*it_2)->getId();
                     formerRunningPlayerFound = true;
                     break;
                 }
@@ -283,9 +283,9 @@ void BettingRound::handleFirstRun()
         // heads up: bigBlind begins -> dealer/smallBlind is running player before bigBlind
         else
         {
-            firstRoundLastPlayersTurnId = smallBlindPositionId;
+            myFirstRoundLastPlayersTurnId = mySmallBlindPositionId;
         }
-        currentPlayersTurnId = firstRoundLastPlayersTurnId;
+        myCurrentPlayersTurnId = myFirstRoundLastPlayersTurnId;
     }
 }
 GameState BettingRound::getBettingRoundID() const
@@ -299,25 +299,25 @@ void BettingRound::setHighestCardsValue(int /*theValue*/)
 
 void BettingRound::setMinimumRaise(int theValue)
 {
-    minimumRaise = theValue;
+    myMinimumRaise = theValue;
 }
 int BettingRound::getMinimumRaise() const
 {
-    return minimumRaise;
+    return myMinimumRaise;
 }
 
 void BettingRound::setFullBetRule(bool theValue)
 {
-    fullBetRule = theValue;
+    myFullBetRule = theValue;
 }
 bool BettingRound::getFullBetRule() const
 {
-    return fullBetRule;
+    return myFullBetRule;
 }
 
 void BettingRound::skipFirstRunGui()
 {
-    firstRunGui = false;
+    myFirstRunGui = false;
 }
 
 void BettingRound::postRiverRun() {};
@@ -329,118 +329,118 @@ IHand* BettingRound::getHand() const
 
 int BettingRound::getDealerPosition() const
 {
-    return dealerPosition;
+    return myDealerPosition;
 }
 void BettingRound::setDealerPosition(int theValue)
 {
-    dealerPosition = theValue;
+    myDealerPosition = theValue;
 }
 
 void BettingRound::setCurrentPlayersTurnId(unsigned theValue)
 {
-    currentPlayersTurnId = theValue;
+    myCurrentPlayersTurnId = theValue;
 }
 unsigned BettingRound::getCurrentPlayersTurnId() const
 {
-    return currentPlayersTurnId;
+    return myCurrentPlayersTurnId;
 }
 
 void BettingRound::setFirstRoundLastPlayersTurnId(unsigned theValue)
 {
-    firstRoundLastPlayersTurnId = theValue;
+    myFirstRoundLastPlayersTurnId = theValue;
 }
 unsigned BettingRound::getFirstRoundLastPlayersTurnId() const
 {
-    return firstRoundLastPlayersTurnId;
+    return myFirstRoundLastPlayersTurnId;
 }
 
 void BettingRound::setCurrentPlayersTurnIt(PlayerListIterator theValue)
 {
-    currentPlayersTurnIt = theValue;
+    myCurrentPlayersTurnIt = theValue;
 }
 PlayerListIterator BettingRound::getCurrentPlayersTurnIt() const
 {
-    return currentPlayersTurnIt;
+    return myCurrentPlayersTurnIt;
 }
 
 void BettingRound::setLastPlayersTurnIt(PlayerListIterator theValue)
 {
-    lastPlayersTurnIt = theValue;
+    myLastPlayersTurnIt = theValue;
 }
 PlayerListIterator BettingRound::getLastPlayersTurnIt() const
 {
-    return lastPlayersTurnIt;
+    return myLastPlayersTurnIt;
 }
 
 void BettingRound::setHighestSet(int theValue)
 {
-    highestSet = theValue;
+    myHighestSet = theValue;
 }
 int BettingRound::getHighestSet() const
 {
-    return highestSet;
+    return myHighestSet;
 }
 
 void BettingRound::setFirstRun(bool theValue)
 {
-    firstRun = theValue;
+    myFirstRun = theValue;
 }
 bool BettingRound::getFirstRun() const
 {
-    return firstRun;
+    return myFirstRun;
 }
 
 void BettingRound::setFirstRound(bool theValue)
 {
-    firstRound = theValue;
+    myFirstRound = theValue;
 }
 bool BettingRound::getFirstRound() const
 {
-    return firstRound;
+    return myFirstRound;
 }
 
 void BettingRound::setDealerPositionId(unsigned theValue)
 {
-    dealerPositionId = theValue;
+    myDealerPositionId = theValue;
 }
 unsigned BettingRound::getDealerPositionId() const
 {
-    return dealerPositionId;
+    return myDealerPositionId;
 }
 
 void BettingRound::setSmallBlindPositionId(unsigned theValue)
 {
-    smallBlindPositionId = theValue;
+    mySmallBlindPositionId = theValue;
 }
 unsigned BettingRound::getSmallBlindPositionId() const
 {
-    return smallBlindPositionId;
+    return mySmallBlindPositionId;
 }
 
 void BettingRound::setBigBlindPositionId(unsigned theValue)
 {
-    bigBlindPositionId = theValue;
+    myBigBlindPositionId = theValue;
 }
 unsigned BettingRound::getBigBlindPositionId() const
 {
-    return bigBlindPositionId;
+    return myBigBlindPositionId;
 }
 
 void BettingRound::setSmallBlindPosition(int theValue)
 {
-    smallBlindPosition = theValue;
+    mySmallBlindPosition = theValue;
 }
 int BettingRound::getSmallBlindPosition() const
 {
-    return smallBlindPosition;
+    return mySmallBlindPosition;
 }
 
 void BettingRound::setSmallBlind(int theValue)
 {
-    smallBlind = theValue;
+    mySmallBlind = theValue;
 }
 int BettingRound::getSmallBlind() const
 {
-    return smallBlind;
+    return mySmallBlind;
 }
 } // namespace pkt::core

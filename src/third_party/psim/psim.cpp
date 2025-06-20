@@ -38,7 +38,7 @@ Simulate::Hand IntsToHand(const int* hand)
 }
 
 /// Pass in a string like "Ah Ad 2s Tc 4d 5h" and this'll process it into a useful structure.
-Simulate::Hand StringToHand(const char* hand)
+Simulate::Hand stringToHand(const char* hand)
 {
     std::vector<CardMask> cardVec;
     cardVec.reserve(7);
@@ -100,52 +100,52 @@ Simulate::Hand StringToHand(const char* hand)
 }
 } // namespace
 
-void GetHandState(const char* hand, PostFlopState* state)
+void getHandState(const char* hand, PostFlopState* state)
 {
-    Simulate::Hand shand = StringToHand(hand);
-    Simulate::GetHandState(shand, state);
+    Simulate::Hand shand = stringToHand(hand);
+    Simulate::getHandState(shand, state);
 }
 
-void GetHandState(const int* hand, PostFlopState* state)
-{
-    Simulate::Hand shand = IntsToHand(hand);
-    Simulate::GetHandState(shand, state);
-}
-
-unsigned int RankHand(const char* hand)
-{
-    Simulate::Hand shand = StringToHand(hand);
-    return Simulate::RankHand(shand);
-}
-
-unsigned int RankHand(const int* hand)
+void getHandState(const int* hand, PostFlopState* state)
 {
     Simulate::Hand shand = IntsToHand(hand);
-    return Simulate::RankHand(shand);
+    Simulate::getHandState(shand, state);
 }
 
-void SimulateHand(const char* hand, SimResults* results, float lowRange, float highRange, unsigned int boards)
+unsigned int rankHand(const char* hand)
 {
-    Simulate::Hand shand = StringToHand(hand);
-    Simulate::SimulateHand(shand, results, lowRange, highRange, boards);
+    Simulate::Hand shand = stringToHand(hand);
+    return Simulate::rankHand(shand);
 }
 
-void SimulateHand(const int* hand, SimResults* results, float lowRange, float highRange, unsigned int boards)
+unsigned int rankHand(const int* hand)
 {
     Simulate::Hand shand = IntsToHand(hand);
-    Simulate::SimulateHand(shand, results, lowRange, highRange, boards);
+    return Simulate::rankHand(shand);
 }
 
-void SimulateHandMulti(const char* hand, SimResults* results, unsigned int boards, unsigned int hands,
+void simulateHand(const char* hand, SimResults* results, float lowRange, float highRange, unsigned int boards)
+{
+    Simulate::Hand shand = stringToHand(hand);
+    Simulate::simulateHand(shand, results, lowRange, highRange, boards);
+}
+
+void simulateHand(const int* hand, SimResults* results, float lowRange, float highRange, unsigned int boards)
+{
+    Simulate::Hand shand = IntsToHand(hand);
+    Simulate::simulateHand(shand, results, lowRange, highRange, boards);
+}
+
+void simulateHandMulti(const char* hand, SimResults* results, unsigned int boards, unsigned int hands,
                        unsigned int numOpponents)
 {
-    Simulate::Hand shand = StringToHand(hand);
-    Simulate::SimulateHandMulti(shand, results, boards, hands, numOpponents);
+    Simulate::Hand shand = stringToHand(hand);
+    Simulate::simulateHandMulti(shand, results, boards, hands, numOpponents);
 }
 
-void SimulateHandMulti(const int* hand, SimResults* results, unsigned int boards, unsigned int hands,
+void simulateHandMulti(const int* hand, SimResults* results, unsigned int boards, unsigned int hands,
                        unsigned int numOpponents)
 {
     Simulate::Hand shand = IntsToHand(hand);
-    Simulate::SimulateHandMulti(shand, results, boards, hands, numOpponents);
+    Simulate::simulateHandMulti(shand, results, boards, hands, numOpponents);
 }

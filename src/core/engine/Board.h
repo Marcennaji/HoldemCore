@@ -33,7 +33,7 @@ class Board : public IBoard
     void getCards(int* theValue);
 
     void setAllInCondition(bool theValue);
-    void setLastActionPlayerID(unsigned theValue);
+    void setLastActionPlayerId(unsigned theValue);
 
     int getPot() const;
     void setPot(int theValue);

@@ -16,7 +16,7 @@ std::unique_ptr<IBotStrategy> StrategyAssigner::chooseStrategyFor(int botIndex)
 {
     int rand = std::rand() % 12;
 
-    if (myProfile == TIGHT_AGRESSIVE_OPPONENTS)
+    if (myProfile == TightAgressiveOpponents)
     {
         if (rand % 2 == 0)
         {
@@ -28,7 +28,7 @@ std::unique_ptr<IBotStrategy> StrategyAssigner::chooseStrategyFor(int botIndex)
         }
     }
 
-    if (myProfile == LARGE_AGRESSIVE_OPPONENTS)
+    if (myProfile == LargeAgressiveOpponents)
     {
         if (rand % 2 == 0)
         {
@@ -40,7 +40,7 @@ std::unique_ptr<IBotStrategy> StrategyAssigner::chooseStrategyFor(int botIndex)
         }
     }
 
-    // RANDOM_OPPONENTS profile
+    // RandomOpponents profile
     if (rand < 3 && countManiac++ < maxPerType)
         return std::make_unique<ManiacBotStrategy>();
     if (rand < 5 && countUltraTight++ < maxPerType)

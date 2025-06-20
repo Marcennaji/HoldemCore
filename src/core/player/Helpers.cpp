@@ -17,7 +17,7 @@ using namespace std;
 void shufflePlayers(std::list<std::shared_ptr<Player>>& players, unsigned humanId)
 {
     std::vector<std::shared_ptr<Player>> v(players.begin(), players.end());
-    auto it = std::find_if(v.begin(), v.end(), [=](auto& p) { return p->getID() == humanId; });
+    auto it = std::find_if(v.begin(), v.end(), [=](auto& p) { return p->getId() == humanId; });
     if (it != v.end())
         std::swap(v.front(), *it);
 
@@ -181,11 +181,11 @@ const int getDrawingProbability(const PostFlopState& postFlopState)
     // TODO : this is not correct, as we must also take into account the other players actions, and their stacks
     /*if (currentHand->getCurrentRound() == GameStateFlop)
     {
-        const int lastRaiserID = currentHand->getLastRaiserID();
+        const int lastRaiserId = currentHand->getLastRaiserId();
 
-        if (lastRaiserID != -1)
+        if (lastRaiserId != -1)
         {
-            std::shared_ptr<Player> lastRaiser = getPlayerByUniqueId(lastRaiserID);
+            std::shared_ptr<Player> lastRaiser = getPlayerByUniqueId(lastRaiserId);
             const std::vector<PlayerAction>& actions = lastRaiser->getCurrentHandActions().getFlopActions();
 
             for (std::vector<PlayerAction>::const_iterator itAction = actions.begin(); itAction != actions.end();

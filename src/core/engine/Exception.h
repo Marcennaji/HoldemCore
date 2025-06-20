@@ -22,15 +22,15 @@ class Exception : public std::exception
 
     virtual ~Exception() throw();
 
-    int getErrorId() const { return static_cast<const int>(myMErrorId); }
-    int getOsErrorCode() const { return myMOsErrorCode; }
+    int getErrorId() const { return static_cast<const int>(myErrorId); }
+    int getOsErrorCode() const { return myOsErrorCode; }
 
     virtual const char* what() const throw();
 
   private:
-    EngineError myMErrorId;
-    int myMOsErrorCode;
+    EngineError myErrorId;
+    int myOsErrorCode;
 
-    std::string myMMsg;
+    std::string myMsg;
 };
 } // namespace pkt::core

@@ -78,7 +78,7 @@ void HandTest::initializeHandWithPlayers(size_t activePlayerCount)
     gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
     gameData.startMoney = 1000;
     gameData.firstSmallBlind = 10;
-    gameData.tableProfile = TableProfile::RANDOM_OPPONENTS;
+    gameData.tableProfile = TableProfile::RandomOpponents;
 
     StartData startData;
     startData.startDealerPlayerId = 0;

@@ -46,13 +46,13 @@ float PlayerStatistics::getWentToShowDown() const
     return ((m_riverStatistics.m_hands - m_riverStatistics.m_folds) * 100) / (m_flopStatistics.m_hands);
 }
 
-void PreflopStatistics::AddLastAction(PlayerAction p)
+void PreflopStatistics::addLastAction(PlayerAction p)
 {
     m_lastActions.push_back(p);
     if (m_lastActions.size() > LAST_ACTIONS_STACK_SIZE)
         m_lastActions.pop_front();
 }
-int PreflopStatistics::GetLastActionsNumber(PlayerAction p) const
+int PreflopStatistics::getLastActionsNumber(PlayerAction p) const
 {
 
     int result = 0;

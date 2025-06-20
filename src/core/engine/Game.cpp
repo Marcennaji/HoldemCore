@@ -20,12 +20,12 @@ using namespace pkt::core::player;
 
 Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, const PlayerList& playerList,
            const GameData& gameData, const StartData& startData, int gameId)
-    : myFactory(factory), myEvents(events), startQuantityPlayers(startData.numberOfPlayers),
-      startCash(gameData.startMoney), startSmallBlind(gameData.firstSmallBlind), myGameID(gameId),
-      currentSmallBlind(gameData.firstSmallBlind), currentHandID(0), dealerPosition(0), lastHandBlindsRaised(1),
-      lastTimeBlindsRaised(0), myGameData(gameData), myStartData(startData)
+    : myFactory(factory), myEvents(events), myStartQuantityPlayers(startData.numberOfPlayers),
+      myStartCash(gameData.startMoney), myStartSmallBlind(gameData.firstSmallBlind), myGameId(gameId),
+      myCurrentSmallBlind(gameData.firstSmallBlind), myCurrentHandId(0), myDealerPosition(0), myLastHandBlindsRaised(1),
+      myLastTimeBlindsRaised(0), myGameData(gameData), myStartData(startData)
 {
-    dealerPosition = startData.startDealerPlayerId;
+    myDealerPosition = startData.startDealerPlayerId;
 
     // determine dealer position
     PlayerListConstIterator player_i = playerList->begin();
@@ -33,45 +33,45 @@ Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, con
 
     while (player_i != player_end)
     {
-        if ((*player_i)->getID() == dealerPosition)
+        if ((*player_i)->getId() == myDealerPosition)
             break;
         ++player_i;
     }
     if (player_i == player_end)
-        throw Exception(__FILE__, __LINE__, EngineError::DEALER_NOT_FOUND);
+        throw Exception(__FILE__, __LINE__, EngineError::DealerNotFound);
 
     // create board
-    currentBoard = myFactory->createBoard(dealerPosition);
+    myCurrentBoard = myFactory->createBoard(myDealerPosition);
 
     // create player lists
-    seatsList.reset(new std::list<std::shared_ptr<Player>>);
-    activePlayerList.reset(new std::list<std::shared_ptr<Player>>);
-    runningPlayerList.reset(new std::list<std::shared_ptr<Player>>);
+    mySeatsList.reset(new std::list<std::shared_ptr<Player>>);
+    myActivePlayerList.reset(new std::list<std::shared_ptr<Player>>);
+    myRunningPlayerList.reset(new std::list<std::shared_ptr<Player>>);
 
-    (*runningPlayerList) = (*playerList);
-    (*activePlayerList) = (*playerList);
-    (*seatsList) = (*playerList);
+    (*myRunningPlayerList) = (*playerList);
+    (*myActivePlayerList) = (*playerList);
+    (*mySeatsList) = (*playerList);
 
-    currentBoard->setPlayerLists(seatsList, activePlayerList, runningPlayerList);
+    myCurrentBoard->setPlayerLists(mySeatsList, myActivePlayerList, myRunningPlayerList);
 
-    GlobalServices::instance().rankingStore()->updateRankingPlayedGames(activePlayerList);
+    GlobalServices::instance().rankingStore()->updateRankingPlayedGames(myActivePlayerList);
 }
 
 Game::~Game()
 {
-    runningPlayerList->clear();
-    activePlayerList->clear();
-    seatsList->clear();
+    myRunningPlayerList->clear();
+    myActivePlayerList->clear();
+    mySeatsList->clear();
 }
 
 std::shared_ptr<IHand> Game::getCurrentHand()
 {
-    return currentHand;
+    return myCurrentHand;
 }
 
 const std::shared_ptr<IHand> Game::getCurrentHand() const
 {
-    return currentHand;
+    return myCurrentHand;
 }
 
 void Game::initHand()
@@ -81,23 +81,23 @@ void Game::initHand()
     PlayerListConstIterator it_c;
     PlayerListIterator it;
 
-    currentHandID++;
+    myCurrentHandId++;
 
     // set player action none
-    for (it = seatsList->begin(); it != seatsList->end(); ++it)
+    for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
         (*it)->setAction(PlayerActionNone);
     }
 
     // set player with empty cash inactive
-    it = activePlayerList->begin();
-    while (it != activePlayerList->end())
+    it = myActivePlayerList->begin();
+    while (it != myActivePlayerList->end())
     {
 
         if ((*it)->getCash() == 0)
         {
             (*it)->setActiveStatus(false);
-            it = activePlayerList->erase(it);
+            it = myActivePlayerList->erase(it);
         }
         else
         {
@@ -105,38 +105,38 @@ void Game::initHand()
         }
     }
 
-    runningPlayerList->clear();
-    (*runningPlayerList) = (*activePlayerList);
+    myRunningPlayerList->clear();
+    (*myRunningPlayerList) = (*myActivePlayerList);
 
     // create Hand
-    currentHand = myFactory->createHand(myFactory, currentBoard, seatsList, activePlayerList, runningPlayerList,
-                                        currentHandID, myGameData, myStartData);
+    myCurrentHand = myFactory->createHand(myFactory, myCurrentBoard, mySeatsList, myActivePlayerList,
+                                          myRunningPlayerList, myCurrentHandId, myGameData, myStartData);
 
     bool nextDealerFound = false;
-    PlayerListConstIterator dealerPositionIt = currentHand->getSeatIt(dealerPosition);
-    if (dealerPositionIt == seatsList->end())
+    PlayerListConstIterator dealerPositionIt = myCurrentHand->getSeatIt(myDealerPosition);
+    if (dealerPositionIt == mySeatsList->end())
     {
-        throw Exception(__FILE__, __LINE__, EngineError::SEAT_NOT_FOUND);
+        throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
     }
 
-    for (i = 0; i < seatsList->size(); i++)
+    for (i = 0; i < mySeatsList->size(); i++)
     {
 
         ++dealerPositionIt;
-        if (dealerPositionIt == seatsList->end())
-            dealerPositionIt = seatsList->begin();
+        if (dealerPositionIt == mySeatsList->end())
+            dealerPositionIt = mySeatsList->begin();
 
-        it_c = currentHand->getActivePlayerIt((*dealerPositionIt)->getID());
-        if (it_c != activePlayerList->end())
+        it_c = myCurrentHand->getActivePlayerIt((*dealerPositionIt)->getId());
+        if (it_c != myActivePlayerList->end())
         {
             nextDealerFound = true;
-            dealerPosition = (*it_c)->getID();
+            myDealerPosition = (*it_c)->getId();
             break;
         }
     }
     if (!nextDealerFound)
     {
-        throw Exception(__FILE__, __LINE__, EngineError::NEXT_DEALER_NOT_FOUND);
+        throw Exception(__FILE__, __LINE__, EngineError::NextDealerNotFound);
     }
 }
 
@@ -145,7 +145,7 @@ void Game::startHand()
     if (myEvents.onNextBettingRoundInitializeGui)
         myEvents.onNextBettingRoundInitializeGui();
 
-    currentHand->start();
+    myCurrentHand->start();
 }
 
 std::shared_ptr<Player> Game::getPlayerByUniqueId(unsigned id)
@@ -155,7 +155,7 @@ std::shared_ptr<Player> Game::getPlayerByUniqueId(unsigned id)
     PlayerListIterator end = getSeatsList()->end();
     while (i != end)
     {
-        if ((*i)->getID() == id)
+        if ((*i)->getId() == id)
         {
             tmpPlayer = *i;
             break;
@@ -170,7 +170,7 @@ std::shared_ptr<Player> Game::getCurrentPlayer()
     std::shared_ptr<Player> tmpPlayer =
         getPlayerByUniqueId(getCurrentHand()->getCurrentBettingRound()->getCurrentPlayersTurnId());
     if (!tmpPlayer.get())
-        throw Exception(__FILE__, __LINE__, EngineError::CURRENT_PLAYER_NOT_FOUND);
+        throw Exception(__FILE__, __LINE__, EngineError::CurrentPlayerNotFound);
     return tmpPlayer;
 }
 
