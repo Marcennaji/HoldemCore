@@ -26,8 +26,6 @@ class PreflopRangeEstimator
     std::string computeEstimatedPreflopRangeFromLastRaiser(CurrentHandContext& ctx) const;
     std::string computeEstimatedPreflopRangeFromCaller(CurrentHandContext& ctx) const;
 
-    std::string computeEstimatedPreflopRangeFromCaller_old(CurrentHandContext& ctx) const;
-
   private:
     // Analyze player actions to count raises and calls
     void analyzePlayerActions(const CurrentHandContext& ctx, int& raises, int& calls) const;

@@ -12,7 +12,7 @@ class CurrentHandActions
 {
   public:
     CurrentHandActions() { reset(); };
-    ~CurrentHandActions() {};
+    ~CurrentHandActions() = default;
 
     void reset(); // init to zero
 
