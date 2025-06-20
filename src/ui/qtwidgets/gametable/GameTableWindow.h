@@ -7,7 +7,7 @@
 #include <core/engine/model/GameData.h>
 #include <core/engine/model/GameState.h>
 #include <core/engine/model/StartData.h>
-#include "ui_gametable.h"
+#include "ui_GameTableWindow.h"
 
 #include <core/session/Session.h>
 

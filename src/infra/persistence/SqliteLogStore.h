@@ -59,10 +59,10 @@ class SqliteLogStore
     void updatePlayerStatistics(PlayerStatistics& stats, const std::string& columnName, sqlite3_stmt* stmt,
                                 int nCol) const;
 
-    sqlite3* mySqliteLogDb;
+    sqlite3* mySqliteLogDb{nullptr};
     std::filesystem::path mySqliteLogFileName;
-    int myUniqueGameId;
-    int myCurrentHandId;
+    int myUniqueGameId{0};
+    int myCurrentHandId{0};
     std::string mySql;
     std::string myLogDir;
 };

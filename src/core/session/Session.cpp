@@ -29,13 +29,11 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-Session::Session(const GameEvents& events) : myCurrentGameNum(0), myEvents(events)
+Session::Session(const GameEvents& events) : myEvents(events)
 {
 }
 
-Session::~Session()
-{
-}
+Session::~Session() = default;
 
 void Session::startGame(const GameData& gameData, const StartData& startData)
 {
@@ -43,9 +41,13 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
     myCurrentGameNum++;
 
     if (myEvents.onHideHoleCards)
+    {
         myEvents.onHideHoleCards();
+    }
     if (myEvents.onInitializeGui)
+    {
         myEvents.onInitializeGui(gameData.guiSpeed);
+    }
 
     auto engineFactory = std::make_shared<EngineFactory>(myEvents);
 

@@ -26,7 +26,7 @@ class Session
     std::shared_ptr<Game> getCurrentGame();
 
   private:
-    int myCurrentGameNum;
+    int myCurrentGameNum{0};
 
     std::shared_ptr<Game> myCurrentGame;
     GameEvents myEvents;

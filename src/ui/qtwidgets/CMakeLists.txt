@@ -22,6 +22,8 @@ qt_wrap_ui(UI_GENERATED_FILES ${UI_FILES})
 
 # Automatically process files that require MOC
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
 
 # Create a static library
 add_library(qtwidgets STATIC ${LIB_SOURCES} ${INCLUDE_HEADERS} ${UI_GENERATED_FILES})

@@ -7,10 +7,9 @@
 #include <assert.h>
 #include <memory>
 
-#include "ui_startwindow.h"
-
 #include <core/engine/EngineDefs.h>
 #include <core/session/Session.h>
+#include "ui_StartWindow.h"
 
 #include <QtWidgets/QMainWindow>
 
