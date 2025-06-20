@@ -20,8 +20,8 @@ class PreflopStatistics
     float getPreflop3Bet() const;
     float getPreflop4Bet() const;
     float getPreflopCall3BetsFrequency() const;
-    void AddLastAction(PlayerAction);
-    int GetLastActionsNumber(PlayerAction p) const;
+    void addLastAction(PlayerAction);
+    int getLastActionsNumber(PlayerAction p) const;
 
     void reset();
 
@@ -106,7 +106,7 @@ class PlayerStatistics
 {
   public:
     PlayerStatistics() { reset(); }
-    ~PlayerStatistics() {}
+    ~PlayerStatistics() = default;
 
     const PreflopStatistics& getPreflopStatistics() const;
     const FlopStatistics& getFlopStatistics() const;

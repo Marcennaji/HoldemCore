@@ -28,7 +28,7 @@ class StartWindow;
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
-    int* p = NULL;
+    int* p = nullptr;
     pkt::infra::AppDirectories dirs = pkt::infra::AppDirectories::initialize();
 
     QString appPath = QString::fromStdString(dirs.appDataDir);

@@ -45,15 +45,15 @@ class SqliteLogStore
 
   private:
     void createDatabase();
-    void InitializeStrategyStatistics(const std::string playerName, const int nbPlayers);
-    void exec_transaction();
+    void initializeStrategyStatistics(const std::string playerName, const int nbPlayers);
+    void execTransaction();
     int getIntegerValue(const std::string playerName, const std::string tableName, const std::string attributeName);
     void createRankingTable();
     void createUnplausibleHandsTable();
 
     bool validateLogDirectory(std::filesystem::path& sqliteLogFileName) const;
     bool openDatabase(const std::filesystem::path& sqliteLogFileName, sqlite3*& db) const;
-    bool prepareStatement(sqlite3* db, const std::string& sql_select, sqlite3_stmt*& stmt) const;
+    bool prepareStatement(sqlite3* db, const std::string& sqlSelect, sqlite3_stmt*& stmt) const;
     void processQueryResults(sqlite3_stmt* stmt,
                              std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1>& playerStatistics) const;
     void updatePlayerStatistics(PlayerStatistics& stats, const std::string& columnName, sqlite3_stmt* stmt,
@@ -61,9 +61,9 @@ class SqliteLogStore
 
     sqlite3* mySqliteLogDb;
     std::filesystem::path mySqliteLogFileName;
-    int uniqueGameID;
-    int currentHandID;
-    std::string sql;
+    int myUniqueGameId;
+    int myCurrentHandId;
+    std::string mySql;
     std::string myLogDir;
 };
 } // namespace pkt::infra

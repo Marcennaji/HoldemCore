@@ -16,7 +16,7 @@
 
 class GameTableWindow;
 
-class StartWindow : public QMainWindow, public Ui::startWindow
+class StartWindow : public QMainWindow, public Ui::StartWindow
 {
     Q_OBJECT
   public:

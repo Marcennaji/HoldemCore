@@ -14,7 +14,7 @@ namespace pkt::infra
 
 class ConsoleLogger : public pkt::core::ILogger
 {
-    int logLevel;
+    int myLogLevel;
 
   public:
     explicit ConsoleLogger(int level = 1);

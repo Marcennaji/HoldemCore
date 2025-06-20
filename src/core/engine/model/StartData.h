@@ -9,7 +9,7 @@ namespace pkt::core
 
 struct StartData
 {
-    StartData() {}
+    StartData() = default;
     unsigned startDealerPlayerId{0};
     int numberOfPlayers{0};
 };

@@ -9,9 +9,9 @@ namespace pkt::core
 {
 enum TableProfile
 {
-    RANDOM_OPPONENTS = 1,
-    TIGHT_AGRESSIVE_OPPONENTS,
-    LARGE_AGRESSIVE_OPPONENTS,
-    MANIAC_OPPONENTS
+    RandomOpponents = 1,
+    TightAgressiveOpponents,
+    LargeAgressiveOpponents,
+    ManiacOpponents
 };
 }
