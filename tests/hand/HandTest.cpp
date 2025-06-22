@@ -160,4 +160,52 @@ TEST_F(HandTest, DealCards_NoOverlap_OverMultipleRounds)
     }
 }
 
+TEST_F(HandTest, SwitchRounds_TransitionsCorrectlyThroughAllPhases)
+{
+    initializeHandForTesting(6);
+    hand->setCurrentRound(GameStatePreflop);
+    hand->setAllInCondition(false); // normal game
+
+    hand->switchRounds();
+    EXPECT_EQ(hand->getCurrentRound(), GameStateFlop);
+
+    hand->switchRounds();
+    EXPECT_EQ(hand->getCurrentRound(), GameStateTurn);
+
+    hand->switchRounds();
+    EXPECT_EQ(hand->getCurrentRound(), GameStateRiver);
+
+    // After river, no more transitions
+    hand->switchRounds();
+    EXPECT_EQ(hand->getCurrentRound(), GameStateRiver);
+}
+
+TEST_F(HandTest, SwitchRounds_DoesNotAdvanceWhenAllInConditionIsTrue)
+{
+    initializeHandForTesting(6);
+    hand->setCurrentRound(GameStateFlop);
+    hand->setAllInCondition(true); // simulate all-in stop
+
+    hand->switchRounds();
+    EXPECT_EQ(hand->getCurrentRound(), GameStateFlop);
+}
+
+TEST_F(HandTest, SwitchRounds_DoesNotAdvancePastRiver)
+{
+    initializeHandForTesting(6);
+    hand->setCurrentRound(GameStateRiver);
+
+    hand->switchRounds(); // should not move past river
+    EXPECT_EQ(hand->getCurrentRound(), GameStateRiver);
+}
+
+TEST_F(HandTest, SwitchRounds_SkipsWhenOnlyOnePlayerRunning)
+{
+    initializeHandForTesting(1);
+    hand->setCurrentRound(GameStatePreflop);
+
+    hand->switchRounds();                                 // should detect end of game
+    EXPECT_EQ(hand->getCurrentRound(), GameStatePreflop); // or GameStateRiver if end state forced
+}
+
 } // namespace pkt::test
