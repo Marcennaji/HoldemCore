@@ -77,21 +77,6 @@ This project is under **active refactoring**, with major milestones completed:
 
 ---
 
-## 🙋 About Me
-
-I'm a senior freelance C++ / Python developer, and this project is both a portfolio piece and a real-world training tool.
-
-It demonstrates:
-
-* Domain-driven design in games
-* Code decoupling and modularization, applying the SOLID and clean architecture principles
-* Clean testing practices
-* Cross-platform architecture thinking
-
-📫 Feel free to reach out or contribute if you're interested in poker strategy simulation, bots, or frontends.
-
----
-
 ## 📁 Project Structure (Simplified)
 
 ```
@@ -130,6 +115,20 @@ This project uses or integrates the following third-party libraries:
 > All third-party libraries are included in accordance with their respective open-source licenses.  
 > Please refer to the `third_party/` directory for license information where applicable.
 
+## 🙋 About Me
+
+I'm a senior freelance C++ / Python developer, and this project is both a portfolio piece and a real-world training tool.
+
+It demonstrates:
+
+* Domain-driven design in games
+* Code decoupling and modularization, applying the SOLID and clean architecture principles
+* Clean testing practices
+* Cross-platform architecture thinking
+
+📫 Feel free to reach out or contribute if you're interested in poker strategy simulation, bots, or frontends.
+
+---
 
 ## 📝 License
 
