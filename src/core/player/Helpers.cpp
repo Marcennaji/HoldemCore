@@ -8,6 +8,7 @@
 #include <fstream>
 #include <random>
 #include <sstream>
+#include <string.h>
 #include <string>
 
 namespace pkt::core::player
