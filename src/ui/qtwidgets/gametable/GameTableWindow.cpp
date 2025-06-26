@@ -374,41 +374,16 @@ GameTableWindow::GameTableWindow(const std::string& appDataDir, QMainWindow* par
 
     connect(pushButton_break, SIGNAL(clicked()), this, SLOT(breakButtonClicked()));
 
-    // connect(this, SIGNAL(signalinitializeGui(int)), this, SLOT(initializeGui(int)));
-    // connect(this, SIGNAL(signalRefreshSet()), this, SLOT(refreshSet()));
-    // connect(this, SIGNAL(signalRefreshCash()), this, SLOT(refreshCash()));
-    // connect(this, SIGNAL(signalRefreshAction(int, int)), this, SLOT(refreshAction(int, int)));
-    // connect(this, SIGNAL(signalRefreshChangePlayer()), this, SLOT(refreshChangePlayer()));
-    // connect(this, SIGNAL(signalRefreshPot()), this, SLOT(refreshPot()));
-    // connect(this, SIGNAL(signalrefreshPlayersActiveInactiveStyles(int, int)), this,
-    // SLOT(refreshPlayersActiveInactiveStyles(int, int))); connect(this, SIGNAL(signalRefreshAll()), this,
-    // SLOT(refreshAll())); connect(this, SIGNAL(signalRefreshPlayerName()), this, SLOT(refreshPlayerName()));
-    // connect(this, SIGNAL(signalrefreshDealerAndBlindsButtons()), this, SLOT(refreshDealerAndBlindsButtons()));
-    // connect(this, SIGNAL(signalrefreshTableDescriptiveLabels(int)), this, SLOT(refreshTableDescriptiveLabels(int)));
-    // connect(this, SIGNAL(signalGuiUpdateDone()), this, SLOT(guiUpdateDone()));
-    // connect(this, SIGNAL(signalDoHumanAction()), this, SLOT(doHumanAction()));
-    // connect(this, SIGNAL(signalDisableMyButtons()), this, SLOT(disableMyButtons()));
-    // connect(this, SIGNAL(signalupdateHumanPlayerButtonsState()), this, SLOT(updateHumanPlayerButtonsState()));
-    // connect(this, SIGNAL(signalDealBettingRoundCards(int)), this, SLOT(dealBettingRoundCards(int)));
-    // connect(this, SIGNAL(signalDealHoleCards()), this, SLOT(dealHoleCards()));
     connect(this, SIGNAL(signalDealFlopCards0()), this, SLOT(dealFlopCards0()));
     connect(this, SIGNAL(signalDealTurnCards0()), this, SLOT(dealTurnCards0()));
     connect(this, SIGNAL(signalDealRiverCards0()), this, SLOT(dealRiverCards0()));
-    // connect(this, SIGNAL(signalactivePlayerActionDone()), this, SLOT(activePlayerActionDone()));
-    // connect(this, SIGNAL(signalBettingRoundAnimation2(int)), this, SLOT(bettingRoundAnimation(int)));
-    // connect(this, SIGNAL(signalPreflopAnimation1()), this, SLOT(preflopAnimation1()));
-    connect(this, SIGNAL(signalPreflopAnimation2()), this, SLOT(preflopAnimation2()));
-    // connect(this, SIGNAL(signalFlopAnimation1()), this, SLOT(flopAnimation1()));
+    connect(this, SIGNAL(signalStartPreflop()), this, SLOT(startPreflop()));
+
     connect(this, SIGNAL(signalFlopAnimation2()), this, SLOT(flopAnimation2()));
-    // connect(this, SIGNAL(signalTurnAnimation1()), this, SLOT(turnAnimation1()));
+
     connect(this, SIGNAL(signalTurnAnimation2()), this, SLOT(turnAnimation2()));
-    // connect(this, SIGNAL(signalRiverAnimation1()), this, SLOT(riverAnimation1()));
-    connect(this, SIGNAL(signalRiverAnimation2()), this, SLOT(riverAnimation2()));
-    // connect(this, SIGNAL(signalPostRiverAnimation1()), this, SLOT(postRiverAnimation1()));
+
     connect(this, SIGNAL(signalPostRiverRunAnimation1()), this, SLOT(postRiverRunAnimation1()));
-    // connect(this, SIGNAL(signalPostRiverShowCards(unsigned)), this, SLOT(showHoleCards(unsigned)));
-    // connect(this, SIGNAL(signalFlipHoleCardsAllIn()), this, SLOT(flipHoleCardsAllIn()));
-    // connect(this, SIGNAL(signalnextBettingRoundInitializeGui()), this, SLOT(nextBettingRoundInitializeGui()));
 }
 
 GameTableWindow::~GameTableWindow()
@@ -458,7 +433,7 @@ void GameTableWindow::hideHoleCards()
     }
 }
 
-void GameTableWindow::initializeGui(int speed)
+void GameTableWindow::gameInitializeGui(int speed)
 {
     stopAllGuiTimers();
     setGameSpeed(speed);
@@ -2079,7 +2054,7 @@ void GameTableWindow::bettingRoundAnimation(int myBettingRoundID)
     }
 }
 
-void GameTableWindow::preflopAnimation1()
+void GameTableWindow::startPreflop()
 {
     preflopAnimation1Timer->start(nextPlayerSpeed2);
 }

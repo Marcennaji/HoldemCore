@@ -470,9 +470,9 @@ void Hand::switchRounds()
     {
     case GameStatePreflop:
     {
-        if (myEvents.onPreflopAnimation)
+        if (myEvents.onStartPreflop)
         {
-            myEvents.onPreflopAnimation();
+            myEvents.onStartPreflop();
         }
     }
     break;

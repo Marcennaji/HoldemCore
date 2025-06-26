@@ -44,9 +44,9 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
     {
         myEvents.onHideHoleCards();
     }
-    if (myEvents.onInitializeGui)
+    if (myEvents.onGameInitializeGui)
     {
-        myEvents.onInitializeGui(gameData.guiSpeed);
+        myEvents.onGameInitializeGui(gameData.guiSpeed);
     }
 
     auto engineFactory = std::make_shared<EngineFactory>(myEvents);

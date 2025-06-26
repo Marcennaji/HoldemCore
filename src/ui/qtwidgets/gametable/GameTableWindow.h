@@ -86,7 +86,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
 
   public slots:
 
-    void initializeGui(int speed);
+    void gameInitializeGui(int speed);
     void hideHoleCards();
 
     void refreshSet();
@@ -155,7 +155,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
 
     void bettingRoundAnimation(int);
 
-    void preflopAnimation1();
+    void startPreflop();
     void preflopAnimation1Action();
     void preflopAnimation2();
     void preflopAnimation2Action();

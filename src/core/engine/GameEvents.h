@@ -9,7 +9,7 @@ namespace pkt::core
 
 struct GameEvents
 {
-    std::function<void(int gameSpeed)> onInitializeGui;
+    std::function<void(int gameSpeed)> onGameInitializeGui;
 
     // --- Game state display ---
     std::function<void(int)> onPotUpdated;
@@ -39,7 +39,7 @@ struct GameEvents
     // --- Optional: animations ---
     std::function<void(int bettingRoundId)> onBettingRoundAnimation;
 
-    std::function<void()> onPreflopAnimation;
+    std::function<void()> onStartPreflop;
     std::function<void()> onFlopAnimation;
     std::function<void()> onTurnAnimation;
     std::function<void()> onRiverAnimation;

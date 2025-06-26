@@ -7,10 +7,10 @@ GuiBridgeWidgets::GuiBridgeWidgets(GameTableWindow* table, QObject* parent) : QO
 
 void GuiBridgeWidgets::connectTo(pkt::core::GameEvents& events)
 {
-    events.onInitializeGui = [this](int gameSpeed)
+    events.onGameInitializeGui = [this](int gameSpeed)
     {
         QMetaObject::invokeMethod(
-            myGameTableWindow, [this, gameSpeed]() { myGameTableWindow->initializeGui(gameSpeed); },
+            myGameTableWindow, [this, gameSpeed]() { myGameTableWindow->gameInitializeGui(gameSpeed); },
             Qt::DirectConnection);
     };
     events.onPotUpdated = [this](int pot)
@@ -103,10 +103,10 @@ void GuiBridgeWidgets::connectTo(pkt::core::GameEvents& events)
             myGameTableWindow, [this, bettingRoundId]() { myGameTableWindow->bettingRoundAnimation(bettingRoundId); },
             Qt::DirectConnection);
     };
-    events.onPreflopAnimation = [this]()
+    events.onStartPreflop = [this]()
     {
         QMetaObject::invokeMethod(
-            myGameTableWindow, [this]() { myGameTableWindow->preflopAnimation1(); }, Qt::DirectConnection);
+            myGameTableWindow, [this]() { myGameTableWindow->startPreflop(); }, Qt::DirectConnection);
     };
     events.onFlopAnimation = [this]()
     {
