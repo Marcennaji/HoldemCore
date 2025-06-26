@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <sstream>
+#include <string.h>
 #include <string>
 #include <vector>
 
@@ -43,7 +44,7 @@ Simulate::Hand stringToHand(const char* hand)
 
     char cs[] = "00";
 
-    size_t len = std::strlen(hand);
+    size_t len = strlen(hand);
 
     for (size_t x = 0; x < len; ++x)
     {
