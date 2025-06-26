@@ -2072,7 +2072,7 @@ void GameTableWindow::preflopAnimation2Action()
     myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getCurrentBettingRound()->nextPlayer();
 }
 
-void GameTableWindow::flopAnimation1()
+void GameTableWindow::startFlop()
 {
     flopAnimation1Timer->start(nextPlayerSpeed2);
 }
@@ -2090,7 +2090,7 @@ void GameTableWindow::flopAnimation2Action()
     myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getCurrentBettingRound()->nextPlayer();
 }
 
-void GameTableWindow::turnAnimation1()
+void GameTableWindow::startTurn()
 {
     turnAnimation1Timer->start(nextPlayerSpeed2);
 }
@@ -2108,7 +2108,7 @@ void GameTableWindow::turnAnimation2Action()
     myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getCurrentBettingRound()->nextPlayer();
 }
 
-void GameTableWindow::riverAnimation1()
+void GameTableWindow::startRiver()
 {
     riverAnimation1Timer->start(nextPlayerSpeed2);
 }
@@ -2126,7 +2126,7 @@ void GameTableWindow::riverAnimation2Action()
     myStartWindow->getSession()->getCurrentGame()->getCurrentHand()->getCurrentBettingRound()->nextPlayer();
 }
 
-void GameTableWindow::postRiverAnimation1()
+void GameTableWindow::startPostRiver()
 {
     postRiverAnimation1Timer->start(nextPlayerSpeed2);
 }

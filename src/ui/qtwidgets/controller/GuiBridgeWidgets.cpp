@@ -111,22 +111,22 @@ void GuiBridgeWidgets::connectTo(pkt::core::GameEvents& events)
     events.onStartFlop = [this]()
     {
         QMetaObject::invokeMethod(
-            myGameTableWindow, [this]() { myGameTableWindow->flopAnimation1(); }, Qt::DirectConnection);
+            myGameTableWindow, [this]() { myGameTableWindow->startFlop(); }, Qt::DirectConnection);
     };
     events.onStartTurn = [this]()
     {
         QMetaObject::invokeMethod(
-            myGameTableWindow, [this]() { myGameTableWindow->turnAnimation1(); }, Qt::DirectConnection);
+            myGameTableWindow, [this]() { myGameTableWindow->startTurn(); }, Qt::DirectConnection);
     };
     events.onStartRiver = [this]()
     {
         QMetaObject::invokeMethod(
-            myGameTableWindow, [this]() { myGameTableWindow->riverAnimation1(); }, Qt::DirectConnection);
+            myGameTableWindow, [this]() { myGameTableWindow->startRiver(); }, Qt::DirectConnection);
     };
     events.onStartPostRiver = [this]()
     {
         QMetaObject::invokeMethod(
-            myGameTableWindow, [this]() { myGameTableWindow->postRiverAnimation1(); }, Qt::DirectConnection);
+            myGameTableWindow, [this]() { myGameTableWindow->startPostRiver(); }, Qt::DirectConnection);
     };
     events.onPostRiverRunAnimation = [this]()
     {

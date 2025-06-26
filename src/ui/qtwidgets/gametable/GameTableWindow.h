@@ -77,7 +77,7 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     void signalactivePlayerActionDone();
 
     void signalPreflopAnimation2();
-    void signalFlopAnimation1();
+    void signalstartFlop();
     void signalFlopAnimation2();
 
     void signalTurnAnimation2();
@@ -160,22 +160,22 @@ class GameTableWindow : public QMainWindow, public Ui::gameTable
     void preflopAnimation2();
     void preflopAnimation2Action();
 
-    void flopAnimation1();
+    void startFlop();
     void flopAnimation1Action();
     void flopAnimation2();
     void flopAnimation2Action();
 
-    void turnAnimation1();
+    void startTurn();
     void turnAnimation1Action();
     void turnAnimation2();
     void turnAnimation2Action();
 
-    void riverAnimation1();
+    void startRiver();
     void riverAnimation1Action();
     void riverAnimation2();
     void riverAnimation2Action();
 
-    void postRiverAnimation1();
+    void startPostRiver();
     void postRiverAnimation1Action();
 
     void postRiverRunAnimation1();
