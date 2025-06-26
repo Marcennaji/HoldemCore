@@ -40,10 +40,10 @@ struct GameEvents
     std::function<void(int bettingRoundId)> onBettingRoundAnimation;
 
     std::function<void()> onStartPreflop;
-    std::function<void()> onFlopAnimation;
-    std::function<void()> onTurnAnimation;
-    std::function<void()> onRiverAnimation;
-    std::function<void()> onPostRiverAnimation;
+    std::function<void()> onStartFlop;
+    std::function<void()> onStartTurn;
+    std::function<void()> onStartRiver;
+    std::function<void()> onStartPostRiver;
     std::function<void()> onPostRiverRunAnimation;
     std::function<void()> onPauseHand;
 

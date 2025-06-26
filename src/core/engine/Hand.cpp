@@ -478,33 +478,33 @@ void Hand::switchRounds()
     break;
     case GameStateFlop:
     {
-        if (myEvents.onFlopAnimation)
+        if (myEvents.onStartFlop)
         {
-            myEvents.onFlopAnimation();
+            myEvents.onStartFlop();
         }
     }
     break;
     case GameStateTurn:
     {
-        if (myEvents.onTurnAnimation)
+        if (myEvents.onStartTurn)
         {
-            myEvents.onTurnAnimation();
+            myEvents.onStartTurn();
         }
     }
     break;
     case GameStateRiver:
     {
-        if (myEvents.onRiverAnimation)
+        if (myEvents.onStartRiver)
         {
-            myEvents.onRiverAnimation();
+            myEvents.onStartRiver();
         }
     }
     break;
     case GameStatePostRiver:
     {
-        if (myEvents.onPostRiverAnimation)
+        if (myEvents.onStartPostRiver)
         {
-            myEvents.onPostRiverAnimation();
+            myEvents.onStartPostRiver();
         }
     }
     break;
