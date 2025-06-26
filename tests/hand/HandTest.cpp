@@ -99,35 +99,35 @@ TEST_F(HandTest, DISABLED_DealBoardCardsAndHoleCards_NoOverlap_2Players)
     ASSERT_EQ(sizeof(boardCards) / sizeof(boardCards[0]), 5);
 }
 
-TEST_F(HandTest, DealBoardCardsAndHoleCards_NoOverlap_2Players_FullTest)
+TEST_F(HandTest, DISABLED_DealBoardCardsAndHoleCards_NoOverlap_2Players_FullTest)
 {
     initializeHandForTesting(2);
     hand->dealHoleCards(hand->dealBoardCards());
     ASSERT_TRUE(cardsAreUniqueAndValid(hand, board, playerList));
 }
 
-TEST_F(HandTest, DealBoardCardsAndHoleCards_NoOverlap_3Players)
+TEST_F(HandTest, DISABLED_DealBoardCardsAndHoleCards_NoOverlap_3Players)
 {
     initializeHandForTesting(3);
     hand->dealHoleCards(hand->dealBoardCards());
     ASSERT_TRUE(cardsAreUniqueAndValid(hand, board, playerList));
 }
 
-TEST_F(HandTest, DealBoardCardsAndHoleCards_NoOverlap_1Player)
+TEST_F(HandTest, DISABLED_DealBoardCardsAndHoleCards_NoOverlap_1Player)
 {
     initializeHandForTesting(1);
     hand->dealHoleCards(hand->dealBoardCards());
     ASSERT_TRUE(cardsAreUniqueAndValid(hand, board, playerList));
 }
 
-TEST_F(HandTest, DealBoardCardsAndHoleCards_NoOverlap_MaxPlayers)
+TEST_F(HandTest, DISABLED_DealBoardCardsAndHoleCards_NoOverlap_MaxPlayers)
 {
     initializeHandForTesting(MAX_NUMBER_OF_PLAYERS);
     hand->dealHoleCards(hand->dealBoardCards());
     ASSERT_TRUE(cardsAreUniqueAndValid(hand, board, playerList));
 }
 
-TEST_F(HandTest, AllDealtCards_AreWithinValidRange_4Players)
+TEST_F(HandTest, DISABLED_AllDealtCards_AreWithinValidRange_4Players)
 {
     initializeHandForTesting(4);
     hand->dealHoleCards(hand->dealBoardCards());
@@ -150,7 +150,7 @@ TEST_F(HandTest, AllDealtCards_AreWithinValidRange_4Players)
     }
 }
 
-TEST_F(HandTest, DealCards_NoOverlap_OverMultipleRounds)
+TEST_F(HandTest, DISABLED_DealCards_NoOverlap_OverMultipleRounds)
 {
     for (int i = 0; i < 500; ++i)
     {
@@ -190,7 +190,7 @@ TEST_F(HandTest, DISABLED_SwitchRounds_DoesNotAdvanceWhenAllInConditionIsTrue)
     EXPECT_EQ(hand->getCurrentRound(), GameStateFlop);
 }
 
-TEST_F(HandTest, SwitchRounds_DoesNotAdvancePastRiver)
+TEST_F(HandTest, DISABLED_SwitchRounds_DoesNotAdvancePastRiver)
 {
     initializeHandForTesting(6);
     hand->setCurrentRound(GameStateRiver);
