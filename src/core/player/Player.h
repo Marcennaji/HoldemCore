@@ -89,7 +89,7 @@ class Player
     void setCardsFlip(bool theValue);
     bool getCardsFlip() const;
 
-    void setCardsValueInt(int theValue);
+    void setHandRanking(int theValue);
     int getCardsValueInt() const;
 
     void setRoundStartCash(int theValue);

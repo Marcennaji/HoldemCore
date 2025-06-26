@@ -337,7 +337,7 @@ bool Player::getCardsFlip() const
     return myCardsFlip;
 }
 
-void Player::setCardsValueInt(int theValue)
+void Player::setHandRanking(int theValue)
 {
     myCardsValueInt = theValue;
 }

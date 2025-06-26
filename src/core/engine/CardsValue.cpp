@@ -4,6 +4,7 @@
 
 #include "CardsValue.h"
 #include <third_party/psim/psim.hpp>
+#include "core/services/GlobalServices.h"
 
 // translate card int code, to string equivalent
 
@@ -23,9 +24,15 @@ std::map<std::string, int> CardsValue::CardStringOrdering = {
     {"Qs", 12}, {"Ks", 13}, {"As", 14}, {"2h", 2},  {"3h", 3},  {"4h", 4},  {"5h", 5},  {"6h", 6},  {"7h", 7},
     {"8h", 8},  {"9h", 9},  {"Th", 10}, {"Jh", 11}, {"Qh", 12}, {"Kh", 13}, {"Ah", 14}};
 
-int CardsValue::evaluateHand(const int* cards)
+unsigned int CardsValue::evaluateHand(const char* hand)
 {
-    return static_cast<int>(rankHand(cards));
+    GlobalServices::instance().logger()->info("Evaluating hand : " + std::string(hand));
+
+    // Evaluate the hand
+    unsigned int result = rankHand(hand);
+
+    GlobalServices::instance().logger()->info("Hand evaluation ranking result: " + std::to_string(result));
+    return result;
 }
 
 } // namespace pkt::core

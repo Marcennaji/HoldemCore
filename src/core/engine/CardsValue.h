@@ -18,9 +18,9 @@ class CardsValue
 {
   public:
     /// Evaluates the strength of a 7-card poker hand.
-    /// \param cards An array of 7 integers (0–51) representing cards.
+    /// \param hand A string representing the 7-card poker hand (5 board + 2 hole).
     /// \return A hand strength score where higher means better.
-    static int evaluateHand(const int* cards);
+    static unsigned int evaluateHand(const char* hand);
 
     static const std::string CardStringValue[];
     static std::map<std::string, int> CardStringOrdering;

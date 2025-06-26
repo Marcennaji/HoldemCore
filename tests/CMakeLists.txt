@@ -16,6 +16,7 @@ add_executable(core_tests
     range/RangeRefinerTest.cpp
     range/CardsInRangeTest.cpp
     hand/HandTest.cpp
+    cards_value/CardsValueTest.cpp
 )
 
 target_include_directories(core_tests

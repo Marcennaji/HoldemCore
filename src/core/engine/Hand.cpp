@@ -72,33 +72,43 @@ void Hand::initAndShuffleDeck()
 
 void Hand::dealHoleCards(size_t cardsArrayIndex)
 {
-    int i, j, k = 0;
+    int boardCardIndex, holeCardIndex, playerIndex = 0;
     int tempPlayerArray[2];
-    int tempPlayerAndBoardArray[7];
+    char tempPlayerAndBoardArray[7];
 
-    // init the first 5 cards of the board
-    // NB. cardsArray has already 5 board cards
-    for (i = 0; i < 5; i++)
+    // Validate that there are enough cards in the deck
+    if (myCardsArray.size() < 5 + 2 * myActivePlayerList->size())
     {
-        tempPlayerAndBoardArray[i] = myCardsArray[i];
+        throw std::runtime_error("Not enough cards in the deck to deal hole cards and board cards.");
     }
 
-    for (auto it = myActivePlayerList->begin(); it != myActivePlayerList->end(); ++it, k++)
+    // Initialize the first 5 cards of the board
+    for (boardCardIndex = 0; boardCardIndex < 5; boardCardIndex++)
     {
-        for (j = 0; j < 2; j++)
+        tempPlayerAndBoardArray[boardCardIndex] = myCardsArray[boardCardIndex];
+    }
+
+    for (auto it = myActivePlayerList->begin(); it != myActivePlayerList->end(); ++it, playerIndex++)
+    {
+        for (holeCardIndex = 0; holeCardIndex < 2; holeCardIndex++)
         {
-            tempPlayerArray[j] = myCardsArray[2 * k + j + 5];
-            tempPlayerAndBoardArray[j] = myCardsArray[2 * k + j + 5];
+            tempPlayerArray[holeCardIndex] = myCardsArray[2 * playerIndex + holeCardIndex + 5];
+            tempPlayerAndBoardArray[5 + holeCardIndex] = myCardsArray[2 * playerIndex + holeCardIndex + 5];
         }
 
         (*it)->setCards(tempPlayerArray);
-        (*it)->setCardsValueInt(CardsValue::evaluateHand(tempPlayerAndBoardArray));
+        (*it)->setHandRanking(CardsValue::evaluateHand(tempPlayerAndBoardArray));
         (*it)->setRoundStartCash((*it)->getCash());
         (*it)->getCurrentHandActions().reset();
         (*it)->setPosition();
         (*it)->getRangeEstimator()->setEstimatedRange("");
+        GlobalServices::instance().logger()->info("Player " + std::to_string((*it)->getId()) +
+                                                  " dealt cards: " + CardsValue::CardStringValue[tempPlayerArray[0]] +
+                                                  " " + CardsValue::CardStringValue[tempPlayerArray[1]] +
+                                                  ", hand strength = " + std::to_string((*it)->getCardsValueInt()));
     }
 }
+
 size_t Hand::dealBoardCards()
 {
     int tempBoardArray[5];
