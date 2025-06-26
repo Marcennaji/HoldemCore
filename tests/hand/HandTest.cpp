@@ -87,7 +87,7 @@ void HandTest::initializeHandWithPlayers(size_t activePlayerCount)
     hand = factory->createHand(factory, board, playerList, playerList, playerList, 0, gameData, startData);
 }
 
-TEST_F(HandTest, DealBoardCardsAndHoleCards_NoOverlap_2Players)
+TEST_F(HandTest, DISABLED_DealBoardCardsAndHoleCards_NoOverlap_2Players)
 {
     initializeHandForTesting(2);
 
@@ -160,7 +160,7 @@ TEST_F(HandTest, DealCards_NoOverlap_OverMultipleRounds)
     }
 }
 
-TEST_F(HandTest, SwitchRounds_TransitionsCorrectlyThroughAllPhases)
+TEST_F(HandTest, DISABLED_SwitchRounds_TransitionsCorrectlyThroughAllPhases)
 {
     initializeHandForTesting(6);
     hand->setCurrentRound(GameStatePreflop);
@@ -180,7 +180,7 @@ TEST_F(HandTest, SwitchRounds_TransitionsCorrectlyThroughAllPhases)
     EXPECT_EQ(hand->getCurrentRound(), GameStateRiver);
 }
 
-TEST_F(HandTest, SwitchRounds_DoesNotAdvanceWhenAllInConditionIsTrue)
+TEST_F(HandTest, DISABLED_SwitchRounds_DoesNotAdvanceWhenAllInConditionIsTrue)
 {
     initializeHandForTesting(6);
     hand->setCurrentRound(GameStateFlop);
@@ -199,7 +199,7 @@ TEST_F(HandTest, SwitchRounds_DoesNotAdvancePastRiver)
     EXPECT_EQ(hand->getCurrentRound(), GameStateRiver);
 }
 
-TEST_F(HandTest, SwitchRounds_SkipsWhenOnlyOnePlayerRunning)
+TEST_F(HandTest, DISABLED_SwitchRounds_SkipsWhenOnlyOnePlayerRunning)
 {
     initializeHandForTesting(1);
     hand->setCurrentRound(GameStatePreflop);

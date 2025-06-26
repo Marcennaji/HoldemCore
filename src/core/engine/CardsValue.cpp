@@ -28,7 +28,6 @@ unsigned int CardsValue::evaluateHand(const char* hand)
 {
     GlobalServices::instance().logger()->info("Evaluating hand : " + std::string(hand));
 
-    // Evaluate the hand
     unsigned int result = rankHand(hand);
 
     GlobalServices::instance().logger()->info("Hand evaluation ranking result: " + std::to_string(result));
