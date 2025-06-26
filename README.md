@@ -44,8 +44,7 @@ PokerTraining is an offline, open-source poker simulation tool designed to help 
 
 ### 5. **Testing Infrastructure**
 
-* GoogleTest-based unit tests under `tests/core/...`
-* Focus on verifying strategy behavior, ranges calculation & decision logic
+* GoogleTest-based unit tests under `tests` directory
 
 ---
 
@@ -110,6 +109,27 @@ src/
 ```
 
 ---
+UI Acknowledgement
+The current Qt Widgets game table implementation is a refactored and adapted version of the UI originally developed for PokerTH. While much of the original structure has been rewritten and redesigned to suit the specific needs of PokerTraining, this work builds upon the visual foundation provided by the PokerTH project.
+
+### 🧩 UI Acknowledgement
+
+The current **Qt Widgets game table** implementation is a **refactored and adapted version** of the UI originally developed for [PokerTH](https://github.com/pokerth/pokerth).  
+While much of the original structure has been **rewritten and redesigned** to suit the specific needs of PokerTraining, this work builds upon the visual foundation provided by the PokerTH project.
+
+---
+
+### 📚 Third-Party Components
+
+This project uses or integrates the following third-party libraries:
+
+- **[psim](https://github.com/billthefarmer/psim)** — A fast poker hand simulator and evaluator, used for hand ranking and simulation.  
+- **[poker-eval](https://github.com/andrewprock/poker-eval)** — A C library for poker hand evaluation, originally developed by Andrew Prock.  
+- **[SQLite3](https://www.sqlite.org/index.html)** — A self-contained, high-reliability embedded SQL database engine, used for persistent data storage.
+
+> All third-party libraries are included in accordance with their respective open-source licenses.  
+> Please refer to the `third_party/` directory for license information where applicable.
+
 
 ## 📝 License
 
