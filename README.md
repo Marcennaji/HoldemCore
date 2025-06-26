@@ -93,10 +93,6 @@ src/
 └── third_party/      # hand simulation, sqlite3, etc.
 ```
 
----
-UI Acknowledgement
-The current Qt Widgets game table implementation is a refactored and adapted version of the UI originally developed for PokerTH. While much of the original structure has been rewritten and redesigned to suit the specific needs of PokerTraining, this work builds upon the visual foundation provided by the PokerTH project.
-
 ### 🧩 UI Acknowledgement
 
 The current **Qt Widgets game table** implementation is a **refactored and adapted version** of the UI originally developed for [PokerTH](https://github.com/pokerth/pokerth).  
