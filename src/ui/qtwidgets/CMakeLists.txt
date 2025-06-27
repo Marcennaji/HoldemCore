@@ -34,6 +34,7 @@ target_include_directories(qtwidgets PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/ui/qtwidgets
+    ${CMAKE_SOURCE_DIR}/src/ui/qtwidgets/poker_ui
     ${CMAKE_SOURCE_DIR}/src/ui/qtwidgets/gametable
     ${CMAKE_SOURCE_DIR}/src/ui/qtwidgets/startwindow
 )
