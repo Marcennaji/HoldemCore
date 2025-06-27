@@ -1,7 +1,6 @@
-// File: core/services/GlobalServices.hpp
-
 #pragma once
 
+#include "core/interfaces/IHandEvaluationEngine.h"
 #include "core/interfaces/ILogger.h"
 #include "core/interfaces/persistence/IHandAuditStore.h"
 #include "core/interfaces/persistence/IPlayersStatisticsStore.h"
@@ -26,6 +25,7 @@ class GlobalServices
     std::shared_ptr<IRankingStore> rankingStore() const { return myRankingStore; }
     std::shared_ptr<IHandAuditStore> handAuditStore() const { return myHandAuditStore; }
     std::shared_ptr<IPlayersStatisticsStore> playersStatisticsStore() const { return myPlayersStatisticsStore; }
+    std::shared_ptr<IHandEvaluationEngine> handEvaluationEngine() const { return myHandEvaluationEngine; }
 
     // Setters
     void setLogger(std::shared_ptr<ILogger> logger) { myLogger = std::move(logger); }
@@ -35,6 +35,10 @@ class GlobalServices
     {
         myPlayersStatisticsStore = std::move(store);
     }
+    void setHandEvaluationEngine(std::shared_ptr<IHandEvaluationEngine> engine)
+    {
+        myHandEvaluationEngine = std::move(engine);
+    }
 
   private:
     GlobalServices();
@@ -43,6 +47,7 @@ class GlobalServices
     std::shared_ptr<IRankingStore> myRankingStore;
     std::shared_ptr<IHandAuditStore> myHandAuditStore;
     std::shared_ptr<IPlayersStatisticsStore> myPlayersStatisticsStore;
+    std::shared_ptr<IHandEvaluationEngine> myHandEvaluationEngine;
 };
 
 } // namespace pkt::core

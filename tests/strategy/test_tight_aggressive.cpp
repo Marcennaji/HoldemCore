@@ -145,6 +145,8 @@ TEST_F(TightAggressiveStrategyTest, ZeroCash_CannotRaise)
     ctx.gameState = GameStatePreflop;
     ctx.myHandSimulation.winSd = 0.5f;
     ctx.myCash = 0;
+    ctx.myCard1 = "8h";
+    ctx.myCard2 = "9h";
     EXPECT_FALSE(strategy.preflopShouldCall(ctx, true));
     EXPECT_EQ(strategy.preflopShouldRaise(ctx, true), 0);
 }
@@ -155,5 +157,7 @@ TEST_F(TightAggressiveStrategyTest, NoBluff_DisablesBluffing)
     ctx.myHavePosition = true;
     ctx.myCanBluff = false;
     ctx.myHandSimulation.winSd = 0.4f;
+    ctx.myCard1 = "8h";
+    ctx.myCard2 = "9h";
     EXPECT_EQ(strategy.flopShouldRaise(ctx, true), 0);
 }

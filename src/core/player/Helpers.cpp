@@ -1,6 +1,7 @@
 
 #include "Helpers.h"
 #include <third_party/psim/psim.hpp>
+#include "core/engine/CardUtilities.h"
 #include "core/player/Player.h"
 
 #include <algorithm>
@@ -51,7 +52,7 @@ int getBoardCardsHigherThan(std::string stringBoard, std::string card)
     while (getline(oss, boardCard, ' '))
     {
 
-        if (CardsValue::CardStringOrdering[boardCard] > CardsValue::CardStringOrdering[card])
+        if (CardUtilities::getCardValue(boardCard) > CardUtilities::getCardValue(card))
         {
             n++;
         }
@@ -124,7 +125,7 @@ bool isCardsInRange(string card1, string card2, string ranges)
 }
 void ensureHighestCard(string& card1, string& card2)
 {
-    if (CardsValue::CardStringOrdering[card1] < CardsValue::CardStringOrdering[card2])
+    if (CardUtilities::getCardValue(card1) < CardUtilities::getCardValue(card2))
     {
         std::swap(card1, card2);
     }
@@ -150,22 +151,22 @@ bool isExactOffsuitedHand(const char* c1, const char* c2, const char* range)
 bool isPairAndAbove(const string& card1, const string& card2, const char* range)
 {
     return (strlen(range) == 3 && range[0] == range[1] && range[2] == '+' &&
-            CardsValue::CardStringOrdering[card1] == CardsValue::CardStringOrdering[card2] &&
-            CardsValue::CardStringOrdering[card1] >= CardsValue::CardStringOrdering[getFakeCard(range[0])]);
+            CardUtilities::getCardValue(card1) == CardUtilities::getCardValue(card2) &&
+            CardUtilities::getCardValue(card1) >= CardUtilities::getCardValue(getFakeCard(range[0])));
 }
 bool isOffsuitedAndAbove(const string& card1, const string& card2, const char* c1, const char* c2, const char* range)
 {
     return (strlen(range) == 4 && range[2] == 'o' && range[3] == '+' &&
-            CardsValue::CardStringOrdering[card1] == CardsValue::CardStringOrdering[getFakeCard(range[0])] &&
-            CardsValue::CardStringOrdering[card2] >= CardsValue::CardStringOrdering[getFakeCard(range[1])] &&
-            CardsValue::CardStringOrdering[card2] < CardsValue::CardStringOrdering[card1] && c1[1] != c2[1]);
+            CardUtilities::getCardValue(card1) == CardUtilities::getCardValue(getFakeCard(range[0])) &&
+            CardUtilities::getCardValue(card2) >= CardUtilities::getCardValue(getFakeCard(range[1])) &&
+            CardUtilities::getCardValue(card2) < CardUtilities::getCardValue(card1) && c1[1] != c2[1]);
 }
 bool isSuitedAndAbove(const string& card1, const string& card2, const char* c1, const char* c2, const char* range)
 {
     return (strlen(range) == 4 && range[2] == 's' && range[3] == '+' &&
-            CardsValue::CardStringOrdering[card1] == CardsValue::CardStringOrdering[getFakeCard(range[0])] &&
-            CardsValue::CardStringOrdering[card2] >= CardsValue::CardStringOrdering[getFakeCard(range[1])] &&
-            CardsValue::CardStringOrdering[card2] < CardsValue::CardStringOrdering[card1] && c1[1] == c2[1]);
+            CardUtilities::getCardValue(card1) == CardUtilities::getCardValue(getFakeCard(range[0])) &&
+            CardUtilities::getCardValue(card2) >= CardUtilities::getCardValue(getFakeCard(range[1])) &&
+            CardUtilities::getCardValue(card2) < CardUtilities::getCardValue(card1) && c1[1] == c2[1]);
 }
 bool isExactHand(const string& card1, const string& card2, const char* range)
 {

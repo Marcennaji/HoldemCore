@@ -76,14 +76,21 @@ TEST(IsCardsInRangeTests, CardOrder)
 
 TEST(IsCardsInRangeTests, InvalidCardValues)
 {
-    EXPECT_FALSE(isCardsInRange("Xh", "7d", "77"));  // Invalid card value
-    EXPECT_FALSE(isCardsInRange("7h", "Yd", "77"));  // Invalid card value
-    EXPECT_FALSE(isCardsInRange("Zh", "Zd", "99+")); // Invalid card value
+    // Test that invalid card values throw std::invalid_argument
+    EXPECT_THROW(isCardsInRange("Xh", "7d", "77"), std::invalid_argument);  // Invalid card value
+    EXPECT_THROW(isCardsInRange("7h", "Yd", "77"), std::invalid_argument);  // Invalid card value
+    EXPECT_THROW(isCardsInRange("Zh", "Zd", "99+"), std::invalid_argument); // Invalid card value
+
+    // Test with more invalid card combinations
+    EXPECT_THROW(isCardsInRange("1h", "7d", "77"), std::invalid_argument); // Invalid rank
+    EXPECT_THROW(isCardsInRange("7x", "7d", "77"), std::invalid_argument); // Invalid suit
+    EXPECT_THROW(isCardsInRange("7h", "7z", "77"), std::invalid_argument); // Invalid suit
 }
 
 TEST(IsCardsInRangeTests, EmptyCards)
 {
-    EXPECT_FALSE(isCardsInRange("", "7d", "77")); // Empty card1
-    EXPECT_FALSE(isCardsInRange("7h", "", "77")); // Empty card2
-    EXPECT_FALSE(isCardsInRange("", "", "77"));   // Both cards empty
+    // Test that empty cards also throw std::invalid_argument
+    EXPECT_THROW(isCardsInRange("", "7d", "77"), std::invalid_argument); // Empty card1
+    EXPECT_THROW(isCardsInRange("7h", "", "77"), std::invalid_argument); // Empty card2
+    EXPECT_THROW(isCardsInRange("", "", "77"), std::invalid_argument);   // Both cards empty
 }

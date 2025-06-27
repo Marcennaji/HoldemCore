@@ -8,6 +8,7 @@
 #include "model/ButtonState.h"
 #include "model/EngineError.h"
 
+#include <core/engine/CardUtilities.h>
 #include <core/player/BotPlayer.h>
 #include <core/services/GlobalServices.h>
 
@@ -221,25 +222,25 @@ void BettingRound::logBoardCards()
         {
         case GameStateFlop:
             GlobalServices::instance().logger()->info(
-                "************************* FLOP " + CardsValue::CardStringValue[tempBoardCardsArray[0]] + " " +
-                CardsValue::CardStringValue[tempBoardCardsArray[1]] + " " +
-                CardsValue::CardStringValue[tempBoardCardsArray[2]] + "  *************************");
+                "************************* FLOP " + CardUtilities::getCardString(tempBoardCardsArray[0]) + " " +
+                CardUtilities::getCardString(tempBoardCardsArray[1]) + " " +
+                CardUtilities::getCardString(tempBoardCardsArray[2]) + "  *************************");
             break;
         case GameStateTurn:
             GlobalServices::instance().logger()->info(
-                "************************* TURN " + CardsValue::CardStringValue[tempBoardCardsArray[0]] + " " +
-                CardsValue::CardStringValue[tempBoardCardsArray[1]] + " " +
-                CardsValue::CardStringValue[tempBoardCardsArray[2]] + " " +
-                CardsValue::CardStringValue[tempBoardCardsArray[3]] + "  *************************");
+                "************************* TURN " + CardUtilities::getCardString(tempBoardCardsArray[0]) + " " +
+                CardUtilities::getCardString(tempBoardCardsArray[1]) + " " +
+                CardUtilities::getCardString(tempBoardCardsArray[2]) + " " +
+                CardUtilities::getCardString(tempBoardCardsArray[3]) + "  *************************");
 
             break;
         case GameStateRiver:
             GlobalServices::instance().logger()->info(
-                "************************* RIVER " + CardsValue::CardStringValue[tempBoardCardsArray[0]] + " " +
-                CardsValue::CardStringValue[tempBoardCardsArray[1]] + " " +
-                CardsValue::CardStringValue[tempBoardCardsArray[2]] + " " +
-                CardsValue::CardStringValue[tempBoardCardsArray[3]] + " " +
-                CardsValue::CardStringValue[tempBoardCardsArray[4]] + "  *************************");
+                "************************* RIVER " + CardUtilities::getCardString(tempBoardCardsArray[0]) + " " +
+                CardUtilities::getCardString(tempBoardCardsArray[1]) + " " +
+                CardUtilities::getCardString(tempBoardCardsArray[2]) + " " +
+                CardUtilities::getCardString(tempBoardCardsArray[3]) + " " +
+                CardUtilities::getCardString(tempBoardCardsArray[4]) + "  *************************");
 
             break;
         default:

@@ -4,7 +4,8 @@
 
 #include "Player.h"
 
-#include <core/engine/CardsValue.h>
+#include <core/engine/CardUtilities.h>
+#include <core/engine/HandEvaluator.h>
 #include <core/engine/Randomizer.h>
 #include <core/engine/model/Ranges.h>
 #include <core/interfaces/IHand.h>
@@ -307,8 +308,8 @@ void Player::setCards(int* theValue)
     }
 
     // will contain human-readable string, i.e "Qc" or "Ts"
-    myCard1 = CardsValue::CardStringValue[myCards[0]];
-    myCard2 = CardsValue::CardStringValue[myCards[1]];
+    myCard1 = CardUtilities::getCardString(myCards[0]);
+    myCard2 = CardUtilities::getCardString(myCards[1]);
 }
 void Player::getCards(int* theValue) const
 {
@@ -652,7 +653,7 @@ std::string Player::getStringBoard() const
     for (int i = 0; i < cardsOnBoard; i++)
     {
         stringBoard += " ";
-        stringBoard += CardsValue::CardStringValue[board[i]];
+        stringBoard += CardUtilities::getCardString(board[i]);
     }
 
     return stringBoard;

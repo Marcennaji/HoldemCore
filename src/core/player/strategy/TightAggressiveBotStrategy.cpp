@@ -3,7 +3,7 @@
 // Licensed under the MIT License — see LICENSE file for details.
 #include <core/player/strategy/TightAggressiveBotStrategy.h>
 
-#include <core/engine/CardsValue.h>
+#include <core/engine/HandEvaluator.h>
 #include <core/engine/Randomizer.h>
 #include <core/engine/model/EngineError.h>
 #include <core/engine/model/Ranges.h>

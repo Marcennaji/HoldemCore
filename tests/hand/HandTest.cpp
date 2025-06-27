@@ -2,6 +2,9 @@
 #include "DummyPlayer.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
+#include "core/services/GlobalServices.h"
+#include "infra/ConsoleLogger.h"
+#include "infra/eval/PsimHandEvaluationEngine.h"
 
 #include <gtest/gtest.h>
 #include <memory>
@@ -47,6 +50,9 @@ bool cardsAreUniqueAndValid(const std::shared_ptr<pkt::core::IHand>& hand,
 void HandTest::SetUp()
 {
     factory = std::make_shared<EngineFactory>(events);
+    auto& services = pkt::core::GlobalServices::instance();
+    services.setLogger(std::make_shared<pkt::infra::ConsoleLogger>());
+    services.setHandEvaluationEngine(std::make_shared<pkt::infra::PsimHandEvaluationEngine>());
 }
 
 void HandTest::TearDown()

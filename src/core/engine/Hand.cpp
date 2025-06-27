@@ -4,7 +4,7 @@
 
 #include "Hand.h"
 #include <core/services/GlobalServices.h>
-#include "CardsValue.h"
+#include "CardUtilities.h"
 #include "GameEvents.h"
 #include "Randomizer.h"
 #include "model/ButtonState.h"
@@ -95,16 +95,16 @@ void Hand::dealHoleCards(size_t cardsArrayIndex)
             tempPlayerArray[holeCardIndex] = myCardsArray[2 * playerIndex + holeCardIndex + 5];
             tempPlayerAndBoardArray[5 + holeCardIndex] = myCardsArray[2 * playerIndex + holeCardIndex + 5];
         }
-        string humanReadableHand = CardsValue::getCardStringValue(tempPlayerAndBoardArray, 7);
+        string humanReadableHand = CardUtilities::getCardStringValue(tempPlayerAndBoardArray, 7);
         (*it)->setCards(tempPlayerArray);
-        (*it)->setHandRanking(CardsValue::evaluateHand(humanReadableHand.c_str()));
+        (*it)->setHandRanking(HandEvaluator::evaluateHand(humanReadableHand.c_str()));
         (*it)->setRoundStartCash((*it)->getCash());
         (*it)->getCurrentHandActions().reset();
         (*it)->setPosition();
         (*it)->getRangeEstimator()->setEstimatedRange("");
         GlobalServices::instance().logger()->info("Player " + std::to_string((*it)->getId()) +
-                                                  " dealt cards: " + CardsValue::CardStringValue[tempPlayerArray[0]] +
-                                                  " " + CardsValue::CardStringValue[tempPlayerArray[1]] +
+                                                  " dealt cards: " + CardUtilities::getCardString(tempPlayerArray[0]) +
+                                                  " " + CardUtilities::getCardString(tempPlayerArray[1]) +
                                                   ", hand strength = " + std::to_string((*it)->getCardsValueInt()));
     }
 }

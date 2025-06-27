@@ -1,7 +1,8 @@
-#include "core/engine/CardsValue.h"
 #include <gtest/gtest.h>
+#include "core/engine/HandEvaluator.h"
 #include "core/services/GlobalServices.h"
 #include "infra/ConsoleLogger.h"
+#include "infra/eval/PsimHandEvaluationEngine.h"
 
 using namespace pkt::core;
 
@@ -10,7 +11,9 @@ class CardsValueTest : public ::testing::Test
   protected:
     void SetUp() override
     {
-        pkt::core::GlobalServices::instance().setLogger(std::make_shared<pkt::infra::ConsoleLogger>());
+        auto& services = pkt::core::GlobalServices::instance();
+        services.setLogger(std::make_shared<pkt::infra::ConsoleLogger>());
+        services.setHandEvaluationEngine(std::make_shared<pkt::infra::PsimHandEvaluationEngine>());
     }
 
     void TearDown() override {}
@@ -29,7 +32,7 @@ class CardsValueTest : public ::testing::Test
             cards += card + " ";
         }
 
-        return CardsValue::evaluateHand(cards.c_str());
+        return HandEvaluator::evaluateHand(cards.c_str());
     }
 };
 

@@ -4,7 +4,7 @@
 
 #include "SqliteLogStore.h"
 #include <core/player/typedefs.h>
-#include "core/engine/CardsValue.h"
+#include "core/engine/CardUtilities.h"
 #include "core/engine/EngineDefs.h"
 #include "core/engine/model/PlayerStatistics.h"
 #include "core/interfaces/NullLogger.h"
@@ -297,11 +297,11 @@ void SqliteLogStore::updateUnplausibleHand(const std::string card1, const std::s
     if (card1.at(1) == card2.at(1))
     {
         // suited hand
-        if (CardsValue::CardStringOrdering[card1] > CardsValue::CardStringOrdering[card2])
+        if (CardUtilities::getCardValue(card1) > CardUtilities::getCardValue(card2))
         {
             hand << card1 << card2;
         }
-        else if (CardsValue::CardStringOrdering[card1] < CardsValue::CardStringOrdering[card2])
+        else if (CardUtilities::getCardValue(card1) < CardUtilities::getCardValue(card2))
         {
             hand << card2 << card1;
         }
@@ -309,11 +309,11 @@ void SqliteLogStore::updateUnplausibleHand(const std::string card1, const std::s
     else
     {
         // unsuited hand
-        if (CardsValue::CardStringOrdering[card1] > CardsValue::CardStringOrdering[card2])
+        if (CardUtilities::getCardValue(card1) > CardUtilities::getCardValue(card2))
         {
             hand << card1.at(0) << card2.at(0) << 'o';
         }
-        else if (CardsValue::CardStringOrdering[card1] < CardsValue::CardStringOrdering[card2])
+        else if (CardUtilities::getCardValue(card1) < CardUtilities::getCardValue(card2))
         {
             hand << card2.at(0) << card1.at(0) << 'o';
         }
