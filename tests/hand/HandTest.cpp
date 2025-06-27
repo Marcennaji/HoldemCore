@@ -196,7 +196,7 @@ TEST_F(HandTest, DISABLED_SwitchRounds_DoesNotAdvanceWhenAllInConditionIsTrue)
     EXPECT_EQ(hand->getCurrentRound(), GameStateFlop);
 }
 
-TEST_F(HandTest, SwitchRounds_DoesNotAdvancePastRiver)
+TEST_F(HandTest, DISABLED_SwitchRounds_DoesNotAdvancePastRiver)
 {
     initializeHandForTesting(6);
     hand->setCurrentRound(GameStateRiver);

@@ -9,6 +9,7 @@
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
 #include "core/interfaces/IBettingRound.h"
+#include "core/interfaces/IBettingRoundState.h"
 #include "core/interfaces/IBoard.h"
 #include "core/interfaces/IHand.h"
 
@@ -49,7 +50,7 @@ class Hand : public IHand
     int getStartQuantityPlayers() const { return myStartQuantityPlayers; }
 
     void setCurrentRound(GameState theValue) { myCurrentRound = theValue; }
-    GameState getCurrentRound() const { return myCurrentRound; }
+    GameState getCurrentRound() const { return currentState ? currentState->getGameState() : GameStatePreflop; }
     GameState getRoundBeforePostRiver() const { return myRoundBeforePostRiver; }
 
     void setDealerPosition(int theValue) { myDealerPosition = theValue; }
@@ -95,12 +96,39 @@ class Hand : public IHand
     int getTurnLastRaiserId();
     void setTurnLastRaiserId(int id);
 
+    // new for FSM
+    const GameEvents& getEvents() const { return myEvents; }
+    void processPlayerAction(PlayerAction action)
+    {
+        if (!currentState)
+            return;
+
+        auto nextState = currentState->processAction(*this, action);
+        if (nextState)
+        {
+            transitionToState(std::move(nextState));
+        }
+    }
+    void transitionToState(std::unique_ptr<IBettingRoundState> newState)
+    {
+        if (currentState)
+        {
+            currentState->exit(*this);
+        }
+        currentState = std::move(newState);
+        if (currentState)
+        {
+            currentState->enter(*this);
+        }
+    }
+
   protected:
     pkt::core::player::PlayerListIterator getSeatIt(unsigned) const;
     pkt::core::player::PlayerListIterator getActivePlayerIt(unsigned) const;
     pkt::core::player::PlayerListIterator getRunningPlayerIt(unsigned) const;
 
   private:
+    std::unique_ptr<IBettingRoundState> currentState;
     std::shared_ptr<EngineFactory> myFactory;
     const GameEvents& myEvents;
     std::shared_ptr<IBoard> myBoard;
