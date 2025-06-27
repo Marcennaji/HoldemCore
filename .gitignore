@@ -34,6 +34,11 @@
 build
 .vscode
 
+src/ui/qtwidgets/gametable
+src/ui/qtwidgets/resources
+src/ui/qtwidgets/styles
+
+
 # cppdepend analysis
 CppDependOut
 *.cdproj

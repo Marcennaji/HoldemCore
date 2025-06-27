@@ -25,7 +25,7 @@ PokerTraining is an offline, open-source poker simulation tool designed to help 
 
 ### 2. **Multiple Frontends (Planned)**
 
-* ✅ Qt Widgets UI (existing)
+* ✅ Qt Widgets UI (in progress)
 * 🟡 Flutter/Web frontend (in progress)
 
 ### 3. **Bot Strategies with Dependency Injection**
@@ -60,7 +60,8 @@ PokerTraining is an offline, open-source poker simulation tool designed to help 
 
 ## 🚧 Current Status
 
-This project is under **active refactoring**, with major milestones completed:
+I published the first version of this project 15 years ago, on SourceForge.
+This project is today under **active refactoring**, with major milestones completed:
 
 ✅ Engine now headless  
 ✅ `GameEvents` emit UI updates without UI dependency  
@@ -93,36 +94,20 @@ src/
 └── third_party/      # hand simulation, sqlite3, etc.
 ```
 
-### 🧩 UI Acknowledgement
-
-The current **Qt Widgets game table** implementation is a **refactored and adapted version** of the UI originally developed for [PokerTH](https://github.com/pokerth/pokerth).  
-While much of the original structure has been **rewritten and redesigned** to suit the specific needs of PokerTraining, this work builds upon the visual foundation provided by the PokerTH project.
-
----
-
 ### 📚 Third-Party Components
 
 This project uses or integrates the following third-party libraries:
 
-- **[psim](https://github.com/billthefarmer/psim)** — A fast poker hand simulator and evaluator, used for hand ranking and simulation.  
-- **[poker-eval](https://github.com/andrewprock/poker-eval)** — A C library for poker hand evaluation, originally developed by Andrew Prock.  
+- **[psim](https://github.com/christophschmalhofer/poker/tree/master/XPokerEval/XPokerEval.PokerSim)** — A fast poker hand simulator and evaluator, used for hand ranking and simulation.  
+- **[poker-eval](https://github.com/atinm/poker-eval)** — A C library for poker hand evaluation, originally developed by Andrew Prock.  
 - **[SQLite3](https://www.sqlite.org/index.html)** — A self-contained, high-reliability embedded SQL database engine, used for persistent data storage.
 
 > All third-party libraries are included in accordance with their respective open-source licenses.  
 > Please refer to the `third_party/` directory for license information where applicable.
 
-## 🙋 About Me
+## 🙋 Contributing
 
-I'm a senior freelance C++ / Python developer, and this project is both a portfolio piece and a real-world training tool.
-
-It demonstrates:
-
-* Domain-driven design in games
-* Code decoupling and modularization, applying the SOLID and clean architecture principles
-* Clean testing practices
-* Cross-platform architecture thinking
-
-📫 Feel free to reach out or contribute if you're interested in poker strategy simulation, bots, or frontends.
+See `[CONTRIBUTING.md](CONTRIBUTING.md)`
 
 ---
 
