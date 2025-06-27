@@ -1,8 +1,7 @@
 // PokerTraining — Texas Hold'em simulator
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
-#ifndef STARTWINDOWIMPL_H
-#define STARTWINDOWIMPL_H
+#pragma once
 
 #include <assert.h>
 #include <memory>
@@ -13,13 +12,15 @@
 
 #include <QtWidgets/QMainWindow>
 
-class GameTableWindow;
-
+namespace pkt::ui::qtwidgets
+{
+class PokerTableWindow;
 class StartWindow : public QMainWindow, public Ui::StartWindow
 {
     Q_OBJECT
   public:
-    StartWindow(const QString& appDataPath, GameTableWindow* tableWindow, pkt::core::Session* session, QWidget* parent);
+    StartWindow(const QString& appDataPath, PokerTableWindow* tableWindow, pkt::core::Session* session,
+                QWidget* parent);
     ~StartWindow();
 
     void setSession(pkt::core::Session* session) { mySession = session; }
@@ -41,10 +42,10 @@ class StartWindow : public QMainWindow, public Ui::StartWindow
   private:
     QString myAppDataPath;
 
-    std::shared_ptr<GameTableWindow> myGameTableWindow;
+    std::shared_ptr<PokerTableWindow> myPokerTableWindow;
     pkt::core::Session* mySession;
 
     friend class GuiWrapper;
 };
 
-#endif
+} // namespace pkt::ui::qtwidgets

@@ -3,7 +3,7 @@
 // Licensed under the MIT License — see LICENSE file for details.
 #include "StartWindow.h"
 
-#include <ui/qtwidgets/gametable/GameTableWindow.h>
+#include <ui/qtwidgets/poker_ui/PokerTableWindow.h>
 
 #include <core/engine/EngineDefs.h>
 #include <core/engine/Game.h>
@@ -14,11 +14,14 @@
 using namespace std;
 using namespace pkt::core;
 
-StartWindow::StartWindow(const QString& appDataPath, GameTableWindow* tableWindow, Session* session, QWidget* parent)
-    : QMainWindow(parent), myAppDataPath(appDataPath), myGameTableWindow(tableWindow), mySession(session)
+namespace pkt::ui::qtwidgets
+{
+
+StartWindow::StartWindow(const QString& appDataPath, PokerTableWindow* tableWindow, Session* session, QWidget* parent)
+    : QMainWindow(parent), myAppDataPath(appDataPath), myPokerTableWindow(tableWindow), mySession(session)
 {
     setupUi(this);
-    myGameTableWindow->setStartWindow(this);
+    // myPokerTableWindow->setStartWindow(this);
     setWindowTitle(QString(tr("PokerTraining %1").arg(POKERTRAINING_BETA_RELEASE_STRING)));
     setWindowIcon(QIcon(myAppDataPath + "gfx/gui/misc/windowicon.png"));
     setStatusBar(nullptr);
@@ -37,7 +40,7 @@ void StartWindow::startNewGame()
 
     this->hide();
 
-    myGameTableWindow->show();
+    myPokerTableWindow->show();
 
     GameData gameData;
 
@@ -61,7 +64,7 @@ void StartWindow::startNewGame()
     Randomizer::getRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
     startData.startDealerPlayerId = static_cast<unsigned>(tmpDealerPos);
 
-    myGameTableWindow->GameModification();
+    // myPokerTableWindow->GameModification();
 
     mySession->startGame(gameData, startData);
 }
@@ -80,3 +83,4 @@ bool StartWindow::eventFilter(QObject* obj, QEvent* event)
         return QMainWindow::eventFilter(obj, event);
     }
 }
+} // namespace pkt::ui::qtwidgets

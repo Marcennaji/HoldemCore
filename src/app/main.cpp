@@ -22,8 +22,7 @@
 #include <sstream>
 
 using namespace std;
-
-class StartWindow;
+using namespace pkt::ui::qtwidgets;
 
 int main(int argc, char** argv)
 {

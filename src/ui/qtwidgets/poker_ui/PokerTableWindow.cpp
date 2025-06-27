@@ -1,7 +1,9 @@
-// PokerTableWindow.cpp
 #include "PokerTableWindow.h"
 #include <QString>
 #include <QVBoxLayout>
+
+namespace pkt::ui::qtwidgets
+{
 
 PokerTableWindow::PokerTableWindow(std::shared_ptr<pkt::core::Session> session, QWidget* parent)
     : QWidget(parent), m_session(std::move(session))
@@ -100,3 +102,4 @@ void PokerTableWindow::showBoardCards(const std::array<int, 5>& cards)
         m_boardCardLabels[i]->setText(QString("[%1]").arg(cards[i]));
     }
 }
+} // namespace pkt::ui::qtwidgets

@@ -2,10 +2,12 @@
 #include "GuiAppController.h"
 #include <core/session/Session.h>
 #include <infra/persistence/SqliteLogStore.h>
-#include <ui/qtwidgets/gametable/GameTableWindow.h>
+#include <ui/qtwidgets/poker_ui/PokerTableWindow.h>
 #include <ui/qtwidgets/startwindow/StartWindow.h>
 
 #include "GuiBridgeWidgets.h"
+namespace pkt::ui::qtwidgets
+{
 
 GuiAppController::GuiAppController(const QString& app, const QString& log, const QString& user)
     : myAppDataPath(app), myLogPath(log), myUserDataPath(user)
@@ -13,16 +15,17 @@ GuiAppController::GuiAppController(const QString& app, const QString& log, const
     myDbStatisticsLogger = std::make_unique<pkt::infra::SqliteLogStore>(myLogPath.toStdString());
     myDbStatisticsLogger->init();
 
-    myGameTableWindow = std::make_unique<GameTableWindow>(myUserDataPath.toStdString());
-    myBridge = std::make_unique<GuiBridgeWidgets>(myGameTableWindow.get());
-    myBridge->connectTo(myEvents);
+    mySession = std::make_shared<pkt::core::Session>(myEvents);
+    myPokerTableWindow = std::make_unique<PokerTableWindow>(mySession);
+    myBridge = std::make_unique<GuiBridgeWidgets>(mySession, myPokerTableWindow.get());
 
-    mySession = std::make_unique<pkt::core::Session>(myEvents);
+    myBridge->connectEventsToUi(myEvents);
 }
 
 StartWindow* GuiAppController::createMainWindow()
 {
-    return new StartWindow(myAppDataPath, myGameTableWindow.get(), mySession.get(), nullptr);
+    return new StartWindow(myAppDataPath, myPokerTableWindow.get(), mySession.get(), nullptr);
 }
 
 GuiAppController::~GuiAppController() = default;
+} // namespace pkt::ui::qtwidgets

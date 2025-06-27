@@ -9,12 +9,16 @@
 #include <QString>
 #include <memory>
 
-class StartWindow;
-class SqliteLogStore;
+namespace pkt::core
+{
 class Session;
-class GameTableWindow;
-class GuiBridgeWidgets;
+} // namespace pkt::core
 
+namespace pkt::ui::qtwidgets
+{
+class PokerTableWindow;
+class GuiBridgeWidgets;
+class StartWindow;
 class GuiAppController
 {
   public:
@@ -28,8 +32,9 @@ class GuiAppController
     QString myLogPath;
     QString myUserDataPath;
     std::unique_ptr<pkt::infra::SqliteLogStore> myDbStatisticsLogger;
-    std::unique_ptr<GameTableWindow> myGameTableWindow;
-    std::unique_ptr<pkt::core::Session> mySession;
+    std::unique_ptr<PokerTableWindow> myPokerTableWindow;
+    std::shared_ptr<pkt::core::Session> mySession;
     pkt::core::GameEvents myEvents;
     std::unique_ptr<GuiBridgeWidgets> myBridge;
 };
+} // namespace pkt::ui::qtwidgets

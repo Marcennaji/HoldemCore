@@ -34,4 +34,31 @@ unsigned int CardsValue::evaluateHand(const char* hand)
     return result;
 }
 
+std::string CardsValue::getCardStringValue(std::vector<int> cardValues)
+{
+    std::string result;
+    for (const auto& cardValue : cardValues)
+    {
+        if (!result.empty())
+        {
+            result += " ";
+        }
+        result += CardStringValue[cardValue];
+    }
+    return result;
+}
+std::string CardsValue::getCardStringValue(const int* cardValues, int size)
+{
+    std::string result;
+    for (int i = 0; i < size; ++i)
+    {
+        if (!result.empty())
+        {
+            result += " ";
+        }
+        result += CardStringValue[cardValues[i]];
+    }
+    return result;
+}
+
 } // namespace pkt::core

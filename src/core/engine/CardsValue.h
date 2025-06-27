@@ -21,6 +21,8 @@ class CardsValue
     /// \param hand A string representing the 7-card poker hand (5 board + 2 hole).
     /// \return A hand strength score where higher means better.
     static unsigned int evaluateHand(const char* hand);
+    static std::string getCardStringValue(const int* cardValues, int size);
+    static std::string getCardStringValue(std::vector<int> cardValues);
 
     static const std::string CardStringValue[];
     static std::map<std::string, int> CardStringOrdering;

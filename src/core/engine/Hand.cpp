@@ -74,7 +74,7 @@ void Hand::dealHoleCards(size_t cardsArrayIndex)
 {
     int boardCardIndex, holeCardIndex, playerIndex = 0;
     int tempPlayerArray[2];
-    char tempPlayerAndBoardArray[7];
+    int tempPlayerAndBoardArray[7];
 
     // Validate that there are enough cards in the deck
     if (myCardsArray.size() < 5 + 2 * myActivePlayerList->size())
@@ -95,9 +95,9 @@ void Hand::dealHoleCards(size_t cardsArrayIndex)
             tempPlayerArray[holeCardIndex] = myCardsArray[2 * playerIndex + holeCardIndex + 5];
             tempPlayerAndBoardArray[5 + holeCardIndex] = myCardsArray[2 * playerIndex + holeCardIndex + 5];
         }
-
+        string humanReadableHand = CardsValue::getCardStringValue(tempPlayerAndBoardArray, 7);
         (*it)->setCards(tempPlayerArray);
-        (*it)->setHandRanking(CardsValue::evaluateHand(tempPlayerAndBoardArray));
+        (*it)->setHandRanking(CardsValue::evaluateHand(humanReadableHand.c_str()));
         (*it)->setRoundStartCash((*it)->getCash());
         (*it)->getCurrentHandActions().reset();
         (*it)->setPosition();

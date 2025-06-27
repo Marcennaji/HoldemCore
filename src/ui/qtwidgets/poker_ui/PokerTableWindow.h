@@ -10,13 +10,15 @@
 
 #include "core/engine/model/GameState.h"
 #include "core/player/Player.h"
+#include "core/session/Session.h"
 
 namespace pkt::core
 {
-class Session;
 class IBoard;
 } // namespace pkt::core
 
+namespace pkt::ui::qtwidgets
+{
 class PokerTableWindow : public QWidget
 {
     Q_OBJECT
@@ -60,3 +62,4 @@ class PokerTableWindow : public QWidget
     void createBoardArea();
     void createActionButtons();
 };
+} // namespace pkt::ui::qtwidgets

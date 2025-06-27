@@ -3,16 +3,27 @@
 #include <QObject>
 #include <core/engine/GameEvents.h>
 
-class GameTableWindow;
+class PokerTableWindow;
 
-class GuiBridgeWidgets : public QObject
+namespace pkt::core
 {
-    Q_OBJECT
+class Session;
+}
+namespace pkt::ui::qtwidgets
+{
+class PokerTableWindow;
 
+class GuiBridgeWidgets
+{
   public:
-    explicit GuiBridgeWidgets(GameTableWindow* table, QObject* parent = nullptr);
-    void connectTo(pkt::core::GameEvents& events);
+    GuiBridgeWidgets(std::shared_ptr<pkt::core::Session> session, PokerTableWindow* pokerTableWindow);
+    void connectEventsToUi(pkt::core::GameEvents& events);
 
   private:
-    GameTableWindow* myGameTableWindow;
+    void connectSignalsFromUi();
+
+    PokerTableWindow* m_tableWindow = nullptr;
+    std::shared_ptr<pkt::core::Session> m_session = nullptr;
 };
+
+} // namespace pkt::ui::qtwidgets
