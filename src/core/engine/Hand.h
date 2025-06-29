@@ -13,6 +13,7 @@
 #include "core/interfaces/IBoard.h"
 #include "core/interfaces/IHand.h"
 
+#include <memory>
 #include <vector>
 
 namespace pkt::core
@@ -37,11 +38,11 @@ class Hand : public IHand
     pkt::core::player::PlayerList getRunningPlayerList() const { return myRunningPlayerList; }
 
     std::shared_ptr<IBoard> getBoard() const { return myBoard; }
-    std::shared_ptr<IBettingRound> getPreflop() const { return myBettingRound[GameStatePreflop]; }
-    std::shared_ptr<IBettingRound> getFlop() const { return myBettingRound[GameStateFlop]; }
-    std::shared_ptr<IBettingRound> getTurn() const { return myBettingRound[GameStateTurn]; }
-    std::shared_ptr<IBettingRound> getRiver() const { return myBettingRound[GameStateRiver]; }
-    std::shared_ptr<IBettingRound> getCurrentBettingRound() const { return myBettingRound[myCurrentRound]; }
+    std::shared_ptr<IBettingRound> getPreflop() const { return myBettingRounds[GameStatePreflop]; }
+    std::shared_ptr<IBettingRound> getFlop() const { return myBettingRounds[GameStateFlop]; }
+    std::shared_ptr<IBettingRound> getTurn() const { return myBettingRounds[GameStateTurn]; }
+    std::shared_ptr<IBettingRound> getRiver() const { return myBettingRounds[GameStateRiver]; }
+    std::shared_ptr<IBettingRound> getCurrentBettingRound() const { return myBettingRounds[myCurrentRound]; }
 
     void setId(int theValue) { myID = theValue; }
     int getId() const { return myID; }
@@ -137,7 +138,7 @@ class Hand : public IHand
     pkt::core::player::PlayerList myActivePlayerList;  // all player who are not out
     pkt::core::player::PlayerList myRunningPlayerList; // all player who are not folded, not all in and not out
 
-    std::vector<std::shared_ptr<IBettingRound>> myBettingRound;
+    std::vector<std::shared_ptr<IBettingRound>> myBettingRounds;
 
     std::vector<int> myCardsArray;
 

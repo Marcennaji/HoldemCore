@@ -37,7 +37,7 @@ std::shared_ptr<IBoard> EngineFactory::createBoard(unsigned dp)
     return std::shared_ptr<IBoard>(new Board(dp));
 }
 
-std::vector<std::shared_ptr<IBettingRound>> EngineFactory::createBettingRound(IHand* hi, unsigned dP, int sB)
+std::vector<std::shared_ptr<IBettingRound>> EngineFactory::createAllBettingRounds(IHand* hi, unsigned dP, int sB)
 {
     std::vector<std::shared_ptr<IBettingRound>> myBettingRound;
 

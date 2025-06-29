@@ -30,7 +30,7 @@ class EngineFactory
                                               pkt::core::player::PlayerList sl, pkt::core::player::PlayerList apl,
                                               pkt::core::player::PlayerList rpl, int id, GameData, StartData);
     virtual std::shared_ptr<IBoard> createBoard(unsigned dp);
-    virtual std::vector<std::shared_ptr<IBettingRound>> createBettingRound(IHand* hi, unsigned dP, int sB);
+    virtual std::vector<std::shared_ptr<IBettingRound>> createAllBettingRounds(IHand* hi, unsigned dP, int sB);
 
   private:
     const GameEvents& myEvents;

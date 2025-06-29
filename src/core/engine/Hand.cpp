@@ -54,7 +54,11 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
 
     setBlinds();
 
-    myBettingRound = myFactory->createBettingRound(this, myDealerPosition, mySmallBlind);
+    myBettingRounds = myFactory->createAllBettingRounds(this, myDealerPosition, mySmallBlind);
+
+    // Initialize FSM - start with preflop state
+    // This will be expanded in Phase 2 to use the factory pattern
+    // For now, we create skeleton state for compilation
 }
 
 Hand::~Hand() = default;
@@ -370,7 +374,7 @@ void Hand::switchRounds()
             for (itC = myRunningPlayerList->begin(); itC != myRunningPlayerList->end(); ++itC)
             {
 
-                if ((*itC)->getSet() >= myBettingRound[myCurrentRound]->getHighestSet())
+                if ((*itC)->getSet() >= myBettingRounds[myCurrentRound]->getHighestSet())
                 {
                     myAllInCondition = true;
                     myBoard->setAllInCondition(true);
@@ -381,11 +385,11 @@ void Hand::switchRounds()
             // no.1: if in first Preflop Round next player is small blind and only all-in-big-blind with less than
             // smallblind amount and other all-in players with less than small blind are nonfold too -> preflop is over
             PlayerListConstIterator smallBlindItC =
-                getRunningPlayerIt(myBettingRound[myCurrentRound]->getSmallBlindPositionId());
+                getRunningPlayerIt(myBettingRounds[myCurrentRound]->getSmallBlindPositionId());
             PlayerListConstIterator bigBlindItC =
-                getActivePlayerIt(myBettingRound[myCurrentRound]->getBigBlindPositionId());
+                getActivePlayerIt(myBettingRounds[myCurrentRound]->getBigBlindPositionId());
             if (smallBlindItC != myRunningPlayerList->end() && bigBlindItC != myActivePlayerList->end() &&
-                myCurrentRound == GameStatePreflop && myBettingRound[myCurrentRound]->getFirstRound())
+                myCurrentRound == GameStatePreflop && myBettingRounds[myCurrentRound]->getFirstRound())
             {
                 // determine player who are all in with less than small blind amount
                 int tempCounter = 0;

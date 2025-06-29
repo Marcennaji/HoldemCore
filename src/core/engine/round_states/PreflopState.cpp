@@ -1,9 +1,10 @@
 #include "PreflopState.h"
 #include <core/services/GlobalServices.h>
+#include "AllInState.h"
+#include "FlopState.h"
+#include "PostRiverState.h"
+#include "core/engine/Hand.h"
 #include "core/engine/model/ButtonState.h"
-// #include "AllInState.h"     // Forward declaration needed
-// #include "FlopState.h"      // Forward declaration needed
-// #include "PostRiverState.h" // Forward declaration needed
 
 namespace pkt::core
 {
@@ -160,6 +161,77 @@ void PreflopState::setFirstPlayerToAct(Hand& hand)
             break;
         }
     }
+}
+
+void PreflopState::processPlayerBetting(Hand& hand, PlayerAction action)
+{
+    // Extract from BettingRound logic
+    // This will be implemented in Phase 2
+}
+
+void PreflopState::advanceToNextPlayer(Hand& hand)
+{
+    // Extract from BettingRound::run() - next player logic
+    // This will be implemented in Phase 2
+}
+
+std::unique_ptr<IBettingRoundState> PreflopState::checkForTransition(Hand& hand)
+{
+    // Check for all-in condition
+    if (checkAllInCondition(hand))
+    {
+        return std::make_unique<AllInState>();
+    }
+
+    // Check if only one player remains
+    if (checkSinglePlayerRemaining(hand))
+    {
+        return std::make_unique<PostRiverState>();
+    }
+
+    // Normal transition to flop
+    return std::make_unique<FlopState>();
+}
+
+bool PreflopState::checkSinglePlayerRemaining(const Hand& hand) const
+{
+    // Extract from Hand::switchRounds() logic
+    // This will be implemented in Phase 2
+    return false;
+}
+
+bool PreflopState::checkAllInCondition(const Hand& hand) const
+{
+    // Extract from Hand::switchRounds() all-in logic
+    // This will be implemented in Phase 2
+    return false;
+}
+
+bool PreflopState::validateAction(const Hand& hand, PlayerAction action) const
+{
+    // Extract from existing betting validation logic
+    // This will be implemented in Phase 2
+    return true;
+}
+
+bool PreflopState::isBettingComplete(const Hand& hand) const
+{
+    // Extract from BettingRound::allBetsAreDone()
+    // This will be implemented in Phase 2
+    return false;
+}
+
+void PreflopState::updatePlayerLists(Hand& hand)
+{
+    // Extract from Hand::switchRounds() - player list refresh
+    // This will be implemented in Phase 2
+}
+
+int PreflopState::getNextPlayerToAct(const Hand& hand) const
+{
+    // Extract from BettingRound::run() - next player logic
+    // This will be implemented in Phase 2
+    return -1;
 }
 
 } // namespace pkt::core
