@@ -59,6 +59,7 @@ void BettingRoundsLegacyTest::onActivePlayerActionDone()
 
 void BettingRoundsLegacyTest::startPreflop()
 {
+    logTestMessage("Starting Preflop round");
     myHand->getCurrentBettingRound()->run();
 }
 
@@ -158,7 +159,7 @@ void BettingRoundsLegacyTest::onRefreshPlayersActiveInactiveStyles(int playerId,
 
 TEST_F(BettingRoundsLegacyTest, StartShouldSetPreflopAsCurrentRound)
 {
-    initializeHandForTesting(6);
+    initializeHandForTesting(2);
     myHand->start();
     EXPECT_EQ(myHand->getCurrentRoundState(), GameStatePreflop);
 }
