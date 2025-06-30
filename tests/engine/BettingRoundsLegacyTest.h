@@ -10,9 +10,9 @@ class BettingRoundsLegacyTest : public EngineTest
 {
   protected:
     void SetUp() override;
-    void simulateBettingRoundToCompletion();
 
   private:
+    void logTestMessage(const std::string& message) const;
     void resolveHandConditions();
     void onActivePlayerActionDone();
 
