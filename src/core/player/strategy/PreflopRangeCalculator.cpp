@@ -184,6 +184,10 @@ float PreflopRangeCalculator::adjustCallForRaises(const CurrentHandContext& cont
     const PlayerPosition myPosition = context.myPosition;
     const int nbRunningPlayers = context.nbRunningPlayers;
     std::shared_ptr<Player> lastRaiser = context.preflopLastRaiser;
+    if (!lastRaiser)
+    {
+        return callingRange;
+    }
 
     PreflopStatistics raiserStats = lastRaiser->getStatistics(nbPlayers).getPreflopStatistics();
 

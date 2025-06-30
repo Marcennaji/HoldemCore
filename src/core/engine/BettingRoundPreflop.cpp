@@ -143,21 +143,16 @@ void BettingRoundPreflop::run()
 
     setCurrentPlayersTurnId((*currentPlayersTurnIt)->getId());
 
-    // prfen, ob Preflop wirklich dran ist
     if (!getFirstRound() && allHighestSet && getHand()->getRunningPlayerList()->size() != 1)
     {
 
-        // Preflop nicht dran, weil wir nicht mehr in erster PreflopRunde und alle Sets gleich sind
-        // also gehe in Flop
         getHand()->setCurrentRound(GameStateFlop);
 
-        // Action loeschen und ActionButtons refresh
         for (itC = getHand()->getRunningPlayerList()->begin(); itC != getHand()->getRunningPlayerList()->end(); ++itC)
         {
             (*itC)->setAction(PlayerActionNone);
         }
 
-        // Sets in den Pot verschieben und Sets = 0 und Pot-refresh
         getHand()->getBoard()->collectSets();
         getHand()->getBoard()->collectPot();
 
@@ -184,7 +179,7 @@ void BettingRoundPreflop::run()
             }
         }
 
-        getHand()->switchRounds();
+        getHand()->resolveHandConditions();
     }
     else
     {
@@ -212,7 +207,7 @@ void BettingRoundPreflop::run()
             myEvents.onRefreshAction(getCurrentPlayersTurnId(), PlayerActionNone);
         }
 
-        if (getCurrentPlayersTurnId() == 0)
+        if ((*currentPlayersTurnIt)->getName() == HumanPlayer::getName())
         {
             if (myEvents.onDoHumanAction)
             {

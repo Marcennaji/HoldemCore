@@ -11,9 +11,9 @@ DefaultPlayerFactory::DefaultPlayerFactory(const GameEvents& events, StrategyAss
 {
 }
 
-std::shared_ptr<Player> DefaultPlayerFactory::createHumanPlayer(int id, const std::string& name, int startMoney)
+std::shared_ptr<Player> DefaultPlayerFactory::createHumanPlayer(int id, int startMoney)
 {
-    return std::make_shared<HumanPlayer>(myEvents, id, name, startMoney, true, 0);
+    return std::make_shared<HumanPlayer>(myEvents, id, startMoney, true, 0);
 }
 
 std::shared_ptr<Player> DefaultPlayerFactory::createBotPlayer(int id, TableProfile profile, int startMoney)

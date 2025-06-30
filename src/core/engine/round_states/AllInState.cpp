@@ -66,7 +66,7 @@ void AllInState::logStateInfo(const Hand& hand) const
 // Private method implementations
 void AllInState::handleAllInSituation(Hand& hand)
 {
-    // Extract from Hand::switchRounds() all-in condition handling
+    // Extract from Hand::resolveHandConditions() all-in condition handling
     // This will be implemented in Phase 2
 
     // Mark hand as all-in
@@ -76,7 +76,7 @@ void AllInState::handleAllInSituation(Hand& hand)
 
 void AllInState::dealRemainingCards(Hand& hand)
 {
-    // Extract from Hand::switchRounds() - deal remaining board cards
+    // Extract from Hand::resolveHandConditions() - deal remaining board cards
     // This will be implemented in Phase 2
 
     // Based on current state, deal cards to complete the board
@@ -88,7 +88,7 @@ void AllInState::dealRemainingCards(Hand& hand)
 
 void AllInState::collectPots(Hand& hand)
 {
-    // Extract from Hand::switchRounds() pot collection logic
+    // Extract from Hand::resolveHandConditions() pot collection logic
     // This will be implemented in Phase 2
 
     hand.getBoard()->collectPot();
@@ -106,7 +106,7 @@ void AllInState::collectPots(Hand& hand)
 
 void AllInState::flipCards(Hand& hand)
 {
-    // Extract from Hand::switchRounds() card flipping logic
+    // Extract from Hand::resolveHandConditions() card flipping logic
     // This will be implemented in Phase 2
 
     if (hand.getEvents().onFlipHoleCardsAllIn)
@@ -124,7 +124,7 @@ std::unique_ptr<IBettingRoundState> AllInState::checkForTransition(Hand& hand)
 void AllInState::determineEntryState(Hand& hand)
 {
     // Determine which state we entered from
-    entryState = hand.getCurrentRound();
+    entryState = hand.getCurrentRoundState();
     showdownReady = true; // All-in is always ready for showdown
 }
 

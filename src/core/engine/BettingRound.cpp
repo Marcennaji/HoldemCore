@@ -141,7 +141,7 @@ void BettingRound::run()
             myFirstRound = false;
         }
 
-        if (myCurrentPlayersTurnId == 0)
+        if ((*currentPlayersTurnIt)->getName() == HumanPlayer::getName())
         {
             if (myEvents.onDoHumanAction)
             {
@@ -208,7 +208,7 @@ void BettingRound::proceedToNextBettingRound()
         }
     }
 
-    myHand->switchRounds();
+    myHand->resolveHandConditions();
 }
 
 void BettingRound::logBoardCards()

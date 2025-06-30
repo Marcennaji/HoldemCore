@@ -48,7 +48,7 @@ class Hand : public IHand
     int getStartQuantityPlayers() const { return myStartQuantityPlayers; }
 
     void setCurrentRound(GameState theValue) { myCurrentRound = theValue; }
-    GameState getCurrentRound() const { return currentState ? currentState->getGameState() : GameStatePreflop; }
+    GameState getCurrentRoundState() const { return currentState ? currentState->getGameState() : GameStatePreflop; }
     GameState getRoundBeforePostRiver() const { return myRoundBeforePostRiver; }
 
     void setDealerPosition(int theValue) { myDealerPosition = theValue; }
@@ -76,7 +76,7 @@ class Hand : public IHand
     void assignButtons();
     void setBlinds();
 
-    void switchRounds();
+    void resolveHandConditions();
 
     int getPreflopCallsNumber();
     int getPreflopRaisesNumber();

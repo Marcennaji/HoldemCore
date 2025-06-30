@@ -27,7 +27,7 @@ BotPlayer::~BotPlayer() = default;
 void BotPlayer::action()
 {
 
-    switch (currentHand->getCurrentRound())
+    switch (currentHand->getCurrentRoundState())
     {
 
     case GameStatePreflop:

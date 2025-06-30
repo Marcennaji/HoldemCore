@@ -8,6 +8,7 @@
 #include "core/engine/EngineDefs.h"
 #include "core/engine/model/PlayerStatistics.h"
 #include "core/interfaces/NullLogger.h"
+#include "core/player/HumanPlayer.h"
 #include "core/player/Player.h"
 #include "core/player/strategy/LooseAggressiveBotStrategy.h"
 #include "core/player/strategy/ManiacBotStrategy.h"
@@ -140,7 +141,7 @@ void SqliteLogStore::createDatabase()
 
     for (int j = 2; j <= MAX_NUMBER_OF_PLAYERS; j++)
     {
-        initializeStrategyStatistics("You", j); // human player
+        initializeStrategyStatistics(HumanPlayer::getName(), j);
         // initialize players statistics for all bot strategies
         initializeStrategyStatistics(tightAggressiveStrategy.getStrategyName(), j);
         initializeStrategyStatistics(looseAggressiveStrategy.getStrategyName(), j);

@@ -39,7 +39,7 @@ void EngineTest::createPlayerList(size_t playerCount)
     myPlayerList = std::make_shared<std::list<std::shared_ptr<Player>>>();
     for (size_t i = 0; i < playerCount; ++i)
     {
-        myPlayerList->push_back(std::make_shared<DummyPlayer>(i + 1, myEvents));
+        myPlayerList->push_back(std::make_shared<DummyPlayer>(i, myEvents));
     }
 }
 void EngineTest::initializeHandWithPlayers(size_t activePlayerCount)

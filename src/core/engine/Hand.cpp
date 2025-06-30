@@ -287,7 +287,7 @@ void Hand::setBlinds()
     }
 }
 
-void Hand::switchRounds()
+void Hand::resolveHandConditions()
 {
 
     PlayerListIterator it, it1;
@@ -471,7 +471,7 @@ void Hand::switchRounds()
 
     if (myEvents.onRefreshTableDescriptiveLabels)
     {
-        myEvents.onRefreshTableDescriptiveLabels(getCurrentRound());
+        myEvents.onRefreshTableDescriptiveLabels(getCurrentRoundState());
     }
 
     if (myCurrentRound < GameStatePostRiver)

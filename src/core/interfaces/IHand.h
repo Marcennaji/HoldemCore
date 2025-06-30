@@ -40,7 +40,7 @@ class IHand
     virtual int getStartQuantityPlayers() const = 0;
 
     virtual void setCurrentRound(GameState theValue) = 0;
-    virtual GameState getCurrentRound() const = 0;
+    virtual GameState getCurrentRoundState() const = 0;
     virtual GameState getRoundBeforePostRiver() const = 0;
 
     virtual void setDealerPosition(int theValue) = 0;
@@ -64,7 +64,7 @@ class IHand
     virtual void setCardsShown(bool theValue) = 0;
     virtual bool getCardsShown() const = 0;
 
-    virtual void switchRounds() = 0;
+    virtual void resolveHandConditions() = 0;
 
     virtual int getPreflopCallsNumber() = 0;
     virtual int getPreflopRaisesNumber() = 0;

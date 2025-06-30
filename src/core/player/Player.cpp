@@ -629,15 +629,15 @@ std::string Player::getStringBoard() const
 
     int cardsOnBoard;
 
-    if (currentHand->getCurrentRound() == GameStateFlop)
+    if (currentHand->getCurrentRoundState() == GameStateFlop)
     {
         cardsOnBoard = 3;
     }
-    else if (currentHand->getCurrentRound() == GameStateTurn)
+    else if (currentHand->getCurrentRoundState() == GameStateTurn)
     {
         cardsOnBoard = 4;
     }
-    else if (currentHand->getCurrentRound() == GameStateRiver)
+    else if (currentHand->getCurrentRoundState() == GameStateRiver)
     {
         cardsOnBoard = 5;
     }

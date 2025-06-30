@@ -1,5 +1,6 @@
 #include "PostRiverState.h"
 #include "core/engine/Hand.h"
+#include "core/player/HumanPlayer.h"
 
 namespace pkt::core
 {
@@ -160,7 +161,7 @@ bool PostRiverState::shouldPauseHand(Hand& hand) const
     auto activePlayerList = hand.getActivePlayerList();
     for (auto it = activePlayerList->begin(); it != activePlayerList->end(); ++it)
     {
-        if ((*it)->getAction() != PlayerActionFold && (*it)->getId() == 0)
+        if ((*it)->getAction() != PlayerActionFold && (*it)->getName() == pkt::core::player::HumanPlayer::getName())
         {
             humanPlayerInvolved = true;
             break;

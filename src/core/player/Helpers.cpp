@@ -213,7 +213,7 @@ const int getDrawingProbability(const PostFlopState& postFlopState)
 
     // if the last raiser is allin on flop : we must count our odds for the turn AND the river
     // TODO : this is not correct, as we must also take into account the other players actions, and their stacks
-    /*if (currentHand->getCurrentRound() == GameStateFlop)
+    /*if (currentHand->getCurrentRoundState() == GameStateFlop)
     {
         const int lastRaiserId = currentHand->getLastRaiserId();
 

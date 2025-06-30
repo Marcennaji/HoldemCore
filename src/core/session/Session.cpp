@@ -57,7 +57,7 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
 
     auto playerList = std::make_shared<std::list<std::shared_ptr<Player>>>();
 
-    playerList->push_back(playerFactory->createHumanPlayer(0, "You", gameData.startMoney));
+    playerList->push_back(playerFactory->createHumanPlayer(0, gameData.startMoney));
 
     for (int i = 1; i < startData.numberOfPlayers; ++i)
     {

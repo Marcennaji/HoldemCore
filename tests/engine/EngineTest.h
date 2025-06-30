@@ -33,6 +33,6 @@ class EngineTest : public ::testing::Test
     void createPlayerList(size_t playerCount);
     void initializeHandWithPlayers(size_t activePlayerCount);
 
-    static const int startDealerPlayerId = 1;
+    static const int startDealerPlayerId = 0;
 };
 } // namespace pkt::test

@@ -11,11 +11,13 @@ class HumanPlayer : public Player
 {
 
   public:
-    HumanPlayer(const GameEvents&, int id, std::string name, int sC, bool aS, int mB);
+    HumanPlayer(const GameEvents&, int id, int sC, bool aS, int mB);
 
     ~HumanPlayer();
 
     virtual std::string getStrategyName() const override { return "HumanPlayer"; }
+
+    static std::string getName() { return "You"; }
 };
 
 } // namespace pkt::core::player

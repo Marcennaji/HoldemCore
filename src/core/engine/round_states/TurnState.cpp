@@ -129,14 +129,14 @@ std::unique_ptr<IBettingRoundState> TurnState::checkForTransition(Hand& hand)
 
 bool TurnState::checkSinglePlayerRemaining(const Hand& hand) const
 {
-    // Extract from Hand::switchRounds() logic
+    // Extract from Hand::resolveHandConditions() logic
     // This will be implemented in Phase 2
     return false;
 }
 
 bool TurnState::checkAllInCondition(const Hand& hand) const
 {
-    // Extract from Hand::switchRounds() all-in logic
+    // Extract from Hand::resolveHandConditions() all-in logic
     // This will be implemented in Phase 2
     return false;
 }
@@ -157,7 +157,7 @@ bool TurnState::isBettingComplete(const Hand& hand) const
 
 void TurnState::updatePlayerLists(Hand& hand)
 {
-    // Extract from Hand::switchRounds() - player list refresh
+    // Extract from Hand::resolveHandConditions() - player list refresh
     // This will be implemented in Phase 2
 }
 
