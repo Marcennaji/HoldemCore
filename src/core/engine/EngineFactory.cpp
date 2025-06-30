@@ -32,24 +32,30 @@ std::shared_ptr<IHand> EngineFactory::createHand(std::shared_ptr<EngineFactory> 
     return std::shared_ptr<IHand>(new Hand(myEvents, f, b, sl, apl, rpl, id, gd, sd));
 }
 
-std::shared_ptr<IBoard> EngineFactory::createBoard(unsigned dp)
+std::shared_ptr<IBoard> EngineFactory::createBoard(unsigned dealerPosition)
 {
-    return std::shared_ptr<IBoard>(new Board(dp));
+    return std::shared_ptr<IBoard>(new Board(dealerPosition));
 }
 
-std::vector<std::shared_ptr<IBettingRound>> EngineFactory::createAllBettingRounds(IHand* hi, unsigned dP, int sB)
+std::vector<std::shared_ptr<IBettingRound>> EngineFactory::createAllBettingRounds(IHand* hand, unsigned dealerPosition,
+                                                                                  int smallBlind)
 {
     std::vector<std::shared_ptr<IBettingRound>> myBettingRound;
 
-    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundPreflop(myEvents, hi, dP, sB)));
+    myBettingRound.push_back(
+        std::shared_ptr<IBettingRound>(new BettingRoundPreflop(myEvents, hand, dealerPosition, smallBlind)));
 
-    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRound(myEvents, hi, dP, sB, GameStateFlop)));
+    myBettingRound.push_back(
+        std::shared_ptr<IBettingRound>(new BettingRound(myEvents, hand, dealerPosition, smallBlind, GameStateFlop)));
 
-    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRound(myEvents, hi, dP, sB, GameStateTurn)));
+    myBettingRound.push_back(
+        std::shared_ptr<IBettingRound>(new BettingRound(myEvents, hand, dealerPosition, smallBlind, GameStateTurn)));
 
-    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRound(myEvents, hi, dP, sB, GameStateRiver)));
+    myBettingRound.push_back(
+        std::shared_ptr<IBettingRound>(new BettingRound(myEvents, hand, dealerPosition, smallBlind, GameStateRiver)));
 
-    myBettingRound.push_back(std::shared_ptr<IBettingRound>(new BettingRoundPostRiver(myEvents, hi, dP, sB)));
+    myBettingRound.push_back(
+        std::shared_ptr<IBettingRound>(new BettingRoundPostRiver(myEvents, hand, dealerPosition, smallBlind)));
 
     return myBettingRound;
 }

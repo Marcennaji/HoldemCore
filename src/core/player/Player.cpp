@@ -734,7 +734,7 @@ float Player::getM() const
     }
 }
 
-const SimResults Player::getHandSimulation() const
+const SimResults Player::getHandSimulation(bool logResult) const
 {
 
     SimResults r;
@@ -754,27 +754,30 @@ const SimResults Player::getHandSimulation() const
 
     r.winRanged = 1 - maxOpponentsStrengths;
 
-    std::ostringstream logMessage;
-    logMessage << "\n"
-               << "\tsimulation with " << cards << " : " << std::endl
-               << "\t\twin at showdown is " << r.winSd << std::endl
-               << "\t\ttie at showdown is " << r.tieSd << std::endl
-               << "\t\twin now (against random hands) is " << r.win << std::endl
-               << "\t\twin now (against ranged hands) is " << r.winRanged << std::endl;
-
-    if (r.winRanged == 0)
+    if (logResult)
     {
-        logMessage << "\n"
-                   << "\t\tr.winRanged = 1 - " << maxOpponentsStrengths
-                   << " = 0 : setting value to r.win / 4 = " << r.win / 4 << std::endl;
-    }
+        std::ostringstream logMessage;
+        logMessage << "\nPlayer " << myName << " (id = " << myID << "):\n"
+                   << "\tsimulation with " << cards << " : " << std::endl
+                   << "\t\twin at showdown is " << r.winSd << std::endl
+                   << "\t\ttie at showdown is " << r.tieSd << std::endl
+                   << "\t\twin now (against random hands) is " << r.win << std::endl
+                   << "\t\twin now (against ranged hands) is " << r.winRanged << std::endl;
 
-    if (getPotOdd() > 0)
-    {
-        logMessage << "\t\tpot odd is " << getPotOdd() << std::endl;
-    }
+        if (r.winRanged == 0)
+        {
+            logMessage << "\n"
+                       << "\t\tr.winRanged = 1 - " << maxOpponentsStrengths
+                       << " = 0 : setting value to r.win / 4 = " << r.win / 4 << std::endl;
+        }
 
-    GlobalServices::instance().logger()->info(logMessage.str());
+        if (getPotOdd() > 0)
+        {
+            logMessage << "\t\tpot odd is " << getPotOdd() << std::endl;
+        }
+
+        GlobalServices::instance().logger()->info(logMessage.str());
+    }
     if (r.winRanged == 0)
     {
         r.winRanged = r.win / 4;

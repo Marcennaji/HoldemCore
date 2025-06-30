@@ -39,14 +39,15 @@ void EngineTest::createPlayerList(size_t playerCount)
     myPlayerList = std::make_shared<std::list<std::shared_ptr<Player>>>();
     for (size_t i = 0; i < playerCount; ++i)
     {
-        myPlayerList->push_back(std::make_shared<DummyPlayer>(i, myEvents));
+        myPlayerList->push_back(std::make_shared<DummyPlayer>(i + 1, myEvents));
     }
 }
 void EngineTest::initializeHandWithPlayers(size_t activePlayerCount)
 {
     // Create the active player list by selecting the first `activePlayerCount` players from the seats list
 
-    myBoard = myFactory->createBoard(1);
+    myBoard = myFactory->createBoard(startDealerPlayerId);
+    myBoard->setPlayerLists(myPlayerList, myPlayerList, myPlayerList);
 
     GameData gameData;
     gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
@@ -55,11 +56,11 @@ void EngineTest::initializeHandWithPlayers(size_t activePlayerCount)
     gameData.tableProfile = TableProfile::RandomOpponents;
 
     StartData startData;
-    startData.startDealerPlayerId = 0;
+    startData.startDealerPlayerId = startDealerPlayerId;
     startData.numberOfPlayers = static_cast<int>(activePlayerCount);
 
-    myHand =
-        myFactory->createHand(myFactory, myBoard, myPlayerList, myPlayerList, myPlayerList, 0, gameData, startData);
+    myHand = myFactory->createHand(myFactory, myBoard, myPlayerList, myPlayerList, myPlayerList, startDealerPlayerId,
+                                   gameData, startData);
 }
 
 } // namespace pkt::test

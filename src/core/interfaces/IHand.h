@@ -36,9 +36,6 @@ class IHand
     virtual std::shared_ptr<IBettingRound> getRiver() const = 0;
     virtual std::shared_ptr<IBettingRound> getCurrentBettingRound() const = 0;
 
-    virtual void setId(int theValue) = 0;
-    virtual int getId() const = 0;
-
     virtual void setStartQuantityPlayers(int theValue) = 0;
     virtual int getStartQuantityPlayers() const = 0;
 

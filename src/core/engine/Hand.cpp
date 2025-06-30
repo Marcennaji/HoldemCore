@@ -34,7 +34,6 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
 {
 
     GlobalServices::instance().logger()->info("\n-------------------------------------------------------------\n");
-    GlobalServices::instance().logger()->info("\nHAND " + std::to_string(myID) + "\n");
 
     for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
@@ -106,7 +105,7 @@ void Hand::dealHoleCards(size_t cardsArrayIndex)
         (*it)->getCurrentHandActions().reset();
         (*it)->setPosition();
         (*it)->getRangeEstimator()->setEstimatedRange("");
-        GlobalServices::instance().logger()->info("Player " + std::to_string((*it)->getId()) +
+        GlobalServices::instance().logger()->info("Player " + (*it)->getName() +
                                                   " dealt cards: " + CardUtilities::getCardString(tempPlayerArray[0]) +
                                                   " " + CardUtilities::getCardString(tempPlayerArray[1]) +
                                                   ", hand strength = " + std::to_string((*it)->getCardsValueInt()));

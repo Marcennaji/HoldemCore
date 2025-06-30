@@ -132,7 +132,7 @@ class Player
 
     std::string getStringBoard() const;
     std::map<int, float> evaluateOpponentsStrengths() const;
-    const SimResults getHandSimulation() const;
+    const SimResults getHandSimulation(bool logResult = false) const;
 
     bool isAgressor(const GameState gameState) const;
 

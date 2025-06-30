@@ -12,27 +12,49 @@ void BettingRoundsLegacyTest::SetUp()
 {
     EngineTest::SetUp();
 
-    myEvents.onDealBettingRoundCards = [this](int bettingRoundId) { uiDealBettingRoundCards(bettingRoundId); };
+    myEvents.onStartPreflop = [this]() { startPreflop(); };
+    myEvents.onBettingRoundAnimation = [this](int bettingRoundId) { bettingRoundAnimation(bettingRoundId); };
+    myEvents.onActivePlayerActionDone = [this]()
+    {
+        // This is where we would handle the end of a player's action in the betting round
+        // For now, we just switch rounds to simulate the next player taking their turn
+        handSwitchRounds();
+    };
 }
-void BettingRoundsLegacyTest::uiDealBettingRoundCards(int myBettingRoundID)
+void BettingRoundsLegacyTest::handSwitchRounds()
+{
+    myHand->switchRounds();
+}
+
+void BettingRoundsLegacyTest::startPreflop()
+{
+    myHand->getCurrentBettingRound()->run();
+}
+
+void BettingRoundsLegacyTest::bettingRoundAnimation(int myBettingRoundID)
 {
 
     switch (myBettingRoundID)
     {
 
+    case 0:
+    {
+        preflopAnimation2();
+    }
+    break;
     case 1:
     {
-        // dealFlopCards0();
+        // flopAnimation2();
     }
     break;
     case 2:
     {
-        // dealTurnCards0();
+        // turnAnimation2();
     }
     break;
     case 3:
     {
-        // dealRiverCards0();
+        // riverAnimation2();
     }
     break;
     default:
@@ -40,6 +62,12 @@ void BettingRoundsLegacyTest::uiDealBettingRoundCards(int myBettingRoundID)
     }
     }
 }
+void BettingRoundsLegacyTest::preflopAnimation2()
+{
+    myHand->getCurrentBettingRound()->nextPlayer();
+}
+
+// Tests for betting rounds and transitions
 
 TEST_F(BettingRoundsLegacyTest, DISABLED_StartShouldSetPreflopAsCurrentRound)
 {
@@ -50,7 +78,7 @@ TEST_F(BettingRoundsLegacyTest, DISABLED_StartShouldSetPreflopAsCurrentRound)
 
 TEST_F(BettingRoundsLegacyTest, DISABLED_SwitchRoundsGoesFromPreflopToFlop)
 {
-    initializeHandForTesting(4);
+    initializeHandForTesting(2);
     myHand->start();
     myHand->switchRounds();
     EXPECT_EQ(myHand->getCurrentRound(), GameStateFlop);

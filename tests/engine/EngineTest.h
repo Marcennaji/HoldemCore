@@ -32,5 +32,7 @@ class EngineTest : public ::testing::Test
     // Helper function to create a PlayerList with mock players
     void createPlayerList(size_t playerCount);
     void initializeHandWithPlayers(size_t activePlayerCount);
+
+    static const int startDealerPlayerId = 1;
 };
 } // namespace pkt::test

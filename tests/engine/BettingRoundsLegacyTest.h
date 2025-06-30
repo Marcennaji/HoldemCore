@@ -12,6 +12,9 @@ class BettingRoundsLegacyTest : public EngineTest
     void SetUp() override;
 
   private:
-    void uiDealBettingRoundCards(int bettingRoundId);
+    void handSwitchRounds();
+    void startPreflop();
+    void bettingRoundAnimation(int myBettingRoundID);
+    void preflopAnimation2();
 };
 } // namespace pkt::test

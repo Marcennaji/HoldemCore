@@ -44,9 +44,6 @@ class Hand : public IHand
     std::shared_ptr<IBettingRound> getRiver() const { return myBettingRounds[GameStateRiver]; }
     std::shared_ptr<IBettingRound> getCurrentBettingRound() const { return myBettingRounds[myCurrentRound]; }
 
-    void setId(int theValue) { myID = theValue; }
-    int getId() const { return myID; }
-
     void setStartQuantityPlayers(int theValue) { myStartQuantityPlayers = theValue; }
     int getStartQuantityPlayers() const { return myStartQuantityPlayers; }
 
@@ -142,7 +139,6 @@ class Hand : public IHand
 
     std::vector<int> myCardsArray;
 
-    int myID;
     int myStartQuantityPlayers;
     unsigned myDealerPosition;
     unsigned mySmallBlindPosition;
