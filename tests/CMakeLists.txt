@@ -10,13 +10,11 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
+# add all the cpp files in the tests directory
+file(GLOB_RECURSE TEST_SOURCES "*.cpp")
+
 add_executable(core_tests
-    strategy/test_tight_aggressive.cpp
-    range/RangeParserTest.cpp
-    range/RangeRefinerTest.cpp
-    range/CardsInRangeTest.cpp
-    hand/HandTest.cpp
-    cards_value/CardsValueTest.cpp
+    ${TEST_SOURCES}
 )
 
 target_include_directories(core_tests
