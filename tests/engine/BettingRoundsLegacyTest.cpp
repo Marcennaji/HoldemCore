@@ -18,37 +18,33 @@ void BettingRoundsLegacyTest::SetUp()
     EngineTest::SetUp();
 
     // Essential events for game flow
+    myEvents.onActivePlayerActionDone = [this]() { activePlayerActionDone(); };
+    myEvents.onBettingRoundAnimation = [this](int bettingRoundId) { bettingRoundAnimation(bettingRoundId); };
+    myEvents.onDealBettingRoundCards = [this](int bettingRoundId) { dealBettingRoundCards(bettingRoundId); };
     myEvents.onStartPreflop = [this]() { startPreflop(); };
     myEvents.onStartFlop = [this]() { startFlop(); };
     myEvents.onStartTurn = [this]() { startTurn(); };
     myEvents.onStartRiver = [this]() { startRiver(); };
-
-    myEvents.onBettingRoundAnimation = [this](int bettingRoundId) { bettingRoundAnimation(bettingRoundId); };
-    myEvents.onActivePlayerActionDone = [this]() { onActivePlayerActionDone(); };
-
-    // Pot and cash management events
-    myEvents.onPotUpdated = [this](int pot) { onPotUpdated(pot); };
-    myEvents.onRefreshCash = [this]() { onRefreshCash(); };
-    myEvents.onRefreshSet = [this]() { onRefreshSet(); };
-
-    // Card dealing events
-    myEvents.onDealBettingRoundCards = [this](int bettingRoundId) { onDealBettingRoundCards(bettingRoundId); };
-    myEvents.onDealHoleCards = [this]() { onDealHoleCards(); };
-
-    // Player state events
-    myEvents.onRefreshAction = [this](int playerId, int playerAction) { onRefreshAction(playerId, playerAction); };
-    myEvents.onRefreshPlayersActiveInactiveStyles = [this](int playerId, int status)
-    { onRefreshPlayersActiveInactiveStyles(playerId, status); };
+    myEvents.onStartPostRiver = [this]() { startPostRiver(); };
 }
 void BettingRoundsLegacyTest::resolveHandConditions()
 {
     logTestMessage("Calling resolveHandConditions(), current round before: " +
                    std::to_string(myHand->getCurrentRoundState()));
+
+    assert(myHand->getRunningPlayerList()->size() == myHand->getActivePlayerList()->size() &&
+           myHand->getRunningPlayerList()->size() == myPlayerList->size());
+
     myHand->resolveHandConditions();
-    logTestMessage("After resolveHandConditions(), current round: " + std::to_string(myHand->getCurrentRoundState()));
+
+    logTestMessage("After resolveHandConditions(), current round is: " +
+                   std::to_string(myHand->getCurrentRoundState()));
+
+    assert(myHand->getRunningPlayerList()->size() == myHand->getActivePlayerList()->size() &&
+           myHand->getRunningPlayerList()->size() == myPlayerList->size());
 }
 
-void BettingRoundsLegacyTest::onActivePlayerActionDone()
+void BettingRoundsLegacyTest::activePlayerActionDone()
 {
     // After each player action, check if the betting round is complete
     // This is done by checking if all bets are done, and if so, proceed to next round
@@ -81,85 +77,38 @@ void BettingRoundsLegacyTest::startRiver()
     myHand->getCurrentBettingRound()->run();
 }
 
-void BettingRoundsLegacyTest::bettingRoundAnimation(int myBettingRoundID)
+void BettingRoundsLegacyTest::startPostRiver()
 {
-
-    switch (myBettingRoundID)
-    {
-
-    case 0:
-    {
-        preflopAnimation2();
-    }
-    break;
-    case 1:
-    {
-        // flopAnimation2();
-    }
-    break;
-    case 2:
-    {
-        // turnAnimation2();
-    }
-    break;
-    case 3:
-    {
-        // riverAnimation2();
-    }
-    break;
-    default:
-    {
-    }
-    }
-}
-void BettingRoundsLegacyTest::preflopAnimation2()
-{
-    myHand->getCurrentBettingRound()->nextPlayer();
+    logTestMessage("Starting Post-River round");
+    myHand->getCurrentBettingRound()->postRiverRun();
 }
 
-// Pot and cash event handlers
-void BettingRoundsLegacyTest::onPotUpdated(int pot)
+void BettingRoundsLegacyTest::bettingRoundAnimation(int bettingRoundID)
 {
-    logTestMessage("Pot updated to: " + std::to_string(pot));
+    assert(myHand->getCurrentBettingRound()->getBettingRoundID() == bettingRoundID &&
+           "Betting round ID does not match the current betting round ID");
+
+    if (bettingRoundID < 4)
+    {
+        myHand->getCurrentBettingRound()->nextPlayer();
+    }
 }
 
-void BettingRoundsLegacyTest::onRefreshCash()
-{
-    logTestMessage("Refreshing player cash");
-}
-
-void BettingRoundsLegacyTest::onRefreshSet()
-{
-    logTestMessage("Refreshing player bets");
-}
-
-// Card dealing event handlers
-void BettingRoundsLegacyTest::onDealBettingRoundCards(int bettingRoundId)
+void BettingRoundsLegacyTest::dealBettingRoundCards(int bettingRoundId)
 {
     logTestMessage("Dealing cards for betting round: " + std::to_string(bettingRoundId));
-}
 
-void BettingRoundsLegacyTest::onDealHoleCards()
-{
-    logTestMessage("Dealing hole cards");
-}
-
-// Player state event handlers
-void BettingRoundsLegacyTest::onRefreshAction(int playerId, int playerAction)
-{
-    logTestMessage("Player " + std::to_string(playerId) + " action: " + std::to_string(playerAction));
-}
-
-void BettingRoundsLegacyTest::onRefreshPlayersActiveInactiveStyles(int playerId, int status)
-{
-    logTestMessage("Player " + std::to_string(playerId) + " status: " + std::to_string(status));
+    if (bettingRoundId != 0)
+    {
+        resolveHandConditions();
+    }
 }
 
 // Tests for betting rounds and transitions
 
 TEST_F(BettingRoundsLegacyTest, StartShouldSetPreflopAsCurrentRound)
 {
-    initializeHandForTesting(2);
+    initializeHandForTesting(3);
     myHand->start();
     EXPECT_EQ(myHand->getCurrentRoundState(), GameStatePreflop);
 }
@@ -198,7 +147,7 @@ TEST_F(BettingRoundsLegacyTest, DISABLED_ShouldNotCrashIfSwitchRoundsCalledAfter
 TEST_F(BettingRoundsLegacyTest, DISABLED_SwitchRounds_TransitionsCorrectlyThroughAllPhases)
 {
     initializeHandForTesting(6);
-    myHand->setCurrentRound(GameStatePreflop);
+    myHand->setCurrentRoundState(GameStatePreflop);
     myHand->setAllInCondition(false); // normal game
 
     myHand->resolveHandConditions();
@@ -218,7 +167,7 @@ TEST_F(BettingRoundsLegacyTest, DISABLED_SwitchRounds_TransitionsCorrectlyThroug
 TEST_F(BettingRoundsLegacyTest, DISABLED_SwitchRounds_DoesNotAdvanceWhenAllInConditionIsTrue)
 {
     initializeHandForTesting(6);
-    myHand->setCurrentRound(GameStateFlop);
+    myHand->setCurrentRoundState(GameStateFlop);
     myHand->setAllInCondition(true); // simulate all-in stop
 
     myHand->resolveHandConditions();
@@ -228,7 +177,7 @@ TEST_F(BettingRoundsLegacyTest, DISABLED_SwitchRounds_DoesNotAdvanceWhenAllInCon
 TEST_F(BettingRoundsLegacyTest, DISABLED_SwitchRounds_DoesNotAdvancePastRiver)
 {
     initializeHandForTesting(6);
-    myHand->setCurrentRound(GameStateRiver);
+    myHand->setCurrentRoundState(GameStateRiver);
 
     myHand->resolveHandConditions(); // should not move past river
     EXPECT_EQ(myHand->getCurrentRoundState(), GameStateRiver);
@@ -237,7 +186,7 @@ TEST_F(BettingRoundsLegacyTest, DISABLED_SwitchRounds_DoesNotAdvancePastRiver)
 TEST_F(BettingRoundsLegacyTest, DISABLED_SwitchRounds_SkipsWhenOnlyOnePlayerRunning)
 {
     initializeHandForTesting(1);
-    myHand->setCurrentRound(GameStatePreflop);
+    myHand->setCurrentRoundState(GameStatePreflop);
 
     myHand->resolveHandConditions();                             // should detect end of game
     EXPECT_EQ(myHand->getCurrentRoundState(), GameStatePreflop); // or GameStateRiver if end state forced

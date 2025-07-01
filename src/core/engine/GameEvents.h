@@ -11,11 +11,9 @@ struct GameEvents
 {
     std::function<void(int gameSpeed)> onGameInitializeGui;
 
-    // --- Game state display ---
     std::function<void(int)> onPotUpdated;
     std::function<void(unsigned playerId, int newChips)> onPlayerChipsUpdated;
 
-    // --- Card dealing ---
     std::function<void()> onDealHoleCards;
     std::function<void(unsigned playerId)> onShowHoleCards;
     std::function<void(int bettingRoundId)> onDealBettingRoundCards;
@@ -23,7 +21,6 @@ struct GameEvents
 
     std::function<void()> onActivePlayerActionDone;
 
-    // --- GUI refresh ---
     std::function<void(int)> onRefreshTableDescriptiveLabels;
     std::function<void()> onNextBettingRoundInitializeGui;
     std::function<void()> onHideHoleCards;
@@ -36,7 +33,6 @@ struct GameEvents
     std::function<void()> onDisableButtons;
     std::function<void()> onDoHumanAction;
 
-    // --- Optional: animations ---
     std::function<void(int bettingRoundId)> onBettingRoundAnimation;
 
     std::function<void()> onStartPreflop;

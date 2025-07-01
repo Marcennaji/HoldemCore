@@ -146,7 +146,7 @@ void BettingRoundPreflop::run()
     if (!getFirstRound() && allHighestSet && getHand()->getRunningPlayerList()->size() != 1)
     {
 
-        getHand()->setCurrentRound(GameStateFlop);
+        getHand()->setCurrentRoundState(GameStateFlop);
 
         for (itC = getHand()->getRunningPlayerList()->begin(); itC != getHand()->getRunningPlayerList()->end(); ++itC)
         {

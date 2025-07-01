@@ -1,5 +1,6 @@
 #include "EngineTest.h"
 #include "DummyPlayer.h"
+#include "core/engine/Exception.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
 #include "core/services/GlobalServices.h"
@@ -39,7 +40,9 @@ void EngineTest::createPlayerList(size_t playerCount)
     myPlayerList = std::make_shared<std::list<std::shared_ptr<Player>>>();
     for (size_t i = 0; i < playerCount; ++i)
     {
-        myPlayerList->push_back(std::make_shared<DummyPlayer>(i, myEvents));
+        auto player = std::make_shared<DummyPlayer>(i, myEvents);
+        player->setAction(PlayerActionNone);
+        myPlayerList->push_back(player);
     }
 }
 void EngineTest::initializeHandWithPlayers(size_t activePlayerCount)

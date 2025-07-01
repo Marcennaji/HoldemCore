@@ -70,7 +70,7 @@ void BettingRound::nextPlayer()
     PlayerListConstIterator currentPlayersTurnConstIt = myHand->getRunningPlayerIt(myCurrentPlayersTurnId);
     if (currentPlayersTurnConstIt == myHand->getRunningPlayerList()->end())
     {
-        GlobalServices::instance().logger()->error("RUNNING_PLAYER_NOT_FOUND");
+        throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
     }
 
     auto botPtr = std::dynamic_pointer_cast<BotPlayer>(*currentPlayersTurnConstIt);
@@ -79,9 +79,14 @@ void BettingRound::nextPlayer()
         botPtr->action();
     }
 }
-
 void BettingRound::run()
 {
+    GlobalServices::instance().logger()->info("myHighestSet at start of round: " + std::to_string(myHighestSet));
+    for (auto& player : *myHand->getRunningPlayerList())
+    {
+        GlobalServices::instance().logger()->info("Player " + player->getName() +
+                                                  " action: " + playerActionToString(player->getAction()));
+    }
     if (myFirstRunGui)
     {
         handleFirstRunGui();
@@ -95,18 +100,22 @@ void BettingRound::run()
     logBoardCards();
 
     bool allHighestSet = allBetsAreDone();
+    GlobalServices::instance().logger()->info("allBetsAreDone: " + std::to_string(allHighestSet) +
+                                              ", myFirstRound: " + std::to_string(myFirstRound));
 
     if (!myFirstRound && allHighestSet)
     {
+        GlobalServices::instance().logger()->info("all bets are done, proceeding to next betting round");
         proceedToNextBettingRound();
     }
     else
     {
         // determine next running player
+
         PlayerListConstIterator currentPlayersTurnIt = myHand->getRunningPlayerIt(myCurrentPlayersTurnId);
         if (currentPlayersTurnIt == myHand->getRunningPlayerList()->end())
         {
-            GlobalServices::instance().logger()->error("RUNNING_PLAYER_NOT_FOUND");
+            currentPlayersTurnIt = myHand->getRunningPlayerList()->begin();
         }
 
         ++currentPlayersTurnIt;
@@ -127,11 +136,12 @@ void BettingRound::run()
         {
             myEvents.onRefreshAction(myCurrentPlayersTurnId, 0);
         }
+        GlobalServices::instance().logger()->info("BettingRound::run() : Determining next running player (2)");
 
         currentPlayersTurnIt = myHand->getRunningPlayerIt(myCurrentPlayersTurnId);
         if (currentPlayersTurnIt == myHand->getRunningPlayerList()->end())
         {
-            GlobalServices::instance().logger()->error("RUNNING_PLAYER_NOT_FOUND");
+            throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
         }
 
         (*currentPlayersTurnIt)->setTurn(true);
@@ -169,13 +179,14 @@ bool BettingRound::allBetsAreDone() const
             return false;
         }
     }
+
     return true;
 }
 
 void BettingRound::proceedToNextBettingRound()
 {
     PlayerListIterator itC;
-    myHand->setCurrentRound(GameState(myBettingRoundID + 1));
+    myHand->setCurrentRoundState(GameState(myBettingRoundID + 1));
 
     for (itC = myHand->getRunningPlayerList()->begin(); itC != myHand->getRunningPlayerList()->end(); ++itC)
     {
@@ -222,25 +233,25 @@ void BettingRound::logBoardCards()
         {
         case GameStateFlop:
             GlobalServices::instance().logger()->info(
-                "************************* FLOP " + CardUtilities::getCardString(tempBoardCardsArray[0]) + " " +
+                "\n\n************************* FLOP " + CardUtilities::getCardString(tempBoardCardsArray[0]) + " " +
                 CardUtilities::getCardString(tempBoardCardsArray[1]) + " " +
-                CardUtilities::getCardString(tempBoardCardsArray[2]) + "  *************************");
+                CardUtilities::getCardString(tempBoardCardsArray[2]) + "  *************************\n\n");
             break;
         case GameStateTurn:
             GlobalServices::instance().logger()->info(
-                "************************* TURN " + CardUtilities::getCardString(tempBoardCardsArray[0]) + " " +
+                "\n\n************************* TURN " + CardUtilities::getCardString(tempBoardCardsArray[0]) + " " +
                 CardUtilities::getCardString(tempBoardCardsArray[1]) + " " +
                 CardUtilities::getCardString(tempBoardCardsArray[2]) + " " +
-                CardUtilities::getCardString(tempBoardCardsArray[3]) + "  *************************");
+                CardUtilities::getCardString(tempBoardCardsArray[3]) + "  *************************\n\n");
 
             break;
         case GameStateRiver:
             GlobalServices::instance().logger()->info(
-                "************************* RIVER " + CardUtilities::getCardString(tempBoardCardsArray[0]) + " " +
+                "\n\n************************* RIVER " + CardUtilities::getCardString(tempBoardCardsArray[0]) + " " +
                 CardUtilities::getCardString(tempBoardCardsArray[1]) + " " +
                 CardUtilities::getCardString(tempBoardCardsArray[2]) + " " +
                 CardUtilities::getCardString(tempBoardCardsArray[3]) + " " +
-                CardUtilities::getCardString(tempBoardCardsArray[4]) + "  *************************");
+                CardUtilities::getCardString(tempBoardCardsArray[4]) + "  *************************\n\n");
 
             break;
         default:
@@ -285,6 +296,7 @@ void BettingRound::handleFirstRun()
                     it1 = myHand->getActivePlayerList()->end();
                 }
                 --it1;
+                GlobalServices::instance().logger()->info("handleFirstRun : finding running player");
 
                 it2 = myHand->getRunningPlayerIt((*it1)->getId());
                 // running player found

@@ -33,6 +33,6 @@ class EngineTest : public ::testing::Test
     void createPlayerList(size_t playerCount);
     void initializeHandWithPlayers(size_t activePlayerCount);
 
-    static const int startDealerPlayerId = 0;
+    const int startDealerPlayerId{0}; // Starting dealer player ID, can be set to any valid player ID
 };
 } // namespace pkt::test

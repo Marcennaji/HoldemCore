@@ -12,31 +12,20 @@ class BettingRoundsLegacyTest : public EngineTest
     void SetUp() override;
 
   private:
-    void logTestMessage(const std::string& message) const;
-    void resolveHandConditions();
-    void onActivePlayerActionDone();
-
-    // Round start events
+    // events that are part of the GameEvents interface
+    void dealBettingRoundCards(int bettingRoundId);
+    void activePlayerActionDone();
+    void bettingRoundAnimation(int myBettingRoundID);
     void startPreflop();
     void startFlop();
     void startTurn();
     void startRiver();
+    void startPostRiver();
 
-    // Animation events
-    void bettingRoundAnimation(int myBettingRoundID);
-    void preflopAnimation2();
+    // internal gui methods that are called by the legacy qt widget ui, after the events are triggered
+    void resolveHandConditions();
 
-    // Pot and cash events
-    void onPotUpdated(int pot);
-    void onRefreshCash();
-    void onRefreshSet();
-
-    // Card dealing events
-    void onDealBettingRoundCards(int bettingRoundId);
-    void onDealHoleCards();
-
-    // Player state events
-    void onRefreshAction(int playerId, int playerAction);
-    void onRefreshPlayersActiveInactiveStyles(int playerId, int status);
+    // misc
+    void logTestMessage(const std::string& message) const;
 };
 } // namespace pkt::test

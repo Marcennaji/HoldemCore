@@ -35,7 +35,6 @@ class BotPlayer : public Player
     void evaluateBetAmount();
 
     std::unique_ptr<IBotStrategy> myStrategy;
-    GameState myCurrentGameState = GameStateNone;
     int myCurrentHandID = 0;
     int myBetAmount = 0;
     int myRaiseAmount = 0;

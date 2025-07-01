@@ -157,7 +157,7 @@ void BotPlayer::doPreflopAction()
         }
     }
 
-    if (myAction == PlayerActionRaise || myAction != PlayerActionAllin)
+    if (myAction == PlayerActionRaise || myAction == PlayerActionAllin)
     {
         currentHand->setPreflopLastRaiserId(myID);
     }

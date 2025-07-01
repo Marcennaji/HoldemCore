@@ -39,7 +39,7 @@ class IHand
     virtual void setStartQuantityPlayers(int theValue) = 0;
     virtual int getStartQuantityPlayers() const = 0;
 
-    virtual void setCurrentRound(GameState theValue) = 0;
+    virtual void setCurrentRoundState(GameState theValue) = 0;
     virtual GameState getCurrentRoundState() const = 0;
     virtual GameState getRoundBeforePostRiver() const = 0;
 
@@ -82,7 +82,6 @@ class IHand
     virtual int getTurnLastRaiserId() = 0;
     virtual void setTurnLastRaiserId(int id) = 0;
 
-  protected:
     virtual pkt::core::player::PlayerListIterator getSeatIt(unsigned) const = 0;
     virtual pkt::core::player::PlayerListIterator getActivePlayerIt(unsigned) const = 0;
     virtual pkt::core::player::PlayerListIterator getRunningPlayerIt(unsigned) const = 0;

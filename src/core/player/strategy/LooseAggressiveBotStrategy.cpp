@@ -161,7 +161,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
 
     stringRaisingRange = rangesString[(int) raisingRange];
 
-    GlobalServices::instance().logger()->info(stringRaisingRange);
+    GlobalServices::instance().logger()->info("Raising range : " + stringRaisingRange);
 
     // determine when to 3-bet without a real hand
     bool speculativeHandedAdded = false;

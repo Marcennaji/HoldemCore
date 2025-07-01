@@ -1117,7 +1117,6 @@ bool Player::isInVeryLooseMode(const int nbPlayers) const
 
 void Player::updateCurrentHandContext(const GameState state)
 {
-
     // general (and shared) game state
     myCurrentHandContext->gameState = state;
     myCurrentHandContext->nbRunningPlayers = currentHand->getRunningPlayerList()->size();
