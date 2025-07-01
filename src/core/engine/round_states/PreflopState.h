@@ -1,11 +1,11 @@
 #pragma once
 #include "core/engine/Hand.h"
-#include "core/interfaces/IBettingRoundState.h"
+#include "core/interfaces/IBettingRoundStateFsm.h"
 
 namespace pkt::core
 {
 
-class PreflopState : public IBettingRoundState
+class PreflopState : public IBettingRoundStateFsm
 {
   private:
     bool bettingComplete = false;
@@ -17,7 +17,7 @@ class PreflopState : public IBettingRoundState
   public:
     void enter(Hand& hand) override;
     void exit(Hand& hand) override;
-    std::unique_ptr<IBettingRoundState> processAction(Hand& hand, PlayerAction action) override;
+    std::unique_ptr<IBettingRoundStateFsm> processAction(Hand& hand, PlayerAction action) override;
 
     GameState getGameState() const override { return GameStatePreflop; }
     std::string getStateName() const override { return "Preflop"; }
@@ -38,7 +38,7 @@ class PreflopState : public IBettingRoundState
     void advanceToNextPlayer(Hand& hand);
 
     // Transition logic
-    std::unique_ptr<IBettingRoundState> checkForTransition(Hand& hand);
+    std::unique_ptr<IBettingRoundStateFsm> checkForTransition(Hand& hand);
     bool checkSinglePlayerRemaining(const Hand& hand) const;
     bool checkAllInCondition(const Hand& hand) const;
 

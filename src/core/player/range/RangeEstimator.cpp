@@ -143,8 +143,8 @@ void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(CurrentHandConte
     computeEstimatedPreflopRange(ctx);
     const string originalEstimatedRange = getEstimatedRange();
 
-    GlobalServices::instance().logger()->info("\tPlausible range on preflop for player " + std::to_string(ctx.myID) +
-                                              " :\t" + getEstimatedRange());
+    GlobalServices::instance().logger()->verbose("\tPlausible range on preflop for player " + std::to_string(ctx.myID) +
+                                                 " :\t" + getEstimatedRange());
 
     const int nbPlayers = ctx.nbPlayers;
 
@@ -181,7 +181,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext&
     const string originalEstimatedRange = getEstimatedRange();
     string unplausibleRanges;
 
-    GlobalServices::instance().logger()->info("\tPlausible range on flop, before update :\t" + getEstimatedRange());
+    GlobalServices::instance().logger()->verbose("\tPlausible range on flop, before update :\t" + getEstimatedRange());
 
     // update my unplausible hands (unplausible to my opponents eyes), given what I did on flop
 
@@ -191,7 +191,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext&
 
     if (ctx.myIsInVeryLooseMode)
     {
-        GlobalServices::instance().logger()->info(
+        GlobalServices::instance().logger()->verbose(
             "\tSeems to be (temporarily ?) on very loose mode : estimated range is\t" + getEstimatedRange());
         return;
     }
@@ -260,7 +260,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext&
     {
         // keep previous range
 
-        GlobalServices::instance().logger()->info("\tCan't remove all plausible ranges, keeping last one");
+        GlobalServices::instance().logger()->verbose("\tCan't remove all plausible ranges, keeping last one");
 
         setEstimatedRange(originalEstimatedRange);
         unplausibleRanges = "";
@@ -268,7 +268,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext&
 
     if (unplausibleRanges != "")
     {
-        GlobalServices::instance().logger()->info("\tRemoving unplausible ranges : " + unplausibleRanges);
+        GlobalServices::instance().logger()->verbose("\tRemoving unplausible ranges : " + unplausibleRanges);
     }
     // logUnplausibleHands(GameStateFlop);
 }
@@ -283,7 +283,7 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(CurrentHandContext&
     const string originalEstimatedRange = getEstimatedRange();
     string unplausibleRanges;
 
-    GlobalServices::instance().logger()->info("\tPlausible range on turn, before update :\t" + getEstimatedRange());
+    GlobalServices::instance().logger()->verbose("\tPlausible range on turn, before update :\t" + getEstimatedRange());
 
     // update my unplausible hands (unplausible to my opponents eyes), given what I did on turn
 
@@ -292,7 +292,7 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(CurrentHandContext&
 
     if (ctx.myIsInVeryLooseMode)
     {
-        GlobalServices::instance().logger()->info(
+        GlobalServices::instance().logger()->verbose(
             "\tSeems to be (temporarily ?) on very loose mode : estimated range is\t" + getEstimatedRange());
         return;
     }
@@ -354,14 +354,14 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(CurrentHandContext&
     {
         // keep previous range
 
-        GlobalServices::instance().logger()->info("\tCan't remove all plausible ranges, keeping last one");
+        GlobalServices::instance().logger()->verbose("\tCan't remove all plausible ranges, keeping last one");
         setEstimatedRange(originalEstimatedRange);
         unplausibleRanges = "";
     }
 
     if (unplausibleRanges != "")
     {
-        GlobalServices::instance().logger()->info("\tRemoving unplausible ranges : " + unplausibleRanges);
+        GlobalServices::instance().logger()->verbose("\tRemoving unplausible ranges : " + unplausibleRanges);
     }
     // logUnplausibleHands(GameStateTurn);
 }
@@ -376,7 +376,7 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(CurrentHandContext
     const string originalEstimatedRange = getEstimatedRange();
     string unplausibleRanges;
 
-    GlobalServices::instance().logger()->info("\tPlausible range on river, before update :\t" + getEstimatedRange());
+    GlobalServices::instance().logger()->verbose("\tPlausible range on river, before update :\t" + getEstimatedRange());
 
     // update my unplausible hands (unplausible to my opponents eyes), given what I did on river
 
@@ -386,8 +386,8 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(CurrentHandContext
 
     if (ctx.myIsInVeryLooseMode)
     {
-        GlobalServices::instance().logger()->info("\tSeems to be on very loose mode : estimated range is\t" +
-                                                  getEstimatedRange());
+        GlobalServices::instance().logger()->verbose("\tSeems to be on very loose mode : estimated range is\t" +
+                                                     getEstimatedRange());
         return;
     }
 
@@ -447,14 +447,14 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(CurrentHandContext
     {
         // keep previous range
 
-        GlobalServices::instance().logger()->info("\tCan't remove all plausible ranges, keeping last one");
+        GlobalServices::instance().logger()->verbose("\tCan't remove all plausible ranges, keeping last one");
         setEstimatedRange(originalEstimatedRange);
         unplausibleRanges = "";
     }
 
     if (unplausibleRanges != "")
     {
-        GlobalServices::instance().logger()->info("\tRemoving unplausible ranges : " + unplausibleRanges);
+        GlobalServices::instance().logger()->verbose("\tRemoving unplausible ranges : " + unplausibleRanges);
     }
     // logUnplausibleHands(GameStateRiver);
 }

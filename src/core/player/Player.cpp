@@ -776,7 +776,7 @@ const SimResults Player::getHandSimulation(bool logResult) const
             logMessage << "\t\tpot odd is " << getPotOdd() << std::endl;
         }
 
-        GlobalServices::instance().logger()->info(logMessage.str());
+        GlobalServices::instance().logger()->verbose(logMessage.str());
     }
     if (r.winRanged == 0)
     {

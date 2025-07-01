@@ -9,7 +9,7 @@
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
 #include "core/interfaces/IBettingRound.h"
-#include "core/interfaces/IBettingRoundState.h"
+#include "core/interfaces/IBettingRoundStateFsm.h"
 #include "core/interfaces/IBoard.h"
 #include "core/interfaces/IHand.h"
 
@@ -47,11 +47,11 @@ class Hand : public IHand
     void setStartQuantityPlayers(int theValue) { myStartQuantityPlayers = theValue; }
     int getStartQuantityPlayers() const { return myStartQuantityPlayers; }
 
-    void setCurrentRoundState(GameState theValue);
-    GameState getCurrentRoundState() const
-    {
-        return myCurrentState ? myCurrentState->getGameState() : GameStatePreflop;
-    }
+    void setCurrentRoundState(GameState theValue) { myCurrentRound = theValue; }
+    GameState getCurrentRoundState() const { return myCurrentRound; }
+
+    GameState getCurrentRoundStateFsm() const;
+
     GameState getRoundBeforePostRiver() const { return myRoundBeforePostRiver; }
 
     void setDealerPosition(int theValue) { myDealerPosition = theValue; }
@@ -97,7 +97,6 @@ class Hand : public IHand
     int getTurnLastRaiserId();
     void setTurnLastRaiserId(int id);
 
-    // new for FSM
     const GameEvents& getEvents() const { return myEvents; }
 
   protected:
@@ -107,7 +106,7 @@ class Hand : public IHand
     void updateRunningPlayerList();
 
   private:
-    std::unique_ptr<IBettingRoundState> myCurrentState;
+    std::unique_ptr<IBettingRoundStateFsm> myCurrentStateFsm;
     std::shared_ptr<EngineFactory> myFactory;
     const GameEvents& myEvents;
     std::shared_ptr<IBoard> myBoard;

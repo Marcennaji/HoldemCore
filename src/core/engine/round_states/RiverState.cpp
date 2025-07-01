@@ -8,7 +8,7 @@ namespace pkt::core
 
 void RiverState::enter(Hand& hand)
 {
-    GlobalServices::instance().logger()->info("Entering River state");
+    GlobalServices::instance().logger()->verbose("Entering River state");
 
     // Initialize betting round
     initializeBettingRound(hand);
@@ -30,11 +30,11 @@ void RiverState::enter(Hand& hand)
 
 void RiverState::exit(Hand& hand)
 {
-    GlobalServices::instance().logger()->info("Exiting River state");
+    GlobalServices::instance().logger()->verbose("Exiting River state");
     // Clean up any river-specific state
 }
 
-std::unique_ptr<IBettingRoundState> RiverState::processAction(Hand& hand, PlayerAction action)
+std::unique_ptr<IBettingRoundStateFsm> RiverState::processAction(Hand& hand, PlayerAction action)
 {
     if (!canProcessAction(hand, action))
     {
@@ -70,9 +70,9 @@ bool RiverState::canProcessAction(const Hand& hand, PlayerAction action) const
 
 void RiverState::logStateInfo(const Hand& hand) const
 {
-    GlobalServices::instance().logger()->info("River State - Highest bet: " + std::to_string(highestBet) +
-                                              ", Players acted: " + std::to_string(playersActedCount) +
-                                              ", Current player: " + std::to_string(currentPlayerToAct));
+    GlobalServices::instance().logger()->verbose("River State - Highest bet: " + std::to_string(highestBet) +
+                                                 ", Players acted: " + std::to_string(playersActedCount) +
+                                                 ", Current player: " + std::to_string(currentPlayerToAct));
 }
 
 // Private method implementations
@@ -108,7 +108,7 @@ void RiverState::advanceToNextPlayer(Hand& hand)
     // This will be implemented in Phase 2
 }
 
-std::unique_ptr<IBettingRoundState> RiverState::checkForTransition(Hand& hand)
+std::unique_ptr<IBettingRoundStateFsm> RiverState::checkForTransition(Hand& hand)
 {
     // Check for all-in condition
     if (checkAllInCondition(hand))

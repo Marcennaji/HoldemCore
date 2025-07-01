@@ -1,11 +1,11 @@
 #pragma once
-#include "core/interfaces/IBettingRoundState.h"
+#include "core/interfaces/IBettingRoundStateFsm.h"
 #include "core/services/GlobalServices.h"
 
 namespace pkt::core
 {
 
-class AllInState : public IBettingRoundState
+class AllInState : public IBettingRoundStateFsm
 {
   private:
     GameState entryState = GameStatePreflop; // Which state we entered from
@@ -15,7 +15,7 @@ class AllInState : public IBettingRoundState
     // Core state lifecycle
     void enter(Hand& hand) override;
     void exit(Hand& hand) override;
-    std::unique_ptr<IBettingRoundState> processAction(Hand& hand, PlayerAction action) override;
+    std::unique_ptr<IBettingRoundStateFsm> processAction(Hand& hand, PlayerAction action) override;
 
     // State identification
     GameState getGameState() const override { return entryState; } // Returns the state we're handling all-in for
@@ -36,7 +36,7 @@ class AllInState : public IBettingRoundState
     void flipCards(Hand& hand);
 
     // Transition logic
-    std::unique_ptr<IBettingRoundState> checkForTransition(Hand& hand);
+    std::unique_ptr<IBettingRoundStateFsm> checkForTransition(Hand& hand);
     void determineEntryState(Hand& hand);
 };
 

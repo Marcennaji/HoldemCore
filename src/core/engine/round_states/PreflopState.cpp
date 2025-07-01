@@ -11,7 +11,7 @@ namespace pkt::core
 
 void PreflopState::enter(Hand& hand)
 {
-    GlobalServices::instance().logger()->info("Entering Preflop state");
+    GlobalServices::instance().logger()->verbose("Entering Preflop state");
 
     // Initialize betting round
     initializeBettingRound(hand);
@@ -33,7 +33,7 @@ void PreflopState::enter(Hand& hand)
 
 void PreflopState::exit(Hand& hand)
 {
-    GlobalServices::instance().logger()->info("Exiting Preflop state");
+    GlobalServices::instance().logger()->verbose("Exiting Preflop state");
 
     // Update player lists for next round
     updatePlayerLists(hand);
@@ -50,7 +50,7 @@ void PreflopState::exit(Hand& hand)
     }
 }
 
-std::unique_ptr<IBettingRoundState> PreflopState::processAction(Hand& hand, PlayerAction action)
+std::unique_ptr<IBettingRoundStateFsm> PreflopState::processAction(Hand& hand, PlayerAction action)
 {
     if (!canProcessAction(hand, action))
     {
@@ -86,9 +86,9 @@ bool PreflopState::canProcessAction(const Hand& hand, PlayerAction action) const
 
 void PreflopState::logStateInfo(const Hand& hand) const
 {
-    GlobalServices::instance().logger()->info("Preflop State - Highest bet: " + std::to_string(highestBet) +
-                                              ", Players acted: " + std::to_string(playersActedCount) +
-                                              ", Current player: " + std::to_string(currentPlayerToAct));
+    GlobalServices::instance().logger()->verbose("Preflop State - Highest bet: " + std::to_string(highestBet) +
+                                                 ", Players acted: " + std::to_string(playersActedCount) +
+                                                 ", Current player: " + std::to_string(currentPlayerToAct));
 }
 
 // Private method implementations
@@ -175,7 +175,7 @@ void PreflopState::advanceToNextPlayer(Hand& hand)
     // This will be implemented in Phase 2
 }
 
-std::unique_ptr<IBettingRoundState> PreflopState::checkForTransition(Hand& hand)
+std::unique_ptr<IBettingRoundStateFsm> PreflopState::checkForTransition(Hand& hand)
 {
     // Check for all-in condition
     if (checkAllInCondition(hand))

@@ -7,7 +7,7 @@ namespace pkt::core
 
 void PostRiverState::enter(Hand& hand)
 {
-    GlobalServices::instance().logger()->info("Entering PostRiver state");
+    GlobalServices::instance().logger()->verbose("Entering PostRiver state");
 
     // Fire event
     if (hand.getEvents().onStartPostRiver)
@@ -23,11 +23,11 @@ void PostRiverState::enter(Hand& hand)
 
 void PostRiverState::exit(Hand& hand)
 {
-    GlobalServices::instance().logger()->info("Exiting PostRiver state - Hand complete");
+    GlobalServices::instance().logger()->verbose("Exiting PostRiver state - Hand complete");
     // Clean up post-river state
 }
 
-std::unique_ptr<IBettingRoundState> PostRiverState::processAction(Hand& hand, PlayerAction action)
+std::unique_ptr<IBettingRoundStateFsm> PostRiverState::processAction(Hand& hand, PlayerAction action)
 {
     // PostRiver doesn't process betting actions
     // This is the final state - hand is complete
@@ -47,7 +47,7 @@ bool PostRiverState::canProcessAction(const Hand& hand, PlayerAction action) con
 
 void PostRiverState::logStateInfo(const Hand& hand) const
 {
-    GlobalServices::instance().logger()->info(
+    GlobalServices::instance().logger()->verbose(
         "PostRiver State - Highest cards value: " + std::to_string(highestCardsValue) +
         ", Showdown complete: " + std::to_string(showdownComplete));
 }

@@ -76,7 +76,7 @@ bool UltraTightBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool dete
 
         stringCallingRange += HIGH_SUITED_CONNECTORS;
 
-        GlobalServices::instance().logger()->info(
+        GlobalServices::instance().logger()->verbose(
             "\t\tTAG adding high suited connectors to the initial calling range.");
     }
 
@@ -95,12 +95,12 @@ bool UltraTightBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool dete
             stringCallingRange += HIGH_SUITED_ACES;
             stringCallingRange += PAIRS;
 
-            GlobalServices::instance().logger()->info(
+            GlobalServices::instance().logger()->verbose(
                 "\t\tLAG defending against 3-bet : adding high suited connectors, high suited aces and pairs to "
                 "the initial calling range.");
         }
     }
-    GlobalServices::instance().logger()->info("\t\tLAG final calling range : " + stringCallingRange);
+    GlobalServices::instance().logger()->verbose("\t\tLAG final calling range : " + stringCallingRange);
 
     return isCardsInRange(ctx.myCard1, ctx.myCard2, stringCallingRange);
 }
@@ -143,7 +143,7 @@ int UltraTightBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool dete
 
     stringRaisingRange = rangesString[(int) raisingRange];
 
-    GlobalServices::instance().logger()->info(stringRaisingRange);
+    GlobalServices::instance().logger()->verbose(stringRaisingRange);
 
     // determine when to 3-bet without a real hand
     bool speculativeHandedAdded = false;
@@ -169,7 +169,7 @@ int UltraTightBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool dete
                 if (rand == 2)
                 {
                     speculativeHandedAdded = true;
-                    GlobalServices::instance().logger()->info("\t\tTAG trying to steal this bet");
+                    GlobalServices::instance().logger()->verbose("\t\tTAG trying to steal this bet");
                 }
             }
             else
@@ -179,7 +179,7 @@ int UltraTightBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool dete
                 {
 
                     speculativeHandedAdded = true;
-                    GlobalServices::instance().logger()->info(
+                    GlobalServices::instance().logger()->verbose(
                         "\t\tLAG adding this speculative hand to our initial raising range");
                 }
             }
@@ -203,7 +203,7 @@ int UltraTightBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool dete
         Randomizer::getRand(1, 8, 1, &rand);
         if (rand == 1)
         {
-            GlobalServices::instance().logger()->info("\t\twon't raise, to hide the hand strength");
+            GlobalServices::instance().logger()->verbose("\t\twon't raise, to hide the hand strength");
             myShouldCall = true;
             return 0;
         }

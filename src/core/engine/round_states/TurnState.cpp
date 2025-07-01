@@ -9,7 +9,7 @@ namespace pkt::core
 
 void TurnState::enter(Hand& hand)
 {
-    GlobalServices::instance().logger()->info("Entering Turn state");
+    GlobalServices::instance().logger()->verbose("Entering Turn state");
 
     // Initialize betting round
     initializeBettingRound(hand);
@@ -31,11 +31,11 @@ void TurnState::enter(Hand& hand)
 
 void TurnState::exit(Hand& hand)
 {
-    GlobalServices::instance().logger()->info("Exiting Turn state");
+    GlobalServices::instance().logger()->verbose("Exiting Turn state");
     // Clean up any turn-specific state
 }
 
-std::unique_ptr<IBettingRoundState> TurnState::processAction(Hand& hand, PlayerAction action)
+std::unique_ptr<IBettingRoundStateFsm> TurnState::processAction(Hand& hand, PlayerAction action)
 {
     if (!canProcessAction(hand, action))
     {
@@ -71,9 +71,9 @@ bool TurnState::canProcessAction(const Hand& hand, PlayerAction action) const
 
 void TurnState::logStateInfo(const Hand& hand) const
 {
-    GlobalServices::instance().logger()->info("Turn State - Highest bet: " + std::to_string(highestBet) +
-                                              ", Players acted: " + std::to_string(playersActedCount) +
-                                              ", Current player: " + std::to_string(currentPlayerToAct));
+    GlobalServices::instance().logger()->verbose("Turn State - Highest bet: " + std::to_string(highestBet) +
+                                                 ", Players acted: " + std::to_string(playersActedCount) +
+                                                 ", Current player: " + std::to_string(currentPlayerToAct));
 }
 
 // Private method implementations
@@ -109,7 +109,7 @@ void TurnState::advanceToNextPlayer(Hand& hand)
     // This will be implemented in Phase 2
 }
 
-std::unique_ptr<IBettingRoundState> TurnState::checkForTransition(Hand& hand)
+std::unique_ptr<IBettingRoundStateFsm> TurnState::checkForTransition(Hand& hand)
 {
     // Check for all-in condition
     if (checkAllInCondition(hand))

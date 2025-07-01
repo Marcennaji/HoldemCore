@@ -1,11 +1,11 @@
 #pragma once
-#include "core/interfaces/IBettingRoundState.h"
+#include "core/interfaces/IBettingRoundStateFsm.h"
 #include "core/services/GlobalServices.h"
 
 namespace pkt::core
 {
 
-class PostRiverState : public IBettingRoundState
+class PostRiverState : public IBettingRoundStateFsm
 {
   private:
     bool showdownComplete = false;
@@ -15,7 +15,7 @@ class PostRiverState : public IBettingRoundState
     // Core state lifecycle
     void enter(Hand& hand) override;
     void exit(Hand& hand) override;
-    std::unique_ptr<IBettingRoundState> processAction(Hand& hand, PlayerAction action) override;
+    std::unique_ptr<IBettingRoundStateFsm> processAction(Hand& hand, PlayerAction action) override;
 
     // State identification
     GameState getGameState() const override { return GameStatePostRiver; }

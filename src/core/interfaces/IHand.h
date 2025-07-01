@@ -39,8 +39,11 @@ class IHand
     virtual void setStartQuantityPlayers(int theValue) = 0;
     virtual int getStartQuantityPlayers() const = 0;
 
+    virtual GameState getCurrentRoundStateFsm() const = 0;
+
     virtual void setCurrentRoundState(GameState theValue) = 0;
     virtual GameState getCurrentRoundState() const = 0;
+
     virtual GameState getRoundBeforePostRiver() const = 0;
 
     virtual void setDealerPosition(int theValue) = 0;

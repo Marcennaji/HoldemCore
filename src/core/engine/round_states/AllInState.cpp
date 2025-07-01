@@ -7,7 +7,7 @@ namespace pkt::core
 
 void AllInState::enter(Hand& hand)
 {
-    GlobalServices::instance().logger()->info("Entering AllIn state");
+    GlobalServices::instance().logger()->verbose("Entering AllIn state");
 
     // Determine which state we entered from
     determineEntryState(hand);
@@ -29,11 +29,11 @@ void AllInState::enter(Hand& hand)
 
 void AllInState::exit(Hand& hand)
 {
-    GlobalServices::instance().logger()->info("Exiting AllIn state");
+    GlobalServices::instance().logger()->verbose("Exiting AllIn state");
     // Clean up all-in specific state
 }
 
-std::unique_ptr<IBettingRoundState> AllInState::processAction(Hand& hand, PlayerAction action)
+std::unique_ptr<IBettingRoundStateFsm> AllInState::processAction(Hand& hand, PlayerAction action)
 {
     // In all-in state, no player actions are typically processed
     // This state automatically transitions to showdown
@@ -59,8 +59,8 @@ bool AllInState::canProcessAction(const Hand& hand, PlayerAction action) const
 
 void AllInState::logStateInfo(const Hand& hand) const
 {
-    GlobalServices::instance().logger()->info("AllIn State - Entry state: " + std::to_string(entryState) +
-                                              ", Showdown ready: " + std::to_string(showdownReady));
+    GlobalServices::instance().logger()->verbose("AllIn State - Entry state: " + std::to_string(entryState) +
+                                                 ", Showdown ready: " + std::to_string(showdownReady));
 }
 
 // Private method implementations
@@ -115,7 +115,7 @@ void AllInState::flipCards(Hand& hand)
     }
 }
 
-std::unique_ptr<IBettingRoundState> AllInState::checkForTransition(Hand& hand)
+std::unique_ptr<IBettingRoundStateFsm> AllInState::checkForTransition(Hand& hand)
 {
     // All-in always goes to showdown
     return std::make_unique<PostRiverState>();

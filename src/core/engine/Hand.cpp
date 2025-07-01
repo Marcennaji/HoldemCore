@@ -33,7 +33,7 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
 
 {
 
-    GlobalServices::instance().logger()->info("\n-------------------------------------------------------------\n");
+    GlobalServices::instance().logger()->verbose("\n-------------------------------------------------------------\n");
 
     for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
@@ -105,10 +105,10 @@ void Hand::dealHoleCards(size_t cardsArrayIndex)
         (*it)->getCurrentHandActions().reset();
         (*it)->setPosition();
         (*it)->getRangeEstimator()->setEstimatedRange("");
-        GlobalServices::instance().logger()->info("Player " + (*it)->getName() +
-                                                  " dealt cards: " + CardUtilities::getCardString(tempPlayerArray[0]) +
-                                                  " " + CardUtilities::getCardString(tempPlayerArray[1]) +
-                                                  ", hand strength = " + std::to_string((*it)->getCardsValueInt()));
+        GlobalServices::instance().logger()->verbose(
+            "Player " + (*it)->getName() + " dealt cards: " + CardUtilities::getCardString(tempPlayerArray[0]) + " " +
+            CardUtilities::getCardString(tempPlayerArray[1]) +
+            ", hand strength = " + std::to_string((*it)->getCardsValueInt()));
     }
 }
 
@@ -289,18 +289,18 @@ void Hand::setBlinds()
 
 void Hand::updateRunningPlayerList()
 {
-    GlobalServices::instance().logger()->info("Updating myRunningPlayerList...");
+    GlobalServices::instance().logger()->verbose("Updating myRunningPlayerList...");
 
     PlayerListIterator it, it1;
 
     for (it = myRunningPlayerList->begin(); it != myRunningPlayerList->end();)
     {
-        GlobalServices::instance().logger()->info("Checking player: " + (*it)->getName() +
-                                                  ", action: " + playerActionToString((*it)->getAction()));
+        GlobalServices::instance().logger()->verbose("Checking player: " + (*it)->getName() +
+                                                     ", action: " + playerActionToString((*it)->getAction()));
 
         if ((*it)->getAction() == PlayerActionFold || (*it)->getAction() == PlayerActionAllin)
         {
-            GlobalServices::instance().logger()->info(
+            GlobalServices::instance().logger()->verbose(
                 "Removing player: " + (*it)->getName() +
                 " from myRunningPlayerList due to action: " + playerActionToString((*it)->getAction()));
 
@@ -308,20 +308,20 @@ void Hand::updateRunningPlayerList()
 
             if (!myRunningPlayerList->empty())
             {
-                GlobalServices::instance().logger()->info(
+                GlobalServices::instance().logger()->verbose(
                     "myRunningPlayerList is not empty after removal. Updating current player's turn.");
 
                 it1 = it;
                 if (it1 == myRunningPlayerList->begin())
                 {
-                    GlobalServices::instance().logger()->info(
+                    GlobalServices::instance().logger()->verbose(
                         "Iterator points to the beginning of the list. Wrapping around to the end.");
                     it1 = myRunningPlayerList->end();
                 }
                 --it1;
 
-                GlobalServices::instance().logger()->info("Setting current player's turn to: " + (*it1)->getName() +
-                                                          " (ID: " + std::to_string((*it1)->getId()) + ")");
+                GlobalServices::instance().logger()->verbose("Setting current player's turn to: " + (*it1)->getName() +
+                                                             " (ID: " + std::to_string((*it1)->getId()) + ")");
                 getCurrentBettingRound()->setCurrentPlayersTurnId((*it1)->getId());
             }
             else
@@ -331,30 +331,30 @@ void Hand::updateRunningPlayerList()
         }
         else
         {
-            GlobalServices::instance().logger()->info("Player: " + (*it)->getName() +
-                                                      " remains in myRunningPlayerList. Moving to the next player.");
+            GlobalServices::instance().logger()->verbose("Player: " + (*it)->getName() +
+                                                         " remains in myRunningPlayerList. Moving to the next player.");
             ++it;
         }
     }
 
-    GlobalServices::instance().logger()->info("Finished updating myRunningPlayerList.");
+    GlobalServices::instance().logger()->verbose("Finished updating myRunningPlayerList.");
 }
 
 void Hand::resolveHandConditions()
 {
-    GlobalServices::instance().logger()->info("Executing resolveHandConditions() for betting round: " +
-                                              std::to_string(myCurrentRound));
+    GlobalServices::instance().logger()->verbose("Executing resolveHandConditions() for betting round: " +
+                                                 std::to_string(myCurrentRound));
 
     PlayerListIterator it, it1;
     PlayerListConstIterator itC;
 
     // Log the current state of the running player list
-    GlobalServices::instance().logger()->info("Current running players:");
+    GlobalServices::instance().logger()->verbose("Current running players:");
     for (auto& player : *myRunningPlayerList)
     {
-        GlobalServices::instance().logger()->info("Player " + player->getName() +
-                                                  " action: " + playerActionToString(player->getAction()) +
-                                                  ", set: " + std::to_string(player->getSet()));
+        GlobalServices::instance().logger()->verbose("Player " + player->getName() +
+                                                     " action: " + playerActionToString(player->getAction()) +
+                                                     ", set: " + std::to_string(player->getSet()));
     }
 
     updateRunningPlayerList();
@@ -368,7 +368,7 @@ void Hand::resolveHandConditions()
             allInPlayersCounter++;
         }
     }
-    GlobalServices::instance().logger()->info("Number of all-in players: " + std::to_string(allInPlayersCounter));
+    GlobalServices::instance().logger()->verbose("Number of all-in players: " + std::to_string(allInPlayersCounter));
 
     // Determine number of non-fold players
     int nonFoldPlayerCounter = 0;
@@ -379,12 +379,12 @@ void Hand::resolveHandConditions()
             nonFoldPlayerCounter++;
         }
     }
-    GlobalServices::instance().logger()->info("Number of non-fold players: " + std::to_string(nonFoldPlayerCounter));
+    GlobalServices::instance().logger()->verbose("Number of non-fold players: " + std::to_string(nonFoldPlayerCounter));
 
     // If only one player non-fold -> distribute pot
     if (nonFoldPlayerCounter == 1)
     {
-        GlobalServices::instance().logger()->info("Only one non-fold player remains. Distributing pot.");
+        GlobalServices::instance().logger()->verbose("Only one non-fold player remains. Distributing pot.");
         myBoard->collectPot();
         if (myEvents.onPotUpdated)
         {
@@ -396,28 +396,28 @@ void Hand::resolveHandConditions()
             myEvents.onRefreshSet();
         }
         myCurrentRound = GameStatePostRiver;
-        GlobalServices::instance().logger()->info("Set current round to GameStatePostRiver.");
+        GlobalServices::instance().logger()->verbose("Set current round to GameStatePostRiver.");
     }
     else
     {
         // Check for all-in condition
         if (allInPlayersCounter == nonFoldPlayerCounter)
         {
-            GlobalServices::instance().logger()->info("All players are all-in.");
+            GlobalServices::instance().logger()->verbose("All players are all-in.");
             myAllInCondition = true;
             myBoard->setAllInCondition(true);
         }
         else if (allInPlayersCounter + 1 == nonFoldPlayerCounter)
         {
-            GlobalServices::instance().logger()->info("All players but one are all-in.");
+            GlobalServices::instance().logger()->verbose("All players but one are all-in.");
             for (itC = myRunningPlayerList->begin(); itC != myRunningPlayerList->end(); ++itC)
             {
                 if ((*itC)->getSet() >= myBettingRounds[myCurrentRound]->getHighestSet())
                 {
                     myAllInCondition = true;
                     myBoard->setAllInCondition(true);
-                    GlobalServices::instance().logger()->info("Player " + (*itC)->getName() +
-                                                              " has the highest set and triggered all-in condition.");
+                    GlobalServices::instance().logger()->verbose(
+                        "Player " + (*itC)->getName() + " has the highest set and triggered all-in condition.");
                 }
             }
         }
@@ -426,7 +426,7 @@ void Hand::resolveHandConditions()
     // Special routine for all-in condition
     if (myAllInCondition)
     {
-        GlobalServices::instance().logger()->info("Handling all-in condition.");
+        GlobalServices::instance().logger()->verbose("Handling all-in condition.");
         myBoard->collectPot();
 
         if (myEvents.onPotUpdated)
@@ -447,14 +447,14 @@ void Hand::resolveHandConditions()
         if (myCurrentRound < GameStatePostRiver)
         {
             myCurrentRound = GameState(myCurrentRound + 1);
-            GlobalServices::instance().logger()->info("Advanced to next round: " + std::to_string(myCurrentRound));
+            GlobalServices::instance().logger()->verbose("Advanced to next round: " + std::to_string(myCurrentRound));
         }
 
         if (myCurrentRound >= GameStateFlop)
         {
             int tempBoardCardsArray[5];
             myBoard->getCards(tempBoardCardsArray);
-            GlobalServices::instance().logger()->info("Board cards logged for all-in condition.");
+            GlobalServices::instance().logger()->verbose("Board cards logged for all-in condition.");
         }
     }
 
@@ -465,16 +465,16 @@ void Hand::resolveHandConditions()
         if (myEvents.onRefreshPlayersActiveInactiveStyles)
         {
             myEvents.onRefreshPlayersActiveInactiveStyles(myPreviousPlayerId, 1);
-            GlobalServices::instance().logger()->info("Unhighlighted previous player's groupbox: " +
-                                                      std::to_string(myPreviousPlayerId));
+            GlobalServices::instance().logger()->verbose("Unhighlighted previous player's groupbox: " +
+                                                         std::to_string(myPreviousPlayerId));
         }
     }
 
     if (myEvents.onRefreshTableDescriptiveLabels)
     {
         myEvents.onRefreshTableDescriptiveLabels(getCurrentRoundState());
-        GlobalServices::instance().logger()->info("Refreshed table descriptive labels for round: " +
-                                                  std::to_string(getCurrentRoundState()));
+        GlobalServices::instance().logger()->verbose("Refreshed table descriptive labels for round: " +
+                                                     std::to_string(getCurrentRoundState()));
     }
 
     if (myCurrentRound < GameStatePostRiver)
@@ -488,43 +488,43 @@ void Hand::resolveHandConditions()
         if (myEvents.onStartPreflop)
         {
             myEvents.onStartPreflop();
-            GlobalServices::instance().logger()->info("Started Preflop round.");
+            GlobalServices::instance().logger()->verbose("Started Preflop round.");
         }
         break;
     case GameStateFlop:
         if (myEvents.onStartFlop)
         {
             myEvents.onStartFlop();
-            GlobalServices::instance().logger()->info("Started Flop round.");
+            GlobalServices::instance().logger()->verbose("Started Flop round.");
         }
         break;
     case GameStateTurn:
         if (myEvents.onStartTurn)
         {
             myEvents.onStartTurn();
-            GlobalServices::instance().logger()->info("Started Turn round.");
+            GlobalServices::instance().logger()->verbose("Started Turn round.");
         }
         break;
     case GameStateRiver:
         if (myEvents.onStartRiver)
         {
             myEvents.onStartRiver();
-            GlobalServices::instance().logger()->info("Started River round.");
+            GlobalServices::instance().logger()->verbose("Started River round.");
         }
         break;
     case GameStatePostRiver:
         if (myEvents.onStartPostRiver)
         {
             myEvents.onStartPostRiver();
-            GlobalServices::instance().logger()->info("Started Post-River round.");
+            GlobalServices::instance().logger()->verbose("Started Post-River round.");
         }
         break;
     default:
-        GlobalServices::instance().logger()->info("Unhandled game state: " + std::to_string(myCurrentRound));
+        GlobalServices::instance().logger()->verbose("Unhandled game state: " + std::to_string(myCurrentRound));
         break;
     }
 
-    GlobalServices::instance().logger()->info("Exiting resolveHandConditions()");
+    GlobalServices::instance().logger()->verbose("Exiting resolveHandConditions()");
 }
 
 PlayerListIterator Hand::getSeatIt(unsigned uniqueId) const
@@ -561,8 +561,8 @@ PlayerListIterator Hand::getActivePlayerIt(unsigned uniqueId) const
 
 PlayerListIterator Hand::getRunningPlayerIt(unsigned uniqueId) const
 {
-    GlobalServices::instance().logger()->info("Entering getRunningPlayerIt() with uniqueId: " +
-                                              std::to_string(uniqueId));
+    GlobalServices::instance().logger()->verbose("Entering getRunningPlayerIt() with uniqueId: " +
+                                                 std::to_string(uniqueId));
 
     // Check if the list is empty
     if (myRunningPlayerList->empty())
@@ -595,7 +595,7 @@ PlayerListIterator Hand::getRunningPlayerIt(unsigned uniqueId) const
         return myRunningPlayerList->end();
     }
 
-    GlobalServices::instance().logger()->info("Player found");
+    GlobalServices::instance().logger()->verbose("Player found");
     return it;
 }
 
@@ -823,10 +823,8 @@ void Hand::setTurnLastRaiserId(int id)
     myTurnLastRaiserId = id;
 }
 
-void Hand::setCurrentRoundState(GameState theValue)
+GameState Hand::getCurrentRoundStateFsm() const
 {
-    GlobalServices::instance().logger()->info("Setting current round state to: " +
-                                              std::to_string(static_cast<int>(theValue)));
-    myCurrentRound = theValue;
+    return myCurrentStateFsm ? myCurrentStateFsm->getGameState() : GameStatePreflop;
 }
 } // namespace pkt::core

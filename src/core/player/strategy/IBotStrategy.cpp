@@ -112,7 +112,7 @@ bool IBotStrategy::shouldPotControl(CurrentHandContext& ctx, bool deterministic)
 
     if (potControl)
     {
-        GlobalServices::instance().logger()->info("\t\tShould control pot");
+        GlobalServices::instance().logger()->verbose("\t\tShould control pot");
     }
 
     return potControl;

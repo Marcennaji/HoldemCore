@@ -71,7 +71,7 @@ bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool
     if (ctx.preflopRaisesNumber < 3)
     {
 
-        GlobalServices::instance().logger()->info("\t\tLAG adding high pairs to the initial calling range.");
+        GlobalServices::instance().logger()->verbose("\t\tLAG adding high pairs to the initial calling range.");
         stringCallingRange += HIGH_PAIRS;
     }
 
@@ -81,7 +81,7 @@ bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool
         lastRaiser->getCash() >= ctx.pot * 10 && !ctx.isPreflopBigBet)
     {
 
-        GlobalServices::instance().logger()->info(
+        GlobalServices::instance().logger()->verbose(
             "\t\tLAG adding high suited connectors, high suited aces and pairs to the initial calling range.");
         stringCallingRange += HIGH_SUITED_CONNECTORS;
         stringCallingRange += HIGH_SUITED_ACES;
@@ -92,7 +92,7 @@ bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool
             stringCallingRange += SUITED_CONNECTORS;
             stringCallingRange += SUITED_ONE_GAPED;
             stringCallingRange += SUITED_TWO_GAPED;
-            GlobalServices::instance().logger()->info(
+            GlobalServices::instance().logger()->verbose(
                 "\t\tLAG adding suited connectors, suited one-gaped and suited two-gaped to the initial "
                 "calling range.");
         }
@@ -113,12 +113,12 @@ bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool
             stringCallingRange += HIGH_SUITED_ACES;
             stringCallingRange += PAIRS;
 
-            GlobalServices::instance().logger()->info(
+            GlobalServices::instance().logger()->verbose(
                 "\t\tLAG defending against 3-bet : adding high suited connectors, high suited aces and pairs to "
                 "the initial calling range.");
         }
     }
-    GlobalServices::instance().logger()->info("\t\tLAG final calling range : " + stringCallingRange);
+    GlobalServices::instance().logger()->verbose("\t\tLAG final calling range : " + stringCallingRange);
 
     return isCardsInRange(ctx.myCard1, ctx.myCard2, stringCallingRange);
 }
@@ -161,7 +161,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
 
     stringRaisingRange = rangesString[(int) raisingRange];
 
-    GlobalServices::instance().logger()->info("Raising range : " + stringRaisingRange);
+    GlobalServices::instance().logger()->verbose("Raising range : " + stringRaisingRange);
 
     // determine when to 3-bet without a real hand
     bool speculativeHandedAdded = false;
@@ -182,7 +182,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
             {
 
                 speculativeHandedAdded = true;
-                GlobalServices::instance().logger()->info("\t\tLAG trying to steal this bet");
+                GlobalServices::instance().logger()->verbose("\t\tLAG trying to steal this bet");
             }
             else
             {
@@ -192,7 +192,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
                 {
 
                     speculativeHandedAdded = true;
-                    GlobalServices::instance().logger()->info(
+                    GlobalServices::instance().logger()->verbose(
                         "\t\tLAG adding this speculative hand to our initial raising range");
                 }
                 else
@@ -206,7 +206,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
                         if (rand == 1)
                         {
                             speculativeHandedAdded = true;
-                            GlobalServices::instance().logger()->info(
+                            GlobalServices::instance().logger()->verbose(
                                 "\t\tLAG adding this junk hand to our initial raising range");
                         }
                     }
@@ -233,7 +233,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
             {
 
                 speculativeHandedAdded = true;
-                GlobalServices::instance().logger()->info(
+                GlobalServices::instance().logger()->verbose(
                     "\t\tLAG adding this speculative hand to our initial raising range");
             }
         }
@@ -255,7 +255,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
         Randomizer::getRand(1, 6, 1, &rand);
         if (rand == 1)
         {
-            GlobalServices::instance().logger()->info("\t\twon't raise, to hide the hand strength");
+            GlobalServices::instance().logger()->verbose("\t\twon't raise, to hide the hand strength");
             myShouldCall = true;
             return 0;
         }

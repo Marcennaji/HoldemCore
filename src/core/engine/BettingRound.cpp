@@ -81,11 +81,11 @@ void BettingRound::nextPlayer()
 }
 void BettingRound::run()
 {
-    GlobalServices::instance().logger()->info("myHighestSet at start of round: " + std::to_string(myHighestSet));
+    GlobalServices::instance().logger()->verbose("myHighestSet at start of round: " + std::to_string(myHighestSet));
     for (auto& player : *myHand->getRunningPlayerList())
     {
-        GlobalServices::instance().logger()->info("Player " + player->getName() +
-                                                  " action: " + playerActionToString(player->getAction()));
+        GlobalServices::instance().logger()->verbose("start of round: Player " + player->getName() +
+                                                     " action: " + playerActionToString(player->getAction()));
     }
     if (myFirstRunGui)
     {
@@ -100,12 +100,12 @@ void BettingRound::run()
     logBoardCards();
 
     bool allHighestSet = allBetsAreDone();
-    GlobalServices::instance().logger()->info("allBetsAreDone: " + std::to_string(allHighestSet) +
-                                              ", myFirstRound: " + std::to_string(myFirstRound));
+    GlobalServices::instance().logger()->verbose("allBetsAreDone: " + std::to_string(allHighestSet) +
+                                                 ", myFirstRound: " + std::to_string(myFirstRound));
 
     if (!myFirstRound && allHighestSet)
     {
-        GlobalServices::instance().logger()->info("all bets are done, proceeding to next betting round");
+        GlobalServices::instance().logger()->verbose("all bets are done, proceeding to next betting round");
         proceedToNextBettingRound();
     }
     else
@@ -136,7 +136,7 @@ void BettingRound::run()
         {
             myEvents.onRefreshAction(myCurrentPlayersTurnId, 0);
         }
-        GlobalServices::instance().logger()->info("BettingRound::run() : Determining next running player (2)");
+        GlobalServices::instance().logger()->verbose("BettingRound::run() : Determining next running player (2)");
 
         currentPlayersTurnIt = myHand->getRunningPlayerIt(myCurrentPlayersTurnId);
         if (currentPlayersTurnIt == myHand->getRunningPlayerList()->end())
@@ -296,7 +296,7 @@ void BettingRound::handleFirstRun()
                     it1 = myHand->getActivePlayerList()->end();
                 }
                 --it1;
-                GlobalServices::instance().logger()->info("handleFirstRun : finding running player");
+                GlobalServices::instance().logger()->verbose("handleFirstRun : finding running player");
 
                 it2 = myHand->getRunningPlayerIt((*it1)->getId());
                 // running player found

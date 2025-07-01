@@ -62,7 +62,7 @@ void SqliteLogStore::init()
         else
         {
 
-            GlobalServices::instance().logger()->info("warning : database does not exist, will be created");
+            GlobalServices::instance().logger()->verbose("warning : database does not exist, will be created");
         }
 
         // open sqlite-db
@@ -266,9 +266,9 @@ int SqliteLogStore::getIntegerValue(const std::string playerName, const std::str
             }
             else
             {
-                GlobalServices::instance().logger()->info("no data for player " + playerName + " in table " +
-                                                          tableName);
-                GlobalServices::instance().logger()->info("SQL query was :\n" + sqlSelect);
+                GlobalServices::instance().logger()->verbose("no data for player " + playerName + " in table " +
+                                                             tableName);
+                GlobalServices::instance().logger()->verbose("SQL query was :\n" + sqlSelect);
             }
         }
         sqlite3_free_table(resultPlayer);

@@ -9,7 +9,7 @@ namespace pkt::core
 
 void FlopState::enter(Hand& hand)
 {
-    GlobalServices::instance().logger()->info("Entering Flop state");
+    GlobalServices::instance().logger()->verbose("Entering Flop state");
 
     // Initialize betting round
     initializeBettingRound(hand);
@@ -31,11 +31,11 @@ void FlopState::enter(Hand& hand)
 
 void FlopState::exit(Hand& hand)
 {
-    GlobalServices::instance().logger()->info("Exiting Flop state");
+    GlobalServices::instance().logger()->verbose("Exiting Flop state");
     // Clean up any flop-specific state
 }
 
-std::unique_ptr<IBettingRoundState> FlopState::processAction(Hand& hand, PlayerAction action)
+std::unique_ptr<IBettingRoundStateFsm> FlopState::processAction(Hand& hand, PlayerAction action)
 {
     if (!canProcessAction(hand, action))
     {
@@ -71,9 +71,9 @@ bool FlopState::canProcessAction(const Hand& hand, PlayerAction action) const
 
 void FlopState::logStateInfo(const Hand& hand) const
 {
-    GlobalServices::instance().logger()->info("Flop State - Highest bet: " + std::to_string(highestBet) +
-                                              ", Players acted: " + std::to_string(playersActedCount) +
-                                              ", Current player: " + std::to_string(currentPlayerToAct));
+    GlobalServices::instance().logger()->verbose("Flop State - Highest bet: " + std::to_string(highestBet) +
+                                                 ", Players acted: " + std::to_string(playersActedCount) +
+                                                 ", Current player: " + std::to_string(currentPlayerToAct));
 }
 
 // Private method implementations
@@ -109,7 +109,7 @@ void FlopState::advanceToNextPlayer(Hand& hand)
     // This will be implemented in Phase 2
 }
 
-std::unique_ptr<IBettingRoundState> FlopState::checkForTransition(Hand& hand)
+std::unique_ptr<IBettingRoundStateFsm> FlopState::checkForTransition(Hand& hand)
 {
     // Check for all-in condition
     if (checkAllInCondition(hand))

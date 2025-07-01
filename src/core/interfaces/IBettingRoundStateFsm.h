@@ -9,17 +9,17 @@ namespace pkt::core
 
 class Hand; // Forward declaration
 
-class IBettingRoundState
+class IBettingRoundStateFsm
 {
   public:
-    virtual ~IBettingRoundState() = default;
+    virtual ~IBettingRoundStateFsm() = default;
 
     // Core state lifecycle
     virtual void enter(Hand& hand) = 0;
     virtual void exit(Hand& hand) = 0;
 
     // Action processing - returns next state if transition needed
-    virtual std::unique_ptr<IBettingRoundState> processAction(Hand& hand, PlayerAction action) = 0;
+    virtual std::unique_ptr<IBettingRoundStateFsm> processAction(Hand& hand, PlayerAction action) = 0;
 
     // State identification
     virtual GameState getGameState() const = 0;
