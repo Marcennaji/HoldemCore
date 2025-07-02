@@ -61,7 +61,7 @@ string PreflopRangeEstimator::computeEstimatedPreflopRange(CurrentHandContext& c
         }
     }
 
-    GlobalServices::instance().logger()->info("PreflopRangeEstimator : estimated range is {" + estimatedRange + "}");
+    GlobalServices::instance().logger()->info("Estimated range is {" + estimatedRange + "}");
 
     return estimatedRange;
 }

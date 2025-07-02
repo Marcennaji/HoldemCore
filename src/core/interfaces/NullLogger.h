@@ -12,9 +12,10 @@ namespace pkt::core
 class NullLogger : public ILogger
 {
   public:
+    virtual void setLogLevel(LogLevel level) override {}
     virtual void error(const std::string& msg) override {}
     virtual void info(const std::string& msg) override {}
-    virtual void verbose(const std::string& msg, int level = 1) override {}
+    virtual void verbose(const std::string& msg) override {}
 };
 
 } // namespace pkt::core

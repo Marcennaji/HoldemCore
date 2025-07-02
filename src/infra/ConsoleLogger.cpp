@@ -5,8 +5,11 @@
 namespace pkt::infra
 {
 
-ConsoleLogger::ConsoleLogger(int level) : myLogLevel(level)
+using namespace pkt::core;
+
+ConsoleLogger::ConsoleLogger()
 {
+    myLogLevel = LogLevel::Info;
 }
 
 void ConsoleLogger::error(const std::string& msg)
@@ -19,9 +22,9 @@ void ConsoleLogger::info(const std::string& msg)
     std::cout << "[INFO] " << msg << std::endl;
 }
 
-void ConsoleLogger::verbose(const std::string& msg, int level)
+void ConsoleLogger::verbose(const std::string& msg)
 {
-    if (myLogLevel >= level)
+    if (myLogLevel >= LogLevel::Verbose)
     {
         std::cout << "[VERBOSE] " << msg << std::endl;
     }

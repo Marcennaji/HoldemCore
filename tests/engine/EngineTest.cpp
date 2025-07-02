@@ -20,7 +20,7 @@ void EngineTest::SetUp()
 {
     myFactory = std::make_shared<EngineFactory>(myEvents);
     auto& services = pkt::core::GlobalServices::instance();
-    services.setLogger(std::make_shared<pkt::infra::ConsoleLogger>(0));
+    services.setLogger(std::make_shared<pkt::infra::ConsoleLogger>());
     services.setHandEvaluationEngine(std::make_shared<pkt::infra::PsimHandEvaluationEngine>());
 }
 

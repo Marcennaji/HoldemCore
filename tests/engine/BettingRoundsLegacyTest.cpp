@@ -10,7 +10,7 @@ namespace pkt::test
 {
 void BettingRoundsLegacyTest::logTestMessage(const std::string& message) const
 {
-    GlobalServices::instance().logger()->verbose("BettingRoundsLegacyTest : " + message, 2);
+    GlobalServices::instance().logger()->verbose("BettingRoundsLegacyTest : " + message);
 }
 
 void BettingRoundsLegacyTest::SetUp()

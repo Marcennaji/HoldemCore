@@ -63,31 +63,31 @@ void BotPlayer::action()
 
     if (myAction == PlayerActionFold)
     {
-        logMessage << "FOLD";
+        logMessage << myName + " FOLD";
     }
     else if (myAction == PlayerActionBet)
     {
-        logMessage << "BET " << myBetAmount;
+        logMessage << myName + " BET " << myBetAmount;
     }
     else if (myAction == PlayerActionRaise)
     {
-        logMessage << "RAISE " << myRaiseAmount;
+        logMessage << myName + " RAISE " << myRaiseAmount;
     }
     else if (myAction == PlayerActionCall)
     {
-        logMessage << "CALL ";
+        logMessage << myName + " CALL ";
     }
     else if (myAction == PlayerActionCheck)
     {
-        logMessage << "CHECK";
+        logMessage << myName + " CHECK";
     }
     else if (myAction == PlayerActionAllin)
     {
-        logMessage << "ALLIN ";
+        logMessage << myName + " ALLIN ";
     }
     else if (myAction == PlayerActionNone)
     {
-        logMessage << "NONE";
+        logMessage << myName + " NONE";
     }
     else
     {

@@ -14,13 +14,11 @@ namespace pkt::infra
 
 class ConsoleLogger : public pkt::core::ILogger
 {
-    int myLogLevel;
-
   public:
-    explicit ConsoleLogger(int level = 1);
-
+    explicit ConsoleLogger();
+    void setLogLevel(pkt::core::LogLevel level) override { myLogLevel = level; }
     void error(const std::string& msg) override;
     void info(const std::string& msg) override;
-    void verbose(const std::string& msg, int level = 2) override;
+    void verbose(const std::string& msg) override;
 };
 } // namespace pkt::infra
