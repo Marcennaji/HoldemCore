@@ -26,8 +26,7 @@ class IHand
     virtual void initAndShuffleDeck() = 0;
 
     virtual pkt::core::player::PlayerList getSeatsList() const = 0;
-    virtual pkt::core::player::PlayerList getActivePlayerList() const = 0;
-    virtual pkt::core::player::PlayerList getRunningPlayerList() const = 0;
+    virtual pkt::core::player::PlayerList getRunningPlayersList() const = 0;
 
     virtual std::shared_ptr<IBoard> getBoard() const = 0;
     virtual std::shared_ptr<IBettingRound> getPreflop() const = 0;

@@ -799,8 +799,8 @@ bool UltraTightBotStrategy::riverShouldCall(CurrentHandContext& ctx, bool determ
         PlayerListConstIterator it_c;
         int playersAfterRaiser = 0;
 
-        for (it_c = currentHand->getRunningPlayerList()->begin(); it_c !=
-    currentHand->getRunningPlayerList()->end();
+        for (it_c = currentHand->getRunningPlayersList()->begin(); it_c !=
+    currentHand->getRunningPlayersList()->end();
              ++it_c)
         {
             if ((*it_c)->getPosition() > ctx.lastVPIPPlayer->getPosition())

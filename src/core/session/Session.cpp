@@ -55,27 +55,27 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
 
     auto playerFactory = std::make_unique<DefaultPlayerFactory>(myEvents, strategyAssigner.get());
 
-    auto playerList = std::make_shared<std::list<std::shared_ptr<Player>>>();
+    auto playersList = std::make_shared<std::list<std::shared_ptr<Player>>>();
 
-    playerList->push_back(playerFactory->createHumanPlayer(0, gameData.startMoney));
+    playersList->push_back(playerFactory->createHumanPlayer(0, gameData.startMoney));
 
     for (int i = 1; i < startData.numberOfPlayers; ++i)
     {
-        playerList->push_back(playerFactory->createBotPlayer(i, gameData.tableProfile, gameData.startMoney));
+        playersList->push_back(playerFactory->createBotPlayer(i, gameData.tableProfile, gameData.startMoney));
     }
 
     // Shuffle bots but keep human first
-    shufflePlayers(*playerList, 0);
+    shufflePlayers(*playersList, 0);
 
     // Reassign player IDs after shuffle
     int id = 0;
-    for (auto& p : *playerList)
+    for (auto& p : *playersList)
     {
         p->setId(id++);
         p->setIsSessionActive(true);
     }
 
-    myCurrentGame = std::make_unique<Game>(myEvents, engineFactory, playerList, gameData, startData, myCurrentGameNum);
+    myCurrentGame = std::make_unique<Game>(myEvents, engineFactory, playersList, gameData, startData, myCurrentGameNum);
 
     myCurrentGame->initHand();
     myCurrentGame->startHand();

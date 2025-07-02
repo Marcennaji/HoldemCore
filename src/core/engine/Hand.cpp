@@ -23,13 +23,12 @@ using namespace std;
 using namespace pkt::core::player;
 
 Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
-           pkt::core::player::PlayerList seats, PlayerList activePlayers, PlayerList runningPlayers, int handId,
-           GameData gameData, StartData startData)
-    : myEvents(events), myFactory(factory), myBoard(board), mySeatsList(seats), myActivePlayerList(activePlayers),
-      myRunningPlayerList(runningPlayers), myStartQuantityPlayers(startData.numberOfPlayers),
-      myDealerPosition(startData.startDealerPlayerId), mySmallBlindPosition(startData.startDealerPlayerId),
-      myBigBlindPosition(startData.startDealerPlayerId), mySmallBlind(gameData.firstSmallBlind),
-      myStartCash(gameData.startMoney)
+           pkt::core::player::PlayerList seats, PlayerList runningPlayers, int handId, GameData gameData,
+           StartData startData)
+    : myEvents(events), myFactory(factory), myBoard(board), mySeatsList(seats), myRunningPlayersList(runningPlayers),
+      myStartQuantityPlayers(startData.numberOfPlayers), myDealerPosition(startData.startDealerPlayerId),
+      mySmallBlindPosition(startData.startDealerPlayerId), myBigBlindPosition(startData.startDealerPlayerId),
+      mySmallBlind(gameData.firstSmallBlind), myStartCash(gameData.startMoney)
 
 {
 
@@ -80,7 +79,7 @@ void Hand::dealHoleCards(size_t cardsArrayIndex)
     int tempPlayerAndBoardArray[7];
 
     // Validate that there are enough cards in the deck
-    if (myCardsArray.size() < 5 + 2 * myActivePlayerList->size())
+    if (myCardsArray.size() < 5 + 2 * mySeatsList->size())
     {
         throw std::runtime_error("Not enough cards in the deck to deal hole cards and board cards.");
     }
@@ -91,7 +90,7 @@ void Hand::dealHoleCards(size_t cardsArrayIndex)
         tempPlayerAndBoardArray[boardCardIndex] = myCardsArray[boardCardIndex];
     }
 
-    for (auto it = myActivePlayerList->begin(); it != myActivePlayerList->end(); ++it, playerIndex++)
+    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it, playerIndex++)
     {
         for (holeCardIndex = 0; holeCardIndex < 2; holeCardIndex++)
         {
@@ -186,10 +185,10 @@ void Hand::assignButtons()
         }
 
         it = getActivePlayerIt((*dealerPositionIt)->getId());
-        if (it != myActivePlayerList->end())
+        if (it != mySeatsList->end())
         {
             nextActivePlayerFound = true;
-            if (myActivePlayerList->size() > 2)
+            if (mySeatsList->size() > 2)
             {
                 // small blind normal
                 (*it)->setButton(2);
@@ -208,12 +207,12 @@ void Hand::assignButtons()
             myBoard->setLastActionPlayerId(myLastActionPlayerId);
 
             ++it;
-            if (it == myActivePlayerList->end())
+            if (it == mySeatsList->end())
             {
-                it = myActivePlayerList->begin();
+                it = mySeatsList->begin();
             }
 
-            if (myActivePlayerList->size() > 2)
+            if (mySeatsList->size() > 2)
             {
                 // big blind normal
                 (*it)->setButton(3);
@@ -241,7 +240,7 @@ void Hand::setBlinds()
     PlayerListConstIterator itC;
 
     // do sets --> TODO switch?
-    for (itC = myRunningPlayerList->begin(); itC != myRunningPlayerList->end(); ++itC)
+    for (itC = myRunningPlayersList->begin(); itC != myRunningPlayersList->end(); ++itC)
     {
 
         // small blind
@@ -264,7 +263,7 @@ void Hand::setBlinds()
     }
 
     // do sets --> TODO switch?
-    for (itC = myRunningPlayerList->begin(); itC != myRunningPlayerList->end(); ++itC)
+    for (itC = myRunningPlayersList->begin(); itC != myRunningPlayersList->end(); ++itC)
     {
 
         // big blind
@@ -287,13 +286,13 @@ void Hand::setBlinds()
     }
 }
 
-void Hand::updateRunningPlayerList()
+void Hand::updateRunningPlayersList()
 {
-    GlobalServices::instance().logger()->verbose("Updating myRunningPlayerList...");
+    GlobalServices::instance().logger()->verbose("Updating myRunningPlayersList...");
 
     PlayerListIterator it, it1;
 
-    for (it = myRunningPlayerList->begin(); it != myRunningPlayerList->end();)
+    for (it = myRunningPlayersList->begin(); it != myRunningPlayersList->end();)
     {
         GlobalServices::instance().logger()->verbose("Checking player: " + (*it)->getName() +
                                                      ", action: " + playerActionToString((*it)->getAction()));
@@ -302,21 +301,21 @@ void Hand::updateRunningPlayerList()
         {
             GlobalServices::instance().logger()->verbose(
                 "Removing player: " + (*it)->getName() +
-                " from myRunningPlayerList due to action: " + playerActionToString((*it)->getAction()));
+                " from myRunningPlayersList due to action: " + playerActionToString((*it)->getAction()));
 
-            it = myRunningPlayerList->erase(it); // Safely erase and update iterator
+            it = myRunningPlayersList->erase(it); // Safely erase and update iterator
 
-            if (!myRunningPlayerList->empty())
+            if (!myRunningPlayersList->empty())
             {
                 GlobalServices::instance().logger()->verbose(
-                    "myRunningPlayerList is not empty after removal. Updating current player's turn.");
+                    "myRunningPlayersList is not empty after removal. Updating current player's turn.");
 
                 it1 = it;
-                if (it1 == myRunningPlayerList->begin())
+                if (it1 == myRunningPlayersList->begin())
                 {
                     GlobalServices::instance().logger()->verbose(
                         "Iterator points to the beginning of the list. Wrapping around to the end.");
-                    it1 = myRunningPlayerList->end();
+                    it1 = myRunningPlayersList->end();
                 }
                 --it1;
 
@@ -326,18 +325,18 @@ void Hand::updateRunningPlayerList()
             }
             else
             {
-                GlobalServices::instance().logger()->error("myRunningPlayerList is now empty after removal.");
+                GlobalServices::instance().logger()->error("myRunningPlayersList is now empty after removal.");
             }
         }
         else
         {
-            GlobalServices::instance().logger()->verbose("Player: " + (*it)->getName() +
-                                                         " remains in myRunningPlayerList. Moving to the next player.");
+            GlobalServices::instance().logger()->verbose(
+                "Player: " + (*it)->getName() + " remains in myRunningPlayersList. Moving to the next player.");
             ++it;
         }
     }
 
-    GlobalServices::instance().logger()->verbose("Finished updating myRunningPlayerList.");
+    GlobalServices::instance().logger()->verbose("Finished updating myRunningPlayersList.");
 }
 
 void Hand::resolveHandConditions()
@@ -350,18 +349,18 @@ void Hand::resolveHandConditions()
 
     // Log the current state of the running player list
     GlobalServices::instance().logger()->verbose("Current running players:");
-    for (auto& player : *myRunningPlayerList)
+    for (auto& player : *myRunningPlayersList)
     {
         GlobalServices::instance().logger()->verbose("Player " + player->getName() +
                                                      " action: " + playerActionToString(player->getAction()) +
                                                      ", set: " + std::to_string(player->getSet()));
     }
 
-    updateRunningPlayerList();
+    updateRunningPlayersList();
 
     // Determine number of all-in players
     int allInPlayersCounter = 0;
-    for (itC = myActivePlayerList->begin(); itC != myActivePlayerList->end(); ++itC)
+    for (itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
     {
         if ((*itC)->getAction() == PlayerActionAllin)
         {
@@ -372,7 +371,7 @@ void Hand::resolveHandConditions()
 
     // Determine number of non-fold players
     int nonFoldPlayerCounter = 0;
-    for (itC = myActivePlayerList->begin(); itC != myActivePlayerList->end(); ++itC)
+    for (itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
     {
         if ((*itC)->getAction() != PlayerActionFold)
         {
@@ -410,7 +409,7 @@ void Hand::resolveHandConditions()
         else if (allInPlayersCounter + 1 == nonFoldPlayerCounter)
         {
             GlobalServices::instance().logger()->verbose("All players but one are all-in.");
-            for (itC = myRunningPlayerList->begin(); itC != myRunningPlayerList->end(); ++itC)
+            for (itC = myRunningPlayersList->begin(); itC != myRunningPlayersList->end(); ++itC)
             {
                 if ((*itC)->getSet() >= myBettingRounds[myCurrentRound]->getHighestSet())
                 {
@@ -460,7 +459,7 @@ void Hand::resolveHandConditions()
 
     // Unhighlight current player's groupbox
     itC = getActivePlayerIt(myPreviousPlayerId);
-    if (itC != myActivePlayerList->end())
+    if (itC != mySeatsList->end())
     {
         if (myEvents.onRefreshPlayersActiveInactiveStyles)
         {
@@ -548,7 +547,7 @@ PlayerListIterator Hand::getActivePlayerIt(unsigned uniqueId) const
 
     PlayerListIterator it;
 
-    for (it = myActivePlayerList->begin(); it != myActivePlayerList->end(); ++it)
+    for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
         if ((*it)->getId() == uniqueId)
         {
@@ -565,20 +564,20 @@ PlayerListIterator Hand::getRunningPlayerIt(unsigned uniqueId) const
                                                  std::to_string(uniqueId));
 
     // Check if the list is empty
-    if (myRunningPlayerList->empty())
+    if (myRunningPlayersList->empty())
     {
-        GlobalServices::instance().logger()->error("myRunningPlayerList is empty! Returning end iterator.");
-        return myRunningPlayerList->end();
+        GlobalServices::instance().logger()->error("myRunningPlayersList is empty! Returning end iterator.");
+        return myRunningPlayersList->end();
     }
 
     PlayerListIterator it;
 
-    for (it = myRunningPlayerList->begin(); it != myRunningPlayerList->end(); ++it)
+    for (it = myRunningPlayersList->begin(); it != myRunningPlayersList->end(); ++it)
     {
         // Check if the player pointer is valid
         if (!(*it))
         {
-            GlobalServices::instance().logger()->error("Null player pointer encountered in myRunningPlayerList!");
+            GlobalServices::instance().logger()->error("Null player pointer encountered in myRunningPlayersList!");
             continue; // Skip to the next player
         }
 
@@ -588,11 +587,11 @@ PlayerListIterator Hand::getRunningPlayerIt(unsigned uniqueId) const
         }
     }
 
-    if (it == myRunningPlayerList->end())
+    if (it == myRunningPlayersList->end())
     {
         GlobalServices::instance().logger()->error("Player with uniqueId: " + std::to_string(uniqueId) +
-                                                   " not found in myRunningPlayerList.");
-        return myRunningPlayerList->end();
+                                                   " not found in myRunningPlayersList.");
+        return myRunningPlayersList->end();
     }
 
     GlobalServices::instance().logger()->verbose("Player found");
@@ -610,7 +609,7 @@ int Hand::getPreflopCallsNumber()
 
     int calls = 0;
 
-    for (PlayerListIterator it = myActivePlayerList->begin(); it != myActivePlayerList->end(); ++it)
+    for (PlayerListIterator it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
 
         const std::vector<PlayerAction>& actions = (*it)->getCurrentHandActions().getPreflopActions();
@@ -627,7 +626,7 @@ int Hand::getPreflopRaisesNumber()
 
     int raises = 0;
 
-    for (PlayerListIterator it = myActivePlayerList->begin(); it != myActivePlayerList->end(); ++it)
+    for (PlayerListIterator it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
 
         const std::vector<PlayerAction>& actions = (*it)->getCurrentHandActions().getPreflopActions();
@@ -649,7 +648,7 @@ int Hand::getFlopBetsOrRaisesNumber()
 
     int bets = 0;
 
-    for (PlayerListIterator it = myActivePlayerList->begin(); it != myActivePlayerList->end(); ++it)
+    for (PlayerListIterator it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
 
         const std::vector<PlayerAction>& actions = (*it)->getCurrentHandActions().getFlopActions();
@@ -671,7 +670,7 @@ int Hand::getTurnBetsOrRaisesNumber()
 
     int bets = 0;
 
-    for (PlayerListIterator it = myActivePlayerList->begin(); it != myActivePlayerList->end(); ++it)
+    for (PlayerListIterator it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
 
         const std::vector<PlayerAction>& actions = (*it)->getCurrentHandActions().getTurnActions();
@@ -693,7 +692,7 @@ int Hand::getRiverBetsOrRaisesNumber()
 
     int bets = 0;
 
-    for (PlayerListIterator it = myActivePlayerList->begin(); it != myActivePlayerList->end(); ++it)
+    for (PlayerListIterator it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
 
         const std::vector<PlayerAction>& actions = (*it)->getCurrentHandActions().getRiverActions();
@@ -717,7 +716,7 @@ std::vector<PlayerPosition> Hand::getRaisersPositions()
 
     PlayerListIterator itC;
 
-    for (itC = myActivePlayerList->begin(); itC != myActivePlayerList->end(); ++itC)
+    for (itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
     { // note that all in players are not "running" any more
 
         if ((*itC)->getAction() == PlayerActionRaise || (*itC)->getAction() == PlayerActionAllin)
@@ -735,7 +734,7 @@ std::vector<PlayerPosition> Hand::getCallersPositions()
 
     PlayerListIterator itC;
 
-    for (itC = myRunningPlayerList->begin(); itC != myRunningPlayerList->end(); ++itC)
+    for (itC = myRunningPlayersList->begin(); itC != myRunningPlayersList->end(); ++itC)
     {
 
         if ((*itC)->getAction() == PlayerActionCall)
@@ -748,9 +747,9 @@ std::vector<PlayerPosition> Hand::getCallersPositions()
 int Hand::getLastRaiserId()
 {
 
-    PlayerListIterator lastRaiser = myActivePlayerList->end();
+    PlayerListIterator lastRaiser = mySeatsList->end();
 
-    PlayerList players = myActivePlayerList;
+    PlayerList players = mySeatsList;
 
     for (PlayerListIterator it = players->begin(); it != players->end(); ++it)
     {
@@ -758,7 +757,7 @@ int Hand::getLastRaiserId()
         if ((*it)->getAction() == PlayerActionRaise || (*it)->getAction() == PlayerActionAllin)
         {
 
-            if (lastRaiser != myActivePlayerList->end())
+            if (lastRaiser != mySeatsList->end())
             {
                 if ((*lastRaiser)->getPosition() < (*it)->getPosition())
                 {
@@ -771,7 +770,7 @@ int Hand::getLastRaiserId()
             }
         }
     }
-    if (lastRaiser != myActivePlayerList->end())
+    if (lastRaiser != mySeatsList->end())
     {
         return (*lastRaiser)->getId();
     }
@@ -786,7 +785,7 @@ int Hand::getLastRaiserId()
             lastRaiser = it;
         }
     }
-    if (lastRaiser != myActivePlayerList->end())
+    if (lastRaiser != mySeatsList->end())
     {
         return (*lastRaiser)->getId();
     }

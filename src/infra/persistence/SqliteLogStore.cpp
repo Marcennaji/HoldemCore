@@ -171,13 +171,13 @@ void SqliteLogStore::initializeStrategyStatistics(const string playerName, const
     execTransaction();
 }
 
-void SqliteLogStore::updateRankingGameLosers(PlayerList activePlayerList)
+void SqliteLogStore::updateRankingGameLosers(PlayerList seatsList)
 {
     createRankingTable();
 
     int losers = 0;
     PlayerListConstIterator itC;
-    for (itC = activePlayerList->begin(); itC != activePlayerList->end(); ++itC)
+    for (itC = seatsList->begin(); itC != seatsList->end(); ++itC)
     {
         if ((*itC)->getCash() == 0)
         {
@@ -190,13 +190,13 @@ void SqliteLogStore::updateRankingGameLosers(PlayerList activePlayerList)
 
     execTransaction();
 }
-void SqliteLogStore::updateRankingGameWinner(PlayerList activePlayerList)
+void SqliteLogStore::updateRankingGameWinner(PlayerList seatsList)
 {
     createRankingTable();
 
     int playersPositiveCashCounter = 0;
     PlayerListConstIterator itC;
-    for (itC = activePlayerList->begin(); itC != activePlayerList->end(); ++itC)
+    for (itC = seatsList->begin(); itC != seatsList->end(); ++itC)
     {
         if ((*itC)->getCash() > 0)
         {
@@ -205,7 +205,7 @@ void SqliteLogStore::updateRankingGameWinner(PlayerList activePlayerList)
     }
     if (playersPositiveCashCounter == 1)
     {
-        for (itC = activePlayerList->begin(); itC != activePlayerList->end(); ++itC)
+        for (itC = seatsList->begin(); itC != seatsList->end(); ++itC)
         {
             if ((*itC)->getCash() > 0)
             {
@@ -219,13 +219,13 @@ void SqliteLogStore::updateRankingGameWinner(PlayerList activePlayerList)
 
     execTransaction();
 }
-void SqliteLogStore::updateRankingPlayedGames(PlayerList activePlayerList)
+void SqliteLogStore::updateRankingPlayedGames(PlayerList seatsList)
 {
     createRankingTable();
 
     int losers = 0;
     PlayerListConstIterator itC;
-    for (itC = activePlayerList->begin(); itC != activePlayerList->end(); ++itC)
+    for (itC = seatsList->begin(); itC != seatsList->end(); ++itC)
     {
         mySql += "INSERT OR IGNORE INTO Ranking VALUES ('" + (*itC)->getStrategyName() + "', 0, 0, 0);";
         const int playedGames = getIntegerValue((*itC)->getStrategyName(), "Ranking", "played_games") + 1;
@@ -395,14 +395,14 @@ void SqliteLogStore::execTransaction()
     }
 }
 
-void SqliteLogStore::updatePlayersStatistics(PlayerList activePlayerList)
+void SqliteLogStore::updatePlayersStatistics(PlayerList seatsList)
 {
 
     PlayerListConstIterator itC;
 
-    const int i = activePlayerList->size();
+    const int i = seatsList->size();
 
-    for (itC = activePlayerList->begin(); itC != activePlayerList->end(); ++itC)
+    for (itC = seatsList->begin(); itC != seatsList->end(); ++itC)
     {
 
         if ((*itC)->getStatistics(i).getPreflopStatistics().m_hands == 0)

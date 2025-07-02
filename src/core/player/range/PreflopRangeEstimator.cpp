@@ -193,7 +193,7 @@ std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromCaller(Curren
     bool isTopRange = true;
     std::vector<std::string> ranges;
     std::vector<float> rangesValues;
-    const int nbPlayers = myHand->getActivePlayerList()->size();
+    const int nbPlayers = myHand->getSeatsList()->size();
     float range = 0;
 
     // Step 1: Analyze player actions
@@ -388,7 +388,7 @@ float PreflopRangeEstimator::handleLimpRange(const CurrentHandContext& ctx, cons
 {
     float range = currentRange;
 
-    if (myHand->getRunningPlayerList()->size() > 3)
+    if (myHand->getRunningPlayersList()->size() > 3)
     {
         range = currentRange - ctx.myStatistics.getPreflopStatistics().getPreflopRaise();
         GlobalServices::instance().logger()->verbose("Limp range adjusted for deception: " + std::to_string(range));

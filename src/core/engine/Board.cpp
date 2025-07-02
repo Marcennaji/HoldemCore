@@ -28,20 +28,18 @@ Board::~Board()
     {
         mySeatsList->clear();
     }
-    if (myActivePlayerList)
+    if (myRunningPlayersList)
     {
-        myActivePlayerList->clear();
-    }
-    if (myRunningPlayerList)
-    {
-        myRunningPlayerList->clear();
+        myRunningPlayersList->clear();
     }
 }
-void Board::setPlayerLists(PlayerList sl, PlayerList apl, PlayerList rpl)
+void Board::setSeatsList(PlayerList seats)
 {
-    mySeatsList = sl;
-    myActivePlayerList = apl;
-    myRunningPlayerList = rpl;
+    mySeatsList = seats;
+}
+void Board::setRunningPlayersList(PlayerList runningPlayers)
+{
+    myRunningPlayersList = runningPlayers;
 }
 
 void Board::collectSets()
@@ -296,7 +294,7 @@ void Board::determinePlayerNeedToShowCards()
 
         PlayerListConstIterator itC;
 
-        for (itC = myActivePlayerList->begin(); itC != myActivePlayerList->end(); ++itC)
+        for (itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
         {
             if ((*itC)->getAction() != PlayerActionFold)
             {
@@ -316,7 +314,7 @@ void Board::determinePlayerNeedToShowCards()
         PlayerListConstIterator itC;
 
         // search lastActionPlayer
-        for (itC = myActivePlayerList->begin(); itC != myActivePlayerList->end(); ++itC)
+        for (itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
         {
             if ((*itC)->getId() == myLastActionPlayerId && (*itC)->getAction() != PlayerActionFold)
             {
@@ -325,9 +323,9 @@ void Board::determinePlayerNeedToShowCards()
             }
         }
 
-        if (itC == myActivePlayerList->end())
+        if (itC == mySeatsList->end())
         {
-            for (itC = myActivePlayerList->begin(); itC != myActivePlayerList->end(); ++itC)
+            for (itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
             {
                 if ((*itC)->getAction() != PlayerActionFold)
                 {
@@ -353,12 +351,12 @@ void Board::determinePlayerNeedToShowCards()
         itC = lastActionPlayerIt;
         ++itC;
 
-        for (unsigned i = 0; i < myActivePlayerList->size(); i++)
+        for (unsigned i = 0; i < mySeatsList->size(); i++)
         {
 
-            if (itC == myActivePlayerList->end())
+            if (itC == mySeatsList->end())
             {
-                itC = myActivePlayerList->begin();
+                itC = mySeatsList->begin();
             }
 
             if ((*itC)->getAction() != PlayerActionFold)

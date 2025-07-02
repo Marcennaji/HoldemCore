@@ -105,7 +105,7 @@ void PreflopState::postBlinds(Hand& hand)
     // Extract the clean blind posting logic from Hand::setBlinds()
     // This will be much cleaner than the current implementation
 
-    auto runningPlayers = hand.getRunningPlayerList();
+    auto runningPlayers = hand.getRunningPlayersList();
 
     for (auto it = runningPlayers->begin(); it != runningPlayers->end(); ++it)
     {
@@ -145,17 +145,17 @@ void PreflopState::setFirstPlayerToAct(Hand& hand)
 {
     // Find first player after big blind
     // This is much cleaner than the current complex logic
-    auto activePlayers = hand.getActivePlayerList();
+    auto seats = hand.getSeatsList();
 
     // Simple implementation - find player after big blind
-    for (auto it = activePlayers->begin(); it != activePlayers->end(); ++it)
+    for (auto it = seats->begin(); it != seats->end(); ++it)
     {
         if ((*it)->getButton() == ButtonBigBlind)
         {
             ++it;
-            if (it == activePlayers->end())
+            if (it == seats->end())
             {
-                it = activePlayers->begin();
+                it = seats->begin();
             }
             currentPlayerToAct = (*it)->getId();
             break;

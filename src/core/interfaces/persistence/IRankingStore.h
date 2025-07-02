@@ -14,8 +14,8 @@ class IRankingStore
   public:
     virtual ~IRankingStore() = default;
 
-    virtual void updateRankingGameLosers(pkt::core::player::PlayerList activePlayerList) = 0;
-    virtual void updateRankingGameWinner(pkt::core::player::PlayerList activePlayerList) = 0;
-    virtual void updateRankingPlayedGames(pkt::core::player::PlayerList activePlayerList) = 0;
+    virtual void updateRankingGameLosers(pkt::core::player::PlayerList) = 0;
+    virtual void updateRankingGameWinner(pkt::core::player::PlayerList) = 0;
+    virtual void updateRankingPlayedGames(pkt::core::player::PlayerList) = 0;
 };
 } // namespace pkt::core

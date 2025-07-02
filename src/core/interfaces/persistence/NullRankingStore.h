@@ -13,8 +13,8 @@ class NullRankingStore : public IRankingStore
   public:
     virtual ~NullRankingStore() = default;
 
-    virtual void updateRankingGameLosers(pkt::core::player::PlayerList activePlayerList) override {}
-    virtual void updateRankingGameWinner(pkt::core::player::PlayerList activePlayerList) override {}
-    virtual void updateRankingPlayedGames(pkt::core::player::PlayerList activePlayerList) override {}
+    virtual void updateRankingGameLosers(pkt::core::player::PlayerList) override {}
+    virtual void updateRankingGameWinner(pkt::core::player::PlayerList) override {}
+    virtual void updateRankingPlayedGames(pkt::core::player::PlayerList) override {}
 };
 } // namespace pkt::core

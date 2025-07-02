@@ -65,7 +65,7 @@ void Player::setPosition()
     myPosition = UNKNOWN;
 
     const int dealerPosition = currentHand->getDealerPosition();
-    const int nbPlayers = currentHand->getActivePlayerList()->size();
+    const int nbPlayers = currentHand->getSeatsList()->size();
 
     // first dimension is my relative position, after the dealer.
     // Second dimension is the corrresponding position, depending on the number of players (from 0 to 10)
@@ -126,7 +126,7 @@ void Player::setPosition()
 
         // get my relative position from the dealer
         PlayerListIterator itC;
-        PlayerList players = currentHand->getActivePlayerList();
+        PlayerList players = currentHand->getSeatsList();
 
         int pos = 0;
 
@@ -387,7 +387,7 @@ void Player::resetPlayerStatistics()
 void Player::updatePreflopStatistics()
 {
 
-    const int nbPlayers = currentHand->getActivePlayerList()->size();
+    const int nbPlayers = currentHand->getSeatsList()->size();
 
     if (myCurrentHandActions.m_preflopActions.size() == 1)
     {
@@ -464,7 +464,7 @@ void Player::updatePreflopStatistics()
 void Player::updateFlopStatistics()
 {
 
-    const int nbPlayers = currentHand->getActivePlayerList()->size();
+    const int nbPlayers = currentHand->getSeatsList()->size();
 
     if (myCurrentHandActions.m_flopActions.size() == 1)
     {
@@ -512,7 +512,7 @@ void Player::updateFlopStatistics()
 void Player::updateTurnStatistics()
 {
 
-    const int nbPlayers = currentHand->getActivePlayerList()->size();
+    const int nbPlayers = currentHand->getSeatsList()->size();
 
     if (myCurrentHandActions.m_turnActions.size() == 1)
     {
@@ -550,7 +550,7 @@ void Player::updateTurnStatistics()
 void Player::updateRiverStatistics()
 {
 
-    const int nbPlayers = currentHand->getActivePlayerList()->size();
+    const int nbPlayers = currentHand->getSeatsList()->size();
 
     if (myCurrentHandActions.m_riverActions.size() == 1)
     {
@@ -744,7 +744,7 @@ const SimResults Player::getHandSimulation(bool logResult) const
 
     float win = r.win; // save the value
 
-    const int nbOpponents = std::max(1, (int) currentHand->getRunningPlayerList()->size() -
+    const int nbOpponents = std::max(1, (int) currentHand->getRunningPlayersList()->size() -
                                             1); // note that allin opponents are not "running" any more
     simulateHandMulti(cards.c_str(), &r, 200, 100, nbOpponents);
     r.win = win; // because simulateHandMulti doesn't compute 'win'
@@ -934,7 +934,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 void Player::logUnplausibleHands(GameState g)
 {
 
-    const int nbPlayers = currentHand->getActivePlayerList()->size();
+    const int nbPlayers = currentHand->getSeatsList()->size();
     string label;
     char bettingRound;
 
@@ -964,8 +964,8 @@ std::map<int, float> Player::evaluateOpponentsStrengths() const
 {
 
     map<int, float> result;
-    PlayerList players = currentHand->getActivePlayerList();
-    const int nbPlayers = currentHand->getActivePlayerList()->size();
+    PlayerList players = currentHand->getSeatsList();
+    const int nbPlayers = currentHand->getSeatsList()->size();
 
     for (PlayerListIterator it = players->begin(); it != players->end(); ++it)
     {
@@ -1033,10 +1033,10 @@ bool Player::canBluff(const GameState gameState) const
     // check if there is no calling station at the table
     // check also if my opponents stacks are big enough to bluff them
 
-    const int nbPlayers = currentHand->getActivePlayerList()->size();
+    const int nbPlayers = currentHand->getSeatsList()->size();
     const int nbRaises = currentHand->getPreflopRaisesNumber();
 
-    PlayerList players = currentHand->getRunningPlayerList();
+    PlayerList players = currentHand->getRunningPlayersList();
 
     if (players->size() == 1)
     {
@@ -1119,7 +1119,7 @@ void Player::updateCurrentHandContext(const GameState state)
 {
     // general (and shared) game state
     myCurrentHandContext->gameState = state;
-    myCurrentHandContext->nbRunningPlayers = currentHand->getRunningPlayerList()->size();
+    myCurrentHandContext->nbRunningPlayers = currentHand->getRunningPlayersList()->size();
     myCurrentHandContext->lastVPIPPlayer = getPlayerByUniqueId(currentHand->getLastRaiserId());
     myCurrentHandContext->callersPositions = currentHand->getCallersPositions();
     myCurrentHandContext->pot = currentHand->getBoard()->getPot();
@@ -1136,7 +1136,7 @@ void Player::updateCurrentHandContext(const GameState state)
     myCurrentHandContext->turnBetsOrRaisesNumber = currentHand->getTurnBetsOrRaisesNumber();
     myCurrentHandContext->turnLastRaiser = getPlayerByUniqueId(currentHand->getTurnLastRaiserId());
     myCurrentHandContext->riverBetsOrRaisesNumber = currentHand->getRiverBetsOrRaisesNumber();
-    myCurrentHandContext->nbPlayers = currentHand->getActivePlayerList()->size();
+    myCurrentHandContext->nbPlayers = currentHand->getSeatsList()->size();
     myCurrentHandContext->smallBlind = currentHand->getSmallBlind();
 
     for (std::vector<PlayerAction>::const_iterator i = myCurrentHandActions.m_flopActions.begin();
@@ -1170,14 +1170,14 @@ void Player::updateCurrentHandContext(const GameState state)
     myCurrentHandContext->mySet = mySet;
     myCurrentHandContext->myM = static_cast<int>(getM());
     myCurrentHandContext->myCurrentHandActions = myCurrentHandActions;
-    myCurrentHandContext->myHavePosition = Player::getHavePosition(myPosition, currentHand->getRunningPlayerList());
+    myCurrentHandContext->myHavePosition = Player::getHavePosition(myPosition, currentHand->getRunningPlayersList());
     myCurrentHandContext->myPreflopIsAggressor = isAgressor(GameStatePreflop);
     myCurrentHandContext->myFlopIsAggressor = isAgressor(GameStateFlop);
     myCurrentHandContext->myTurnIsAggressor = isAgressor(GameStateTurn);
     myCurrentHandContext->myRiverIsAggressor = isAgressor(GameStateRiver);
-    myCurrentHandContext->myStatistics = getStatistics(currentHand->getActivePlayerList()->size());
+    myCurrentHandContext->myStatistics = getStatistics(currentHand->getSeatsList()->size());
     myCurrentHandContext->myID = myID;
-    myCurrentHandContext->myIsInVeryLooseMode = isInVeryLooseMode(currentHand->getActivePlayerList()->size());
+    myCurrentHandContext->myIsInVeryLooseMode = isInVeryLooseMode(currentHand->getSeatsList()->size());
     myCurrentHandContext->myPosition = myPosition;
 
     // player specific, hidden from the opponents :
@@ -1191,7 +1191,7 @@ void Player::updateCurrentHandContext(const GameState state)
 
 float Player::calculatePreflopCallingRange(CurrentHandContext& context, bool deterministic) const
 {
-    return myRangeEstimator->getStandardCallingRange(currentHand->getActivePlayerList()->size());
+    return myRangeEstimator->getStandardCallingRange(currentHand->getSeatsList()->size());
 }
 
 } // namespace pkt::core::player

@@ -34,12 +34,12 @@ class SqliteLogStore
     ~SqliteLogStore();
 
     void init();
-    void updateRankingGameLosers(PlayerList activePlayerList);
-    void updateRankingGameWinner(PlayerList activePlayerList);
-    void updateRankingPlayedGames(PlayerList activePlayerList);
+    void updateRankingGameLosers(PlayerList seatsList);
+    void updateRankingGameWinner(PlayerList seatsList);
+    void updateRankingPlayedGames(PlayerList seatsList);
     void updateUnplausibleHand(const std::string card1, const std::string card2, const bool human,
                                const char bettingRound, const int nbPlayers);
-    void updatePlayersStatistics(PlayerList activePlayerList);
+    void updatePlayersStatistics(PlayerList seatsList);
 
     std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> getPlayerStatistics(const std::string& playerName);
 

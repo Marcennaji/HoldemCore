@@ -47,10 +47,9 @@ void EngineTest::createPlayerList(size_t playerCount)
 }
 void EngineTest::initializeHandWithPlayers(size_t activePlayerCount)
 {
-    // Create the active player list by selecting the first `activePlayerCount` players from the seats list
-
     myBoard = myFactory->createBoard(startDealerPlayerId);
-    myBoard->setPlayerLists(myPlayerList, myPlayerList, myPlayerList);
+    myBoard->setSeatsList(myPlayerList);
+    myBoard->setRunningPlayersList(myPlayerList);
 
     GameData gameData;
     gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
@@ -62,8 +61,8 @@ void EngineTest::initializeHandWithPlayers(size_t activePlayerCount)
     startData.startDealerPlayerId = startDealerPlayerId;
     startData.numberOfPlayers = static_cast<int>(activePlayerCount);
 
-    myHand = myFactory->createHand(myFactory, myBoard, myPlayerList, myPlayerList, myPlayerList, startDealerPlayerId,
-                                   gameData, startData);
+    myHand =
+        myFactory->createHand(myFactory, myBoard, myPlayerList, myPlayerList, startDealerPlayerId, gameData, startData);
 }
 
 } // namespace pkt::test

@@ -18,7 +18,7 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, const PlayerList& playerList,
+Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, const PlayerList& playersList,
            const GameData& gameData, const StartData& startData, int gameId)
     : myFactory(factory), myEvents(events), myStartQuantityPlayers(startData.numberOfPlayers),
       myStartCash(gameData.startMoney), myStartSmallBlind(gameData.firstSmallBlind), myGameId(gameId),
@@ -27,8 +27,8 @@ Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, con
     myDealerPosition = startData.startDealerPlayerId;
 
     // determine dealer position
-    PlayerListConstIterator playerI = playerList->begin();
-    PlayerListConstIterator playerEnd = playerList->end();
+    PlayerListConstIterator playerI = playersList->begin();
+    PlayerListConstIterator playerEnd = playersList->end();
 
     while (playerI != playerEnd)
     {
@@ -46,24 +46,23 @@ Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, con
     // create board
     myCurrentBoard = myFactory->createBoard(myDealerPosition);
 
-    // create player lists
+    // create players lists
     mySeatsList.reset(new std::list<std::shared_ptr<Player>>);
-    myActivePlayerList.reset(new std::list<std::shared_ptr<Player>>);
-    myRunningPlayerList.reset(new std::list<std::shared_ptr<Player>>);
+    myRunningPlayersList.reset(new std::list<std::shared_ptr<Player>>);
 
-    (*myRunningPlayerList) = (*playerList);
-    (*myActivePlayerList) = (*playerList);
-    (*mySeatsList) = (*playerList);
+    (*myRunningPlayersList) = (*playersList);
+    (*mySeatsList) = (*playersList);
 
-    myCurrentBoard->setPlayerLists(mySeatsList, myActivePlayerList, myRunningPlayerList);
+    myCurrentBoard->setSeatsList(mySeatsList);
+    myCurrentBoard->setRunningPlayersList(myRunningPlayersList);
 
-    GlobalServices::instance().rankingStore()->updateRankingPlayedGames(myActivePlayerList);
+    GlobalServices::instance().rankingStore()->updateRankingPlayedGames(mySeatsList);
 }
 
 Game::~Game()
 {
-    myRunningPlayerList->clear();
-    myActivePlayerList->clear();
+    myRunningPlayersList->clear();
+    mySeatsList->clear();
     mySeatsList->clear();
 }
 
@@ -93,14 +92,14 @@ void Game::initHand()
     }
 
     // set player with empty cash inactive
-    it = myActivePlayerList->begin();
-    while (it != myActivePlayerList->end())
+    it = mySeatsList->begin();
+    while (it != mySeatsList->end())
     {
 
         if ((*it)->getCash() == 0)
         {
             (*it)->setActiveStatus(false);
-            it = myActivePlayerList->erase(it);
+            it = mySeatsList->erase(it);
         }
         else
         {
@@ -108,12 +107,12 @@ void Game::initHand()
         }
     }
 
-    myRunningPlayerList->clear();
-    (*myRunningPlayerList) = (*myActivePlayerList);
+    myRunningPlayersList->clear();
+    (*myRunningPlayersList) = (*mySeatsList);
 
     // create Hand
-    myCurrentHand = myFactory->createHand(myFactory, myCurrentBoard, mySeatsList, myActivePlayerList,
-                                          myRunningPlayerList, myCurrentHandId, myGameData, myStartData);
+    myCurrentHand = myFactory->createHand(myFactory, myCurrentBoard, mySeatsList, myRunningPlayersList, myCurrentHandId,
+                                          myGameData, myStartData);
 
     bool nextDealerFound = false;
     PlayerListConstIterator dealerPositionIt = myCurrentHand->getSeatIt(myDealerPosition);
@@ -132,7 +131,7 @@ void Game::initHand()
         }
 
         itC = myCurrentHand->getActivePlayerIt((*dealerPositionIt)->getId());
-        if (itC != myActivePlayerList->end())
+        if (itC != mySeatsList->end())
         {
             nextDealerFound = true;
             myDealerPosition = (*itC)->getId();

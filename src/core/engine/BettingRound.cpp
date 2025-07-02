@@ -22,13 +22,13 @@ BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int
     : IBettingRound(), myHand(hi), myBettingRoundID(gS), myDealerPosition(dP), myDealerPositionId(dP), mySmallBlind(sB),
       myMinimumRaise(2 * sB), myEvents(events)
 {
-    myCurrentPlayersTurnIt = myHand->getRunningPlayerList()->begin();
-    myLastPlayersTurnIt = myHand->getRunningPlayerList()->begin();
+    myCurrentPlayersTurnIt = myHand->getRunningPlayersList()->begin();
+    myLastPlayersTurnIt = myHand->getRunningPlayersList()->begin();
 
     PlayerListConstIterator itC;
 
     // determine bigBlindPosition
-    for (itC = myHand->getActivePlayerList()->begin(); itC != myHand->getActivePlayerList()->end(); ++itC)
+    for (itC = myHand->getSeatsList()->begin(); itC != myHand->getSeatsList()->end(); ++itC)
     {
         if ((*itC)->getButton() == ButtonBigBlind)
         {
@@ -36,13 +36,13 @@ BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int
             break;
         }
     }
-    if (itC == myHand->getActivePlayerList()->end())
+    if (itC == myHand->getSeatsList()->end())
     {
         GlobalServices::instance().logger()->error("ACTIVE_PLAYER_NOT_FOUND");
     }
 
     // determine smallBlindPosition
-    for (itC = myHand->getActivePlayerList()->begin(); itC != myHand->getActivePlayerList()->end(); ++itC)
+    for (itC = myHand->getSeatsList()->begin(); itC != myHand->getSeatsList()->end(); ++itC)
     {
         if ((*itC)->getButton() == ButtonSmallBlind)
         {
@@ -50,7 +50,7 @@ BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int
             break;
         }
     }
-    if (itC == myHand->getActivePlayerList()->end())
+    if (itC == myHand->getSeatsList()->end())
     {
         GlobalServices::instance().logger()->error("ACTIVE_PLAYER_NOT_FOUND");
     }
@@ -68,7 +68,7 @@ void BettingRound::nextPlayer()
 {
 
     PlayerListConstIterator currentPlayersTurnConstIt = myHand->getRunningPlayerIt(myCurrentPlayersTurnId);
-    if (currentPlayersTurnConstIt == myHand->getRunningPlayerList()->end())
+    if (currentPlayersTurnConstIt == myHand->getRunningPlayersList()->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
     }
@@ -82,7 +82,7 @@ void BettingRound::nextPlayer()
 void BettingRound::run()
 {
     GlobalServices::instance().logger()->verbose("myHighestSet at start of round: " + std::to_string(myHighestSet));
-    for (auto& player : *myHand->getRunningPlayerList())
+    for (auto& player : *myHand->getRunningPlayersList())
     {
         GlobalServices::instance().logger()->verbose("start of round: Player " + player->getName() +
                                                      " action: " + playerActionToString(player->getAction()));
@@ -113,15 +113,15 @@ void BettingRound::run()
         // determine next running player
 
         PlayerListConstIterator currentPlayersTurnIt = myHand->getRunningPlayerIt(myCurrentPlayersTurnId);
-        if (currentPlayersTurnIt == myHand->getRunningPlayerList()->end())
+        if (currentPlayersTurnIt == myHand->getRunningPlayersList()->end())
         {
-            currentPlayersTurnIt = myHand->getRunningPlayerList()->begin();
+            currentPlayersTurnIt = myHand->getRunningPlayersList()->begin();
         }
 
         ++currentPlayersTurnIt;
-        if (currentPlayersTurnIt == myHand->getRunningPlayerList()->end())
+        if (currentPlayersTurnIt == myHand->getRunningPlayersList()->end())
         {
-            currentPlayersTurnIt = myHand->getRunningPlayerList()->begin();
+            currentPlayersTurnIt = myHand->getRunningPlayersList()->begin();
         }
 
         myCurrentPlayersTurnId = (*currentPlayersTurnIt)->getId();
@@ -139,7 +139,7 @@ void BettingRound::run()
         GlobalServices::instance().logger()->verbose("BettingRound::run() : Determining next running player (2)");
 
         currentPlayersTurnIt = myHand->getRunningPlayerIt(myCurrentPlayersTurnId);
-        if (currentPlayersTurnIt == myHand->getRunningPlayerList()->end())
+        if (currentPlayersTurnIt == myHand->getRunningPlayersList()->end())
         {
             throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
         }
@@ -172,7 +172,7 @@ bool BettingRound::allBetsAreDone() const
 {
     PlayerListIterator itC;
 
-    for (itC = myHand->getRunningPlayerList()->begin(); itC != myHand->getRunningPlayerList()->end(); ++itC)
+    for (itC = myHand->getRunningPlayersList()->begin(); itC != myHand->getRunningPlayersList()->end(); ++itC)
     {
         if (myHighestSet != (*itC)->getSet())
         {
@@ -188,7 +188,7 @@ void BettingRound::proceedToNextBettingRound()
     PlayerListIterator itC;
     myHand->setCurrentRoundState(GameState(myBettingRoundID + 1));
 
-    for (itC = myHand->getRunningPlayerList()->begin(); itC != myHand->getRunningPlayerList()->end(); ++itC)
+    for (itC = myHand->getRunningPlayersList()->begin(); itC != myHand->getRunningPlayersList()->end(); ++itC)
     {
         (*itC)->setAction(PlayerActionNone);
     }
@@ -281,26 +281,26 @@ void BettingRound::handleFirstRun()
 
         // running player before smallBlind
         bool formerRunningPlayerFound = false;
-        if (myHand->getActivePlayerList()->size() > 2)
+        if (myHand->getSeatsList()->size() > 2)
         {
             it1 = myHand->getActivePlayerIt(mySmallBlindPositionId);
-            if (it1 == myHand->getActivePlayerList()->end())
+            if (it1 == myHand->getSeatsList()->end())
             {
                 GlobalServices::instance().logger()->error("ACTIVE_PLAYER_NOT_FOUND");
             }
 
-            for (size_t i = 0; i < myHand->getActivePlayerList()->size(); i++)
+            for (size_t i = 0; i < myHand->getSeatsList()->size(); i++)
             {
-                if (it1 == myHand->getActivePlayerList()->begin())
+                if (it1 == myHand->getSeatsList()->begin())
                 {
-                    it1 = myHand->getActivePlayerList()->end();
+                    it1 = myHand->getSeatsList()->end();
                 }
                 --it1;
                 GlobalServices::instance().logger()->verbose("handleFirstRun : finding running player");
 
                 it2 = myHand->getRunningPlayerIt((*it1)->getId());
                 // running player found
-                if (it2 != myHand->getRunningPlayerList()->end())
+                if (it2 != myHand->getRunningPlayersList()->end())
                 {
                     myFirstRoundLastPlayersTurnId = (*it2)->getId();
                     formerRunningPlayerFound = true;

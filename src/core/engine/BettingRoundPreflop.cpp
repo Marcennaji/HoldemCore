@@ -39,12 +39,12 @@ void BettingRoundPreflop::run()
         PlayerListIterator bigBlindPositionIt = getHand()->getRunningPlayerIt(getBigBlindPositionId());
 
         // more than 2 players are still active -> runningPlayerList is not empty
-        if (getHand()->getActivePlayerList()->size() > 2)
+        if (getHand()->getSeatsList()->size() > 2)
         {
 
             // bigBlindPlayer not found in runningPlayerList (he is all in) -> bigBlindPlayer is not the running player
             // before first action player
-            if (bigBlindPositionIt == getHand()->getRunningPlayerList()->end())
+            if (bigBlindPositionIt == getHand()->getRunningPlayersList()->end())
             {
 
                 // search smallBlindPosition in runningPlayerList
@@ -52,18 +52,18 @@ void BettingRoundPreflop::run()
 
                 // smallBlindPlayer not found in runningPlayerList (he is all in) -> next active player before
                 // smallBlindPlayer is running player before first action player
-                if (smallBlindPositionIt == getHand()->getRunningPlayerList()->end())
+                if (smallBlindPositionIt == getHand()->getRunningPlayersList()->end())
                 {
 
                     it = getHand()->getActivePlayerIt(getSmallBlindPositionId());
-                    if (it == getHand()->getActivePlayerList()->end())
+                    if (it == getHand()->getSeatsList()->end())
                     {
                         throw Exception(__FILE__, __LINE__, EngineError::ActivePlayerNotFound);
                     }
 
-                    if (it == getHand()->getActivePlayerList()->begin())
+                    if (it == getHand()->getSeatsList()->begin())
                     {
-                        it = getHand()->getActivePlayerList()->end();
+                        it = getHand()->getSeatsList()->end();
                     }
                     --it;
 
@@ -87,7 +87,7 @@ void BettingRoundPreflop::run()
 
             // bigBlindPlayer not found in runningPlayerList (he is all in) -> only smallBlind has to choose fold or
             // call the bigBlindAmount
-            if (bigBlindPositionIt == getHand()->getRunningPlayerList()->end())
+            if (bigBlindPositionIt == getHand()->getRunningPlayersList()->end())
             {
 
                 // search smallBlindPosition in runningPlayerList
@@ -95,7 +95,7 @@ void BettingRoundPreflop::run()
 
                 // smallBlindPlayer not found in runningPlayerList (he is all in) -> no running player -> showdown and
                 // no firstRoundLastPlayersTurnId is used
-                if (smallBlindPositionIt == getHand()->getRunningPlayerList()->end())
+                if (smallBlindPositionIt == getHand()->getRunningPlayersList()->end())
                 {
                 }
                 // smallBlindPlayer found in runningPlayerList -> running player before first action player (himself)
@@ -119,7 +119,7 @@ void BettingRoundPreflop::run()
     PlayerListConstIterator itC;
 
     // check if all running players have same sets (else allHighestSet = false)
-    for (itC = getHand()->getRunningPlayerList()->begin(); itC != getHand()->getRunningPlayerList()->end(); ++itC)
+    for (itC = getHand()->getRunningPlayersList()->begin(); itC != getHand()->getRunningPlayersList()->end(); ++itC)
     {
         if (getHighestSet() != (*itC)->getSet())
         {
@@ -130,25 +130,25 @@ void BettingRoundPreflop::run()
 
     // determine next player
     PlayerListConstIterator currentPlayersTurnIt = getHand()->getRunningPlayerIt(getCurrentPlayersTurnId());
-    if (currentPlayersTurnIt == getHand()->getRunningPlayerList()->end())
+    if (currentPlayersTurnIt == getHand()->getRunningPlayersList()->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
     }
 
     ++currentPlayersTurnIt;
-    if (currentPlayersTurnIt == getHand()->getRunningPlayerList()->end())
+    if (currentPlayersTurnIt == getHand()->getRunningPlayersList()->end())
     {
-        currentPlayersTurnIt = getHand()->getRunningPlayerList()->begin();
+        currentPlayersTurnIt = getHand()->getRunningPlayersList()->begin();
     }
 
     setCurrentPlayersTurnId((*currentPlayersTurnIt)->getId());
 
-    if (!getFirstRound() && allHighestSet && getHand()->getRunningPlayerList()->size() != 1)
+    if (!getFirstRound() && allHighestSet && getHand()->getRunningPlayersList()->size() != 1)
     {
 
         getHand()->setCurrentRoundState(GameStateFlop);
 
-        for (itC = getHand()->getRunningPlayerList()->begin(); itC != getHand()->getRunningPlayerList()->end(); ++itC)
+        for (itC = getHand()->getRunningPlayersList()->begin(); itC != getHand()->getRunningPlayersList()->end(); ++itC)
         {
             (*itC)->setAction(PlayerActionNone);
         }
@@ -190,7 +190,7 @@ void BettingRoundPreflop::run()
         }
 
         currentPlayersTurnIt = getHand()->getRunningPlayerIt(getCurrentPlayersTurnId());
-        if (currentPlayersTurnIt == getHand()->getRunningPlayerList()->end())
+        if (currentPlayersTurnIt == getHand()->getRunningPlayersList()->end())
         {
             throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
         }

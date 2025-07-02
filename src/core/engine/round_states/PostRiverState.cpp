@@ -84,8 +84,8 @@ void PostRiverState::showCards(Hand& hand)
     if (hand.getCardsShown())
     {
         // Show cards for players who didn't fold preflop
-        auto activePlayerList = hand.getActivePlayerList();
-        for (auto it = activePlayerList->begin(); it != activePlayerList->end(); ++it)
+        auto seatsList = hand.getSeatsList();
+        for (auto it = seatsList->begin(); it != seatsList->end(); ++it)
         {
             // Check if player has preflop actions and didn't fold
             if ((*it)->getCurrentHandActions().getPreflopActions().size() > 0 &&
@@ -114,9 +114,9 @@ void PostRiverState::updateStatistics(Hand& hand)
     // Extract from BettingRoundPostRiver::postRiverRun() - statistics update
     // This will be implemented in Phase 2
 
-    GlobalServices::instance().rankingStore()->updateRankingGameLosers(hand.getActivePlayerList());
-    GlobalServices::instance().rankingStore()->updateRankingGameWinner(hand.getActivePlayerList());
-    GlobalServices::instance().playersStatisticsStore()->updatePlayersStatistics(hand.getActivePlayerList());
+    GlobalServices::instance().rankingStore()->updateRankingGameLosers(hand.getSeatsList());
+    GlobalServices::instance().rankingStore()->updateRankingGameWinner(hand.getSeatsList());
+    GlobalServices::instance().playersStatisticsStore()->updatePlayersStatistics(hand.getSeatsList());
 }
 
 void PostRiverState::handleHandPause(Hand& hand)
@@ -140,8 +140,8 @@ void PostRiverState::calculateHighestCardsValue(Hand& hand)
     // Extract from BettingRoundPostRiver::postRiverRun() - highest cards calculation
     // This will be implemented in Phase 2
 
-    auto activePlayerList = hand.getActivePlayerList();
-    for (auto it = activePlayerList->begin(); it != activePlayerList->end(); ++it)
+    auto seatsList = hand.getSeatsList();
+    for (auto it = seatsList->begin(); it != seatsList->end(); ++it)
     {
         if ((*it)->getAction() != PlayerActionFold && (*it)->getCardsValueInt() > highestCardsValue)
         {
@@ -158,8 +158,8 @@ bool PostRiverState::shouldPauseHand(Hand& hand) const
     bool humanPlayerInvolved = false;
     int nonFoldPlayerCount = countNonFoldedPlayers(hand);
 
-    auto activePlayerList = hand.getActivePlayerList();
-    for (auto it = activePlayerList->begin(); it != activePlayerList->end(); ++it)
+    auto seatsList = hand.getSeatsList();
+    for (auto it = seatsList->begin(); it != seatsList->end(); ++it)
     {
         if ((*it)->getAction() != PlayerActionFold && (*it)->getName() == pkt::core::player::HumanPlayer::getName())
         {
@@ -177,8 +177,8 @@ int PostRiverState::countNonFoldedPlayers(Hand& hand) const
     // This will be implemented in Phase 2
 
     int count = 0;
-    auto activePlayerList = hand.getActivePlayerList();
-    for (auto it = activePlayerList->begin(); it != activePlayerList->end(); ++it)
+    auto seatsList = hand.getSeatsList();
+    for (auto it = seatsList->begin(); it != seatsList->end(); ++it)
     {
         if ((*it)->getAction() != PlayerActionFold)
         {

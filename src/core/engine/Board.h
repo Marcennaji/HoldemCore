@@ -27,7 +27,8 @@ class Board : public IBoard
     Board(unsigned dealerPosition);
     ~Board();
 
-    void setPlayerLists(pkt::core::player::PlayerList, pkt::core::player::PlayerList, pkt::core::player::PlayerList);
+    void setSeatsList(pkt::core::player::PlayerList seats);
+    void setRunningPlayersList(pkt::core::player::PlayerList runningPlayers);
 
     void setCards(int* theValue);
     void getCards(int* theValue);
@@ -54,8 +55,7 @@ class Board : public IBoard
 
   private:
     pkt::core::player::PlayerList mySeatsList;
-    pkt::core::player::PlayerList myActivePlayerList;
-    pkt::core::player::PlayerList myRunningPlayerList;
+    pkt::core::player::PlayerList myRunningPlayersList;
 
     std::list<unsigned> myWinners;
     std::list<unsigned> myPlayerNeedToShowCards;

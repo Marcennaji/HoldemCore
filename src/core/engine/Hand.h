@@ -22,9 +22,9 @@ namespace pkt::core
 class Hand : public IHand
 {
   public:
-    Hand(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard>, pkt::core::player::PlayerList,
-         pkt::core::player::PlayerList, pkt::core::player::PlayerList, int handId, GameData gameData,
-         StartData startData);
+    Hand(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard>,
+         pkt::core::player::PlayerList seats, pkt::core::player::PlayerList runningPlayers, int handId,
+         GameData gameData, StartData startData);
     ~Hand();
 
     void start();
@@ -34,8 +34,7 @@ class Hand : public IHand
     void initAndShuffleDeck();
 
     pkt::core::player::PlayerList getSeatsList() const { return mySeatsList; }
-    pkt::core::player::PlayerList getActivePlayerList() const { return myActivePlayerList; }
-    pkt::core::player::PlayerList getRunningPlayerList() const { return myRunningPlayerList; }
+    pkt::core::player::PlayerList getRunningPlayersList() const { return myRunningPlayersList; }
 
     std::shared_ptr<IBoard> getBoard() const { return myBoard; }
     std::shared_ptr<IBettingRound> getPreflop() const { return myBettingRounds[GameStatePreflop]; }
@@ -103,7 +102,7 @@ class Hand : public IHand
     pkt::core::player::PlayerListIterator getSeatIt(unsigned) const;
     pkt::core::player::PlayerListIterator getActivePlayerIt(unsigned) const;
     pkt::core::player::PlayerListIterator getRunningPlayerIt(unsigned) const;
-    void updateRunningPlayerList();
+    void updateRunningPlayersList();
 
   private:
     std::unique_ptr<IBettingRoundStateFsm> myCurrentStateFsm;
@@ -111,9 +110,8 @@ class Hand : public IHand
     const GameEvents& myEvents;
     std::shared_ptr<IBoard> myBoard;
 
-    pkt::core::player::PlayerList mySeatsList;         // all player
-    pkt::core::player::PlayerList myActivePlayerList;  // all player who are not out
-    pkt::core::player::PlayerList myRunningPlayerList; // all player who are not folded, not all in and not out
+    pkt::core::player::PlayerList mySeatsList;          // all players
+    pkt::core::player::PlayerList myRunningPlayersList; // all players who have not folded and are not all in
 
     std::vector<std::shared_ptr<IBettingRound>> myBettingRounds;
 

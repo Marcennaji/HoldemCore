@@ -25,7 +25,7 @@ class Game
 {
 
   public:
-    Game(const GameEvents&, std::shared_ptr<EngineFactory> factory, const pkt::core::player::PlayerList& playerList,
+    Game(const GameEvents&, std::shared_ptr<EngineFactory> factory, const pkt::core::player::PlayerList& playersList,
          const GameData& gameData, const StartData& startData, int gameId);
 
     ~Game();
@@ -37,8 +37,7 @@ class Game
     const std::shared_ptr<IHand> getCurrentHand() const;
 
     pkt::core::player::PlayerList getSeatsList() const { return mySeatsList; }
-    pkt::core::player::PlayerList getActivePlayerList() const { return myActivePlayerList; }
-    pkt::core::player::PlayerList getRunningPlayerList() const { return myRunningPlayerList; }
+    pkt::core::player::PlayerList getRunningPlayersList() const { return myRunningPlayersList; }
 
     void setStartQuantityPlayers(int theValue) { myStartQuantityPlayers = theValue; }
     int getStartQuantityPlayers() const { return myStartQuantityPlayers; }
@@ -80,8 +79,7 @@ class Game
     std::shared_ptr<IBoard> myCurrentBoard;
 
     pkt::core::player::PlayerList mySeatsList;
-    pkt::core::player::PlayerList myActivePlayerList;  // used seats
-    pkt::core::player::PlayerList myRunningPlayerList; // nonfolded and nonallin active players
+    pkt::core::player::PlayerList myRunningPlayersList; // nonfolded and nonallin active players
 
     // start variables
     int myStartQuantityPlayers;

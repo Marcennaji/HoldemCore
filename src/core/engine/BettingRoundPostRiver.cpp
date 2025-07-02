@@ -34,7 +34,7 @@ void BettingRoundPostRiver::postRiverRun()
     PlayerListIterator it;
 
     // who is the winner
-    for (itC = getHand()->getActivePlayerList()->begin(); itC != getHand()->getActivePlayerList()->end(); ++itC)
+    for (itC = getHand()->getSeatsList()->begin(); itC != getHand()->getSeatsList()->end(); ++itC)
     {
 
         if ((*itC)->getAction() != PlayerActionFold && (*itC)->getCardsValueInt() > myHighestCardsValue)
@@ -45,7 +45,7 @@ void BettingRoundPostRiver::postRiverRun()
 
     int potPlayers = 0;
 
-    for (itC = getHand()->getActivePlayerList()->begin(); itC != getHand()->getActivePlayerList()->end(); ++itC)
+    for (itC = getHand()->getSeatsList()->begin(); itC != getHand()->getSeatsList()->end(); ++itC)
     {
         if ((*itC)->getAction() != PlayerActionFold)
         {
@@ -61,7 +61,7 @@ void BettingRoundPostRiver::postRiverRun()
 
     bool pauseHand = false;
     int nonfoldPlayersCounter = 0;
-    for (itC = getHand()->getActivePlayerList()->begin(); itC != getHand()->getActivePlayerList()->end(); ++itC)
+    for (itC = getHand()->getSeatsList()->begin(); itC != getHand()->getSeatsList()->end(); ++itC)
     {
         if ((*itC)->getAction() != PlayerActionFold)
         {
@@ -73,9 +73,9 @@ void BettingRoundPostRiver::postRiverRun()
         }
     }
 
-    GlobalServices::instance().rankingStore()->updateRankingGameLosers(getHand()->getActivePlayerList());
-    GlobalServices::instance().rankingStore()->updateRankingGameWinner(getHand()->getActivePlayerList());
-    GlobalServices::instance().playersStatisticsStore()->updatePlayersStatistics(getHand()->getActivePlayerList());
+    GlobalServices::instance().rankingStore()->updateRankingGameLosers(getHand()->getSeatsList());
+    GlobalServices::instance().rankingStore()->updateRankingGameWinner(getHand()->getSeatsList());
+    GlobalServices::instance().playersStatisticsStore()->updatePlayersStatistics(getHand()->getSeatsList());
 
     if (myEvents.onPostRiverRunAnimation)
     {
@@ -85,7 +85,7 @@ void BettingRoundPostRiver::postRiverRun()
     if (getHand()->getCardsShown())
     {
         // show cards for players who didn't fold preflop
-        for (itC = getHand()->getActivePlayerList()->begin(); itC != getHand()->getActivePlayerList()->end(); ++itC)
+        for (itC = getHand()->getSeatsList()->begin(); itC != getHand()->getSeatsList()->end(); ++itC)
         {
 
             if ((*itC)->getCurrentHandActions().getPreflopActions().size() > 0 &&

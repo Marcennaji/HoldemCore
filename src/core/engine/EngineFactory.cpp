@@ -26,10 +26,11 @@ EngineFactory::EngineFactory(const GameEvents& events) : myEvents(events)
 EngineFactory::~EngineFactory() = default;
 
 std::shared_ptr<IHand> EngineFactory::createHand(std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
-                                                 pkt::core::player::PlayerList sl, pkt::core::player::PlayerList apl,
-                                                 pkt::core::player::PlayerList rpl, int id, GameData gd, StartData sd)
+                                                 pkt::core::player::PlayerList seats,
+                                                 pkt::core::player::PlayerList runningPlayers, int id, GameData gd,
+                                                 StartData sd)
 {
-    return std::shared_ptr<IHand>(new Hand(myEvents, f, b, sl, apl, rpl, id, gd, sd));
+    return std::shared_ptr<IHand>(new Hand(myEvents, f, b, seats, runningPlayers, id, gd, sd));
 }
 
 std::shared_ptr<IBoard> EngineFactory::createBoard(unsigned dealerPosition)
