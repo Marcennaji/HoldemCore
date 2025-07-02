@@ -67,7 +67,7 @@ void BotPlayer::action()
     }
     else if (myAction == PlayerActionBet)
     {
-        logMessage << myName + " BET " << myBetAmount;
+        logMessage << myName + " BET " << myBetAmount << endl;
     }
     else if (myAction == PlayerActionRaise)
     {
@@ -94,16 +94,37 @@ void BotPlayer::action()
         logMessage << "undefined ?";
     }
 
-    GlobalServices::instance().logger()->info(logMessage.str() + '\n');
+    GlobalServices::instance().logger()->info(logMessage.str() + (myAction == PlayerActionFold ? "\n" : ""));
 
+    if (myAction != PlayerActionFold)
+    {
+        if (currentHand->getCurrentRoundState() == GameStatePreflop)
+        {
+            GlobalServices::instance().logger()->info(
+                "--> Preflop estimated range : " + myRangeEstimator->getEstimatedRange() + '\n');
+        }
+        else if (currentHand->getCurrentRoundState() == GameStateFlop)
+        {
+            GlobalServices::instance().logger()->verbose(
+                "--> Flop estimated range : " + myRangeEstimator->getEstimatedRange() + '\n');
+        }
+        else if (currentHand->getCurrentRoundState() == GameStateTurn)
+        {
+            GlobalServices::instance().logger()->verbose(
+                "--> Turn estimated range : " + myRangeEstimator->getEstimatedRange() + '\n');
+        }
+        else if (currentHand->getCurrentRoundState() == GameStateRiver)
+        {
+            GlobalServices::instance().logger()->verbose(
+                "--> River estimated range : " + myRangeEstimator->getEstimatedRange() + '\n');
+        }
+    }
     currentHand->setPreviousPlayerId(myID);
 
     if (myEvents.onActivePlayerActionDone)
     {
         myEvents.onActivePlayerActionDone();
     }
-
-    // currentHand->getGuiInterface()->showCards(myID);//test
 }
 
 void BotPlayer::doPreflopAction()

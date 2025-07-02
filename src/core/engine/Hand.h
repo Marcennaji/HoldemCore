@@ -99,8 +99,7 @@ class Hand : public IHand
     const GameEvents& getEvents() const { return myEvents; }
 
   protected:
-    pkt::core::player::PlayerListIterator getSeatIt(unsigned) const;
-    pkt::core::player::PlayerListIterator getActivePlayerIt(unsigned) const;
+    pkt::core::player::PlayerListIterator getSeatsIt(unsigned) const;
     pkt::core::player::PlayerListIterator getRunningPlayerIt(unsigned) const;
     void updateRunningPlayersList();
 

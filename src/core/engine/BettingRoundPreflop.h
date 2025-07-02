@@ -6,7 +6,7 @@
 
 #include "BettingRound.h"
 
-#include <iostream>
+#include "core/player/typedefs.h"
 
 namespace pkt::core
 {
@@ -20,5 +20,14 @@ class BettingRoundPreflop : public BettingRound
     ~BettingRoundPreflop();
 
     void run();
+
+  private:
+    void handleFirstRunPreflop();
+    void handleMultiPlayerFirstRun(pkt::core::player::PlayerListIterator bigBlindPositionIt);
+    void handleHeadsUpFirstRun(pkt::core::player::PlayerListIterator bigBlindPositionIt);
+    void findLastActivePlayerBeforeSmallBlind();
+    bool checkAllHighestSet();
+    void proceedToFlop();
+    void handleNextPlayerTurn();
 };
 } // namespace pkt::core

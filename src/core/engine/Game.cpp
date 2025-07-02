@@ -115,7 +115,7 @@ void Game::initHand()
                                           myGameData, myStartData);
 
     bool nextDealerFound = false;
-    PlayerListConstIterator dealerPositionIt = myCurrentHand->getSeatIt(myDealerPosition);
+    PlayerListConstIterator dealerPositionIt = myCurrentHand->getSeatsIt(myDealerPosition);
     if (dealerPositionIt == mySeatsList->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
@@ -130,7 +130,7 @@ void Game::initHand()
             dealerPositionIt = mySeatsList->begin();
         }
 
-        itC = myCurrentHand->getActivePlayerIt((*dealerPositionIt)->getId());
+        itC = myCurrentHand->getSeatsIt((*dealerPositionIt)->getId());
         if (itC != mySeatsList->end())
         {
             nextDealerFound = true;

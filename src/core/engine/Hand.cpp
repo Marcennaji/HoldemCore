@@ -32,7 +32,8 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
 
 {
 
-    GlobalServices::instance().logger()->verbose("\n-------------------------------------------------------------\n");
+    GlobalServices::instance().logger()->verbose(
+        "\n----------------------  NEW HAND -------------------------------\n");
 
     for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
@@ -159,7 +160,7 @@ void Hand::assignButtons()
     }
 
     // assign dealer button
-    it = getSeatIt(myDealerPosition);
+    it = getSeatsIt(myDealerPosition);
     if (it == mySeatsList->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
@@ -169,7 +170,7 @@ void Hand::assignButtons()
     // assign Small Blind next to dealer. ATTENTION: in heads up it is big blind
     // assign big blind next to small blind. ATTENTION: in heads up it is small blind
     bool nextActivePlayerFound = false;
-    PlayerListIterator dealerPositionIt = getSeatIt(myDealerPosition);
+    PlayerListIterator dealerPositionIt = getSeatsIt(myDealerPosition);
     if (dealerPositionIt == mySeatsList->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
@@ -184,7 +185,7 @@ void Hand::assignButtons()
             dealerPositionIt = mySeatsList->begin();
         }
 
-        it = getActivePlayerIt((*dealerPositionIt)->getId());
+        it = getSeatsIt((*dealerPositionIt)->getId());
         if (it != mySeatsList->end())
         {
             nextActivePlayerFound = true;
@@ -303,7 +304,7 @@ void Hand::updateRunningPlayersList()
                 "Removing player: " + (*it)->getName() +
                 " from myRunningPlayersList due to action: " + playerActionToString((*it)->getAction()));
 
-            it = myRunningPlayersList->erase(it); // Safely erase and update iterator
+            it = myRunningPlayersList->erase(it);
 
             if (!myRunningPlayersList->empty())
             {
@@ -458,7 +459,7 @@ void Hand::resolveHandConditions()
     }
 
     // Unhighlight current player's groupbox
-    itC = getActivePlayerIt(myPreviousPlayerId);
+    itC = getSeatsIt(myPreviousPlayerId);
     if (itC != mySeatsList->end())
     {
         if (myEvents.onRefreshPlayersActiveInactiveStyles)
@@ -526,23 +527,7 @@ void Hand::resolveHandConditions()
     GlobalServices::instance().logger()->verbose("Exiting resolveHandConditions()");
 }
 
-PlayerListIterator Hand::getSeatIt(unsigned uniqueId) const
-{
-
-    PlayerListIterator it;
-
-    for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
-    {
-        if ((*it)->getId() == uniqueId)
-        {
-            break;
-        }
-    }
-
-    return it;
-}
-
-PlayerListIterator Hand::getActivePlayerIt(unsigned uniqueId) const
+PlayerListIterator Hand::getSeatsIt(unsigned uniqueId) const
 {
 
     PlayerListIterator it;
@@ -589,8 +574,8 @@ PlayerListIterator Hand::getRunningPlayerIt(unsigned uniqueId) const
 
     if (it == myRunningPlayersList->end())
     {
-        GlobalServices::instance().logger()->error("Player with uniqueId: " + std::to_string(uniqueId) +
-                                                   " not found in myRunningPlayersList.");
+        GlobalServices::instance().logger()->verbose("Player with uniqueId: " + std::to_string(uniqueId) +
+                                                     " not found in myRunningPlayersList.");
         return myRunningPlayersList->end();
     }
 

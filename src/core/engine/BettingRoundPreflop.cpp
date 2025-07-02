@@ -28,98 +28,123 @@ BettingRoundPreflop::~BettingRoundPreflop() = default;
 
 void BettingRoundPreflop::run()
 {
-
     if (getFirstRun())
     {
         GlobalServices::instance().logger()->info(
             "\n\n************************* PREFLOP *************************\n\n");
-        PlayerListIterator it;
-
-        // search bigBlindPosition in runningPlayerList
-        PlayerListIterator bigBlindPositionIt = getHand()->getRunningPlayerIt(getBigBlindPositionId());
-
-        // more than 2 players are still active -> runningPlayerList is not empty
-        if (getHand()->getSeatsList()->size() > 2)
-        {
-
-            // bigBlindPlayer not found in runningPlayerList (he is all in) -> bigBlindPlayer is not the running player
-            // before first action player
-            if (bigBlindPositionIt == getHand()->getRunningPlayersList()->end())
-            {
-
-                // search smallBlindPosition in runningPlayerList
-                PlayerListIterator smallBlindPositionIt = getHand()->getRunningPlayerIt(getSmallBlindPositionId());
-
-                // smallBlindPlayer not found in runningPlayerList (he is all in) -> next active player before
-                // smallBlindPlayer is running player before first action player
-                if (smallBlindPositionIt == getHand()->getRunningPlayersList()->end())
-                {
-
-                    it = getHand()->getActivePlayerIt(getSmallBlindPositionId());
-                    if (it == getHand()->getSeatsList()->end())
-                    {
-                        throw Exception(__FILE__, __LINE__, EngineError::ActivePlayerNotFound);
-                    }
-
-                    if (it == getHand()->getSeatsList()->begin())
-                    {
-                        it = getHand()->getSeatsList()->end();
-                    }
-                    --it;
-
-                    setFirstRoundLastPlayersTurnId((*it)->getId());
-                }
-                // smallBlindPlayer found in runningPlayerList -> running player before first action player
-                else
-                {
-                    setFirstRoundLastPlayersTurnId(getSmallBlindPositionId());
-                }
-            }
-            // bigBlindPlayer found in runningPlayerList -> player before first action player
-            else
-            {
-                setFirstRoundLastPlayersTurnId(getBigBlindPositionId());
-            }
-        }
-        // heads up -> dealer/smallBlindPlayer is first action player and bigBlindPlayer is player before
-        else
-        {
-
-            // bigBlindPlayer not found in runningPlayerList (he is all in) -> only smallBlind has to choose fold or
-            // call the bigBlindAmount
-            if (bigBlindPositionIt == getHand()->getRunningPlayersList()->end())
-            {
-
-                // search smallBlindPosition in runningPlayerList
-                PlayerListIterator smallBlindPositionIt = getHand()->getRunningPlayerIt(getSmallBlindPositionId());
-
-                // smallBlindPlayer not found in runningPlayerList (he is all in) -> no running player -> showdown and
-                // no firstRoundLastPlayersTurnId is used
-                if (smallBlindPositionIt == getHand()->getRunningPlayersList()->end())
-                {
-                }
-                // smallBlindPlayer found in runningPlayerList -> running player before first action player (himself)
-                else
-                {
-                    setFirstRoundLastPlayersTurnId(getSmallBlindPositionId());
-                }
-            }
-            else
-            {
-                setFirstRoundLastPlayersTurnId(getBigBlindPositionId());
-            }
-        }
-
-        setCurrentPlayersTurnId(getFirstRoundLastPlayersTurnId());
-
-        setFirstRun(false);
+        handleFirstRunPreflop();
     }
 
-    bool allHighestSet = true;
-    PlayerListConstIterator itC;
+    if (checkAllHighestSet())
+    {
+        proceedToFlop();
+    }
+    else
+    {
+        handleNextPlayerTurn();
+    }
+}
 
-    // check if all running players have same sets (else allHighestSet = false)
-    for (itC = getHand()->getRunningPlayersList()->begin(); itC != getHand()->getRunningPlayersList()->end(); ++itC)
+void BettingRoundPreflop::handleFirstRunPreflop()
+{
+    GlobalServices::instance().logger()->verbose("Handling first run of preflop.");
+
+    PlayerListIterator bigBlindPositionIt = getHand()->getRunningPlayerIt(getBigBlindPositionId());
+
+    if (getHand()->getSeatsList()->size() > 2)
+    {
+        handleMultiPlayerFirstRun(bigBlindPositionIt);
+    }
+    else
+    {
+        handleHeadsUpFirstRun(bigBlindPositionIt);
+    }
+
+    setCurrentPlayersTurnId(getFirstRoundLastPlayersTurnId());
+    setFirstRun(false);
+
+    GlobalServices::instance().logger()->verbose("First run of preflop completed. Current player's turn ID: " +
+                                                 std::to_string(getCurrentPlayersTurnId()));
+}
+
+void BettingRoundPreflop::handleMultiPlayerFirstRun(PlayerListIterator bigBlindPositionIt)
+{
+    GlobalServices::instance().logger()->verbose("Handling first run for multi-player preflop.");
+
+    if (bigBlindPositionIt == getHand()->getRunningPlayersList()->end())
+    {
+        PlayerListIterator smallBlindPositionIt = getHand()->getRunningPlayerIt(getSmallBlindPositionId());
+
+        if (smallBlindPositionIt == getHand()->getRunningPlayersList()->end())
+        {
+            findLastActivePlayerBeforeSmallBlind();
+        }
+        else
+        {
+            setFirstRoundLastPlayersTurnId(getSmallBlindPositionId());
+            GlobalServices::instance().logger()->verbose("Small blind is the last player before the first action.");
+        }
+    }
+    else
+    {
+        setFirstRoundLastPlayersTurnId(getBigBlindPositionId());
+        GlobalServices::instance().logger()->verbose("Big blind is the last player before the first action.");
+    }
+}
+
+void BettingRoundPreflop::handleHeadsUpFirstRun(PlayerListIterator bigBlindPositionIt)
+{
+    GlobalServices::instance().logger()->verbose("Handling first run for heads-up preflop.");
+
+    if (bigBlindPositionIt == getHand()->getRunningPlayersList()->end())
+    {
+        PlayerListIterator smallBlindPositionIt = getHand()->getRunningPlayerIt(getSmallBlindPositionId());
+
+        if (smallBlindPositionIt == getHand()->getRunningPlayersList()->end())
+        {
+            GlobalServices::instance().logger()->verbose("No running players found. Heads-up showdown.");
+        }
+        else
+        {
+            setFirstRoundLastPlayersTurnId(getSmallBlindPositionId());
+            GlobalServices::instance().logger()->verbose("Small blind is the last player before the first action.");
+        }
+    }
+    else
+    {
+        setFirstRoundLastPlayersTurnId(getBigBlindPositionId());
+        GlobalServices::instance().logger()->verbose("Big blind is the last player before the first action.");
+    }
+}
+
+void BettingRoundPreflop::findLastActivePlayerBeforeSmallBlind()
+{
+    GlobalServices::instance().logger()->verbose("Finding the last active player before the small blind.");
+
+    PlayerListIterator it = getHand()->getSeatsIt(getSmallBlindPositionId());
+    if (it == getHand()->getSeatsList()->end())
+    {
+        throw Exception(__FILE__, __LINE__, EngineError::ActivePlayerNotFound);
+    }
+
+    if (it == getHand()->getSeatsList()->begin())
+    {
+        it = getHand()->getSeatsList()->end();
+    }
+    --it;
+
+    setFirstRoundLastPlayersTurnId((*it)->getId());
+    GlobalServices::instance().logger()->verbose("Last active player before small blind found. Player ID: " +
+                                                 std::to_string(getFirstRoundLastPlayersTurnId()));
+}
+
+bool BettingRoundPreflop::checkAllHighestSet()
+{
+    GlobalServices::instance().logger()->verbose("Checking if all running players have the highest set.");
+
+    bool allHighestSet = true;
+    for (PlayerListConstIterator itC = getHand()->getRunningPlayersList()->begin();
+         itC != getHand()->getRunningPlayersList()->end(); ++itC)
     {
         if (getHighestSet() != (*itC)->getSet())
         {
@@ -128,7 +153,56 @@ void BettingRoundPreflop::run()
         }
     }
 
-    // determine next player
+    GlobalServices::instance().logger()->verbose("All highest set check result: " + std::to_string(allHighestSet));
+    return allHighestSet;
+}
+
+void BettingRoundPreflop::proceedToFlop()
+{
+    GlobalServices::instance().logger()->verbose("Proceeding to the flop.");
+
+    getHand()->setCurrentRoundState(GameStateFlop);
+
+    for (PlayerListConstIterator itC = getHand()->getRunningPlayersList()->begin();
+         itC != getHand()->getRunningPlayersList()->end(); ++itC)
+    {
+        (*itC)->setAction(PlayerActionNone);
+    }
+
+    getHand()->getBoard()->collectSets();
+    getHand()->getBoard()->collectPot();
+
+    if (myEvents.onPotUpdated)
+    {
+        myEvents.onPotUpdated(getHand()->getBoard()->getPot());
+    }
+
+    if (myEvents.onRefreshSet)
+    {
+        myEvents.onRefreshSet();
+    }
+
+    if (myEvents.onRefreshCash)
+    {
+        myEvents.onRefreshCash();
+    }
+
+    for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
+    {
+        if (myEvents.onRefreshAction)
+        {
+            myEvents.onRefreshAction(i, PlayerActionNone);
+        }
+    }
+
+    getHand()->resolveHandConditions();
+    GlobalServices::instance().logger()->verbose("Flop setup completed.");
+}
+
+void BettingRoundPreflop::handleNextPlayerTurn()
+{
+    GlobalServices::instance().logger()->verbose("Determining the next player's turn.");
+
     PlayerListConstIterator currentPlayersTurnIt = getHand()->getRunningPlayerIt(getCurrentPlayersTurnId());
     if (currentPlayersTurnIt == getHand()->getRunningPlayersList()->end())
     {
@@ -143,84 +217,44 @@ void BettingRoundPreflop::run()
 
     setCurrentPlayersTurnId((*currentPlayersTurnIt)->getId());
 
-    if (!getFirstRound() && allHighestSet && getHand()->getRunningPlayersList()->size() != 1)
+    if (getCurrentPlayersTurnId() == getFirstRoundLastPlayersTurnId())
     {
+        setFirstRound(false);
+    }
 
-        getHand()->setCurrentRoundState(GameStateFlop);
+    currentPlayersTurnIt = getHand()->getRunningPlayerIt(getCurrentPlayersTurnId());
+    if (currentPlayersTurnIt == getHand()->getRunningPlayersList()->end())
+    {
+        throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
+    }
+    (*currentPlayersTurnIt)->setTurn(true);
 
-        for (itC = getHand()->getRunningPlayersList()->begin(); itC != getHand()->getRunningPlayersList()->end(); ++itC)
+    if (myEvents.onRefreshPlayersActiveInactiveStyles)
+    {
+        myEvents.onRefreshPlayersActiveInactiveStyles(getCurrentPlayersTurnId(), 2);
+    }
+
+    if (myEvents.onRefreshAction)
+    {
+        myEvents.onRefreshAction(getCurrentPlayersTurnId(), PlayerActionNone);
+    }
+
+    if ((*currentPlayersTurnIt)->getName() == HumanPlayer::getName())
+    {
+        if (myEvents.onDoHumanAction)
         {
-            (*itC)->setAction(PlayerActionNone);
+            myEvents.onDoHumanAction();
         }
-
-        getHand()->getBoard()->collectSets();
-        getHand()->getBoard()->collectPot();
-
-        if (myEvents.onPotUpdated)
-        {
-            myEvents.onPotUpdated(getHand()->getBoard()->getPot());
-        }
-
-        if (myEvents.onRefreshSet)
-        {
-            myEvents.onRefreshSet();
-        }
-
-        if (myEvents.onRefreshCash)
-        {
-            myEvents.onRefreshCash();
-        }
-
-        for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
-        {
-            if (myEvents.onRefreshAction)
-            {
-                myEvents.onRefreshAction(i, PlayerActionNone);
-            }
-        }
-
-        getHand()->resolveHandConditions();
     }
     else
     {
-        // lastPlayersTurn -> PreflopFirstRound is over
-        if (getCurrentPlayersTurnId() == getFirstRoundLastPlayersTurnId())
+        if (myEvents.onBettingRoundAnimation)
         {
-            setFirstRound(false);
-        }
-
-        currentPlayersTurnIt = getHand()->getRunningPlayerIt(getCurrentPlayersTurnId());
-        if (currentPlayersTurnIt == getHand()->getRunningPlayersList()->end())
-        {
-            throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
-        }
-        (*currentPlayersTurnIt)->setTurn(true);
-
-        // highlight active players groupbox and clear action
-        if (myEvents.onRefreshPlayersActiveInactiveStyles)
-        {
-            myEvents.onRefreshPlayersActiveInactiveStyles(getCurrentPlayersTurnId(), 2);
-        }
-
-        if (myEvents.onRefreshAction)
-        {
-            myEvents.onRefreshAction(getCurrentPlayersTurnId(), PlayerActionNone);
-        }
-
-        if ((*currentPlayersTurnIt)->getName() == HumanPlayer::getName())
-        {
-            if (myEvents.onDoHumanAction)
-            {
-                myEvents.onDoHumanAction();
-            }
-        }
-        else
-        {
-            if (myEvents.onBettingRoundAnimation)
-            {
-                myEvents.onBettingRoundAnimation(getBettingRoundID());
-            }
+            myEvents.onBettingRoundAnimation(getBettingRoundID());
         }
     }
+
+    GlobalServices::instance().logger()->verbose("Next player's turn determined. Player ID: " +
+                                                 std::to_string(getCurrentPlayersTurnId()));
 }
 } // namespace pkt::core

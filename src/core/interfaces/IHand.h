@@ -84,8 +84,7 @@ class IHand
     virtual int getTurnLastRaiserId() = 0;
     virtual void setTurnLastRaiserId(int id) = 0;
 
-    virtual pkt::core::player::PlayerListIterator getSeatIt(unsigned) const = 0;
-    virtual pkt::core::player::PlayerListIterator getActivePlayerIt(unsigned) const = 0;
+    virtual pkt::core::player::PlayerListIterator getSeatsIt(unsigned) const = 0;
     virtual pkt::core::player::PlayerListIterator getRunningPlayerIt(unsigned) const = 0;
 
     friend class Game;

@@ -76,6 +76,7 @@ class BettingRound : public IBettingRound
 
   private:
     // helpers
+    unsigned findNextEligiblePlayerFromSmallBlind();
     void handleFirstRunGui();
     void handleFirstRun();
     void logBoardCards();

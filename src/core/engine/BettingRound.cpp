@@ -38,7 +38,7 @@ BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int
     }
     if (itC == myHand->getSeatsList()->end())
     {
-        GlobalServices::instance().logger()->error("ACTIVE_PLAYER_NOT_FOUND");
+        GlobalServices::instance().logger()->error("BB player not found in the seats list");
     }
 
     // determine smallBlindPosition
@@ -52,7 +52,12 @@ BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int
     }
     if (itC == myHand->getSeatsList()->end())
     {
-        GlobalServices::instance().logger()->error("ACTIVE_PLAYER_NOT_FOUND");
+        GlobalServices::instance().logger()->error("SB player not found in the seats list");
+    }
+    else
+    {
+        GlobalServices::instance().logger()->info("SB player found: " + (*itC)->getName() +
+                                                  " with ID: " + std::to_string(mySmallBlindPositionId));
     }
 }
 
@@ -105,7 +110,7 @@ void BettingRound::run()
 
     if (!myFirstRound && allHighestSet)
     {
-        GlobalServices::instance().logger()->verbose("all bets are done, proceeding to next betting round");
+        GlobalServices::instance().logger()->info("all bets are done, proceeding to next betting round");
         proceedToNextBettingRound();
     }
     else
@@ -126,7 +131,7 @@ void BettingRound::run()
 
         myCurrentPlayersTurnId = (*currentPlayersTurnIt)->getId();
 
-        // highlight active players groupbox and clear action
+        // send event to UI to refresh players' styles
         if (myEvents.onRefreshPlayersActiveInactiveStyles)
         {
             myEvents.onRefreshPlayersActiveInactiveStyles(myCurrentPlayersTurnId, 2);
@@ -183,6 +188,37 @@ bool BettingRound::allBetsAreDone() const
     return true;
 }
 
+unsigned BettingRound::findNextEligiblePlayerFromSmallBlind()
+{
+    GlobalServices::instance().logger()->verbose("Finding the next eligible player starting from the small blind.");
+
+    PlayerListIterator it = myHand->getSeatsIt(mySmallBlindPositionId);
+    if (it == myHand->getSeatsList()->end())
+    {
+        throw Exception(__FILE__, __LINE__, EngineError::ActivePlayerNotFound);
+    }
+
+    // Iterate through the seats list to find the next eligible player
+    for (size_t i = 0; i < myHand->getSeatsList()->size(); ++i)
+    {
+        ++it;
+        if (it == myHand->getSeatsList()->end())
+        {
+            it = myHand->getSeatsList()->begin(); // Wrap around to the beginning
+        }
+
+        PlayerListIterator runningPlayerIt = myHand->getRunningPlayerIt((*it)->getId());
+        if (runningPlayerIt != myHand->getRunningPlayersList()->end())
+        {
+            GlobalServices::instance().logger()->info("Next eligible player found: " + (*it)->getName() +
+                                                      " with ID: " + std::to_string((*it)->getId()));
+            return (*it)->getId();
+        }
+    }
+
+    throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
+}
+
 void BettingRound::proceedToNextBettingRound()
 {
     PlayerListIterator itC;
@@ -192,6 +228,23 @@ void BettingRound::proceedToNextBettingRound()
     {
         (*itC)->setAction(PlayerActionNone);
     }
+    PlayerListIterator smallBlindIt = myHand->getRunningPlayerIt(mySmallBlindPositionId);
+    if (smallBlindIt != myHand->getRunningPlayersList()->end())
+    {
+        // Small blind is still in the game
+        myCurrentPlayersTurnId = mySmallBlindPositionId;
+        GlobalServices::instance().logger()->info(
+            "myCurrentPlayersTurnId set to Small Blind (ID: " + std::to_string(myCurrentPlayersTurnId) + ")");
+    }
+    else
+    {
+        // Small blind is not in the game, find the next eligible player
+        GlobalServices::instance().logger()->info(
+            "Small Blind (ID: " + std::to_string(mySmallBlindPositionId) +
+            ") is not in the running players list. Finding the next eligible player.");
+        myCurrentPlayersTurnId = findNextEligiblePlayerFromSmallBlind();
+    }
+    GlobalServices::instance().logger()->info("myCurrentPlayersTurnId: " + std::to_string(myCurrentPlayersTurnId));
 
     myHand->getBoard()->collectSets();
     myHand->getBoard()->collectPot();
@@ -281,14 +334,17 @@ void BettingRound::handleFirstRun()
 
         // running player before smallBlind
         bool formerRunningPlayerFound = false;
+
         if (myHand->getSeatsList()->size() > 2)
         {
-            it1 = myHand->getActivePlayerIt(mySmallBlindPositionId);
+            // Start from the small blind position
+            it1 = myHand->getSeatsIt(mySmallBlindPositionId);
             if (it1 == myHand->getSeatsList()->end())
             {
                 GlobalServices::instance().logger()->error("ACTIVE_PLAYER_NOT_FOUND");
             }
 
+            // Iterate backward to find the last running player before the small blind
             for (size_t i = 0; i < myHand->getSeatsList()->size(); i++)
             {
                 if (it1 == myHand->getSeatsList()->begin())
@@ -296,6 +352,7 @@ void BettingRound::handleFirstRun()
                     it1 = myHand->getSeatsList()->end();
                 }
                 --it1;
+
                 GlobalServices::instance().logger()->verbose("handleFirstRun : finding running player");
 
                 it2 = myHand->getRunningPlayerIt((*it1)->getId());
@@ -307,17 +364,35 @@ void BettingRound::handleFirstRun()
                     break;
                 }
             }
+
             if (!formerRunningPlayerFound)
             {
                 GlobalServices::instance().logger()->error("FORMER_RUNNING_PLAYER_NOT_FOUND");
             }
         }
-        // heads up: bigBlind begins -> dealer/smallBlind is running player before bigBlind
         else
         {
-            myFirstRoundLastPlayersTurnId = mySmallBlindPositionId;
+            // Heads-up: Small blind acts first if they are still in the game
+            PlayerListIterator smallBlindIt = myHand->getRunningPlayerIt(mySmallBlindPositionId);
+            if (smallBlindIt != myHand->getRunningPlayersList()->end())
+            {
+                myFirstRoundLastPlayersTurnId = mySmallBlindPositionId;
+                GlobalServices::instance().logger()->verbose(
+                    "handleFirstRun: Small blind is running player before big blind.");
+            }
+            else
+            {
+                // If small blind is not in the game, set to big blind
+                myFirstRoundLastPlayersTurnId = myBigBlindPositionId;
+                GlobalServices::instance().logger()->info(
+                    "handleFirstRun: Small blind is not in the game. Setting to big blind.");
+            }
         }
+
+        // Set the current player's turn to the determined player
         myCurrentPlayersTurnId = myFirstRoundLastPlayersTurnId;
+        GlobalServices::instance().logger()->verbose("handleFirstRun: First player's turn set to ID: " +
+                                                     std::to_string(myCurrentPlayersTurnId));
     }
 }
 GameState BettingRound::getBettingRoundID() const
