@@ -23,8 +23,7 @@ using namespace std;
 using namespace pkt::core::player;
 
 Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
-           pkt::core::player::PlayerList seats, PlayerList runningPlayers, int handId, GameData gameData,
-           StartData startData)
+           PlayerList seats, PlayerList runningPlayers, int handId, GameData gameData, StartData startData)
     : myEvents(events), myFactory(factory), myBoard(board), mySeatsList(seats), myRunningPlayersList(runningPlayers),
       myStartQuantityPlayers(startData.numberOfPlayers), myDealerPosition(startData.startDealerPlayerId),
       mySmallBlindPosition(startData.startDealerPlayerId), myBigBlindPosition(startData.startDealerPlayerId),
@@ -33,7 +32,7 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
 {
 
     GlobalServices::instance().logger()->verbose(
-        "\n----------------------  NEW HAND -------------------------------\n");
+        "\n----------------------  New hand initialization  -------------------------------\n");
 
     for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {

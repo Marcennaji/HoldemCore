@@ -20,7 +20,8 @@ class EngineTest : public ::testing::Test
     std::shared_ptr<pkt::core::EngineFactory> myFactory;
     std::shared_ptr<pkt::core::IHand> myHand;
     std::shared_ptr<pkt::core::IBoard> myBoard;
-    std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::Player>>> myPlayerList;
+    std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::Player>>> mySeatsList;
+    std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::Player>>> myRunningPlayersList;
 
     void SetUp() override;
 
@@ -30,7 +31,7 @@ class EngineTest : public ::testing::Test
 
   private:
     // Helper function to create a PlayerList with mock players
-    void createPlayerList(size_t playerCount);
+    void createPlayersLists(size_t playerCount);
     void initializeHandWithPlayers(size_t activePlayerCount);
 
     const int startDealerPlayerId{0}; // Starting dealer player ID, can be set to any valid player ID

@@ -77,8 +77,9 @@ class BettingRound : public IBettingRound
   private:
     // helpers
     unsigned findNextEligiblePlayerFromSmallBlind();
-    void handleFirstRunGui();
     void handleFirstRun();
+    unsigned getPreviousRunningPlayerId(unsigned currentPlayerId,
+                                        pkt::core::player::PlayerList runningPlayersList) const;
     void logBoardCards();
     bool allBetsAreDone() const;
     void proceedToNextBettingRound();

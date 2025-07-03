@@ -50,8 +50,17 @@ Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, con
     mySeatsList.reset(new std::list<std::shared_ptr<Player>>);
     myRunningPlayersList.reset(new std::list<std::shared_ptr<Player>>);
 
-    (*myRunningPlayersList) = (*playersList);
-    (*mySeatsList) = (*playersList);
+    // Create a deep copy of playersList for mySeatsList
+    for (const auto& player : *playersList)
+    {
+        mySeatsList->push_back(player);
+    }
+
+    // Create a separate deep copy of playersList for myRunningPlayersList
+    for (const auto& player : *playersList)
+    {
+        myRunningPlayersList->push_back(player);
+    }
 
     myCurrentBoard->setSeatsList(mySeatsList);
     myCurrentBoard->setRunningPlayersList(myRunningPlayersList);

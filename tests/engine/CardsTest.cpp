@@ -57,28 +57,28 @@ TEST_F(CardsTest, DealBoardCardsAndHoleCards_NoOverlap_2Players_FullTest)
 {
     initializeHandForTesting(2);
     myHand->dealHoleCards(myHand->dealBoardCards());
-    ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, myPlayerList));
+    ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
 }
 
 TEST_F(CardsTest, DealBoardCardsAndHoleCards_NoOverlap_3Players)
 {
     initializeHandForTesting(3);
     myHand->dealHoleCards(myHand->dealBoardCards());
-    ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, myPlayerList));
+    ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
 }
 
 TEST_F(CardsTest, DealBoardCardsAndHoleCards_NoOverlap_1Player)
 {
     initializeHandForTesting(1);
     myHand->dealHoleCards(myHand->dealBoardCards());
-    ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, myPlayerList));
+    ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
 }
 
 TEST_F(CardsTest, DealBoardCardsAndHoleCards_NoOverlap_MaxPlayers)
 {
     initializeHandForTesting(MAX_NUMBER_OF_PLAYERS);
     myHand->dealHoleCards(myHand->dealBoardCards());
-    ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, myPlayerList));
+    ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
 }
 
 TEST_F(CardsTest, AllDealtCards_AreWithinValidRange_4Players)
@@ -94,7 +94,7 @@ TEST_F(CardsTest, AllDealtCards_AreWithinValidRange_4Players)
         ASSERT_LT(card, 52);
     }
     int cards[2];
-    for (const auto& player : *myPlayerList)
+    for (const auto& player : *mySeatsList)
     {
         player->getCards(cards);
         ASSERT_GE(cards[0], 0);
@@ -110,7 +110,7 @@ TEST_F(CardsTest, DealCards_NoOverlap_OverMultipleRounds)
     {
         initializeHandForTesting(6);
         myHand->dealHoleCards(myHand->dealBoardCards());
-        ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, myPlayerList));
+        ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
     }
 }
 

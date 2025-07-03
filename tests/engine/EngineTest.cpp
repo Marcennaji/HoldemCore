@@ -20,7 +20,9 @@ void EngineTest::SetUp()
 {
     myFactory = std::make_shared<EngineFactory>(myEvents);
     auto& services = pkt::core::GlobalServices::instance();
-    services.setLogger(std::make_shared<pkt::infra::ConsoleLogger>());
+    auto logger = std::make_shared<pkt::infra::ConsoleLogger>();
+    logger->setLogLevel(pkt::core::LogLevel::Info);
+    services.setLogger(logger);
     services.setHandEvaluationEngine(std::make_shared<pkt::infra::PsimHandEvaluationEngine>());
 }
 
@@ -31,25 +33,31 @@ void EngineTest::TearDown()
 void EngineTest::initializeHandForTesting(size_t activePlayerCount)
 {
     myHand.reset();
-    createPlayerList(activePlayerCount);
+    createPlayersLists(activePlayerCount);
     initializeHandWithPlayers(activePlayerCount);
 }
 
-void EngineTest::createPlayerList(size_t playerCount)
+void EngineTest::createPlayersLists(size_t playerCount)
 {
-    myPlayerList = std::make_shared<std::list<std::shared_ptr<Player>>>();
+    mySeatsList = std::make_shared<std::list<std::shared_ptr<Player>>>();
     for (size_t i = 0; i < playerCount; ++i)
     {
         auto player = std::make_shared<DummyPlayer>(i, myEvents);
         player->setAction(PlayerActionNone);
-        myPlayerList->push_back(player);
+        mySeatsList->push_back(player);
+    }
+    // Create a deep copy of mySeatsList for RunningPlayersList
+    myRunningPlayersList = std::make_shared<std::list<std::shared_ptr<Player>>>();
+    for (const auto& player : *mySeatsList)
+    {
+        myRunningPlayersList->push_back(player);
     }
 }
 void EngineTest::initializeHandWithPlayers(size_t activePlayerCount)
 {
     myBoard = myFactory->createBoard(startDealerPlayerId);
-    myBoard->setSeatsList(myPlayerList);
-    myBoard->setRunningPlayersList(myPlayerList);
+    myBoard->setSeatsList(mySeatsList);
+    myBoard->setRunningPlayersList(myRunningPlayersList);
 
     GameData gameData;
     gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
@@ -61,8 +69,8 @@ void EngineTest::initializeHandWithPlayers(size_t activePlayerCount)
     startData.startDealerPlayerId = startDealerPlayerId;
     startData.numberOfPlayers = static_cast<int>(activePlayerCount);
 
-    myHand =
-        myFactory->createHand(myFactory, myBoard, myPlayerList, myPlayerList, startDealerPlayerId, gameData, startData);
+    myHand = myFactory->createHand(myFactory, myBoard, mySeatsList, myRunningPlayersList, startDealerPlayerId, gameData,
+                                   startData);
 }
 
 } // namespace pkt::test

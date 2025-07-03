@@ -203,9 +203,19 @@ void BotPlayer::doFlopAction()
                << "\n";
     GlobalServices::instance().logger()->verbose(logMessage.str());
 
-    myBetAmount = myStrategy->flopShouldBet(*myCurrentHandContext);
-    bool shouldCall = myBetAmount ? false : myStrategy->flopShouldCall(*myCurrentHandContext);
-    myRaiseAmount = myBetAmount ? false : myStrategy->flopShouldRaise(*myCurrentHandContext);
+    myBetAmount = 0;
+    myRaiseAmount = 0;
+    bool shouldCall = false;
+
+    if (currentHand->getFlopBetsOrRaisesNumber() == 0)
+    {
+        myBetAmount = myStrategy->flopShouldBet(*myCurrentHandContext);
+    }
+    else
+    {
+        shouldCall = myStrategy->flopShouldCall(*myCurrentHandContext);
+        myRaiseAmount = myStrategy->flopShouldRaise(*myCurrentHandContext);
+    }
 
     if (myRaiseAmount)
     {
@@ -265,9 +275,19 @@ void BotPlayer::doTurnAction()
                << "\n";
     GlobalServices::instance().logger()->verbose(logMessage.str());
 
-    myBetAmount = myStrategy->turnShouldBet(*myCurrentHandContext);
-    bool shouldCall = myBetAmount ? false : myStrategy->turnShouldCall(*myCurrentHandContext);
-    myRaiseAmount = myBetAmount ? false : myStrategy->turnShouldRaise(*myCurrentHandContext);
+    myBetAmount = 0;
+    myRaiseAmount = 0;
+    bool shouldCall = false;
+
+    if (currentHand->getTurnBetsOrRaisesNumber() == 0)
+    {
+        myBetAmount = myStrategy->turnShouldBet(*myCurrentHandContext);
+    }
+    else
+    {
+        shouldCall = myStrategy->turnShouldCall(*myCurrentHandContext);
+        myRaiseAmount = myStrategy->turnShouldRaise(*myCurrentHandContext);
+    }
 
     if (myRaiseAmount)
     {
@@ -327,9 +347,19 @@ void BotPlayer::doRiverAction()
                << "\n";
     GlobalServices::instance().logger()->verbose(logMessage.str());
 
-    myBetAmount = myStrategy->riverShouldBet(*myCurrentHandContext);
-    bool shouldCall = myBetAmount ? false : myStrategy->riverShouldCall(*myCurrentHandContext);
-    myRaiseAmount = myBetAmount ? false : myStrategy->riverShouldRaise(*myCurrentHandContext);
+    myBetAmount = 0;
+    myRaiseAmount = 0;
+    bool shouldCall = false;
+
+    if (currentHand->getRiverBetsOrRaisesNumber() == 0)
+    {
+        myBetAmount = myStrategy->riverShouldBet(*myCurrentHandContext);
+    }
+    else
+    {
+        shouldCall = myStrategy->riverShouldCall(*myCurrentHandContext);
+        myRaiseAmount = myStrategy->riverShouldRaise(*myCurrentHandContext);
+    }
 
     if (myRaiseAmount)
     {

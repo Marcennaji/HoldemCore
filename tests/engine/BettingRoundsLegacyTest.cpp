@@ -29,27 +29,13 @@ void BettingRoundsLegacyTest::SetUp()
 }
 void BettingRoundsLegacyTest::resolveHandConditions()
 {
-    logTestMessage("Calling resolveHandConditions(), current round before: " +
-                   std::to_string(myHand->getCurrentRoundState()));
-
-    assert(myHand->getRunningPlayersList()->size() == myHand->getSeatsList()->size() &&
-           myHand->getRunningPlayersList()->size() == myPlayerList->size());
-
+    logTestMessage("myHand->resolveHandConditions() called");
     myHand->resolveHandConditions();
-
-    logTestMessage("After resolveHandConditions(), current round is: " +
-                   std::to_string(myHand->getCurrentRoundState()));
-
-    assert(myHand->getRunningPlayersList()->size() == myHand->getSeatsList()->size() &&
-           myHand->getRunningPlayersList()->size() == myPlayerList->size());
 }
 
 void BettingRoundsLegacyTest::activePlayerActionDone()
 {
-    // After each player action, check if the betting round is complete
-    // This is done by checking if all bets are done, and if so, proceed to next round
-    // We do this by calling resolveHandConditions which handles special cases
-    // and then checking if the round should progress
+    logTestMessage("resolveHandConditions() called");
     resolveHandConditions();
 }
 
