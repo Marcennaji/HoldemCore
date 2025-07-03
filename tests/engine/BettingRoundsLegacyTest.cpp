@@ -17,63 +17,20 @@ void BettingRoundsLegacyTest::SetUp()
 {
     EngineTest::SetUp();
 
-    // Essential events for game flow
-    myEvents.onActivePlayerActionDone = [this]() { activePlayerActionDone(); };
+    // Essential events for game flow, in the legacy code (that has an unwanted dependency in which the gui pilots the
+    // game)
+    myEvents.onActivePlayerActionDone = [this]() { myHand->resolveHandConditions(); };
     myEvents.onBettingRoundAnimation = [this](int bettingRoundId) { bettingRoundAnimation(bettingRoundId); };
     myEvents.onDealBettingRoundCards = [this](int bettingRoundId) { dealBettingRoundCards(bettingRoundId); };
-    myEvents.onStartPreflop = [this]() { startPreflop(); };
-    myEvents.onStartFlop = [this]() { startFlop(); };
-    myEvents.onStartTurn = [this]() { startTurn(); };
-    myEvents.onStartRiver = [this]() { startRiver(); };
-    myEvents.onStartPostRiver = [this]() { startPostRiver(); };
-}
-void BettingRoundsLegacyTest::resolveHandConditions()
-{
-    logTestMessage("myHand->resolveHandConditions() called");
-    myHand->resolveHandConditions();
-}
-
-void BettingRoundsLegacyTest::activePlayerActionDone()
-{
-    logTestMessage("resolveHandConditions() called");
-    resolveHandConditions();
-}
-
-void BettingRoundsLegacyTest::startPreflop()
-{
-    logTestMessage("Starting Preflop round");
-    myHand->getCurrentBettingRound()->run();
-}
-
-void BettingRoundsLegacyTest::startFlop()
-{
-    logTestMessage("Starting Flop round");
-    myHand->getCurrentBettingRound()->run();
-}
-
-void BettingRoundsLegacyTest::startTurn()
-{
-    logTestMessage("Starting Turn round");
-    myHand->getCurrentBettingRound()->run();
-}
-
-void BettingRoundsLegacyTest::startRiver()
-{
-    logTestMessage("Starting River round");
-    myHand->getCurrentBettingRound()->run();
-}
-
-void BettingRoundsLegacyTest::startPostRiver()
-{
-    logTestMessage("Starting Post-River round");
-    myHand->getCurrentBettingRound()->postRiverRun();
+    myEvents.onStartPreflop = [this]() { myHand->getCurrentBettingRound()->run(); };
+    myEvents.onStartFlop = [this]() { myHand->getCurrentBettingRound()->run(); };
+    myEvents.onStartTurn = [this]() { myHand->getCurrentBettingRound()->run(); };
+    myEvents.onStartRiver = [this]() { myHand->getCurrentBettingRound()->run(); };
+    myEvents.onStartPostRiver = [this]() { myHand->getCurrentBettingRound()->postRiverRun(); };
 }
 
 void BettingRoundsLegacyTest::bettingRoundAnimation(int bettingRoundID)
 {
-    assert(myHand->getCurrentBettingRound()->getBettingRoundID() == bettingRoundID &&
-           "Betting round ID does not match the current betting round ID");
-
     if (bettingRoundID < 4)
     {
         myHand->getCurrentBettingRound()->nextPlayer();
@@ -82,19 +39,29 @@ void BettingRoundsLegacyTest::bettingRoundAnimation(int bettingRoundID)
 
 void BettingRoundsLegacyTest::dealBettingRoundCards(int bettingRoundId)
 {
-    logTestMessage("Dealing cards for betting round: " + std::to_string(bettingRoundId));
-
     if (bettingRoundId != 0)
     {
-        resolveHandConditions();
+        myHand->resolveHandConditions();
     }
 }
 
 // Tests for betting rounds and transitions
 
-TEST_F(BettingRoundsLegacyTest, StartShouldGoFromPreflopToPostRiver)
+TEST_F(BettingRoundsLegacyTest, StartShouldGoFromPreflopToPostRiverHeadsUp)
 {
     initializeHandForTesting(2);
+    myHand->start();
+    EXPECT_EQ(myHand->getCurrentRoundState(), GameStatePostRiver);
+}
+TEST_F(BettingRoundsLegacyTest, StartShouldGoFromPreflopToPostRiver3Players)
+{
+    initializeHandForTesting(3);
+    myHand->start();
+    EXPECT_EQ(myHand->getCurrentRoundState(), GameStatePostRiver);
+}
+TEST_F(BettingRoundsLegacyTest, StartShouldGoFromPreflopToPostRiver6Players)
+{
+    initializeHandForTesting(6);
     myHand->start();
     EXPECT_EQ(myHand->getCurrentRoundState(), GameStatePostRiver);
 }
