@@ -94,7 +94,7 @@ void BettingRoundsLegacyTest::dealBettingRoundCards(int bettingRoundId)
 
 TEST_F(BettingRoundsLegacyTest, StartShouldGoFromPreflopToPostRiver)
 {
-    initializeHandForTesting(3);
+    initializeHandForTesting(2);
     myHand->start();
     EXPECT_EQ(myHand->getCurrentRoundState(), GameStatePostRiver);
 }

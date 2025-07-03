@@ -315,39 +315,48 @@ void BettingRound::handleFirstRun()
         return;
     }
 
-    // Start from the small blind position
-    PlayerListIterator playerIt = myHand->getSeatsIt(mySmallBlindPositionId);
-    if (playerIt == myHand->getSeatsList()->end())
+    // Check if only two players are left
+    if (myHand->getRunningPlayersList()->size() == 2)
     {
-        GlobalServices::instance().logger()->error("Small blind player not found in the seats list.");
-        GlobalServices::instance().logger()->error("mySmallBlindPositionId: " + std::to_string(mySmallBlindPositionId));
-        // display the whoile list of players
-        for (const auto& player : *myHand->getSeatsList())
+        GlobalServices::instance().logger()->verbose("Heads-up scenario detected. Setting first player to act.");
+        for (const auto& player : *myHand->getRunningPlayersList())
         {
-            GlobalServices::instance().logger()->error("Player ID: " + std::to_string(player->getId()) +
-                                                       ", Name: " + player->getName());
+            if (player->getButton() == ButtonBigBlind)
+            {
+                myFirstRoundLastPlayersTurnId = player->getId();
+                GlobalServices::instance().logger()->verbose("handleFirstRun: First player's turn set to ID: " +
+                                                             std::to_string(myFirstRoundLastPlayersTurnId));
+                break;
+            }
         }
-
-        throw Exception(__FILE__, __LINE__, EngineError::ActivePlayerNotFound);
     }
-
-    // Find the next eligible player in the running players list
-    for (size_t i = 0; i < myHand->getSeatsList()->size(); ++i)
+    else
     {
-        PlayerListIterator runningPlayerIt = myHand->getRunningPlayerIt((*playerIt)->getId());
-        if (runningPlayerIt != myHand->getRunningPlayersList()->end())
-        {
-            myFirstRoundLastPlayersTurnId = (*playerIt)->getId();
-            GlobalServices::instance().logger()->verbose("handleFirstRun: First player's turn set to ID: " +
-                                                         std::to_string(myFirstRoundLastPlayersTurnId));
-            break;
-        }
-
-        // Move to the next player
-        ++playerIt;
+        // Multi-player scenario: Start from the small blind position
+        PlayerListIterator playerIt = myHand->getSeatsIt(mySmallBlindPositionId);
         if (playerIt == myHand->getSeatsList()->end())
         {
-            playerIt = myHand->getSeatsList()->begin(); // Wrap around to the beginning
+            throw Exception(__FILE__, __LINE__, EngineError::ActivePlayerNotFound);
+        }
+
+        // Find the next eligible player in the running players list
+        for (size_t i = 0; i < myHand->getSeatsList()->size(); ++i)
+        {
+            PlayerListIterator runningPlayerIt = myHand->getRunningPlayerIt((*playerIt)->getId());
+            if (runningPlayerIt != myHand->getRunningPlayersList()->end())
+            {
+                myFirstRoundLastPlayersTurnId = (*playerIt)->getId();
+                GlobalServices::instance().logger()->verbose("handleFirstRun: First player's turn set to ID: " +
+                                                             std::to_string(myFirstRoundLastPlayersTurnId));
+                break;
+            }
+
+            // Move to the next player
+            ++playerIt;
+            if (playerIt == myHand->getSeatsList()->end())
+            {
+                playerIt = myHand->getSeatsList()->begin(); // Wrap around to the beginning
+            }
         }
     }
 
