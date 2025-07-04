@@ -51,7 +51,7 @@ class IHand
 
     virtual GameState getRoundBeforePostRiver() const = 0;
 
-    virtual int getDealerPosition() const = 0;
+    virtual int getDealerPlayerId() const = 0;
 
     virtual void setSmallBlind(int theValue) = 0;
     virtual int getSmallBlind() const = 0;
@@ -89,8 +89,8 @@ class IHand
     virtual int getTurnLastRaiserId() = 0;
     virtual void setTurnLastRaiserId(int id) = 0;
 
-    virtual pkt::core::player::PlayerListIterator getSeatsIt(unsigned) const = 0;
-    virtual pkt::core::player::PlayerListIterator getRunningPlayerIt(unsigned) const = 0;
+    virtual pkt::core::player::PlayerListIterator getPlayerSeatFromId(unsigned) const = 0;
+    virtual pkt::core::player::PlayerListIterator getRunningPlayerFromId(unsigned) const = 0;
 
     void recordPlayerAction(GameState round, unsigned playerId, const pkt::core::PlayerAction& action)
     {

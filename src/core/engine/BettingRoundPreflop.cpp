@@ -49,7 +49,7 @@ void BettingRoundPreflop::handleFirstRunPreflop()
 {
     GlobalServices::instance().logger()->verbose("Handling first run of preflop.");
 
-    PlayerListIterator bigBlindPositionIt = getHand()->getRunningPlayerIt(getBigBlindPositionId());
+    PlayerListIterator bigBlindPositionIt = getHand()->getRunningPlayerFromId(getBigBlindPositionId());
 
     if (getHand()->getSeatsList()->size() > 2)
     {
@@ -73,7 +73,7 @@ void BettingRoundPreflop::handleMultiPlayerFirstRun(PlayerListIterator bigBlindP
 
     if (bigBlindPositionIt == getHand()->getRunningPlayersList()->end())
     {
-        PlayerListIterator smallBlindPositionIt = getHand()->getRunningPlayerIt(getSmallBlindPositionId());
+        PlayerListIterator smallBlindPositionIt = getHand()->getRunningPlayerFromId(getSmallBlindPositionId());
 
         if (smallBlindPositionIt == getHand()->getRunningPlayersList()->end())
         {
@@ -98,7 +98,7 @@ void BettingRoundPreflop::handleHeadsUpFirstRun(PlayerListIterator bigBlindPosit
 
     if (bigBlindPositionIt == getHand()->getRunningPlayersList()->end())
     {
-        PlayerListIterator smallBlindPositionIt = getHand()->getRunningPlayerIt(getSmallBlindPositionId());
+        PlayerListIterator smallBlindPositionIt = getHand()->getRunningPlayerFromId(getSmallBlindPositionId());
 
         if (smallBlindPositionIt == getHand()->getRunningPlayersList()->end())
         {
@@ -121,7 +121,7 @@ void BettingRoundPreflop::findLastActivePlayerBeforeSmallBlind()
 {
     GlobalServices::instance().logger()->verbose("Finding the last active player before the small blind.");
 
-    PlayerListIterator it = getHand()->getSeatsIt(getSmallBlindPositionId());
+    PlayerListIterator it = getHand()->getPlayerSeatFromId(getSmallBlindPositionId());
     if (it == getHand()->getSeatsList()->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::ActivePlayerNotFound);
@@ -203,7 +203,7 @@ void BettingRoundPreflop::handleNextPlayerTurn()
 {
     GlobalServices::instance().logger()->verbose("Determining the next player's turn.");
 
-    PlayerListConstIterator currentPlayersTurnIt = getHand()->getRunningPlayerIt(getCurrentPlayersTurnId());
+    PlayerListConstIterator currentPlayersTurnIt = getHand()->getRunningPlayerFromId(getCurrentPlayersTurnId());
     if (currentPlayersTurnIt == getHand()->getRunningPlayersList()->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
@@ -222,7 +222,7 @@ void BettingRoundPreflop::handleNextPlayerTurn()
         setFirstRound(false);
     }
 
-    currentPlayersTurnIt = getHand()->getRunningPlayerIt(getCurrentPlayersTurnId());
+    currentPlayersTurnIt = getHand()->getRunningPlayerFromId(getCurrentPlayersTurnId());
     if (currentPlayersTurnIt == getHand()->getRunningPlayersList()->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);

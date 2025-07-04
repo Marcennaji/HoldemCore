@@ -53,7 +53,7 @@ class Hand : public IHand
 
     GameState getRoundBeforePostRiver() const { return myRoundBeforePostRiver; }
 
-    int getDealerPosition() const { return myDealerPosition; }
+    int getDealerPlayerId() const { return myDealerPosition; }
 
     void setSmallBlind(int theValue) { mySmallBlind = theValue; }
     int getSmallBlind() const { return mySmallBlind; }
@@ -98,8 +98,8 @@ class Hand : public IHand
     const GameEvents& getEvents() const { return myEvents; }
 
   protected:
-    pkt::core::player::PlayerListIterator getSeatsIt(unsigned) const;
-    pkt::core::player::PlayerListIterator getRunningPlayerIt(unsigned) const;
+    pkt::core::player::PlayerListIterator getPlayerSeatFromId(unsigned) const;
+    pkt::core::player::PlayerListIterator getRunningPlayerFromId(unsigned) const;
     void updateRunningPlayersList();
 
   private:

@@ -56,7 +56,7 @@ class Game
     void setCurrentHandID(int theValue) { myCurrentHandId = theValue; }
     int getCurrentHandID() const { return myCurrentHandId; }
 
-    unsigned getDealerPosition() const { return myDealerPosition; }
+    unsigned getDealerPlayerId() const { return myDealerPosition; }
 
     void replaceDealer(unsigned oldDealer, unsigned newDealer)
     {

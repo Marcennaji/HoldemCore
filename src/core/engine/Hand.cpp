@@ -159,7 +159,7 @@ void Hand::assignButtons()
     }
 
     // assign dealer button
-    it = getSeatsIt(myDealerPosition);
+    it = getPlayerSeatFromId(myDealerPosition);
     if (it == mySeatsList->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
@@ -169,7 +169,7 @@ void Hand::assignButtons()
     // assign Small Blind next to dealer. ATTENTION: in heads up it is big blind
     // assign big blind next to small blind. ATTENTION: in heads up it is small blind
     bool nextActivePlayerFound = false;
-    PlayerListIterator dealerPositionIt = getSeatsIt(myDealerPosition);
+    PlayerListIterator dealerPositionIt = getPlayerSeatFromId(myDealerPosition);
     if (dealerPositionIt == mySeatsList->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
@@ -184,7 +184,7 @@ void Hand::assignButtons()
             dealerPositionIt = mySeatsList->begin();
         }
 
-        it = getSeatsIt((*dealerPositionIt)->getId());
+        it = getPlayerSeatFromId((*dealerPositionIt)->getId());
         if (it != mySeatsList->end())
         {
             nextActivePlayerFound = true;
@@ -458,7 +458,7 @@ void Hand::resolveHandConditions()
     }
 
     // Unhighlight current player's groupbox
-    itC = getSeatsIt(myPreviousPlayerId);
+    itC = getPlayerSeatFromId(myPreviousPlayerId);
     if (itC != mySeatsList->end())
     {
         if (myEvents.onRefreshPlayersActiveInactiveStyles)
@@ -526,7 +526,7 @@ void Hand::resolveHandConditions()
     GlobalServices::instance().logger()->verbose("Exiting resolveHandConditions()");
 }
 
-PlayerListIterator Hand::getSeatsIt(unsigned uniqueId) const
+PlayerListIterator Hand::getPlayerSeatFromId(unsigned uniqueId) const
 {
 
     PlayerListIterator it;
@@ -542,9 +542,9 @@ PlayerListIterator Hand::getSeatsIt(unsigned uniqueId) const
     return it;
 }
 
-PlayerListIterator Hand::getRunningPlayerIt(unsigned uniqueId) const
+PlayerListIterator Hand::getRunningPlayerFromId(unsigned uniqueId) const
 {
-    GlobalServices::instance().logger()->verbose("Entering getRunningPlayerIt() with uniqueId: " +
+    GlobalServices::instance().logger()->verbose("Entering getRunningPlayerFromId() with uniqueId: " +
                                                  std::to_string(uniqueId));
 
     // Check if the list is empty

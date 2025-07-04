@@ -64,7 +64,7 @@ void Player::setPosition()
 
     myPosition = UNKNOWN;
 
-    const int dealerPosition = currentHand->getDealerPosition();
+    const int dealerPlayerId = currentHand->getDealerPlayerId();
     const int nbPlayers = currentHand->getSeatsList()->size();
 
     // first dimension is my relative position, after the dealer.
@@ -117,7 +117,7 @@ void Player::setPosition()
 
     };
 
-    if (myID == dealerPosition)
+    if (myID == dealerPlayerId)
     {
         myPosition = BUTTON;
     }
@@ -130,13 +130,13 @@ void Player::setPosition()
 
         int pos = 0;
 
-        if (myID > dealerPosition)
+        if (myID > dealerPlayerId)
         {
 
             bool dealerFound = false;
             for (itC = players->begin(); itC != players->end(); ++itC)
             {
-                if ((*itC)->getId() == dealerPosition)
+                if ((*itC)->getId() == dealerPlayerId)
                 {
                     dealerFound = true;
                 }
@@ -153,7 +153,7 @@ void Player::setPosition()
         }
         else
         {
-            // myId < dealerPosition
+            // myId < dealerPlayerId
             bool myPositionFound = false;
             for (itC = players->begin(); itC != players->end(); ++itC)
             {
@@ -166,7 +166,7 @@ void Player::setPosition()
                 {
                     pos++;
                 }
-                if ((*itC)->getId() == dealerPosition)
+                if ((*itC)->getId() == dealerPlayerId)
                 {
                     break;
                 }
