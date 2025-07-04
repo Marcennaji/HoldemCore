@@ -69,211 +69,185 @@ void Board::collectPot()
 
 void Board::distributePot()
 {
-
     myWinners.clear();
+    std::vector<unsigned> contributions = distributePotInitializePlayerContributions();
+    std::vector<unsigned> remainingContributions = contributions;
+    std::sort(remainingContributions.begin(), remainingContributions.end());
 
-    size_t i, j, k, l;
-    PlayerListIterator it;
-    PlayerListConstIterator itC;
-
-    // filling player sets vector
-    std::vector<unsigned> playerSets;
-    for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
+    while (distributePotHasRemaining(remainingContributions))
     {
-        playerSets.push_back((((*it)->getRoundStartCash()) - ((*it)->getCash())));
-        (*it)->setLastMoneyWon(0);
-    }
+        unsigned levelAmount = distributePotNextLevelAmount(remainingContributions);
+        std::vector<size_t> levelEligible = distributePotEligibleContributors(contributions, levelAmount);
 
-    // sort player sets asc
-    std::vector<unsigned> playerSetsSort = playerSets;
-    std::sort(playerSetsSort.begin(), playerSetsSort.end());
-
-    // potLevel[0] = amount, potLevel[1] = sum, potLevel[2..n] = winner
-    std::vector<unsigned> potLevel;
-
-    // temp var
-    int highestCardsValue;
-    int winnerCount;
-    int mod;
-    bool winnerHit;
-
-    // level loop
-    for (i = 0; i < playerSetsSort.size(); i++)
-    {
-
-        // restart levelHighestCardsValue
-        highestCardsValue = 0;
-
-        // level detection
-        if (playerSetsSort[i] > 0)
+        if (levelEligible.empty())
         {
-
-            // level amount
-            potLevel.push_back(playerSetsSort[i]);
-
-            // level sum
-            potLevel.push_back((playerSetsSort.size() - i) * potLevel[0]);
-
-            // determine level highestCardsValue
-            for (itC = mySeatsList->begin(), j = 0; itC != mySeatsList->end(); ++itC, j++)
-            {
-                if ((*itC)->getHandRanking() > highestCardsValue && (*itC)->getAction() != PlayerActionFold &&
-                    playerSets[j] >= potLevel[0])
-                {
-                    highestCardsValue = (*itC)->getHandRanking();
-                }
-            }
-
-            // level winners
-            for (itC = mySeatsList->begin(), j = 0; itC != mySeatsList->end(); ++itC, j++)
-            {
-                if (highestCardsValue == (*itC)->getHandRanking() && (*itC)->getAction() != PlayerActionFold &&
-                    playerSets[j] >= potLevel[0])
-                {
-                    potLevel.push_back((*itC)->getId());
-                }
-            }
-
-            // determine the number of level winners
-            winnerCount = potLevel.size() - 2;
-
-            if (winnerCount == 0 || potLevel.size() == 0)
-            {
-                break;
-            }
-
-            // distribute the pot level sum to level winners
-            mod = (potLevel[1]) % winnerCount;
-            // pot level sum divisible by winnerCount
-            if (mod == 0)
-            {
-
-                for (j = 2; j < potLevel.size(); j++)
-                {
-                    // find seat with potLevel[j]-ID
-                    for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
-                    {
-                        if ((*it)->getId() == potLevel[j])
-                        {
-                            break;
-                        }
-                    }
-                    if (it == mySeatsList->end())
-                    {
-                        throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
-                    }
-                    (*it)->setCash((*it)->getCash() + ((potLevel[1]) / winnerCount));
-
-                    // filling winners vector
-                    myWinners.push_back((*it)->getId());
-                    (*it)->setLastMoneyWon((*it)->getLastMoneyWon() + (potLevel[1]) / winnerCount);
-                }
-            }
-            // pot level sum not divisible by winnerCount
-            // --> distribution after smallBlind
-            else
-            {
-
-                // find Seat with dealerPosition
-                for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
-                {
-                    if ((*it)->getId() == myDealerPlayerId)
-                    {
-                        break;
-                    }
-                }
-                if (it == mySeatsList->end())
-                {
-                    throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
-                }
-
-                for (j = 0; j < winnerCount; j++)
-                {
-
-                    winnerHit = false;
-
-                    for (k = 0; k < MAX_NUMBER_OF_PLAYERS && !winnerHit; k++)
-                    {
-
-                        ++it;
-                        if (it == mySeatsList->end())
-                        {
-                            it = mySeatsList->begin();
-                        }
-
-                        for (l = 2; l < potLevel.size(); l++)
-                        {
-                            if ((*it)->getId() == potLevel[l])
-                            {
-                                winnerHit = true;
-                            }
-                        }
-                    }
-
-                    if (j < mod)
-                    {
-                        (*it)->setCash((*it)->getCash() + (int) ((potLevel[1]) / winnerCount) + 1);
-                        // filling winners vector
-                        myWinners.push_back((*it)->getId());
-                        (*it)->setLastMoneyWon((*it)->getLastMoneyWon() + ((potLevel[1]) / winnerCount) + 1);
-                    }
-                    else
-                    {
-                        (*it)->setCash((*it)->getCash() + (int) ((potLevel[1]) / winnerCount));
-                        // filling winners vector
-                        myWinners.push_back((*it)->getId());
-                        (*it)->setLastMoneyWon((*it)->getLastMoneyWon() + (potLevel[1]) / winnerCount);
-                    }
-                }
-            }
-
-            // reevaluate the player sets
-            for (j = 0; j < playerSets.size(); j++)
-            {
-                if (playerSets[j] > 0)
-                {
-                    playerSets[j] -= potLevel[0];
-                }
-            }
-
-            // sort player sets asc
-            playerSetsSort = playerSets;
-            sort(playerSetsSort.begin(), playerSetsSort.end());
-
-            // pot refresh
-            myPot -= potLevel[1];
-
-            if (myPot == 0)
-            {
-                break;
-            }
-
-            // clear potLevel
-            potLevel.clear();
+            // No eligible players left at this level — exit early
+            break;
         }
+
+        int levelPot = static_cast<int>(levelEligible.size() * levelAmount);
+        std::vector<size_t> levelWinners = distributePotDetermineWinners(levelEligible, levelAmount);
+
+        if (levelWinners.empty())
+        {
+            // No winners — skip distribution for this level (but reduce contributions anyway)
+            distributePotReduceContributions(contributions, levelAmount);
+            myPot -= levelPot;
+            continue;
+        }
+
+        int baseShare = levelPot / static_cast<int>(levelWinners.size());
+        int remainder = levelPot % static_cast<int>(levelWinners.size());
+
+        distributePotAwardBase(levelWinners, baseShare);
+        distributePotDistributeRemainder(levelWinners, remainder);
+
+        distributePotReduceContributions(contributions, levelAmount);
+        myPot -= levelPot;
     }
 
-    // winners sort and unique
+    distributePotFinalize();
+}
+std::vector<unsigned> Board::distributePotInitializePlayerContributions()
+{
+    std::vector<unsigned> contributions;
+    for (const auto& player : *mySeatsList)
+    {
+        unsigned contributed = player->getRoundStartCash() - player->getCash();
+        contributions.push_back(contributed);
+        player->setLastMoneyWon(0);
+    }
+    return contributions;
+}
+
+bool Board::distributePotHasRemaining(const std::vector<unsigned>& contributions) const
+{
+    return std::any_of(contributions.begin(), contributions.end(), [](unsigned c) { return c > 0; });
+}
+
+unsigned Board::distributePotNextLevelAmount(const std::vector<unsigned>& contributions) const
+{
+    for (unsigned c : contributions)
+        if (c > 0)
+            return c;
+    return 0;
+}
+
+std::vector<size_t> Board::distributePotEligibleContributors(const std::vector<unsigned>& contributions,
+                                                             unsigned levelAmount) const
+{
+    std::vector<size_t> eligible;
+    for (size_t i = 0; i < contributions.size(); ++i)
+    {
+        if (contributions[i] >= levelAmount && (*std::next(mySeatsList->begin(), i))->getAction() != PlayerActionFold)
+            eligible.push_back(i);
+    }
+    return eligible;
+}
+
+std::vector<size_t> Board::distributePotDetermineWinners(const std::vector<size_t>& eligibleIndexes,
+                                                         unsigned levelAmount) const
+{
+    int bestRank = 0;
+    for (size_t idx : eligibleIndexes)
+    {
+        auto& player = *std::next(mySeatsList->begin(), idx);
+        bestRank = std::max(bestRank, player->getHandRanking());
+    }
+
+    std::vector<size_t> winners;
+    for (size_t idx : eligibleIndexes)
+    {
+        auto& player = *std::next(mySeatsList->begin(), idx);
+        if (player->getHandRanking() == bestRank)
+            winners.push_back(idx);
+    }
+
+    return winners;
+}
+
+void Board::distributePotAwardBase(const std::vector<size_t>& winnerIndexes, int baseAmount)
+{
+    for (size_t idx : winnerIndexes)
+    {
+        auto& player = *std::next(mySeatsList->begin(), idx);
+        player->setCash(player->getCash() + baseAmount);
+        player->setLastMoneyWon(player->getLastMoneyWon() + baseAmount);
+        myWinners.push_back(player->getId());
+    }
+}
+
+void Board::distributePotDistributeRemainder(const std::vector<size_t>& winnerIndexes, int remainder)
+{
+    if (remainder <= 0 || winnerIndexes.empty())
+        return;
+
+    std::vector<unsigned> winnerIds;
+    for (size_t idx : winnerIndexes)
+        winnerIds.push_back((*std::next(mySeatsList->begin(), idx))->getId());
+
+    auto receiver = distributePotResolveRemainderReceiver(winnerIds);
+    receiver->setCash(receiver->getCash() + remainder);
+    receiver->setLastMoneyWon(receiver->getLastMoneyWon() + remainder);
+}
+
+void Board::distributePotReduceContributions(std::vector<unsigned>& contributions, unsigned amount)
+{
+    for (auto& c : contributions)
+        if (c >= amount)
+            c -= amount;
+}
+
+void Board::distributePotFinalize()
+{
     myWinners.sort();
     myWinners.unique();
 
-    if (myPot != 0)
+    if (myPot > 0 && !myWinners.empty())
     {
-
-        std::list<unsigned>::iterator itInt;
-
-        for (itInt = myWinners.begin(); itInt != myWinners.end(); ++itInt)
+        int share = myPot / static_cast<int>(myWinners.size());
+        for (unsigned id : myWinners)
         {
-
-            for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
-            {
-                if ((*it)->getId() == (*itInt))
-                {
-                    (*it)->setCash((*it)->getCash() + (myPot / myWinners.size()));
-                }
-            }
+            auto player = getPlayerById(id);
+            player->setCash(player->getCash() + share);
+            player->setLastMoneyWon(player->getLastMoneyWon() + share);
         }
+        myPot = 0;
     }
+}
+
+std::shared_ptr<Player> Board::getPlayerById(unsigned id) const
+{
+    for (const auto& p : *mySeatsList)
+    {
+        if (p->getId() == id)
+            return p;
+    }
+    throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
+}
+
+std::shared_ptr<Player> Board::distributePotResolveRemainderReceiver(const std::vector<unsigned>& winnerIds) const
+{
+    auto it = getSeatsIt(myDealerPlayerId);
+    do
+    {
+        ++it;
+        if (it == mySeatsList->end())
+            it = mySeatsList->begin();
+        if (std::find(winnerIds.begin(), winnerIds.end(), (*it)->getId()) != winnerIds.end())
+            return *it;
+    } while ((*it)->getId() != myDealerPlayerId);
+
+    return getPlayerById(winnerIds.front()); // fallback
+}
+pkt::core::player::PlayerListIterator Board::getSeatsIt(unsigned playerId) const
+{
+    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
+    {
+        if ((*it)->getId() == playerId)
+            return it;
+    }
+    throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
 }
 
 void Board::determinePlayerNeedToShowCards()

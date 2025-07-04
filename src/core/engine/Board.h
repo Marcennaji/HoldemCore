@@ -54,6 +54,23 @@ class Board : public IBoard
     void setPlayerNeedToShowCards(const std::list<unsigned>& p);
 
   private:
+    std::shared_ptr<player::Player> getPlayerById(unsigned id) const;
+
+    // -- -distributePot helper methods-- -
+    std::shared_ptr<player::Player> distributePotResolveRemainderReceiver(const std::vector<unsigned>& winnerIds) const;
+    pkt::core::player::PlayerListIterator getSeatsIt(unsigned playerId) const;
+    std::vector<unsigned> distributePotInitializePlayerContributions();
+    bool distributePotHasRemaining(const std::vector<unsigned>& contributions) const;
+    unsigned distributePotNextLevelAmount(const std::vector<unsigned>& contributions) const;
+    std::vector<size_t> distributePotEligibleContributors(const std::vector<unsigned>& contributions,
+                                                          unsigned levelAmount) const;
+    std::vector<size_t> distributePotDetermineWinners(const std::vector<size_t>& eligibleIndexes,
+                                                      unsigned levelAmount) const;
+    void distributePotAwardBase(const std::vector<size_t>& winnerIndexes, int baseAmount);
+    void distributePotDistributeRemainder(const std::vector<size_t>& winnerIndexes, int remainder);
+    void distributePotReduceContributions(std::vector<unsigned>& contributions, unsigned amount);
+    void distributePotFinalize();
+
     pkt::core::player::PlayerList mySeatsList;
     pkt::core::player::PlayerList myRunningPlayersList;
 
