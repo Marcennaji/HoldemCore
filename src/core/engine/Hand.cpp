@@ -26,7 +26,7 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
            PlayerList seats, PlayerList runningPlayers, int handId, GameData gameData, StartData startData)
     : myEvents(events), myFactory(factory), myBoard(board), mySeatsList(seats), myRunningPlayersList(runningPlayers),
       myStartQuantityPlayers(startData.numberOfPlayers), myDealerPosition(startData.startDealerPlayerId),
-      mySmallBlindPosition(startData.startDealerPlayerId), myBigBlindPosition(startData.startDealerPlayerId),
+      mySmallBlindPlayerId(startData.startDealerPlayerId), myBigBlindPosition(startData.startDealerPlayerId),
       mySmallBlind(gameData.firstSmallBlind), myStartCash(gameData.startMoney)
 
 {
@@ -192,7 +192,7 @@ void Hand::assignButtons()
             {
                 // small blind normal
                 (*it)->setButton(2);
-                mySmallBlindPosition = (*it)->getId();
+                mySmallBlindPlayerId = (*it)->getId();
             }
             else
             {
@@ -222,7 +222,7 @@ void Hand::assignButtons()
             {
                 // small blind in heads up
                 (*it)->setButton(2);
-                mySmallBlindPosition = (*it)->getId();
+                mySmallBlindPlayerId = (*it)->getId();
             }
 
             break;

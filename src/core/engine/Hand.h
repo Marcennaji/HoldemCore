@@ -53,7 +53,6 @@ class Hand : public IHand
 
     GameState getRoundBeforePostRiver() const { return myRoundBeforePostRiver; }
 
-    void setDealerPosition(int theValue) { myDealerPosition = theValue; }
     int getDealerPosition() const { return myDealerPosition; }
 
     void setSmallBlind(int theValue) { mySmallBlind = theValue; }
@@ -118,7 +117,7 @@ class Hand : public IHand
 
     int myStartQuantityPlayers;
     unsigned myDealerPosition;
-    unsigned mySmallBlindPosition;
+    unsigned mySmallBlindPlayerId;
     unsigned myBigBlindPosition;
     GameState myCurrentRound{GameStatePreflop};
     GameState myRoundBeforePostRiver{GameStatePreflop};

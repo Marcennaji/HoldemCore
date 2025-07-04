@@ -24,7 +24,6 @@ class IBettingRound
     virtual void setCurrentPlayersTurnIt(pkt::core::player::PlayerListIterator) = 0;
     virtual pkt::core::player::PlayerListIterator getCurrentPlayersTurnIt() const = 0;
 
-    virtual void setSmallBlindPositionId(unsigned) = 0;
     virtual unsigned getSmallBlindPositionId() const = 0;
 
     virtual void setBigBlindPositionId(unsigned) = 0;

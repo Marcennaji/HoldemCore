@@ -51,7 +51,6 @@ class IHand
 
     virtual GameState getRoundBeforePostRiver() const = 0;
 
-    virtual void setDealerPosition(int theValue) = 0;
     virtual int getDealerPosition() const = 0;
 
     virtual void setSmallBlind(int theValue) = 0;

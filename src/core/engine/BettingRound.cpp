@@ -46,7 +46,7 @@ BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int
     {
         if ((*itC)->getButton() == ButtonSmallBlind)
         {
-            mySmallBlindPositionId = (*itC)->getId();
+            mySmallBlindPlayerId = (*itC)->getId();
             break;
         }
     }
@@ -197,7 +197,7 @@ unsigned BettingRound::findNextEligiblePlayerFromSmallBlind()
 {
     GlobalServices::instance().logger()->info("Finding the next eligible player starting from the small blind.");
 
-    PlayerListIterator it = myHand->getSeatsIt(mySmallBlindPositionId);
+    PlayerListIterator it = myHand->getSeatsIt(mySmallBlindPlayerId);
     if (it == myHand->getSeatsList()->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::ActivePlayerNotFound);
@@ -425,15 +425,6 @@ IHand* BettingRound::getHand() const
     return myHand;
 }
 
-int BettingRound::getDealerPosition() const
-{
-    return myDealerPosition;
-}
-void BettingRound::setDealerPosition(int theValue)
-{
-    myDealerPosition = theValue;
-}
-
 void BettingRound::setCurrentPlayersTurnId(unsigned theValue)
 {
     myCurrentPlayersTurnId = theValue;
@@ -497,13 +488,9 @@ bool BettingRound::getFirstRound() const
     return myFirstRound;
 }
 
-void BettingRound::setSmallBlindPositionId(unsigned theValue)
-{
-    mySmallBlindPositionId = theValue;
-}
 unsigned BettingRound::getSmallBlindPositionId() const
 {
-    return mySmallBlindPositionId;
+    return mySmallBlindPlayerId;
 }
 
 void BettingRound::setBigBlindPositionId(unsigned theValue)
@@ -513,15 +500,6 @@ void BettingRound::setBigBlindPositionId(unsigned theValue)
 unsigned BettingRound::getBigBlindPositionId() const
 {
     return myBigBlindPositionId;
-}
-
-void BettingRound::setSmallBlindPosition(int theValue)
-{
-    mySmallBlindPosition = theValue;
-}
-int BettingRound::getSmallBlindPosition() const
-{
-    return mySmallBlindPosition;
 }
 
 void BettingRound::setSmallBlind(int theValue)

@@ -33,9 +33,6 @@ class BettingRound : public IBettingRound
   protected:
     IHand* getHand() const;
 
-    int getDealerPosition() const;
-    void setDealerPosition(int theValue);
-
     void setCurrentPlayersTurnId(unsigned theValue);
     unsigned getCurrentPlayersTurnId() const;
 
@@ -57,14 +54,10 @@ class BettingRound : public IBettingRound
     void setFirstRound(bool theValue);
     bool getFirstRound() const;
 
-    void setSmallBlindPositionId(unsigned theValue);
     unsigned getSmallBlindPositionId() const;
 
     void setBigBlindPositionId(unsigned theValue);
     unsigned getBigBlindPositionId() const;
-
-    void setSmallBlindPosition(int theValue);
-    int getSmallBlindPosition() const;
 
     void setSmallBlind(int theValue);
     int getSmallBlind() const;
@@ -85,9 +78,8 @@ class BettingRound : public IBettingRound
 
     const GameState myBettingRoundId;
     int myDealerPosition{0};
-    int mySmallBlindPosition{0};
 
-    unsigned mySmallBlindPositionId{0};
+    unsigned mySmallBlindPlayerId{0};
     unsigned myBigBlindPositionId{0};
 
     int mySmallBlind;
