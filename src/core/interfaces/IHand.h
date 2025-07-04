@@ -10,6 +10,7 @@
 #include "core/interfaces/IBettingRound.h"
 #include "core/interfaces/IBoard.h"
 
+#include <algorithm>
 #include <memory>
 #include <vector>
 
