@@ -21,9 +21,6 @@ class IBettingRound
     virtual void setCurrentPlayersTurnId(unsigned) = 0;
     virtual unsigned getCurrentPlayersTurnId() const = 0;
 
-    virtual void setCurrentPlayersTurnIt(pkt::core::player::PlayerListIterator) = 0;
-    virtual pkt::core::player::PlayerListIterator getCurrentPlayersTurnIt() const = 0;
-
     virtual unsigned getSmallBlindPlayerId() const = 0;
 
     virtual unsigned getBigBlindPlayerId() const = 0;
@@ -44,7 +41,7 @@ class IBettingRound
 
     virtual void skipFirstRunGui() = 0;
 
-    virtual void nextPlayer() = 0;
+    virtual void giveActionToNextBotPlayer() = 0;
     virtual void run() = 0;
 
     virtual void postRiverRun() = 0;

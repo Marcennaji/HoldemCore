@@ -77,8 +77,6 @@ class Player
 
     void setButton(int theValue);
     int getButton() const;
-    void setActiveStatus(bool theValue);
-    bool getActiveStatus() const;
 
     void setCards(int* theValue);
     void getCards(int* theValue) const;
@@ -90,7 +88,7 @@ class Player
     bool getCardsFlip() const;
 
     void setHandRanking(int theValue);
-    int getCardsValueInt() const;
+    int getHandRanking() const;
 
     void setRoundStartCash(int theValue);
     int getRoundStartCash() const;
@@ -169,7 +167,7 @@ class Player
     // vars
     PlayerPosition myPosition;
     std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> myStatistics;
-    int myCardsValueInt{0};
+    int myHandRanking{0};
 
     int myCards[2];
     std::string myCard1;
@@ -179,7 +177,6 @@ class Player
     int myLastRelativeSet{0};
     PlayerAction myAction{PlayerActionNone};
     int myButton;        // 0 = none, 1 = dealer, 2 =small, 3 = big
-    bool myActiveStatus; // 0 = inactive, 1 = active
     bool myTurn{0};      // 0 = no, 1 = yes
     bool myCardsFlip{0}; // 0 = cards are not fliped, 1 = cards are already flipped,
     int myRoundStartCash{0};

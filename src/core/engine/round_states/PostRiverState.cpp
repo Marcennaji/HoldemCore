@@ -143,9 +143,9 @@ void PostRiverState::calculateHighestCardsValue(Hand& hand)
     auto seatsList = hand.getSeatsList();
     for (auto it = seatsList->begin(); it != seatsList->end(); ++it)
     {
-        if ((*it)->getAction() != PlayerActionFold && (*it)->getCardsValueInt() > highestCardsValue)
+        if ((*it)->getAction() != PlayerActionFold && (*it)->getHandRanking() > highestCardsValue)
         {
-            highestCardsValue = (*it)->getCardsValueInt();
+            highestCardsValue = (*it)->getHandRanking();
         }
     }
 }

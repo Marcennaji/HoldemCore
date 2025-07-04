@@ -36,7 +36,7 @@ void BettingRoundsLegacyTest::bettingRoundAnimation(int bettingRoundId)
 {
     if (bettingRoundId < 4)
     {
-        myHand->getCurrentBettingRound()->nextPlayer();
+        myHand->getCurrentBettingRound()->giveActionToNextBotPlayer();
     }
 }
 

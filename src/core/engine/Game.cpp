@@ -100,22 +100,6 @@ void Game::initHand()
         (*it)->setAction(PlayerActionNone);
     }
 
-    // set player with empty cash inactive
-    it = mySeatsList->begin();
-    while (it != mySeatsList->end())
-    {
-
-        if ((*it)->getCash() == 0)
-        {
-            (*it)->setActiveStatus(false);
-            it = mySeatsList->erase(it);
-        }
-        else
-        {
-            ++it;
-        }
-    }
-
     myRunningPlayersList->clear();
     (*myRunningPlayersList) = (*mySeatsList);
 

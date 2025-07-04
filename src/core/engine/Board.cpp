@@ -80,14 +80,7 @@ void Board::distributePot()
     std::vector<unsigned> playerSets;
     for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
-        if ((*it)->getActiveStatus())
-        {
-            playerSets.push_back((((*it)->getRoundStartCash()) - ((*it)->getCash())));
-        }
-        else
-        {
-            playerSets.push_back(0);
-        }
+        playerSets.push_back((((*it)->getRoundStartCash()) - ((*it)->getCash())));
         (*it)->setLastMoneyWon(0);
     }
 
@@ -124,18 +117,18 @@ void Board::distributePot()
             // determine level highestCardsValue
             for (itC = mySeatsList->begin(), j = 0; itC != mySeatsList->end(); ++itC, j++)
             {
-                if ((*itC)->getActiveStatus() && (*itC)->getCardsValueInt() > highestCardsValue &&
-                    (*itC)->getAction() != PlayerActionFold && playerSets[j] >= potLevel[0])
+                if ((*itC)->getHandRanking() > highestCardsValue && (*itC)->getAction() != PlayerActionFold &&
+                    playerSets[j] >= potLevel[0])
                 {
-                    highestCardsValue = (*itC)->getCardsValueInt();
+                    highestCardsValue = (*itC)->getHandRanking();
                 }
             }
 
             // level winners
             for (itC = mySeatsList->begin(), j = 0; itC != mySeatsList->end(); ++itC, j++)
             {
-                if ((*itC)->getActiveStatus() && highestCardsValue == (*itC)->getCardsValueInt() &&
-                    (*itC)->getAction() != PlayerActionFold && playerSets[j] >= potLevel[0])
+                if (highestCardsValue == (*itC)->getHandRanking() && (*itC)->getAction() != PlayerActionFold &&
+                    playerSets[j] >= potLevel[0])
                 {
                     potLevel.push_back((*itC)->getId());
                 }
@@ -340,7 +333,7 @@ void Board::determinePlayerNeedToShowCards()
 
         std::pair<int, int> levelTmp;
         // get position und cardsValue of the player who show his cards first
-        levelTmp.first = (*lastActionPlayerIt)->getCardsValueInt();
+        levelTmp.first = (*lastActionPlayerIt)->getHandRanking();
         levelTmp.second = (*lastActionPlayerIt)->getRoundStartCash() - (*lastActionPlayerIt)->getCash();
 
         level.push_back(levelTmp);
@@ -364,14 +357,14 @@ void Board::determinePlayerNeedToShowCards()
 
                 for (levelIt = level.begin(); levelIt != level.end(); ++levelIt)
                 {
-                    if ((*itC)->getCardsValueInt() > (*levelIt).first)
+                    if ((*itC)->getHandRanking() > (*levelIt).first)
                     {
                         nextLevelIt = levelIt;
                         ++nextLevelIt;
                         if (nextLevelIt == level.end())
                         {
                             myPlayerNeedToShowCards.push_back((*itC)->getId());
-                            levelTmp.first = (*itC)->getCardsValueInt();
+                            levelTmp.first = (*itC)->getHandRanking();
                             levelTmp.second = (*itC)->getRoundStartCash() - (*itC)->getCash();
                             level.push_back(levelTmp);
                             break;
@@ -379,7 +372,7 @@ void Board::determinePlayerNeedToShowCards()
                     }
                     else
                     {
-                        if ((*itC)->getCardsValueInt() == (*levelIt).first)
+                        if ((*itC)->getHandRanking() == (*levelIt).first)
                         {
                             nextLevelIt = levelIt;
                             ++nextLevelIt;
@@ -400,7 +393,7 @@ void Board::determinePlayerNeedToShowCards()
                             if ((*itC)->getRoundStartCash() - (*itC)->getCash() > (*levelIt).second)
                             {
                                 myPlayerNeedToShowCards.push_back((*itC)->getId());
-                                levelTmp.first = (*itC)->getCardsValueInt();
+                                levelTmp.first = (*itC)->getHandRanking();
                                 levelTmp.second = (*itC)->getRoundStartCash() - (*itC)->getCash();
 
                                 level.insert(levelIt, levelTmp);

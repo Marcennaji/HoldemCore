@@ -107,7 +107,7 @@ void Hand::dealHoleCards(size_t cardsArrayIndex)
         GlobalServices::instance().logger()->verbose(
             "Player " + (*it)->getName() + " dealt cards: " + CardUtilities::getCardString(tempPlayerArray[0]) + " " +
             CardUtilities::getCardString(tempPlayerArray[1]) +
-            ", hand strength = " + std::to_string((*it)->getCardsValueInt()));
+            ", hand strength = " + std::to_string((*it)->getHandRanking()));
     }
 }
 

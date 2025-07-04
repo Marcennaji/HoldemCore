@@ -37,9 +37,9 @@ void BettingRoundPostRiver::postRiverRun()
     for (itC = getHand()->getSeatsList()->begin(); itC != getHand()->getSeatsList()->end(); ++itC)
     {
 
-        if ((*itC)->getAction() != PlayerActionFold && (*itC)->getCardsValueInt() > myHighestCardsValue)
+        if ((*itC)->getAction() != PlayerActionFold && (*itC)->getHandRanking() > myHighestCardsValue)
         {
-            myHighestCardsValue = (*itC)->getCardsValueInt();
+            myHighestCardsValue = (*itC)->getHandRanking();
         }
     }
 

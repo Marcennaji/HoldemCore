@@ -26,7 +26,7 @@ class BettingRound : public IBettingRound
     void setFullBetRule(bool);
     bool getFullBetRule() const;
     void skipFirstRunGui();
-    void nextPlayer();
+    void giveActionToNextBotPlayer();
     void run();
     void postRiverRun();
 
@@ -38,12 +38,6 @@ class BettingRound : public IBettingRound
 
     void setFirstRoundLastPlayersTurnId(unsigned theValue);
     unsigned getFirstRoundLastPlayersTurnId() const;
-
-    void setCurrentPlayersTurnIt(pkt::core::player::PlayerListIterator theValue);
-    pkt::core::player::PlayerListIterator getCurrentPlayersTurnIt() const;
-
-    void setLastPlayersTurnIt(pkt::core::player::PlayerListIterator theValue);
-    pkt::core::player::PlayerListIterator getLastPlayersTurnIt() const;
 
     void setHighestSet(int theValue);
     int getHighestSet() const;
@@ -90,9 +84,6 @@ class BettingRound : public IBettingRound
     bool myFirstRunGui{true}; // HACK
     bool myFirstRound{true};
     bool myFirstHeadsUpRound{true};
-
-    pkt::core::player::PlayerListIterator myCurrentPlayersTurnIt; // iterator for runningPlayerList
-    pkt::core::player::PlayerListIterator myLastPlayersTurnIt;    // iterator for runningPlayerList
 
     unsigned myCurrentPlayersTurnId{0};
     unsigned myFirstRoundLastPlayersTurnId{0};

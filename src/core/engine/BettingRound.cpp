@@ -22,9 +22,6 @@ BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int
     : IBettingRound(), myHand(hi), myBettingRoundId(gS), myDealerPlayerId(dP), mySmallBlind(sB), myMinimumRaise(2 * sB),
       myEvents(events)
 {
-    myCurrentPlayersTurnIt = myHand->getRunningPlayersList()->begin();
-    myLastPlayersTurnIt = myHand->getRunningPlayersList()->begin();
-
     PlayerListConstIterator itC;
 
     // determine bigBlindPosition
@@ -64,16 +61,15 @@ int BettingRound::getHighestCardsValue() const
     return 0;
 }
 
-void BettingRound::nextPlayer()
+void BettingRound::giveActionToNextBotPlayer()
 {
-
-    PlayerListConstIterator currentPlayersTurnConstIt = myHand->getRunningPlayerFromId(myCurrentPlayersTurnId);
-    if (currentPlayersTurnConstIt == myHand->getRunningPlayersList()->end())
+    auto nextBotPlayer = myHand->getRunningPlayerFromId(myCurrentPlayersTurnId);
+    if (nextBotPlayer == myHand->getRunningPlayersList()->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
     }
 
-    auto botPtr = std::dynamic_pointer_cast<BotPlayer>(*currentPlayersTurnConstIt);
+    auto botPtr = std::dynamic_pointer_cast<BotPlayer>(*nextBotPlayer);
     if (botPtr)
     {
         botPtr->action();
@@ -441,24 +437,6 @@ void BettingRound::setFirstRoundLastPlayersTurnId(unsigned theValue)
 unsigned BettingRound::getFirstRoundLastPlayersTurnId() const
 {
     return myFirstRoundLastPlayersTurnId;
-}
-
-void BettingRound::setCurrentPlayersTurnIt(PlayerListIterator theValue)
-{
-    myCurrentPlayersTurnIt = theValue;
-}
-PlayerListIterator BettingRound::getCurrentPlayersTurnIt() const
-{
-    return myCurrentPlayersTurnIt;
-}
-
-void BettingRound::setLastPlayersTurnIt(PlayerListIterator theValue)
-{
-    myLastPlayersTurnIt = theValue;
-}
-PlayerListIterator BettingRound::getLastPlayersTurnIt() const
-{
-    return myLastPlayersTurnIt;
 }
 
 void BettingRound::setHighestSet(int theValue)

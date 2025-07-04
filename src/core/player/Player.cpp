@@ -25,7 +25,7 @@ namespace pkt::core::player
 using namespace std;
 
 Player::Player(const GameEvents& events, int id, std::string name, int sC, bool aS, int mB)
-    : myID(id), myName(name), myCash(sC), myButton(mB), myActiveStatus(aS), myEvents(events)
+    : myID(id), myName(name), myCash(sC), myButton(mB), myEvents(events)
 {
     myRangeEstimator = std::make_unique<RangeEstimator>(myID);
     myCurrentHandContext = std::make_unique<CurrentHandContext>();
@@ -290,15 +290,6 @@ int Player::getButton() const
     return myButton;
 }
 
-void Player::setActiveStatus(bool theValue)
-{
-    myActiveStatus = theValue;
-}
-bool Player::getActiveStatus() const
-{
-    return myActiveStatus;
-}
-
 void Player::setCards(int* theValue)
 {
 
@@ -340,11 +331,11 @@ bool Player::getCardsFlip() const
 
 void Player::setHandRanking(int theValue)
 {
-    myCardsValueInt = theValue;
+    myHandRanking = theValue;
 }
-int Player::getCardsValueInt() const
+int Player::getHandRanking() const
 {
-    return myCardsValueInt;
+    return myHandRanking;
 }
 
 void Player::setRoundStartCash(int theValue)
