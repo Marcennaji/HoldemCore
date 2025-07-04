@@ -19,8 +19,8 @@ using namespace std;
 using namespace pkt::core::player;
 
 BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int sB, GameState gS)
-    : IBettingRound(), myHand(hi), myBettingRoundID(gS), myDealerPosition(dP), myDealerPositionId(dP), mySmallBlind(sB),
-      myMinimumRaise(2 * sB), myEvents(events)
+    : IBettingRound(), myHand(hi), myBettingRoundId(gS), myDealerPosition(dP), mySmallBlind(sB), myMinimumRaise(2 * sB),
+      myEvents(events)
 {
     myCurrentPlayersTurnIt = myHand->getRunningPlayersList()->begin();
     myLastPlayersTurnIt = myHand->getRunningPlayersList()->begin();
@@ -94,7 +94,7 @@ void BettingRound::run()
 
         if (myEvents.onDealBettingRoundCards)
         {
-            myEvents.onDealBettingRoundCards(myBettingRoundID);
+            myEvents.onDealBettingRoundCards(myBettingRoundId);
         }
         return;
     }
@@ -172,7 +172,7 @@ void BettingRound::run()
         {
             if (myEvents.onBettingRoundAnimation)
             {
-                myEvents.onBettingRoundAnimation(myBettingRoundID);
+                myEvents.onBettingRoundAnimation(myBettingRoundId);
             }
         }
     }
@@ -227,7 +227,7 @@ unsigned BettingRound::findNextEligiblePlayerFromSmallBlind()
 void BettingRound::proceedToNextBettingRound()
 {
     PlayerListIterator itC;
-    myHand->setCurrentRoundState(GameState(myBettingRoundID + 1));
+    myHand->setCurrentRoundState(GameState(myBettingRoundId + 1));
 
     for (itC = myHand->getRunningPlayersList()->begin(); itC != myHand->getRunningPlayersList()->end(); ++itC)
     {
@@ -272,7 +272,7 @@ void BettingRound::logBoardCards()
         int tempBoardCardsArray[5];
         myHand->getBoard()->getCards(tempBoardCardsArray);
 
-        switch (myBettingRoundID)
+        switch (myBettingRoundId)
         {
         case GameStateFlop:
             GlobalServices::instance().logger()->info(
@@ -298,7 +298,7 @@ void BettingRound::logBoardCards()
 
             break;
         default:
-            GlobalServices::instance().logger()->error("wrong myBettingRoundID");
+            GlobalServices::instance().logger()->error("wrong myBettingRoundId");
         }
         myLogBoardCardsDone = true;
     }
@@ -319,7 +319,7 @@ void BettingRound::handleFirstRun()
     GlobalServices::instance().logger()->info("Setting first player to act (clockwise from dealer).");
 
     // Clockwise from dealer to find first active player
-    PlayerListIterator dealerIt = myHand->getSeatsIt(myDealerPositionId);
+    PlayerListIterator dealerIt = myHand->getSeatsIt(myDealerPosition);
     if (dealerIt == myHand->getSeatsList()->end())
         throw Exception(__FILE__, __LINE__, EngineError::ActivePlayerNotFound);
 
@@ -386,9 +386,9 @@ unsigned BettingRound::getPreviousRunningPlayerId(unsigned currentPlayerId, Play
     return (*currentPlayerIt)->getId();
 }
 
-GameState BettingRound::getBettingRoundID() const
+GameState BettingRound::getBettingRoundId() const
 {
-    return myBettingRoundID;
+    return myBettingRoundId;
 }
 
 void BettingRound::setHighestCardsValue(int /*theValue*/)
@@ -495,15 +495,6 @@ void BettingRound::setFirstRound(bool theValue)
 bool BettingRound::getFirstRound() const
 {
     return myFirstRound;
-}
-
-void BettingRound::setDealerPositionId(unsigned theValue)
-{
-    myDealerPositionId = theValue;
-}
-unsigned BettingRound::getDealerPositionId() const
-{
-    return myDealerPositionId;
 }
 
 void BettingRound::setSmallBlindPositionId(unsigned theValue)

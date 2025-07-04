@@ -15,6 +15,6 @@ class BettingRoundsLegacyTest : public EngineTest
 
   private:
     void dealBettingRoundCards(int bettingRoundId);
-    void bettingRoundAnimation(int myBettingRoundID);
+    void bettingRoundAnimation(int myBettingRoundId);
 };
 } // namespace pkt::test

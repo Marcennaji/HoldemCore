@@ -16,7 +16,7 @@ class IBettingRound
   public:
     virtual ~IBettingRound() = default;
 
-    virtual GameState getBettingRoundID() const = 0;
+    virtual GameState getBettingRoundId() const = 0;
 
     virtual void setCurrentPlayersTurnId(unsigned) = 0;
     virtual unsigned getCurrentPlayersTurnId() const = 0;

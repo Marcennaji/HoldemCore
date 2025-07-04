@@ -18,8 +18,10 @@ void BettingRoundsLegacyTest::SetUp()
 {
     EngineTest::SetUp();
 
-    // Essential events for game flow, in the legacy code (that has an unwanted dependency in which the gui pilots the
-    // game)
+    // events for game flow, in the legacy code (that has an unwanted dependencies in which the gui pilots the
+    // game). These dependencies will be removed in the new engine code, which will use a FSM for the betting rounds
+    // handling.
+    myEvents.clear();
     myEvents.onActivePlayerActionDone = [this]() { myHand->resolveHandConditions(); };
     myEvents.onBettingRoundAnimation = [this](int bettingRoundId) { bettingRoundAnimation(bettingRoundId); };
     myEvents.onDealBettingRoundCards = [this](int bettingRoundId) { dealBettingRoundCards(bettingRoundId); };
@@ -30,9 +32,9 @@ void BettingRoundsLegacyTest::SetUp()
     myEvents.onStartPostRiver = [this]() { myHand->getCurrentBettingRound()->postRiverRun(); };
 }
 
-void BettingRoundsLegacyTest::bettingRoundAnimation(int bettingRoundID)
+void BettingRoundsLegacyTest::bettingRoundAnimation(int bettingRoundId)
 {
-    if (bettingRoundID < 4)
+    if (bettingRoundId < 4)
     {
         myHand->getCurrentBettingRound()->nextPlayer();
     }
@@ -407,4 +409,63 @@ TEST_F(BettingRoundsLegacyTest, NoPlayerChecksAfterBetOrRaise)
         }
     }
 }
+TEST_F(BettingRoundsLegacyTest, OnlyOneBetAllowedPerRoundUnlessRaised)
+{
+    initializeHandForTesting(4);
+    myHand->start();
+
+    const auto& history = myHand->getHandActionHistory();
+    for (const auto& round : history)
+    {
+        int betCount = 0;
+        for (const auto& [playerId, action] : round.actions)
+        {
+            if (action == PlayerAction::PlayerActionBet)
+                ++betCount;
+        }
+        EXPECT_LE(betCount, 1) << "Multiple bets occurred in a single round.";
+    }
+}
+TEST_F(BettingRoundsLegacyTest, FoldedPlayerDoesNotReappearInLaterRounds)
+{
+    initializeHandForTesting(4);
+    myHand->start();
+
+    std::unordered_map<unsigned, bool> hasFolded;
+
+    const auto& history = myHand->getHandActionHistory();
+    for (const auto& round : history)
+    {
+        for (const auto& [playerId, action] : round.actions)
+        {
+            if (hasFolded[playerId])
+            {
+                FAIL() << "Player " << playerId << " acted after folding.";
+            }
+
+            if (action == PlayerAction::PlayerActionFold)
+                hasFolded[playerId] = true;
+        }
+    }
+}
+TEST_F(BettingRoundsLegacyTest, NoBettingInPostRiverRound)
+{
+    initializeHandForTesting(4);
+    myHand->start();
+
+    const auto& history = myHand->getHandActionHistory();
+    for (const auto& round : history)
+    {
+        if (round.round == GameStatePostRiver)
+        {
+            for (const auto& [playerId, action] : round.actions)
+            {
+                EXPECT_NE(action, PlayerAction::PlayerActionBet);
+                EXPECT_NE(action, PlayerAction::PlayerActionRaise);
+                EXPECT_NE(action, PlayerAction::PlayerActionCall);
+            }
+        }
+    }
+}
+
 } // namespace pkt::test

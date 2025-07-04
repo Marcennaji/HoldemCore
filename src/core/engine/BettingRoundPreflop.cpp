@@ -250,7 +250,7 @@ void BettingRoundPreflop::handleNextPlayerTurn()
     {
         if (myEvents.onBettingRoundAnimation)
         {
-            myEvents.onBettingRoundAnimation(getBettingRoundID());
+            myEvents.onBettingRoundAnimation(getBettingRoundId());
         }
     }
 
