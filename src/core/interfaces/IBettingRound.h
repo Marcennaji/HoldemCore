@@ -24,10 +24,9 @@ class IBettingRound
     virtual void setCurrentPlayersTurnIt(pkt::core::player::PlayerListIterator) = 0;
     virtual pkt::core::player::PlayerListIterator getCurrentPlayersTurnIt() const = 0;
 
-    virtual unsigned getSmallBlindPositionId() const = 0;
+    virtual unsigned getSmallBlindPlayerId() const = 0;
 
-    virtual void setBigBlindPositionId(unsigned) = 0;
-    virtual unsigned getBigBlindPositionId() const = 0;
+    virtual unsigned getBigBlindPlayerId() const = 0;
 
     virtual void setHighestSet(int) = 0;
     virtual int getHighestSet() const = 0;

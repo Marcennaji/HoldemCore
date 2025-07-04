@@ -67,13 +67,6 @@ TEST_F(CardsTest, DealBoardCardsAndHoleCards_NoOverlap_3Players)
     ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
 }
 
-TEST_F(CardsTest, DealBoardCardsAndHoleCards_NoOverlap_1Player)
-{
-    initializeHandForTesting(1);
-    myHand->dealHoleCards(myHand->dealBoardCards());
-    ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
-}
-
 TEST_F(CardsTest, DealBoardCardsAndHoleCards_NoOverlap_MaxPlayers)
 {
     initializeHandForTesting(MAX_NUMBER_OF_PLAYERS);

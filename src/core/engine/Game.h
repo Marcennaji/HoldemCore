@@ -56,13 +56,13 @@ class Game
     void setCurrentHandID(int theValue) { myCurrentHandId = theValue; }
     int getCurrentHandID() const { return myCurrentHandId; }
 
-    unsigned getDealerPlayerId() const { return myDealerPosition; }
+    unsigned getDealerPlayerId() const { return myDealerPlayerId; }
 
     void replaceDealer(unsigned oldDealer, unsigned newDealer)
     {
-        if (myDealerPosition == oldDealer)
+        if (myDealerPlayerId == oldDealer)
         {
-            myDealerPosition = newDealer;
+            myDealerPlayerId = newDealer;
         }
     }
 
@@ -90,7 +90,7 @@ class Game
     // running variables
     int myCurrentSmallBlind;
     int myCurrentHandId{0};
-    unsigned myDealerPosition{0};
+    unsigned myDealerPlayerId{0};
     int myLastHandBlindsRaised{1};
     int myLastTimeBlindsRaised{0};
     GameData myGameData;

@@ -53,7 +53,7 @@ class Hand : public IHand
 
     GameState getRoundBeforePostRiver() const { return myRoundBeforePostRiver; }
 
-    int getDealerPlayerId() const { return myDealerPosition; }
+    int getDealerPlayerId() const { return myDealerPlayerId; }
 
     void setSmallBlind(int theValue) { mySmallBlind = theValue; }
     int getSmallBlind() const { return mySmallBlind; }
@@ -116,9 +116,9 @@ class Hand : public IHand
     std::vector<int> myCardsArray;
 
     int myStartQuantityPlayers;
-    unsigned myDealerPosition;
+    unsigned myDealerPlayerId;
     unsigned mySmallBlindPlayerId;
-    unsigned myBigBlindPosition;
+    unsigned myBigBlindPlayerId;
     GameState myCurrentRound{GameStatePreflop};
     GameState myRoundBeforePostRiver{GameStatePreflop};
     int mySmallBlind;

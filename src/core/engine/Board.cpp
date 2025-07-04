@@ -17,7 +17,7 @@ namespace pkt::core
 {
 using namespace pkt::core::player;
 
-Board::Board(unsigned dp) : IBoard(), myDealerPosition(dp)
+Board::Board(unsigned dp) : IBoard(), myDealerPlayerId(dp)
 {
     myCards[0] = myCards[1] = myCards[2] = myCards[3] = myCards[4] = 0;
 }
@@ -184,7 +184,7 @@ void Board::distributePot()
                 // find Seat with dealerPosition
                 for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
                 {
-                    if ((*it)->getId() == myDealerPosition)
+                    if ((*it)->getId() == myDealerPlayerId)
                     {
                         break;
                     }

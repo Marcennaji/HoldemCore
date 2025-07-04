@@ -49,7 +49,7 @@ void BettingRoundPreflop::handleFirstRunPreflop()
 {
     GlobalServices::instance().logger()->verbose("Handling first run of preflop.");
 
-    PlayerListIterator bigBlindPositionIt = getHand()->getRunningPlayerFromId(getBigBlindPositionId());
+    PlayerListIterator bigBlindPositionIt = getHand()->getRunningPlayerFromId(getBigBlindPlayerId());
 
     if (getHand()->getSeatsList()->size() > 2)
     {
@@ -73,7 +73,7 @@ void BettingRoundPreflop::handleMultiPlayerFirstRun(PlayerListIterator bigBlindP
 
     if (bigBlindPositionIt == getHand()->getRunningPlayersList()->end())
     {
-        PlayerListIterator smallBlindPositionIt = getHand()->getRunningPlayerFromId(getSmallBlindPositionId());
+        PlayerListIterator smallBlindPositionIt = getHand()->getRunningPlayerFromId(getSmallBlindPlayerId());
 
         if (smallBlindPositionIt == getHand()->getRunningPlayersList()->end())
         {
@@ -81,13 +81,13 @@ void BettingRoundPreflop::handleMultiPlayerFirstRun(PlayerListIterator bigBlindP
         }
         else
         {
-            setFirstRoundLastPlayersTurnId(getSmallBlindPositionId());
+            setFirstRoundLastPlayersTurnId(getSmallBlindPlayerId());
             GlobalServices::instance().logger()->verbose("Small blind is the last player before the first action.");
         }
     }
     else
     {
-        setFirstRoundLastPlayersTurnId(getBigBlindPositionId());
+        setFirstRoundLastPlayersTurnId(getBigBlindPlayerId());
         GlobalServices::instance().logger()->verbose("Big blind is the last player before the first action.");
     }
 }
@@ -98,7 +98,7 @@ void BettingRoundPreflop::handleHeadsUpFirstRun(PlayerListIterator bigBlindPosit
 
     if (bigBlindPositionIt == getHand()->getRunningPlayersList()->end())
     {
-        PlayerListIterator smallBlindPositionIt = getHand()->getRunningPlayerFromId(getSmallBlindPositionId());
+        PlayerListIterator smallBlindPositionIt = getHand()->getRunningPlayerFromId(getSmallBlindPlayerId());
 
         if (smallBlindPositionIt == getHand()->getRunningPlayersList()->end())
         {
@@ -106,13 +106,13 @@ void BettingRoundPreflop::handleHeadsUpFirstRun(PlayerListIterator bigBlindPosit
         }
         else
         {
-            setFirstRoundLastPlayersTurnId(getSmallBlindPositionId());
+            setFirstRoundLastPlayersTurnId(getSmallBlindPlayerId());
             GlobalServices::instance().logger()->verbose("Small blind is the last player before the first action.");
         }
     }
     else
     {
-        setFirstRoundLastPlayersTurnId(getBigBlindPositionId());
+        setFirstRoundLastPlayersTurnId(getBigBlindPlayerId());
         GlobalServices::instance().logger()->verbose("Big blind is the last player before the first action.");
     }
 }
@@ -121,7 +121,7 @@ void BettingRoundPreflop::findLastActivePlayerBeforeSmallBlind()
 {
     GlobalServices::instance().logger()->verbose("Finding the last active player before the small blind.");
 
-    PlayerListIterator it = getHand()->getPlayerSeatFromId(getSmallBlindPositionId());
+    PlayerListIterator it = getHand()->getPlayerSeatFromId(getSmallBlindPlayerId());
     if (it == getHand()->getSeatsList()->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::ActivePlayerNotFound);

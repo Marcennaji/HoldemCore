@@ -25,8 +25,8 @@ using namespace pkt::core::player;
 Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
            PlayerList seats, PlayerList runningPlayers, int handId, GameData gameData, StartData startData)
     : myEvents(events), myFactory(factory), myBoard(board), mySeatsList(seats), myRunningPlayersList(runningPlayers),
-      myStartQuantityPlayers(startData.numberOfPlayers), myDealerPosition(startData.startDealerPlayerId),
-      mySmallBlindPlayerId(startData.startDealerPlayerId), myBigBlindPosition(startData.startDealerPlayerId),
+      myStartQuantityPlayers(startData.numberOfPlayers), myDealerPlayerId(startData.startDealerPlayerId),
+      mySmallBlindPlayerId(startData.startDealerPlayerId), myBigBlindPlayerId(startData.startDealerPlayerId),
       mySmallBlind(gameData.firstSmallBlind), myStartCash(gameData.startMoney)
 
 {
@@ -52,7 +52,7 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
 
     setBlinds();
 
-    myBettingRounds = myFactory->createAllBettingRounds(this, myDealerPosition, mySmallBlind);
+    myBettingRounds = myFactory->createAllBettingRounds(this, myDealerPlayerId, mySmallBlind);
 
     // Initialize FSM - start with preflop state
     // This will be expanded in Phase 2 to use the factory pattern
@@ -159,7 +159,7 @@ void Hand::assignButtons()
     }
 
     // assign dealer button
-    it = getPlayerSeatFromId(myDealerPosition);
+    it = getPlayerSeatFromId(myDealerPlayerId);
     if (it == mySeatsList->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
@@ -169,7 +169,7 @@ void Hand::assignButtons()
     // assign Small Blind next to dealer. ATTENTION: in heads up it is big blind
     // assign big blind next to small blind. ATTENTION: in heads up it is small blind
     bool nextActivePlayerFound = false;
-    PlayerListIterator dealerPositionIt = getPlayerSeatFromId(myDealerPosition);
+    PlayerListIterator dealerPositionIt = getPlayerSeatFromId(myDealerPlayerId);
     if (dealerPositionIt == mySeatsList->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
@@ -198,7 +198,7 @@ void Hand::assignButtons()
             {
                 // big blind in heads up
                 (*it)->setButton(3);
-                myBigBlindPosition = (*it)->getId();
+                myBigBlindPlayerId = (*it)->getId();
                 // lastPlayerAction for showing cards
             }
 
@@ -216,7 +216,7 @@ void Hand::assignButtons()
             {
                 // big blind normal
                 (*it)->setButton(3);
-                myBigBlindPosition = (*it)->getId();
+                myBigBlindPlayerId = (*it)->getId();
             }
             else
             {

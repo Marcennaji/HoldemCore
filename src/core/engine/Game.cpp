@@ -24,7 +24,7 @@ Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, con
       myStartCash(gameData.startMoney), myStartSmallBlind(gameData.firstSmallBlind), myGameId(gameId),
       myCurrentSmallBlind(gameData.firstSmallBlind), myGameData(gameData), myStartData(startData)
 {
-    myDealerPosition = startData.startDealerPlayerId;
+    myDealerPlayerId = startData.startDealerPlayerId;
 
     // determine dealer position
     PlayerListConstIterator playerI = playersList->begin();
@@ -32,7 +32,7 @@ Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, con
 
     while (playerI != playerEnd)
     {
-        if ((*playerI)->getId() == myDealerPosition)
+        if ((*playerI)->getId() == myDealerPlayerId)
         {
             break;
         }
@@ -44,7 +44,7 @@ Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, con
     }
 
     // create board
-    myCurrentBoard = myFactory->createBoard(myDealerPosition);
+    myCurrentBoard = myFactory->createBoard(myDealerPlayerId);
 
     // create players lists
     mySeatsList.reset(new std::list<std::shared_ptr<Player>>);
@@ -124,7 +124,7 @@ void Game::initHand()
                                           myGameData, myStartData);
 
     bool nextDealerFound = false;
-    PlayerListConstIterator dealerPositionIt = myCurrentHand->getPlayerSeatFromId(myDealerPosition);
+    PlayerListConstIterator dealerPositionIt = myCurrentHand->getPlayerSeatFromId(myDealerPlayerId);
     if (dealerPositionIt == mySeatsList->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
@@ -143,7 +143,7 @@ void Game::initHand()
         if (itC != mySeatsList->end())
         {
             nextDealerFound = true;
-            myDealerPosition = (*itC)->getId();
+            myDealerPlayerId = (*itC)->getId();
             break;
         }
     }

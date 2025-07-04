@@ -19,7 +19,7 @@ using namespace std;
 using namespace pkt::core::player;
 
 BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int sB, GameState gS)
-    : IBettingRound(), myHand(hi), myBettingRoundId(gS), myDealerPosition(dP), mySmallBlind(sB), myMinimumRaise(2 * sB),
+    : IBettingRound(), myHand(hi), myBettingRoundId(gS), myDealerPlayerId(dP), mySmallBlind(sB), myMinimumRaise(2 * sB),
       myEvents(events)
 {
     myCurrentPlayersTurnIt = myHand->getRunningPlayersList()->begin();
@@ -32,7 +32,7 @@ BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int
     {
         if ((*itC)->getButton() == ButtonBigBlind)
         {
-            myBigBlindPositionId = (*itC)->getId();
+            myBigBlindPlayerId = (*itC)->getId();
             break;
         }
     }
@@ -319,7 +319,7 @@ void BettingRound::handleFirstRun()
     GlobalServices::instance().logger()->info("Setting first player to act (clockwise from dealer).");
 
     // Clockwise from dealer to find first active player
-    PlayerListIterator dealerIt = myHand->getPlayerSeatFromId(myDealerPosition);
+    PlayerListIterator dealerIt = myHand->getPlayerSeatFromId(myDealerPlayerId);
     if (dealerIt == myHand->getSeatsList()->end())
         throw Exception(__FILE__, __LINE__, EngineError::ActivePlayerNotFound);
 
@@ -488,18 +488,14 @@ bool BettingRound::getFirstRound() const
     return myFirstRound;
 }
 
-unsigned BettingRound::getSmallBlindPositionId() const
+unsigned BettingRound::getSmallBlindPlayerId() const
 {
     return mySmallBlindPlayerId;
 }
 
-void BettingRound::setBigBlindPositionId(unsigned theValue)
+unsigned BettingRound::getBigBlindPlayerId() const
 {
-    myBigBlindPositionId = theValue;
-}
-unsigned BettingRound::getBigBlindPositionId() const
-{
-    return myBigBlindPositionId;
+    return myBigBlindPlayerId;
 }
 
 void BettingRound::setSmallBlind(int theValue)
