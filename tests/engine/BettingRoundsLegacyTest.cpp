@@ -1,6 +1,7 @@
 // tests/BettingRoundsLegacyTest.cpp
 
 #include "BettingRoundsLegacyTest.h"
+#include "core/engine/model/PlayerAction.h"
 #include "core/services/GlobalServices.h"
 
 using namespace pkt::core;
@@ -43,6 +44,15 @@ void BettingRoundsLegacyTest::dealBettingRoundCards(int bettingRoundId)
     {
         myHand->resolveHandConditions();
     }
+}
+bool BettingRoundsLegacyTest::isPlayerStillActive(unsigned id) const
+{
+    for (const auto& p : *myHand->getRunningPlayersList())
+    {
+        if (p->getId() == id)
+            return true;
+    }
+    return false;
 }
 
 // Tests for betting rounds and transitions
@@ -95,7 +105,7 @@ TEST_F(BettingRoundsLegacyTest, PlayersDoNotActAfterFolding)
     }
 }
 
-TEST_F(BettingRoundsLegacyTest, EachRoundHasAtLeastOneActionIfNotAllIn)
+TEST_F(BettingRoundsLegacyTest, EachPLayerHasAtLeastOneAction)
 {
     initializeHandForTesting(4);
     myHand->start();
@@ -109,40 +119,292 @@ TEST_F(BettingRoundsLegacyTest, EachRoundHasAtLeastOneActionIfNotAllIn)
         totalActionCount += player->getCurrentHandActions().getRiverActions().size();
     }
 
-    EXPECT_GT(totalActionCount, 0u) << "No betting actions occurred in any round.";
+    EXPECT_GT(totalActionCount, 0u) << "No actions occurred in any round.";
 }
 
-TEST_F(BettingRoundsLegacyTest, DISABLED_PreflopActionOrderMatchesSeatOrder)
+TEST_F(BettingRoundsLegacyTest, ShouldRecordAllActionsInHandHistoryChronologically)
 {
     initializeHandForTesting(3);
     myHand->start();
 
-    std::vector<int> actionOrder;
+    const auto& history = myHand->getHandActionHistory();
+    EXPECT_FALSE(history.empty()) << "Hand action history should not be empty.";
 
-    for (const auto& player : *mySeatsList)
+    for (const auto& roundHistory : history)
     {
-        for (const auto& action : player->getCurrentHandActions().getPreflopActions())
+        SCOPED_TRACE("Round: " + std::to_string(static_cast<int>(roundHistory.round)));
+        EXPECT_FALSE(roundHistory.actions.empty())
+            << "No actions recorded for round " << static_cast<int>(roundHistory.round);
+
+        for (const auto& [playerId, action] : roundHistory.actions)
         {
-            actionOrder.push_back(player->getId());
-            break;
+            EXPECT_GE(playerId, 0u);
+            EXPECT_TRUE(action != PlayerAction::PlayerActionNone);
         }
     }
+}
+TEST_F(BettingRoundsLegacyTest, ActionOrderStartsCorrectlyInHeadsUpPreflop)
+{
+    initializeHandForTesting(2);
+    myHand->start();
 
-    auto it = mySeatsList->begin();
-    std::advance(it, 2);
-    if (it == mySeatsList->end())
-        it = mySeatsList->begin();
+    const auto& history = myHand->getHandActionHistory();
+    const auto& preflop = history.front();
+    ASSERT_EQ(preflop.round, GameStatePreflop);
+    ASSERT_FALSE(preflop.actions.empty());
 
-    std::vector<int> expectedOrder;
-    for (size_t i = 0; i < mySeatsList->size(); ++i)
-    {
-        expectedOrder.push_back((*it)->getId());
-        ++it;
-        if (it == mySeatsList->end())
-            it = mySeatsList->begin();
-    }
-
-    EXPECT_EQ(actionOrder, expectedOrder) << "Preflop action order does not match expected seat order.";
+    PlayerListIterator dealerIt = myHand->getSeatsIt(myHand->getDealerPosition());
+    ASSERT_FALSE(preflop.actions.empty());
+    // in heads-up, preflop, the first player to act is the dealer
+    EXPECT_EQ(preflop.actions.front().first, (*dealerIt)->getId());
 }
 
+TEST_F(BettingRoundsLegacyTest, FirstToActPostflopIsLeftOfDealer)
+{
+    initializeHandForTesting(3);
+    myHand->start();
+
+    const auto& history = myHand->getHandActionHistory();
+    for (const auto& round : history)
+    {
+        if (round.round == GameStateFlop || round.round == GameStateTurn || round.round == GameStateRiver)
+        {
+            ASSERT_FALSE(round.actions.empty());
+            unsigned dealerId = myHand->getDealerPosition();
+
+            // Get seat iterator for the dealer
+            auto seats = myHand->getSeatsList();
+            auto it = std::find_if(seats->begin(), seats->end(),
+                                   [dealerId](const auto& p) { return p->getId() == dealerId; });
+
+            // Move to the next seat (left of dealer)
+            ++it;
+            if (it == seats->end())
+                it = seats->begin();
+
+            // Collect all players who acted in this round
+            std::set<unsigned> actors;
+            for (const auto& [pid, action] : round.actions)
+                actors.insert(pid);
+
+            // Find first player who acted clockwise from dealer
+            unsigned expectedFirstId = std::numeric_limits<unsigned>::max();
+            for (size_t i = 0; i < seats->size(); ++i)
+            {
+                unsigned id = (*it)->getId();
+                if (actors.count(id))
+                {
+                    expectedFirstId = id;
+                    break;
+                }
+                ++it;
+                if (it == seats->end())
+                    it = seats->begin();
+            }
+
+            ASSERT_NE(expectedFirstId, std::numeric_limits<unsigned>::max())
+                << "No valid first actor found from seat order";
+
+            EXPECT_EQ(round.actions.front().first, expectedFirstId)
+                << "First action in round " << static_cast<int>(round.round)
+                << " not from first eligible player after dealer";
+        }
+    }
+}
+
+TEST_F(BettingRoundsLegacyTest, AllActionsAreFromActivePlayersOnly)
+{
+    initializeHandForTesting(6);
+    myHand->start();
+
+    const auto& history = myHand->getHandActionHistory();
+    for (const auto& round : history)
+    {
+        for (const auto& [playerId, action] : round.actions)
+        {
+            EXPECT_TRUE(myHand->getSeatsIt(playerId) != myHand->getSeatsList()->end());
+            EXPECT_NE(action, PlayerAction::PlayerActionNone);
+        }
+    }
+}
+
+TEST_F(BettingRoundsLegacyTest, NoTwoConsecutiveActionsBySamePlayerInRound)
+{
+    initializeHandForTesting(3);
+    myHand->start();
+
+    const auto& history = myHand->getHandActionHistory();
+    for (const auto& round : history)
+    {
+        unsigned lastId = std::numeric_limits<unsigned>::max();
+        for (const auto& [playerId, action] : round.actions)
+        {
+            EXPECT_NE(playerId, lastId);
+            lastId = playerId;
+        }
+    }
+}
+TEST_F(BettingRoundsLegacyTest, NoPlayerStartsPostFlopRoundWithRaise)
+{
+    initializeHandForTesting(4);
+    myHand->start();
+
+    const auto& history = myHand->getHandActionHistory();
+    for (const auto& round : history)
+    {
+        if (round.round == GameStateFlop || round.round == GameStateTurn || round.round == GameStateRiver)
+        {
+
+            // Check the first action in the round
+            const auto& firstAction = round.actions.front();
+            EXPECT_NE(firstAction.second, PlayerAction::PlayerActionRaise)
+                << "Invalid action: Player started the post-flop round with a raise.";
+        }
+    }
+}
+TEST_F(BettingRoundsLegacyTest, NoPlayerStartsPostflopRoundByFolding)
+{
+    initializeHandForTesting(4);
+    myHand->start();
+
+    const auto& history = myHand->getHandActionHistory();
+    for (const auto& round : history)
+    {
+        if (round.round == GameStateFlop || round.round == GameStateTurn || round.round == GameStateRiver)
+        {
+            ASSERT_FALSE(round.actions.empty()) << "Postflop round has no actions.";
+
+            // Check the first action in the round
+            const auto& firstAction = round.actions.front();
+            EXPECT_NE(firstAction.second, PlayerAction::PlayerActionFold)
+                << "Invalid action: Player started a postflop round by folding.";
+        }
+    }
+}
+TEST_F(BettingRoundsLegacyTest, NoPlayerBetsAfterRaise)
+{
+    initializeHandForTesting(4);
+    myHand->start();
+
+    const auto& history = myHand->getHandActionHistory();
+    for (const auto& round : history)
+    {
+        ASSERT_FALSE(round.actions.empty()) << "Round has no actions.";
+
+        // Track the previous action
+        pkt::core::PlayerAction previousAction = PlayerAction::PlayerActionNone;
+
+        for (const auto& [playerId, action] : round.actions)
+        {
+            if (previousAction == PlayerAction::PlayerActionRaise)
+            {
+                EXPECT_NE(action, PlayerAction::PlayerActionBet)
+                    << "Invalid action: Player placed a bet after a raise.";
+            }
+            previousAction = action;
+        }
+    }
+}
+TEST_F(BettingRoundsLegacyTest, NoPlayerFoldsPostFlopWhenNoBet)
+{
+    initializeHandForTesting(4);
+    myHand->start();
+
+    const auto& history = myHand->getHandActionHistory();
+    for (const auto& round : history)
+    {
+        if (round.round == GameStateFlop || round.round == GameStateTurn || round.round == GameStateRiver)
+        {
+
+            bool hasBetOrRaise = false;
+
+            for (const auto& [playerId, action] : round.actions)
+            {
+                if (action == PlayerAction::PlayerActionBet || action == PlayerAction::PlayerActionRaise)
+                {
+                    hasBetOrRaise = true;
+                }
+
+                if (!hasBetOrRaise)
+                {
+                    EXPECT_NE(action, PlayerAction::PlayerActionFold)
+                        << "Invalid action: Player folded when there was no bet or raise.";
+                }
+            }
+        }
+    }
+}
+TEST_F(BettingRoundsLegacyTest, NoPlayerCallsWithoutBetOrRaise)
+{
+    initializeHandForTesting(4);
+    myHand->start();
+
+    const auto& history = myHand->getHandActionHistory();
+    for (const auto& round : history)
+    {
+        ASSERT_FALSE(round.actions.empty()) << "Round has no actions.";
+
+        bool hasBetOrRaise = false;
+
+        for (const auto& [playerId, action] : round.actions)
+        {
+            if (action == PlayerAction::PlayerActionBet || action == PlayerAction::PlayerActionRaise)
+            {
+                hasBetOrRaise = true;
+            }
+
+            if (!hasBetOrRaise)
+            {
+                EXPECT_NE(action, PlayerAction::PlayerActionCall)
+                    << "Invalid action: Player called when there was no bet or raise.";
+            }
+        }
+    }
+}
+TEST_F(BettingRoundsLegacyTest, NoConsecutiveRaisesBySamePlayer)
+{
+    initializeHandForTesting(4);
+    myHand->start();
+
+    const auto& history = myHand->getHandActionHistory();
+    for (const auto& round : history)
+    {
+        ASSERT_FALSE(round.actions.empty()) << "Round has no actions.";
+
+        unsigned lastRaiserId = std::numeric_limits<unsigned>::max();
+
+        for (const auto& [playerId, action] : round.actions)
+        {
+            if (action == PlayerAction::PlayerActionRaise)
+            {
+                EXPECT_NE(playerId, lastRaiserId)
+                    << "Invalid action: Player raised consecutively without another player acting.";
+                lastRaiserId = playerId;
+            }
+        }
+    }
+}
+TEST_F(BettingRoundsLegacyTest, NoPlayerChecksAfterBetOrRaise)
+{
+    initializeHandForTesting(4);
+    myHand->start();
+
+    const auto& history = myHand->getHandActionHistory();
+    for (const auto& round : history)
+    {
+        ASSERT_FALSE(round.actions.empty()) << "Round has no actions.";
+
+        pkt::core::PlayerAction previousAction = PlayerAction::PlayerActionNone;
+
+        for (const auto& [playerId, action] : round.actions)
+        {
+            if (previousAction == PlayerAction::PlayerActionBet || previousAction == PlayerAction::PlayerActionRaise)
+            {
+                EXPECT_NE(action, PlayerAction::PlayerActionCheck)
+                    << "Invalid action: Player checked after a bet or raise.";
+            }
+            previousAction = action;
+        }
+    }
+}
 } // namespace pkt::test

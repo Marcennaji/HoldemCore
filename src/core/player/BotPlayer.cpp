@@ -96,6 +96,8 @@ void BotPlayer::action()
 
     GlobalServices::instance().logger()->info(logMessage.str() + (myAction == PlayerActionFold ? "\n" : ""));
 
+    currentHand->recordPlayerAction(currentHand->getCurrentRoundState(), getId(), myAction);
+
     if (myAction != PlayerActionFold)
     {
         if (currentHand->getCurrentRoundState() == GameStatePreflop)

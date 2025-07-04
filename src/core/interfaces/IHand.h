@@ -5,6 +5,7 @@
 #pragma once
 
 #include "core/engine/GameEvents.h"
+#include "core/engine/model/PlayerAction.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/interfaces/IBettingRound.h"
 #include "core/interfaces/IBoard.h"
@@ -14,6 +15,11 @@
 
 namespace pkt::core
 {
+struct BettingRoundHistory
+{
+    GameState round;
+    std::vector<std::pair<unsigned, pkt::core::PlayerAction>> actions; // playerId, action
+};
 
 class IHand
 {
@@ -86,6 +92,26 @@ class IHand
 
     virtual pkt::core::player::PlayerListIterator getSeatsIt(unsigned) const = 0;
     virtual pkt::core::player::PlayerListIterator getRunningPlayerIt(unsigned) const = 0;
+
+    void recordPlayerAction(GameState round, unsigned playerId, const pkt::core::PlayerAction& action)
+    {
+        // Find or create entry for this round
+        auto it = std::find_if(myHandActionHistory.begin(), myHandActionHistory.end(),
+                               [round](const BettingRoundHistory& h) { return h.round == round; });
+
+        if (it == myHandActionHistory.end())
+        {
+            myHandActionHistory.push_back({round, {{playerId, action}}});
+        }
+        else
+        {
+            it->actions.emplace_back(playerId, action);
+        }
+    }
+
+    const std::vector<BettingRoundHistory>& getHandActionHistory() const { return myHandActionHistory; }
+
+    std::vector<BettingRoundHistory> myHandActionHistory;
 
     friend class Game;
     friend class BettingRound;
