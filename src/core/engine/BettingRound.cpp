@@ -50,7 +50,7 @@ BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int
             break;
         }
     }
-    if (itC == myHand->getSeatsList()->end())
+    if (itC == myHand->getSeatsList()->end() && myHand->getSeatsList()->size() > 2)
     {
         GlobalServices::instance().logger()->error("SB player not found in the seats list");
     }

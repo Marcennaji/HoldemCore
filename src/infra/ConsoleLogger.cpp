@@ -19,7 +19,10 @@ void ConsoleLogger::error(const std::string& msg)
 
 void ConsoleLogger::info(const std::string& msg)
 {
-    std::cout << "[INFO] " << msg << std::endl;
+    if (myLogLevel >= LogLevel::Info)
+    {
+        std::cout << "[INFO] " << msg << std::endl;
+    }
 }
 
 void ConsoleLogger::verbose(const std::string& msg)

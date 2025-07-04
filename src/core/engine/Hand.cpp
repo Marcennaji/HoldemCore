@@ -325,7 +325,7 @@ void Hand::updateRunningPlayersList()
             }
             else
             {
-                GlobalServices::instance().logger()->error("myRunningPlayersList is now empty after removal.");
+                GlobalServices::instance().logger()->verbose("myRunningPlayersList is now empty after removal.");
             }
         }
         else
