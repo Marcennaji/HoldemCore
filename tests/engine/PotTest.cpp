@@ -18,12 +18,13 @@ class PotTest : public ::testing::Test
     GameEvents events;
     std::unique_ptr<Pot> pot;
 
-    std::shared_ptr<DummyPlayer> createPlayer(int id, int startCash, int cash, int handRank, PlayerAction action)
+    std::shared_ptr<DummyPlayer> createPlayer(int id, int cashAtHandStart, int remainingCash, int handRank,
+                                              PlayerAction action)
     {
         auto p = std::make_shared<DummyPlayer>(id, events);
         p->setId(id);
-        p->setRoundStartCash(startCash);
-        p->setCash(cash);
+        p->setCashAtHandStart(cashAtHandStart);
+        p->setCash(remainingCash);
         p->setHandRanking(handRank);
         p->setAction(action);
         return p;
@@ -40,24 +41,24 @@ class PotTest : public ::testing::Test
 
 TEST_F(PotTest, SingleWinnerGetsFullPot)
 {
-    auto p1 = createPlayer(0, 1000, 0, 200, PlayerActionCall);
-    auto p2 = createPlayer(1, 1000, 0, 100, PlayerActionCall);
+    auto p1 = createPlayer(0, 1000, 750, 200, PlayerActionCall);
+    auto p2 = createPlayer(1, 1000, 750, 100, PlayerActionCall);
     setupPot({p1, p2}, 500, 0);
     pot->distribute();
 
-    EXPECT_EQ(p1->getCash(), 500);
-    EXPECT_EQ(p2->getCash(), 0);
+    EXPECT_EQ(p1->getCash(), 1250);
+    EXPECT_EQ(p2->getCash(), 750);
 }
 
 TEST_F(PotTest, EqualSplitBetweenTwoWinners)
 {
-    auto p1 = createPlayer(0, 1000, 0, 150, PlayerActionCall);
-    auto p2 = createPlayer(1, 1000, 0, 150, PlayerActionCall);
+    auto p1 = createPlayer(0, 1000, 750, 150, PlayerActionCall);
+    auto p2 = createPlayer(1, 1000, 750, 150, PlayerActionCall);
     setupPot({p1, p2}, 500, 0);
     pot->distribute();
 
-    EXPECT_EQ(p1->getCash(), 250);
-    EXPECT_EQ(p2->getCash(), 250);
+    EXPECT_EQ(p1->getCash(), 1000);
+    EXPECT_EQ(p2->getCash(), 1000);
 }
 
 TEST_F(PotTest, OddChipGoesToLeftOfDealer)
@@ -71,14 +72,14 @@ TEST_F(PotTest, OddChipGoesToLeftOfDealer)
     EXPECT_TRUE(p1->getCash() == 250 || p1->getCash() == 251);
 }
 
-TEST_F(PotTest, FoldedPlayerGetsNothing)
+TEST_F(PotTest, FoldedPlayerGetsNothing2Players)
 {
-    auto p1 = createPlayer(0, 1000, 0, 100, PlayerActionCall);
-    auto p2 = createPlayer(1, 1000, 0, 120, PlayerActionFold);
+    auto p1 = createPlayer(0, 1000, 300, 100, PlayerActionCall);
+    auto p2 = createPlayer(1, 1000, 200, 120, PlayerActionFold);
     setupPot({p1, p2}, 500, 0);
     pot->distribute();
 
-    EXPECT_EQ(p2->getCash(), 0);
+    EXPECT_EQ(p2->getCash(), 200);
 }
 
 TEST_F(PotTest, SidePotWithShortStack)
@@ -104,4 +105,45 @@ TEST_F(PotTest, NoWinnersMeansNoDistribution)
     EXPECT_EQ(p2->getCash(), 0);
 }
 
+TEST_F(PotTest, AllInPlayerWinsSidePot)
+{
+    auto p1 = createPlayer(0, 100, 0, 200, PlayerActionCall); // All-in
+    auto p2 = createPlayer(1, 300, 0, 150, PlayerActionCall);
+    auto p3 = createPlayer(2, 300, 0, 100, PlayerActionCall);
+    setupPot({p1, p2, p3}, 700, 2);
+    pot->distribute();
+
+    EXPECT_EQ(p1->getCash(), 300);           // Player 0 wins the side pot
+    EXPECT_GT(p2->getCash(), p3->getCash()); // Player 1 wins more than Player 2
+}
+TEST_F(PotTest, FoldedPlayersGetsNothing3Players)
+{
+    auto p1 = createPlayer(0, 1000, 700, 200, PlayerActionCall);
+    auto p2 = createPlayer(1, 1000, 900, 150, PlayerActionFold);
+    auto p3 = createPlayer(2, 1000, 900, 100, PlayerActionCall);
+    setupPot({p1, p2, p3}, 500, 0);
+    pot->distribute();
+
+    EXPECT_EQ(p2->getCash(), 900);           // Folded player gets nothing
+    EXPECT_GT(p1->getCash(), p3->getCash()); // Player 1 wins more than Player 3
+}
+TEST_F(PotTest, PotFullyDistributed)
+{
+    auto p1 = createPlayer(0, 1000, 700, 200, PlayerActionCall);
+    auto p2 = createPlayer(1, 1000, 900, 150, PlayerActionCall);
+    setupPot({p1, p2}, 400, 0);
+    pot->distribute();
+
+    EXPECT_EQ(p1->getCash() + p2->getCash(), 2000); // Total cash matches pot amount
+}
+TEST_F(PotTest, AllInPlayerWinsEntirePot)
+{
+    auto p1 = createPlayer(0, 1000, 0, 200, PlayerActionCall); // All-in
+    auto p2 = createPlayer(1, 1500, 500, 150, PlayerActionCall);
+    setupPot({p1, p2}, 1500, 0);
+    pot->distribute();
+
+    EXPECT_EQ(p1->getCash(), 1500); // Player 0 wins the entire pot
+    EXPECT_EQ(p2->getCash(), 500);  // Player 1 gets nothing
+}
 } // namespace pkt::test

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include "core/engine/Exception.h"
+#include "core/services/GlobalServices.h"
 
 namespace pkt::core
 {
@@ -28,7 +29,11 @@ void Pot::distribute()
 
         int potLevel = static_cast<int>(eligible.size() * level);
         if (potLevel > myTotal)
+        {
+            GlobalServices::instance().logger()->info("Pot level " + std::to_string(potLevel) +
+                                                      " exceeds total available chips : " + std::to_string(myTotal));
             potLevel = myTotal;
+        }
 
         auto winners = determineWinners(eligible, level);
         if (winners.empty())
@@ -58,7 +63,7 @@ std::vector<unsigned> Pot::initializePlayerContributions()
     std::vector<unsigned> result;
     for (const auto& p : *mySeats)
     {
-        unsigned contributed = p->getRoundStartCash() - p->getCash();
+        unsigned contributed = p->getCashAtHandStart() - p->getCash();
         result.push_back(contributed);
         p->setLastMoneyWon(0);
     }

@@ -100,7 +100,7 @@ void Hand::dealHoleCards(size_t cardsArrayIndex)
         string humanReadableHand = CardUtilities::getCardStringValue(tempPlayerAndBoardArray, 7);
         (*it)->setCards(tempPlayerArray);
         (*it)->setHandRanking(HandEvaluator::evaluateHand(humanReadableHand.c_str()));
-        (*it)->setRoundStartCash((*it)->getCash());
+        (*it)->setCashAtHandStart((*it)->getCash());
         (*it)->getCurrentHandActions().reset();
         (*it)->setPosition();
         (*it)->getRangeEstimator()->setEstimatedRange("");

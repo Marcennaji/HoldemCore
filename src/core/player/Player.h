@@ -90,8 +90,8 @@ class Player
     void setHandRanking(int theValue);
     int getHandRanking() const;
 
-    void setRoundStartCash(int theValue);
-    int getRoundStartCash() const;
+    void setCashAtHandStart(int theValue);
+    int getCashAtHandStart() const;
 
     void setLastMoneyWon(int theValue);
     int getLastMoneyWon() const;
@@ -172,14 +172,32 @@ class Player
     int myCards[2];
     std::string myCard1;
     std::string myCard2;
-    int myCash;
+
+    int myCash{0};
+    int myCashAtHandStart{0};
+
+    /**
+     * Purpose: Represents the total amount of chips the player has committed to the pot during the game.
+     * Usage:
+     * Tracks the cumulative amount the player has bet across all rounds.
+     * Used in pot distribution calculations to determine the player's share of the pot.
+     * Example:
+     * If a player bets 200 in the preflop and 300 on the flop, mySet would be 500.
+     */
     int mySet{0};
+
+    /**
+     * Purpose: Represents the amount of chips the player has committed to the pot during the most recent betting
+     * action. Usage: Tracks the player's contribution during the current betting action (e.g., a call, raise, or
+     * all-in). Helps calculate the player's odds and contributions for the current pot level. Example: If a player
+     * raises by 300 chips, myLastRelativeSet would be set to 300
+     */
     int myLastRelativeSet{0};
+
     PlayerAction myAction{PlayerActionNone};
     int myButton;        // 0 = none, 1 = dealer, 2 =small, 3 = big
     bool myTurn{0};      // 0 = no, 1 = yes
     bool myCardsFlip{0}; // 0 = cards are not fliped, 1 = cards are already flipped,
-    int myRoundStartCash{0};
     int lastMoneyWon{0};
     int myPreflopPotOdd;
     std::unique_ptr<RangeEstimator> myRangeEstimator;

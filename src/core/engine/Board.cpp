@@ -131,9 +131,9 @@ void Board::determinePlayerNeedToShowCards()
         myPlayerNeedToShowCards.push_back((*lastActionPlayerIt)->getId());
 
         std::pair<int, int> levelTmp;
-        // get position und cardsValue of the player who show his cards first
+        // get position and cardsValue of the player who show his cards first
         levelTmp.first = (*lastActionPlayerIt)->getHandRanking();
-        levelTmp.second = (*lastActionPlayerIt)->getRoundStartCash() - (*lastActionPlayerIt)->getCash();
+        levelTmp.second = (*lastActionPlayerIt)->getCashAtHandStart() - (*lastActionPlayerIt)->getCash();
 
         level.push_back(levelTmp);
 
@@ -164,7 +164,7 @@ void Board::determinePlayerNeedToShowCards()
                         {
                             myPlayerNeedToShowCards.push_back((*itC)->getId());
                             levelTmp.first = (*itC)->getHandRanking();
-                            levelTmp.second = (*itC)->getRoundStartCash() - (*itC)->getCash();
+                            levelTmp.second = (*itC)->getCashAtHandStart() - (*itC)->getCash();
                             level.push_back(levelTmp);
                             break;
                         }
@@ -177,23 +177,23 @@ void Board::determinePlayerNeedToShowCards()
                             ++nextLevelIt;
 
                             if (nextLevelIt == level.end() ||
-                                (*itC)->getRoundStartCash() - (*itC)->getCash() > (*nextLevelIt).second)
+                                (*itC)->getCashAtHandStart() - (*itC)->getCash() > (*nextLevelIt).second)
                             {
                                 myPlayerNeedToShowCards.push_back((*itC)->getId());
-                                if ((*itC)->getRoundStartCash() - (*itC)->getCash() > (*levelIt).second)
+                                if ((*itC)->getCashAtHandStart() - (*itC)->getCash() > (*levelIt).second)
                                 {
-                                    (*levelIt).second = (*itC)->getRoundStartCash() - (*itC)->getCash();
+                                    (*levelIt).second = (*itC)->getCashAtHandStart() - (*itC)->getCash();
                                 }
                             }
                             break;
                         }
                         else
                         {
-                            if ((*itC)->getRoundStartCash() - (*itC)->getCash() > (*levelIt).second)
+                            if ((*itC)->getCashAtHandStart() - (*itC)->getCash() > (*levelIt).second)
                             {
                                 myPlayerNeedToShowCards.push_back((*itC)->getId());
                                 levelTmp.first = (*itC)->getHandRanking();
-                                levelTmp.second = (*itC)->getRoundStartCash() - (*itC)->getCash();
+                                levelTmp.second = (*itC)->getCashAtHandStart() - (*itC)->getCash();
 
                                 level.insert(levelIt, levelTmp);
 

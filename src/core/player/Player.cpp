@@ -338,13 +338,13 @@ int Player::getHandRanking() const
     return myHandRanking;
 }
 
-void Player::setRoundStartCash(int theValue)
+void Player::setCashAtHandStart(int theValue)
 {
-    myRoundStartCash = theValue;
+    myCashAtHandStart = theValue;
 }
-int Player::getRoundStartCash() const
+int Player::getCashAtHandStart() const
 {
-    return myRoundStartCash;
+    return myCashAtHandStart;
 }
 
 void Player::setLastMoneyWon(int theValue)

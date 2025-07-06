@@ -135,7 +135,7 @@ void BotPlayer::doPreflopAction()
 
     std::ostringstream logMessage;
     logMessage << "\t" << getPositionLabel(myPosition) << "\t" << myName << "\t" << getCardsValueString() << "\t"
-               << "stack = " << myCash
+               << "stack = " << myCash << ", stack when starting the betting round = " << myCashAtHandStart
                << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
                << "\tpreflop raise : "
                << getStatistics(myCurrentHandContext->nbPlayers).getPreflopStatistics().getPreflopRaise() << " % ";
