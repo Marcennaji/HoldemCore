@@ -503,4 +503,44 @@ int BettingRound::getSmallBlind() const
 {
     return mySmallBlind;
 }
+void BettingRound::findLastActivePlayerBeforeSmallBlind()
+{
+    GlobalServices::instance().logger()->verbose("Finding the last active player before the small blind.");
+
+    PlayerListIterator it = getHand()->getPlayerSeatFromId(getSmallBlindPlayerId());
+    if (it == getHand()->getSeatsList()->end())
+    {
+        throw Exception(__FILE__, __LINE__, EngineError::ActivePlayerNotFound);
+    }
+
+    if (it == getHand()->getSeatsList()->begin())
+    {
+        it = getHand()->getSeatsList()->end();
+    }
+    --it;
+
+    setFirstRoundLastPlayersTurnId((*it)->getId());
+    GlobalServices::instance().logger()->verbose("Last active player before small blind found. Player ID: " +
+                                                 std::to_string(getFirstRoundLastPlayersTurnId()));
+}
+
+bool BettingRound::checkAllHighestSet()
+{
+    GlobalServices::instance().logger()->verbose("Checking if all running players have the highest set.");
+
+    bool allHighestSet = true;
+    for (PlayerListConstIterator itC = getHand()->getRunningPlayersList()->begin();
+         itC != getHand()->getRunningPlayersList()->end(); ++itC)
+    {
+        if (getHighestSet() != (*itC)->getSet())
+        {
+            allHighestSet = false;
+            break;
+        }
+    }
+
+    GlobalServices::instance().logger()->verbose("All highest set check result: " + std::to_string(allHighestSet));
+    return allHighestSet;
+}
+
 } // namespace pkt::core

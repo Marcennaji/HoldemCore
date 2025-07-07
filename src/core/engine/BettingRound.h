@@ -32,7 +32,8 @@ class BettingRound : public IBettingRound
 
   protected:
     IHand* getHand() const;
-
+    void findLastActivePlayerBeforeSmallBlind();
+    bool checkAllHighestSet();
     void setCurrentPlayersTurnId(unsigned theValue);
     unsigned getCurrentPlayersTurnId() const;
 

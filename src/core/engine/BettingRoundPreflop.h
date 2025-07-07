@@ -22,11 +22,10 @@ class BettingRoundPreflop : public BettingRound
     void run();
 
   private:
-    void handleFirstRunPreflop();
+    void handleFirstRun();
     void handleMultiPlayerFirstRun(pkt::core::player::PlayerListIterator bigBlindPositionIt);
     void handleHeadsUpFirstRun(pkt::core::player::PlayerListIterator bigBlindPositionIt);
-    void findLastActivePlayerBeforeSmallBlind();
-    bool checkAllHighestSet();
+
     void proceedToFlop();
     void handleNextPlayerTurn();
 };
