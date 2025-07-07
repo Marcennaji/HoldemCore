@@ -33,7 +33,7 @@ class Pot
     void reduceContributions(std::vector<unsigned>& contributions, unsigned level);
     void finalizeDistribution();
 
-    player::PlayerListIterator getSeatsIt(unsigned id);
+    player::PlayerListIterator getPlayerSeatFromId(unsigned id);
     std::shared_ptr<player::Player> resolveRemainderReceiver(const std::vector<size_t>& winnerIndices) const;
     std::vector<size_t> indexesOf(const std::list<unsigned>& ids);
 };

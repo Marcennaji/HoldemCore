@@ -211,7 +211,7 @@ void Pot::finalizeDistribution()
     // Distribute base share to each winner
     for (unsigned id : uniqueWinners)
     {
-        auto it = getSeatsIt(id);
+        auto it = getPlayerSeatFromId(id);
         if (it != mySeats->end())
         {
             (*it)->setCash((*it)->getCash() + baseShare);
@@ -232,7 +232,7 @@ void Pot::finalizeDistribution()
 
     myTotal = 0;
 }
-player::PlayerListIterator Pot::getSeatsIt(unsigned id)
+player::PlayerListIterator Pot::getPlayerSeatFromId(unsigned id)
 {
     return std::find_if(mySeats->begin(), mySeats->end(),
                         [id](const std::shared_ptr<player::Player>& p) { return p->getId() == id; });

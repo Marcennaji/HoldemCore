@@ -123,9 +123,17 @@ void BotPlayer::action()
     }
     currentHand->setPreviousPlayerId(myID);
 
-    if (myEvents.onActivePlayerActionDone)
+    if (currentHand->getFlowMode() == FlowMode::Legacy)
     {
-        myEvents.onActivePlayerActionDone();
+        // in the legacy code, at this point the GUI is piloting the game flow
+        if (myEvents.onActivePlayerActionDone)
+        {
+            myEvents.onActivePlayerActionDone();
+        }
+    }
+    else
+    {
+        currentHand->resolveHandConditions();
     }
 }
 

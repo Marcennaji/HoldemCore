@@ -71,6 +71,7 @@ void EngineTest::initializeHandWithPlayers(size_t activePlayerCount)
 
     myHand = myFactory->createHand(myFactory, myBoard, mySeatsList, myRunningPlayersList, startDealerPlayerId, gameData,
                                    startData);
+    myHand->setFlowMode(myFlowMode);
 }
 
 } // namespace pkt::test

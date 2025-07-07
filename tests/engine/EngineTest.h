@@ -28,6 +28,7 @@ class EngineTest : public ::testing::Test
     void TearDown() override;
     // Helper function to initialize a Hand object for testing
     void initializeHandForTesting(size_t activePlayerCount);
+    void setFlowMode(pkt::core::FlowMode mode) { myFlowMode = mode; };
 
   private:
     // Helper function to create a PlayerList with mock players
@@ -35,5 +36,6 @@ class EngineTest : public ::testing::Test
     void initializeHandWithPlayers(size_t activePlayerCount);
 
     const int startDealerPlayerId{0}; // Starting dealer player ID, can be set to any valid player ID
+    pkt::core::FlowMode myFlowMode{pkt::core::FlowMode::Legacy}; // Default flow mode for the hand
 };
 } // namespace pkt::test
