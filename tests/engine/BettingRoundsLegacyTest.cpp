@@ -31,7 +31,7 @@ void BettingRoundsLegacyTest::SetUp()
     myEvents.onStartFlop = [this]() { myHand->getCurrentBettingRound()->run(); };
     myEvents.onStartTurn = [this]() { myHand->getCurrentBettingRound()->run(); };
     myEvents.onStartRiver = [this]() { myHand->getCurrentBettingRound()->run(); };
-    myEvents.onStartPostRiver = [this]() { myHand->getCurrentBettingRound()->postRiverRun(); };
+    myEvents.onStartPostRiver = [this]() { myHand->getCurrentBettingRound()->run(); };
 }
 
 void BettingRoundsLegacyTest::bettingRoundAnimation(int bettingRoundId)

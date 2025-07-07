@@ -55,12 +55,6 @@ BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int
 
 BettingRound::~BettingRound() = default;
 
-int BettingRound::getHighestCardsValue() const
-{
-    GlobalServices::instance().logger()->error("getHighestCardsValue() in wrong BettingRound");
-    return 0;
-}
-
 void BettingRound::giveActionToNextBotPlayer()
 {
     auto nextBotPlayer = myHand->getRunningPlayerFromId(myCurrentPlayersTurnId);
@@ -406,10 +400,6 @@ GameState BettingRound::getBettingRoundId() const
     return myBettingRoundId;
 }
 
-void BettingRound::setHighestCardsValue(int /*theValue*/)
-{
-}
-
 void BettingRound::setMinimumRaise(int theValue)
 {
     myMinimumRaise = theValue;
@@ -432,8 +422,6 @@ void BettingRound::skipFirstRunGui()
 {
     myFirstRunGui = false;
 }
-
-void BettingRound::postRiverRun() {};
 
 IHand* BettingRound::getHand() const
 {

@@ -28,9 +28,6 @@ class IBettingRound
     virtual void setHighestSet(int) = 0;
     virtual int getHighestSet() const = 0;
 
-    virtual void setHighestCardsValue(int theValue) = 0;
-    virtual int getHighestCardsValue() const = 0;
-
     virtual void setMinimumRaise(int) = 0;
     virtual int getMinimumRaise() const = 0;
 
@@ -43,7 +40,5 @@ class IBettingRound
 
     virtual void giveActionToNextBotPlayer() = 0;
     virtual void run() = 0;
-
-    virtual void postRiverRun() = 0;
 };
 } // namespace pkt::core

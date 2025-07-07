@@ -25,11 +25,6 @@ BettingRoundPostRiver::~BettingRoundPostRiver() = default;
 
 void BettingRoundPostRiver::run()
 {
-}
-
-void BettingRoundPostRiver::postRiverRun()
-{
-
     PlayerListConstIterator itC;
     PlayerListIterator it;
 
@@ -106,12 +101,5 @@ void BettingRoundPostRiver::postRiverRun()
         myEvents.onPauseHand();
     }
 }
-void BettingRoundPostRiver::setHighestCardsValue(int theValue)
-{
-    myHighestCardsValue = theValue;
-}
-int BettingRoundPostRiver::getHighestCardsValue() const
-{
-    return myHighestCardsValue;
-}
+
 } // namespace pkt::core

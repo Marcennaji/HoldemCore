@@ -17,10 +17,7 @@ class BettingRoundPostRiver : public BettingRound
     BettingRoundPostRiver(const GameEvents&, IHand*, int, int);
     ~BettingRoundPostRiver();
 
-    void setHighestCardsValue(int theValue);
-    int getHighestCardsValue() const;
     void run();
-    void postRiverRun();
 
   private:
     int myHighestCardsValue{0};

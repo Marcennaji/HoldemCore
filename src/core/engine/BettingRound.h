@@ -19,8 +19,7 @@ class BettingRound : public IBettingRound
     ~BettingRound();
 
     GameState getBettingRoundId() const;
-    int getHighestCardsValue() const;
-    void setHighestCardsValue(int);
+
     void setMinimumRaise(int);
     int getMinimumRaise() const;
     void setFullBetRule(bool);
@@ -28,7 +27,6 @@ class BettingRound : public IBettingRound
     void skipFirstRunGui();
     void giveActionToNextBotPlayer();
     void run();
-    void postRiverRun();
 
   protected:
     IHand* getHand() const;
