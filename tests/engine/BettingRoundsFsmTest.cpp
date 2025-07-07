@@ -21,31 +21,8 @@ void BettingRoundsFsmTest::SetUp()
     setFlowMode(pkt::core::FlowMode::Fsm);
 
     myEvents.clear();
-    // myEvents.onActivePlayerActionDone = [this]() { myHand->resolveHandConditions(); };
-    myEvents.onBettingRoundAnimation = [this](int bettingRoundId) { bettingRoundAnimation(bettingRoundId); };
-    myEvents.onDealBettingRoundCards = [this](int bettingRoundId) { dealBettingRoundCards(bettingRoundId); };
-    myEvents.onStartPreflop = [this]() { myHand->getCurrentBettingRound()->run(); };
-    myEvents.onStartFlop = [this]() { myHand->getCurrentBettingRound()->run(); };
-    myEvents.onStartTurn = [this]() { myHand->getCurrentBettingRound()->run(); };
-    myEvents.onStartRiver = [this]() { myHand->getCurrentBettingRound()->run(); };
-    myEvents.onStartPostRiver = [this]() { myHand->getCurrentBettingRound()->postRiverRun(); };
 }
 
-void BettingRoundsFsmTest::bettingRoundAnimation(int bettingRoundId)
-{
-    if (bettingRoundId < 4)
-    {
-        myHand->getCurrentBettingRound()->giveActionToNextBotPlayer();
-    }
-}
-
-void BettingRoundsFsmTest::dealBettingRoundCards(int bettingRoundId)
-{
-    if (bettingRoundId != 0)
-    {
-        myHand->resolveHandConditions();
-    }
-}
 bool BettingRoundsFsmTest::isPlayerStillActive(unsigned id) const
 {
     for (const auto& p : *myHand->getRunningPlayersList())
@@ -58,19 +35,19 @@ bool BettingRoundsFsmTest::isPlayerStillActive(unsigned id) const
 
 // Tests for betting rounds and transitions
 
-TEST_F(BettingRoundsFsmTest, DISABLED_StartShouldGoFromPreflopToPostRiverHeadsUp)
+TEST_F(BettingRoundsFsmTest, StartShouldGoFromPreflopToPostRiverHeadsUp)
 {
     initializeHandForTesting(2);
     myHand->start();
     EXPECT_EQ(myHand->getCurrentRoundState(), GameStatePostRiver);
 }
-TEST_F(BettingRoundsFsmTest, DISABLED_StartShouldGoFromPreflopToPostRiver3Players)
+TEST_F(BettingRoundsFsmTest, StartShouldGoFromPreflopToPostRiver3Players)
 {
     initializeHandForTesting(3);
     myHand->start();
     EXPECT_EQ(myHand->getCurrentRoundState(), GameStatePostRiver);
 }
-TEST_F(BettingRoundsFsmTest, DISABLED_StartShouldGoFromPreflopToPostRiver6Players)
+TEST_F(BettingRoundsFsmTest, StartShouldGoFromPreflopToPostRiver6Players)
 {
     initializeHandForTesting(6);
     myHand->start();
@@ -106,7 +83,7 @@ TEST_F(BettingRoundsFsmTest, PlayersDoNotActAfterFolding)
     }
 }
 
-TEST_F(BettingRoundsFsmTest, DISABLED_EachPLayerHasAtLeastOneAction)
+TEST_F(BettingRoundsFsmTest, EachPPlayerHasAtLeastOneAction)
 {
     initializeHandForTesting(4);
     myHand->start();
@@ -123,7 +100,7 @@ TEST_F(BettingRoundsFsmTest, DISABLED_EachPLayerHasAtLeastOneAction)
     EXPECT_GT(totalActionCount, 0u) << "No actions occurred in any round.";
 }
 
-TEST_F(BettingRoundsFsmTest, DISABLED_ShouldRecordAllActionsInHandHistoryChronologically)
+TEST_F(BettingRoundsFsmTest, ShouldRecordAllActionsInHandHistoryChronologically)
 {
     initializeHandForTesting(3);
     myHand->start();
@@ -144,7 +121,7 @@ TEST_F(BettingRoundsFsmTest, DISABLED_ShouldRecordAllActionsInHandHistoryChronol
         }
     }
 }
-TEST_F(BettingRoundsFsmTest, DISABLED_ActionOrderStartsCorrectlyInHeadsUpPreflop)
+TEST_F(BettingRoundsFsmTest, ActionOrderStartsCorrectlyInHeadsUpPreflop)
 {
     initializeHandForTesting(2);
     myHand->start();
@@ -160,7 +137,7 @@ TEST_F(BettingRoundsFsmTest, DISABLED_ActionOrderStartsCorrectlyInHeadsUpPreflop
     EXPECT_EQ(preflop.actions.front().first, (*dealerIt)->getId());
 }
 
-TEST_F(BettingRoundsFsmTest, DISABLED_FirstToActPostflopIsLeftOfDealer)
+TEST_F(BettingRoundsFsmTest, FirstToActPostflopIsLeftOfDealer)
 {
     initializeHandForTesting(3);
     myHand->start();

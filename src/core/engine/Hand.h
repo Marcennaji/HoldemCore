@@ -103,6 +103,8 @@ class Hand : public IHand
     void updateRunningPlayersList();
 
   private:
+    void startRound(GameState round, const std::function<void()>& legacyCallback, const std::string& roundName);
+
     std::unique_ptr<IBettingRoundStateFsm> myCurrentStateFsm;
     std::shared_ptr<EngineFactory> myFactory;
     const GameEvents& myEvents;
