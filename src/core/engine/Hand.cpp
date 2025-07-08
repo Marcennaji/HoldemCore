@@ -387,10 +387,6 @@ void Hand::resolveHandConditions()
             myEvents.onPotUpdated(myBoard->getPot());
         }
 
-        if (myEvents.onRefreshSet)
-        {
-            myEvents.onRefreshSet();
-        }
         myCurrentRound = GameStatePostRiver;
         GlobalServices::instance().logger()->verbose("Set current round to GameStatePostRiver.");
     }
@@ -430,11 +426,6 @@ void Hand::resolveHandConditions()
             myEvents.onPotUpdated(myBoard->getPot());
         }
 
-        if (myEvents.onRefreshSet)
-        {
-            myEvents.onRefreshSet();
-        }
-
         if (myEvents.onFlipHoleCardsAllIn)
         {
             myEvents.onFlipHoleCardsAllIn();
@@ -454,23 +445,15 @@ void Hand::resolveHandConditions()
         }
     }
 
-    // Unhighlight current player's groupbox
     itC = getPlayerSeatFromId(myPreviousPlayerId);
     if (itC != mySeatsList->end())
     {
-        if (myEvents.onRefreshPlayersActiveInactiveStyles)
+        if (myEvents.onPlayerStatusChanged)
         {
-            myEvents.onRefreshPlayersActiveInactiveStyles(myPreviousPlayerId, 1);
+            myEvents.onPlayerStatusChanged(myPreviousPlayerId, false);
             GlobalServices::instance().logger()->verbose("Unhighlighted previous player's groupbox: " +
                                                          std::to_string(myPreviousPlayerId));
         }
-    }
-
-    if (myEvents.onRefreshTableDescriptiveLabels)
-    {
-        myEvents.onRefreshTableDescriptiveLabels(getCurrentRoundState());
-        GlobalServices::instance().logger()->verbose("Refreshed table descriptive labels for round: " +
-                                                     std::to_string(getCurrentRoundState()));
     }
 
     if (myCurrentRound < GameStatePostRiver)

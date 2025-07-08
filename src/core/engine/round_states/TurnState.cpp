@@ -21,9 +21,9 @@ void TurnState::enter(Hand& hand)
     setFirstPlayerToAct(hand);
 
     // Fire event
-    if (hand.getEvents().onStartTurn)
+    if (hand.getEvents().onBettingRoundStarted)
     {
-        hand.getEvents().onStartTurn();
+        hand.getEvents().onBettingRoundStarted(GameStateTurn);
     }
 
     logStateInfo(hand);

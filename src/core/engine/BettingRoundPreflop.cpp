@@ -137,21 +137,11 @@ void BettingRoundPreflop::proceedToFlop()
         myEvents.onPotUpdated(getHand()->getBoard()->getPot());
     }
 
-    if (myEvents.onRefreshSet)
-    {
-        myEvents.onRefreshSet();
-    }
-
-    if (myEvents.onRefreshCash)
-    {
-        myEvents.onRefreshCash();
-    }
-
     for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
     {
-        if (myEvents.onRefreshAction)
+        if (myEvents.onPlayerActed)
         {
-            myEvents.onRefreshAction(i, PlayerActionNone);
+            myEvents.onPlayerActed(i, PlayerActionNone);
         }
     }
 
@@ -189,21 +179,21 @@ void BettingRoundPreflop::handleNextPlayerTurn()
     }
     (*currentPlayersTurnIt)->setTurn(true);
 
-    if (myEvents.onRefreshPlayersActiveInactiveStyles)
+    if (myEvents.onPlayerStatusChanged)
     {
-        myEvents.onRefreshPlayersActiveInactiveStyles(getCurrentPlayersTurnId(), 2);
+        myEvents.onPlayerStatusChanged(getCurrentPlayersTurnId(), true);
     }
 
-    if (myEvents.onRefreshAction)
+    if (myEvents.onPlayerActed)
     {
-        myEvents.onRefreshAction(getCurrentPlayersTurnId(), PlayerActionNone);
+        myEvents.onPlayerActed(getCurrentPlayersTurnId(), PlayerActionNone);
     }
 
     if ((*currentPlayersTurnIt)->getName() == HumanPlayer::getName())
     {
-        if (myEvents.onDoHumanAction)
+        if (myEvents.onAwaitingHumanInput)
         {
-            myEvents.onDoHumanAction();
+            myEvents.onAwaitingHumanInput();
         }
     }
     else

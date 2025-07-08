@@ -97,11 +97,6 @@ void AllInState::collectPots(Hand& hand)
     {
         hand.getEvents().onPotUpdated(hand.getBoard()->getPot());
     }
-
-    if (hand.getEvents().onRefreshSet)
-    {
-        hand.getEvents().onRefreshSet();
-    }
 }
 
 void AllInState::flipCards(Hand& hand)

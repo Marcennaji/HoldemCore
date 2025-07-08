@@ -39,7 +39,7 @@ void GuiBridgeWidgets::connectEventsToUi(pkt::core::GameEvents& events)
     };
 
     /*
-   events.onGameInitializeGui = [this](int gameSpeed)
+   events.onGameInitialized = [this](int gameSpeed)
    {
        QMetaObject::invokeMethod(
            myPokerTableWindow, [this, gameSpeed]() { myPokerTableWindow->gameInitializeGui(gameSpeed); },
@@ -83,13 +83,13 @@ void GuiBridgeWidgets::connectEventsToUi(pkt::core::GameEvents& events)
            myPokerTableWindow, [this, playerId]() { myPokerTableWindow->showHoleCards(playerId); },
            Qt::DirectConnection);
    };
-   events.onDealBettingRoundCards = [this](int bettingRoundId)
+   events.onDealCommunityCards = [this](int bettingRoundId)
    {
        QMetaObject::invokeMethod(
            myPokerTableWindow, [this, bettingRoundId]() {
    myPokerTableWindow->dealBettingRoundCards(bettingRoundId); }, Qt::DirectConnection);
    };
-   events.onRefreshAction = [this](int playerId, int playerAction)
+   events.onPlayerActed = [this](int playerId, int playerAction)
    {
        QMetaObject::invokeMethod(
            myPokerTableWindow, [this, playerId, playerAction]()
@@ -109,7 +109,7 @@ void GuiBridgeWidgets::connectEventsToUi(pkt::core::GameEvents& events)
            myPokerTableWindow, [this, state]() { myPokerTableWindow->refreshTableDescriptiveLabels(state); },
            Qt::DirectConnection);
    };
-   events.onRefreshPlayersActiveInactiveStyles = [this](int playerId, int status)
+   events.onPlayerStatusChanged = [this](int playerId, int status)
    {
        QMetaObject::invokeMethod(
            myPokerTableWindow, [this, playerId, status]()
@@ -120,7 +120,7 @@ void GuiBridgeWidgets::connectEventsToUi(pkt::core::GameEvents& events)
        QMetaObject::invokeMethod(
            myPokerTableWindow, [this]() { myPokerTableWindow->activePlayerActionDone(); }, Qt::DirectConnection);
    };
-   events.onDoHumanAction = [this]()
+   events.onAwaitingHumanInput = [this]()
    {
        QMetaObject::invokeMethod(
            myPokerTableWindow, [this]() { myPokerTableWindow->doHumanAction(); }, Qt::DirectConnection);
@@ -161,7 +161,7 @@ void GuiBridgeWidgets::connectEventsToUi(pkt::core::GameEvents& events)
        QMetaObject::invokeMethod(
            myPokerTableWindow, [this]() { myPokerTableWindow->startPostRiver(); }, Qt::DirectConnection);
    };
-   events.onPostRiverRunAnimation = [this]()
+   events.onShowdownStarted = [this]()
    {
        QMetaObject::invokeMethod(
            myPokerTableWindow, [this]() { myPokerTableWindow->postRiverRunAnimation1(); }, Qt::DirectConnection);

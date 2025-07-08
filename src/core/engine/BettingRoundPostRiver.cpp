@@ -72,9 +72,9 @@ void BettingRoundPostRiver::run()
     GlobalServices::instance().rankingStore()->updateRankingGameWinner(getHand()->getSeatsList());
     GlobalServices::instance().playersStatisticsStore()->updatePlayersStatistics(getHand()->getSeatsList());
 
-    if (myEvents.onPostRiverRunAnimation)
+    if (myEvents.onShowdownStarted)
     {
-        myEvents.onPostRiverRunAnimation();
+        myEvents.onShowdownStarted();
     }
 
     if (getHand()->getCardsShown())

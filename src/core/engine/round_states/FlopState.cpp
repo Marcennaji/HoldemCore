@@ -21,9 +21,9 @@ void FlopState::enter(Hand& hand)
     setFirstPlayerToAct(hand);
 
     // Fire event
-    if (hand.getEvents().onStartFlop)
+    if (hand.getEvents().onBettingRoundStarted)
     {
-        hand.getEvents().onStartFlop();
+        hand.getEvents().onBettingRoundStarted(GameStateFlop);
     }
 
     logStateInfo(hand);

@@ -139,9 +139,9 @@ void Game::initHand()
 
 void Game::startHand()
 {
-    if (myEvents.onNextBettingRoundInitializeGui)
+    if (myEvents.onBettingRoundStarted)
     {
-        myEvents.onNextBettingRoundInitializeGui();
+        myEvents.onBettingRoundStarted(myCurrentHand->getCurrentBettingRound()->getBettingRoundId());
     }
 
     myCurrentHand->start();

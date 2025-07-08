@@ -23,9 +23,9 @@ void PreflopState::enter(Hand& hand)
     setFirstPlayerToAct(hand);
 
     // Fire event
-    if (hand.getEvents().onStartPreflop)
+    if (hand.getEvents().onBettingRoundStarted)
     {
-        hand.getEvents().onStartPreflop();
+        hand.getEvents().onBettingRoundStarted(GameStatePreflop);
     }
 
     logStateInfo(hand);

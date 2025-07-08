@@ -10,9 +10,9 @@ void PostRiverState::enter(Hand& hand)
     GlobalServices::instance().logger()->verbose("Entering PostRiver state");
 
     // Fire event
-    if (hand.getEvents().onStartPostRiver)
+    if (hand.getEvents().onBettingRoundStarted)
     {
-        hand.getEvents().onStartPostRiver();
+        hand.getEvents().onBettingRoundStarted(GameStatePostRiver);
     }
 
     // Run showdown
@@ -129,9 +129,9 @@ void PostRiverState::handleHandPause(Hand& hand)
         hand.getEvents().onPauseHand();
     }
 
-    if (hand.getEvents().onPostRiverRunAnimation)
+    if (hand.getEvents().onShowdownStarted)
     {
-        hand.getEvents().onPostRiverRunAnimation();
+        hand.getEvents().onShowdownStarted();
     }
 }
 

@@ -20,9 +20,9 @@ void RiverState::enter(Hand& hand)
     setFirstPlayerToAct(hand);
 
     // Fire event
-    if (hand.getEvents().onStartRiver)
+    if (hand.getEvents().onBettingRoundStarted)
     {
-        hand.getEvents().onStartRiver();
+        hand.getEvents().onBettingRoundStarted(GameStateRiver);
     }
 
     logStateInfo(hand);

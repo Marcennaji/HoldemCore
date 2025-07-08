@@ -124,15 +124,14 @@ void BettingRound::run()
 
         myCurrentPlayersTurnId = (*currentPlayersTurnIt)->getId();
 
-        // send event to UI to refresh players' styles
-        if (myEvents.onRefreshPlayersActiveInactiveStyles)
+        if (myEvents.onPlayerStatusChanged)
         {
-            myEvents.onRefreshPlayersActiveInactiveStyles(myCurrentPlayersTurnId, 2);
+            myEvents.onPlayerStatusChanged(myCurrentPlayersTurnId, true);
         }
 
-        if (myEvents.onRefreshAction)
+        if (myEvents.onPlayerActed)
         {
-            myEvents.onRefreshAction(myCurrentPlayersTurnId, 0);
+            myEvents.onPlayerActed(myCurrentPlayersTurnId, PlayerActionNone);
         }
         GlobalServices::instance().logger()->verbose("BettingRound::run() : Determining next running player");
 
@@ -154,9 +153,9 @@ void BettingRound::run()
 
         if ((*currentPlayersTurnIt)->getName() == HumanPlayer::getName())
         {
-            if (myEvents.onDoHumanAction)
+            if (myEvents.onAwaitingHumanInput)
             {
-                myEvents.onDoHumanAction();
+                myEvents.onAwaitingHumanInput();
             }
         }
         else
@@ -234,21 +233,11 @@ void BettingRound::proceedToNextBettingRound()
         myEvents.onPotUpdated(myHand->getBoard()->getPot());
     }
 
-    if (myEvents.onRefreshSet)
-    {
-        myEvents.onRefreshSet();
-    }
-
-    if (myEvents.onRefreshCash)
-    {
-        myEvents.onRefreshCash();
-    }
-
     for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
     {
-        if (myEvents.onRefreshAction)
+        if (myEvents.onPlayerActed)
         {
-            myEvents.onRefreshAction(i, PlayerActionNone);
+            myEvents.onPlayerActed(i, PlayerActionNone);
         }
     }
 
