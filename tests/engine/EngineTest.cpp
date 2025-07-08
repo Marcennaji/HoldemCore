@@ -74,4 +74,12 @@ void EngineTest::initializeHandWithPlayers(size_t activePlayerCount)
     myHand->setFlowMode(myFlowMode);
 }
 
+void EngineTest::checkPostRiverConditions()
+{
+    // Check if the hand has been resolved correctly after the river
+    EXPECT_EQ(myHand->getCurrentRoundState(), GameStatePostRiver);
+    EXPECT_EQ(myHand->getBoard()->getPot(), 0); // Pot should be reset to 0
+    EXPECT_FALSE(myHand->getBoard()->getWinners().empty());
+}
+
 } // namespace pkt::test

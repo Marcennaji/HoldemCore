@@ -122,19 +122,7 @@ void BotPlayer::action()
         }
     }
     currentHand->setPreviousPlayerId(myID);
-
-    if (currentHand->getFlowMode() == FlowMode::Legacy)
-    {
-        // in the legacy code, at this point the GUI is piloting the game flow
-        if (myEvents.onActivePlayerActionDone)
-        {
-            myEvents.onActivePlayerActionDone();
-        }
-    }
-    else
-    {
-        currentHand->resolveHandConditions();
-    }
+    currentHand->resolveHandConditions();
 }
 
 void BotPlayer::doPreflopAction()

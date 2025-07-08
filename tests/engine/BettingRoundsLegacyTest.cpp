@@ -20,35 +20,14 @@ void BettingRoundsLegacyTest::SetUp()
 
     setFlowMode(pkt::core::FlowMode::Legacy);
 
-    // events for game flow, in the legacy code (that has an unwanted dependencies in which the gui sometimes pilots the
-    // game). These dependencies will be removed in the new engine code, which will use a FSM for the betting rounds
-    // handling.
     myEvents.clear();
-    myEvents.onActivePlayerActionDone = [this]() { myHand->resolveHandConditions(); };
-    myEvents.onBettingRoundAnimation = [this](int bettingRoundId) { bettingRoundAnimation(bettingRoundId); };
-    myEvents.onDealBettingRoundCards = [this](int bettingRoundId) { dealBettingRoundCards(bettingRoundId); };
-    myEvents.onStartPreflop = [this]() { myHand->getCurrentBettingRound()->run(); };
-    myEvents.onStartFlop = [this]() { myHand->getCurrentBettingRound()->run(); };
-    myEvents.onStartTurn = [this]() { myHand->getCurrentBettingRound()->run(); };
-    myEvents.onStartRiver = [this]() { myHand->getCurrentBettingRound()->run(); };
-    myEvents.onStartPostRiver = [this]() { myHand->getCurrentBettingRound()->run(); };
 }
 
-void BettingRoundsLegacyTest::bettingRoundAnimation(int bettingRoundId)
+void BettingRoundsLegacyTest::TearDown()
 {
-    if (bettingRoundId < 4)
-    {
-        myHand->getCurrentBettingRound()->giveActionToNextBotPlayer();
-    }
+    checkPostRiverConditions();
 }
 
-void BettingRoundsLegacyTest::dealBettingRoundCards(int bettingRoundId)
-{
-    if (bettingRoundId != 0)
-    {
-        myHand->resolveHandConditions();
-    }
-}
 bool BettingRoundsLegacyTest::isPlayerStillActive(unsigned id) const
 {
     for (const auto& p : *myHand->getRunningPlayersList())
@@ -65,19 +44,16 @@ TEST_F(BettingRoundsLegacyTest, StartShouldGoFromPreflopToPostRiverHeadsUp)
 {
     initializeHandForTesting(2);
     myHand->start();
-    EXPECT_EQ(myHand->getCurrentRoundState(), GameStatePostRiver);
 }
 TEST_F(BettingRoundsLegacyTest, StartShouldGoFromPreflopToPostRiver3Players)
 {
     initializeHandForTesting(3);
     myHand->start();
-    EXPECT_EQ(myHand->getCurrentRoundState(), GameStatePostRiver);
 }
 TEST_F(BettingRoundsLegacyTest, StartShouldGoFromPreflopToPostRiver6Players)
 {
     initializeHandForTesting(6);
     myHand->start();
-    EXPECT_EQ(myHand->getCurrentRoundState(), GameStatePostRiver);
 }
 TEST_F(BettingRoundsLegacyTest, PlayersDoNotActAfterFolding)
 {
@@ -109,7 +85,7 @@ TEST_F(BettingRoundsLegacyTest, PlayersDoNotActAfterFolding)
     }
 }
 
-TEST_F(BettingRoundsLegacyTest, EachPLayerHasAtLeastOneAction)
+TEST_F(BettingRoundsLegacyTest, EachPlayerHasAtLeastOneAction)
 {
     initializeHandForTesting(4);
     myHand->start();

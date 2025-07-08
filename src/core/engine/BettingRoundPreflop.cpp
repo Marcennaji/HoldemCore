@@ -208,19 +208,10 @@ void BettingRoundPreflop::handleNextPlayerTurn()
     }
     else
     {
-        if (getHand()->getFlowMode() == FlowMode::Legacy)
-        {
-            if (myEvents.onBettingRoundAnimation)
-            {
-                myEvents.onBettingRoundAnimation(getBettingRoundId());
-            }
-        }
-        else
-        {
-            GlobalServices::instance().logger()->info("Fsm - Giving action to next bot player: " +
-                                                      (*currentPlayersTurnIt)->getName());
-            giveActionToNextBotPlayer();
-        }
+
+        GlobalServices::instance().logger()->verbose("Giving action to next bot player: " +
+                                                     (*currentPlayersTurnIt)->getName());
+        giveActionToNextBotPlayer();
     }
 
     GlobalServices::instance().logger()->verbose("Next player's turn determined. Player ID: " +

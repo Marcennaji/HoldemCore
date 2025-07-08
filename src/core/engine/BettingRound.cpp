@@ -82,20 +82,11 @@ void BettingRound::run()
         myFirstRunGui = false;
         myHand->setPreviousPlayerId(-1);
 
-        if (myHand->getFlowMode() == FlowMode::Legacy)
+        if (myBettingRoundId != 0)
         {
-            if (myEvents.onDealBettingRoundCards)
-            {
-                myEvents.onDealBettingRoundCards(myBettingRoundId);
-            }
+            myHand->resolveHandConditions();
         }
-        else
-        {
-            if (myBettingRoundId != 0)
-            {
-                myHand->resolveHandConditions();
-            }
-        }
+
         return;
     }
 
@@ -170,19 +161,9 @@ void BettingRound::run()
         }
         else
         {
-            if (myHand->getFlowMode() == FlowMode::Legacy)
-            {
-                if (myEvents.onBettingRoundAnimation)
-                {
-                    myEvents.onBettingRoundAnimation(myBettingRoundId);
-                }
-            }
-            else
-            {
-                GlobalServices::instance().logger()->info("Fsm - Giving action to next bot player: " +
-                                                          (*currentPlayersTurnIt)->getName());
-                giveActionToNextBotPlayer();
-            }
+            GlobalServices::instance().logger()->verbose("Giving action to next bot player: " +
+                                                         (*currentPlayersTurnIt)->getName());
+            giveActionToNextBotPlayer();
         }
     }
 }

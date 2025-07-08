@@ -32,6 +32,10 @@ bool BettingRoundsFsmTest::isPlayerStillActive(unsigned id) const
     }
     return false;
 }
+void BettingRoundsFsmTest::TearDown()
+{
+    checkPostRiverConditions();
+}
 
 // Tests for betting rounds and transitions
 
@@ -39,19 +43,17 @@ TEST_F(BettingRoundsFsmTest, StartShouldGoFromPreflopToPostRiverHeadsUp)
 {
     initializeHandForTesting(2);
     myHand->start();
-    EXPECT_EQ(myHand->getCurrentRoundState(), GameStatePostRiver);
 }
 TEST_F(BettingRoundsFsmTest, StartShouldGoFromPreflopToPostRiver3Players)
 {
     initializeHandForTesting(3);
     myHand->start();
-    EXPECT_EQ(myHand->getCurrentRoundState(), GameStatePostRiver);
 }
+
 TEST_F(BettingRoundsFsmTest, StartShouldGoFromPreflopToPostRiver6Players)
 {
     initializeHandForTesting(6);
     myHand->start();
-    EXPECT_EQ(myHand->getCurrentRoundState(), GameStatePostRiver);
 }
 TEST_F(BettingRoundsFsmTest, PlayersDoNotActAfterFolding)
 {

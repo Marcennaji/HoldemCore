@@ -29,6 +29,7 @@ class EngineTest : public ::testing::Test
     // Helper function to initialize a Hand object for testing
     void initializeHandForTesting(size_t activePlayerCount);
     void setFlowMode(pkt::core::FlowMode mode) { myFlowMode = mode; };
+    void checkPostRiverConditions();
 
   private:
     // Helper function to create a PlayerList with mock players

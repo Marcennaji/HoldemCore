@@ -33,8 +33,6 @@ struct GameEvents
     std::function<void()> onDisableButtons;
     std::function<void()> onDoHumanAction;
 
-    std::function<void(int bettingRoundId)> onBettingRoundAnimation;
-
     std::function<void()> onStartPreflop;
     std::function<void()> onStartFlop;
     std::function<void()> onStartTurn;

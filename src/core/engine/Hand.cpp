@@ -138,17 +138,8 @@ void Hand::start()
     {
         myEvents.onPotUpdated(getBoard()->getPot());
     }
-    if (myFlowMode == FlowMode::Legacy)
-    {
-        if (myEvents.onActivePlayerActionDone)
-        {
-            myEvents.onActivePlayerActionDone();
-        }
-    }
-    else
-    {
-        resolveHandConditions();
-    }
+
+    resolveHandConditions();
 }
 
 void Hand::assignButtons()
@@ -487,45 +478,7 @@ void Hand::resolveHandConditions()
         myRoundBeforePostRiver = myCurrentRound;
     }
 
-    switch (myCurrentRound)
-    {
-    case GameStatePreflop:
-        startRound(GameStatePreflop, myEvents.onStartPreflop, "Preflop");
-        break;
-    case GameStateFlop:
-        startRound(GameStateFlop, myEvents.onStartFlop, "Flop");
-        break;
-    case GameStateTurn:
-        startRound(GameStateTurn, myEvents.onStartTurn, "Turn");
-        break;
-    case GameStateRiver:
-        startRound(GameStateRiver, myEvents.onStartRiver, "River");
-        break;
-    case GameStatePostRiver:
-        startRound(GameStatePostRiver, myEvents.onStartPostRiver, "Post-River");
-        break;
-    default:
-        GlobalServices::instance().logger()->verbose("Unhandled game state: " + std::to_string(myCurrentRound));
-        break;
-    }
-
-    GlobalServices::instance().logger()->verbose("Exiting resolveHandConditions()");
-}
-void Hand::startRound(GameState round, const std::function<void()>& legacyCallback, const std::string& roundName)
-{
-    if (myFlowMode == FlowMode::Legacy)
-    {
-        if (legacyCallback)
-        {
-            legacyCallback();
-            GlobalServices::instance().logger()->verbose("Started " + roundName + " round (legacy mode).");
-        }
-    }
-    else
-    {
-        getCurrentBettingRound()->run();
-        GlobalServices::instance().logger()->verbose("Started " + roundName + " round (FSM mode).");
-    }
+    getCurrentBettingRound()->run();
 }
 
 PlayerListIterator Hand::getPlayerSeatFromId(unsigned uniqueId) const
