@@ -60,11 +60,11 @@ void BettingRoundPreflop::handleFirstRun()
         handleHeadsUpFirstRun(bigBlindPositionIt);
     }
 
-    setCurrentPlayersTurnId(getFirstRoundLastPlayersTurnId());
+    setCurrentPlayerTurnId(getFirstRoundLastPlayersTurnId());
     setFirstRun(false);
 
     GlobalServices::instance().logger()->verbose("First run of preflop completed. Current player's turn ID: " +
-                                                 std::to_string(getCurrentPlayersTurnId()));
+                                                 std::to_string(getCurrentPlayerTurnId()));
 }
 
 void BettingRoundPreflop::handleMultiPlayerFirstRun(PlayerListIterator bigBlindPositionIt)
@@ -153,7 +153,7 @@ void BettingRoundPreflop::handleNextPlayerTurn()
 {
     GlobalServices::instance().logger()->verbose("Determining the next player's turn.");
 
-    PlayerListConstIterator currentPlayersTurnIt = getHand()->getRunningPlayerFromId(getCurrentPlayersTurnId());
+    PlayerListConstIterator currentPlayersTurnIt = getHand()->getRunningPlayerFromId(getCurrentPlayerTurnId());
     if (currentPlayersTurnIt == getHand()->getRunningPlayersList()->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
@@ -165,14 +165,14 @@ void BettingRoundPreflop::handleNextPlayerTurn()
         currentPlayersTurnIt = getHand()->getRunningPlayersList()->begin();
     }
 
-    setCurrentPlayersTurnId((*currentPlayersTurnIt)->getId());
+    setCurrentPlayerTurnId((*currentPlayersTurnIt)->getId());
 
-    if (getCurrentPlayersTurnId() == getFirstRoundLastPlayersTurnId())
+    if (getCurrentPlayerTurnId() == getFirstRoundLastPlayersTurnId())
     {
         setFirstRound(false);
     }
 
-    currentPlayersTurnIt = getHand()->getRunningPlayerFromId(getCurrentPlayersTurnId());
+    currentPlayersTurnIt = getHand()->getRunningPlayerFromId(getCurrentPlayerTurnId());
     if (currentPlayersTurnIt == getHand()->getRunningPlayersList()->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
@@ -181,12 +181,12 @@ void BettingRoundPreflop::handleNextPlayerTurn()
 
     if (myEvents.onPlayerStatusChanged)
     {
-        myEvents.onPlayerStatusChanged(getCurrentPlayersTurnId(), true);
+        myEvents.onPlayerStatusChanged(getCurrentPlayerTurnId(), true);
     }
 
     if (myEvents.onPlayerActed)
     {
-        myEvents.onPlayerActed(getCurrentPlayersTurnId(), PlayerActionNone);
+        myEvents.onPlayerActed(getCurrentPlayerTurnId(), PlayerActionNone);
     }
 
     if ((*currentPlayersTurnIt)->getName() == HumanPlayer::getName())
@@ -205,6 +205,6 @@ void BettingRoundPreflop::handleNextPlayerTurn()
     }
 
     GlobalServices::instance().logger()->verbose("Next player's turn determined. Player ID: " +
-                                                 std::to_string(getCurrentPlayersTurnId()));
+                                                 std::to_string(getCurrentPlayerTurnId()));
 }
 } // namespace pkt::core

@@ -167,7 +167,7 @@ std::shared_ptr<Player> Game::getPlayerByUniqueId(unsigned id)
 std::shared_ptr<Player> Game::getCurrentPlayer()
 {
     std::shared_ptr<Player> tmpPlayer =
-        getPlayerByUniqueId(getCurrentHand()->getCurrentBettingRound()->getCurrentPlayersTurnId());
+        getPlayerByUniqueId(getCurrentHand()->getCurrentBettingRound()->getCurrentPlayerTurnId());
     if (!tmpPlayer.get())
     {
         throw Exception(__FILE__, __LINE__, EngineError::CurrentPlayerNotFound);

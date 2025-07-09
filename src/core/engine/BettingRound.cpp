@@ -57,7 +57,7 @@ BettingRound::~BettingRound() = default;
 
 void BettingRound::giveActionToNextBotPlayer()
 {
-    auto nextBotPlayer = myHand->getRunningPlayerFromId(myCurrentPlayersTurnId);
+    auto nextBotPlayer = myHand->getRunningPlayerFromId(myCurrentPlayerTurnId);
     if (nextBotPlayer == myHand->getRunningPlayersList()->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
@@ -110,7 +110,7 @@ void BettingRound::run()
     {
         // determine next running player
 
-        PlayerListConstIterator currentPlayersTurnIt = myHand->getRunningPlayerFromId(myCurrentPlayersTurnId);
+        PlayerListConstIterator currentPlayersTurnIt = myHand->getRunningPlayerFromId(myCurrentPlayerTurnId);
         if (currentPlayersTurnIt == myHand->getRunningPlayersList()->end())
         {
             currentPlayersTurnIt = myHand->getRunningPlayersList()->begin();
@@ -122,20 +122,20 @@ void BettingRound::run()
             currentPlayersTurnIt = myHand->getRunningPlayersList()->begin();
         }
 
-        myCurrentPlayersTurnId = (*currentPlayersTurnIt)->getId();
+        myCurrentPlayerTurnId = (*currentPlayersTurnIt)->getId();
 
         if (myEvents.onPlayerStatusChanged)
         {
-            myEvents.onPlayerStatusChanged(myCurrentPlayersTurnId, true);
+            myEvents.onPlayerStatusChanged(myCurrentPlayerTurnId, true);
         }
 
         if (myEvents.onPlayerActed)
         {
-            myEvents.onPlayerActed(myCurrentPlayersTurnId, PlayerActionNone);
+            myEvents.onPlayerActed(myCurrentPlayerTurnId, PlayerActionNone);
         }
         GlobalServices::instance().logger()->verbose("BettingRound::run() : Determining next running player");
 
-        currentPlayersTurnIt = myHand->getRunningPlayerFromId(myCurrentPlayersTurnId);
+        currentPlayersTurnIt = myHand->getRunningPlayerFromId(myCurrentPlayerTurnId);
         if (currentPlayersTurnIt == myHand->getRunningPlayersList()->end())
         {
             throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
@@ -146,7 +146,7 @@ void BettingRound::run()
             "BettingRound::run() : Next running player is: " + (*currentPlayersTurnIt)->getName() +
             " with ID: " + std::to_string((*currentPlayersTurnIt)->getId()));
 
-        if (myCurrentPlayersTurnId == myFirstRoundLastPlayersTurnId)
+        if (myCurrentPlayerTurnId == myFirstRoundLastPlayersTurnId)
         {
             myFirstRound = false;
         }
@@ -223,7 +223,7 @@ void BettingRound::proceedToNextBettingRound()
         (*itC)->setAction(PlayerActionNone);
     }
 
-    GlobalServices::instance().logger()->info("myCurrentPlayersTurnId: " + std::to_string(myCurrentPlayersTurnId));
+    GlobalServices::instance().logger()->info("myCurrentPlayerTurnId: " + std::to_string(myCurrentPlayerTurnId));
 
     myHand->getBoard()->collectSets();
     myHand->getBoard()->collectPot();
@@ -332,7 +332,7 @@ void BettingRound::handleFirstRun()
     myFirstRoundLastPlayersTurnId =
         getPreviousRunningPlayerId(myFirstRoundLastPlayersTurnId, myHand->getRunningPlayersList());
 
-    myCurrentPlayersTurnId = myFirstRoundLastPlayersTurnId;
+    myCurrentPlayerTurnId = myFirstRoundLastPlayersTurnId;
 }
 
 unsigned BettingRound::getPreviousRunningPlayerId(unsigned currentPlayerId, PlayerList runningPlayersList) const
@@ -388,23 +388,18 @@ bool BettingRound::getFullBetRule() const
     return myFullBetRule;
 }
 
-void BettingRound::skipFirstRunGui()
-{
-    myFirstRunGui = false;
-}
-
 IHand* BettingRound::getHand() const
 {
     return myHand;
 }
 
-void BettingRound::setCurrentPlayersTurnId(unsigned theValue)
+void BettingRound::setCurrentPlayerTurnId(unsigned theValue)
 {
-    myCurrentPlayersTurnId = theValue;
+    myCurrentPlayerTurnId = theValue;
 }
-unsigned BettingRound::getCurrentPlayersTurnId() const
+unsigned BettingRound::getCurrentPlayerTurnId() const
 {
-    return myCurrentPlayersTurnId;
+    return myCurrentPlayerTurnId;
 }
 
 void BettingRound::setFirstRoundLastPlayersTurnId(unsigned theValue)

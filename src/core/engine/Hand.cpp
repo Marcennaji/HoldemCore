@@ -318,7 +318,7 @@ void Hand::updateRunningPlayersList()
 
                 GlobalServices::instance().logger()->verbose("Setting current player's turn to: " + (*it1)->getName() +
                                                              " (ID: " + std::to_string((*it1)->getId()) + ")");
-                getCurrentBettingRound()->setCurrentPlayersTurnId((*it1)->getId());
+                getCurrentBettingRound()->setCurrentPlayerTurnId((*it1)->getId());
             }
             else
             {

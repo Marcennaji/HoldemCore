@@ -15,7 +15,7 @@ class GameEvents;
 class BettingRound : public IBettingRound
 {
   public:
-    BettingRound(const GameEvents&, IHand* hi, unsigned dP, int sB, GameState gS);
+    BettingRound(const GameEvents&, IHand* hand, unsigned dealerPosition, int smallBlind, GameState);
     ~BettingRound();
 
     GameState getBettingRoundId() const;
@@ -24,7 +24,6 @@ class BettingRound : public IBettingRound
     int getMinimumRaise() const;
     void setFullBetRule(bool);
     bool getFullBetRule() const;
-    void skipFirstRunGui();
     void giveActionToNextBotPlayer();
     void run();
 
@@ -32,8 +31,8 @@ class BettingRound : public IBettingRound
     IHand* getHand() const;
     void findLastActivePlayerBeforeSmallBlind();
     bool checkAllHighestSet();
-    void setCurrentPlayersTurnId(unsigned theValue);
-    unsigned getCurrentPlayersTurnId() const;
+    void setCurrentPlayerTurnId(unsigned theValue);
+    unsigned getCurrentPlayerTurnId() const;
 
     void setFirstRoundLastPlayersTurnId(unsigned theValue);
     unsigned getFirstRoundLastPlayersTurnId() const;
@@ -84,7 +83,7 @@ class BettingRound : public IBettingRound
     bool myFirstRound{true};
     bool myFirstHeadsUpRound{true};
 
-    unsigned myCurrentPlayersTurnId{0};
+    unsigned myCurrentPlayerTurnId{0};
     unsigned myFirstRoundLastPlayersTurnId{0};
 
     bool myLogBoardCardsDone{false};

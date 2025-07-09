@@ -18,8 +18,8 @@ class IBettingRound
 
     virtual GameState getBettingRoundId() const = 0;
 
-    virtual void setCurrentPlayersTurnId(unsigned) = 0;
-    virtual unsigned getCurrentPlayersTurnId() const = 0;
+    virtual void setCurrentPlayerTurnId(unsigned) = 0;
+    virtual unsigned getCurrentPlayerTurnId() const = 0;
 
     virtual unsigned getSmallBlindPlayerId() const = 0;
 
@@ -35,8 +35,6 @@ class IBettingRound
     virtual bool getFullBetRule() const = 0;
 
     virtual bool getFirstRound() const = 0;
-
-    virtual void skipFirstRunGui() = 0;
 
     virtual void giveActionToNextBotPlayer() = 0;
     virtual void run() = 0;
