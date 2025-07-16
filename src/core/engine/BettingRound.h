@@ -81,7 +81,6 @@ class BettingRound : public IBettingRound
     bool myFirstRun{true};
     bool myFirstRunGui{true}; // HACK
     bool myFirstRound{true};
-    bool myFirstHeadsUpRound{true};
 
     unsigned myCurrentPlayerTurnId{0};
     unsigned myFirstRoundLastPlayersTurnId{0};

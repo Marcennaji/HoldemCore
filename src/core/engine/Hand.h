@@ -23,8 +23,8 @@ class Hand : public IHand
 {
   public:
     Hand(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard>,
-         pkt::core::player::PlayerList seats, pkt::core::player::PlayerList runningPlayers, int handId,
-         GameData gameData, StartData startData);
+         pkt::core::player::PlayerList seats, pkt::core::player::PlayerList runningPlayers, GameData gameData,
+         StartData startData);
     ~Hand();
 
     void start();

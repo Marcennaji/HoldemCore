@@ -69,8 +69,7 @@ void EngineTest::initializeHandWithPlayers(size_t activePlayerCount)
     startData.startDealerPlayerId = startDealerPlayerId;
     startData.numberOfPlayers = static_cast<int>(activePlayerCount);
 
-    myHand = myFactory->createHand(myFactory, myBoard, mySeatsList, myRunningPlayersList, startDealerPlayerId, gameData,
-                                   startData);
+    myHand = myFactory->createHand(myFactory, myBoard, mySeatsList, myRunningPlayersList, gameData, startData);
     myHand->setFlowMode(myFlowMode);
 }
 

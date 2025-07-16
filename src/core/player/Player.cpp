@@ -44,16 +44,6 @@ void Player::setHand(IHand* h)
     myRangeEstimator->setHand(h);
 }
 
-void Player::setIsSessionActive(bool active)
-{
-    m_isSessionActive = active;
-}
-
-bool Player::isSessionActive() const
-{
-    return m_isSessionActive;
-}
-
 const PlayerPosition Player::getPosition() const
 {
     return myPosition;

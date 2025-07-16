@@ -18,7 +18,6 @@ class DummyPlayer : public pkt::core::player::BotPlayer
                                        true,                            // Active Status
                                        0)                               // Minimum Bet
     {
-        setIsSessionActive(true);
         setStrategy(std::make_unique<pkt::core::player::LooseAggressiveBotStrategy>());
     }
 };

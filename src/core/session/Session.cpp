@@ -68,7 +68,6 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
     for (auto& p : *playersList)
     {
         p->setId(id++);
-        p->setIsSessionActive(true);
     }
 
     myCurrentGame = std::make_unique<Game>(myEvents, engineFactory, playersList, gameData, startData, myCurrentGameNum);

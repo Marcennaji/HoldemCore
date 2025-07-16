@@ -104,9 +104,6 @@ class Player
 
     static bool getHavePosition(PlayerPosition myPos, PlayerList runningPlayers);
 
-    void setIsSessionActive(bool active);
-    bool isSessionActive() const;
-
     bool checkIfINeedToShowCards() const;
 
     float getM() const;
@@ -162,7 +159,6 @@ class Player
     // const
     int myID;
     std::string myName;
-    std::string myAvatar;
 
     // vars
     PlayerPosition myPosition;
@@ -201,7 +197,5 @@ class Player
     int lastMoneyWon{0};
     int myPreflopPotOdd;
     std::unique_ptr<RangeEstimator> myRangeEstimator;
-
-    bool m_isSessionActive{false};
 };
 } // namespace pkt::core::player

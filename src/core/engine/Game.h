@@ -53,9 +53,6 @@ class Game
     void setCurrentSmallBlind(int theValue) { myCurrentSmallBlind = theValue; }
     int getCurrentSmallBlind() const { return myCurrentSmallBlind; }
 
-    void setCurrentHandID(int theValue) { myCurrentHandId = theValue; }
-    int getCurrentHandID() const { return myCurrentHandId; }
-
     unsigned getDealerPlayerId() const { return myDealerPlayerId; }
 
     void replaceDealer(unsigned oldDealer, unsigned newDealer)
@@ -65,11 +62,6 @@ class Game
             myDealerPlayerId = newDealer;
         }
     }
-
-    std::shared_ptr<pkt::core::player::Player> getPlayerByUniqueId(unsigned id);
-    std::shared_ptr<pkt::core::player::Player> getCurrentPlayer();
-
-    void raiseBlinds();
 
   private:
     std::shared_ptr<EngineFactory> myFactory;
@@ -89,7 +81,6 @@ class Game
 
     // running variables
     int myCurrentSmallBlind;
-    int myCurrentHandId{0};
     unsigned myDealerPlayerId{0};
     int myLastHandBlindsRaised{1};
     int myLastTimeBlindsRaised{0};

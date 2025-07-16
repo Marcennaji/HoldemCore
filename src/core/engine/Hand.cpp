@@ -23,7 +23,7 @@ using namespace std;
 using namespace pkt::core::player;
 
 Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
-           PlayerList seats, PlayerList runningPlayers, int handId, GameData gameData, StartData startData)
+           PlayerList seats, PlayerList runningPlayers, GameData gameData, StartData startData)
     : myEvents(events), myFactory(factory), myBoard(board), mySeatsList(seats), myRunningPlayersList(runningPlayers),
       myStartQuantityPlayers(startData.numberOfPlayers), myDealerPlayerId(startData.startDealerPlayerId),
       mySmallBlindPlayerId(startData.startDealerPlayerId), myBigBlindPlayerId(startData.startDealerPlayerId),
