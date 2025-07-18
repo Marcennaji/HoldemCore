@@ -54,8 +54,6 @@ class Board : public IBoard
     void setPlayerNeedToShowCards(const std::list<unsigned>& p);
 
   private:
-    std::shared_ptr<player::Player> getPlayerById(unsigned id) const;
-
     pkt::core::player::PlayerList mySeatsList;
     pkt::core::player::PlayerList myRunningPlayersList;
 

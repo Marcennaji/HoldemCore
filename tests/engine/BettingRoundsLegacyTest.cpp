@@ -134,7 +134,7 @@ TEST_F(BettingRoundsLegacyTest, ActionOrderStartsCorrectlyInHeadsUpPreflop)
     ASSERT_EQ(preflop.round, GameStatePreflop);
     ASSERT_FALSE(preflop.actions.empty());
 
-    auto dealerIt = getPlayerById(myHand->getSeatsList(), myHand->getDealerPlayerId());
+    auto dealerIt = getPlayerListIteratorById(myHand->getSeatsList(), myHand->getDealerPlayerId());
 
     ASSERT_FALSE(preflop.actions.empty());
     // in heads-up, preflop, the first player to act is the dealer
@@ -204,7 +204,7 @@ TEST_F(BettingRoundsLegacyTest, AllActionsAreFromActivePlayersOnly)
     {
         for (const auto& [playerId, action] : round.actions)
         {
-            EXPECT_TRUE(getPlayerById(myHand->getSeatsList(), playerId) != myHand->getSeatsList()->end());
+            EXPECT_TRUE(getPlayerListIteratorById(myHand->getSeatsList(), playerId) != myHand->getSeatsList()->end());
             EXPECT_NE(action, PlayerAction::PlayerActionNone);
         }
     }

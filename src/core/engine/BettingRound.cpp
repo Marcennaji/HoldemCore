@@ -58,7 +58,7 @@ BettingRound::~BettingRound() = default;
 
 void BettingRound::giveActionToNextBotPlayer()
 {
-    auto nextBotPlayer = getPlayerById(myHand->getRunningPlayersList(), myCurrentPlayerTurnId);
+    auto nextBotPlayer = getPlayerListIteratorById(myHand->getRunningPlayersList(), myCurrentPlayerTurnId);
     if (nextBotPlayer == myHand->getRunningPlayersList()->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
@@ -111,7 +111,7 @@ void BettingRound::run()
     {
         // determine next running player
 
-        auto currentPlayersTurnIt = getPlayerById(myHand->getRunningPlayersList(), myCurrentPlayerTurnId);
+        auto currentPlayersTurnIt = getPlayerListIteratorById(myHand->getRunningPlayersList(), myCurrentPlayerTurnId);
         if (currentPlayersTurnIt == myHand->getRunningPlayersList()->end())
         {
             currentPlayersTurnIt = myHand->getRunningPlayersList()->begin();
@@ -136,7 +136,7 @@ void BettingRound::run()
         }
         GlobalServices::instance().logger()->verbose("BettingRound::run() : Determining next running player");
 
-        currentPlayersTurnIt = getPlayerById(myHand->getRunningPlayersList(), myCurrentPlayerTurnId);
+        currentPlayersTurnIt = getPlayerListIteratorById(myHand->getRunningPlayersList(), myCurrentPlayerTurnId);
         if (currentPlayersTurnIt == myHand->getRunningPlayersList()->end())
         {
             throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
@@ -187,7 +187,7 @@ unsigned BettingRound::findNextEligiblePlayerFromSmallBlind()
 {
     GlobalServices::instance().logger()->info("Finding the next eligible player starting from the small blind.");
 
-    auto it = getPlayerById(myHand->getSeatsList(), mySmallBlindPlayerId);
+    auto it = getPlayerListIteratorById(myHand->getSeatsList(), mySmallBlindPlayerId);
     if (it == myHand->getSeatsList()->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::ActivePlayerNotFound);
@@ -202,7 +202,7 @@ unsigned BettingRound::findNextEligiblePlayerFromSmallBlind()
             it = myHand->getSeatsList()->begin(); // Wrap around to the beginning
         }
 
-        auto runningPlayerIt = getPlayerById(myHand->getRunningPlayersList(), (*it)->getId());
+        auto runningPlayerIt = getPlayerListIteratorById(myHand->getRunningPlayersList(), (*it)->getId());
         if (runningPlayerIt != myHand->getRunningPlayersList()->end())
         {
             GlobalServices::instance().logger()->info("Next eligible player found: " + (*it)->getName() +
@@ -299,7 +299,7 @@ void BettingRound::handleFirstRun()
     GlobalServices::instance().logger()->info("Setting first player to act (clockwise from dealer).");
 
     // Clockwise from dealer to find first active player
-    auto dealerIt = getPlayerById(myHand->getSeatsList(), myDealerPlayerId);
+    auto dealerIt = getPlayerListIteratorById(myHand->getSeatsList(), myDealerPlayerId);
     if (dealerIt == myHand->getSeatsList()->end())
         throw Exception(__FILE__, __LINE__, EngineError::ActivePlayerNotFound);
 
@@ -312,7 +312,7 @@ void BettingRound::handleFirstRun()
     for (size_t i = 0; i < myHand->getSeatsList()->size(); ++i)
     {
         int id = (*dealerIt)->getId();
-        if (getPlayerById(myHand->getRunningPlayersList(), id) != myHand->getRunningPlayersList()->end())
+        if (getPlayerListIteratorById(myHand->getRunningPlayersList(), id) != myHand->getRunningPlayersList()->end())
         {
             myFirstRoundLastPlayersTurnId = id;
             GlobalServices::instance().logger()->info("First player to act: ID " + std::to_string(id));
@@ -461,7 +461,7 @@ void BettingRound::findLastActivePlayerBeforeSmallBlind()
 {
     GlobalServices::instance().logger()->verbose("Finding the last active player before the small blind.");
 
-    auto it = getPlayerById(myHand->getSeatsList(), getSmallBlindPlayerId());
+    auto it = getPlayerListIteratorById(myHand->getSeatsList(), getSmallBlindPlayerId());
     if (it == getHand()->getSeatsList()->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::ActivePlayerNotFound);

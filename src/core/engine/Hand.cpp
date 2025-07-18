@@ -157,7 +157,7 @@ void Hand::assignButtons()
     }
 
     // assign dealer button
-    it = getPlayerById(mySeatsList, myDealerPlayerId);
+    it = getPlayerListIteratorById(mySeatsList, myDealerPlayerId);
     if (it == mySeatsList->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
@@ -167,7 +167,7 @@ void Hand::assignButtons()
     // assign Small Blind next to dealer. ATTENTION: in heads up it is big blind
     // assign big blind next to small blind. ATTENTION: in heads up it is small blind
     bool nextActivePlayerFound = false;
-    auto dealerPositionIt = getPlayerById(mySeatsList, myDealerPlayerId);
+    auto dealerPositionIt = getPlayerListIteratorById(mySeatsList, myDealerPlayerId);
     if (dealerPositionIt == mySeatsList->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
@@ -181,7 +181,7 @@ void Hand::assignButtons()
         {
             dealerPositionIt = mySeatsList->begin();
         }
-        it = getPlayerById(mySeatsList, (*dealerPositionIt)->getId());
+        it = getPlayerListIteratorById(mySeatsList, (*dealerPositionIt)->getId());
         if (it != mySeatsList->end())
         {
             nextActivePlayerFound = true;
@@ -444,7 +444,7 @@ void Hand::resolveHandConditions()
             GlobalServices::instance().logger()->verbose("Board cards logged for all-in condition.");
         }
     }
-    itC = getPlayerById(mySeatsList, myPreviousPlayerId);
+    itC = getPlayerListIteratorById(mySeatsList, myPreviousPlayerId);
     if (itC != mySeatsList->end())
     {
         if (myEvents.onPlayerStatusChanged)

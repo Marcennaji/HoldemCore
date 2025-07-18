@@ -828,7 +828,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 
     float result = 0;
 
-    auto opponent = *getPlayerById(currentHand->getSeatsList(), opponentId);
+    auto opponent = *getPlayerListIteratorById(currentHand->getSeatsList(), opponentId);
 
     const int myRank = rankHand((myCard1 + myCard2 + board).c_str());
 
@@ -1084,7 +1084,7 @@ void Player::updateCurrentHandContext(const GameState state)
     // general (and shared) game state
     myCurrentHandContext->gameState = state;
     myCurrentHandContext->nbRunningPlayers = currentHand->getRunningPlayersList()->size();
-    myCurrentHandContext->lastVPIPPlayer = *getPlayerById(currentHand->getSeatsList(), currentHand->getLastRaiserId());
+    myCurrentHandContext->lastVPIPPlayer = getPlayerById(currentHand->getSeatsList(), currentHand->getLastRaiserId());
     myCurrentHandContext->callersPositions = currentHand->getCallersPositions();
     myCurrentHandContext->pot = currentHand->getBoard()->getPot();
     myCurrentHandContext->potOdd = getPotOdd();
@@ -1092,16 +1092,16 @@ void Player::updateCurrentHandContext(const GameState state)
     myCurrentHandContext->highestSet = currentHand->getCurrentBettingRound()->getHighestSet();
     myCurrentHandContext->stringBoard = getStringBoard();
     myCurrentHandContext->preflopLastRaiser =
-        *getPlayerById(currentHand->getSeatsList(), currentHand->getPreflopLastRaiserId());
+        getPlayerById(currentHand->getSeatsList(), currentHand->getPreflopLastRaiserId());
     myCurrentHandContext->preflopRaisesNumber = currentHand->getPreflopRaisesNumber();
     myCurrentHandContext->preflopCallsNumber = currentHand->getPreflopCallsNumber();
     myCurrentHandContext->isPreflopBigBet = isPreflopBigBet();
     myCurrentHandContext->flopBetsOrRaisesNumber = currentHand->getFlopBetsOrRaisesNumber();
     myCurrentHandContext->flopLastRaiser =
-        *getPlayerById(currentHand->getSeatsList(), currentHand->getFlopLastRaiserId());
+        getPlayerById(currentHand->getSeatsList(), currentHand->getFlopLastRaiserId());
     myCurrentHandContext->turnBetsOrRaisesNumber = currentHand->getTurnBetsOrRaisesNumber();
     myCurrentHandContext->turnLastRaiser =
-        *getPlayerById(currentHand->getSeatsList(), currentHand->getTurnLastRaiserId());
+        getPlayerById(currentHand->getSeatsList(), currentHand->getTurnLastRaiserId());
     myCurrentHandContext->riverBetsOrRaisesNumber = currentHand->getRiverBetsOrRaisesNumber();
     myCurrentHandContext->nbPlayers = currentHand->getSeatsList()->size();
     myCurrentHandContext->smallBlind = currentHand->getSmallBlind();

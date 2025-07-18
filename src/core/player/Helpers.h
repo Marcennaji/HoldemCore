@@ -54,6 +54,7 @@ bool isSuitedAndAbove(const std::string& card1, const std::string& card2, const 
 // Checks if the cards match an exact hand range
 bool isExactHand(const std::string& card1, const std::string& card2, const char* range);
 
-PlayerListIterator getPlayerById(PlayerList list, unsigned id);
+std::shared_ptr<Player> getPlayerById(PlayerList list, unsigned id);
+PlayerListIterator getPlayerListIteratorById(PlayerList list, unsigned id);
 
 } // namespace pkt::core::player

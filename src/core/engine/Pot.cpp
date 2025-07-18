@@ -212,7 +212,7 @@ void Pot::finalizeDistribution()
     // Distribute base share to each winner
     for (unsigned id : uniqueWinners)
     {
-        auto it = getPlayerById(mySeats, id);
+        auto it = getPlayerListIteratorById(mySeats, id);
         if (it != mySeats->end())
         {
             (*it)->setCash((*it)->getCash() + baseShare);

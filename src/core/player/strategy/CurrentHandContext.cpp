@@ -2,7 +2,7 @@
 
 namespace pkt::core::player
 {
-/*
+
 void CurrentHandContext::reset()
 {
     // Common data
@@ -65,6 +65,5 @@ void CurrentHandContext::reset()
         0.0f  // d90
     };
 }
-    */
 
 } // namespace pkt::core::player
