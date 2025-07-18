@@ -4,6 +4,9 @@
 // Licensed under the MIT License — see LICENSE file for details.
 
 #pragma once
+
+#include "typedefs.h"
+
 #include <iostream>
 #include <list>
 #include <memory>
@@ -50,5 +53,7 @@ bool isSuitedAndAbove(const std::string& card1, const std::string& card2, const 
 
 // Checks if the cards match an exact hand range
 bool isExactHand(const std::string& card1, const std::string& card2, const char* range);
+
+PlayerListIterator getPlayerById(PlayerList list, unsigned id);
 
 } // namespace pkt::core::player

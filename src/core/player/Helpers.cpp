@@ -260,4 +260,10 @@ bool isDrawingProbOk(const PostFlopState& postFlopState, const int potOdd)
     return false;
 }
 
+PlayerListIterator getPlayerById(PlayerList list, unsigned id)
+{
+    return std::find_if(list->begin(), list->end(),
+                        [id](const std::shared_ptr<Player>& p) { return p->getId() == id; });
+}
+
 } // namespace pkt::core::player

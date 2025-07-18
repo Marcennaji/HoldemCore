@@ -6,6 +6,7 @@
 
 #include "EngineFactory.h"
 #include "Exception.h"
+#include "core/player/Helpers.h"
 #include "core/services/GlobalServices.h"
 #include "model/EngineError.h"
 #include "model/StartData.h"
@@ -106,7 +107,8 @@ void Game::initHand()
         myFactory->createHand(myFactory, myCurrentBoard, mySeatsList, myRunningPlayersList, myGameData, myStartData);
 
     bool nextDealerFound = false;
-    PlayerListConstIterator dealerPositionIt = myCurrentHand->getPlayerSeatFromId(myDealerPlayerId);
+
+    auto dealerPositionIt = getPlayerById(myCurrentHand->getSeatsList(), myDealerPlayerId);
     if (dealerPositionIt == mySeatsList->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
@@ -120,8 +122,8 @@ void Game::initHand()
         {
             dealerPositionIt = mySeatsList->begin();
         }
+        itC = getPlayerById(myCurrentHand->getSeatsList(), (*dealerPositionIt)->getId());
 
-        itC = myCurrentHand->getPlayerSeatFromId((*dealerPositionIt)->getId());
         if (itC != mySeatsList->end())
         {
             nextDealerFound = true;

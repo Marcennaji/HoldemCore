@@ -7,6 +7,7 @@
 #include "CardUtilities.h"
 #include "GameEvents.h"
 #include "Randomizer.h"
+#include "core/player/Helpers.h"
 #include "model/ButtonState.h"
 
 #include "Exception.h"
@@ -156,7 +157,7 @@ void Hand::assignButtons()
     }
 
     // assign dealer button
-    it = getPlayerSeatFromId(myDealerPlayerId);
+    it = getPlayerById(mySeatsList, myDealerPlayerId);
     if (it == mySeatsList->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
@@ -166,7 +167,7 @@ void Hand::assignButtons()
     // assign Small Blind next to dealer. ATTENTION: in heads up it is big blind
     // assign big blind next to small blind. ATTENTION: in heads up it is small blind
     bool nextActivePlayerFound = false;
-    PlayerListIterator dealerPositionIt = getPlayerSeatFromId(myDealerPlayerId);
+    auto dealerPositionIt = getPlayerById(mySeatsList, myDealerPlayerId);
     if (dealerPositionIt == mySeatsList->end())
     {
         throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
@@ -180,8 +181,7 @@ void Hand::assignButtons()
         {
             dealerPositionIt = mySeatsList->begin();
         }
-
-        it = getPlayerSeatFromId((*dealerPositionIt)->getId());
+        it = getPlayerById(mySeatsList, (*dealerPositionIt)->getId());
         if (it != mySeatsList->end())
         {
             nextActivePlayerFound = true;
@@ -444,8 +444,7 @@ void Hand::resolveHandConditions()
             GlobalServices::instance().logger()->verbose("Board cards logged for all-in condition.");
         }
     }
-
-    itC = getPlayerSeatFromId(myPreviousPlayerId);
+    itC = getPlayerById(mySeatsList, myPreviousPlayerId);
     if (itC != mySeatsList->end())
     {
         if (myEvents.onPlayerStatusChanged)
@@ -462,62 +461,6 @@ void Hand::resolveHandConditions()
     }
 
     getCurrentBettingRound()->run();
-}
-
-PlayerListIterator Hand::getPlayerSeatFromId(unsigned uniqueId) const
-{
-
-    PlayerListIterator it;
-
-    for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
-    {
-        if ((*it)->getId() == uniqueId)
-        {
-            break;
-        }
-    }
-
-    return it;
-}
-
-PlayerListIterator Hand::getRunningPlayerFromId(unsigned uniqueId) const
-{
-    GlobalServices::instance().logger()->verbose("Entering getRunningPlayerFromId() with uniqueId: " +
-                                                 std::to_string(uniqueId));
-
-    // Check if the list is empty
-    if (myRunningPlayersList->empty())
-    {
-        GlobalServices::instance().logger()->error("myRunningPlayersList is empty! Returning end iterator.");
-        return myRunningPlayersList->end();
-    }
-
-    PlayerListIterator it;
-
-    for (it = myRunningPlayersList->begin(); it != myRunningPlayersList->end(); ++it)
-    {
-        // Check if the player pointer is valid
-        if (!(*it))
-        {
-            GlobalServices::instance().logger()->error("Null player pointer encountered in myRunningPlayersList!");
-            continue; // Skip to the next player
-        }
-
-        if ((*it)->getId() == uniqueId)
-        {
-            break;
-        }
-    }
-
-    if (it == myRunningPlayersList->end())
-    {
-        GlobalServices::instance().logger()->verbose("Player with uniqueId: " + std::to_string(uniqueId) +
-                                                     " not found in myRunningPlayersList.");
-        return myRunningPlayersList->end();
-    }
-
-    GlobalServices::instance().logger()->verbose("Player found");
-    return it;
 }
 
 void Hand::setLastActionPlayerId(unsigned theValue)
@@ -748,4 +691,5 @@ GameState Hand::getCurrentRoundStateFsm() const
 {
     return myCurrentStateFsm ? myCurrentStateFsm->getGameState() : GameStatePreflop;
 }
+
 } // namespace pkt::core

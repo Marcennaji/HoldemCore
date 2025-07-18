@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include "core/engine/Exception.h"
+#include "core/player/Helpers.h"
 #include "core/services/GlobalServices.h"
 
 namespace pkt::core
@@ -211,7 +212,7 @@ void Pot::finalizeDistribution()
     // Distribute base share to each winner
     for (unsigned id : uniqueWinners)
     {
-        auto it = getPlayerSeatFromId(id);
+        auto it = getPlayerById(mySeats, id);
         if (it != mySeats->end())
         {
             (*it)->setCash((*it)->getCash() + baseShare);
@@ -232,11 +233,7 @@ void Pot::finalizeDistribution()
 
     myTotal = 0;
 }
-player::PlayerListIterator Pot::getPlayerSeatFromId(unsigned id)
-{
-    return std::find_if(mySeats->begin(), mySeats->end(),
-                        [id](const std::shared_ptr<player::Player>& p) { return p->getId() == id; });
-}
+
 std::vector<size_t> Pot::indexesOf(const std::list<unsigned>& ids)
 {
     std::vector<size_t> result;

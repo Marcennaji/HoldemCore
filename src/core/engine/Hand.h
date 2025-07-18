@@ -98,8 +98,6 @@ class Hand : public IHand
     const GameEvents& getEvents() const { return myEvents; }
 
   protected:
-    pkt::core::player::PlayerListIterator getPlayerSeatFromId(unsigned) const;
-    pkt::core::player::PlayerListIterator getRunningPlayerFromId(unsigned) const;
     void updateRunningPlayersList();
 
   private:

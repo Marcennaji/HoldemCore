@@ -121,7 +121,6 @@ class Player
     void updateTurnStatistics();
     void updateRiverStatistics();
 
-    std::shared_ptr<Player> getPlayerByUniqueId(unsigned id) const;
     int getPotOdd() const;
     void setPreflopPotOdd(const int potOdd);
 

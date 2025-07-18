@@ -2,6 +2,7 @@
 
 #include "BettingRoundsFsmTest.h"
 #include "core/engine/model/PlayerAction.h"
+#include "core/player/Helpers.h"
 #include "core/services/GlobalServices.h"
 
 using namespace pkt::core;
@@ -133,7 +134,8 @@ TEST_F(BettingRoundsFsmTest, ActionOrderStartsCorrectlyInHeadsUpPreflop)
     ASSERT_EQ(preflop.round, GameStatePreflop);
     ASSERT_FALSE(preflop.actions.empty());
 
-    PlayerListIterator dealerIt = myHand->getPlayerSeatFromId(myHand->getDealerPlayerId());
+    auto dealerIt = getPlayerById(myHand->getSeatsList(), myHand->getDealerPlayerId());
+
     ASSERT_FALSE(preflop.actions.empty());
     // in heads-up, preflop, the first player to act is the dealer
     EXPECT_EQ(preflop.actions.front().first, (*dealerIt)->getId());
@@ -202,7 +204,7 @@ TEST_F(BettingRoundsFsmTest, AllActionsAreFromActivePlayersOnly)
     {
         for (const auto& [playerId, action] : round.actions)
         {
-            EXPECT_TRUE(myHand->getPlayerSeatFromId(playerId) != myHand->getSeatsList()->end());
+            EXPECT_TRUE(getPlayerById(myHand->getSeatsList(), playerId) != myHand->getSeatsList()->end());
             EXPECT_NE(action, PlayerAction::PlayerActionNone);
         }
     }

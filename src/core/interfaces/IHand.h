@@ -94,9 +94,6 @@ class IHand
     virtual int getTurnLastRaiserId() = 0;
     virtual void setTurnLastRaiserId(int id) = 0;
 
-    virtual pkt::core::player::PlayerListIterator getPlayerSeatFromId(unsigned) const = 0;
-    virtual pkt::core::player::PlayerListIterator getRunningPlayerFromId(unsigned) const = 0;
-
     void recordPlayerAction(GameState round, unsigned playerId, const pkt::core::PlayerAction& action)
     {
         // Find or create entry for this round
