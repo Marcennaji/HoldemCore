@@ -4,6 +4,7 @@
 
 namespace pkt::core
 {
+class GameEvents;
 
 class AllInState : public IBettingRoundStateFsm
 {
@@ -12,32 +13,35 @@ class AllInState : public IBettingRoundStateFsm
     bool showdownReady = false;
 
   public:
+    AllInState(GameEvents& events);
     // Core state lifecycle
-    void enter(Hand& hand) override;
-    void exit(Hand& hand) override;
-    std::unique_ptr<IBettingRoundStateFsm> processAction(Hand& hand, PlayerAction action) override;
+    void enter(IHand& Ihand) override;
+    void exit(IHand& Ihand) override;
+    std::unique_ptr<IBettingRoundStateFsm> processAction(IHand& Ihand, PlayerAction action) override;
 
     // State identification
-    GameState getGameState() const override { return entryState; } // Returns the state we're handling all-in for
+    GameState getGameState() const override { return entryState; } // Returns the state we're Ihandling all-in for
     std::string getStateName() const override { return "AllIn"; }
 
     // State queries
-    bool isRoundComplete(const Hand& hand) const override;
-    bool canProcessAction(const Hand& hand, PlayerAction action) const override;
+    bool isRoundComplete(const IHand& Ihand) const override;
+    bool canProcessAction(const IHand& Ihand, PlayerAction action) const override;
 
     // Utility for logging/debugging
-    void logStateInfo(const Hand& hand) const override;
+    void logStateInfo(const IHand& Ihand) const override;
 
   private:
+    GameEvents& myEvents;
+
     // All-in specific methods
-    void handleAllInSituation(Hand& hand);
-    void dealRemainingCards(Hand& hand);
-    void collectPots(Hand& hand);
-    void flipCards(Hand& hand);
+    void handleAllInSituation(IHand& Ihand);
+    void dealRemainingCards(IHand& Ihand);
+    void collectPots(IHand& Ihand);
+    void flipCards(IHand& Ihand);
 
     // Transition logic
-    std::unique_ptr<IBettingRoundStateFsm> checkForTransition(Hand& hand);
-    void determineEntryState(Hand& hand);
+    std::unique_ptr<IBettingRoundStateFsm> checkForTransition(IHand& Ihand);
+    void determineEntryState(IHand& Ihand);
 };
 
 } // namespace pkt::core

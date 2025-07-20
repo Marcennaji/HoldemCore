@@ -97,6 +97,16 @@ class Hand : public IHand
 
     const GameEvents& getEvents() const { return myEvents; }
 
+    void applyActionFsm(const pkt::core::PlayerAction&);
+    void advanceToNextPlayerFsm();
+    bool isBettingRoundCompleteFsm() const;
+    bool canAcceptActionFsm(PlayerAction) const;
+    void postBlindsFsm();
+    void prepareBettingRoundFsm();
+    void dealFlopFsm();
+    void dealTurnFsm();
+    void dealRiverFsm();
+
   protected:
     void updateRunningPlayersList();
 

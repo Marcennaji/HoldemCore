@@ -691,5 +691,31 @@ GameState Hand::getCurrentRoundStateFsm() const
 {
     return myCurrentStateFsm ? myCurrentStateFsm->getGameState() : GameStatePreflop;
 }
-
+void Hand::applyActionFsm(const pkt::core::PlayerAction&)
+{
+}
+void Hand::advanceToNextPlayerFsm()
+{
+}
+bool Hand::isBettingRoundCompleteFsm() const
+{
+}
+bool Hand::canAcceptActionFsm(PlayerAction) const
+{
+}
+void Hand::postBlindsFsm()
+{
+}
+void Hand::prepareBettingRoundFsm()
+{
+}
+void Hand::dealFlopFsm()
+{
+}
+void Hand::dealTurnFsm()
+{
+}
+void Hand::dealRiverFsm()
+{
+}
 } // namespace pkt::core

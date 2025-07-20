@@ -1,164 +1,70 @@
 #include "RiverState.h"
-#include "AllInState.h"
+#include "GameEvents.h"
+#include "Hand.h"
 #include "PostRiverState.h"
-#include "core/engine/Hand.h"
+#include "core/engine/model/PlayerAction.h"
 
 namespace pkt::core
 {
 
-void RiverState::enter(Hand& hand)
+RiverState::RiverState(GameEvents& events) : myEvents(events)
 {
-    GlobalServices::instance().logger()->verbose("Entering River state");
-
-    // Initialize betting round
-    initializeBettingRound(hand);
-
-    // Deal river card
-    dealRiverCard(hand);
-
-    // Set first player to act
-    setFirstPlayerToAct(hand);
-
-    // Fire event
-    if (hand.getEvents().onBettingRoundStarted)
-    {
-        hand.getEvents().onBettingRoundStarted(GameStateRiver);
-    }
-
-    logStateInfo(hand);
 }
 
-void RiverState::exit(Hand& hand)
+void RiverState::enter(IHand& hand)
 {
-    GlobalServices::instance().logger()->verbose("Exiting River state");
-    // Clean up any river-specific state
+    hand.dealRiverFsm();
+    hand.prepareBettingRoundFsm();
+
+    if (myEvents.onBettingRoundStarted)
+        myEvents.onBettingRoundStarted(GameState::GameStateRiver);
 }
 
-std::unique_ptr<IBettingRoundStateFsm> RiverState::processAction(Hand& hand, PlayerAction action)
+void RiverState::exit(IHand& hand)
+{
+    // Nothing needed for now
+}
+
+std::unique_ptr<IBettingRoundStateFsm> RiverState::processAction(IHand& hand, PlayerAction action)
 {
     if (!canProcessAction(hand, action))
-    {
-        GlobalServices::instance().logger()->error("Invalid action in river state");
         return nullptr;
-    }
 
-    // Process the betting action
-    processPlayerBetting(hand, action);
+    hand.applyActionFsm(action);
 
-    // Check if this completes the betting round
-    if (isBettingComplete(hand))
+    if (isRoundComplete(hand))
     {
-        bettingComplete = true;
-        return checkForTransition(hand);
+        exit(hand);
+        return std::make_unique<PostRiverState>(myEvents);
     }
 
-    // Move to next player
-    advanceToNextPlayer(hand);
-
-    return nullptr; // No state transition yet
+    hand.advanceToNextPlayerFsm();
+    return nullptr;
 }
 
-bool RiverState::isRoundComplete(const Hand& hand) const
+GameState RiverState::getGameState() const
 {
-    return bettingComplete;
+    return GameState::GameStateRiver;
 }
 
-bool RiverState::canProcessAction(const Hand& hand, PlayerAction action) const
+std::string RiverState::getStateName() const
 {
-    return validateAction(hand, action);
+    return "River";
 }
 
-void RiverState::logStateInfo(const Hand& hand) const
+bool RiverState::isRoundComplete(const IHand& hand) const
 {
-    GlobalServices::instance().logger()->verbose("River State - Highest bet: " + std::to_string(highestBet) +
-                                                 ", Players acted: " + std::to_string(playersActedCount) +
-                                                 ", Current player: " + std::to_string(currentPlayerToAct));
+    return hand.isBettingRoundCompleteFsm();
 }
 
-// Private method implementations
-void RiverState::initializeBettingRound(Hand& hand)
+bool RiverState::canProcessAction(const IHand& hand, PlayerAction action) const
 {
-    highestBet = 0; // Fresh betting round
-    bettingComplete = false;
-    lastRaiserId = -1;
-    playersActedCount = 0;
+    return hand.canAcceptActionFsm(action);
 }
 
-void RiverState::dealRiverCard(Hand& hand)
+void RiverState::logStateInfo(const IHand& hand) const
 {
-    // Extract from Hand::dealBoardCards() - deal 5th card
-    // This will be implemented in Phase 2
-}
-
-void RiverState::setFirstPlayerToAct(Hand& hand)
-{
-    // Extract from BettingRound::handleFirstRun() - find first player after dealer
-    // This will be implemented in Phase 2
-}
-
-void RiverState::processPlayerBetting(Hand& hand, PlayerAction action)
-{
-    // Extract from BettingRound logic
-    // This will be implemented in Phase 2
-}
-
-void RiverState::advanceToNextPlayer(Hand& hand)
-{
-    // Extract from BettingRound::run() - next player logic
-    // This will be implemented in Phase 2
-}
-
-std::unique_ptr<IBettingRoundStateFsm> RiverState::checkForTransition(Hand& hand)
-{
-    // Check for all-in condition
-    if (checkAllInCondition(hand))
-    {
-        return std::make_unique<AllInState>();
-    }
-
-    // River always goes to PostRiver (showdown)
-    return std::make_unique<PostRiverState>();
-}
-
-bool RiverState::checkSinglePlayerRemaining(const Hand& hand) const
-{
-    // Extract from Hand::resolveHandConditions() logic
-    // This will be implemented in Phase 2
-    return false;
-}
-
-bool RiverState::checkAllInCondition(const Hand& hand) const
-{
-    // Extract from Hand::resolveHandConditions() all-in logic
-    // This will be implemented in Phase 2
-    return false;
-}
-
-bool RiverState::validateAction(const Hand& hand, PlayerAction action) const
-{
-    // Extract from existing betting validation logic
-    // This will be implemented in Phase 2
-    return true;
-}
-
-bool RiverState::isBettingComplete(const Hand& hand) const
-{
-    // Extract from BettingRound::allBetsAreDone()
-    // This will be implemented in Phase 2
-    return false;
-}
-
-void RiverState::updatePlayerLists(Hand& hand)
-{
-    // Extract from Hand::resolveHandConditions() - player list refresh
-    // This will be implemented in Phase 2
-}
-
-int RiverState::getNextPlayerToAct(const Hand& hand) const
-{
-    // Extract from BettingRound::run() - next player logic
-    // This will be implemented in Phase 2
-    return -1;
+    // Optional debug logging
 }
 
 } // namespace pkt::core

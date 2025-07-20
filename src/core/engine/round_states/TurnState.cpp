@@ -1,171 +1,70 @@
 #include "TurnState.h"
-#include "AllInState.h"
-#include "PostRiverState.h"
+#include "GameEvents.h"
+#include "Hand.h"
 #include "RiverState.h"
-#include "core/engine/Hand.h"
+#include "core/engine/model/PlayerAction.h"
 
 namespace pkt::core
 {
 
-void TurnState::enter(Hand& hand)
+TurnState::TurnState(GameEvents& events) : myEvents(events)
 {
-    GlobalServices::instance().logger()->verbose("Entering Turn state");
-
-    // Initialize betting round
-    initializeBettingRound(hand);
-
-    // Deal turn card
-    dealTurnCard(hand);
-
-    // Set first player to act
-    setFirstPlayerToAct(hand);
-
-    // Fire event
-    if (hand.getEvents().onBettingRoundStarted)
-    {
-        hand.getEvents().onBettingRoundStarted(GameStateTurn);
-    }
-
-    logStateInfo(hand);
 }
 
-void TurnState::exit(Hand& hand)
+void TurnState::enter(IHand& hand)
 {
-    GlobalServices::instance().logger()->verbose("Exiting Turn state");
-    // Clean up any turn-specific state
+    hand.dealTurnFsm();
+    hand.prepareBettingRoundFsm();
+
+    if (myEvents.onBettingRoundStarted)
+        myEvents.onBettingRoundStarted(GameState::GameStateTurn);
 }
 
-std::unique_ptr<IBettingRoundStateFsm> TurnState::processAction(Hand& hand, PlayerAction action)
+void TurnState::exit(IHand& hand)
+{
+    // Nothing needed for now
+}
+
+std::unique_ptr<IBettingRoundStateFsm> TurnState::processAction(IHand& hand, PlayerAction action)
 {
     if (!canProcessAction(hand, action))
-    {
-        GlobalServices::instance().logger()->error("Invalid action in turn state");
         return nullptr;
-    }
 
-    // Process the betting action
-    processPlayerBetting(hand, action);
+    hand.applyActionFsm(action);
 
-    // Check if this completes the betting round
-    if (isBettingComplete(hand))
+    if (isRoundComplete(hand))
     {
-        bettingComplete = true;
-        return checkForTransition(hand);
+        exit(hand);
+        return std::make_unique<RiverState>(myEvents);
     }
 
-    // Move to next player
-    advanceToNextPlayer(hand);
-
-    return nullptr; // No state transition yet
+    hand.advanceToNextPlayerFsm();
+    return nullptr;
 }
 
-bool TurnState::isRoundComplete(const Hand& hand) const
+GameState TurnState::getGameState() const
 {
-    return bettingComplete;
+    return GameState::GameStateTurn;
 }
 
-bool TurnState::canProcessAction(const Hand& hand, PlayerAction action) const
+std::string TurnState::getStateName() const
 {
-    return validateAction(hand, action);
+    return "Turn";
 }
 
-void TurnState::logStateInfo(const Hand& hand) const
+bool TurnState::isRoundComplete(const IHand& hand) const
 {
-    GlobalServices::instance().logger()->verbose("Turn State - Highest bet: " + std::to_string(highestBet) +
-                                                 ", Players acted: " + std::to_string(playersActedCount) +
-                                                 ", Current player: " + std::to_string(currentPlayerToAct));
+    return hand.isBettingRoundCompleteFsm();
 }
 
-// Private method implementations
-void TurnState::initializeBettingRound(Hand& hand)
+bool TurnState::canProcessAction(const IHand& hand, PlayerAction action) const
 {
-    highestBet = 0; // Fresh betting round
-    bettingComplete = false;
-    lastRaiserId = -1;
-    playersActedCount = 0;
+    return hand.canAcceptActionFsm(action);
 }
 
-void TurnState::dealTurnCard(Hand& hand)
+void TurnState::logStateInfo(const IHand& hand) const
 {
-    // Extract from Hand::dealBoardCards() - deal 4th card
-    // This will be implemented in Phase 2
-}
-
-void TurnState::setFirstPlayerToAct(Hand& hand)
-{
-    // Extract from BettingRound::handleFirstRun() - find first player after dealer
-    // This will be implemented in Phase 2
-}
-
-void TurnState::processPlayerBetting(Hand& hand, PlayerAction action)
-{
-    // Extract from BettingRound logic
-    // This will be implemented in Phase 2
-}
-
-void TurnState::advanceToNextPlayer(Hand& hand)
-{
-    // Extract from BettingRound::run() - next player logic
-    // This will be implemented in Phase 2
-}
-
-std::unique_ptr<IBettingRoundStateFsm> TurnState::checkForTransition(Hand& hand)
-{
-    // Check for all-in condition
-    if (checkAllInCondition(hand))
-    {
-        return std::make_unique<AllInState>();
-    }
-
-    // Check if only one player remains
-    if (checkSinglePlayerRemaining(hand))
-    {
-        return std::make_unique<PostRiverState>();
-    }
-
-    // Normal transition to river
-    return std::make_unique<RiverState>();
-}
-
-bool TurnState::checkSinglePlayerRemaining(const Hand& hand) const
-{
-    // Extract from Hand::resolveHandConditions() logic
-    // This will be implemented in Phase 2
-    return false;
-}
-
-bool TurnState::checkAllInCondition(const Hand& hand) const
-{
-    // Extract from Hand::resolveHandConditions() all-in logic
-    // This will be implemented in Phase 2
-    return false;
-}
-
-bool TurnState::validateAction(const Hand& hand, PlayerAction action) const
-{
-    // Extract from existing betting validation logic
-    // This will be implemented in Phase 2
-    return true;
-}
-
-bool TurnState::isBettingComplete(const Hand& hand) const
-{
-    // Extract from BettingRound::allBetsAreDone()
-    // This will be implemented in Phase 2
-    return false;
-}
-
-void TurnState::updatePlayerLists(Hand& hand)
-{
-    // Extract from Hand::resolveHandConditions() - player list refresh
-    // This will be implemented in Phase 2
-}
-
-int TurnState::getNextPlayerToAct(const Hand& hand) const
-{
-    // Extract from BettingRound::run() - next player logic
-    // This will be implemented in Phase 2
-    return -1;
+    // Optional debug logging
 }
 
 } // namespace pkt::core

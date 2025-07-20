@@ -4,8 +4,11 @@
 
 namespace pkt::core
 {
+AllInState::AllInState(GameEvents& events) : myEvents(events)
+{
+}
 
-void AllInState::enter(Hand& hand)
+void AllInState::enter(IHand& hand)
 {
     GlobalServices::instance().logger()->verbose("Entering AllIn state");
 
@@ -27,13 +30,13 @@ void AllInState::enter(Hand& hand)
     logStateInfo(hand);
 }
 
-void AllInState::exit(Hand& hand)
+void AllInState::exit(IHand& hand)
 {
     GlobalServices::instance().logger()->verbose("Exiting AllIn state");
     // Clean up all-in specific state
 }
 
-std::unique_ptr<IBettingRoundStateFsm> AllInState::processAction(Hand& hand, PlayerAction action)
+std::unique_ptr<IBettingRoundStateFsm> AllInState::processAction(IHand& hand, PlayerAction action)
 {
     // In all-in state, no player actions are typically processed
     // This state automatically transitions to showdown
@@ -46,25 +49,25 @@ std::unique_ptr<IBettingRoundStateFsm> AllInState::processAction(Hand& hand, Pla
     return nullptr;
 }
 
-bool AllInState::isRoundComplete(const Hand& hand) const
+bool AllInState::isRoundComplete(const IHand& hand) const
 {
     return showdownReady;
 }
 
-bool AllInState::canProcessAction(const Hand& hand, PlayerAction action) const
+bool AllInState::canProcessAction(const IHand& hand, PlayerAction action) const
 {
     // No actions can be processed in all-in state
     return false;
 }
 
-void AllInState::logStateInfo(const Hand& hand) const
+void AllInState::logStateInfo(const IHand& hand) const
 {
     GlobalServices::instance().logger()->verbose("AllIn State - Entry state: " + std::to_string(entryState) +
                                                  ", Showdown ready: " + std::to_string(showdownReady));
 }
 
 // Private method implementations
-void AllInState::handleAllInSituation(Hand& hand)
+void AllInState::handleAllInSituation(IHand& hand)
 {
     // Extract from Hand::resolveHandConditions() all-in condition handling
     // This will be implemented in Phase 2
@@ -74,7 +77,7 @@ void AllInState::handleAllInSituation(Hand& hand)
     hand.getBoard()->setAllInCondition(true);
 }
 
-void AllInState::dealRemainingCards(Hand& hand)
+void AllInState::dealRemainingCards(IHand& hand)
 {
     // Extract from Hand::resolveHandConditions() - deal remaining board cards
     // This will be implemented in Phase 2
@@ -86,37 +89,37 @@ void AllInState::dealRemainingCards(Hand& hand)
     // If river all-in: no additional cards
 }
 
-void AllInState::collectPots(Hand& hand)
+void AllInState::collectPots(IHand& hand)
 {
     // Extract from Hand::resolveHandConditions() pot collection logic
     // This will be implemented in Phase 2
 
     hand.getBoard()->collectPot();
 
-    if (hand.getEvents().onPotUpdated)
+    if (myEvents.onPotUpdated)
     {
-        hand.getEvents().onPotUpdated(hand.getBoard()->getPot());
+        myEvents.onPotUpdated(hand.getBoard()->getPot());
     }
 }
 
-void AllInState::flipCards(Hand& hand)
+void AllInState::flipCards(IHand& hand)
 {
     // Extract from Hand::resolveHandConditions() card flipping logic
     // This will be implemented in Phase 2
 
-    if (hand.getEvents().onFlipHoleCardsAllIn)
+    if (myEvents.onFlipHoleCardsAllIn)
     {
-        hand.getEvents().onFlipHoleCardsAllIn();
+        myEvents.onFlipHoleCardsAllIn();
     }
 }
 
-std::unique_ptr<IBettingRoundStateFsm> AllInState::checkForTransition(Hand& hand)
+std::unique_ptr<IBettingRoundStateFsm> AllInState::checkForTransition(IHand& hand)
 {
     // All-in always goes to showdown
-    return std::make_unique<PostRiverState>();
+    return std::make_unique<PostRiverState>(myEvents);
 }
 
-void AllInState::determineEntryState(Hand& hand)
+void AllInState::determineEntryState(IHand& hand)
 {
     // Determine which state we entered from
     entryState = hand.getCurrentRoundState();

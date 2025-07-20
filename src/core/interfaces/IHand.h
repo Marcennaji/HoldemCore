@@ -112,6 +112,16 @@ class IHand
 
     const std::vector<BettingRoundHistory>& getHandActionHistory() const { return myHandActionHistory; }
 
+    virtual void applyActionFsm(const pkt::core::PlayerAction&) = 0;
+    virtual void advanceToNextPlayerFsm() = 0;
+    virtual bool isBettingRoundCompleteFsm() const = 0;
+    virtual bool canAcceptActionFsm(PlayerAction) const = 0;
+    virtual void postBlindsFsm() = 0;
+    virtual void prepareBettingRoundFsm() = 0;
+    virtual void dealFlopFsm() = 0;
+    virtual void dealTurnFsm() = 0;
+    virtual void dealRiverFsm() = 0;
+
     std::vector<BettingRoundHistory> myHandActionHistory;
     FlowMode myFlowMode{FlowMode::Legacy};
     friend class Game;
