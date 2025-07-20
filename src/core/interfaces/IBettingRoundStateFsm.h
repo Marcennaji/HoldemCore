@@ -27,7 +27,7 @@ class IBettingRoundStateFsm
 
     // State queries
     virtual bool isRoundComplete(const IHand& hand) const = 0;
-    virtual bool canProcessAction(const IHand& hand, PlayerAction action) const = 0;
+    virtual bool canProcessAction(const IHand& hand, const PlayerAction action) const = 0;
 
     // Utility for logging/debugging
     virtual void logStateInfo(const IHand& hand) const {}

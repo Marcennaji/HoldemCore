@@ -24,7 +24,40 @@ void PreflopState::exit(IHand& hand)
 {
     // Nothing needed for now
 }
+bool PreflopState::canProcessAction(const IHand& hand, const PlayerAction action) const
+{
+    /*auto player = getPlayerById(action.playerId);
 
+    // Player must be in the hand
+    if (player.isFolded())
+        return false;
+
+    // It's not this player's turn
+    if (hand.currentPlayerId() != action.playerId)
+        return false;
+
+    const int callAmount = hand.amountToCall(player.id());
+
+    switch (action.type)
+    {
+    case ActionType::Fold:
+        return true; // Always allowed
+    case ActionType::Check:
+        return callAmount == 0;
+    case ActionType::Call:
+        return callAmount > 0 && player.stack() >= callAmount;
+    case ActionType::Bet:
+        // Only allowed if no previous bet
+        return callAmount == 0 && action.amount > 0 && action.amount <= player.stack();
+    case ActionType::Raise:
+        // Raise must be above minRaise and within stack
+        return callAmount > 0 && action.amount >= hand.minRaiseAmount() && action.amount <= player.stack();
+    case ActionType::Allin:
+        return player.stack() > 0;
+    default:
+        return false;
+    }*/
+}
 std::unique_ptr<IBettingRoundStateFsm> PreflopState::processAction(IHand& hand, PlayerAction action)
 {
     if (!canProcessAction(hand, action))
@@ -55,11 +88,6 @@ std::string PreflopState::getStateName() const
 bool PreflopState::isRoundComplete(const IHand& hand) const
 {
     return hand.isBettingRoundCompleteFsm();
-}
-
-bool PreflopState::canProcessAction(const IHand& hand, PlayerAction action) const
-{
-    return hand.canAcceptActionFsm(action);
 }
 
 void PreflopState::logStateInfo(const IHand& hand) const
