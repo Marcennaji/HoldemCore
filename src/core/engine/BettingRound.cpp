@@ -132,7 +132,7 @@ void BettingRound::run()
 
         if (myEvents.onPlayerActed)
         {
-            myEvents.onPlayerActed(myCurrentPlayerTurnId, ActionType::None);
+            myEvents.onPlayerActed({myCurrentPlayerTurnId, ActionType::None, 0});
         }
         GlobalServices::instance().logger()->verbose("BettingRound::run() : Determining next running player");
 
@@ -234,11 +234,11 @@ void BettingRound::proceedToNextBettingRound()
         myEvents.onPotUpdated(myHand->getBoard()->getPot());
     }
 
-    for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
+    for (unsigned int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
     {
         if (myEvents.onPlayerActed)
         {
-            myEvents.onPlayerActed(i, ActionType::None);
+            myEvents.onPlayerActed({i, ActionType::None, 0});
         }
     }
 

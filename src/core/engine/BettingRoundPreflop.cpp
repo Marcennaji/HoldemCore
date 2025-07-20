@@ -140,11 +140,11 @@ void BettingRoundPreflop::proceedToFlop()
         myEvents.onPotUpdated(getHand()->getBoard()->getPot());
     }
 
-    for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
+    for (unsigned int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
     {
         if (myEvents.onPlayerActed)
         {
-            myEvents.onPlayerActed(i, ActionType::None);
+            myEvents.onPlayerActed({i, ActionType::None, 0});
         }
     }
 
@@ -189,7 +189,7 @@ void BettingRoundPreflop::handleNextPlayerTurn()
 
     if (myEvents.onPlayerActed)
     {
-        myEvents.onPlayerActed(getCurrentPlayerTurnId(), ActionType::None);
+        myEvents.onPlayerActed({getCurrentPlayerTurnId(), ActionType::None, 0});
     }
 
     if ((*currentPlayersTurnIt)->getName() == HumanPlayer::getName())

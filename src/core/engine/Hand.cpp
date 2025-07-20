@@ -683,9 +683,13 @@ void Hand::setTurnLastRaiserId(int id)
     myTurnLastRaiserId = id;
 }
 
-GameState Hand::getCurrentRoundStateFsm() const
+std::shared_ptr<IBettingRoundStateFsm> Hand::getCurrentRoundStateFsm() const
 {
-    return myCurrentStateFsm ? myCurrentStateFsm->getGameState() : GameStatePreflop;
+    return myCurrentStateFsm;
+}
+void Hand::setCurrentRoundStateFsm(std::shared_ptr<IBettingRoundStateFsm> b)
+{
+    myCurrentStateFsm = b;
 }
 
 void Hand::applyActionFsm(const pkt::core::PlayerAction&)
@@ -696,9 +700,11 @@ void Hand::advanceToNextPlayerFsm()
 }
 bool Hand::isBettingRoundCompleteFsm() const
 {
+    return false;
 }
 bool Hand::canAcceptActionFsm(PlayerAction) const
 {
+    return false;
 }
 void Hand::postBlindsFsm()
 {
@@ -714,5 +720,38 @@ void Hand::dealTurnFsm()
 }
 void Hand::dealRiverFsm()
 {
+}
+
+void Hand::handlePlayerActionFsm(PlayerAction action)
+{
+    assert(myCurrentStateFsm && "Betting state must be initialized");
+
+    auto player = getPlayerById(getSeatsList(), action.playerId);
+
+    // 1. Ask current FSM state if the action is allowed
+    if (!myCurrentStateFsm->canProcessAction(*this, action))
+    {
+        throw std::logic_error("Action not allowed in current state");
+    }
+
+    // 2. Process the action via the FSM
+    std::unique_ptr<IBettingRoundStateFsm> nextState = myCurrentStateFsm->processAction(*this, action);
+
+    // 3. Apply the state transition, if any
+    if (nextState)
+    {
+        myCurrentStateFsm->exit(*this);
+        myCurrentStateFsm = std::move(nextState);
+        myCurrentStateFsm->enter(*this);
+    }
+
+    // 4. Notify event listeners (e.g., UI)
+    if (myEvents.onPlayerActed)
+    {
+        myEvents.onPlayerActed(action);
+    }
+
+    // 5. Optionally log state
+    myCurrentStateFsm->logStateInfo(*this);
 }
 } // namespace pkt::core

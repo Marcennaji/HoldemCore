@@ -95,8 +95,10 @@ class Hand : public IHand
 
     const GameEvents& getEvents() const { return myEvents; }
 
-    GameState getCurrentRoundStateFsm() const;
+    std::shared_ptr<IBettingRoundStateFsm> getCurrentRoundStateFsm() const;
+    void setCurrentRoundStateFsm(std::shared_ptr<IBettingRoundStateFsm>);
     void applyActionFsm(const pkt::core::PlayerAction&);
+    void handlePlayerActionFsm(PlayerAction action);
     void advanceToNextPlayerFsm();
     bool isBettingRoundCompleteFsm() const;
     bool canAcceptActionFsm(PlayerAction) const;
@@ -110,7 +112,7 @@ class Hand : public IHand
     void updateRunningPlayersList();
 
   private:
-    std::unique_ptr<IBettingRoundStateFsm> myCurrentStateFsm;
+    std::shared_ptr<IBettingRoundStateFsm> myCurrentStateFsm;
     std::shared_ptr<EngineFactory> myFactory;
     const GameEvents& myEvents;
     std::shared_ptr<IBoard> myBoard;

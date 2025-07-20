@@ -2,11 +2,13 @@
 
 #include "PreflopStateTest.h"
 #include "core/engine/model/PlayerAction.h"
+#include "core/engine/round_states/PreflopState.h"
 #include "core/player/Helpers.h"
 #include "core/services/GlobalServices.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;
+using namespace std;
 
 namespace pkt::test
 {
@@ -40,6 +42,6 @@ void PreflopStateTest::TearDown()
 TEST_F(PreflopStateTest, GoesToFlopAfterAllPlayersCall)
 {
     initializeHandForTesting(3);
-    // myHand->setState(std::make_unique < PreflopState());
+    myHand->setCurrentRoundStateFsm(std::make_shared<pkt::core::PreflopState>(myEvents));
 }
 } // namespace pkt::test

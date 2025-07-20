@@ -9,6 +9,7 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/interfaces/IBettingRound.h"
+#include "core/interfaces/IBettingRoundStateFsm.h"
 #include "core/interfaces/IBoard.h"
 
 #include <algorithm>
@@ -46,7 +47,8 @@ class IHand
     virtual void setStartQuantityPlayers(int theValue) = 0;
     virtual int getStartQuantityPlayers() const = 0;
 
-    virtual GameState getCurrentRoundStateFsm() const = 0;
+    virtual std::shared_ptr<IBettingRoundStateFsm> getCurrentRoundStateFsm() const = 0;
+    virtual void setCurrentRoundStateFsm(std::shared_ptr<IBettingRoundStateFsm>) = 0;
 
     virtual void setCurrentRoundState(GameState theValue) = 0;
     virtual GameState getCurrentRoundState() const = 0;
