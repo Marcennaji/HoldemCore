@@ -43,5 +43,11 @@ TEST_F(PreflopStateTest, GoesToFlopAfterAllPlayersCall)
 {
     initializeHandForTesting(3);
     myHand->setCurrentRoundStateFsm(std::make_shared<pkt::core::PreflopState>(myEvents));
+
+    myHand->handlePlayerActionFsm({0, ActionType::Call});
+    myHand->handlePlayerActionFsm({1, ActionType::Call});
+    myHand->handlePlayerActionFsm({2, ActionType::Check});
+
+    EXPECT_EQ(myHand->getCurrentRoundStateFsm()->getGameState(), GameStateFlop);
 }
 } // namespace pkt::test
