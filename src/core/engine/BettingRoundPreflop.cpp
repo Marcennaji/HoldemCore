@@ -129,7 +129,7 @@ void BettingRoundPreflop::proceedToFlop()
     for (PlayerListConstIterator itC = getHand()->getRunningPlayersList()->begin();
          itC != getHand()->getRunningPlayersList()->end(); ++itC)
     {
-        (*itC)->setAction(PlayerActionNone);
+        (*itC)->setAction(ActionType::None);
     }
 
     getHand()->getBoard()->collectSets();
@@ -144,7 +144,7 @@ void BettingRoundPreflop::proceedToFlop()
     {
         if (myEvents.onPlayerActed)
         {
-            myEvents.onPlayerActed(i, PlayerActionNone);
+            myEvents.onPlayerActed(i, ActionType::None);
         }
     }
 
@@ -189,7 +189,7 @@ void BettingRoundPreflop::handleNextPlayerTurn()
 
     if (myEvents.onPlayerActed)
     {
-        myEvents.onPlayerActed(getCurrentPlayerTurnId(), PlayerActionNone);
+        myEvents.onPlayerActed(getCurrentPlayerTurnId(), ActionType::None);
     }
 
     if ((*currentPlayersTurnIt)->getName() == HumanPlayer::getName())

@@ -8,34 +8,41 @@
 namespace pkt::core
 {
 
-enum PlayerAction
+enum class ActionType
 {
-    PlayerActionNone = 0,
-    PlayerActionFold,
-    PlayerActionCheck,
-    PlayerActionCall,
-    PlayerActionBet,
-    PlayerActionRaise,
-    PlayerActionAllin
+    None = 0,
+    Fold,
+    Check,
+    Call,
+    Bet,
+    Raise,
+    Allin
 };
 
-inline const char* playerActionToString(PlayerAction action)
+struct PlayerAction
+{
+    int playerId;
+    ActionType type;
+    int amount = 0;
+};
+
+inline const char* playerActionToString(ActionType action)
 {
     switch (action)
     {
-    case PlayerActionNone:
+    case ActionType::None:
         return "None";
-    case PlayerActionFold:
+    case ActionType::Fold:
         return "Fold";
-    case PlayerActionCheck:
+    case ActionType::Check:
         return "Check";
-    case PlayerActionCall:
+    case ActionType::Call:
         return "Call";
-    case PlayerActionBet:
+    case ActionType::Bet:
         return "Bet";
-    case PlayerActionRaise:
+    case ActionType::Raise:
         return "Raise";
-    case PlayerActionAllin:
+    case ActionType::Allin:
         return "All-in";
     default:
         return "Unknown Action";

@@ -20,7 +20,7 @@ namespace pkt::core
 struct BettingRoundHistory
 {
     GameState round;
-    std::vector<std::pair<unsigned, pkt::core::PlayerAction>> actions; // playerId, action
+    std::vector<std::pair<unsigned, pkt::core::ActionType>> actions; // playerId, action
 };
 
 class IHand
@@ -94,7 +94,7 @@ class IHand
     virtual int getTurnLastRaiserId() = 0;
     virtual void setTurnLastRaiserId(int id) = 0;
 
-    void recordPlayerAction(GameState round, unsigned playerId, const pkt::core::PlayerAction& action)
+    void recordPlayerAction(GameState round, unsigned playerId, const pkt::core::ActionType& action)
     {
         // Find or create entry for this round
         auto it = std::find_if(myHandActionHistory.begin(), myHandActionHistory.end(),

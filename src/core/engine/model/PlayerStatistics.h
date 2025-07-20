@@ -20,8 +20,8 @@ class PreflopStatistics
     float getPreflop3Bet() const;
     float getPreflop4Bet() const;
     float getPreflopCall3BetsFrequency() const;
-    void addLastAction(PlayerAction);
-    int getLastActionsNumber(PlayerAction p) const;
+    void addLastAction(ActionType);
+    int getLastActionsNumber(ActionType p) const;
 
     void reset();
 
@@ -39,7 +39,7 @@ class PreflopStatistics
     static const int LAST_ACTIONS_STACK_SIZE;
 
     // actions for last n hands :
-    std::deque<PlayerAction> m_lastActions;
+    std::deque<ActionType> m_lastActions;
 };
 
 class FlopStatistics

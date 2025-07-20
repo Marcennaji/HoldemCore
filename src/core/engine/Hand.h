@@ -49,8 +49,6 @@ class Hand : public IHand
     void setCurrentRoundState(GameState theValue) { myCurrentRound = theValue; }
     GameState getCurrentRoundState() const { return myCurrentRound; }
 
-    GameState getCurrentRoundStateFsm() const;
-
     GameState getRoundBeforePostRiver() const { return myRoundBeforePostRiver; }
 
     int getDealerPlayerId() const { return myDealerPlayerId; }
@@ -97,6 +95,7 @@ class Hand : public IHand
 
     const GameEvents& getEvents() const { return myEvents; }
 
+    GameState getCurrentRoundStateFsm() const;
     void applyActionFsm(const pkt::core::PlayerAction&);
     void advanceToNextPlayerFsm();
     bool isBettingRoundCompleteFsm() const;
@@ -111,8 +110,6 @@ class Hand : public IHand
     void updateRunningPlayersList();
 
   private:
-    void startRound(GameState round, const std::function<void()>& legacyCallback, const std::string& roundName);
-
     std::unique_ptr<IBettingRoundStateFsm> myCurrentStateFsm;
     std::shared_ptr<EngineFactory> myFactory;
     const GameEvents& myEvents;

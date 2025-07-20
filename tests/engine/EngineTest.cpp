@@ -43,7 +43,7 @@ void EngineTest::createPlayersLists(size_t playerCount)
     for (size_t i = 0; i < playerCount; ++i)
     {
         auto player = std::make_shared<DummyPlayer>(i, myEvents);
-        player->setAction(PlayerActionNone);
+        player->setAction(ActionType::None);
         mySeatsList->push_back(player);
     }
     // Create a deep copy of mySeatsList for RunningPlayersList

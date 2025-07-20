@@ -16,24 +16,24 @@ class CurrentHandActions
 
     void reset(); // init to zero
 
-    std::vector<PlayerAction>& getPreflopActions();
-    std::vector<PlayerAction>& getFlopActions();
-    std::vector<PlayerAction>& getTurnActions();
-    std::vector<PlayerAction>& getRiverActions();
+    std::vector<ActionType>& getPreflopActions();
+    std::vector<ActionType>& getFlopActions();
+    std::vector<ActionType>& getTurnActions();
+    std::vector<ActionType>& getRiverActions();
 
-    const std::vector<PlayerAction>& getPreflopActions() const { return m_preflopActions; };
-    const std::vector<PlayerAction>& getFlopActions() const { return m_flopActions; };
-    const std::vector<PlayerAction>& getTurnActions() const { return m_turnActions; };
-    const std::vector<PlayerAction>& getRiverActions() const { return m_riverActions; };
+    const std::vector<ActionType>& getPreflopActions() const { return m_preflopActions; };
+    const std::vector<ActionType>& getFlopActions() const { return m_flopActions; };
+    const std::vector<ActionType>& getTurnActions() const { return m_turnActions; };
+    const std::vector<ActionType>& getRiverActions() const { return m_riverActions; };
 
   protected:
     friend class Player;
     friend class HumanPlayer;
     friend class BotPlayer;
 
-    std::vector<PlayerAction> m_preflopActions;
-    std::vector<PlayerAction> m_flopActions;
-    std::vector<PlayerAction> m_turnActions;
-    std::vector<PlayerAction> m_riverActions;
+    std::vector<ActionType> m_preflopActions;
+    std::vector<ActionType> m_flopActions;
+    std::vector<ActionType> m_turnActions;
+    std::vector<ActionType> m_riverActions;
 };
 } // namespace pkt::core::player

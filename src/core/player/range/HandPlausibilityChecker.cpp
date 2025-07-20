@@ -204,7 +204,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(const PostFlopState
         return true;
     }
 
-    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.myCurrentHandActions.getFlopActions().back() == PlayerActionCall &&
+    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.myCurrentHandActions.getFlopActions().back() == ActionType::Call &&
         !(ctx.myStatistics.getWentToShowDown() > 35 &&
           ctx.myStatistics.getRiverStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE))
     {
@@ -494,7 +494,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopState
 
     // the player called a bet on flop and turn, and he is not loose
     if (ctx.turnBetsOrRaisesNumber > 0 && ctx.flopBetsOrRaisesNumber > 0 &&
-        ctx.myCurrentHandActions.getTurnActions().back() && !ctx.myFlopIsAggressor &&
+        ctx.myCurrentHandActions.getTurnActions().back() == ActionType::Call && !ctx.myFlopIsAggressor &&
         !(ctx.myStatistics.getWentToShowDown() > 30 &&
           ctx.myStatistics.getRiverStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE))
     {
@@ -522,7 +522,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopState
         }
     }
     // the player called a raise on turn, and is not loose : he has at least a top pair or a good draw
-    if (ctx.turnBetsOrRaisesNumber > 1 && ctx.myCurrentHandActions.getTurnActions().back() == PlayerActionCall &&
+    if (ctx.turnBetsOrRaisesNumber > 1 && ctx.myCurrentHandActions.getTurnActions().back() == ActionType::Call &&
         !(ctx.myStatistics.getWentToShowDown() > 35 &&
           ctx.myStatistics.getRiverStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE))
     {

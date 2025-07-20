@@ -61,31 +61,31 @@ void BotPlayer::action()
 
     std::ostringstream logMessage;
 
-    if (myAction == PlayerActionFold)
+    if (myAction == ActionType::Fold)
     {
         logMessage << myName + " FOLD";
     }
-    else if (myAction == PlayerActionBet)
+    else if (myAction == ActionType::Bet)
     {
         logMessage << myName + " BET " << myBetAmount << endl;
     }
-    else if (myAction == PlayerActionRaise)
+    else if (myAction == ActionType::Raise)
     {
         logMessage << myName + " RAISE " << myRaiseAmount;
     }
-    else if (myAction == PlayerActionCall)
+    else if (myAction == ActionType::Call)
     {
         logMessage << myName + " CALL ";
     }
-    else if (myAction == PlayerActionCheck)
+    else if (myAction == ActionType::Check)
     {
         logMessage << myName + " CHECK";
     }
-    else if (myAction == PlayerActionAllin)
+    else if (myAction == ActionType::Allin)
     {
         logMessage << myName + " ALLIN ";
     }
-    else if (myAction == PlayerActionNone)
+    else if (myAction == ActionType::None)
     {
         logMessage << myName + " NONE";
     }
@@ -94,11 +94,11 @@ void BotPlayer::action()
         logMessage << "undefined ?";
     }
 
-    GlobalServices::instance().logger()->info(logMessage.str() + (myAction == PlayerActionFold ? "\n" : ""));
+    GlobalServices::instance().logger()->info(logMessage.str() + (myAction == ActionType::Fold ? "\n" : ""));
 
     currentHand->recordPlayerAction(currentHand->getCurrentRoundState(), getId(), myAction);
 
-    if (myAction != PlayerActionFold)
+    if (myAction != ActionType::Fold)
     {
         if (currentHand->getCurrentRoundState() == GameStatePreflop)
         {
@@ -151,29 +151,29 @@ void BotPlayer::doPreflopAction()
     // if last to speak, and nobody has raised : I can check
     if (currentHand->getPreflopRaisesNumber() == 0 && !myRaiseAmount && myPosition == BB)
     {
-        myAction = PlayerActionCheck;
+        myAction = ActionType::Check;
     }
     else
     {
         if (myBetAmount > 0)
         {
-            myAction = PlayerActionBet;
+            myAction = ActionType::Bet;
         }
         else if (shouldCall)
         {
-            myAction = PlayerActionCall;
+            myAction = ActionType::Call;
         }
         else if (myRaiseAmount > 0)
         {
-            myAction = PlayerActionRaise;
+            myAction = ActionType::Raise;
         }
         else
         {
-            myAction = PlayerActionFold;
+            myAction = ActionType::Fold;
         }
     }
 
-    if (myAction == PlayerActionRaise || myAction == PlayerActionAllin)
+    if (myAction == ActionType::Raise || myAction == ActionType::Allin)
     {
         currentHand->setPreflopLastRaiserId(myID);
     }
@@ -183,7 +183,7 @@ void BotPlayer::doPreflopAction()
     updatePreflopStatistics();
     updateCurrentHandContext(GameStatePreflop);
 
-    if (myAction != PlayerActionFold)
+    if (myAction != ActionType::Fold)
     {
         myRangeEstimator->updateUnplausibleRangesGivenPreflopActions(*myCurrentHandContext);
     }
@@ -222,29 +222,29 @@ void BotPlayer::doFlopAction()
 
     if (currentHand->getFlopBetsOrRaisesNumber() == 0 && !myRaiseAmount && !myBetAmount)
     {
-        myAction = PlayerActionCheck;
+        myAction = ActionType::Check;
     }
     else
     {
         if (myBetAmount)
         {
-            myAction = PlayerActionBet;
+            myAction = ActionType::Bet;
         }
         else if (shouldCall)
         {
-            myAction = PlayerActionCall;
+            myAction = ActionType::Call;
         }
         else if (myRaiseAmount)
         {
-            myAction = PlayerActionRaise;
+            myAction = ActionType::Raise;
         }
         else
         {
-            myAction = PlayerActionFold;
+            myAction = ActionType::Fold;
         }
     }
 
-    if (myAction == PlayerActionBet || myAction == PlayerActionRaise || myAction == PlayerActionAllin)
+    if (myAction == ActionType::Bet || myAction == ActionType::Raise || myAction == ActionType::Allin)
     {
         currentHand->setFlopLastRaiserId(myID);
     }
@@ -254,7 +254,7 @@ void BotPlayer::doFlopAction()
     updateFlopStatistics();
     updateCurrentHandContext(GameStateFlop);
 
-    if (myAction != PlayerActionFold)
+    if (myAction != ActionType::Fold)
     {
         myRangeEstimator->updateUnplausibleRangesGivenFlopActions(*myCurrentHandContext);
     }
@@ -294,29 +294,29 @@ void BotPlayer::doTurnAction()
 
     if (currentHand->getTurnBetsOrRaisesNumber() == 0 && !myRaiseAmount && !myBetAmount)
     {
-        myAction = PlayerActionCheck;
+        myAction = ActionType::Check;
     }
     else
     {
         if (myBetAmount)
         {
-            myAction = PlayerActionBet;
+            myAction = ActionType::Bet;
         }
         else if (shouldCall)
         {
-            myAction = PlayerActionCall;
+            myAction = ActionType::Call;
         }
         else if (myRaiseAmount)
         {
-            myAction = PlayerActionRaise;
+            myAction = ActionType::Raise;
         }
         else
         {
-            myAction = PlayerActionFold;
+            myAction = ActionType::Fold;
         }
     }
 
-    if (myAction == PlayerActionBet || myAction == PlayerActionRaise || myAction == PlayerActionAllin)
+    if (myAction == ActionType::Bet || myAction == ActionType::Raise || myAction == ActionType::Allin)
     {
         currentHand->setTurnLastRaiserId(myID);
     }
@@ -326,7 +326,7 @@ void BotPlayer::doTurnAction()
     updateTurnStatistics();
     updateCurrentHandContext(GameStateTurn);
 
-    if (myAction != PlayerActionFold)
+    if (myAction != ActionType::Fold)
     {
         myRangeEstimator->updateUnplausibleRangesGivenTurnActions(*myCurrentHandContext);
     }
@@ -366,25 +366,25 @@ void BotPlayer::doRiverAction()
 
     if (currentHand->getRiverBetsOrRaisesNumber() == 0 && !myRaiseAmount && !myBetAmount)
     {
-        myAction = PlayerActionCheck;
+        myAction = ActionType::Check;
     }
     else
     {
         if (myBetAmount)
         {
-            myAction = PlayerActionBet;
+            myAction = ActionType::Bet;
         }
         else if (shouldCall)
         {
-            myAction = PlayerActionCall;
+            myAction = ActionType::Call;
         }
         else if (myRaiseAmount)
         {
-            myAction = PlayerActionRaise;
+            myAction = ActionType::Raise;
         }
         else
         {
-            myAction = PlayerActionFold;
+            myAction = ActionType::Fold;
         }
     }
 
@@ -393,7 +393,7 @@ void BotPlayer::doRiverAction()
     updateRiverStatistics();
     updateCurrentHandContext(GameStateRiver);
 
-    if (myAction != PlayerActionFold)
+    if (myAction != ActionType::Fold)
     {
         myRangeEstimator->updateUnplausibleRangesGivenRiverActions(*myCurrentHandContext);
     }
@@ -403,7 +403,7 @@ void BotPlayer::evaluateBetAmount()
 
     int highestSet = currentHand->getCurrentBettingRound()->getHighestSet();
 
-    if (myAction == PlayerActionCall)
+    if (myAction == ActionType::Call)
     {
 
         // all in
@@ -411,7 +411,7 @@ void BotPlayer::evaluateBetAmount()
         {
             mySet += myCash;
             myCash = 0;
-            myAction = PlayerActionAllin;
+            myAction = ActionType::Allin;
         }
         else
         {
@@ -420,7 +420,7 @@ void BotPlayer::evaluateBetAmount()
         }
     }
 
-    if (myAction == PlayerActionBet)
+    if (myAction == ActionType::Bet)
     {
 
         // if short stack, just go allin
@@ -439,7 +439,7 @@ void BotPlayer::evaluateBetAmount()
             currentHand->getCurrentBettingRound()->setMinimumRaise(myCash);
             mySet = myCash;
             myCash = 0;
-            myAction = PlayerActionAllin;
+            myAction = ActionType::Allin;
             highestSet = mySet;
         }
         else
@@ -452,7 +452,7 @@ void BotPlayer::evaluateBetAmount()
         currentHand->setLastActionPlayerId(myID);
     }
 
-    if (myAction == PlayerActionRaise)
+    if (myAction == ActionType::Raise)
     {
 
         // short stack, just go allin
@@ -468,13 +468,13 @@ void BotPlayer::evaluateBetAmount()
             {
                 mySet += myCash;
                 myCash = 0;
-                myAction = PlayerActionAllin;
+                myAction = ActionType::Allin;
             }
             else
             {
                 myCash = myCash - highestSet + mySet;
                 mySet = highestSet;
-                myAction = PlayerActionCall;
+                myAction = ActionType::Call;
             }
         }
         else
@@ -494,7 +494,7 @@ void BotPlayer::evaluateBetAmount()
                         // only call all-in
                         mySet += myCash;
                         myCash = 0;
-                        myAction = PlayerActionAllin;
+                        myAction = ActionType::Allin;
                     }
                     else
                     {
@@ -506,7 +506,7 @@ void BotPlayer::evaluateBetAmount()
                         mySet += myCash;
                         currentHand->getCurrentBettingRound()->setMinimumRaise(mySet - highestSet);
                         myCash = 0;
-                        myAction = PlayerActionAllin;
+                        myAction = ActionType::Allin;
                         highestSet = mySet;
                     }
                 }
@@ -517,7 +517,7 @@ void BotPlayer::evaluateBetAmount()
                     mySet += myCash;
                     currentHand->getCurrentBettingRound()->setMinimumRaise(mySet - highestSet);
                     myCash = 0;
-                    myAction = PlayerActionAllin;
+                    myAction = ActionType::Allin;
                     highestSet = mySet;
                 }
             }

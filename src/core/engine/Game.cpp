@@ -96,7 +96,7 @@ void Game::initHand()
     // set player action none
     for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
-        (*it)->setAction(PlayerActionNone);
+        (*it)->setAction(ActionType::None);
     }
 
     myRunningPlayersList->clear();

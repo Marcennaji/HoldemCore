@@ -224,7 +224,7 @@ const int getDrawingProbability(const PostFlopState& postFlopState)
 
             for (std::vector<PlayerAction>::const_iterator itAction = actions.begin(); itAction != actions.end();
                  itAction++)
-                if ((*itAction) == PlayerActionAllin)
+                if ((*itAction) == ActionType::Allin)
                     return outsOddsTwoCard[outs];
         }
     }*/

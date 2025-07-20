@@ -6,7 +6,7 @@
 namespace pkt::test
 {
 
-class BettingRoundsFsmTest : public EngineTest
+class PreflopStateTest : public EngineTest
 {
   protected:
     void SetUp() override;

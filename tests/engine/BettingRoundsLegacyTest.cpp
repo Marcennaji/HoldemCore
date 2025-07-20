@@ -66,13 +66,13 @@ TEST_F(BettingRoundsLegacyTest, PlayersDoNotActAfterFolding)
         bool folded = false;
         bool actedAfterFold = false;
 
-        auto checkRound = [&](const std::vector<PlayerAction>& actions)
+        auto checkRound = [&](const std::vector<ActionType>& actions)
         {
             for (const auto& action : actions)
             {
                 if (folded)
                     actedAfterFold = true;
-                if (action == PlayerActionFold)
+                if (action == ActionType::Fold)
                     folded = true;
             }
         };
@@ -120,7 +120,7 @@ TEST_F(BettingRoundsLegacyTest, ShouldRecordAllActionsInHandHistoryChronological
         for (const auto& [playerId, action] : roundHistory.actions)
         {
             EXPECT_GE(playerId, 0u);
-            EXPECT_TRUE(action != PlayerAction::PlayerActionNone);
+            EXPECT_TRUE(action != ActionType::None);
         }
     }
 }
@@ -205,7 +205,7 @@ TEST_F(BettingRoundsLegacyTest, AllActionsAreFromActivePlayersOnly)
         for (const auto& [playerId, action] : round.actions)
         {
             EXPECT_TRUE(getPlayerListIteratorById(myHand->getSeatsList(), playerId) != myHand->getSeatsList()->end());
-            EXPECT_NE(action, PlayerAction::PlayerActionNone);
+            EXPECT_NE(action, ActionType::None);
         }
     }
 }
@@ -239,7 +239,7 @@ TEST_F(BettingRoundsLegacyTest, NoPlayerStartsPostFlopRoundWithRaise)
 
             // Check the first action in the round
             const auto& firstAction = round.actions.front();
-            EXPECT_NE(firstAction.second, PlayerAction::PlayerActionRaise)
+            EXPECT_NE(firstAction.second, ActionType::Raise)
                 << "Invalid action: Player started the post-flop round with a raise.";
         }
     }
@@ -258,7 +258,7 @@ TEST_F(BettingRoundsLegacyTest, NoPlayerStartsPostflopRoundByFolding)
 
             // Check the first action in the round
             const auto& firstAction = round.actions.front();
-            EXPECT_NE(firstAction.second, PlayerAction::PlayerActionFold)
+            EXPECT_NE(firstAction.second, ActionType::Fold)
                 << "Invalid action: Player started a postflop round by folding.";
         }
     }
@@ -274,14 +274,13 @@ TEST_F(BettingRoundsLegacyTest, NoPlayerBetsAfterRaise)
         ASSERT_FALSE(round.actions.empty()) << "Round has no actions.";
 
         // Track the previous action
-        pkt::core::PlayerAction previousAction = PlayerAction::PlayerActionNone;
+        pkt::core::ActionType previousAction = ActionType::None;
 
         for (const auto& [playerId, action] : round.actions)
         {
-            if (previousAction == PlayerAction::PlayerActionRaise)
+            if (previousAction == ActionType::Raise)
             {
-                EXPECT_NE(action, PlayerAction::PlayerActionBet)
-                    << "Invalid action: Player placed a bet after a raise.";
+                EXPECT_NE(action, ActionType::Bet) << "Invalid action: Player placed a bet after a raise.";
             }
             previousAction = action;
         }
@@ -302,14 +301,14 @@ TEST_F(BettingRoundsLegacyTest, NoPlayerFoldsPostFlopWhenNoBet)
 
             for (const auto& [playerId, action] : round.actions)
             {
-                if (action == PlayerAction::PlayerActionBet || action == PlayerAction::PlayerActionRaise)
+                if (action == ActionType::Bet || action == ActionType::Raise)
                 {
                     hasBetOrRaise = true;
                 }
 
                 if (!hasBetOrRaise)
                 {
-                    EXPECT_NE(action, PlayerAction::PlayerActionFold)
+                    EXPECT_NE(action, ActionType::Fold)
                         << "Invalid action: Player folded when there was no bet or raise.";
                 }
             }
@@ -330,15 +329,14 @@ TEST_F(BettingRoundsLegacyTest, NoPlayerCallsWithoutBetOrRaise)
 
         for (const auto& [playerId, action] : round.actions)
         {
-            if (action == PlayerAction::PlayerActionBet || action == PlayerAction::PlayerActionRaise)
+            if (action == ActionType::Bet || action == ActionType::Raise)
             {
                 hasBetOrRaise = true;
             }
 
             if (!hasBetOrRaise)
             {
-                EXPECT_NE(action, PlayerAction::PlayerActionCall)
-                    << "Invalid action: Player called when there was no bet or raise.";
+                EXPECT_NE(action, ActionType::Call) << "Invalid action: Player called when there was no bet or raise.";
             }
         }
     }
@@ -357,7 +355,7 @@ TEST_F(BettingRoundsLegacyTest, NoConsecutiveRaisesBySamePlayer)
 
         for (const auto& [playerId, action] : round.actions)
         {
-            if (action == PlayerAction::PlayerActionRaise)
+            if (action == ActionType::Raise)
             {
                 EXPECT_NE(playerId, lastRaiserId)
                     << "Invalid action: Player raised consecutively without another player acting.";
@@ -376,14 +374,13 @@ TEST_F(BettingRoundsLegacyTest, NoPlayerChecksAfterBetOrRaise)
     {
         ASSERT_FALSE(round.actions.empty()) << "Round has no actions.";
 
-        pkt::core::PlayerAction previousAction = PlayerAction::PlayerActionNone;
+        pkt::core::ActionType previousAction = ActionType::None;
 
         for (const auto& [playerId, action] : round.actions)
         {
-            if (previousAction == PlayerAction::PlayerActionBet || previousAction == PlayerAction::PlayerActionRaise)
+            if (previousAction == ActionType::Bet || previousAction == ActionType::Raise)
             {
-                EXPECT_NE(action, PlayerAction::PlayerActionCheck)
-                    << "Invalid action: Player checked after a bet or raise.";
+                EXPECT_NE(action, ActionType::Check) << "Invalid action: Player checked after a bet or raise.";
             }
             previousAction = action;
         }
@@ -400,7 +397,7 @@ TEST_F(BettingRoundsLegacyTest, OnlyOneBetAllowedPerRoundUnlessRaised)
         int betCount = 0;
         for (const auto& [playerId, action] : round.actions)
         {
-            if (action == PlayerAction::PlayerActionBet)
+            if (action == ActionType::Bet)
                 ++betCount;
         }
         EXPECT_LE(betCount, 1) << "Multiple bets occurred in a single round.";
@@ -423,7 +420,7 @@ TEST_F(BettingRoundsLegacyTest, FoldedPlayerDoesNotReappearInLaterRounds)
                 FAIL() << "Player " << playerId << " acted after folding.";
             }
 
-            if (action == PlayerAction::PlayerActionFold)
+            if (action == ActionType::Fold)
                 hasFolded[playerId] = true;
         }
     }
@@ -440,9 +437,9 @@ TEST_F(BettingRoundsLegacyTest, NoBettingInPostRiverRound)
         {
             for (const auto& [playerId, action] : round.actions)
             {
-                EXPECT_NE(action, PlayerAction::PlayerActionBet);
-                EXPECT_NE(action, PlayerAction::PlayerActionRaise);
-                EXPECT_NE(action, PlayerAction::PlayerActionCall);
+                EXPECT_NE(action, ActionType::Bet);
+                EXPECT_NE(action, ActionType::Raise);
+                EXPECT_NE(action, ActionType::Call);
             }
         }
     }
@@ -452,7 +449,7 @@ TEST_F(BettingRoundsLegacyTest, AllInPlayerDoesNotActAgain)
     initializeHandForTesting(3);
     auto p = *mySeatsList->begin();
     p->setCash(0); // Force all-in
-    p->setAction(PlayerAction::PlayerActionAllin);
+    p->setAction(ActionType::Allin);
 
     myHand->start();
 
@@ -462,7 +459,7 @@ TEST_F(BettingRoundsLegacyTest, AllInPlayerDoesNotActAgain)
         for (const auto& [playerId, action] : round.actions)
         {
             if (playerId == p->getId())
-                EXPECT_NE(action, PlayerAction::PlayerActionNone);
+                EXPECT_NE(action, ActionType::None);
         }
     }
 }
@@ -478,9 +475,9 @@ TEST_F(BettingRoundsLegacyTest, NoExtraActionsAfterFinalCall)
         int callsAfterRaise = 0;
         for (const auto& [_, action] : round.actions)
         {
-            if (raiseSeen && action == PlayerAction::PlayerActionCall)
+            if (raiseSeen && action == ActionType::Call)
                 ++callsAfterRaise;
-            if (action == PlayerAction::PlayerActionRaise)
+            if (action == ActionType::Raise)
                 raiseSeen = true;
         }
         if (raiseSeen)
@@ -490,7 +487,7 @@ TEST_F(BettingRoundsLegacyTest, NoExtraActionsAfterFinalCall)
 TEST_F(BettingRoundsLegacyTest, HeadsUpEndsImmediatelyOnFold)
 {
     initializeHandForTesting(2);
-    (*mySeatsList->begin())->setAction(PlayerAction::PlayerActionFold);
+    (*mySeatsList->begin())->setAction(ActionType::Fold);
     myHand->start();
 
     // If one folds, there should only be preflop actions

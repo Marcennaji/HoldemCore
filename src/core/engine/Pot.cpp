@@ -90,7 +90,7 @@ std::vector<size_t> Pot::eligibleContributors(const std::vector<unsigned>& contr
     size_t index = 0;
     for (const auto& p : *mySeats)
     {
-        if (p->getAction() != PlayerActionFold && contributions[index] >= level)
+        if (p->getAction() != ActionType::Fold && contributions[index] >= level)
             result.push_back(index);
         ++index;
     }
@@ -195,7 +195,7 @@ void Pot::finalizeDistribution()
     {
         for (const auto& player : *mySeats)
         {
-            if (player->getAction() != PlayerActionFold)
+            if (player->getAction() != ActionType::Fold)
                 uniqueWinners.push_back(player->getId());
         }
         uniqueWinners.sort();

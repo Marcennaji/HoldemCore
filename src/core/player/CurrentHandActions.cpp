@@ -14,22 +14,22 @@ void CurrentHandActions::reset()
     m_riverActions.clear();
 }
 
-std::vector<PlayerAction>& CurrentHandActions::getPreflopActions()
+std::vector<ActionType>& CurrentHandActions::getPreflopActions()
 {
     return m_preflopActions;
 }
 
-std::vector<PlayerAction>& CurrentHandActions::getFlopActions()
+std::vector<ActionType>& CurrentHandActions::getFlopActions()
 {
     return m_flopActions;
 }
 
-std::vector<PlayerAction>& CurrentHandActions::getTurnActions()
+std::vector<ActionType>& CurrentHandActions::getTurnActions()
 {
     return m_turnActions;
 }
 
-std::vector<PlayerAction>& CurrentHandActions::getRiverActions()
+std::vector<ActionType>& CurrentHandActions::getRiverActions()
 {
     return m_riverActions;
 }

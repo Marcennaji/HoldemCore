@@ -32,7 +32,7 @@ void BettingRoundPostRiver::run()
     for (itC = getHand()->getSeatsList()->begin(); itC != getHand()->getSeatsList()->end(); ++itC)
     {
 
-        if ((*itC)->getAction() != PlayerActionFold && (*itC)->getHandRanking() > myHighestCardsValue)
+        if ((*itC)->getAction() != ActionType::Fold && (*itC)->getHandRanking() > myHighestCardsValue)
         {
             myHighestCardsValue = (*itC)->getHandRanking();
         }
@@ -42,7 +42,7 @@ void BettingRoundPostRiver::run()
 
     for (itC = getHand()->getSeatsList()->begin(); itC != getHand()->getSeatsList()->end(); ++itC)
     {
-        if ((*itC)->getAction() != PlayerActionFold)
+        if ((*itC)->getAction() != ActionType::Fold)
         {
             potPlayers++;
         }
@@ -58,7 +58,7 @@ void BettingRoundPostRiver::run()
     int nonfoldPlayersCounter = 0;
     for (itC = getHand()->getSeatsList()->begin(); itC != getHand()->getSeatsList()->end(); ++itC)
     {
-        if ((*itC)->getAction() != PlayerActionFold)
+        if ((*itC)->getAction() != ActionType::Fold)
         {
             nonfoldPlayersCounter++;
             if ((*itC)->getName() == HumanPlayer::getName())
@@ -84,7 +84,7 @@ void BettingRoundPostRiver::run()
         {
 
             if ((*itC)->getCurrentHandActions().getPreflopActions().size() > 0 &&
-                (*itC)->getCurrentHandActions().getPreflopActions().at(0) != PlayerActionFold)
+                (*itC)->getCurrentHandActions().getPreflopActions().at(0) != ActionType::Fold)
             {
 
                 if (myEvents.onShowHoleCards)

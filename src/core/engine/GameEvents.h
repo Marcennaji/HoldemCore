@@ -22,7 +22,7 @@ struct GameEvents
     std::function<void()> onFlipHoleCardsAllIn;
 
     std::function<void(GameState)> onBettingRoundStarted;
-    std::function<void(int playerId, PlayerAction)> onPlayerActed;
+    std::function<void(int playerId, ActionType)> onPlayerActed;
     std::function<void(int playerId, bool isActive)> onPlayerStatusChanged;
 
     std::function<void()> onAwaitingHumanInput;

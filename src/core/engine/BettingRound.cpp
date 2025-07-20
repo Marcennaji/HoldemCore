@@ -132,7 +132,7 @@ void BettingRound::run()
 
         if (myEvents.onPlayerActed)
         {
-            myEvents.onPlayerActed(myCurrentPlayerTurnId, PlayerActionNone);
+            myEvents.onPlayerActed(myCurrentPlayerTurnId, ActionType::None);
         }
         GlobalServices::instance().logger()->verbose("BettingRound::run() : Determining next running player");
 
@@ -221,7 +221,7 @@ void BettingRound::proceedToNextBettingRound()
 
     for (itC = myHand->getRunningPlayersList()->begin(); itC != myHand->getRunningPlayersList()->end(); ++itC)
     {
-        (*itC)->setAction(PlayerActionNone);
+        (*itC)->setAction(ActionType::None);
     }
 
     GlobalServices::instance().logger()->info("myCurrentPlayerTurnId: " + std::to_string(myCurrentPlayerTurnId));
@@ -238,7 +238,7 @@ void BettingRound::proceedToNextBettingRound()
     {
         if (myEvents.onPlayerActed)
         {
-            myEvents.onPlayerActed(i, PlayerActionNone);
+            myEvents.onPlayerActed(i, ActionType::None);
         }
     }
 

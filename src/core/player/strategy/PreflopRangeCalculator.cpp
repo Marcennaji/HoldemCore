@@ -316,7 +316,7 @@ bool PreflopRangeCalculator::shouldCallForAllIn(const CurrentHandContext& contex
     std::shared_ptr<Player> lastRaiser = context.preflopLastRaiser;
     const PlayerPosition myPosition = context.myPosition;
 
-    return context.myM > 10 && potOdd <= 20 && nbRaises < 2 && lastRaiser->getAction() == PlayerActionAllin &&
+    return context.myM > 10 && potOdd <= 20 && nbRaises < 2 && lastRaiser->getAction() == ActionType::Allin &&
            (myPosition >= LATE || myPosition == SB || myPosition == BB);
 }
 

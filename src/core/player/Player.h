@@ -70,8 +70,8 @@ class Player
 
     void setHand(IHand*);
     IHand* getHand() const { return currentHand; }
-    void setAction(PlayerAction theValue, bool blind = 0);
-    PlayerAction getAction() const;
+    void setAction(ActionType theValue, bool blind = 0);
+    ActionType getAction() const;
 
     virtual std::string getStrategyName() const = 0;
 
@@ -189,7 +189,7 @@ class Player
      */
     int myLastRelativeSet{0};
 
-    PlayerAction myAction{PlayerActionNone};
+    ActionType myAction{ActionType::None};
     int myButton;        // 0 = none, 1 = dealer, 2 =small, 3 = big
     bool myTurn{0};      // 0 = no, 1 = yes
     bool myCardsFlip{0}; // 0 = cards are not fliped, 1 = cards are already flipped,

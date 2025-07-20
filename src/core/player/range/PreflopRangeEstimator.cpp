@@ -220,11 +220,11 @@ void PreflopRangeEstimator::analyzePlayerActions(const CurrentHandContext& ctx, 
 {
     for (const auto& action : ctx.myCurrentHandActions.getPreflopActions())
     {
-        if (action == PlayerActionRaise || action == PlayerActionAllin)
+        if (action == ActionType::Raise || action == ActionType::Allin)
         {
             raises++;
         }
-        else if (action == PlayerActionCall)
+        else if (action == ActionType::Call)
         {
             calls++;
         }

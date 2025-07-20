@@ -262,11 +262,11 @@ int Player::getLastRelativeSet() const
     return myLastRelativeSet;
 }
 
-void Player::setAction(PlayerAction theValue, bool blind)
+void Player::setAction(ActionType theValue, bool blind)
 {
     myAction = theValue;
 }
-PlayerAction Player::getAction() const
+ActionType Player::getAction() const
 {
     return myAction;
 }
@@ -378,19 +378,19 @@ void Player::updatePreflopStatistics()
 
     switch (myAction)
     {
-    case PlayerActionAllin:
+    case ActionType::Allin:
         myStatistics[nbPlayers].m_preflopStatistics.m_raises++;
         break;
-    case PlayerActionRaise:
+    case ActionType::Raise:
         myStatistics[nbPlayers].m_preflopStatistics.m_raises++;
         break;
-    case PlayerActionFold:
+    case ActionType::Fold:
         myStatistics[nbPlayers].m_preflopStatistics.m_folds++;
         break;
-    case PlayerActionCheck:
+    case ActionType::Check:
         myStatistics[nbPlayers].m_preflopStatistics.m_checks++;
         break;
-    case PlayerActionCall:
+    case ActionType::Call:
         myStatistics[nbPlayers].m_preflopStatistics.m_calls++;
         break;
     default:
@@ -399,22 +399,22 @@ void Player::updatePreflopStatistics()
 
     myStatistics[nbPlayers].m_preflopStatistics.addLastAction(myAction); // keep track of the last 10 actions
 
-    if (myAction == PlayerActionCall && currentHand->getRaisersPositions().size() == 0)
+    if (myAction == ActionType::Call && currentHand->getRaisersPositions().size() == 0)
     { //
         myStatistics[nbPlayers].m_preflopStatistics.m_limps++;
     }
 
     int playerRaises = 0;
-    for (std::vector<PlayerAction>::const_iterator i = myCurrentHandActions.m_preflopActions.begin();
+    for (std::vector<ActionType>::const_iterator i = myCurrentHandActions.m_preflopActions.begin();
          i != myCurrentHandActions.m_preflopActions.end(); i++)
     {
-        if (*i == PlayerActionRaise || *i == PlayerActionAllin)
+        if (*i == ActionType::Raise || *i == ActionType::Allin)
         {
             playerRaises++;
         }
     }
 
-    if (myAction == PlayerActionRaise || myAction == PlayerActionAllin)
+    if (myAction == ActionType::Raise || myAction == ActionType::Allin)
     {
 
         if (playerRaises == 1 && currentHand->getRaisersPositions().size() == 2)
@@ -435,7 +435,7 @@ void Player::updatePreflopStatistics()
 
             myStatistics[nbPlayers].m_preflopStatistics.m_call3BetsOpportunities++;
 
-            if (myAction == PlayerActionCall)
+            if (myAction == ActionType::Call)
             {
                 myStatistics[nbPlayers].m_preflopStatistics.m_call3Bets++;
             }
@@ -454,28 +454,28 @@ void Player::updateFlopStatistics()
 
     switch (myAction)
     {
-    case PlayerActionAllin:
+    case ActionType::Allin:
         myStatistics[nbPlayers].m_flopStatistics.m_raises++;
         break;
-    case PlayerActionRaise:
+    case ActionType::Raise:
         myStatistics[nbPlayers].m_flopStatistics.m_raises++;
         break;
-    case PlayerActionFold:
+    case ActionType::Fold:
         myStatistics[nbPlayers].m_flopStatistics.m_folds++;
         break;
-    case PlayerActionCheck:
+    case ActionType::Check:
         myStatistics[nbPlayers].m_flopStatistics.m_checks++;
         break;
-    case PlayerActionCall:
+    case ActionType::Call:
         myStatistics[nbPlayers].m_flopStatistics.m_calls++;
         break;
-    case PlayerActionBet:
+    case ActionType::Bet:
         myStatistics[nbPlayers].m_flopStatistics.m_bets++;
         break;
     default:
         break;
     }
-    if (myAction == PlayerActionRaise && currentHand->getRaisersPositions().size() > 1)
+    if (myAction == ActionType::Raise && currentHand->getRaisersPositions().size() > 1)
     {
         myStatistics[nbPlayers].m_flopStatistics.m_3Bets++;
     }
@@ -484,7 +484,7 @@ void Player::updateFlopStatistics()
     if (currentHand->getPreflopLastRaiserId() == myID)
     {
         myStatistics[nbPlayers].m_flopStatistics.m_continuationBetsOpportunities++;
-        if (myAction == PlayerActionBet)
+        if (myAction == ActionType::Bet)
         {
             myStatistics[nbPlayers].m_flopStatistics.m_continuationBets++;
         }
@@ -502,28 +502,28 @@ void Player::updateTurnStatistics()
 
     switch (myAction)
     {
-    case PlayerActionAllin:
+    case ActionType::Allin:
         myStatistics[nbPlayers].m_turnStatistics.m_raises++;
         break;
-    case PlayerActionRaise:
+    case ActionType::Raise:
         myStatistics[nbPlayers].m_turnStatistics.m_raises++;
         break;
-    case PlayerActionFold:
+    case ActionType::Fold:
         myStatistics[nbPlayers].m_turnStatistics.m_folds++;
         break;
-    case PlayerActionCheck:
+    case ActionType::Check:
         myStatistics[nbPlayers].m_turnStatistics.m_checks++;
         break;
-    case PlayerActionCall:
+    case ActionType::Call:
         myStatistics[nbPlayers].m_turnStatistics.m_calls++;
         break;
-    case PlayerActionBet:
+    case ActionType::Bet:
         myStatistics[nbPlayers].m_turnStatistics.m_bets++;
         break;
     default:
         break;
     }
-    if (myAction == PlayerActionRaise && currentHand->getRaisersPositions().size() > 1)
+    if (myAction == ActionType::Raise && currentHand->getRaisersPositions().size() > 1)
     {
         myStatistics[nbPlayers].m_turnStatistics.m_3Bets++;
     }
@@ -540,28 +540,28 @@ void Player::updateRiverStatistics()
 
     switch (myAction)
     {
-    case PlayerActionAllin:
+    case ActionType::Allin:
         myStatistics[nbPlayers].m_riverStatistics.m_raises++;
         break;
-    case PlayerActionRaise:
+    case ActionType::Raise:
         myStatistics[nbPlayers].m_riverStatistics.m_raises++;
         break;
-    case PlayerActionFold:
+    case ActionType::Fold:
         myStatistics[nbPlayers].m_riverStatistics.m_folds++;
         break;
-    case PlayerActionCheck:
+    case ActionType::Check:
         myStatistics[nbPlayers].m_riverStatistics.m_checks++;
         break;
-    case PlayerActionCall:
+    case ActionType::Call:
         myStatistics[nbPlayers].m_riverStatistics.m_calls++;
         break;
-    case PlayerActionBet:
+    case ActionType::Bet:
         myStatistics[nbPlayers].m_riverStatistics.m_bets++;
         break;
     default:
         break;
     }
-    if (myAction == PlayerActionRaise && currentHand->getRaisersPositions().size() > 1)
+    if (myAction == ActionType::Raise && currentHand->getRaisersPositions().size() > 1)
     {
         myStatistics[nbPlayers].m_riverStatistics.m_3Bets++;
     }
@@ -934,7 +934,7 @@ std::map<int, float> Player::evaluateOpponentsStrengths() const
     for (PlayerListIterator it = players->begin(); it != players->end(); ++it)
     {
 
-        if ((*it)->getId() == myID || (*it)->getAction() == PlayerActionFold || (*it)->getAction() == PlayerActionNone)
+        if ((*it)->getId() == myID || (*it)->getAction() == ActionType::Fold || (*it)->getAction() == ActionType::None)
         {
             continue;
         }
@@ -1067,8 +1067,8 @@ bool Player::isInVeryLooseMode(const int nbPlayers) const
 
     PreflopStatistics preflop = stats.getPreflopStatistics();
 
-    if (preflop.getLastActionsNumber(PlayerActionAllin) + preflop.getLastActionsNumber(PlayerActionRaise) +
-            preflop.getLastActionsNumber(PlayerActionCall) >
+    if (preflop.getLastActionsNumber(ActionType::Allin) + preflop.getLastActionsNumber(ActionType::Raise) +
+            preflop.getLastActionsNumber(ActionType::Call) >
         PreflopStatistics::LAST_ACTIONS_STACK_SIZE * 0.8)
     {
         return true;
@@ -1106,27 +1106,27 @@ void Player::updateCurrentHandContext(const GameState state)
     myCurrentHandContext->nbPlayers = currentHand->getSeatsList()->size();
     myCurrentHandContext->smallBlind = currentHand->getSmallBlind();
 
-    for (std::vector<PlayerAction>::const_iterator i = myCurrentHandActions.m_flopActions.begin();
+    for (std::vector<ActionType>::const_iterator i = myCurrentHandActions.m_flopActions.begin();
          i != myCurrentHandActions.m_flopActions.end(); i++)
     {
 
-        if (*i == PlayerActionRaise)
+        if (*i == ActionType::Raise)
         {
             myCurrentHandContext->nbRaises++;
         }
-        else if (*i == PlayerActionBet)
+        else if (*i == ActionType::Bet)
         {
             myCurrentHandContext->nbBets++;
         }
-        else if (*i == PlayerActionCheck)
+        else if (*i == ActionType::Check)
         {
             myCurrentHandContext->nbChecks++;
         }
-        else if (*i == PlayerActionCall)
+        else if (*i == ActionType::Call)
         {
             myCurrentHandContext->nbCalls++;
         }
-        else if (*i == PlayerActionAllin)
+        else if (*i == ActionType::Allin)
         {
             myCurrentHandContext->nbAllins++;
         }
