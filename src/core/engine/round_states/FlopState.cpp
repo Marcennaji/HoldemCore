@@ -25,7 +25,7 @@ void FlopState::exit(IHand& hand)
     // Nothing needed for now
 }
 
-std::unique_ptr<IBettingRoundStateFsm> FlopState::processAction(IHand& hand, PlayerAction action)
+std::unique_ptr<IHandState> FlopState::processAction(IHand& hand, PlayerAction action)
 {
     if (!canProcessAction(hand, action))
         return nullptr;
@@ -35,21 +35,12 @@ std::unique_ptr<IBettingRoundStateFsm> FlopState::processAction(IHand& hand, Pla
     if (isRoundComplete(hand))
     {
         exit(hand);
-        return std::make_unique<TurnState>(myEvents);
+        // return std::make_unique<TurnState>(myEvents);
+        return nullptr;
     }
 
     hand.advanceToNextPlayerFsm();
     return nullptr;
-}
-
-GameState FlopState::getGameState() const
-{
-    return GameStateFlop;
-}
-
-std::string FlopState::getStateName() const
-{
-    return "Flop";
 }
 
 bool FlopState::isRoundComplete(const IHand& hand) const

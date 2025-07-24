@@ -74,6 +74,7 @@ class Player
     ActionType getAction() const;
 
     virtual std::string getStrategyName() const = 0;
+    virtual bool isBot() const = 0;
 
     void setButton(int theValue);
     int getButton() const;

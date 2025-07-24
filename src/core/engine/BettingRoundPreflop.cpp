@@ -192,7 +192,7 @@ void BettingRoundPreflop::handleNextPlayerTurn()
         myEvents.onPlayerActed({getCurrentPlayerTurnId(), ActionType::None, 0});
     }
 
-    if ((*currentPlayersTurnIt)->getName() == HumanPlayer::getName())
+    if (!(*currentPlayersTurnIt)->isBot())
     {
         if (myEvents.onAwaitingHumanInput)
         {

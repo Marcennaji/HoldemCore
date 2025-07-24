@@ -152,7 +152,7 @@ void BettingRound::run()
             myFirstRound = false;
         }
 
-        if ((*currentPlayersTurnIt)->getName() == HumanPlayer::getName())
+        if (!(*currentPlayersTurnIt)->isBot())
         {
             if (myEvents.onAwaitingHumanInput)
             {

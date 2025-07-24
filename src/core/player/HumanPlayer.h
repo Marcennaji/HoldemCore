@@ -18,6 +18,8 @@ class HumanPlayer : public Player
     virtual std::string getStrategyName() const override { return "HumanPlayer"; }
 
     static std::string getName() { return "You"; }
+
+    bool isBot() const override { return false; }
 };
 
 } // namespace pkt::core::player

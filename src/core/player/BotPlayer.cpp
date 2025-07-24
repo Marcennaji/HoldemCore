@@ -540,4 +540,39 @@ float BotPlayer::calculatePreflopCallingRange(CurrentHandContext& context, bool 
     return myStrategy->getPreflopRangeCalculator()->calculatePreflopCallingRange(context, deterministic);
 }
 
+PlayerAction BotPlayer::decidePreflopActionFsm()
+{
+    updateCurrentHandContext(GameStatePreflop);
+
+    PlayerAction action;
+    action.playerId = getId();
+
+    const int raiseAmount = myStrategy->preflopShouldRaise(*myCurrentHandContext);
+    const bool shouldCall = myStrategy->preflopShouldCall(*myCurrentHandContext);
+    const bool isBigBlind = myPosition == BB;
+    const bool noRaises = currentHand->getPreflopRaisesNumber() == 0;
+
+    myPreflopPotOdd = getPotOdd();
+
+    if (raiseAmount > 0)
+    {
+        action.type = ActionType::Raise;
+        action.amount = raiseAmount;
+    }
+    else if (noRaises && isBigBlind)
+    {
+        action.type = ActionType::Check;
+    }
+    else if (shouldCall)
+    {
+        action.type = ActionType::Call;
+    }
+    else
+    {
+        action.type = ActionType::Fold;
+    }
+
+    return action;
+}
+
 } // namespace pkt::core::player

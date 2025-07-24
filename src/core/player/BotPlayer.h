@@ -31,6 +31,10 @@ class BotPlayer : public Player
 
     float calculatePreflopCallingRange(CurrentHandContext& context, bool deterministic) const override;
 
+    PlayerAction decidePreflopActionFsm();
+
+    bool isBot() const override { return true; }
+
   private:
     void evaluateBetAmount();
 

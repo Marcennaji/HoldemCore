@@ -66,7 +66,6 @@ class Hand : public IHand
     int getPreviousPlayerId() const { return myPreviousPlayerId; }
 
     void setLastActionPlayerId(unsigned theValue);
-
     unsigned getLastActionPlayerId() const { return myLastActionPlayerId; }
 
     void setCardsShown(bool theValue) { myCardsShown = theValue; }
@@ -98,7 +97,6 @@ class Hand : public IHand
     std::shared_ptr<IBettingRoundStateFsm> getCurrentRoundStateFsm() const;
     void setCurrentRoundStateFsm(std::shared_ptr<IBettingRoundStateFsm>);
     void applyActionFsm(const pkt::core::PlayerAction&);
-    void handlePlayerActionFsm(PlayerAction action);
     void advanceToNextPlayerFsm();
     bool isBettingRoundCompleteFsm() const;
     bool canAcceptActionFsm(PlayerAction) const;
@@ -107,6 +105,8 @@ class Hand : public IHand
     void dealFlopFsm();
     void dealTurnFsm();
     void dealRiverFsm();
+    int getCurrentPlayerIdFsm() const;
+    void setCurrentPlayerIdFsm(int playerId);
 
   protected:
     void updateRunningPlayersList();
@@ -123,7 +123,7 @@ class Hand : public IHand
     std::vector<std::shared_ptr<IBettingRound>> myBettingRounds;
 
     std::vector<int> myCardsArray;
-
+    int myCurrentPlayerIdFsm = -1;
     int myStartQuantityPlayers;
     unsigned myDealerPlayerId;
     unsigned mySmallBlindPlayerId;

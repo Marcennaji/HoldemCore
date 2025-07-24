@@ -692,16 +692,88 @@ void Hand::setCurrentRoundStateFsm(std::shared_ptr<IBettingRoundStateFsm> b)
     myCurrentStateFsm = b;
 }
 
-void Hand::applyActionFsm(const pkt::core::PlayerAction&)
+void Hand::applyActionFsm(const pkt::core::PlayerAction& action)
 {
+    if (!myCurrentStateFsm)
+    {
+        throw std::logic_error("FSM state not initialized in Hand.");
+    }
+
+    if (!myCurrentStateFsm->canProcessAction(*this, action))
+    {
+        throw std::invalid_argument("Action not valid in current state.");
+    }
+
+    auto player = getPlayerById(myRunningPlayersList, action.playerId);
+
+    // Apply the action
+    switch (action.type)
+    {
+    case ActionType::Fold:
+        // player.setHasFolded(true);
+        break;
+
+    case ActionType::Check:
+        // No chips moved
+        break;
+
+    case ActionType::Call:
+        // deductChipsFromPlayer(player, getCallAmountFor(player));
+        break;
+
+    case ActionType::Bet:
+    case ActionType::Raise:
+        // deductChipsFromPlayer(player, action.amount);
+        // updateCurrentBet(action.amount);
+        break;
+
+    case ActionType::Allin:
+        // handleAllIn(player);
+        break;
+
+    default:
+        throw std::invalid_argument("Unknown or unsupported action.");
+    }
+
+    // recordAction(player, action); // audit trail or logging if needed
+
+    // updatePlayerToAct();                   // Set next player to act
+    // myCurrentStateFsm->onPlayerActed(*this, player); // Let FSM decide what’s next
 }
 void Hand::advanceToNextPlayerFsm()
 {
+    const auto& players = *getRunningPlayersList();
+
+    if (players.empty())
+        return;
+
+    const int currentId = getCurrentPlayerIdFsm();
+    auto it = getPlayerListIteratorById(myRunningPlayersList, currentId);
+
+    // Advance to next player in circular fashion
+    if (it != getRunningPlayersList()->end())
+    {
+        ++it;
+        if (it == getRunningPlayersList()->end())
+            it = getRunningPlayersList()->begin();
+
+        setCurrentPlayerIdFsm((*it)->getId());
+    }
+    else
+    {
+        // Fallback if current player not found
+        setCurrentPlayerIdFsm(players.front()->getId());
+    }
 }
+
 bool Hand::isBettingRoundCompleteFsm() const
 {
-    return false;
+    if (!myCurrentStateFsm)
+        return false;
+
+    return myCurrentStateFsm->isRoundComplete(*this);
 }
+
 bool Hand::canAcceptActionFsm(PlayerAction) const
 {
     return false;
@@ -721,37 +793,13 @@ void Hand::dealTurnFsm()
 void Hand::dealRiverFsm()
 {
 }
-
-void Hand::handlePlayerActionFsm(PlayerAction action)
+int Hand::getCurrentPlayerIdFsm() const
 {
-    assert(myCurrentStateFsm && "Betting state must be initialized");
-
-    auto player = getPlayerById(getSeatsList(), action.playerId);
-
-    // 1. Ask current FSM state if the action is allowed
-    if (!myCurrentStateFsm->canProcessAction(*this, action))
-    {
-        throw std::logic_error("Action not allowed in current state");
-    }
-
-    // 2. Process the action via the FSM
-    std::unique_ptr<IBettingRoundStateFsm> nextState = myCurrentStateFsm->processAction(*this, action);
-
-    // 3. Apply the state transition, if any
-    if (nextState)
-    {
-        myCurrentStateFsm->exit(*this);
-        myCurrentStateFsm = std::move(nextState);
-        myCurrentStateFsm->enter(*this);
-    }
-
-    // 4. Notify event listeners (e.g., UI)
-    if (myEvents.onPlayerActed)
-    {
-        myEvents.onPlayerActed(action);
-    }
-
-    // 5. Optionally log state
-    myCurrentStateFsm->logStateInfo(*this);
+    return myCurrentPlayerIdFsm;
 }
+void Hand::setCurrentPlayerIdFsm(int playerId)
+{
+    myCurrentPlayerIdFsm = playerId;
+}
+
 } // namespace pkt::core

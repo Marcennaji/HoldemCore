@@ -61,7 +61,7 @@ void BettingRoundPostRiver::run()
         if ((*itC)->getAction() != ActionType::Fold)
         {
             nonfoldPlayersCounter++;
-            if ((*itC)->getName() == HumanPlayer::getName())
+            if (!(*itC)->isBot())
             {
                 pauseHand = true;
             }
