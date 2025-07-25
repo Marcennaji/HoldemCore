@@ -5,13 +5,14 @@
 #include "core/interfaces/hand/IHandLifecycle.h"
 #include "core/interfaces/hand/IHandPlayerAction.h"
 #include "core/interfaces/hand/IHandState.h"
+#include "core/interfaces/hand/IPlayerAccess.h"
 
 namespace pkt::core
 {
 
 class IHandState;
 
-class HandFsm : public IHand, IHandLifecycle, public IHandPlayerAction, public IHandState
+class HandFsm : public IHandLifecycle, public IHandPlayerAction, public IHandState, public IPlayerAccess
 {
   public:
     HandFsm();
@@ -24,6 +25,8 @@ class HandFsm : public IHand, IHandLifecycle, public IHandPlayerAction, public I
 
   private:
     std::unique_ptr<IHandState> myState;
+    pkt::core::player::PlayerList mySeatsList;          // all players
+    pkt::core::player::PlayerList myRunningPlayersList; // all players who have not folded and are not all in
 };
 
 } // namespace pkt::core

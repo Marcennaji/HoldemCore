@@ -19,16 +19,16 @@ class PreflopState : public IHandState, public IActionProcessor, public IRoundCo
   public:
     PreflopState(GameEvents& events);
 
-    void enter(IHand& IHand) override;
-    void exit(IHand& IHand) override;
-    std::unique_ptr<IHandState> processAction(IHand& IHand, const PlayerAction action) override;
+    void enter(HandFsm&) override;
+    void exit(HandFsm&) override;
+    std::unique_ptr<IHandState> processAction(HandFsm& IHand, const PlayerAction action) override;
 
-    bool isRoundComplete(const IHand& IHand) const override;
-    bool canProcessAction(const IHand&, const PlayerAction) const override;
+    bool isRoundComplete(const HandFsm&) const override;
+    bool canProcessAction(const HandFsm&, const PlayerAction) const override;
 
-    void logStateInfo(const IHand& IHand) const override;
+    void logStateInfo(const HandFsm&) const override;
     std::string getStateName() const override { return "Preflop"; }
-    void handlePlayerAction(IHand& hand, player::Player& player);
+    void handlePlayerAction(HandFsm&, player::Player& player);
 
   private:
     GameEvents& myEvents;

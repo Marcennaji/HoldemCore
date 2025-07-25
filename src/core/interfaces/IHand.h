@@ -9,7 +9,6 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/interfaces/IBettingRound.h"
-#include "core/interfaces/IBettingRoundStateFsm.h"
 #include "core/interfaces/IBoard.h"
 
 #include <algorithm>
@@ -46,9 +45,6 @@ class IHand
 
     virtual void setStartQuantityPlayers(int theValue) = 0;
     virtual int getStartQuantityPlayers() const = 0;
-
-    virtual std::shared_ptr<IBettingRoundStateFsm> getCurrentRoundStateFsm() const = 0;
-    virtual void setCurrentRoundStateFsm(std::shared_ptr<IBettingRoundStateFsm>) = 0;
 
     virtual void setCurrentRoundState(GameState theValue) = 0;
     virtual GameState getCurrentRoundState() const = 0;
@@ -113,18 +109,6 @@ class IHand
     }
 
     const std::vector<BettingRoundHistory>& getHandActionHistory() const { return myHandActionHistory; }
-
-    virtual void applyActionFsm(const pkt::core::PlayerAction&) = 0;
-    virtual void advanceToNextPlayerFsm() = 0;
-    virtual bool isBettingRoundCompleteFsm() const = 0;
-    virtual bool canAcceptActionFsm(PlayerAction) const = 0;
-    virtual void postBlindsFsm() = 0;
-    virtual void prepareBettingRoundFsm() = 0;
-    virtual void dealFlopFsm() = 0;
-    virtual void dealTurnFsm() = 0;
-    virtual void dealRiverFsm() = 0;
-    virtual int getCurrentPlayerIdFsm() const = 0;
-    virtual void setCurrentPlayerIdFsm(int playerId) = 0;
 
     std::vector<BettingRoundHistory> myHandActionHistory;
     FlowMode myFlowMode{FlowMode::Legacy};

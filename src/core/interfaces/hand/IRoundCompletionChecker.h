@@ -3,14 +3,14 @@
 namespace pkt::core
 {
 
-class IHand;
+class HandFsm;
 
 class IRoundCompletionChecker
 {
   public:
     virtual ~IRoundCompletionChecker() = default;
 
-    virtual bool isRoundComplete(const IHand& hand) const = 0;
+    virtual bool isRoundComplete(const HandFsm& hand) const = 0;
 };
 
 } // namespace pkt::core

@@ -3,14 +3,14 @@
 namespace pkt::core
 {
 
-class IHand;
+class HandFsm;
 
 class IDebuggableState
 {
   public:
     virtual ~IDebuggableState() = default;
 
-    virtual void logStateInfo(const IHand& hand) const
+    virtual void logStateInfo(const HandFsm& hand) const
     {
         // Optional default: do nothing
     }

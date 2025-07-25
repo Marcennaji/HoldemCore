@@ -21,6 +21,9 @@ target_include_directories(core_tests
     PRIVATE
     ${PROJECT_SOURCE_DIR}/tests/strategy
     ${PROJECT_SOURCE_DIR}/tests/helpers
+    ${PROJECT_SOURCE_DIR}/tests/engine
+    ${PROJECT_SOURCE_DIR}/tests/range
+    ${PROJECT_SOURCE_DIR}/tests/cards-value
     ${PROJECT_SOURCE_DIR}/src
 )
 

@@ -1,7 +1,6 @@
 #include "FlopState.h"
 #include "GameEvents.h"
-#include "Hand.h"
-#include "TurnState.h"
+#include "HandFsm.h"
 #include "core/engine/model/PlayerAction.h"
 
 namespace pkt::core
@@ -11,49 +10,32 @@ FlopState::FlopState(GameEvents& events) : myEvents(events)
 {
 }
 
-void FlopState::enter(IHand& hand)
+void FlopState::enter(HandFsm& hand)
 {
-    hand.dealFlopFsm();
-    hand.prepareBettingRoundFsm();
-
-    if (myEvents.onBettingRoundStarted)
-        myEvents.onBettingRoundStarted(GameStateFlop);
 }
 
-void FlopState::exit(IHand& hand)
+void FlopState::exit(HandFsm& hand)
 {
     // Nothing needed for now
 }
 
-std::unique_ptr<IHandState> FlopState::processAction(IHand& hand, PlayerAction action)
+std::unique_ptr<IHandState> FlopState::processAction(HandFsm& hand, PlayerAction action)
 {
-    if (!canProcessAction(hand, action))
-        return nullptr;
 
-    hand.applyActionFsm(action);
-
-    if (isRoundComplete(hand))
-    {
-        exit(hand);
-        // return std::make_unique<TurnState>(myEvents);
-        return nullptr;
-    }
-
-    hand.advanceToNextPlayerFsm();
     return nullptr;
 }
 
-bool FlopState::isRoundComplete(const IHand& hand) const
+bool FlopState::isRoundComplete(const HandFsm& hand) const
 {
-    return hand.isBettingRoundCompleteFsm();
+    return false;
 }
 
-bool FlopState::canProcessAction(const IHand& hand, PlayerAction action) const
+bool FlopState::canProcessAction(const HandFsm& hand, PlayerAction action) const
 {
-    return hand.canAcceptActionFsm(action);
+    return false;
 }
 
-void FlopState::logStateInfo(const IHand& hand) const
+void FlopState::logStateInfo(const HandFsm& hand) const
 {
     // Optional debug logging
 }

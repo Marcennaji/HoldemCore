@@ -6,7 +6,7 @@
 
 namespace pkt::core
 {
-class IHand;
+class HandFsm;
 class IHandState;
 
 class IActionProcessor
@@ -14,7 +14,7 @@ class IActionProcessor
   public:
     virtual ~IActionProcessor() = default;
 
-    virtual std::unique_ptr<IHandState> processAction(IHand& hand, PlayerAction action) = 0;
-    virtual bool canProcessAction(const IHand& hand, PlayerAction action) const = 0;
+    virtual std::unique_ptr<IHandState> processAction(HandFsm& hand, PlayerAction action) = 0;
+    virtual bool canProcessAction(const HandFsm& hand, PlayerAction action) const = 0;
 };
 } // namespace pkt::core

@@ -54,10 +54,6 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
     setBlinds();
 
     myBettingRounds = myFactory->createAllBettingRounds(this, myDealerPlayerId, mySmallBlind);
-
-    // Initialize FSM - start with preflop state
-    // This will be expanded in Phase 2 to use the factory pattern
-    // For now, we create skeleton state for compilation
 }
 
 Hand::~Hand() = default;
@@ -681,125 +677,6 @@ int Hand::getTurnLastRaiserId()
 void Hand::setTurnLastRaiserId(int id)
 {
     myTurnLastRaiserId = id;
-}
-
-std::shared_ptr<IBettingRoundStateFsm> Hand::getCurrentRoundStateFsm() const
-{
-    return myCurrentStateFsm;
-}
-void Hand::setCurrentRoundStateFsm(std::shared_ptr<IBettingRoundStateFsm> b)
-{
-    myCurrentStateFsm = b;
-}
-
-void Hand::applyActionFsm(const pkt::core::PlayerAction& action)
-{
-    if (!myCurrentStateFsm)
-    {
-        throw std::logic_error("FSM state not initialized in Hand.");
-    }
-
-    if (!myCurrentStateFsm->canProcessAction(*this, action))
-    {
-        throw std::invalid_argument("Action not valid in current state.");
-    }
-
-    auto player = getPlayerById(myRunningPlayersList, action.playerId);
-
-    // Apply the action
-    switch (action.type)
-    {
-    case ActionType::Fold:
-        // player.setHasFolded(true);
-        break;
-
-    case ActionType::Check:
-        // No chips moved
-        break;
-
-    case ActionType::Call:
-        // deductChipsFromPlayer(player, getCallAmountFor(player));
-        break;
-
-    case ActionType::Bet:
-    case ActionType::Raise:
-        // deductChipsFromPlayer(player, action.amount);
-        // updateCurrentBet(action.amount);
-        break;
-
-    case ActionType::Allin:
-        // handleAllIn(player);
-        break;
-
-    default:
-        throw std::invalid_argument("Unknown or unsupported action.");
-    }
-
-    // recordAction(player, action); // audit trail or logging if needed
-
-    // updatePlayerToAct();                   // Set next player to act
-    // myCurrentStateFsm->onPlayerActed(*this, player); // Let FSM decide what’s next
-}
-void Hand::advanceToNextPlayerFsm()
-{
-    const auto& players = *getRunningPlayersList();
-
-    if (players.empty())
-        return;
-
-    const int currentId = getCurrentPlayerIdFsm();
-    auto it = getPlayerListIteratorById(myRunningPlayersList, currentId);
-
-    // Advance to next player in circular fashion
-    if (it != getRunningPlayersList()->end())
-    {
-        ++it;
-        if (it == getRunningPlayersList()->end())
-            it = getRunningPlayersList()->begin();
-
-        setCurrentPlayerIdFsm((*it)->getId());
-    }
-    else
-    {
-        // Fallback if current player not found
-        setCurrentPlayerIdFsm(players.front()->getId());
-    }
-}
-
-bool Hand::isBettingRoundCompleteFsm() const
-{
-    if (!myCurrentStateFsm)
-        return false;
-
-    return myCurrentStateFsm->isRoundComplete(*this);
-}
-
-bool Hand::canAcceptActionFsm(PlayerAction) const
-{
-    return false;
-}
-void Hand::postBlindsFsm()
-{
-}
-void Hand::prepareBettingRoundFsm()
-{
-}
-void Hand::dealFlopFsm()
-{
-}
-void Hand::dealTurnFsm()
-{
-}
-void Hand::dealRiverFsm()
-{
-}
-int Hand::getCurrentPlayerIdFsm() const
-{
-    return myCurrentPlayerIdFsm;
-}
-void Hand::setCurrentPlayerIdFsm(int playerId)
-{
-    myCurrentPlayerIdFsm = playerId;
 }
 
 } // namespace pkt::core

@@ -9,7 +9,6 @@
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
 #include "core/interfaces/IBettingRound.h"
-#include "core/interfaces/IBettingRoundStateFsm.h"
 #include "core/interfaces/IBoard.h"
 #include "core/interfaces/IHand.h"
 
@@ -94,25 +93,10 @@ class Hand : public IHand
 
     const GameEvents& getEvents() const { return myEvents; }
 
-    std::shared_ptr<IBettingRoundStateFsm> getCurrentRoundStateFsm() const;
-    void setCurrentRoundStateFsm(std::shared_ptr<IBettingRoundStateFsm>);
-    void applyActionFsm(const pkt::core::PlayerAction&);
-    void advanceToNextPlayerFsm();
-    bool isBettingRoundCompleteFsm() const;
-    bool canAcceptActionFsm(PlayerAction) const;
-    void postBlindsFsm();
-    void prepareBettingRoundFsm();
-    void dealFlopFsm();
-    void dealTurnFsm();
-    void dealRiverFsm();
-    int getCurrentPlayerIdFsm() const;
-    void setCurrentPlayerIdFsm(int playerId);
-
   protected:
     void updateRunningPlayersList();
 
   private:
-    std::shared_ptr<IBettingRoundStateFsm> myCurrentStateFsm;
     std::shared_ptr<EngineFactory> myFactory;
     const GameEvents& myEvents;
     std::shared_ptr<IBoard> myBoard;
@@ -123,7 +107,6 @@ class Hand : public IHand
     std::vector<std::shared_ptr<IBettingRound>> myBettingRounds;
 
     std::vector<int> myCardsArray;
-    int myCurrentPlayerIdFsm = -1;
     int myStartQuantityPlayers;
     unsigned myDealerPlayerId;
     unsigned mySmallBlindPlayerId;

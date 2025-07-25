@@ -5,15 +5,15 @@
 namespace pkt::core
 {
 
-class IHand;
+class HandFsm;
 
 class IHandState
 {
   public:
     virtual ~IHandState() = default;
 
-    virtual void enter(IHand& hand) = 0;
-    virtual void exit(IHand& hand) = 0;
+    virtual void enter(HandFsm& hand) = 0;
+    virtual void exit(HandFsm& hand) = 0;
 
     virtual std::string getStateName() const = 0;
 };

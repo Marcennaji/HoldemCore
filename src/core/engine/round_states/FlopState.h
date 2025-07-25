@@ -13,14 +13,14 @@ class FlopState : public IHandState, public IActionProcessor, public IRoundCompl
   public:
     FlopState(GameEvents& events);
 
-    void enter(IHand& hand) override;
-    void exit(IHand& hand) override;
-    std::unique_ptr<IHandState> processAction(IHand& hand, PlayerAction action) override;
+    void enter(HandFsm& hand) override;
+    void exit(HandFsm& hand) override;
+    std::unique_ptr<IHandState> processAction(HandFsm& hand, PlayerAction action) override;
 
-    bool isRoundComplete(const IHand& hand) const override;
-    bool canProcessAction(const IHand& hand, PlayerAction action) const override;
+    bool isRoundComplete(const HandFsm& hand) const override;
+    bool canProcessAction(const HandFsm& hand, PlayerAction action) const override;
 
-    void logStateInfo(const IHand& hand) const override;
+    void logStateInfo(const HandFsm& hand) const override;
     std::string getStateName() const override { return "Flop"; }
 
   private:
