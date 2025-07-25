@@ -12,11 +12,12 @@ FlopState::FlopState(const GameEvents& events) : myEvents(events)
 
 void FlopState::enter(HandFsm& hand)
 {
+    if (myEvents.onBettingRoundStarted)
+        myEvents.onBettingRoundStarted(GameStateFlop);
 }
 
 void FlopState::exit(HandFsm& hand)
 {
-    // Nothing needed for now
 }
 
 std::unique_ptr<IHandState> FlopState::processAction(HandFsm& hand, PlayerAction action)

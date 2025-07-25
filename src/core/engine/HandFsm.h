@@ -30,7 +30,7 @@ class HandFsm : public IHandLifecycle, public IHandPlayerAction, public IPlayerA
     void dealHoleCards(size_t lastArrayIndex) override;
     void initAndShuffleDeck() override;
 
-    void handlePlayerAction(int playerId, PlayerAction action) override;
+    void handlePlayerAction(PlayerAction action) override;
     pkt::core::player::PlayerFsmList getSeatsList() const override;
     pkt::core::player::PlayerFsmList getRunningPlayersList() const override;
 

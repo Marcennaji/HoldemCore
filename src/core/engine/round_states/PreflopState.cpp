@@ -34,39 +34,39 @@ void PreflopState::exit(HandFsm& /*hand*/)
 
 bool PreflopState::canProcessAction(const HandFsm& hand, const PlayerAction action) const
 {
-    /*   auto player = getPlayerById(hand.getRunningPlayersList(), action.playerId);
-       if (!player)
-           return false;
+    auto player = getPlayerFsmById(hand.getRunningPlayersList(), action.playerId);
+    if (!player)
+        return false;
 
-       const int cash = player->getCash();
-       const int callAmount = 10; // Replace with: hand.amountToCall(player->id());
+    const int cash = player->getLegacyPlayer()->getCash();
+    const int callAmount = 10; // Replace with: hand.amountToCall(player->id());
 
-       switch (action.type)
-       {
-       case ActionType::Fold:
-           return true;
+    switch (action.type)
+    {
+    case ActionType::Fold:
+        return true;
 
-       case ActionType::Check:
-           return callAmount == 0;
+    case ActionType::Check:
+        return callAmount == 0;
 
-       case ActionType::Call:
-           return callAmount > 0 && cash >= callAmount;
+    case ActionType::Call:
+        return callAmount > 0 && cash >= callAmount;
 
-       case ActionType::Bet:
-           return callAmount == 0 && action.amount > 0 && action.amount <= cash;
+    case ActionType::Bet:
+        return callAmount == 0 && action.amount > 0 && action.amount <= cash;
 
-       case ActionType::Raise:
-           // You might want to enforce minimum raise rules here
-           // return callAmount > 0 && action.amount >= hand.minRaiseAmount() && action.amount <= cash;
-           return callAmount > 0 && action.amount <= cash;
+    case ActionType::Raise:
+        // You might want to enforce minimum raise rules here
+        // return callAmount > 0 && action.amount >= hand.minRaiseAmount() && action.amount <= cash;
+        return callAmount > 0 && action.amount <= cash;
 
-       case ActionType::Allin:
-           return cash > 0;
+    case ActionType::Allin:
+        return cash > 0;
 
-       default:
-           return false;
-       }
-           */
+    default:
+        return false;
+    }
+
     return false;
 }
 
@@ -77,13 +77,11 @@ void PreflopState::handlePlayerAction(HandFsm& hand, Player& player)
 
     auto& bot = static_cast<BotPlayer&>(player);
     const PlayerAction action = bot.decidePreflopActionFsm();
-    processAction(hand, action);
+    hand.handlePlayerAction(action);
 }
 
 std::unique_ptr<IHandState> PreflopState::processAction(HandFsm& hand, PlayerAction action)
 {
-    processAction(hand, action);
-
     if (isRoundComplete(hand))
     {
         exit(hand);
@@ -94,25 +92,24 @@ std::unique_ptr<IHandState> PreflopState::processAction(HandFsm& hand, PlayerAct
 }
 
 bool PreflopState::isRoundComplete(const HandFsm& hand) const
-{ /*
-     int highestSet = -1;
+{
+    int highestSet = -1;
 
-     if (hand.getRunningPlayersList()->size() <= 1)
-         return true;
+    if (hand.getRunningPlayersList()->size() <= 1)
+        return true;
 
-     for (auto itC = hand.getRunningPlayersList()->begin(); itC != hand.getRunningPlayersList()->end(); ++itC)
-     {
-         if (highestSet == -1)
-             highestSet = (*itC)->getSet();
-         else
-         {
-             if (highestSet != (*itC)->getSet())
-             {
-                 return false;
-             }
-         }
-     }
-         */
+    for (auto itC = hand.getRunningPlayersList()->begin(); itC != hand.getRunningPlayersList()->end(); ++itC)
+    {
+        if (highestSet == -1)
+            highestSet = (*itC)->getLegacyPlayer()->getSet();
+        else
+        {
+            if (highestSet != (*itC)->getLegacyPlayer()->getSet())
+            {
+                return false;
+            }
+        }
+    }
 
     return true;
 }

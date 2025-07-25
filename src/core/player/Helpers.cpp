@@ -3,6 +3,7 @@
 #include <third_party/psim/psim.hpp>
 #include "core/engine/CardUtilities.h"
 #include "core/player/Player.h"
+#include "core/player/PlayerFsm.h"
 
 #include <algorithm>
 #include <cmath>
@@ -274,5 +275,18 @@ std::shared_ptr<Player> getPlayerById(PlayerList list, unsigned id)
     }
     return nullptr;
 }
-
+PlayerFsmListIterator getPlayerFsmListIteratorById(PlayerFsmList list, unsigned id)
+{
+    return std::find_if(list->begin(), list->end(),
+                        [id](const std::shared_ptr<PlayerFsm>& p) { return p->getLegacyPlayer()->getId() == id; });
+}
+std::shared_ptr<PlayerFsm> getPlayerFsmById(PlayerFsmList list, unsigned id)
+{
+    for (auto i = list->begin(); i != list->end(); ++i)
+    {
+        if ((*i)->getLegacyPlayer()->getId() == id)
+            return *i;
+    }
+    return nullptr;
+}
 } // namespace pkt::core::player

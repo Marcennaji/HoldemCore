@@ -57,4 +57,7 @@ bool isExactHand(const std::string& card1, const std::string& card2, const char*
 std::shared_ptr<Player> getPlayerById(PlayerList list, unsigned id);
 PlayerListIterator getPlayerListIteratorById(PlayerList list, unsigned id);
 
+std::shared_ptr<PlayerFsm> getPlayerFsmById(PlayerFsmList list, unsigned id);
+PlayerFsmListIterator getPlayerFsmListIteratorById(PlayerFsmList list, unsigned id);
+
 } // namespace pkt::core::player

@@ -43,4 +43,23 @@ TEST_F(PreflopStateTest, StartShouldGoToPreflop)
     myHandFsm->start();
     EXPECT_EQ(myLastGameState, GameStatePreflop);
 }
+TEST_F(PreflopStateTest, EverybodyCallShouldGoToFlop)
+{
+    initializeHandFsmForTesting(3);
+    myHandFsm->start();
+    myHandFsm->handlePlayerAction({0, ActionType::Call});
+    myHandFsm->handlePlayerAction({1, ActionType::Call});
+    myHandFsm->handlePlayerAction({2, ActionType::Call});
+
+    EXPECT_EQ(myLastGameState, GameStateFlop);
+}
+TEST_F(PreflopStateTest, EverybodyFoldShouldGoToPostRiver)
+{
+    initializeHandFsmForTesting(3);
+    myHandFsm->start();
+    myHandFsm->handlePlayerAction({0, ActionType::Fold});
+    myHandFsm->handlePlayerAction({1, ActionType::Fold});
+
+    EXPECT_EQ(myLastGameState, GameStatePostRiver);
+}
 } // namespace pkt::test

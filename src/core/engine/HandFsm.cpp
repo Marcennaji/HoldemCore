@@ -56,7 +56,7 @@ void HandFsm::end()
     myState.reset();
 }
 
-void HandFsm::handlePlayerAction(int playerId, PlayerAction action)
+void HandFsm::handlePlayerAction(PlayerAction action)
 {
     if (!myState)
         return;

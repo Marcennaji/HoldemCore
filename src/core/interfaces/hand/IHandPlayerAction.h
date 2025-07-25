@@ -8,6 +8,6 @@ class IHandPlayerAction
 {
   public:
     virtual ~IHandPlayerAction() = default;
-    virtual void handlePlayerAction(int playerId, PlayerAction action) = 0;
+    virtual void handlePlayerAction(PlayerAction action) = 0;
 };
 } // namespace pkt::core
