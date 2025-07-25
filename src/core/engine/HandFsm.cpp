@@ -27,34 +27,28 @@ HandFsm::HandFsm(const GameEvents& events, std::shared_ptr<EngineFactory> factor
       mySmallBlind(gameData.firstSmallBlind), myStartCash(gameData.startMoney)
 
 {
-
-    GlobalServices::instance().logger()->verbose(
-        "\n----------------------  New hand initialization (FSM)  -------------------------------\n");
-
-    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
-    {
-        (*it)->getLegacyPlayer().setHand(nullptr);
-        (*it)->getLegacyPlayer().setCardsFlip(0);
-    }
-
-    initAndShuffleDeck();
-    size_t cardsArrayIndex = dealBoardCards(); // we need to deal the board first,
-                                               // so that the players can use it to evaluate their hands
-    dealHoleCards(cardsArrayIndex);
-
-    myPreflopLastRaiserId = -1;
-
-    // determine dealer, SB, BB
-    // assignButtons();
-
-    // setBlinds();
 }
 
 HandFsm::~HandFsm() = default;
 
 void HandFsm::start()
 {
+    GlobalServices::instance().logger()->verbose(
+        "\n----------------------  New hand initialization (FSM)  -------------------------------\n");
+
+    initAndShuffleDeck();
+    size_t cardsArrayIndex = dealBoardCards();
+    dealHoleCards(cardsArrayIndex);
+
+    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
+    {
+        (*it)->resetForNewHand();
+    }
+
+    myPreflopLastRaiserId = -1;
+
     myState = std::make_unique<PreflopState>(myEvents);
+    myState->enter(*this);
 }
 
 void HandFsm::end()
@@ -130,16 +124,12 @@ void HandFsm::dealHoleCards(size_t cardsArrayIndex)
             tempPlayerAndBoardArray[5 + holeCardIndex] = myCardsArray[2 * playerIndex + holeCardIndex + 5];
         }
         string humanReadableHand = CardUtilities::getCardStringValue(tempPlayerAndBoardArray, 7);
-        (*it)->getLegacyPlayer().setCards(tempPlayerArray);
-        (*it)->getLegacyPlayer().setHandRanking(HandEvaluator::evaluateHand(humanReadableHand.c_str()));
-        (*it)->getLegacyPlayer().setCashAtHandStart((*it)->getLegacyPlayer().getCash());
-        (*it)->getLegacyPlayer().getCurrentHandActions().reset();
-        (*it)->getLegacyPlayer().setPosition();
-        (*it)->getLegacyPlayer().getRangeEstimator()->setEstimatedRange("");
+        (*it)->getLegacyPlayer()->setCards(tempPlayerArray);
+        (*it)->getLegacyPlayer()->setHandRanking(HandEvaluator::evaluateHand(humanReadableHand.c_str()));
         GlobalServices::instance().logger()->verbose(
-            "Player " + (*it)->getLegacyPlayer().getName() + " dealt cards: " +
+            "Player " + (*it)->getLegacyPlayer()->getName() + " dealt cards: " +
             CardUtilities::getCardString(tempPlayerArray[0]) + " " + CardUtilities::getCardString(tempPlayerArray[1]) +
-            ", hand strength = " + std::to_string((*it)->getLegacyPlayer().getHandRanking()));
+            ", hand strength = " + std::to_string((*it)->getLegacyPlayer()->getHandRanking()));
     }
 }
 

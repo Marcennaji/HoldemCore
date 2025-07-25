@@ -6,6 +6,7 @@
 #include <memory>
 #include "core/engine/Board.h"
 #include "core/engine/Hand.h"
+#include "core/engine/model/GameState.h"
 #include "core/interfaces/NullLogger.h"
 #include "core/player/Player.h"
 #include "core/player/typedefs.h"
@@ -26,18 +27,22 @@ class EngineTest : public ::testing::Test
 
     std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::PlayerFsm>>> mySeatsListFsm;
     std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::PlayerFsm>>> myRunningPlayersListFsm;
+    pkt::core::GameState myLastGameState = pkt::core::GameStateNone;
 
     void SetUp() override;
 
     void TearDown() override;
     // Helper function to initialize a Hand object for testing
     void initializeHandForTesting(size_t activePlayerCount);
+    void initializeHandFsmForTesting(size_t activePlayerCount);
     void checkPostRiverConditions();
 
   private:
     // Helper function to create a PlayerList with mock players
     void createPlayersLists(size_t playerCount);
     void initializeHandWithPlayers(size_t activePlayerCount);
+    void createPlayersFsmLists(size_t playerCount);
+    void initializeHandFsmWithPlayers(size_t activePlayerCount);
 
     const int startDealerPlayerId{0}; // Starting dealer player ID, can be set to any valid player ID
 };

@@ -21,13 +21,14 @@ void PreflopStateTest::SetUp()
 {
     EngineTest::SetUp();
     myEvents.clear();
+    myEvents.onBettingRoundStarted = [&](GameState state) { myLastGameState = state; };
 }
 
 bool PreflopStateTest::isPlayerStillActive(unsigned id) const
 {
     for (const auto& p : *myHandFsm->getRunningPlayersList())
     {
-        if (p->getLegacyPlayer().getId() == id)
+        if (p->getLegacyPlayer()->getId() == id)
             return true;
     }
     return false;
@@ -38,7 +39,8 @@ void PreflopStateTest::TearDown()
 
 TEST_F(PreflopStateTest, StartShouldGoToPreflop)
 {
-    initializeHandForTesting(2);
+    initializeHandFsmForTesting(2);
     myHandFsm->start();
+    EXPECT_EQ(myLastGameState, GameStatePreflop);
 }
 } // namespace pkt::test

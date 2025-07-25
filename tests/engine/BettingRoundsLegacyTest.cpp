@@ -18,7 +18,6 @@ void BettingRoundsLegacyTest::logTestMessage(const std::string& message) const
 void BettingRoundsLegacyTest::SetUp()
 {
     EngineTest::SetUp();
-
     myEvents.clear();
 }
 

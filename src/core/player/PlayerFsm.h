@@ -7,12 +7,14 @@ namespace pkt::core::player
 class PlayerFsm
 {
   public:
-    explicit PlayerFsm(Player&);
+    explicit PlayerFsm(std::shared_ptr<Player>);
 
-    Player& getLegacyPlayer() const { return myPlayer; }
+    std::shared_ptr<Player>& getLegacyPlayer() { return myPlayer; }
+
+    void resetForNewHand();
 
   private:
-    Player& myPlayer;
+    std::shared_ptr<Player> myPlayer;
 };
 
 } // namespace pkt::core::player

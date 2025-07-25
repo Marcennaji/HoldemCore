@@ -18,6 +18,11 @@ PreflopState::PreflopState(const GameEvents& events) : myEvents(events)
 
 void PreflopState::enter(HandFsm& hand)
 {
+    // determine dealer, SB, BB
+    // assignButtons();
+
+    // setBlinds();
+
     if (myEvents.onBettingRoundStarted)
         myEvents.onBettingRoundStarted(GameStatePreflop);
 }
