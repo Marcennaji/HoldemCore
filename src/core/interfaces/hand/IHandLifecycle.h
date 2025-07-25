@@ -7,7 +7,7 @@ class IHandLifecycle
 {
   public:
     virtual ~IHandLifecycle() = default;
-    virtual void startHand() = 0;
-    virtual void endHand() = 0;
+    virtual void start() = 0;
+    virtual void end() = 0;
 };
 } // namespace pkt::core

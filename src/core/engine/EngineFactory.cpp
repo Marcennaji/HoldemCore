@@ -32,6 +32,13 @@ std::shared_ptr<IHand> EngineFactory::createHand(std::shared_ptr<EngineFactory> 
 {
     return std::shared_ptr<IHand>(new Hand(myEvents, f, b, seats, runningPlayers, gd, sd));
 }
+std::shared_ptr<HandFsm> EngineFactory::createHandFsm(std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
+                                                      pkt::core::player::PlayerFsmList seats,
+                                                      pkt::core::player::PlayerFsmList runningPlayers, GameData gd,
+                                                      StartData sd)
+{
+    return std::shared_ptr<HandFsm>(new HandFsm(myEvents, f, b, seats, runningPlayers, gd, sd));
+}
 
 std::shared_ptr<IBoard> EngineFactory::createBoard(unsigned dealerPosition)
 {

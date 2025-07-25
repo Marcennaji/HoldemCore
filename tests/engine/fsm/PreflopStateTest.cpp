@@ -20,17 +20,14 @@ void PreflopStateTest::logTestMessage(const std::string& message) const
 void PreflopStateTest::SetUp()
 {
     EngineTest::SetUp();
-
-    setFlowMode(pkt::core::FlowMode::Fsm);
-
     myEvents.clear();
 }
 
 bool PreflopStateTest::isPlayerStillActive(unsigned id) const
 {
-    for (const auto& p : *myHand->getRunningPlayersList())
+    for (const auto& p : *myHandFsm->getRunningPlayersList())
     {
-        if (p->getId() == id)
+        if (p->getLegacyPlayer().getId() == id)
             return true;
     }
     return false;
@@ -39,4 +36,9 @@ void PreflopStateTest::TearDown()
 {
 }
 
+TEST_F(PreflopStateTest, StartShouldGoToPreflop)
+{
+    initializeHandForTesting(2);
+    myHandFsm->start();
+}
 } // namespace pkt::test

@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "FlowMode.h"
 #include "core/engine/GameEvents.h"
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/model/PlayerPosition.h"
@@ -71,9 +70,6 @@ class IHand
     virtual void setCardsShown(bool theValue) = 0;
     virtual bool getCardsShown() const = 0;
 
-    virtual void setFlowMode(FlowMode mode) { myFlowMode = mode; }
-    virtual FlowMode getFlowMode() const { return myFlowMode; }
-
     virtual void resolveHandConditions() = 0;
 
     virtual int getPreflopCallsNumber() = 0;
@@ -111,7 +107,7 @@ class IHand
     const std::vector<BettingRoundHistory>& getHandActionHistory() const { return myHandActionHistory; }
 
     std::vector<BettingRoundHistory> myHandActionHistory;
-    FlowMode myFlowMode{FlowMode::Legacy};
+
     friend class Game;
     friend class BettingRound;
     friend class BettingRoundPreflop;

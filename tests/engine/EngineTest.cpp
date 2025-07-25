@@ -1,5 +1,6 @@
 #include "EngineTest.h"
 #include "DummyPlayer.h"
+#include "PlayerFsm.h"
 #include "core/engine/Exception.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
@@ -33,6 +34,7 @@ void EngineTest::TearDown()
 void EngineTest::initializeHandForTesting(size_t activePlayerCount)
 {
     myHand.reset();
+    myHandFsm.reset();
     createPlayersLists(activePlayerCount);
     initializeHandWithPlayers(activePlayerCount);
 }
@@ -40,11 +42,14 @@ void EngineTest::initializeHandForTesting(size_t activePlayerCount)
 void EngineTest::createPlayersLists(size_t playerCount)
 {
     mySeatsList = std::make_shared<std::list<std::shared_ptr<Player>>>();
+    mySeatsListFsm = std::make_shared<std::list<std::shared_ptr<PlayerFsm>>>();
     for (size_t i = 0; i < playerCount; ++i)
     {
         auto player = std::make_shared<DummyPlayer>(i, myEvents);
         player->setAction(ActionType::None);
         mySeatsList->push_back(player);
+        auto playerFsm = std::make_shared<PlayerFsm>(*player);
+        mySeatsListFsm->push_back(playerFsm);
     }
     // Create a deep copy of mySeatsList for RunningPlayersList
     myRunningPlayersList = std::make_shared<std::list<std::shared_ptr<Player>>>();
@@ -70,7 +75,8 @@ void EngineTest::initializeHandWithPlayers(size_t activePlayerCount)
     startData.numberOfPlayers = static_cast<int>(activePlayerCount);
 
     myHand = myFactory->createHand(myFactory, myBoard, mySeatsList, myRunningPlayersList, gameData, startData);
-    myHand->setFlowMode(myFlowMode);
+    myHandFsm =
+        myFactory->createHandFsm(myFactory, myBoard, mySeatsListFsm, myRunningPlayersListFsm, gameData, startData);
 }
 
 void EngineTest::checkPostRiverConditions()

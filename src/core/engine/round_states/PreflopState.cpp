@@ -12,7 +12,7 @@ namespace pkt::core
 {
 using namespace pkt::core::player;
 
-PreflopState::PreflopState(GameEvents& events) : myEvents(events)
+PreflopState::PreflopState(const GameEvents& events) : myEvents(events)
 {
 }
 

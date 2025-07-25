@@ -17,7 +17,7 @@ class GameEvents;
 class PreflopState : public IHandState, public IActionProcessor, public IRoundCompletionChecker, public IDebuggableState
 {
   public:
-    PreflopState(GameEvents& events);
+    PreflopState(const GameEvents& events);
 
     void enter(HandFsm&) override;
     void exit(HandFsm&) override;
@@ -31,7 +31,7 @@ class PreflopState : public IHandState, public IActionProcessor, public IRoundCo
     void handlePlayerAction(HandFsm&, player::Player& player);
 
   private:
-    GameEvents& myEvents;
+    const GameEvents& myEvents;
 };
 
 } // namespace pkt::core

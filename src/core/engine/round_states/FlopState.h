@@ -11,7 +11,7 @@ class GameEvents;
 class FlopState : public IHandState, public IActionProcessor, public IRoundCompletionChecker, public IDebuggableState
 {
   public:
-    FlopState(GameEvents& events);
+    FlopState(const GameEvents& events);
 
     void enter(HandFsm& hand) override;
     void exit(HandFsm& hand) override;
@@ -24,7 +24,7 @@ class FlopState : public IHandState, public IActionProcessor, public IRoundCompl
     std::string getStateName() const override { return "Flop"; }
 
   private:
-    GameEvents& myEvents;
+    const GameEvents& myEvents;
 };
 
 } // namespace pkt::core

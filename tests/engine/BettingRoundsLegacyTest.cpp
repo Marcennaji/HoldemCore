@@ -19,8 +19,6 @@ void BettingRoundsLegacyTest::SetUp()
 {
     EngineTest::SetUp();
 
-    setFlowMode(pkt::core::FlowMode::Legacy);
-
     myEvents.clear();
 }
 

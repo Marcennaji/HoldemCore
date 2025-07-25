@@ -6,7 +6,7 @@
 namespace pkt::core
 {
 
-FlopState::FlopState(GameEvents& events) : myEvents(events)
+FlopState::FlopState(const GameEvents& events) : myEvents(events)
 {
 }
 

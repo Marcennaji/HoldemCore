@@ -19,16 +19,19 @@ class EngineTest : public ::testing::Test
     pkt::core::GameEvents myEvents;
     std::shared_ptr<pkt::core::EngineFactory> myFactory;
     std::shared_ptr<pkt::core::IHand> myHand;
+    std::shared_ptr<pkt::core::HandFsm> myHandFsm;
     std::shared_ptr<pkt::core::IBoard> myBoard;
     std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::Player>>> mySeatsList;
     std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::Player>>> myRunningPlayersList;
+
+    std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::PlayerFsm>>> mySeatsListFsm;
+    std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::PlayerFsm>>> myRunningPlayersListFsm;
 
     void SetUp() override;
 
     void TearDown() override;
     // Helper function to initialize a Hand object for testing
     void initializeHandForTesting(size_t activePlayerCount);
-    void setFlowMode(pkt::core::FlowMode mode) { myFlowMode = mode; };
     void checkPostRiverConditions();
 
   private:
@@ -37,6 +40,5 @@ class EngineTest : public ::testing::Test
     void initializeHandWithPlayers(size_t activePlayerCount);
 
     const int startDealerPlayerId{0}; // Starting dealer player ID, can be set to any valid player ID
-    pkt::core::FlowMode myFlowMode{pkt::core::FlowMode::Legacy}; // Default flow mode for the hand
 };
 } // namespace pkt::test
