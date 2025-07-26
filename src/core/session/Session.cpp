@@ -7,7 +7,7 @@
 #include <core/engine/GameEvents.h>
 
 #include <core/engine/EngineFactory.h>
-#include <core/engine/Randomizer.h>
+
 #include <core/player/BotPlayer.h>
 #include <core/player/HumanPlayer.h>
 #include <core/player/strategy/LooseAggressiveBotStrategy.h>

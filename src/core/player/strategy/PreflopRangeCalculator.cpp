@@ -2,7 +2,6 @@
 #include "PreflopRangeCalculator.h"
 #include <core/services/GlobalServices.h>
 #include "CurrentHandContext.h"
-#include "core/engine/Randomizer.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/player/Helpers.h"
 
@@ -89,7 +88,7 @@ void PreflopRangeCalculator::initializeRanges(const int utgHeadsUpRange, const i
     }
 }
 
-float PreflopRangeCalculator::calculatePreflopCallingRange(CurrentHandContext& context, bool deterministic) const
+float PreflopRangeCalculator::calculatePreflopCallingRange(CurrentHandContext& context) const
 {
     const int nbRaises = context.preflopRaisesNumber;
     const int nbCalls = context.preflopCallsNumber;
@@ -320,7 +319,7 @@ bool PreflopRangeCalculator::shouldCallForAllIn(const CurrentHandContext& contex
            (myPosition >= LATE || myPosition == SB || myPosition == BB);
 }
 
-float PreflopRangeCalculator::calculatePreflopRaisingRange(CurrentHandContext& context, bool deterministic) const
+float PreflopRangeCalculator::calculatePreflopRaisingRange(CurrentHandContext& context) const
 {
     const int nbRaises = context.preflopRaisesNumber;
     const int nbCalls = context.preflopCallsNumber;
@@ -435,7 +434,7 @@ float PreflopRangeCalculator::adjustRaiseForNoRaiserStats(float raisingRange, in
     return raisingRange;
 }
 float PreflopRangeCalculator::adjustRaiseForNoRaiser(const CurrentHandContext& context, float raisingRange,
-                                                     bool canBluff, bool deterministic) const
+                                                     bool canBluff) const
 {
     const int nbPlayers = context.nbPlayers;
     const PlayerPosition myPosition = context.myPosition;
@@ -446,8 +445,8 @@ float PreflopRangeCalculator::adjustRaiseForNoRaiser(const CurrentHandContext& c
         (myPosition == SB || myPosition == BUTTON || myPosition == CUTOFF) && canBluff)
     {
         int rand = 0;
-        Randomizer::getRand(1, 3, 1, &rand);
-        if (!deterministic && rand == 2)
+        GlobalServices::instance().randomizer()->getRand(1, 3, 1, &rand);
+        if (rand == 2)
         {
             raisingRange = 100;
 

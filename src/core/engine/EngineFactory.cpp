@@ -9,7 +9,6 @@
 #include "BettingRoundPreflop.h"
 #include "Board.h"
 #include "Hand.h"
-#include "Randomizer.h"
 
 #include "HumanPlayer.h"
 #include "strategy/LooseAggressiveBotStrategy.h"

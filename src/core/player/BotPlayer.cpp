@@ -535,9 +535,9 @@ void BotPlayer::evaluateBetAmount()
     currentHand->getCurrentBettingRound()->setHighestSet(highestSet);
 }
 
-float BotPlayer::calculatePreflopCallingRange(CurrentHandContext& context, bool deterministic) const
+float BotPlayer::calculatePreflopCallingRange(CurrentHandContext& context) const
 {
-    return myStrategy->getPreflopRangeCalculator()->calculatePreflopCallingRange(context, deterministic);
+    return myStrategy->getPreflopRangeCalculator()->calculatePreflopCallingRange(context);
 }
 
 PlayerAction BotPlayer::decidePreflopActionFsm()

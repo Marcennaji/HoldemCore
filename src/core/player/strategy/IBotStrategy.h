@@ -18,19 +18,19 @@ class IBotStrategy
   public:
     IBotStrategy() : myPreflopRangeCalculator(std::make_unique<PreflopRangeCalculator>()) {}
 
-    virtual bool preflopShouldCall(CurrentHandContext&, bool deterministic = false) = 0;
-    virtual bool flopShouldCall(CurrentHandContext&, bool deterministic = false) = 0;
-    virtual bool turnShouldCall(CurrentHandContext&, bool deterministic = false) = 0;
-    virtual bool riverShouldCall(CurrentHandContext&, bool deterministic = false) = 0;
+    virtual bool preflopShouldCall(CurrentHandContext&) = 0;
+    virtual bool flopShouldCall(CurrentHandContext&) = 0;
+    virtual bool turnShouldCall(CurrentHandContext&) = 0;
+    virtual bool riverShouldCall(CurrentHandContext&) = 0;
 
-    virtual int preflopShouldRaise(CurrentHandContext&, bool deterministic = false) = 0;
-    virtual int flopShouldRaise(CurrentHandContext&, bool deterministic = false) = 0;
-    virtual int turnShouldRaise(CurrentHandContext&, bool deterministic = false) = 0;
-    virtual int riverShouldRaise(CurrentHandContext&, bool deterministic = false) = 0;
+    virtual int preflopShouldRaise(CurrentHandContext&) = 0;
+    virtual int flopShouldRaise(CurrentHandContext&) = 0;
+    virtual int turnShouldRaise(CurrentHandContext&) = 0;
+    virtual int riverShouldRaise(CurrentHandContext&) = 0;
 
-    virtual int flopShouldBet(CurrentHandContext&, bool deterministic = false) = 0;
-    virtual int turnShouldBet(CurrentHandContext&, bool deterministic = false) = 0;
-    virtual int riverShouldBet(CurrentHandContext&, bool deterministic = false) = 0;
+    virtual int flopShouldBet(CurrentHandContext&) = 0;
+    virtual int turnShouldBet(CurrentHandContext&) = 0;
+    virtual int riverShouldBet(CurrentHandContext&) = 0;
 
     const std::string& getStrategyName() const { return myStrategyName; }
     void setStrategyName(const std::string& name) { myStrategyName = name; }
@@ -44,8 +44,8 @@ class IBotStrategy
   protected:
     void initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange);
 
-    int computePreflopRaiseAmount(CurrentHandContext&, bool deterministic = false);
-    bool shouldPotControl(CurrentHandContext&, bool deterministic = false);
+    int computePreflopRaiseAmount(CurrentHandContext&);
+    bool shouldPotControl(CurrentHandContext&);
 
     bool myShouldCall = false;
     bool myShouldRaise = false;

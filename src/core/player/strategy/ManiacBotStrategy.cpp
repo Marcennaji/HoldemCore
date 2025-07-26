@@ -4,7 +4,7 @@
 #include <core/player/strategy/ManiacBotStrategy.h>
 
 #include <core/engine/HandEvaluator.h>
-#include <core/engine/Randomizer.h>
+
 #include <core/engine/model/EngineError.h>
 #include <core/engine/model/Ranges.h>
 #include <core/interfaces/IHand.h>
@@ -29,13 +29,13 @@ ManiacBotStrategy::ManiacBotStrategy() : IBotStrategy()
 
     // initialize utg starting range, in a full table
     int utgFullTableRange = 0;
-    Randomizer::getRand(30, 35, 1, &utgFullTableRange);
+    GlobalServices::instance().randomizer()->getRand(30, 35, 1, &utgFullTableRange);
     initializeRanges(50, utgFullTableRange);
 }
 
 ManiacBotStrategy::~ManiacBotStrategy() = default;
 
-bool ManiacBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool deterministic)
+bool ManiacBotStrategy::preflopShouldCall(CurrentHandContext& ctx)
 {
 
     float callingRange = getPreflopRangeCalculator()->calculatePreflopCallingRange(ctx);
@@ -105,7 +105,7 @@ bool ManiacBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool determin
     {
 
         int rand = 0;
-        Randomizer::getRand(1, 3, 1, &rand);
+        GlobalServices::instance().randomizer()->getRand(1, 3, 1, &rand);
         if (rand == 1)
         {
 
@@ -123,7 +123,7 @@ bool ManiacBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool determin
     return isCardsInRange(ctx.myCard1, ctx.myCard2, stringCallingRange);
 }
 
-int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool deterministic)
+int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
 {
 
     float raisingRange = getPreflopRangeCalculator()->calculatePreflopRaisingRange(ctx);
@@ -202,7 +202,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
                     {
 
                         int rand = 0;
-                        Randomizer::getRand(1, 3, 1, &rand);
+                        GlobalServices::instance().randomizer()->getRand(1, 3, 1, &rand);
                         if (rand == 1)
                         {
                             speculativeHandedAdded = true;
@@ -231,7 +231,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
             if (ctx.myCanBluff && ctx.myPosition > LATE && raiserStats.getPreflop3Bet() > 8)
             {
                 int rand = 0;
-                Randomizer::getRand(1, 5, 1, &rand);
+                GlobalServices::instance().randomizer()->getRand(1, 5, 1, &rand);
                 if (rand == 1)
                 {
                     speculativeHandedAdded = true;
@@ -255,7 +255,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
     {
 
         int rand = 0;
-        Randomizer::getRand(1, 10, 1, &rand);
+        GlobalServices::instance().randomizer()->getRand(1, 10, 1, &rand);
         if (rand == 1)
         {
             GlobalServices::instance().logger()->verbose("\t\twon't raise, to hide the hand strength");
@@ -264,10 +264,10 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool determin
         }
     }
 
-    return computePreflopRaiseAmount(ctx, deterministic);
+    return computePreflopRaiseAmount(ctx);
 }
 
-int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic)
+int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx)
 {
 
     if (ctx.flopBetsOrRaisesNumber > 0)
@@ -275,7 +275,7 @@ int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic
         return 0;
     }
 
-    if (shouldPotControl(ctx, deterministic))
+    if (shouldPotControl(ctx))
     {
         return 0;
     }
@@ -289,7 +289,7 @@ int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic
             if (getDrawingProbability(ctx.myPostFlopState) > 25)
             {
                 int rand = 0;
-                Randomizer::getRand(1, 2, 1, &rand);
+                GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
                 if (rand == 1)
                 {
                     return ctx.pot * 0.6;
@@ -308,7 +308,7 @@ int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic
             {
 
                 int rand = 0;
-                Randomizer::getRand(1, 2, 1, &rand);
+                GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
                 if (rand == 1)
                 {
                     return ctx.pot * 0.6;
@@ -377,7 +377,7 @@ int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic
 
     return 0;
 }
-bool ManiacBotStrategy::flopShouldCall(CurrentHandContext& ctx, bool deterministic)
+bool ManiacBotStrategy::flopShouldCall(CurrentHandContext& ctx)
 {
 
     if (ctx.flopBetsOrRaisesNumber == 0)
@@ -408,7 +408,7 @@ bool ManiacBotStrategy::flopShouldCall(CurrentHandContext& ctx, bool determinist
     return true;
 }
 
-int ManiacBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool deterministic)
+int ManiacBotStrategy::flopShouldRaise(CurrentHandContext& ctx)
 {
 
     const int nbRaises = ctx.flopBetsOrRaisesNumber;
@@ -418,7 +418,7 @@ int ManiacBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool determinist
         return 0;
     }
 
-    if (shouldPotControl(ctx, deterministic))
+    if (shouldPotControl(ctx))
     {
         return 0;
     }
@@ -428,7 +428,7 @@ int ManiacBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool determinist
     {
 
         int rand = 0;
-        Randomizer::getRand(1, 3, 1, &rand);
+        GlobalServices::instance().randomizer()->getRand(1, 3, 1, &rand);
         if (rand == 2)
         {
             return ctx.pot * 2;
@@ -455,7 +455,7 @@ int ManiacBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool determinist
     {
 
         int rand = 0;
-        Randomizer::getRand(1, 2, 1, &rand);
+        GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
         if (rand == 2)
         {
             return ctx.pot;
@@ -474,7 +474,7 @@ int ManiacBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool determinist
     return 0;
 }
 
-int ManiacBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool deterministic)
+int ManiacBotStrategy::turnShouldBet(CurrentHandContext& ctx)
 {
 
     const int pot = ctx.pot + ctx.sets;
@@ -485,7 +485,7 @@ int ManiacBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool deterministic
         return 0;
     }
 
-    if (shouldPotControl(ctx, deterministic))
+    if (shouldPotControl(ctx))
     {
         return 0;
     }
@@ -526,7 +526,7 @@ int ManiacBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool deterministic
     return 0;
 }
 
-bool ManiacBotStrategy::turnShouldCall(CurrentHandContext& ctx, bool deterministic)
+bool ManiacBotStrategy::turnShouldCall(CurrentHandContext& ctx)
 {
     if (ctx.turnBetsOrRaisesNumber == 0)
     {
@@ -598,14 +598,14 @@ bool ManiacBotStrategy::turnShouldCall(CurrentHandContext& ctx, bool determinist
     return true;
 }
 
-int ManiacBotStrategy::turnShouldRaise(CurrentHandContext& ctx, bool deterministic)
+int ManiacBotStrategy::turnShouldRaise(CurrentHandContext& ctx)
 {
     if (ctx.turnBetsOrRaisesNumber == 0)
     {
         return 0;
     }
 
-    if (shouldPotControl(ctx, deterministic))
+    if (shouldPotControl(ctx))
     {
         return 0;
     }
@@ -659,7 +659,7 @@ int ManiacBotStrategy::turnShouldRaise(CurrentHandContext& ctx, bool determinist
     return 0;
 }
 
-int ManiacBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool deterministic)
+int ManiacBotStrategy::riverShouldBet(CurrentHandContext& ctx)
 {
 
     if (ctx.riverBetsOrRaisesNumber > 0)
@@ -672,7 +672,7 @@ int ManiacBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool deterministi
         ctx.myHandSimulation.winSd > 0.4)
     {
         int rand = 0;
-        Randomizer::getRand(1, 2, 1, &rand);
+        GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
         if (rand == 1)
         {
             return ctx.pot * 0.33;
@@ -688,7 +688,7 @@ int ManiacBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool deterministi
         {
 
             int rand = 0;
-            Randomizer::getRand(1, 4, 1, &rand);
+            GlobalServices::instance().randomizer()->getRand(1, 4, 1, &rand);
             if (rand == 1)
             {
                 return ctx.pot * 0.8;
@@ -697,13 +697,13 @@ int ManiacBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool deterministi
     }
 
     int rand = 0;
-    Randomizer::getRand(40, 90, 1, &rand);
+    GlobalServices::instance().randomizer()->getRand(40, 90, 1, &rand);
     float coeff = (float) rand / (float) 100;
 
     if (ctx.myHandSimulation.winSd > .9 || (ctx.myHavePosition && ctx.myHandSimulation.winSd > .85))
     {
         int rand = 0;
-        Randomizer::getRand(1, 5, 1, &rand);
+        GlobalServices::instance().randomizer()->getRand(1, 5, 1, &rand);
         if (rand != 1 || ctx.myHavePosition)
         {
             return ctx.pot * coeff;
@@ -713,7 +713,7 @@ int ManiacBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool deterministi
         (ctx.myHandSimulation.winRanged > .8 || (ctx.myHavePosition && ctx.myHandSimulation.winRanged > .7)))
     {
         int rand = 0;
-        Randomizer::getRand(1, 3, 1, &rand);
+        GlobalServices::instance().randomizer()->getRand(1, 3, 1, &rand);
         if (rand == 1 || ctx.myHavePosition)
         {
             return ctx.pot * coeff;
@@ -722,7 +722,7 @@ int ManiacBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool deterministi
     return 0;
 }
 
-bool ManiacBotStrategy::riverShouldCall(CurrentHandContext& ctx, bool deterministic)
+bool ManiacBotStrategy::riverShouldCall(CurrentHandContext& ctx)
 {
     const int nbRaises = ctx.riverBetsOrRaisesNumber;
 
@@ -756,7 +756,7 @@ bool ManiacBotStrategy::riverShouldCall(CurrentHandContext& ctx, bool determinis
     return true;
 }
 
-int ManiacBotStrategy::riverShouldRaise(CurrentHandContext& ctx, bool deterministic)
+int ManiacBotStrategy::riverShouldRaise(CurrentHandContext& ctx)
 {
 
     if (ctx.riverBetsOrRaisesNumber == 0)

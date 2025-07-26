@@ -16,7 +16,7 @@ using namespace std;
 std::random_device g_rand_device;
 std::mt19937 g_rand_engine(g_rand_device());
 
-namespace pkt::core
+namespace pkt::infra
 {
 
 void Randomizer::getRand(int minValue, int maxValue, unsigned count, int* out)
@@ -29,4 +29,4 @@ void Randomizer::getRand(int minValue, int maxValue, unsigned count, int* out)
         *startPtr++ = dist(g_rand_engine);
     }
 }
-} // namespace pkt::core
+} // namespace pkt::infra

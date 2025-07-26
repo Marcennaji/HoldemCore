@@ -6,7 +6,7 @@
 
 #include <core/engine/CardUtilities.h>
 #include <core/engine/HandEvaluator.h>
-#include <core/engine/Randomizer.h>
+
 #include <core/engine/model/Ranges.h>
 #include <core/interfaces/IHand.h>
 #include <core/interfaces/persistence/IHandAuditStore.h>
@@ -1156,7 +1156,7 @@ void Player::updateCurrentHandContext(const GameState state)
     myCurrentHandContext->myPostFlopState = getPostFlopState();
 }
 
-float Player::calculatePreflopCallingRange(CurrentHandContext& context, bool deterministic) const
+float Player::calculatePreflopCallingRange(CurrentHandContext& context) const
 {
     return myRangeEstimator->getStandardCallingRange(currentHand->getSeatsList()->size());
 }

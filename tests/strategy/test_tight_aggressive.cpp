@@ -23,7 +23,7 @@ TEST_F(TightAggressiveStrategyTest, Preflop_StrongPair_Raises)
     ctx.gameState = GameStatePreflop;
     ctx.myCard1 = "Ah";
     ctx.myCard2 = "Ad";
-    EXPECT_GT(strategy.preflopShouldRaise(ctx, true), 0);
+    EXPECT_GT(strategy.preflopShouldRaise(ctx), 0);
 }
 
 TEST_F(TightAggressiveStrategyTest, Preflop_SuitedBroadway_Raises)
@@ -31,7 +31,7 @@ TEST_F(TightAggressiveStrategyTest, Preflop_SuitedBroadway_Raises)
     ctx.gameState = GameStatePreflop;
     ctx.myCard1 = "Ks";
     ctx.myCard2 = "Qs";
-    EXPECT_GT(strategy.preflopShouldRaise(ctx, true), 0);
+    EXPECT_GT(strategy.preflopShouldRaise(ctx), 0);
 }
 
 TEST_F(TightAggressiveStrategyTest, Preflop_Trash_DoesNotRaise)
@@ -39,7 +39,7 @@ TEST_F(TightAggressiveStrategyTest, Preflop_Trash_DoesNotRaise)
     ctx.gameState = GameStatePreflop;
     ctx.myCard1 = "7d";
     ctx.myCard2 = "2c";
-    EXPECT_EQ(strategy.preflopShouldRaise(ctx, true), 0);
+    EXPECT_EQ(strategy.preflopShouldRaise(ctx), 0);
 }
 
 TEST_F(TightAggressiveStrategyTest, Preflop_InPosition_CallsWithOdds)
@@ -52,7 +52,7 @@ TEST_F(TightAggressiveStrategyTest, Preflop_InPosition_CallsWithOdds)
     ctx.preflopRaisesNumber = 1;
     ctx.preflopLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events);
     ctx.myHavePosition = true;
-    EXPECT_TRUE(strategy.preflopShouldCall(ctx, true));
+    EXPECT_TRUE(strategy.preflopShouldCall(ctx));
 }
 
 // --- Flop ---
@@ -72,7 +72,7 @@ TEST_F(TightAggressiveStrategyTest, Flop_HighEquity_Raises)
     ctx.myHandSimulation.winSd = 0.95f;
     ctx.myHandSimulation.winRanged = 0.9f;
 
-    EXPECT_GT(strategy.flopShouldRaise(ctx, true), 0);
+    EXPECT_GT(strategy.flopShouldRaise(ctx), 0);
 }
 
 TEST_F(TightAggressiveStrategyTest, Flop_LowEquity_Folds)
@@ -80,7 +80,7 @@ TEST_F(TightAggressiveStrategyTest, Flop_LowEquity_Folds)
     ctx.gameState = GameStateFlop;
     ctx.myHandSimulation.winSd = 0.2f;
     ctx.potOdd = 10;
-    EXPECT_FALSE(strategy.flopShouldCall(ctx, true));
+    EXPECT_FALSE(strategy.flopShouldCall(ctx));
 }
 
 // --- Turn ---
@@ -94,7 +94,7 @@ TEST_F(TightAggressiveStrategyTest, Turn_HighEquity_Raises)
     ctx.turnBetsOrRaisesNumber = 1;
     ctx.turnLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events);
 
-    EXPECT_GT(strategy.turnShouldRaise(ctx, true), 0);
+    EXPECT_GT(strategy.turnShouldRaise(ctx), 0);
 }
 
 TEST_F(TightAggressiveStrategyTest, Turn_LowEquity_DoesNotRaise)
@@ -106,7 +106,7 @@ TEST_F(TightAggressiveStrategyTest, Turn_LowEquity_DoesNotRaise)
     ctx.turnBetsOrRaisesNumber = 1;
     ctx.turnLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events);
 
-    EXPECT_EQ(strategy.turnShouldRaise(ctx, true), 0);
+    EXPECT_EQ(strategy.turnShouldRaise(ctx), 0);
 }
 
 TEST_F(TightAggressiveStrategyTest, Turn_LowEquity_Folds)
@@ -114,7 +114,7 @@ TEST_F(TightAggressiveStrategyTest, Turn_LowEquity_Folds)
     ctx.gameState = GameStateTurn;
     ctx.myHandSimulation.winSd = 0.1f;
     ctx.potOdd = 10;
-    EXPECT_FALSE(strategy.turnShouldCall(ctx, true));
+    EXPECT_FALSE(strategy.turnShouldCall(ctx));
 }
 
 // --- River ---
@@ -128,14 +128,14 @@ TEST_F(TightAggressiveStrategyTest, River_Nuts_Raises)
     ctx.myPosition = PlayerPosition::BUTTON;
     ctx.riverBetsOrRaisesNumber = 5;
 
-    EXPECT_GT(strategy.riverShouldRaise(ctx, true), 0);
+    EXPECT_GT(strategy.riverShouldRaise(ctx), 0);
 }
 
 TEST_F(TightAggressiveStrategyTest, River_ZeroEquity_Folds)
 {
     ctx.gameState = GameStateRiver;
     ctx.myHandSimulation.winSd = 0.0f;
-    EXPECT_FALSE(strategy.riverShouldCall(ctx, true));
+    EXPECT_FALSE(strategy.riverShouldCall(ctx));
 }
 
 // --- Edge / Defensive ---
@@ -147,8 +147,8 @@ TEST_F(TightAggressiveStrategyTest, ZeroCash_CannotRaise)
     ctx.myCash = 0;
     ctx.myCard1 = "8h";
     ctx.myCard2 = "9h";
-    EXPECT_FALSE(strategy.preflopShouldCall(ctx, true));
-    EXPECT_EQ(strategy.preflopShouldRaise(ctx, true), 0);
+    EXPECT_FALSE(strategy.preflopShouldCall(ctx));
+    EXPECT_EQ(strategy.preflopShouldRaise(ctx), 0);
 }
 
 TEST_F(TightAggressiveStrategyTest, NoBluff_DisablesBluffing)
@@ -159,5 +159,5 @@ TEST_F(TightAggressiveStrategyTest, NoBluff_DisablesBluffing)
     ctx.myHandSimulation.winSd = 0.4f;
     ctx.myCard1 = "8h";
     ctx.myCard2 = "9h";
-    EXPECT_EQ(strategy.flopShouldRaise(ctx, true), 0);
+    EXPECT_EQ(strategy.flopShouldRaise(ctx), 0);
 }

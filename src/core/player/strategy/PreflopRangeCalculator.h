@@ -13,8 +13,8 @@ class PreflopRangeCalculator
 {
   public:
     PreflopRangeCalculator() = default;
-    float calculatePreflopCallingRange(CurrentHandContext& context, bool deterministic = false) const;
-    float calculatePreflopRaisingRange(CurrentHandContext& context, bool deterministic = false) const;
+    float calculatePreflopCallingRange(CurrentHandContext& context) const;
+    float calculatePreflopRaisingRange(CurrentHandContext& context) const;
 
     int getRange(PlayerPosition p, int nbPlayers) const;
     void initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange);
@@ -51,8 +51,7 @@ class PreflopRangeCalculator
     float adjustRaiseForRaiserStats(const PreflopStatistics& raiserStats, float raisingRange, int nbRaises,
                                     int nbPlayers) const;
     float adjustRaiseForNoRaiserStats(float raisingRange, int nbRaises) const;
-    float adjustRaiseForNoRaiser(const CurrentHandContext& context, float raisingRange, bool canBluff,
-                                 bool deterministic = false) const;
+    float adjustRaiseForNoRaiser(const CurrentHandContext& context, float raisingRange, bool canBluff) const;
     float adjustRaiseForStack(const CurrentHandContext& context, float raisingRange) const;
     float adjustRaiseForBigBet(float raisingRange, int potOdd, int myCash, int highestSet, int mySet,
                                int smallBlind) const;

@@ -4,7 +4,7 @@
 #include <core/player/strategy/LooseAggressiveBotStrategy.h>
 
 #include <core/engine/HandEvaluator.h>
-#include <core/engine/Randomizer.h>
+
 #include <core/engine/model/EngineError.h>
 #include <core/engine/model/Ranges.h>
 #include <core/interfaces/IHand.h>
@@ -30,13 +30,13 @@ LooseAggressiveBotStrategy::LooseAggressiveBotStrategy() : IBotStrategy()
 
     // initialize utg starting range, in a full table
     int utgFullTableRange = 0;
-    Randomizer::getRand(13, 15, 1, &utgFullTableRange);
+    GlobalServices::instance().randomizer()->getRand(13, 15, 1, &utgFullTableRange);
     initializeRanges(48, utgFullTableRange);
 }
 
 LooseAggressiveBotStrategy::~LooseAggressiveBotStrategy() = default;
 
-bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool deterministic)
+bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx)
 {
 
     float callingRange = getPreflopRangeCalculator()->calculatePreflopCallingRange(ctx);
@@ -105,7 +105,7 @@ bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool
     {
 
         int rand = 0;
-        Randomizer::getRand(1, 3, 1, &rand);
+        GlobalServices::instance().randomizer()->getRand(1, 3, 1, &rand);
         if (rand == 1)
         {
 
@@ -123,7 +123,7 @@ bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx, bool
     return isCardsInRange(ctx.myCard1, ctx.myCard2, stringCallingRange);
 }
 
-int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool deterministic)
+int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
 {
 
     float raisingRange = getPreflopRangeCalculator()->calculatePreflopRaisingRange(ctx);
@@ -202,7 +202,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
                     {
 
                         int rand = 0;
-                        Randomizer::getRand(1, 4, 1, &rand);
+                        GlobalServices::instance().randomizer()->getRand(1, 4, 1, &rand);
                         if (rand == 1)
                         {
                             speculativeHandedAdded = true;
@@ -252,7 +252,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
     {
 
         int rand = 0;
-        Randomizer::getRand(1, 6, 1, &rand);
+        GlobalServices::instance().randomizer()->getRand(1, 6, 1, &rand);
         if (rand == 1)
         {
             GlobalServices::instance().logger()->verbose("\t\twon't raise, to hide the hand strength");
@@ -261,10 +261,10 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx, bool
         }
     }
 
-    return computePreflopRaiseAmount(ctx, deterministic);
+    return computePreflopRaiseAmount(ctx);
 }
 
-int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool deterministic)
+int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx)
 {
 
     if (ctx.flopBetsOrRaisesNumber > 0)
@@ -272,7 +272,7 @@ int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool dete
         return 0;
     }
 
-    if (shouldPotControl(ctx, deterministic))
+    if (shouldPotControl(ctx))
     {
         return 0;
     }
@@ -286,7 +286,7 @@ int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool dete
             if (getDrawingProbability(ctx.myPostFlopState) > 25)
             {
                 int rand = 0;
-                Randomizer::getRand(1, 2, 1, &rand);
+                GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
                 if (rand == 1)
                 {
                     return ctx.pot * 0.6;
@@ -305,7 +305,7 @@ int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool dete
             {
 
                 int rand = 0;
-                Randomizer::getRand(1, 2, 1, &rand);
+                GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
                 if (rand == 1)
                 {
                     return ctx.pot * 0.6;
@@ -331,7 +331,7 @@ int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool dete
         }
 
         int rand = 0;
-        Randomizer::getRand(1, 7, 1, &rand);
+        GlobalServices::instance().randomizer()->getRand(1, 7, 1, &rand);
         if (rand == 3 && !ctx.myHavePosition)
         {
             return 0; // may check-raise or check-call
@@ -390,7 +390,7 @@ int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx, bool dete
 
     return 0;
 }
-bool LooseAggressiveBotStrategy::flopShouldCall(CurrentHandContext& ctx, bool deterministic)
+bool LooseAggressiveBotStrategy::flopShouldCall(CurrentHandContext& ctx)
 {
 
     if (ctx.flopBetsOrRaisesNumber == 0)
@@ -421,14 +421,14 @@ bool LooseAggressiveBotStrategy::flopShouldCall(CurrentHandContext& ctx, bool de
     return true;
 }
 
-int LooseAggressiveBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool deterministic)
+int LooseAggressiveBotStrategy::flopShouldRaise(CurrentHandContext& ctx)
 {
 
     const int nbRaises = ctx.flopBetsOrRaisesNumber;
 
     if (nbRaises == 0)
     {
-        if (shouldPotControl(ctx, deterministic))
+        if (shouldPotControl(ctx))
         {
             return 0;
         }
@@ -457,7 +457,7 @@ int LooseAggressiveBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool de
     {
 
         int rand = 0;
-        Randomizer::getRand(1, 3, 1, &rand);
+        GlobalServices::instance().randomizer()->getRand(1, 3, 1, &rand);
         if (rand == 2)
         {
             return ctx.pot;
@@ -471,7 +471,7 @@ int LooseAggressiveBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool de
         {
 
             int rand = 0;
-            Randomizer::getRand(1, 6, 1, &rand);
+            GlobalServices::instance().randomizer()->getRand(1, 6, 1, &rand);
             if (rand == 2 && ctx.myHandSimulation.winRanged > 0.3 && ctx.myHandSimulation.win > 0.5)
             {
                 return ctx.pot;
@@ -493,7 +493,7 @@ int LooseAggressiveBotStrategy::flopShouldRaise(CurrentHandContext& ctx, bool de
     return 0;
 }
 
-int LooseAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool deterministic)
+int LooseAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx)
 {
 
     const int pot = ctx.pot + ctx.sets;
@@ -501,7 +501,7 @@ int LooseAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool dete
 
     if (nbRaises > 0)
     {
-        if (shouldPotControl(ctx, deterministic))
+        if (shouldPotControl(ctx))
         {
             return 0;
         }
@@ -532,7 +532,7 @@ int LooseAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool dete
     if (getDrawingProbability(ctx.myPostFlopState) > 20 && !ctx.myHavePosition)
     {
         int rand = 0;
-        Randomizer::getRand(1, 2, 1, &rand);
+        GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
         if (rand == 1)
         {
             return pot * 0.6;
@@ -544,7 +544,7 @@ int LooseAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool dete
         if (ctx.myHavePosition && ctx.myCanBluff)
         {
             int rand = 0;
-            Randomizer::getRand(1, 2, 1, &rand);
+            GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
             if (rand == 2)
             {
                 return pot * 0.6;
@@ -555,7 +555,7 @@ int LooseAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx, bool dete
     return 0;
 }
 
-bool LooseAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx, bool deterministic)
+bool LooseAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx)
 {
     if (ctx.turnBetsOrRaisesNumber == 0)
     {
@@ -626,11 +626,11 @@ bool LooseAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx, bool de
     return true;
 }
 
-int LooseAggressiveBotStrategy::turnShouldRaise(CurrentHandContext& ctx, bool deterministic)
+int LooseAggressiveBotStrategy::turnShouldRaise(CurrentHandContext& ctx)
 {
     if (ctx.turnBetsOrRaisesNumber == 0)
     {
-        if (shouldPotControl(ctx, deterministic))
+        if (shouldPotControl(ctx))
         {
             return 0;
         }
@@ -649,7 +649,7 @@ int LooseAggressiveBotStrategy::turnShouldRaise(CurrentHandContext& ctx, bool de
     if (ctx.myHandSimulation.winRanged > 0.98 && ctx.myHandSimulation.win > 0.98 && ctx.myHandSimulation.winSd > 0.9)
     {
         int rand = 0;
-        Randomizer::getRand(1, 4, 1, &rand);
+        GlobalServices::instance().randomizer()->getRand(1, 4, 1, &rand);
         if (rand == 1)
         {
             return 0; // very strong hand, slow play, just call
@@ -682,7 +682,7 @@ int LooseAggressiveBotStrategy::turnShouldRaise(CurrentHandContext& ctx, bool de
     {
 
         int rand = 0;
-        Randomizer::getRand(1, 4, 1, &rand);
+        GlobalServices::instance().randomizer()->getRand(1, 4, 1, &rand);
         if (rand == 1)
         {
             return ctx.pot * 0.6;
@@ -691,7 +691,7 @@ int LooseAggressiveBotStrategy::turnShouldRaise(CurrentHandContext& ctx, bool de
     return 0;
 }
 
-int LooseAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool deterministic)
+int LooseAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx)
 {
 
     if (ctx.riverBetsOrRaisesNumber > 0)
@@ -704,7 +704,7 @@ int LooseAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool det
         ctx.myHandSimulation.winSd > 0.5)
     {
         int rand = 0;
-        Randomizer::getRand(1, 2, 1, &rand);
+        GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
         if (rand == 1)
         {
             return ctx.pot * 0.33;
@@ -720,7 +720,7 @@ int LooseAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool det
         {
 
             int rand = 0;
-            Randomizer::getRand(1, 4, 1, &rand);
+            GlobalServices::instance().randomizer()->getRand(1, 4, 1, &rand);
             if (rand == 1)
             {
                 return ctx.pot * 0.8;
@@ -729,13 +729,13 @@ int LooseAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool det
     }
 
     int rand = 0;
-    Randomizer::getRand(40, 80, 1, &rand);
+    GlobalServices::instance().randomizer()->getRand(40, 80, 1, &rand);
     float coeff = (float) rand / (float) 100;
 
     if (ctx.myHandSimulation.winSd > .94 || (ctx.myHavePosition && ctx.myHandSimulation.winSd > .9))
     {
         int rand = 0;
-        Randomizer::getRand(1, 5, 1, &rand);
+        GlobalServices::instance().randomizer()->getRand(1, 5, 1, &rand);
         if (rand != 1 || ctx.myHavePosition)
         {
             return ctx.pot * coeff;
@@ -745,7 +745,7 @@ int LooseAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool det
         (ctx.myHandSimulation.winRanged > .8 || (ctx.myHavePosition && ctx.myHandSimulation.winRanged > .7)))
     {
         int rand = 0;
-        Randomizer::getRand(1, 3, 1, &rand);
+        GlobalServices::instance().randomizer()->getRand(1, 3, 1, &rand);
         if (rand == 1 || ctx.myHavePosition)
         {
             return ctx.pot * coeff;
@@ -754,7 +754,7 @@ int LooseAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx, bool det
     return 0;
 }
 
-bool LooseAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx, bool deterministic)
+bool LooseAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx)
 {
 
     const int nbRaises = ctx.riverBetsOrRaisesNumber;
@@ -832,7 +832,7 @@ bool LooseAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx, bool d
     return true;
 }
 
-int LooseAggressiveBotStrategy::riverShouldRaise(CurrentHandContext& ctx, bool deterministic)
+int LooseAggressiveBotStrategy::riverShouldRaise(CurrentHandContext& ctx)
 {
 
     if (ctx.riverBetsOrRaisesNumber == 0)

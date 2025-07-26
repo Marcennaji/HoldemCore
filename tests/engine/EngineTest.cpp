@@ -1,5 +1,6 @@
 #include "EngineTest.h"
 #include "DummyPlayer.h"
+#include "FakeRandomizer.h"
 #include "PlayerFsm.h"
 #include "core/engine/Exception.h"
 #include "core/engine/model/GameData.h"
@@ -25,6 +26,13 @@ void EngineTest::SetUp()
     logger->setLogLevel(pkt::core::LogLevel::Quiet);
     services.setLogger(logger);
     services.setHandEvaluationEngine(std::make_shared<pkt::infra::PsimHandEvaluationEngine>());
+    auto randomizer = std::make_shared<FakeRandomizer>();
+    randomizer->values = {3, 5, 7};
+    services.setRandomizer(randomizer);
+
+    // Run test using logic that relies on GlobalServices::randomizer()
+
+    // Restore default impl after test if needed
 }
 
 void EngineTest::TearDown()

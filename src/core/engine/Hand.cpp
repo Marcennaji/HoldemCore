@@ -6,7 +6,6 @@
 #include <core/services/GlobalServices.h>
 #include "CardUtilities.h"
 #include "GameEvents.h"
-#include "Randomizer.h"
 #include "core/player/Helpers.h"
 #include "model/ButtonState.h"
 

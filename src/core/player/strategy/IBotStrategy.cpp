@@ -1,5 +1,5 @@
 #include "IBotStrategy.h"
-#include <core/engine/Randomizer.h>
+
 #include <core/engine/model/Ranges.h>
 #include <core/player/Helpers.h>
 #include <core/services/GlobalServices.h>
@@ -15,7 +15,7 @@ void IBotStrategy::initializeRanges(const int utgHeadsUpRange, const int utgFull
     myPreflopRangeCalculator->initializeRanges(utgHeadsUpRange, utgFullTableRange);
 }
 
-int IBotStrategy::computePreflopRaiseAmount(CurrentHandContext& ctx, bool deterministic)
+int IBotStrategy::computePreflopRaiseAmount(CurrentHandContext& ctx)
 {
     int myRaiseAmount = 0;
 
@@ -70,7 +70,7 @@ int IBotStrategy::computePreflopRaiseAmount(CurrentHandContext& ctx, bool determ
     return myRaiseAmount;
 }
 
-bool IBotStrategy::shouldPotControl(CurrentHandContext& ctx, bool deterministic)
+bool IBotStrategy::shouldPotControl(CurrentHandContext& ctx)
 {
     assert(ctx.gameState == GameStateFlop || ctx.gameState == GameStateTurn);
 

@@ -2,6 +2,7 @@
 
 #include "core/interfaces/IHandEvaluationEngine.h"
 #include "core/interfaces/ILogger.h"
+#include "core/interfaces/IRandomizer.h"
 #include "core/interfaces/persistence/IHandAuditStore.h"
 #include "core/interfaces/persistence/IPlayersStatisticsStore.h"
 #include "core/interfaces/persistence/IRankingStore.h"
@@ -26,6 +27,7 @@ class GlobalServices
     std::shared_ptr<IHandAuditStore> handAuditStore() const { return myHandAuditStore; }
     std::shared_ptr<IPlayersStatisticsStore> playersStatisticsStore() const { return myPlayersStatisticsStore; }
     std::shared_ptr<IHandEvaluationEngine> handEvaluationEngine() const { return myHandEvaluationEngine; }
+    std::shared_ptr<IRandomizer> randomizer() const { return myRandomizer; }
 
     // Setters
     void setLogger(std::shared_ptr<ILogger> logger) { myLogger = std::move(logger); }
@@ -39,6 +41,7 @@ class GlobalServices
     {
         myHandEvaluationEngine = std::move(engine);
     }
+    void setRandomizer(std::shared_ptr<IRandomizer> rand) { myRandomizer = std::move(rand); }
 
   private:
     GlobalServices();
@@ -48,6 +51,7 @@ class GlobalServices
     std::shared_ptr<IHandAuditStore> myHandAuditStore;
     std::shared_ptr<IPlayersStatisticsStore> myPlayersStatisticsStore;
     std::shared_ptr<IHandEvaluationEngine> myHandEvaluationEngine;
+    std::shared_ptr<IRandomizer> myRandomizer;
 };
 
 } // namespace pkt::core

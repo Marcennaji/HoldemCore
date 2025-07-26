@@ -49,7 +49,7 @@ TEST_F(PreflopStateTest, EverybodyCallShouldGoToFlop)
     myHandFsm->start();
     myHandFsm->processPlayerAction({0, ActionType::Call});
     myHandFsm->processPlayerAction({1, ActionType::Call});
-    myHandFsm->processPlayerAction({2, ActionType::Call});
+    myHandFsm->processPlayerAction({2, ActionType::Check});
 
     EXPECT_EQ(myLastGameState, GameStateFlop);
 }

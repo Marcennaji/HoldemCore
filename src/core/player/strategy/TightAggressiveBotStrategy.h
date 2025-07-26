@@ -16,19 +16,19 @@ class TightAggressiveBotStrategy : public IBotStrategy
 
     ~TightAggressiveBotStrategy();
 
-    bool preflopShouldCall(CurrentHandContext& context, bool deterministic = false) override;
-    bool flopShouldCall(CurrentHandContext& context, bool deterministic = false) override;
-    bool turnShouldCall(CurrentHandContext& context, bool deterministic = false) override;
-    bool riverShouldCall(CurrentHandContext& context, bool deterministic = false) override;
+    bool preflopShouldCall(CurrentHandContext& context) override;
+    bool flopShouldCall(CurrentHandContext& context) override;
+    bool turnShouldCall(CurrentHandContext& context) override;
+    bool riverShouldCall(CurrentHandContext& context) override;
 
-    int preflopShouldRaise(CurrentHandContext& context, bool deterministic = false) override;
-    int flopShouldRaise(CurrentHandContext& context, bool deterministic = false) override;
-    int turnShouldRaise(CurrentHandContext& context, bool deterministic = false) override;
-    int riverShouldRaise(CurrentHandContext& context, bool deterministic = false) override;
+    int preflopShouldRaise(CurrentHandContext& context) override;
+    int flopShouldRaise(CurrentHandContext& context) override;
+    int turnShouldRaise(CurrentHandContext& context) override;
+    int riverShouldRaise(CurrentHandContext& context) override;
 
-    int flopShouldBet(CurrentHandContext& context, bool deterministic = false) override;
-    int turnShouldBet(CurrentHandContext& context, bool deterministic = false) override;
-    int riverShouldBet(CurrentHandContext& context, bool deterministic = false) override;
+    int flopShouldBet(CurrentHandContext& context) override;
+    int turnShouldBet(CurrentHandContext& context) override;
+    int riverShouldBet(CurrentHandContext& context) override;
 };
 
 } // namespace pkt::core::player

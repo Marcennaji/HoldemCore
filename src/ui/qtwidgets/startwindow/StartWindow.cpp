@@ -7,7 +7,8 @@
 
 #include <core/engine/EngineDefs.h>
 #include <core/engine/Game.h>
-#include <core/engine/Randomizer.h>
+#include "core/services/GlobalServices.h"
+
 #include <core/engine/model/GameData.h>
 #include <core/player/Player.h>
 
@@ -61,7 +62,7 @@ void StartWindow::startNewGame()
     int tmpDealerPos = 0;
     startData.numberOfPlayers = gameData.maxNumberOfPlayers;
 
-    Randomizer::getRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
+    GlobalServices::instance().randomizer()->getRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
     startData.startDealerPlayerId = static_cast<unsigned>(tmpDealerPos);
 
     // myPokerTableWindow->GameModification();

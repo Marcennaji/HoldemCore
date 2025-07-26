@@ -4,6 +4,7 @@
 
 #include <infra/AppDirectories.h>
 #include <infra/ConsoleLogger.h>
+#include <infra/Randomizer.h>
 #include <infra/eval/PsimHandEvaluationEngine.h>
 #include "core/services/GlobalServices.h"
 
@@ -31,6 +32,7 @@ int main(int argc, char** argv)
     auto& services = pkt::core::GlobalServices::instance();
     services.setLogger(std::make_shared<pkt::infra::ConsoleLogger>());
     services.setHandEvaluationEngine(std::make_shared<pkt::infra::PsimHandEvaluationEngine>());
+    services.setRandomizer(std::make_shared<pkt::infra::Randomizer>());
 
     pkt::infra::AppDirectories dirs = pkt::infra::AppDirectories::initialize();
     QString appPath = QString::fromStdString(dirs.appDataDir);
