@@ -30,7 +30,7 @@ class HandFsm : public IHandLifecycle, public IHandPlayerAction, public IPlayerA
     void dealHoleCards(size_t lastArrayIndex) override;
     void initAndShuffleDeck() override;
 
-    void handlePlayerAction(PlayerAction action) override;
+    void processPlayerAction(PlayerAction action) override;
     pkt::core::player::PlayerFsmList getSeatsList() const override;
     pkt::core::player::PlayerFsmList getRunningPlayersList() const override;
 
@@ -43,11 +43,11 @@ class HandFsm : public IHandLifecycle, public IHandPlayerAction, public IPlayerA
     pkt::core::player::PlayerFsmList myRunningPlayersList; // all players who have not folded and are not all in
     std::vector<int> myCardsArray;
     int myStartQuantityPlayers;
+    int myStartCash;
     unsigned myDealerPlayerId;
     unsigned mySmallBlindPlayerId;
     unsigned myBigBlindPlayerId;
     int mySmallBlind;
-    int myStartCash;
 
     int myPreviousPlayerId{-1};
     int myPreflopLastRaiserId;

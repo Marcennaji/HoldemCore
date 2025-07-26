@@ -47,9 +47,9 @@ TEST_F(PreflopStateTest, EverybodyCallShouldGoToFlop)
 {
     initializeHandFsmForTesting(3);
     myHandFsm->start();
-    myHandFsm->handlePlayerAction({0, ActionType::Call});
-    myHandFsm->handlePlayerAction({1, ActionType::Call});
-    myHandFsm->handlePlayerAction({2, ActionType::Call});
+    myHandFsm->processPlayerAction({0, ActionType::Call});
+    myHandFsm->processPlayerAction({1, ActionType::Call});
+    myHandFsm->processPlayerAction({2, ActionType::Call});
 
     EXPECT_EQ(myLastGameState, GameStateFlop);
 }
@@ -57,8 +57,8 @@ TEST_F(PreflopStateTest, EverybodyFoldShouldGoToPostRiver)
 {
     initializeHandFsmForTesting(3);
     myHandFsm->start();
-    myHandFsm->handlePlayerAction({0, ActionType::Fold});
-    myHandFsm->handlePlayerAction({1, ActionType::Fold});
+    myHandFsm->processPlayerAction({0, ActionType::Fold});
+    myHandFsm->processPlayerAction({1, ActionType::Fold});
 
     EXPECT_EQ(myLastGameState, GameStatePostRiver);
 }

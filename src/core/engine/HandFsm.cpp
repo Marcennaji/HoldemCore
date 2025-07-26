@@ -47,7 +47,7 @@ void HandFsm::start()
 
     myPreflopLastRaiserId = -1;
 
-    myState = std::make_unique<PreflopState>(myEvents);
+    myState = std::make_unique<PreflopState>(myEvents, mySmallBlind);
     myState->enter(*this);
 }
 
@@ -56,7 +56,7 @@ void HandFsm::end()
     myState.reset();
 }
 
-void HandFsm::handlePlayerAction(PlayerAction action)
+void HandFsm::processPlayerAction(PlayerAction action)
 {
     if (!myState)
         return;
