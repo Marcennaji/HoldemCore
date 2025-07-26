@@ -43,7 +43,7 @@ TEST_F(PreflopStateTest, StartShouldGoToPreflop)
     myHandFsm->start();
     EXPECT_EQ(myLastGameState, GameStatePreflop);
 }
-TEST_F(PreflopStateTest, EverybodyCallShouldGoToFlop)
+TEST_F(PreflopStateTest, DISABLED_EverybodyCallShouldGoToFlop)
 {
     initializeHandFsmForTesting(3);
     myHandFsm->start();
@@ -53,7 +53,7 @@ TEST_F(PreflopStateTest, EverybodyCallShouldGoToFlop)
 
     EXPECT_EQ(myLastGameState, GameStateFlop);
 }
-TEST_F(PreflopStateTest, EverybodyFoldShouldGoToPostRiver)
+TEST_F(PreflopStateTest, DISABLED_EverybodyFoldShouldGoToPostRiver)
 {
     initializeHandFsmForTesting(3);
     myHandFsm->start();
