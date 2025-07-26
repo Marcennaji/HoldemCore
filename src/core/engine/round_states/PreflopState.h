@@ -20,7 +20,7 @@ class PreflopState : public BettingStateBase,
                      public IDebuggableState
 {
   public:
-    PreflopState(const GameEvents& events, const int smallBlind);
+    PreflopState(const GameEvents& events, const int smallBlind, unsigned dealerPlayerId);
 
     void enter(HandFsm&) override;
     void exit(HandFsm&) override;

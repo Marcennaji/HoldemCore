@@ -13,7 +13,8 @@ namespace pkt::core
 {
 using namespace pkt::core::player;
 
-PreflopState::PreflopState(const GameEvents& events, const int smallBlind) : myEvents(events), mySmallBlind(smallBlind)
+PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsigned dealerPlayerId)
+    : myEvents(events), mySmallBlind(smallBlind), myDealerPlayerId(dealerPlayerId)
 {
 }
 
