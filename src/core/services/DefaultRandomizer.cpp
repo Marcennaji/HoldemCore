@@ -4,7 +4,7 @@
 
 #define NOMINMAX // for Windows
 
-#include "Randomizer.h"
+#include "DefaultRandomizer.h"
 #include <core/services/GlobalServices.h>
 
 #include <algorithm>
@@ -16,10 +16,10 @@ using namespace std;
 std::random_device g_rand_device;
 std::mt19937 g_rand_engine(g_rand_device());
 
-namespace pkt::infra
+namespace pkt::core
 {
 
-void Randomizer::getRand(int minValue, int maxValue, unsigned count, int* out)
+void DefaultRandomizer::getRand(int minValue, int maxValue, unsigned count, int* out)
 {
     uniform_int_distribution<int> dist(minValue, maxValue);
 
@@ -29,4 +29,4 @@ void Randomizer::getRand(int minValue, int maxValue, unsigned count, int* out)
         *startPtr++ = dist(g_rand_engine);
     }
 }
-} // namespace pkt::infra
+} // namespace pkt::core

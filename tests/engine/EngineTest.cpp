@@ -39,17 +39,17 @@ void EngineTest::TearDown()
 {
 }
 // Helper function to initialize a Hand object for testing
-void EngineTest::initializeHandForTesting(size_t activePlayerCount)
+void EngineTest::initializeHandForTesting(size_t activePlayerCount, GameData gameData)
 {
     myHand.reset();
     createPlayersLists(activePlayerCount);
-    initializeHandWithPlayers(activePlayerCount);
+    initializeHandWithPlayers(activePlayerCount, gameData);
 }
-void EngineTest::initializeHandFsmForTesting(size_t activePlayerCount)
+void EngineTest::initializeHandFsmForTesting(size_t activePlayerCount, GameData gameData)
 {
     myHandFsm.reset();
     createPlayersFsmLists(activePlayerCount);
-    initializeHandFsmWithPlayers(activePlayerCount);
+    initializeHandFsmWithPlayers(activePlayerCount, gameData);
 }
 void EngineTest::createPlayersLists(size_t playerCount)
 {
@@ -67,17 +67,11 @@ void EngineTest::createPlayersLists(size_t playerCount)
         myRunningPlayersList->push_back(player);
     }
 }
-void EngineTest::initializeHandWithPlayers(size_t activePlayerCount)
+void EngineTest::initializeHandWithPlayers(size_t activePlayerCount, GameData gameData)
 {
     myBoard = myFactory->createBoard(startDealerPlayerId);
     myBoard->setSeatsList(mySeatsList);
     myBoard->setRunningPlayersList(myRunningPlayersList);
-
-    GameData gameData;
-    gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
-    gameData.startMoney = 1000;
-    gameData.firstSmallBlind = 10;
-    gameData.tableProfile = TableProfile::RandomOpponents;
 
     StartData startData;
     startData.startDealerPlayerId = startDealerPlayerId;
@@ -103,18 +97,12 @@ void EngineTest::createPlayersFsmLists(size_t playerCount)
         myRunningPlayersListFsm->push_back(player);
     }
 }
-void EngineTest::initializeHandFsmWithPlayers(size_t activePlayerCount)
+void EngineTest::initializeHandFsmWithPlayers(size_t activePlayerCount, GameData gameData)
 {
     createPlayersLists(activePlayerCount);
     myBoard = myFactory->createBoard(startDealerPlayerId);
     myBoard->setSeatsList(mySeatsList);
     myBoard->setRunningPlayersList(myRunningPlayersList);
-
-    GameData gameData;
-    gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
-    gameData.startMoney = 1000;
-    gameData.firstSmallBlind = 10;
-    gameData.tableProfile = TableProfile::RandomOpponents;
 
     StartData startData;
     startData.startDealerPlayerId = startDealerPlayerId;

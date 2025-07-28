@@ -19,6 +19,11 @@ void BettingRoundsLegacyTest::SetUp()
 {
     EngineTest::SetUp();
     myEvents.clear();
+
+    gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
+    gameData.startMoney = 1000;
+    gameData.firstSmallBlind = 10;
+    gameData.tableProfile = TableProfile::RandomOpponents;
 }
 
 void BettingRoundsLegacyTest::TearDown()
@@ -40,22 +45,22 @@ bool BettingRoundsLegacyTest::isPlayerStillActive(unsigned id) const
 
 TEST_F(BettingRoundsLegacyTest, StartShouldGoFromPreflopToPostRiverHeadsUp)
 {
-    initializeHandForTesting(2);
+    initializeHandForTesting(2, gameData);
     myHand->start();
 }
 TEST_F(BettingRoundsLegacyTest, StartShouldGoFromPreflopToPostRiver3Players)
 {
-    initializeHandForTesting(3);
+    initializeHandForTesting(3, gameData);
     myHand->start();
 }
 TEST_F(BettingRoundsLegacyTest, StartShouldGoFromPreflopToPostRiver6Players)
 {
-    initializeHandForTesting(6);
+    initializeHandForTesting(6, gameData);
     myHand->start();
 }
 TEST_F(BettingRoundsLegacyTest, PlayersDoNotActAfterFolding)
 {
-    initializeHandForTesting(4);
+    initializeHandForTesting(4, gameData);
     myHand->start();
 
     for (const auto& player : *mySeatsList)
@@ -85,7 +90,7 @@ TEST_F(BettingRoundsLegacyTest, PlayersDoNotActAfterFolding)
 
 TEST_F(BettingRoundsLegacyTest, EachPlayerHasAtLeastOneAction)
 {
-    initializeHandForTesting(4);
+    initializeHandForTesting(4, gameData);
     myHand->start();
 
     size_t totalActionCount = 0;
@@ -102,7 +107,7 @@ TEST_F(BettingRoundsLegacyTest, EachPlayerHasAtLeastOneAction)
 
 TEST_F(BettingRoundsLegacyTest, ShouldRecordAllActionsInHandHistoryChronologically)
 {
-    initializeHandForTesting(3);
+    initializeHandForTesting(3, gameData);
     myHand->start();
 
     const auto& history = myHand->getHandActionHistory();
@@ -123,7 +128,7 @@ TEST_F(BettingRoundsLegacyTest, ShouldRecordAllActionsInHandHistoryChronological
 }
 TEST_F(BettingRoundsLegacyTest, ActionOrderStartsCorrectlyInHeadsUpPreflop)
 {
-    initializeHandForTesting(2);
+    initializeHandForTesting(2, gameData);
     myHand->start();
 
     const auto& history = myHand->getHandActionHistory();
@@ -140,7 +145,7 @@ TEST_F(BettingRoundsLegacyTest, ActionOrderStartsCorrectlyInHeadsUpPreflop)
 
 TEST_F(BettingRoundsLegacyTest, FirstToActPostflopIsLeftOfDealer)
 {
-    initializeHandForTesting(3);
+    initializeHandForTesting(3, gameData);
     myHand->start();
 
     const auto& history = myHand->getHandActionHistory();
@@ -193,7 +198,7 @@ TEST_F(BettingRoundsLegacyTest, FirstToActPostflopIsLeftOfDealer)
 
 TEST_F(BettingRoundsLegacyTest, AllActionsAreFromActivePlayersOnly)
 {
-    initializeHandForTesting(6);
+    initializeHandForTesting(6, gameData);
     myHand->start();
 
     const auto& history = myHand->getHandActionHistory();
@@ -209,7 +214,7 @@ TEST_F(BettingRoundsLegacyTest, AllActionsAreFromActivePlayersOnly)
 
 TEST_F(BettingRoundsLegacyTest, NoTwoConsecutiveActionsBySamePlayerInRound)
 {
-    initializeHandForTesting(3);
+    initializeHandForTesting(3, gameData);
     myHand->start();
 
     const auto& history = myHand->getHandActionHistory();
@@ -225,7 +230,7 @@ TEST_F(BettingRoundsLegacyTest, NoTwoConsecutiveActionsBySamePlayerInRound)
 }
 TEST_F(BettingRoundsLegacyTest, NoPlayerStartsPostFlopRoundWithRaise)
 {
-    initializeHandForTesting(4);
+    initializeHandForTesting(4, gameData);
     myHand->start();
 
     const auto& history = myHand->getHandActionHistory();
@@ -243,7 +248,7 @@ TEST_F(BettingRoundsLegacyTest, NoPlayerStartsPostFlopRoundWithRaise)
 }
 TEST_F(BettingRoundsLegacyTest, NoPlayerStartsPostflopRoundByFolding)
 {
-    initializeHandForTesting(4);
+    initializeHandForTesting(4, gameData);
     myHand->start();
 
     const auto& history = myHand->getHandActionHistory();
@@ -262,7 +267,7 @@ TEST_F(BettingRoundsLegacyTest, NoPlayerStartsPostflopRoundByFolding)
 }
 TEST_F(BettingRoundsLegacyTest, NoPlayerBetsAfterRaise)
 {
-    initializeHandForTesting(4);
+    initializeHandForTesting(4, gameData);
     myHand->start();
 
     const auto& history = myHand->getHandActionHistory();
@@ -285,7 +290,7 @@ TEST_F(BettingRoundsLegacyTest, NoPlayerBetsAfterRaise)
 }
 TEST_F(BettingRoundsLegacyTest, NoPlayerFoldsPostFlopWhenNoBet)
 {
-    initializeHandForTesting(4);
+    initializeHandForTesting(4, gameData);
     myHand->start();
 
     const auto& history = myHand->getHandActionHistory();
@@ -314,7 +319,7 @@ TEST_F(BettingRoundsLegacyTest, NoPlayerFoldsPostFlopWhenNoBet)
 }
 TEST_F(BettingRoundsLegacyTest, NoPlayerCallsWithoutBetOrRaise)
 {
-    initializeHandForTesting(4);
+    initializeHandForTesting(4, gameData);
     myHand->start();
 
     const auto& history = myHand->getHandActionHistory();
@@ -340,7 +345,7 @@ TEST_F(BettingRoundsLegacyTest, NoPlayerCallsWithoutBetOrRaise)
 }
 TEST_F(BettingRoundsLegacyTest, NoConsecutiveRaisesBySamePlayer)
 {
-    initializeHandForTesting(4);
+    initializeHandForTesting(4, gameData);
     myHand->start();
 
     const auto& history = myHand->getHandActionHistory();
@@ -363,7 +368,7 @@ TEST_F(BettingRoundsLegacyTest, NoConsecutiveRaisesBySamePlayer)
 }
 TEST_F(BettingRoundsLegacyTest, NoPlayerChecksAfterBetOrRaise)
 {
-    initializeHandForTesting(4);
+    initializeHandForTesting(4, gameData);
     myHand->start();
 
     const auto& history = myHand->getHandActionHistory();
@@ -385,7 +390,7 @@ TEST_F(BettingRoundsLegacyTest, NoPlayerChecksAfterBetOrRaise)
 }
 TEST_F(BettingRoundsLegacyTest, OnlyOneBetAllowedPerRoundUnlessRaised)
 {
-    initializeHandForTesting(4);
+    initializeHandForTesting(4, gameData);
     myHand->start();
 
     const auto& history = myHand->getHandActionHistory();
@@ -402,7 +407,7 @@ TEST_F(BettingRoundsLegacyTest, OnlyOneBetAllowedPerRoundUnlessRaised)
 }
 TEST_F(BettingRoundsLegacyTest, FoldedPlayerDoesNotReappearInLaterRounds)
 {
-    initializeHandForTesting(4);
+    initializeHandForTesting(4, gameData);
     myHand->start();
 
     std::unordered_map<unsigned, bool> hasFolded;
@@ -424,7 +429,7 @@ TEST_F(BettingRoundsLegacyTest, FoldedPlayerDoesNotReappearInLaterRounds)
 }
 TEST_F(BettingRoundsLegacyTest, NoBettingInPostRiverRound)
 {
-    initializeHandForTesting(4);
+    initializeHandForTesting(4, gameData);
     myHand->start();
 
     const auto& history = myHand->getHandActionHistory();
@@ -443,7 +448,7 @@ TEST_F(BettingRoundsLegacyTest, NoBettingInPostRiverRound)
 }
 TEST_F(BettingRoundsLegacyTest, AllInPlayerDoesNotActAgain)
 {
-    initializeHandForTesting(3);
+    initializeHandForTesting(3, gameData);
     auto p = *mySeatsList->begin();
     p->setCash(0); // Force all-in
     p->setAction(ActionType::Allin);
@@ -462,7 +467,7 @@ TEST_F(BettingRoundsLegacyTest, AllInPlayerDoesNotActAgain)
 }
 TEST_F(BettingRoundsLegacyTest, NoExtraActionsAfterFinalCall)
 {
-    initializeHandForTesting(3);
+    initializeHandForTesting(3, gameData);
     myHand->start();
 
     const auto& history = myHand->getHandActionHistory();
@@ -483,7 +488,7 @@ TEST_F(BettingRoundsLegacyTest, NoExtraActionsAfterFinalCall)
 }
 TEST_F(BettingRoundsLegacyTest, HeadsUpEndsImmediatelyOnFold)
 {
-    initializeHandForTesting(2);
+    initializeHandForTesting(2, gameData);
     (*mySeatsList->begin())->setAction(ActionType::Fold);
     myHand->start();
 

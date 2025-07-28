@@ -21,10 +21,9 @@ PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsig
 void PreflopState::enter(HandFsm& hand)
 {
     myHighestSet = 2 * mySmallBlind;
-
     assignButtons(hand);
-
     setBlinds(hand);
+    resetRaiser();
 
     if (myEvents.onBettingRoundStarted)
         myEvents.onBettingRoundStarted(GameStatePreflop);

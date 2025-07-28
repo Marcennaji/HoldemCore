@@ -6,12 +6,12 @@
 
 #include "core/interfaces/IRandomizer.h"
 
-namespace pkt::infra
+namespace pkt::core
 {
 
-class Randomizer : public pkt::core::IRandomizer
+class DefaultRandomizer : public pkt::core::IRandomizer
 {
   public:
     void getRand(int minValue, int maxValue, unsigned count, int* out) override;
 };
-} // namespace pkt::infra
+} // namespace pkt::core

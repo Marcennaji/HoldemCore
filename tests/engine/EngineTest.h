@@ -33,16 +33,18 @@ class EngineTest : public ::testing::Test
 
     void TearDown() override;
     // Helper function to initialize a Hand object for testing
-    void initializeHandForTesting(size_t activePlayerCount);
-    void initializeHandFsmForTesting(size_t activePlayerCount);
+    void initializeHandForTesting(size_t activePlayerCount, pkt::core::GameData);
+    void initializeHandFsmForTesting(size_t activePlayerCount, pkt::core::GameData);
     void checkPostRiverConditions();
+
+    pkt::core::GameData gameData;
 
   private:
     // Helper function to create a PlayerList with mock players
     void createPlayersLists(size_t playerCount);
-    void initializeHandWithPlayers(size_t activePlayerCount);
+    void initializeHandWithPlayers(size_t activePlayerCount, pkt::core::GameData);
     void createPlayersFsmLists(size_t playerCount);
-    void initializeHandFsmWithPlayers(size_t activePlayerCount);
+    void initializeHandFsmWithPlayers(size_t activePlayerCount, pkt::core::GameData);
 
     const int startDealerPlayerId{0}; // Starting dealer player ID, can be set to any valid player ID
 };
