@@ -57,19 +57,20 @@ HandSimulationStats PsimHandEvaluationEngine::simulateHandEquity(const std::stri
                                                                  const int nbOpponents, float maxOpponentsStrengths)
 {
     SimResults r;
-    const string cards = (hand + board).c_str();
+    const string cards = (hand + " " + board).c_str();
 
     GlobalServices::instance().logger()->verbose("Calling psim for hand equity computing, cards = " + cards +
                                                  ", nbOpponents = " + to_string(nbOpponents) +
                                                  ", maxOpponentsStrengths = " + to_string(maxOpponentsStrengths));
 
     GlobalServices::instance().logger()->verbose("  --> Calling psim for SimulateHand");
-    SimulateHand(cards.c_str(), &r, 0, 1, 200);
+
+    SimulateHand(cards.c_str(), &r, 0, 1, 10000);
 
     float win = r.win; // save the value
 
     GlobalServices::instance().logger()->verbose("  --> Calling psim for SimulateHandMulti");
-    SimulateHandMulti(cards.c_str(), &r, 100, 50, nbOpponents);
+    SimulateHandMulti(cards.c_str(), &r, 2000, 500, nbOpponents);
     r.win = win; // because simulateHandMulti doesn't compute 'win'
     r.winRanged = 0;
 
