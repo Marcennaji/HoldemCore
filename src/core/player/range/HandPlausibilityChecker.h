@@ -2,7 +2,6 @@
 
 #include <core/engine/model/PlayerStatistics.h>
 #include <core/player/strategy/CurrentHandContext.h>
-#include <third_party/psim/psim.hpp>
 
 #include <string>
 

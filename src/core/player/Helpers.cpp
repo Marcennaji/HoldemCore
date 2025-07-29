@@ -1,6 +1,5 @@
 
 #include "Helpers.h"
-#include <third_party/psim/psim.hpp>
 #include "core/engine/CardUtilities.h"
 #include "core/player/Player.h"
 #include "core/player/PlayerFsm.h"

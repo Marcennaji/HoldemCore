@@ -14,7 +14,6 @@
 #include <core/player/range/RangeParser.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include <core/services/GlobalServices.h>
-#include <third_party/psim/psim.hpp>
 #include "Helpers.h"
 
 #include <sstream>

@@ -1,6 +1,5 @@
 
 #include "HandPlausibilityChecker.h"
-#include <third_party/psim/psim.hpp>
 #include "core/player/range/RangeEstimator.h"
 #include "core/player/typedefs.h"
 
