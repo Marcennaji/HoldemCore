@@ -1,5 +1,6 @@
 #include "PsimHandEvaluationEngine.h"
 #include "core/interfaces/IHandEvaluationEngine.h"
+#include "core/services/GlobalServices.h"
 #include "third_party/psim/psim.hpp"
 
 namespace pkt::infra
@@ -10,7 +11,10 @@ using namespace std;
 
 unsigned int PsimHandEvaluationEngine::rankHand(const char* hand)
 {
-    return ::RankHand(hand);
+    GlobalServices::instance().logger()->verbose("Calling psim for hand ranking");
+    unsigned int result = ::RankHand(hand);
+    GlobalServices::instance().logger()->verbose("hand ranking computed, is " + std::to_string(result));
+    return result;
 }
 HandSimulationStats PsimHandEvaluationEngine::convertSimResults(const SimResults& s)
 {
@@ -55,11 +59,17 @@ HandSimulationStats PsimHandEvaluationEngine::simulateHandEquity(const std::stri
     SimResults r;
     const string cards = (hand + board).c_str();
 
-    SimulateHand(cards.c_str(), &r, 0, 1, 0);
+    GlobalServices::instance().logger()->verbose("Calling psim for hand equity computing, cards = " + cards +
+                                                 ", nbOpponents = " + to_string(nbOpponents) +
+                                                 ", maxOpponentsStrengths = " + to_string(maxOpponentsStrengths));
+
+    GlobalServices::instance().logger()->verbose("  --> Calling psim for SimulateHand");
+    SimulateHand(cards.c_str(), &r, 0, 1, 200);
 
     float win = r.win; // save the value
 
-    SimulateHandMulti(cards.c_str(), &r, 200, 100, nbOpponents);
+    GlobalServices::instance().logger()->verbose("  --> Calling psim for SimulateHandMulti");
+    SimulateHandMulti(cards.c_str(), &r, 100, 50, nbOpponents);
     r.win = win; // because simulateHandMulti doesn't compute 'win'
     r.winRanged = 0;
 
@@ -72,16 +82,19 @@ HandSimulationStats PsimHandEvaluationEngine::simulateHandEquity(const std::stri
         r.winRanged = r.win / 4;
     }
     HandSimulationStats stats = convertSimResults(r);
+    GlobalServices::instance().logger()->verbose("hand equity is computed");
     return stats;
 }
 pkt::core::PostFlopAnalysisFlags PsimHandEvaluationEngine::analyzeHand(const std::string& hand,
                                                                        const std::string& board)
 {
+    GlobalServices::instance().logger()->verbose("Calling psim for postflop hand analysis");
+
     PostFlopState r;
-
     GetHandState((hand + board).c_str(), &r);
-
     PostFlopAnalysisFlags flags = convertPostFlopState(r);
+
+    GlobalServices::instance().logger()->verbose("postflop hand analysis is done");
 
     return flags;
 }

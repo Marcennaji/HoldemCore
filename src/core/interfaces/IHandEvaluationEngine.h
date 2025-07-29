@@ -72,7 +72,7 @@ class IHandEvaluationEngine
     virtual unsigned int rankHand(const char* hand) = 0;
 
     virtual HandSimulationStats simulateHandEquity(const std::string& hand, const std::string& board,
-                                                   const int nbOpponents, float maxOpponentsStrengths = 0) = 0;
+                                                   const int nbOpponents, float maxOpponentsStrengths) = 0;
     virtual PostFlopAnalysisFlags analyzeHand(const std::string& hand, const std::string& board) = 0;
 
     /// Gets the name of the evaluation engine

@@ -181,10 +181,10 @@ void BotPlayer::doPreflopAction()
     myCurrentHandActions.m_preflopActions.push_back(myAction);
 
     updatePreflopStatistics();
-    updateCurrentHandContext(GameStatePreflop);
 
     if (myAction != ActionType::Fold)
     {
+        updateCurrentHandContext(GameStatePreflop);
         myRangeEstimator->updateUnplausibleRangesGivenPreflopActions(*myCurrentHandContext);
     }
 }
@@ -252,10 +252,10 @@ void BotPlayer::doFlopAction()
     myCurrentHandActions.m_flopActions.push_back(myAction);
 
     updateFlopStatistics();
-    updateCurrentHandContext(GameStateFlop);
 
     if (myAction != ActionType::Fold)
     {
+        updateCurrentHandContext(GameStateFlop);
         myRangeEstimator->updateUnplausibleRangesGivenFlopActions(*myCurrentHandContext);
     }
 }
@@ -324,10 +324,10 @@ void BotPlayer::doTurnAction()
     myCurrentHandActions.m_turnActions.push_back(myAction);
 
     updateTurnStatistics();
-    updateCurrentHandContext(GameStateTurn);
 
     if (myAction != ActionType::Fold)
     {
+        updateCurrentHandContext(GameStateTurn);
         myRangeEstimator->updateUnplausibleRangesGivenTurnActions(*myCurrentHandContext);
     }
 }
@@ -391,10 +391,10 @@ void BotPlayer::doRiverAction()
     myCurrentHandActions.m_riverActions.push_back(myAction);
 
     updateRiverStatistics();
-    updateCurrentHandContext(GameStateRiver);
 
     if (myAction != ActionType::Fold)
     {
+        updateCurrentHandContext(GameStateRiver);
         myRangeEstimator->updateUnplausibleRangesGivenRiverActions(*myCurrentHandContext);
     }
 }

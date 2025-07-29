@@ -694,10 +694,11 @@ float Player::getM() const
 
 const HandSimulationStats Player::computeHandSimulation() const
 {
+    const int nbOpponents = currentHand->getSeatsList()->size() - 1;
     // evaluate my strength against my opponents's guessed ranges :
     float maxOpponentsStrengths = getMaxOpponentsStrengths();
     return GlobalServices::instance().handEvaluationEngine()->simulateHandEquity(
-        getCardsValueString(), getStringBoard(), maxOpponentsStrengths);
+        getCardsValueString(), getStringBoard(), nbOpponents, maxOpponentsStrengths);
 }
 
 float Player::getMaxOpponentsStrengths() const
@@ -780,7 +781,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 
     auto opponent = *getPlayerListIteratorById(currentHand->getSeatsList(), opponentId);
 
-    const int myRank = GlobalServices::instance().handEvaluationEngine()->rankHand((myCard1 + myCard2 + board).c_str());
+    assert(myHandRanking > 0);
 
     // compute winning hands % against my rank
     int nbWinningHands = 0;
@@ -831,7 +832,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
     for (vector<std::string>::const_iterator i = newRanges.begin(); i != newRanges.end(); i++)
     {
         const int rank = GlobalServices::instance().handEvaluationEngine()->rankHand(((*i) + board).c_str());
-        if (rank > myRank)
+        if (rank > myHandRanking)
         {
             nbWinningHands++;
         }
