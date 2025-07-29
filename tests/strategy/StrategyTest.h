@@ -3,6 +3,8 @@
 #include <gtest/gtest.h>
 #include "DummyPlayer.h"
 
+namespace pkt::test
+{
 class StrategyTest : public ::testing::Test
 {
   protected:
@@ -20,3 +22,5 @@ class StrategyTest : public ::testing::Test
         ctx.smallBlind = 10;
     }
 };
+
+} // namespace pkt::test

@@ -3,6 +3,8 @@
 
 using namespace pkt::core::player;
 
+namespace pkt::test
+{
 class RangeRefinerTest : public ::testing::Test
 {
   protected:
@@ -94,3 +96,5 @@ TEST_F(RangeRefinerTest, SubstractWithDuplicateRanges)
     std::string result = RangeRefiner::deduceRange("AJo,AJo,KQo", "AJo", "AsKs2d");
     EXPECT_EQ(result, "KQo");
 }
+
+} // namespace pkt::test

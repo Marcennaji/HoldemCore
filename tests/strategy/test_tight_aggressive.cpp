@@ -6,6 +6,9 @@
 using namespace pkt::core;
 using namespace pkt::core::player;
 
+namespace pkt::test
+{
+
 class TightAggressiveStrategyTest : public StrategyTest
 {
   public:
@@ -161,3 +164,5 @@ TEST_F(TightAggressiveStrategyTest, NoBluff_DisablesBluffing)
     ctx.myCard2 = "9h";
     EXPECT_EQ(strategy.flopShouldRaise(ctx), 0);
 }
+
+} // namespace pkt::test

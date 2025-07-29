@@ -5,7 +5,8 @@
 #include "infra/eval/PsimHandEvaluationEngine.h"
 
 using namespace pkt::core;
-
+namespace pkt::test
+{
 class CardsValueTest : public ::testing::Test
 {
   protected:
@@ -289,3 +290,4 @@ TEST_F(CardsValueTest, HandsWithTies)
     // Both hands should have the same ranking
     EXPECT_EQ(result1, result2);
 }
+} // namespace pkt::test

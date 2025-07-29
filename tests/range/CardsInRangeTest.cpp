@@ -3,6 +3,8 @@
 
 using namespace pkt::core::player;
 
+namespace pkt::test
+{
 class IsCardsInRangeTests : public ::testing::Test
 {
 };
@@ -94,3 +96,5 @@ TEST(IsCardsInRangeTests, EmptyCards)
     EXPECT_THROW(isCardsInRange("7h", "", "77"), std::invalid_argument); // Empty card2
     EXPECT_THROW(isCardsInRange("", "", "77"), std::invalid_argument);   // Both cards empty
 }
+
+} // namespace pkt::test

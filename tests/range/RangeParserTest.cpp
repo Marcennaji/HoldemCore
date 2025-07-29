@@ -3,6 +3,8 @@
 
 using namespace pkt::core::player;
 
+namespace pkt::test
+{
 class RangeParserTest : public ::testing::Test
 {
 };
@@ -114,3 +116,5 @@ TEST_F(RangeParserTest, ReturnRangeTrue)
     EXPECT_EQ(result[0], "99");
     EXPECT_EQ(result.back(), "AA");
 }
+
+} // namespace pkt::test

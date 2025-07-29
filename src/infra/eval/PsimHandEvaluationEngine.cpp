@@ -65,12 +65,12 @@ HandSimulationStats PsimHandEvaluationEngine::simulateHandEquity(const std::stri
 
     GlobalServices::instance().logger()->verbose("  --> Calling psim for SimulateHand");
 
-    SimulateHand(cards.c_str(), &r, 0, 1, 10000);
+    SimulateHand(cards.c_str(), &r, 0, 1, 5000);
 
     float win = r.win; // save the value
 
     GlobalServices::instance().logger()->verbose("  --> Calling psim for SimulateHandMulti");
-    SimulateHandMulti(cards.c_str(), &r, 2000, 500, nbOpponents);
+    SimulateHandMulti(cards.c_str(), &r, 1000, 300, nbOpponents);
     r.win = win; // because simulateHandMulti doesn't compute 'win'
     r.winRanged = 0;
 
