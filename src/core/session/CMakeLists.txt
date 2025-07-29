@@ -12,10 +12,6 @@ target_include_directories(core_session
 target_link_libraries(core_session
     PUBLIC
     engine
-    infra
     player
     service
-    psim
-    sqlite
-    tiny
 )

@@ -1,7 +1,9 @@
 #pragma once
 #include <string>
-#include <third_party/psim/psim.hpp>
 #include "core/interfaces/IHandEvaluationEngine.h"
+
+struct SimResults;
+struct PostFlopState;
 
 namespace pkt::infra
 {

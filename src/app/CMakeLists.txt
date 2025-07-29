@@ -11,6 +11,7 @@ target_include_directories(PokerTraining PUBLIC
 
 target_link_libraries(PokerTraining
     core_session
+    infra
     qtwidgets
     Qt6::Widgets
     Qt6::Core

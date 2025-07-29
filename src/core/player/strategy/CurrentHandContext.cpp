@@ -50,7 +50,7 @@ void CurrentHandContext::reset()
     myFlopIsAggressor = false;
     myTurnIsAggressor = false;
     myRiverIsAggressor = false;
-    myPostFlopState = PostFlopState{};
+    myPostFlopAnalysisFlags = PostFlopAnalysisFlags{};
 
     myHandSimulation = {
         0.0f, // win

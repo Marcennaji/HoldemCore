@@ -578,17 +578,12 @@ void Player::loadStatistics()
     }
 }
 
-const PostFlopState Player::getPostFlopState() const
+const PostFlopAnalysisFlags Player::getPostFlopAnalysisFlags() const
 {
-
     std::string stringHand = getCardsValueString();
     std::string stringBoard = getStringBoard();
 
-    PostFlopState r;
-
-    getHandState((stringHand + stringBoard).c_str(), &r);
-
-    return r;
+    return GlobalServices::instance().handEvaluationEngine()->analyzeHand(getCardsValueString(), getStringBoard());
 }
 bool Player::checkIfINeedToShowCards() const
 {
@@ -697,56 +692,12 @@ float Player::getM() const
     }
 }
 
-const SimResults Player::getHandSimulation(bool logResult) const
+const HandSimulationStats Player::computeHandSimulation() const
 {
-
-    SimResults r;
-    const string cards = (getCardsValueString() + getStringBoard()).c_str();
-
-    simulateHand(cards.c_str(), &r, 0, 1, 0);
-
-    float win = r.win; // save the value
-
-    const int nbOpponents = std::max(1, (int) currentHand->getRunningPlayersList()->size() -
-                                            1); // note that allin opponents are not "running" any more
-    simulateHandMulti(cards.c_str(), &r, 200, 100, nbOpponents);
-    r.win = win; // because simulateHandMulti doesn't compute 'win'
-
     // evaluate my strength against my opponents's guessed ranges :
     float maxOpponentsStrengths = getMaxOpponentsStrengths();
-
-    r.winRanged = 1 - maxOpponentsStrengths;
-
-    if (logResult)
-    {
-        std::ostringstream logMessage;
-        logMessage << "\nPlayer " << myName << " (id = " << myID << "):\n"
-                   << "\tsimulation with " << cards << " : " << std::endl
-                   << "\t\twin at showdown is " << r.winSd << std::endl
-                   << "\t\ttie at showdown is " << r.tieSd << std::endl
-                   << "\t\twin now (against random hands) is " << r.win << std::endl
-                   << "\t\twin now (against ranged hands) is " << r.winRanged << std::endl;
-
-        if (r.winRanged == 0)
-        {
-            logMessage << "\n"
-                       << "\t\tr.winRanged = 1 - " << maxOpponentsStrengths
-                       << " = 0 : setting value to r.win / 4 = " << r.win / 4 << std::endl;
-        }
-
-        if (getPotOdd() > 0)
-        {
-            logMessage << "\t\tpot odd is " << getPotOdd() << std::endl;
-        }
-
-        GlobalServices::instance().logger()->verbose(logMessage.str());
-    }
-    if (r.winRanged == 0)
-    {
-        r.winRanged = r.win / 4;
-    }
-
-    return r;
+    return GlobalServices::instance().handEvaluationEngine()->simulateHandEquity(
+        getCardsValueString(), getStringBoard(), maxOpponentsStrengths);
 }
 
 float Player::getMaxOpponentsStrengths() const
@@ -829,7 +780,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 
     auto opponent = *getPlayerListIteratorById(currentHand->getSeatsList(), opponentId);
 
-    const int myRank = rankHand((myCard1 + myCard2 + board).c_str());
+    const int myRank = GlobalServices::instance().handEvaluationEngine()->rankHand((myCard1 + myCard2 + board).c_str());
 
     // compute winning hands % against my rank
     int nbWinningHands = 0;
@@ -854,8 +805,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
         string s1 = (*i).substr(0, 2);
         string s2 = (*i).substr(2, 4);
 
-        // delete hands that can't exist, given the board (we prefer to filter it here, instead of removing them from
-        // the estimated range, for a better GUI readablity (avoid to list numerous particular hands, via the GUI)
+        // delete hands that can't exist, given the board
         if (board.find(s1) != string::npos || board.find(s2) != string::npos)
         {
             continue;
@@ -880,7 +830,8 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 
     for (vector<std::string>::const_iterator i = newRanges.begin(); i != newRanges.end(); i++)
     {
-        if (rankHand(((*i) + board).c_str()) > myRank)
+        const int rank = GlobalServices::instance().handEvaluationEngine()->rankHand(((*i) + board).c_str());
+        if (rank > myRank)
         {
             nbWinningHands++;
         }
@@ -1149,10 +1100,10 @@ void Player::updateCurrentHandContext(const GameState state)
     // player specific, hidden from the opponents :
     myCurrentHandContext->myCanBluff = canBluff(state);
     myCurrentHandContext->myPreflopCallingRange = calculatePreflopCallingRange(*myCurrentHandContext);
-    myCurrentHandContext->myHandSimulation = getHandSimulation();
+    myCurrentHandContext->myHandSimulation = computeHandSimulation();
     myCurrentHandContext->myCard1 = myCard1;
     myCurrentHandContext->myCard2 = myCard2;
-    myCurrentHandContext->myPostFlopState = getPostFlopState();
+    myCurrentHandContext->myPostFlopAnalysisFlags = getPostFlopAnalysisFlags();
 }
 
 float Player::calculatePreflopCallingRange(CurrentHandContext& context) const

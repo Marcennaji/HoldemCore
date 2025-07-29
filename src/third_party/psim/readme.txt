@@ -15,23 +15,23 @@ Here are usage examples to figure out what your odds of winning a showdown are f
 [code]
 //C code:
 SimResults r;
-simulateHand("As 9d     8c 2h Ks", r);
+SimulateHand("As 9d     8c 2h Ks", r);
 std::cout << "This hand will beat " << (r.winSd * 100) << "% of opponents at showdown.\n";
 
 //Java code:
 SimResults r = new SimResults();
-PSim.simulateHand("As 9d     8c 2h Ks", r);
+PSim.SimulateHand("As 9d     8c 2h Ks", r);
 System.out.println("This hand will beat " + (r.winSd * 100) + "% of opponents at showdown.");
 
 ;AutoIt3 code - calling psim.dll
 $simResultsStruct = "float win; float tie; float lose; float winSd; float tieSd; float loseSd; float d94; float d90; int evaluations"
 $simResults = DllStructCreate($simResultsStruct)
-$result = DllCall("psim.dll", "none", "simulateHand", "str", "As 9d     8c 2h Ks", "ptr", DllStructGetPtr($simResults), "float", 0, "float", 1, "uint", 0)
+$result = DllCall("psim.dll", "none", "SimulateHand", "str", "As 9d     8c 2h Ks", "ptr", DllStructGetPtr($simResults), "float", 0, "float", 1, "uint", 0)
 MsgBox(0, "Simulation Results", "This hand will beat " & DllStructGetData($simResults, "winSd") * 100 & "% of opponents at showdown.")
 [/code]
 Tell me that's not simple! As you can see, it interfaces all hands as text (hole cards, the board cards if any, all separated by spaces or tabs. This was natural for me, because I read dealer chat. If you don't like the test interface, it'd be pretty easy to change to the poker-eval hand interface.
 
-Ok, so to get started, unzip and take a look at the psim.hpp file. It has most structures and functions commented pretty well. The SimResults structure and the simulateHand() function are by far the two most important areas. Then hope on over to the java directory and fire up run.bat (you'll need java installed for this). Be aware that this'll run a benchmark, and may take a minute or two. Then, if you are a java programmer take a look at PSimTest.java. Everything you need to get started is there. If you use this for a bot you may want to rename the DLL (if you do change PSim.java line 28 too).
+Ok, so to get started, unzip and take a look at the psim.hpp file. It has most structures and functions commented pretty well. The SimResults structure and the SimulateHand() function are by far the two most important areas. Then hope on over to the java directory and fire up run.bat (you'll need java installed for this). Be aware that this'll run a benchmark, and may take a minute or two. Then, if you are a java programmer take a look at PSimTest.java. Everything you need to get started is there. If you use this for a bot you may want to rename the DLL (if you do change PSim.java line 28 too).
 
 For C++ programmers I would recommend compiling the source as a static library. Note that you will have to link against the poker-eval code to do this. Just include psim.hpp in your program.
 

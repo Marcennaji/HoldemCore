@@ -1,6 +1,4 @@
-// PokerTraining — Texas Hold'em simulator
-// Copyright (c) 2025 Marc Ennaji
-// Licensed under the MIT License — see LICENSE file for details.
+
 #include "simulate.hpp"
 #include "simDefs.hpp"
 
@@ -8,7 +6,6 @@
 
 #include <list>
 #include <sstream>
-#include <string>
 
 namespace Simulate
 {
@@ -48,7 +45,7 @@ unsigned int BoardsToEnumerate(unsigned int cardsToDraw)
     }
 }
 
-void getHandState(const Hand& shand, PostFlopState* state)
+void GetHandState(const Hand& shand, PostFlopState* state)
 {
     ZeroPostFlopState(state);
 
@@ -272,7 +269,7 @@ void getHandState(const Hand& shand, PostFlopState* state)
     }
 }
 
-const std::string getHandStateBrief(const PostFlopState* state)
+const std::string GetHandStateBrief(const PostFlopState* state)
 {
     static std::ostringstream out;
 
@@ -364,7 +361,7 @@ const std::string getHandStateBrief(const PostFlopState* state)
     return out.str();
 }
 
-unsigned int rankHand(const Hand& shand)
+unsigned int RankHand(const Hand& shand)
 {
     CardMask e; // Used to hold a hand we are evaluating.
 
@@ -373,13 +370,13 @@ unsigned int rankHand(const Hand& shand)
     return Hand_EVAL_N(e, shand.size);
 }
 
-void simulateHand(const Hand& shand, SimResults* results, float lowRange, float highRange, unsigned int boards)
+void SimulateHand(const Hand& shand, SimResults* results, float lowRange, float highRange, unsigned int boards)
 {
     SimCurrent(shand, results, lowRange, highRange);
-    // SimSd(shand, results, lowRange, highRange, boards);
+    SimSd(shand, results, lowRange, highRange, boards);
 }
 
-void simulateHandMulti(const Hand& shand, SimResults* results, unsigned int boards, unsigned int hands,
+void SimulateHandMulti(const Hand& shand, SimResults* results, unsigned int boards, unsigned int hands,
                        unsigned int numOpponents)
 {
     // TODO add the current state. Will this really get done? Do I care?
@@ -615,13 +612,15 @@ void SimSdMulti(const Hand& shand, SimResults* results, size_t uboards, size_t h
 
 CardMask MakeCard(const char* s)
 {
-    std::string cs = s;
+    char cs[] = "00";
+
+    std::strcpy(cs, s);
 
     int c;
     CardMask hand;
     CardMask_RESET(hand);
 
-    StdDeck_stringToCard(&cs[0], &c);
+    StdDeck_stringToCard(cs, &c);
     StdDeck_CardMask_SET(hand, c);
 
     return hand;

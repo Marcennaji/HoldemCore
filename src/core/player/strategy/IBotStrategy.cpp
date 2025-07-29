@@ -80,30 +80,31 @@ bool IBotStrategy::shouldPotControl(CurrentHandContext& ctx)
 
     if (ctx.pot >= potThreshold)
     {
-        if (ctx.myPostFlopState.IsPocketPair && !ctx.myPostFlopState.IsOverPair)
+        if (ctx.myPostFlopAnalysisFlags.isPocketPair && !ctx.myPostFlopAnalysisFlags.isOverPair)
         {
             potControl = true;
         }
 
-        if (ctx.myPostFlopState.IsFullHousePossible &&
-            !(ctx.myPostFlopState.IsTrips || ctx.myPostFlopState.IsFlush || ctx.myPostFlopState.IsFullHouse ||
-              ctx.myPostFlopState.IsQuads))
+        if (ctx.myPostFlopAnalysisFlags.isFullHousePossible &&
+            !(ctx.myPostFlopAnalysisFlags.isTrips || ctx.myPostFlopAnalysisFlags.isFlush ||
+              ctx.myPostFlopAnalysisFlags.isFullHouse || ctx.myPostFlopAnalysisFlags.isQuads))
         {
             potControl = true;
         }
 
         if (ctx.gameState == GameStateFlop)
         {
-            if ((ctx.myPostFlopState.IsOverPair || ctx.myPostFlopState.IsTopPair) && ctx.mySet > bigBlind * 20)
+            if ((ctx.myPostFlopAnalysisFlags.isOverPair || ctx.myPostFlopAnalysisFlags.isTopPair) &&
+                ctx.mySet > bigBlind * 20)
             {
                 potControl = true;
             }
         }
         else if (ctx.gameState == GameStateTurn)
         {
-            if (ctx.myPostFlopState.IsOverPair ||
-                (ctx.myPostFlopState.IsTwoPair && !ctx.myPostFlopState.IsFullHousePossible) ||
-                (ctx.myPostFlopState.IsTrips && ctx.mySet > bigBlind * 60))
+            if (ctx.myPostFlopAnalysisFlags.isOverPair ||
+                (ctx.myPostFlopAnalysisFlags.isTwoPair && !ctx.myPostFlopAnalysisFlags.isFullHousePossible) ||
+                (ctx.myPostFlopAnalysisFlags.isTrips && ctx.mySet > bigBlind * 60))
             {
                 potControl = true;
             }

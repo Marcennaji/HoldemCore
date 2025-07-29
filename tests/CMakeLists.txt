@@ -33,7 +33,7 @@ target_link_libraries(core_tests
     player
     engine
     service
-    psim
+    infra
     gtest_main
 )
 

@@ -180,10 +180,10 @@ bool isExactHand(const string& card1, const string& card2, const char* range)
     return false;
 }
 // returns a % chance, for a winning draw
-const int getDrawingProbability(const PostFlopState& postFlopState)
+const int getDrawingProbability(const PostFlopAnalysisFlags& postFlopAnalysis)
 {
 
-    if (!postFlopState.UsesFirst && !postFlopState.UsesSecond)
+    if (!postFlopAnalysis.usesFirst && !postFlopAnalysis.usesSecond)
     {
         return 0;
     }
@@ -192,13 +192,13 @@ const int getDrawingProbability(const PostFlopState& postFlopState)
 
     // do not count outs for straight or flush, is the board is paired
 
-    if (!postFlopState.IsFullHousePossible)
+    if (!postFlopAnalysis.isFullHousePossible)
     {
-        outs = postFlopState.StraightOuts + postFlopState.FlushOuts + postFlopState.BetterOuts;
+        outs = postFlopAnalysis.straightOuts + postFlopAnalysis.flushOuts + postFlopAnalysis.betterOuts;
     }
     else
     {
-        outs = postFlopState.BetterOuts;
+        outs = postFlopAnalysis.betterOuts;
     }
 
     if (outs == 0)
@@ -232,7 +232,7 @@ const int getDrawingProbability(const PostFlopState& postFlopState)
     return outsOddsOneCard[outs];
 }
 
-const int getImplicitOdd(const PostFlopState& state)
+const int getImplicitOdd(const PostFlopAnalysisFlags& state)
 {
 
     // TODO compute implicit odd according to opponent's profiles, stack sizes and actions in this hand
@@ -242,7 +242,7 @@ const int getImplicitOdd(const PostFlopState& state)
     return implicitOdd;
 }
 
-bool isDrawingProbOk(const PostFlopState& postFlopState, const int potOdd)
+bool isDrawingProbOk(const PostFlopAnalysisFlags& postFlopState, const int potOdd)
 {
 
     int implicitOdd = getImplicitOdd(postFlopState);

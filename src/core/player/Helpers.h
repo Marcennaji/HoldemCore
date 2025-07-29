@@ -12,7 +12,7 @@
 #include <memory>
 #include <string>
 
-struct PostFlopState;
+struct PostFlopAnalysisFlags;
 
 namespace pkt::core::player
 {
@@ -21,9 +21,9 @@ class Player;
 void shufflePlayers(std::list<std::shared_ptr<Player>>& players, unsigned humanId = 0);
 bool isCardsInRange(std::string card1, std::string card2, std::string range);
 std::string getFakeCard(char c);
-const int getDrawingProbability(const PostFlopState& state);
-bool isDrawingProbOk(const PostFlopState&, const int potOdd);
-const int getImplicitOdd(const PostFlopState& state);
+const int getDrawingProbability(const PostFlopAnalysisFlags& state);
+bool isDrawingProbOk(const PostFlopAnalysisFlags&, const int potOdd);
+const int getImplicitOdd(const PostFlopAnalysisFlags& state);
 int getBoardCardsHigherThan(std::string stringBoard, std::string card);
 // Ensures the first card is the highest based on card ordering
 void ensureHighestCard(std::string& card1, std::string& card2);

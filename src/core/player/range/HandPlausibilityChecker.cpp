@@ -6,7 +6,8 @@
 namespace pkt::core::player
 {
 
-bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(const PostFlopAnalysisFlags& testedHand,
+                                                              CurrentHandContext& ctx)
 {
 
     const int nbPlayers = ctx.nbPlayers;
@@ -18,36 +19,36 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(const PostFlopStat
     if (bHavePosition &&
         !(flop.getAgressionFactor() < 2 && flop.getAgressionFrequency() < 30 &&
           flop.m_hands > MIN_HANDS_STATISTICS_ACCURATE) &&
-        (testedHand.UsesFirst || testedHand.UsesSecond))
+        (testedHand.usesFirst || testedHand.usesSecond))
     {
 
         // woudn't slow play a medium hand on a dangerous board
-        if (!testedHand.IsFullHousePossible &&
-            ((testedHand.IsMiddlePair && !testedHand.IsFullHousePossible && ctx.nbRunningPlayers < 4) ||
-             testedHand.IsTopPair || testedHand.IsOverPair ||
-             (testedHand.IsTwoPair && !testedHand.IsFullHousePossible)) &&
-            testedHand.IsFlushDrawPossible && testedHand.IsStraightDrawPossible)
+        if (!testedHand.isFullHousePossible &&
+            ((testedHand.isMiddlePair && !testedHand.isFullHousePossible && ctx.nbRunningPlayers < 4) ||
+             testedHand.isTopPair || testedHand.isOverPair ||
+             (testedHand.isTwoPair && !testedHand.isFullHousePossible)) &&
+            testedHand.isFlushDrawPossible && testedHand.isStraightDrawPossible)
         {
             return true;
         }
 
         // on a non-paired board, he would'nt slow play a straigth, a set or 2 pairs, if a flush draw is possible
-        if (!testedHand.IsFullHousePossible && (testedHand.IsTrips || testedHand.IsStraight || testedHand.IsTwoPair) &&
-            testedHand.IsFlushDrawPossible)
+        if (!testedHand.isFullHousePossible && (testedHand.isTrips || testedHand.isStraight || testedHand.isTwoPair) &&
+            testedHand.isFlushDrawPossible)
         {
             return true;
         }
 
         // wouldn't be passive with a decent hand, on position, if more than 1 opponent
-        if (!testedHand.IsFullHousePossible &&
-            (testedHand.IsTopPair || testedHand.IsOverPair || testedHand.IsTwoPair || testedHand.IsTrips) &&
+        if (!testedHand.isFullHousePossible &&
+            (testedHand.isTopPair || testedHand.isOverPair || testedHand.isTwoPair || testedHand.isTrips) &&
             ctx.nbRunningPlayers > 2)
         {
             return true;
         }
 
         // on a paired board, he wouldn't check if he has a pocket overpair
-        if (testedHand.IsFullHousePossible && testedHand.IsOverPair)
+        if (testedHand.isFullHousePossible && testedHand.isOverPair)
         {
             return true;
         }
@@ -55,7 +56,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(const PostFlopStat
     return false;
 }
 
-bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopAnalysisFlags& testedHand,
+                                                            CurrentHandContext& ctx)
 {
 
     const int nbPlayers = ctx.nbPlayers;
@@ -73,7 +75,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopState&
         return false; // he is (temporarily ?) very agressive, so don't make any guess
     }
 
-    if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    if (!testedHand.usesFirst && !testedHand.usesSecond)
     {
         return true;
     }
@@ -83,30 +85,30 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopState&
     if (!bHavePosition && !ctx.myPreflopIsAggressor)
     {
 
-        if (testedHand.IsOverCards || testedHand.StraightOuts >= 8 || testedHand.FlushOuts >= 8)
+        if (testedHand.isOverCards || testedHand.straightOuts >= 8 || testedHand.flushOuts >= 8)
         {
             return (ctx.nbRunningPlayers > 2 ? true : false);
         }
 
-        if (!((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight ||
-              testedHand.IsFlush || testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads ||
-              testedHand.IsStFlush))
+        if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight ||
+              testedHand.isFlush || testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads ||
+              testedHand.isStFlush))
         {
 
-            if (testedHand.IsNoPair)
+            if (testedHand.isNoPair)
             {
                 return true;
             }
 
-            if (testedHand.IsOnePair)
+            if (testedHand.isOnePair)
             {
 
-                if (testedHand.IsFullHousePossible)
+                if (testedHand.isFullHousePossible)
                 {
                     return true;
                 }
 
-                if (!testedHand.IsMiddlePair && !testedHand.IsTopPair && !testedHand.IsOverPair)
+                if (!testedHand.isMiddlePair && !testedHand.isTopPair && !testedHand.isOverPair)
                 {
                     return true;
                 }
@@ -118,30 +120,30 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopState&
     if (bHavePosition && ctx.nbRunningPlayers > 2)
     {
 
-        if (testedHand.IsOverCards || testedHand.StraightOuts >= 8 || testedHand.FlushOuts >= 8)
+        if (testedHand.isOverCards || testedHand.straightOuts >= 8 || testedHand.flushOuts >= 8)
         {
             return true;
         }
 
-        if (!((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight ||
-              testedHand.IsFlush || testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads ||
-              testedHand.IsStFlush))
+        if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight ||
+              testedHand.isFlush || testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads ||
+              testedHand.isStFlush))
         {
 
-            if (testedHand.IsNoPair)
+            if (testedHand.isNoPair)
             {
                 return true;
             }
 
-            if (testedHand.IsOnePair)
+            if (testedHand.isOnePair)
             {
 
-                if (testedHand.IsFullHousePossible)
+                if (testedHand.isFullHousePossible)
                 {
                     return true;
                 }
 
-                if (!testedHand.IsMiddlePair && !testedHand.IsTopPair && !testedHand.IsOverPair)
+                if (!testedHand.isMiddlePair && !testedHand.isTopPair && !testedHand.isOverPair)
                 {
                     return true;
                 }
@@ -153,25 +155,25 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopState&
     if (ctx.nbChecks == 0 && ctx.nbRunningPlayers > 2)
     {
 
-        if (!((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight ||
-              testedHand.IsFlush || testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads ||
-              testedHand.IsStFlush))
+        if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight ||
+              testedHand.isFlush || testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads ||
+              testedHand.isStFlush))
         {
 
-            if (testedHand.IsNoPair)
+            if (testedHand.isNoPair)
             {
                 return true;
             }
 
-            if (testedHand.IsOnePair)
+            if (testedHand.isOnePair)
             {
 
-                if (testedHand.IsFullHousePossible)
+                if (testedHand.isFullHousePossible)
                 {
                     return true;
                 }
 
-                if (!testedHand.IsTopPair && !testedHand.IsOverPair)
+                if (!testedHand.isTopPair && !testedHand.isOverPair)
                 {
                     return true;
                 }
@@ -181,7 +183,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopState&
     return false;
 }
 
-bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(const PostFlopAnalysisFlags& testedHand,
+                                                             CurrentHandContext& ctx)
 {
 
     const int nbPlayers = ctx.nbPlayers;
@@ -198,7 +201,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(const PostFlopState
         return false; // he is (temporarily ?) very agressive, so don't make any guess
     }
 
-    if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    if (!testedHand.usesFirst && !testedHand.usesSecond)
     {
         return true;
     }
@@ -208,29 +211,29 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(const PostFlopState
           ctx.myStatistics.getRiverStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE))
     {
 
-        if (!((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight ||
-              testedHand.IsFlush || testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads ||
-              testedHand.IsStFlush || testedHand.IsOverCards || testedHand.FlushOuts >= 8 ||
-              testedHand.StraightOuts >= 8))
+        if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight ||
+              testedHand.isFlush || testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads ||
+              testedHand.isStFlush || testedHand.isOverCards || testedHand.flushOuts >= 8 ||
+              testedHand.straightOuts >= 8))
         {
 
-            if (testedHand.IsNoPair)
+            if (testedHand.isNoPair)
             {
                 return true;
             }
 
-            if (ctx.flopBetsOrRaisesNumber > 1 && testedHand.IsOnePair && !testedHand.IsTopPair &&
-                !testedHand.IsOverPair)
+            if (ctx.flopBetsOrRaisesNumber > 1 && testedHand.isOnePair && !testedHand.isTopPair &&
+                !testedHand.isOverPair)
             {
                 return true;
             }
 
-            if (ctx.flopBetsOrRaisesNumber > 2 && (testedHand.IsOnePair || testedHand.IsOverCards))
+            if (ctx.flopBetsOrRaisesNumber > 2 && (testedHand.isOnePair || testedHand.isOverCards))
             {
                 return true;
             }
 
-            if (ctx.nbRunningPlayers > 2 && testedHand.IsOnePair && !testedHand.IsTopPair && !testedHand.IsOverPair)
+            if (ctx.nbRunningPlayers > 2 && testedHand.isOnePair && !testedHand.isTopPair && !testedHand.isOverPair)
             {
                 return true;
             }
@@ -239,7 +242,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(const PostFlopState
     return false;
 }
 
-bool HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopAnalysisFlags& testedHand,
+                                                              CurrentHandContext& ctx)
 {
 
     const int nbPlayers = ctx.nbPlayers;
@@ -257,7 +261,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopStat
         return false; // he is (temporarily ?) very agressive, so don't make any guess
     }
 
-    if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    if (!testedHand.usesFirst && !testedHand.usesSecond)
     {
         return true;
     }
@@ -266,24 +270,24 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopStat
     if (ctx.nbChecks == 1)
     {
 
-        if ((testedHand.IsOverCards || testedHand.FlushOuts >= 8 || testedHand.StraightOuts >= 8) &&
+        if ((testedHand.isOverCards || testedHand.flushOuts >= 8 || testedHand.straightOuts >= 8) &&
             ctx.nbRunningPlayers > 2)
         {
             return true;
         }
 
-        if (!((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight ||
-              testedHand.IsFlush || testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads ||
-              testedHand.IsStFlush))
+        if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight ||
+              testedHand.isFlush || testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads ||
+              testedHand.isStFlush))
         {
 
-            if (testedHand.IsNoPair)
+            if (testedHand.isNoPair)
             {
                 return true;
             }
 
-            if (testedHand.IsOnePair && !testedHand.IsFullHousePossible && !testedHand.IsTopPair &&
-                !testedHand.IsOverPair)
+            if (testedHand.isOnePair && !testedHand.isFullHousePossible && !testedHand.isTopPair &&
+                !testedHand.isOverPair)
             {
                 return true;
             }
@@ -294,28 +298,28 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopStat
     if (ctx.nbRaises > 0)
     {
 
-        if (!((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight ||
-              testedHand.IsFlush || testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads ||
-              testedHand.IsStFlush))
+        if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight ||
+              testedHand.isFlush || testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads ||
+              testedHand.isStFlush))
         {
 
-            if (testedHand.IsNoPair || (testedHand.IsOnePair && testedHand.IsFullHousePossible))
+            if (testedHand.isNoPair || (testedHand.isOnePair && testedHand.isFullHousePossible))
             {
                 return true;
             }
 
-            if (testedHand.IsOnePair && !testedHand.IsFullHousePossible &&
-                !testedHand.IsTopPair & !testedHand.IsOverPair)
+            if (testedHand.isOnePair && !testedHand.isFullHousePossible &&
+                !testedHand.isTopPair & !testedHand.isOverPair)
             {
                 return true;
             }
 
-            if (ctx.flopBetsOrRaisesNumber > 3 && (testedHand.IsOnePair))
+            if (ctx.flopBetsOrRaisesNumber > 3 && (testedHand.isOnePair))
             {
                 return true;
             }
 
-            if (ctx.flopBetsOrRaisesNumber > 4 && (testedHand.IsTwoPair))
+            if (ctx.flopBetsOrRaisesNumber > 4 && (testedHand.isTwoPair))
             {
                 return true;
             }
@@ -325,7 +329,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopStat
     return false;
 }
 
-bool HandPlausibilityChecker::isUnplausibleHandGivenFlopAllin(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenFlopAllin(const PostFlopAnalysisFlags& testedHand,
+                                                              CurrentHandContext& ctx)
 {
 
     const int nbPlayers = ctx.nbPlayers;
@@ -348,31 +353,31 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopAllin(const PostFlopStat
         return false; // he is (temporarily ?) very agressive, so don't make any guess
     }
 
-    if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    if (!testedHand.usesFirst && !testedHand.usesSecond)
     {
         return true;
     }
 
-    if (!((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight || testedHand.IsFlush ||
-          testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads || testedHand.IsStFlush))
+    if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight || testedHand.isFlush ||
+          testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads || testedHand.isStFlush))
     {
 
-        if (testedHand.IsNoPair || (testedHand.IsOnePair && testedHand.IsFullHousePossible))
+        if (testedHand.isNoPair || (testedHand.isOnePair && testedHand.isFullHousePossible))
         {
             return true;
         }
 
-        if (testedHand.IsOnePair && !testedHand.IsFullHousePossible && !testedHand.IsTopPair & !testedHand.IsOverPair)
+        if (testedHand.isOnePair && !testedHand.isFullHousePossible && !testedHand.isTopPair & !testedHand.isOverPair)
         {
             return true;
         }
 
-        if (ctx.flopBetsOrRaisesNumber > 3 && (testedHand.IsOnePair))
+        if (ctx.flopBetsOrRaisesNumber > 3 && (testedHand.isOnePair))
         {
             return true;
         }
 
-        if (ctx.flopBetsOrRaisesNumber > 4 && (testedHand.IsTwoPair))
+        if (ctx.flopBetsOrRaisesNumber > 4 && (testedHand.isTwoPair))
         {
             return true;
         }
@@ -380,7 +385,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopAllin(const PostFlopStat
     return false;
 }
 
-bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCheck(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCheck(const PostFlopAnalysisFlags& testedHand,
+                                                              CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.myHavePosition;
@@ -391,23 +397,23 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCheck(const PostFlopStat
                            turn.m_hands > MIN_HANDS_STATISTICS_ACCURATE))
     {
 
-        if (testedHand.IsPocketPair && testedHand.IsOverPair)
+        if (testedHand.isPocketPair && testedHand.isOverPair)
         {
             return true;
         }
 
         // woudn't slow play a medium hand on a dangerous board, if there was no action on flop
-        if (((testedHand.UsesFirst || testedHand.UsesSecond) && ctx.flopBetsOrRaisesNumber == 0 &&
-                 testedHand.IsTopPair ||
-             (testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsTrips) &&
-            testedHand.IsFlushDrawPossible)
+        if (((testedHand.usesFirst || testedHand.usesSecond) && ctx.flopBetsOrRaisesNumber == 0 &&
+                 testedHand.isTopPair ||
+             (testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isTrips) &&
+            testedHand.isFlushDrawPossible)
         {
             return true;
         }
 
         // wouldn't be passive with a decent hand, on position, if more than 1 opponent
-        if (((testedHand.UsesFirst || testedHand.UsesSecond) &&
-             ((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsTrips)) &&
+        if (((testedHand.usesFirst || testedHand.usesSecond) &&
+             ((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isTrips)) &&
             ctx.nbRunningPlayers > 2)
         {
             return true;
@@ -417,7 +423,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCheck(const PostFlopStat
     return false;
 }
 
-bool HandPlausibilityChecker::isUnplausibleHandGivenTurnBet(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenTurnBet(const PostFlopAnalysisFlags& testedHand,
+                                                            CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.myHavePosition;
@@ -434,7 +441,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnBet(const PostFlopState&
         return false; // he is (temporarily ?) very agressive, so don't make any guess
     }
 
-    if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    if (!testedHand.usesFirst && !testedHand.usesSecond)
     {
         return true;
     }
@@ -443,24 +450,24 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnBet(const PostFlopState&
     if (!bHavePosition && !ctx.myFlopIsAggressor && ctx.flopBetsOrRaisesNumber > 0)
     {
 
-        if ((testedHand.IsOverCards || testedHand.FlushOuts >= 8 || testedHand.StraightOuts >= 8) &&
+        if ((testedHand.isOverCards || testedHand.flushOuts >= 8 || testedHand.straightOuts >= 8) &&
             ctx.nbRunningPlayers > 2)
         {
             return true;
         }
 
-        if (!((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight ||
-              testedHand.IsFlush || testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads ||
-              testedHand.IsStFlush))
+        if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight ||
+              testedHand.isFlush || testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads ||
+              testedHand.isStFlush))
         {
 
-            if (testedHand.IsNoPair)
+            if (testedHand.isNoPair)
             {
                 return true;
             }
 
-            if (testedHand.IsOnePair && !testedHand.IsTopPair && !testedHand.IsOverPair &&
-                !testedHand.IsFullHousePossible)
+            if (testedHand.isOnePair && !testedHand.isTopPair && !testedHand.isOverPair &&
+                !testedHand.isFullHousePossible)
             {
                 return true;
             }
@@ -470,7 +477,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnBet(const PostFlopState&
     return false;
 }
 
-bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopAnalysisFlags& testedHand,
+                                                             CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.myHavePosition;
@@ -486,7 +494,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopState
         return false; // he is (temporarily ?) very loose, so don't make any guess
     }
 
-    if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    if (!testedHand.usesFirst && !testedHand.usesSecond)
     {
         return true;
     }
@@ -498,23 +506,23 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopState
           ctx.myStatistics.getRiverStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE))
     {
 
-        if (!((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight ||
-              testedHand.IsFlush || testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads ||
-              testedHand.IsStFlush || testedHand.FlushOuts >= 8 || testedHand.StraightOuts >= 8))
+        if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight ||
+              testedHand.isFlush || testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads ||
+              testedHand.isStFlush || testedHand.flushOuts >= 8 || testedHand.straightOuts >= 8))
         {
 
-            if (testedHand.IsNoPair || (testedHand.IsOnePair && testedHand.IsFullHousePossible))
+            if (testedHand.isNoPair || (testedHand.isOnePair && testedHand.isFullHousePossible))
             {
                 return true;
             }
 
-            if (testedHand.IsOnePair && !testedHand.IsTopPair && !testedHand.IsOverPair &&
-                !testedHand.IsFullHousePossible)
+            if (testedHand.isOnePair && !testedHand.isTopPair && !testedHand.isOverPair &&
+                !testedHand.isFullHousePossible)
             {
                 return true;
             }
 
-            if (ctx.turnBetsOrRaisesNumber > 2 && testedHand.IsOnePair)
+            if (ctx.turnBetsOrRaisesNumber > 2 && testedHand.isOnePair)
             {
                 return true;
             }
@@ -526,19 +534,19 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopState
           ctx.myStatistics.getRiverStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE))
     {
 
-        if (!(((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) && !testedHand.IsFullHousePossible) ||
-              testedHand.IsStraight || testedHand.IsFlush || testedHand.IsFullHouse || testedHand.IsTrips ||
-              testedHand.IsQuads || testedHand.IsStFlush || testedHand.IsOverCards || testedHand.IsFlushDrawPossible ||
-              testedHand.FlushOuts >= 8 || testedHand.StraightOuts >= 8))
+        if (!(((testedHand.isTwoPair && !testedHand.isFullHousePossible) && !testedHand.isFullHousePossible) ||
+              testedHand.isStraight || testedHand.isFlush || testedHand.isFullHouse || testedHand.isTrips ||
+              testedHand.isQuads || testedHand.isStFlush || testedHand.isOverCards || testedHand.isFlushDrawPossible ||
+              testedHand.flushOuts >= 8 || testedHand.straightOuts >= 8))
         {
 
-            if (testedHand.IsNoPair || (testedHand.IsOnePair && testedHand.IsFullHousePossible))
+            if (testedHand.isNoPair || (testedHand.isOnePair && testedHand.isFullHousePossible))
             {
                 return true;
             }
 
-            if (testedHand.IsOnePair && !testedHand.IsTopPair && !testedHand.IsFullHousePossible &&
-                !testedHand.IsOverPair)
+            if (testedHand.isOnePair && !testedHand.isTopPair && !testedHand.isFullHousePossible &&
+                !testedHand.isOverPair)
             {
                 return true;
             }
@@ -548,7 +556,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopState
     return false;
 }
 
-bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopAnalysisFlags& testedHand,
+                                                              CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.myHavePosition;
@@ -565,7 +574,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopStat
         return false; // he is (temporarily ?) very agressive, so don't make any guess
     }
 
-    if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    if (!testedHand.usesFirst && !testedHand.usesSecond)
     {
         return true;
     }
@@ -574,9 +583,9 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopStat
     if (ctx.flopBetsOrRaisesNumber == 0)
     {
 
-        if (testedHand.IsTopPair || testedHand.IsOverPair ||
-            (testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight || testedHand.IsFlush ||
-            testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads || testedHand.IsStFlush)
+        if (testedHand.isTopPair || testedHand.isOverPair ||
+            (testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight || testedHand.isFlush ||
+            testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads || testedHand.isStFlush)
         {
             return false;
         }
@@ -589,9 +598,9 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopStat
     if (!ctx.myFlopIsAggressor && ctx.flopBetsOrRaisesNumber > 0)
     {
 
-        if (testedHand.IsTopPair || testedHand.IsOverPair ||
-            (testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight || testedHand.IsFlush ||
-            testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads || testedHand.IsStFlush)
+        if (testedHand.isTopPair || testedHand.isOverPair ||
+            (testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight || testedHand.isFlush ||
+            testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads || testedHand.isStFlush)
         {
             return false;
         }
@@ -602,15 +611,15 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopStat
     }
     // the player has raised twice the turn, and is not a maniac player : he should have at least two pairs
     if (ctx.nbRaises == 2 &&
-        !((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight || testedHand.IsFlush ||
-          testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads || testedHand.IsStFlush))
+        !((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight || testedHand.isFlush ||
+          testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads || testedHand.isStFlush))
     {
         return true;
     }
 
     // the player has raised 3 times the turn, and is not a maniac player : he should have better than a set
-    if (ctx.nbRaises > 2 && !(testedHand.IsStraight || testedHand.IsFlush || testedHand.IsFullHouse ||
-                              testedHand.IsQuads || testedHand.IsStFlush))
+    if (ctx.nbRaises > 2 && !(testedHand.isStraight || testedHand.isFlush || testedHand.isFullHouse ||
+                              testedHand.isQuads || testedHand.isStFlush))
     {
         return true;
     }
@@ -618,7 +627,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopStat
     return false;
 }
 
-bool HandPlausibilityChecker::isUnplausibleHandGivenTurnAllin(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenTurnAllin(const PostFlopAnalysisFlags& testedHand,
+                                                              CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.myHavePosition;
@@ -640,22 +650,22 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnAllin(const PostFlopStat
         return false; // he is (temporarily ?) very agressive, so don't make any guess
     }
 
-    if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    if (!testedHand.usesFirst && !testedHand.usesSecond)
     {
         return true;
     }
 
     // the player has raised twice the turn, and is not a maniac player : he should have at least two pairs
     if (ctx.nbRaises == 2 &&
-        !((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight || testedHand.IsFlush ||
-          testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads || testedHand.IsStFlush))
+        !((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight || testedHand.isFlush ||
+          testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads || testedHand.isStFlush))
     {
         return true;
     }
 
     // the player has raised 3 times the turn, and is not a maniac player : he should have better than a set
-    if (ctx.nbRaises > 2 && !(testedHand.IsStraight || testedHand.IsFlush || testedHand.IsFullHouse ||
-                              testedHand.IsQuads || testedHand.IsStFlush))
+    if (ctx.nbRaises > 2 && !(testedHand.isStraight || testedHand.isFlush || testedHand.isFullHouse ||
+                              testedHand.isQuads || testedHand.isStFlush))
     {
         return true;
     }
@@ -663,7 +673,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnAllin(const PostFlopStat
     return false;
 }
 
-bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCheck(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCheck(const PostFlopAnalysisFlags& testedHand,
+                                                               CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.myHavePosition;
@@ -674,7 +685,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCheck(const PostFlopSta
     return false;
 }
 
-bool HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(const PostFlopAnalysisFlags& testedHand,
+                                                             CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.myHavePosition;
@@ -691,7 +703,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(const PostFlopState
         return false; // he is (temporarily ?) very agressive, so don't make any guess
     }
 
-    if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    if (!testedHand.usesFirst && !testedHand.usesSecond)
     {
         return true;
     }
@@ -702,8 +714,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(const PostFlopState
         !ctx.myTurnIsAggressor)
     {
 
-        if ((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight || testedHand.IsFlush ||
-            testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads || testedHand.IsStFlush)
+        if ((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight || testedHand.isFlush ||
+            testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads || testedHand.isStFlush)
         {
             return false;
         }
@@ -720,8 +732,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(const PostFlopState
          (ctx.turnBetsOrRaisesNumber > 1 && !ctx.myTurnIsAggressor)))
     {
 
-        if ((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight || testedHand.IsFlush ||
-            testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads || testedHand.IsStFlush)
+        if ((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight || testedHand.isFlush ||
+            testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads || testedHand.isStFlush)
         {
             return false;
         }
@@ -733,7 +745,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(const PostFlopState
     return false;
 }
 
-bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(const PostFlopAnalysisFlags& testedHand,
+                                                              CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.myHavePosition;
@@ -755,7 +768,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(const PostFlopStat
         return false; // he is (temporarily ?) very agressive, so don't make any guess
     }
 
-    if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    if (!testedHand.usesFirst && !testedHand.usesSecond)
     {
         return true;
     }
@@ -765,17 +778,17 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(const PostFlopStat
     if (ctx.nbRunningPlayers > 2)
     {
 
-        if (!((testedHand.IsTwoPair && !testedHand.IsFullHousePossible) || testedHand.IsStraight ||
-              testedHand.IsFlush || testedHand.IsFullHouse || testedHand.IsTrips || testedHand.IsQuads ||
-              testedHand.IsStFlush))
+        if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight ||
+              testedHand.isFlush || testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads ||
+              testedHand.isStFlush))
         {
 
-            if (testedHand.IsNoPair || (testedHand.IsOnePair && testedHand.IsFullHousePossible))
+            if (testedHand.isNoPair || (testedHand.isOnePair && testedHand.isFullHousePossible))
             {
                 return true;
             }
 
-            if (testedHand.IsOnePair && !testedHand.IsTopPair & !testedHand.IsOverPair)
+            if (testedHand.isOnePair && !testedHand.isTopPair & !testedHand.isOverPair)
             {
                 return true;
             }
@@ -785,7 +798,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(const PostFlopStat
     return false;
 }
 
-bool HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(const PostFlopAnalysisFlags& testedHand,
+                                                               CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.myHavePosition;
@@ -803,13 +817,13 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(const PostFlopSta
     }
 
     // the player has raised the river, and is not a maniac player : he should have at least 2 pairs
-    if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    if (!testedHand.usesFirst && !testedHand.usesSecond)
     {
         return true;
     }
 
-    if (testedHand.IsStraight || testedHand.IsFlush || testedHand.IsFullHouse || testedHand.IsTrips ||
-        testedHand.IsQuads || testedHand.IsStFlush || (testedHand.IsTwoPair && !testedHand.IsFullHousePossible))
+    if (testedHand.isStraight || testedHand.isFlush || testedHand.isFullHouse || testedHand.isTrips ||
+        testedHand.isQuads || testedHand.isStFlush || (testedHand.isTwoPair && !testedHand.isFullHousePossible))
     {
         return false;
     }
@@ -825,8 +839,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(const PostFlopSta
          (ctx.turnBetsOrRaisesNumber > 1 && !ctx.myTurnIsAggressor)))
     {
 
-        if (testedHand.IsStraight || testedHand.IsFlush || testedHand.IsFullHouse || testedHand.IsTrips ||
-            testedHand.IsQuads || testedHand.IsStFlush)
+        if (testedHand.isStraight || testedHand.isFlush || testedHand.isFullHouse || testedHand.isTrips ||
+            testedHand.isQuads || testedHand.isStFlush)
         {
             return false;
         }
@@ -837,15 +851,15 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(const PostFlopSta
     }
 
     // the player has raised twice the river, and is not a maniac player : he should have at least trips
-    if (ctx.nbRaises == 2 && !(testedHand.IsStraight || testedHand.IsFlush || testedHand.IsFullHouse ||
-                               testedHand.IsTrips || testedHand.IsQuads || testedHand.IsStFlush))
+    if (ctx.nbRaises == 2 && !(testedHand.isStraight || testedHand.isFlush || testedHand.isFullHouse ||
+                               testedHand.isTrips || testedHand.isQuads || testedHand.isStFlush))
     {
         return true;
     }
 
     // the player has raised 3 times the river, and is not a maniac player : he should have better than a set
-    if (ctx.nbRaises > 2 && !(testedHand.IsStraight || testedHand.IsFlush || testedHand.IsFullHouse ||
-                              testedHand.IsQuads || testedHand.IsStFlush))
+    if (ctx.nbRaises > 2 && !(testedHand.isStraight || testedHand.isFlush || testedHand.isFullHouse ||
+                              testedHand.isQuads || testedHand.isStFlush))
     {
         return true;
     }
@@ -853,7 +867,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(const PostFlopSta
     return false;
 }
 
-bool HandPlausibilityChecker::isUnplausibleHandGivenRiverAllin(const PostFlopState& testedHand, CurrentHandContext& ctx)
+bool HandPlausibilityChecker::isUnplausibleHandGivenRiverAllin(const PostFlopAnalysisFlags& testedHand,
+                                                               CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.myHavePosition;
@@ -875,15 +890,15 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverAllin(const PostFlopSta
         return false; // he is (temporarily ?) very agressive, so don't make any guess
     }
 
-    if (!testedHand.UsesFirst && !testedHand.UsesSecond)
+    if (!testedHand.usesFirst && !testedHand.usesSecond)
     {
         return true;
     }
 
     // the player has raised twice or more the river, and is not a maniac player : he should have at least a
     // straight
-    if (ctx.nbRaises > 1 && !(testedHand.IsStraight || testedHand.IsFlush || testedHand.IsFullHouse ||
-                              testedHand.IsQuads || testedHand.IsStFlush))
+    if (ctx.nbRaises > 1 && !(testedHand.isStraight || testedHand.isFlush || testedHand.isFullHouse ||
+                              testedHand.isQuads || testedHand.isStFlush))
     {
         return true;
     }

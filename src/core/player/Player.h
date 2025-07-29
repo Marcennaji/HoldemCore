@@ -13,7 +13,7 @@
 #include "range/RangeEstimator.h"
 #include "strategy/CurrentHandContext.h"
 
-#include <third_party/psim/psim.hpp>
+#include "core/interfaces/IHandEvaluationEngine.h"
 
 #include <array>
 #include <assert.h>
@@ -114,7 +114,7 @@ class Player
 
     virtual float calculatePreflopCallingRange(CurrentHandContext& context) const;
 
-    const PostFlopState getPostFlopState() const;
+    const PostFlopAnalysisFlags getPostFlopAnalysisFlags() const;
     CurrentHandActions& getCurrentHandActions();
 
     void updatePreflopStatistics();
@@ -126,8 +126,6 @@ class Player
     void setPreflopPotOdd(const int potOdd);
 
     std::string getStringBoard() const;
-    std::map<int, float> evaluateOpponentsStrengths() const;
-    const SimResults getHandSimulation(bool logResult = false) const;
 
     bool isAgressor(const GameState gameState) const;
 
@@ -197,5 +195,9 @@ class Player
     int lastMoneyWon{0};
     int myPreflopPotOdd;
     std::unique_ptr<RangeEstimator> myRangeEstimator;
+
+  private:
+    std::map<int, float> evaluateOpponentsStrengths() const;
+    const HandSimulationStats computeHandSimulation() const;
 };
 } // namespace pkt::core::player

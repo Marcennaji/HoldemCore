@@ -205,8 +205,8 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext&
         string s2 = (*i).substr(2, 4);
 
         std::string stringHand = s1 + " " + s2;
-        PostFlopState r;
-        getHandState((stringHand + ctx.stringBoard).c_str(), &r);
+        PostFlopAnalysisFlags postFlopFlags =
+            GlobalServices::instance().handEvaluationEngine()->analyzeHand(stringHand, ctx.stringBoard);
 
         bool removeHand = false;
 
@@ -220,23 +220,23 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext&
 
         if (myAction == ActionType::Call)
         {
-            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(postFlopFlags, ctx);
         }
         else if (myAction == ActionType::Check)
         {
-            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(postFlopFlags, ctx);
         }
         else if (myAction == ActionType::Raise)
         {
-            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(postFlopFlags, ctx);
         }
         else if (myAction == ActionType::Bet)
         {
-            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(postFlopFlags, ctx);
         }
         else if (myAction == ActionType::Allin)
         {
-            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopAllin(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopAllin(postFlopFlags, ctx);
         }
 
         if (removeHand)
@@ -306,31 +306,31 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(CurrentHandContext&
         string s2 = (*i).substr(2, 4);
 
         std::string stringHand = s1 + " " + s2;
-        PostFlopState r;
-        getHandState((stringHand + ctx.stringBoard).c_str(), &r);
+        PostFlopAnalysisFlags postFlopFlags =
+            GlobalServices::instance().handEvaluationEngine()->analyzeHand(stringHand, ctx.stringBoard);
 
         bool removeHand = false;
         ActionType myAction = ctx.myCurrentHandActions.getTurnActions().back();
 
         if (myAction == ActionType::Call)
         {
-            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(postFlopFlags, ctx);
         }
         else if (myAction == ActionType::Check)
         {
-            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnCheck(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnCheck(postFlopFlags, ctx);
         }
         else if (myAction == ActionType::Raise)
         {
-            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(postFlopFlags, ctx);
         }
         else if (myAction == ActionType::Bet)
         {
-            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnBet(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnBet(postFlopFlags, ctx);
         }
         else if (myAction == ActionType::Allin)
         {
-            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnAllin(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnAllin(postFlopFlags, ctx);
         }
 
         if (removeHand)
@@ -376,7 +376,8 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(CurrentHandContext
     const string originalEstimatedRange = getEstimatedRange();
     string unplausibleRanges;
 
-    GlobalServices::instance().logger()->verbose("\tPlausible range on river, before update :\t" + getEstimatedRange());
+    GlobalServices::instance().logger()->verbose("\tPlausible range on rivepostFlopFlags, before update :\t" +
+                                                 getEstimatedRange());
 
     // update my unplausible hands (unplausible to my opponents eyes), given what I did on river
 
@@ -400,30 +401,30 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(CurrentHandContext
         string s2 = (*i).substr(2, 4);
 
         std::string stringHand = s1 + " " + s2;
-        PostFlopState r;
-        getHandState((stringHand + ctx.stringBoard).c_str(), &r);
+        PostFlopAnalysisFlags postFlopFlags =
+            GlobalServices::instance().handEvaluationEngine()->analyzeHand(stringHand, ctx.stringBoard);
 
         bool removeHand = false;
 
         if (ctx.myCurrentHandActions.getRiverActions().back() == ActionType::Call)
         {
-            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(postFlopFlags, ctx);
         }
         else if (ctx.myCurrentHandActions.getRiverActions().back() == ActionType::Check)
         {
-            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverCheck(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverCheck(postFlopFlags, ctx);
         }
         else if (ctx.myCurrentHandActions.getRiverActions().back() == ActionType::Raise)
         {
-            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(postFlopFlags, ctx);
         }
         else if (ctx.myCurrentHandActions.getRiverActions().back() == ActionType::Bet)
         {
-            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(postFlopFlags, ctx);
         }
         else if (ctx.myCurrentHandActions.getRiverActions().back() == ActionType::Allin)
         {
-            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverAllin(r, ctx);
+            removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverAllin(postFlopFlags, ctx);
         }
 
         if (removeHand)

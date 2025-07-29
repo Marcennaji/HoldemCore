@@ -283,7 +283,7 @@ int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx)
         if (ctx.preflopLastRaiser->getPosition() > ctx.myPosition)
         {
 
-            if (getDrawingProbability(ctx.myPostFlopState) > 25)
+            if (getDrawingProbability(ctx.myPostFlopAnalysisFlags) > 25)
             {
                 int rand = 0;
                 GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
@@ -293,15 +293,16 @@ int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx)
                 }
             }
 
-            if ((ctx.myPostFlopState.IsTwoPair || ctx.myPostFlopState.IsTrips || ctx.myPostFlopState.IsStraight) &&
-                ctx.myPostFlopState.IsFlushDrawPossible)
+            if ((ctx.myPostFlopAnalysisFlags.isTwoPair || ctx.myPostFlopAnalysisFlags.isTrips ||
+                 ctx.myPostFlopAnalysisFlags.isStraight) &&
+                ctx.myPostFlopAnalysisFlags.isFlushDrawPossible)
             {
                 return ctx.pot * 0.6;
             }
 
             // if the flop is dry, try to get the pot
             if (ctx.nbPlayers < 3 && ctx.myCanBluff && getBoardCardsHigherThan(ctx.stringBoard, "Jh") < 2 &&
-                getBoardCardsHigherThan(ctx.stringBoard, "Kh") == 0 && !ctx.myPostFlopState.IsFlushDrawPossible)
+                getBoardCardsHigherThan(ctx.stringBoard, "Kh") == 0 && !ctx.myPostFlopAnalysisFlags.isFlushDrawPossible)
             {
 
                 int rand = 0;
@@ -315,7 +316,7 @@ int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx)
     }
 
     // don't bet if in position, and pretty good drawing probs
-    if (getDrawingProbability(ctx.myPostFlopState) > 20 && ctx.myHavePosition)
+    if (getDrawingProbability(ctx.myPostFlopAnalysisFlags) > 20 && ctx.myHavePosition)
     {
         return 0;
     }
@@ -398,7 +399,7 @@ bool LooseAggressiveBotStrategy::flopShouldCall(CurrentHandContext& ctx)
         return false;
     }
 
-    if (isDrawingProbOk(ctx.myPostFlopState, ctx.potOdd))
+    if (isDrawingProbOk(ctx.myPostFlopAnalysisFlags, ctx.potOdd))
     {
         return true;
     }
@@ -452,7 +453,7 @@ int LooseAggressiveBotStrategy::flopShouldRaise(CurrentHandContext& ctx)
         return 0;
     }
 
-    if ((isDrawingProbOk(ctx.myPostFlopState, ctx.potOdd) || ctx.myHavePosition) && ctx.nbRunningPlayers == 2 &&
+    if ((isDrawingProbOk(ctx.myPostFlopAnalysisFlags, ctx.potOdd) || ctx.myHavePosition) && ctx.nbRunningPlayers == 2 &&
         !(ctx.myHandSimulation.winRanged * 100 < ctx.potOdd) && ctx.myCanBluff && nbRaises < 2)
     {
 
@@ -514,7 +515,7 @@ int LooseAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx)
     }
 
     if (ctx.flopBetsOrRaisesNumber == 0 && ctx.myHavePosition && ctx.nbRunningPlayers < 4 &&
-        getDrawingProbability(ctx.myPostFlopState) < 15 && ctx.myCash > pot * 4)
+        getDrawingProbability(ctx.myPostFlopAnalysisFlags) < 15 && ctx.myCash > pot * 4)
     {
         return pot * 0.6;
     }
@@ -529,7 +530,7 @@ int LooseAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx)
         return pot * 0.6;
     }
 
-    if (getDrawingProbability(ctx.myPostFlopState) > 20 && !ctx.myHavePosition)
+    if (getDrawingProbability(ctx.myPostFlopAnalysisFlags) > 20 && !ctx.myHavePosition)
     {
         int rand = 0;
         GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
@@ -562,7 +563,7 @@ bool LooseAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx)
         return false;
     }
 
-    if (isDrawingProbOk(ctx.myPostFlopState, ctx.potOdd))
+    if (isDrawingProbOk(ctx.myPostFlopAnalysisFlags, ctx.potOdd))
     {
         return true;
     }
@@ -677,7 +678,7 @@ int LooseAggressiveBotStrategy::turnShouldRaise(CurrentHandContext& ctx)
         return ctx.pot * 0.6;
     }
 
-    if ((isDrawingProbOk(ctx.myPostFlopState, ctx.potOdd) || ctx.myHavePosition) && ctx.nbRunningPlayers == 2 &&
+    if ((isDrawingProbOk(ctx.myPostFlopAnalysisFlags, ctx.potOdd) || ctx.myHavePosition) && ctx.nbRunningPlayers == 2 &&
         !(ctx.myHandSimulation.winRanged * 100 < ctx.potOdd) && ctx.myCanBluff && ctx.turnBetsOrRaisesNumber < 2)
     {
 

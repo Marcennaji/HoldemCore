@@ -15,5 +15,8 @@ target_include_directories(infra
             PRIVATE ${CMAKE_SOURCE_DIR}/src
             )
 
+# Link infra to third party libs
+target_link_libraries(infra PRIVATE psim tiny sqlite)
+
 # Link infra to engine so it can use engine interfaces
 target_link_libraries(infra PUBLIC engine)

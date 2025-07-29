@@ -6,7 +6,7 @@
 #pragma once
 
 #include <core/player/Player.h>
-#include <third_party/psim/psim.hpp>
+#include "core/interfaces/IHandEvaluationEngine.h"
 
 namespace pkt::core::player
 {
@@ -61,9 +61,9 @@ struct CurrentHandContext
     bool myTurnIsAggressor = false;
     bool myRiverIsAggressor = false;
     bool myIsInVeryLooseMode = false; // true if the player is in very loose mode (e.g. playing a lot of hands)
-    PostFlopState myPostFlopState{};
+    PostFlopAnalysisFlags myPostFlopAnalysisFlags{};
 
-    SimResults myHandSimulation = {
+    HandSimulationStats myHandSimulation = {
         0.0f, // win
         0.0f, // tie
         0.0f, // lose

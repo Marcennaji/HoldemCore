@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-struct PostFlopState;
+struct PostFlopAnalysisFlags;
 
 namespace pkt::core
 {

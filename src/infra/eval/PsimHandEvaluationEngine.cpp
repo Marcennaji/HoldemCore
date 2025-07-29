@@ -1,5 +1,6 @@
 #include "PsimHandEvaluationEngine.h"
-#include <third_party/psim/psim.hpp>
+#include "core/interfaces/IHandEvaluationEngine.h"
+#include "third_party/psim/psim.hpp"
 
 namespace pkt::infra
 {
@@ -9,7 +10,7 @@ using namespace std;
 
 unsigned int PsimHandEvaluationEngine::rankHand(const char* hand)
 {
-    return ::rankHand(hand);
+    return ::RankHand(hand);
 }
 HandSimulationStats PsimHandEvaluationEngine::convertSimResults(const SimResults& s)
 {
@@ -20,11 +21,33 @@ HandSimulationStats PsimHandEvaluationEngine::convertSimResults(const SimResults
 }
 PostFlopAnalysisFlags PsimHandEvaluationEngine::convertPostFlopState(const PostFlopState& src)
 {
-
-    return {
-        src.IsNoPair,   src.IsOnePair, src.IsPocketPair, src.IsTwoPair, src.IsTrips,
-        src.IsStraight, src.IsFlush,   src.IsFullHouse,  src.IsQuads,   src.IsStFlush,
-    };
+    return {src.UsesFirst,
+            src.UsesSecond,
+            src.IsNoPair,
+            src.IsOnePair,
+            src.IsPocketPair,
+            src.IsTwoPair,
+            src.IsTrips,
+            src.IsStraight,
+            src.IsFlush,
+            src.IsFullHouse,
+            src.IsQuads,
+            src.IsStFlush,
+            src.IsTopPair,
+            src.IsMiddlePair,
+            src.IsBottomPair,
+            src.IsOverPair,
+            src.IsOverCards,
+            src.IsStraightDrawPossible,
+            src.IsStraightPossible,
+            src.IsFlushDrawPossible,
+            src.IsFlushPossible,
+            src.IsFullHousePossible,
+            src.Is3Flush,
+            src.Is4Flush,
+            src.FlushOuts,
+            src.StraightOuts,
+            src.BetterOuts};
 }
 HandSimulationStats PsimHandEvaluationEngine::simulateHandEquity(const std::string& hand, const std::string& board,
                                                                  const int nbOpponents, float maxOpponentsStrengths)
@@ -32,11 +55,11 @@ HandSimulationStats PsimHandEvaluationEngine::simulateHandEquity(const std::stri
     SimResults r;
     const string cards = (hand + board).c_str();
 
-    simulateHand(cards.c_str(), &r, 0, 1, 0);
+    SimulateHand(cards.c_str(), &r, 0, 1, 0);
 
     float win = r.win; // save the value
 
-    simulateHandMulti(cards.c_str(), &r, 200, 100, nbOpponents);
+    SimulateHandMulti(cards.c_str(), &r, 200, 100, nbOpponents);
     r.win = win; // because simulateHandMulti doesn't compute 'win'
     r.winRanged = 0;
 
@@ -56,7 +79,7 @@ pkt::core::PostFlopAnalysisFlags PsimHandEvaluationEngine::analyzeHand(const std
 {
     PostFlopState r;
 
-    getHandState((hand + board).c_str(), &r);
+    GetHandState((hand + board).c_str(), &r);
 
     PostFlopAnalysisFlags flags = convertPostFlopState(r);
 
