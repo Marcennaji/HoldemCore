@@ -55,20 +55,19 @@ void HandFsm::end()
     myState.reset();
 }
 
-void HandFsm::processPlayerAction(PlayerAction action)
+void HandFsm::handlePlayerAction(PlayerAction action)
 {
     if (!myState)
         return;
 
     if (auto* processor = dynamic_cast<IActionProcessor*>(myState.get()))
     {
-        if (!processor->canProcessAction(*this, action))
-        {
-            // Handle invalid action
+        if (!processor->isActionAllowed(*this, action))
             return;
-        }
 
-        auto next = processor->processAction(*this, action);
+        applyActionEffects(action);
+
+        auto next = processor->computeNextState(*this, action);
         if (next)
         {
             myState->exit(*this);
@@ -77,6 +76,60 @@ void HandFsm::processPlayerAction(PlayerAction action)
         }
     }
 }
+void HandFsm::applyActionEffects(const PlayerAction& action)
+{
+    auto player = getPlayerFsmById(myRunningPlayersList, action.playerId);
+    auto* bettingState = dynamic_cast<BettingStateBase*>(myState.get());
+
+    switch (action.type)
+    {
+    case ActionType::Fold:
+        updateRunningPlayersList();
+        break;
+
+    case ActionType::Call:
+    {
+        player->getLegacyPlayer()->setSet(action.amount);
+
+        // myPot += toCall;
+        break;
+    }
+
+    case ActionType::Raise:
+    {
+        /*int toCall = currentBet() - player.currentBet();
+        int raiseAmount = action.amount();
+        int totalPutIn = toCall + raiseAmount;
+
+        player.stack -= totalPutIn;
+        player.addToCurrentBet(totalPutIn);
+        myPot += totalPutIn;
+        myCurrentBet = player.currentBet(); // update table's highest bet
+        myLastAggressor = player.id();
+        */
+        break;
+    }
+    case ActionType::None:
+    {
+        break;
+    }
+    case ActionType::Bet:
+    {
+        break;
+    }
+    case ActionType::Check:
+    {
+        break;
+    }
+    case ActionType::Allin:
+    {
+        break;
+    }
+    }
+
+    // myActionHistory.push_back(action);
+}
+
 pkt::core::player::PlayerFsmList HandFsm::getSeatsList() const
 {
     return mySeatsList;
@@ -144,6 +197,57 @@ size_t HandFsm::dealBoardCards()
 
     myBoard->setCards(tempBoardArray);
     return cardsArrayIndex;
+}
+void HandFsm::updateRunningPlayersList()
+{
+    GlobalServices::instance().logger()->verbose("Updating myRunningPlayersList...");
+
+    PlayerFsmListIterator it, it1;
+
+    for (it = myRunningPlayersList->begin(); it != myRunningPlayersList->end();)
+    {
+        GlobalServices::instance().logger()->verbose(
+            "Checking player: " + (*it)->getLegacyPlayer()->getName() +
+            ", action: " + playerActionToString((*it)->getLegacyPlayer()->getAction()));
+
+        if ((*it)->getLegacyPlayer()->getAction() == ActionType::Fold ||
+            (*it)->getLegacyPlayer()->getAction() == ActionType::Allin)
+        {
+            GlobalServices::instance().logger()->verbose("Removing player: " + (*it)->getLegacyPlayer()->getName() +
+                                                         " from myRunningPlayersList due to action: " +
+                                                         playerActionToString((*it)->getLegacyPlayer()->getAction()));
+
+            it = myRunningPlayersList->erase(it);
+
+            if (!myRunningPlayersList->empty())
+            {
+                GlobalServices::instance().logger()->verbose(
+                    "myRunningPlayersList is not empty after removal. Updating current player's turn.");
+
+                it1 = it;
+                if (it1 == myRunningPlayersList->begin())
+                {
+                    GlobalServices::instance().logger()->verbose(
+                        "Iterator points to the beginning of the list. Wrapping around to the end.");
+                    it1 = myRunningPlayersList->end();
+                }
+                --it1;
+            }
+            else
+            {
+                GlobalServices::instance().logger()->verbose("myRunningPlayersList is now empty after removal.");
+            }
+        }
+        else
+        {
+            GlobalServices::instance().logger()->verbose(
+                "Player: " + (*it)->getLegacyPlayer()->getName() +
+                " remains in myRunningPlayersList. Moving to the next player.");
+            ++it;
+        }
+    }
+
+    GlobalServices::instance().logger()->verbose("Finished updating myRunningPlayersList.");
 }
 
 } // namespace pkt::core

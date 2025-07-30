@@ -20,9 +20,8 @@ void FlopState::exit(HandFsm& hand)
 {
 }
 
-std::unique_ptr<IHandState> FlopState::processAction(HandFsm& hand, PlayerAction action)
+std::unique_ptr<IHandState> FlopState::computeNextState(HandFsm& hand, PlayerAction action)
 {
-
     return nullptr;
 }
 
@@ -31,7 +30,7 @@ bool FlopState::isRoundComplete(const HandFsm& hand) const
     return false;
 }
 
-bool FlopState::canProcessAction(const HandFsm& hand, PlayerAction action) const
+bool FlopState::isActionAllowed(const HandFsm& hand, PlayerAction action) const
 {
     return false;
 }

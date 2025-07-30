@@ -34,7 +34,7 @@ void PreflopState::exit(HandFsm& /*hand*/)
     // No exit action needed for Preflop
 }
 
-bool PreflopState::canProcessAction(const HandFsm& hand, const PlayerAction action) const
+bool PreflopState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const
 {
     auto player = getPlayerFsmById(hand.getRunningPlayersList(), action.playerId);
     if (!player)
@@ -53,7 +53,7 @@ bool PreflopState::canProcessAction(const HandFsm& hand, const PlayerAction acti
         return action.amount == 0;
 
     case ActionType::Call:
-        return action.amount > 0 && cash >= action.amount;
+        return action.amount == amountToCall && cash >= action.amount;
 
     case ActionType::Bet:
         return action.amount > 0 && action.amount <= cash;
@@ -79,10 +79,10 @@ void PreflopState::promptPlayerAction(HandFsm& hand, Player& player)
 
     auto& bot = static_cast<BotPlayer&>(player);
     const PlayerAction action = bot.decidePreflopActionFsm();
-    hand.processPlayerAction(action);
+    hand.handlePlayerAction(action);
 }
 
-std::unique_ptr<IHandState> PreflopState::processAction(HandFsm& hand, PlayerAction action)
+std::unique_ptr<IHandState> PreflopState::computeNextState(HandFsm& hand, PlayerAction action)
 {
     if (isRoundComplete(hand))
     {
@@ -95,21 +95,14 @@ std::unique_ptr<IHandState> PreflopState::processAction(HandFsm& hand, PlayerAct
 
 bool PreflopState::isRoundComplete(const HandFsm& hand) const
 {
-    int highestSet = -1;
-
     if (hand.getRunningPlayersList()->size() <= 1)
         return true;
 
     for (auto itC = hand.getRunningPlayersList()->begin(); itC != hand.getRunningPlayersList()->end(); ++itC)
     {
-        if (highestSet == -1)
-            highestSet = (*itC)->getLegacyPlayer()->getSet();
-        else
+        if ((*itC)->getLegacyPlayer()->getSet() != myHighestSet)
         {
-            if (highestSet != (*itC)->getLegacyPlayer()->getSet())
-            {
-                return false;
-            }
+            return false;
         }
     }
 
@@ -118,7 +111,7 @@ bool PreflopState::isRoundComplete(const HandFsm& hand) const
 
 void PreflopState::logStateInfo(const HandFsm& /*hand*/) const
 {
-    // Optional: Add logging when debugging
+    // todo
 }
 void PreflopState::assignButtons(HandFsm& hand)
 {

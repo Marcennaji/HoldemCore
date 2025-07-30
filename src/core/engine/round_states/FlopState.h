@@ -18,10 +18,10 @@ class FlopState : public BettingStateBase,
 
     void enter(HandFsm& hand) override;
     void exit(HandFsm& hand) override;
-    std::unique_ptr<IHandState> processAction(HandFsm& hand, PlayerAction action) override;
+    std::unique_ptr<IHandState> computeNextState(HandFsm& hand, PlayerAction action) override;
 
     bool isRoundComplete(const HandFsm& hand) const override;
-    bool canProcessAction(const HandFsm& hand, PlayerAction action) const override;
+    bool isActionAllowed(const HandFsm& hand, PlayerAction action) const override;
 
     void logStateInfo(const HandFsm& hand) const override;
     std::string getStateName() const override { return "Flop"; }

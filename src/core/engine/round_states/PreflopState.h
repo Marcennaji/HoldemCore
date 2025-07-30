@@ -24,10 +24,10 @@ class PreflopState : public BettingStateBase,
 
     void enter(HandFsm&) override;
     void exit(HandFsm&) override;
-    std::unique_ptr<IHandState> processAction(HandFsm& IHand, const PlayerAction action) override;
+    std::unique_ptr<IHandState> computeNextState(HandFsm& IHand, const PlayerAction action) override;
 
     bool isRoundComplete(const HandFsm&) const override;
-    bool canProcessAction(const HandFsm&, const PlayerAction) const override;
+    bool isActionAllowed(const HandFsm&, const PlayerAction) const override;
 
     void logStateInfo(const HandFsm&) const override;
     std::string getStateName() const override { return "Preflop"; }

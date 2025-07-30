@@ -30,11 +30,14 @@ class HandFsm : public IHandLifecycle, public IHandPlayerAction, public IPlayerA
     void dealHoleCards(size_t lastArrayIndex) override;
     void initAndShuffleDeck() override;
 
-    void processPlayerAction(PlayerAction action) override;
+    void handlePlayerAction(PlayerAction action) override;
     pkt::core::player::PlayerFsmList getSeatsList() const override;
     pkt::core::player::PlayerFsmList getRunningPlayersList() const override;
 
   private:
+    void applyActionEffects(const PlayerAction& action);
+    void updateRunningPlayersList();
+
     std::shared_ptr<EngineFactory> myFactory;
     const GameEvents& myEvents;
     std::shared_ptr<IBoard> myBoard;

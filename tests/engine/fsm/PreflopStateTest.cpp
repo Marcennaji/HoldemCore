@@ -109,7 +109,7 @@ TEST_F(PreflopStateTest, StartHandShouldGoToPreflop)
 
     EXPECT_EQ(myLastGameState, GameStatePreflop);
 }
-TEST_F(PreflopStateTest, DISABLED_EverybodyCallPreflopShouldGoToFlop)
+TEST_F(PreflopStateTest, OnlyCallsPreflopShouldGoToFlop)
 {
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
@@ -121,9 +121,9 @@ TEST_F(PreflopStateTest, DISABLED_EverybodyCallPreflopShouldGoToFlop)
     auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
     EXPECT_EQ(playerBb->getButton(), ButtonBigBlind);
 
-    myHandFsm->processPlayerAction({0, ActionType::Call, 20});
-    myHandFsm->processPlayerAction({1, ActionType::Call, 10});
-    myHandFsm->processPlayerAction({2, ActionType::Check});
+    myHandFsm->handlePlayerAction({0, ActionType::Call, 20});
+    myHandFsm->handlePlayerAction({1, ActionType::Call, 10});
+    myHandFsm->handlePlayerAction({2, ActionType::Check});
 
     EXPECT_EQ(myLastGameState, GameStateFlop);
 }
@@ -131,8 +131,8 @@ TEST_F(PreflopStateTest, DISABLED_EverybodyFoldPreflopShouldGoToPostRiver)
 {
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
-    myHandFsm->processPlayerAction({0, ActionType::Fold});
-    myHandFsm->processPlayerAction({1, ActionType::Fold});
+    myHandFsm->handlePlayerAction({0, ActionType::Fold});
+    myHandFsm->handlePlayerAction({1, ActionType::Fold});
 
     EXPECT_EQ(myLastGameState, GameStatePostRiver);
 }

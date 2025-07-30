@@ -500,7 +500,6 @@ void BotPlayer::evaluateBetAmount()
                     {
                         // raise, but not enough --> full bet rule
                         currentHand->getCurrentBettingRound()->setFullBetRule(true);
-                        // lastPlayerAction für Karten umblättern reihenfolge setzrn
                         currentHand->setLastActionPlayerId(myID);
 
                         mySet += myCash;
