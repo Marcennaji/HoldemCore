@@ -1,7 +1,7 @@
 # PokerTraining
 
 **Texas Hold'em Poker Training Simulator**  
-Cross-platform, event-driven C++ engine with bot opponents, customizable strategies, and frontend-agnostic architecture.
+Cross-platform, event-driven C++ engine with bot opponents and 1 human player (optional), customizable bot strategies, and frontend-agnostic architecture.
 
 ---
 
@@ -58,10 +58,10 @@ PokerTraining is an offline, open-source poker simulation tool designed to help 
 
 ---
 
-## 🚧 Current Status
+## 🚧 Current Status : under active refactoring
 
-This project was originally created and published on SourceForge by Marc Ennaji in 2011.
-The current version is a complete architectural rewrite, modernized for maintainability, testability, and cross-platform UI support. It is currently under **active refactoring**, with major milestones already completed:
+This project was originally created and published on SourceForge by Marc Ennaji in 2011. It has been migrated on Github during 2025.
+The current version is a complete architectural rewrite, for a better decoupling, modularity, maintainability, testability, and cross-platform UI support. It is currently under **active refactoring**, with major milestones already completed:
 
 ✅ Engine is now headless  
 ✅ `GameEvents` emit UI updates without any UI dependency  
@@ -69,6 +69,7 @@ The current version is a complete architectural rewrite, modernized for maintain
 ✅ Engine is ready to be wrapped in a WebSocket server for multi-platform frontends  
 
 🔜 Next steps:
+- Ongoing : completely redesign the transition between a hand's streets (Preflop->Flop->Turn->River->PostRiver) using a Finished State Machine (FSM)
 - Completely rewrite the Qt Widgets poker table UI for a clean and modern layout
 - Build JSON-based WebSocket protocol  
 - Develop Flutter UI for Android/Web  
