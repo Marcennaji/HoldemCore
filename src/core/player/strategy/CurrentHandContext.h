@@ -41,7 +41,7 @@ struct CurrentHandContext
     int highestSet = 0;
     bool isPreflopBigBet = false;
     int smallBlind = 0;
-    std::string stringBoard; // string representation of the board, e.g. "2H 3D 4C 5S 6H"
+    std::string stringBoard; // string representation of the board's cards
 
     // data that depends on the player that is using the strategy
     float myPreflopCallingRange = -1;

@@ -10,6 +10,7 @@ void PlayerFsm::resetForNewHand()
 {
     myPlayer->setHand(nullptr);
     myPlayer->setCardsFlip(0);
+    myPlayer->getCurrentHandActions().reset();
 }
 void PlayerFsm::setButton(Button b)
 {

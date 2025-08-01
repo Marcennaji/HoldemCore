@@ -178,7 +178,7 @@ void BotPlayer::doPreflopAction()
         currentHand->setPreflopLastRaiserId(myID);
     }
 
-    myCurrentHandActions.m_preflopActions.push_back(myAction);
+    myCurrentHandActions.getPreflopActions().push_back(myAction);
 
     updatePreflopStatistics();
 
@@ -249,7 +249,7 @@ void BotPlayer::doFlopAction()
         currentHand->setFlopLastRaiserId(myID);
     }
 
-    myCurrentHandActions.m_flopActions.push_back(myAction);
+    myCurrentHandActions.getFlopActions().push_back(myAction);
 
     updateFlopStatistics();
 
@@ -321,7 +321,7 @@ void BotPlayer::doTurnAction()
         currentHand->setTurnLastRaiserId(myID);
     }
 
-    myCurrentHandActions.m_turnActions.push_back(myAction);
+    myCurrentHandActions.getTurnActions().push_back(myAction);
 
     updateTurnStatistics();
 
@@ -388,7 +388,7 @@ void BotPlayer::doRiverAction()
         }
     }
 
-    myCurrentHandActions.m_riverActions.push_back(myAction);
+    myCurrentHandActions.getRiverActions().push_back(myAction);
 
     updateRiverStatistics();
 

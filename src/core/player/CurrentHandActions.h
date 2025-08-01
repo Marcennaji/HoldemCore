@@ -27,10 +27,6 @@ class CurrentHandActions
     const std::vector<ActionType>& getRiverActions() const { return m_riverActions; };
 
   protected:
-    friend class Player;
-    friend class HumanPlayer;
-    friend class BotPlayer;
-
     std::vector<ActionType> m_preflopActions;
     std::vector<ActionType> m_flopActions;
     std::vector<ActionType> m_turnActions;

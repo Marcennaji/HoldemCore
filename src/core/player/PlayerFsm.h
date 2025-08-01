@@ -19,6 +19,7 @@ class PlayerFsm
     void setButton(Button);
     Button getButton() const;
 
+  protected:
   private:
     std::shared_ptr<Player> myPlayer;
     Button myButton = ButtonNone;

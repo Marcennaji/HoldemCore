@@ -44,8 +44,6 @@ class StartWindow : public QMainWindow, public Ui::StartWindow
 
     std::shared_ptr<PokerTableWindow> myPokerTableWindow;
     pkt::core::Session* mySession;
-
-    friend class GuiWrapper;
 };
 
 } // namespace pkt::ui::qtwidgets

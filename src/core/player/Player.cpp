@@ -369,7 +369,7 @@ void Player::updatePreflopStatistics()
 
     const int nbPlayers = currentHand->getSeatsList()->size();
 
-    if (myCurrentHandActions.m_preflopActions.size() == 1)
+    if (myCurrentHandActions.getPreflopActions().size() == 1)
     {
         myStatistics[nbPlayers].m_toTalHands++;
         myStatistics[nbPlayers].m_preflopStatistics.m_hands++;
@@ -404,8 +404,8 @@ void Player::updatePreflopStatistics()
     }
 
     int playerRaises = 0;
-    for (std::vector<ActionType>::const_iterator i = myCurrentHandActions.m_preflopActions.begin();
-         i != myCurrentHandActions.m_preflopActions.end(); i++)
+    for (std::vector<ActionType>::const_iterator i = myCurrentHandActions.getPreflopActions().begin();
+         i != myCurrentHandActions.getPreflopActions().end(); i++)
     {
         if (*i == ActionType::Raise || *i == ActionType::Allin)
         {
@@ -446,7 +446,7 @@ void Player::updateFlopStatistics()
 
     const int nbPlayers = currentHand->getSeatsList()->size();
 
-    if (myCurrentHandActions.m_flopActions.size() == 1)
+    if (myCurrentHandActions.getFlopActions().size() == 1)
     {
         myStatistics[nbPlayers].m_flopStatistics.m_hands++;
     }
@@ -494,7 +494,7 @@ void Player::updateTurnStatistics()
 
     const int nbPlayers = currentHand->getSeatsList()->size();
 
-    if (myCurrentHandActions.m_turnActions.size() == 1)
+    if (myCurrentHandActions.getTurnActions().size() == 1)
     {
         myStatistics[nbPlayers].m_turnStatistics.m_hands++;
     }
@@ -532,7 +532,7 @@ void Player::updateRiverStatistics()
 
     const int nbPlayers = currentHand->getSeatsList()->size();
 
-    if (myCurrentHandActions.m_riverActions.size() == 1)
+    if (myCurrentHandActions.getRiverActions().size() == 1)
     {
         myStatistics[nbPlayers].m_riverStatistics.m_hands++;
     }
@@ -1057,8 +1057,8 @@ void Player::updateCurrentHandContext(const GameState state)
     myCurrentHandContext->nbPlayers = currentHand->getSeatsList()->size();
     myCurrentHandContext->smallBlind = currentHand->getSmallBlind();
 
-    for (std::vector<ActionType>::const_iterator i = myCurrentHandActions.m_flopActions.begin();
-         i != myCurrentHandActions.m_flopActions.end(); i++)
+    for (std::vector<ActionType>::const_iterator i = myCurrentHandActions.getFlopActions().begin();
+         i != myCurrentHandActions.getFlopActions().end(); i++)
     {
 
         if (*i == ActionType::Raise)
@@ -1099,11 +1099,12 @@ void Player::updateCurrentHandContext(const GameState state)
     myCurrentHandContext->myPosition = myPosition;
 
     // player specific, hidden from the opponents :
-    myCurrentHandContext->myCanBluff = canBluff(state);
-    myCurrentHandContext->myPreflopCallingRange = calculatePreflopCallingRange(*myCurrentHandContext);
-    myCurrentHandContext->myHandSimulation = computeHandSimulation();
     myCurrentHandContext->myCard1 = myCard1;
     myCurrentHandContext->myCard2 = myCard2;
+    myCurrentHandContext->myCanBluff = canBluff(state);
+    myCurrentHandContext->myPreflopCallingRange = calculatePreflopCallingRange(*myCurrentHandContext);
+    // guess what the opponents might have and evaluate our strength, given our hole cards and the board cards (if any)
+    myCurrentHandContext->myHandSimulation = computeHandSimulation();
     myCurrentHandContext->myPostFlopAnalysisFlags = getPostFlopAnalysisFlags();
 }
 

@@ -130,11 +130,11 @@ void HandFsm::applyActionEffects(const PlayerAction& action)
     // myActionHistory.push_back(action);
 }
 
-pkt::core::player::PlayerFsmList HandFsm::getSeatsList() const
+const pkt::core::player::PlayerFsmList HandFsm::getSeatsList() const
 {
     return mySeatsList;
 }
-pkt::core::player::PlayerFsmList HandFsm::getRunningPlayersList() const
+const pkt::core::player::PlayerFsmList HandFsm::getRunningPlayersList() const
 {
     return myRunningPlayersList;
 }

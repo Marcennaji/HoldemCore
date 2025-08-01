@@ -31,8 +31,8 @@ class HandFsm : public IHandLifecycle, public IHandPlayerAction, public IPlayerA
     void initAndShuffleDeck() override;
 
     void handlePlayerAction(PlayerAction action) override;
-    pkt::core::player::PlayerFsmList getSeatsList() const override;
-    pkt::core::player::PlayerFsmList getRunningPlayersList() const override;
+    const pkt::core::player::PlayerFsmList getSeatsList() const override;
+    const pkt::core::player::PlayerFsmList getRunningPlayersList() const override;
 
   private:
     void applyActionEffects(const PlayerAction& action);
