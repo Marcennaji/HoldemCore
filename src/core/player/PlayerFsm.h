@@ -24,7 +24,6 @@
 
 namespace pkt::core
 {
-class IHand;
 class HandFsm;
 
 } // namespace pkt::core

@@ -204,35 +204,35 @@ void PlayerFsm::updatePreflopStatistics(const int nbPlayers)
     if (myCurrentHandActions.getPreflopActions().size() == 1)
     {
         myStatistics[nbPlayers].m_toTalHands++;
-        myStatistics[nbPlayers].m_preflopStatistics.m_hands++;
+        myStatistics[nbPlayers].preflopStatistics.hands++;
     }
 
     switch (myAction)
     {
     case ActionType::Allin:
-        myStatistics[nbPlayers].m_preflopStatistics.m_raises++;
+        myStatistics[nbPlayers].preflopStatistics.raises++;
         break;
     case ActionType::Raise:
-        myStatistics[nbPlayers].m_preflopStatistics.m_raises++;
+        myStatistics[nbPlayers].preflopStatistics.raises++;
         break;
     case ActionType::Fold:
-        myStatistics[nbPlayers].m_preflopStatistics.m_folds++;
+        myStatistics[nbPlayers].preflopStatistics.folds++;
         break;
     case ActionType::Check:
-        myStatistics[nbPlayers].m_preflopStatistics.m_checks++;
+        myStatistics[nbPlayers].preflopStatistics.checks++;
         break;
     case ActionType::Call:
-        myStatistics[nbPlayers].m_preflopStatistics.m_calls++;
+        myStatistics[nbPlayers].preflopStatistics.calls++;
         break;
     default:
         break;
     }
 
-    myStatistics[nbPlayers].m_preflopStatistics.addLastAction(myAction); // keep track of the last 10 actions
+    myStatistics[nbPlayers].preflopStatistics.addLastAction(myAction); // keep track of the last 10 actions
 
     if (myAction == ActionType::Call && currentHand.getRaisersPositions().size() == 0)
     { //
-        myStatistics[nbPlayers].m_preflopStatistics.m_limps++;
+        myStatistics[nbPlayers].preflopStatistics.limps++;
     }
 
     int playerRaises = 0;
@@ -250,12 +250,12 @@ void PlayerFsm::updatePreflopStatistics(const int nbPlayers)
 
         if (playerRaises == 1 && currentHand.getRaisersPositions().size() == 2)
         {
-            myStatistics[nbPlayers].m_preflopStatistics.m_3Bets++;
+            myStatistics[nbPlayers].preflopStatistics.threeBets++;
         }
 
         if (playerRaises == 2 || (playerRaises == 1 && currentHand.getRaisersPositions().size() == 3))
         {
-            myStatistics[nbPlayers].m_preflopStatistics.m_4Bets++;
+            myStatistics[nbPlayers].preflopStatistics.fourBets++;
         }
     }
     else
@@ -264,11 +264,11 @@ void PlayerFsm::updatePreflopStatistics(const int nbPlayers)
         if (playerRaises == 1)
         {
 
-            myStatistics[nbPlayers].m_preflopStatistics.m_call3BetsOpportunities++;
+            myStatistics[nbPlayers].preflopStatistics.callthreeBetsOpportunities++;
 
             if (myAction == ActionType::Call)
             {
-                myStatistics[nbPlayers].m_preflopStatistics.m_call3Bets++;
+                myStatistics[nbPlayers].preflopStatistics.callthreeBets++;
             }
         }
     }
@@ -278,44 +278,44 @@ void PlayerFsm::updateFlopStatistics(const int nbPlayers)
 
     if (myCurrentHandActions.getFlopActions().size() == 1)
     {
-        myStatistics[nbPlayers].m_flopStatistics.m_hands++;
+        myStatistics[nbPlayers].flopStatistics.hands++;
     }
 
     switch (myAction)
     {
     case ActionType::Allin:
-        myStatistics[nbPlayers].m_flopStatistics.m_raises++;
+        myStatistics[nbPlayers].flopStatistics.raises++;
         break;
     case ActionType::Raise:
-        myStatistics[nbPlayers].m_flopStatistics.m_raises++;
+        myStatistics[nbPlayers].flopStatistics.raises++;
         break;
     case ActionType::Fold:
-        myStatistics[nbPlayers].m_flopStatistics.m_folds++;
+        myStatistics[nbPlayers].flopStatistics.folds++;
         break;
     case ActionType::Check:
-        myStatistics[nbPlayers].m_flopStatistics.m_checks++;
+        myStatistics[nbPlayers].flopStatistics.checks++;
         break;
     case ActionType::Call:
-        myStatistics[nbPlayers].m_flopStatistics.m_calls++;
+        myStatistics[nbPlayers].flopStatistics.calls++;
         break;
     case ActionType::Bet:
-        myStatistics[nbPlayers].m_flopStatistics.m_bets++;
+        myStatistics[nbPlayers].flopStatistics.bets++;
         break;
     default:
         break;
     }
     if (myAction == ActionType::Raise && currentHand.getRaisersPositions().size() > 1)
     {
-        myStatistics[nbPlayers].m_flopStatistics.m_3Bets++;
+        myStatistics[nbPlayers].flopStatistics.threeBets++;
     }
 
     // continuation bets
     if (currentHand.getPreflopLastRaiserId() == myID)
     {
-        myStatistics[nbPlayers].m_flopStatistics.m_continuationBetsOpportunities++;
+        myStatistics[nbPlayers].flopStatistics.continuationBetsOpportunities++;
         if (myAction == ActionType::Bet)
         {
-            myStatistics[nbPlayers].m_flopStatistics.m_continuationBets++;
+            myStatistics[nbPlayers].flopStatistics.continuationBets++;
         }
     }
 }
@@ -324,35 +324,35 @@ void PlayerFsm::updateTurnStatistics(const int nbPlayers)
 
     if (myCurrentHandActions.getTurnActions().size() == 1)
     {
-        myStatistics[nbPlayers].m_turnStatistics.m_hands++;
+        myStatistics[nbPlayers].turnStatistics.hands++;
     }
 
     switch (myAction)
     {
     case ActionType::Allin:
-        myStatistics[nbPlayers].m_turnStatistics.m_raises++;
+        myStatistics[nbPlayers].turnStatistics.raises++;
         break;
     case ActionType::Raise:
-        myStatistics[nbPlayers].m_turnStatistics.m_raises++;
+        myStatistics[nbPlayers].turnStatistics.raises++;
         break;
     case ActionType::Fold:
-        myStatistics[nbPlayers].m_turnStatistics.m_folds++;
+        myStatistics[nbPlayers].turnStatistics.folds++;
         break;
     case ActionType::Check:
-        myStatistics[nbPlayers].m_turnStatistics.m_checks++;
+        myStatistics[nbPlayers].turnStatistics.checks++;
         break;
     case ActionType::Call:
-        myStatistics[nbPlayers].m_turnStatistics.m_calls++;
+        myStatistics[nbPlayers].turnStatistics.calls++;
         break;
     case ActionType::Bet:
-        myStatistics[nbPlayers].m_turnStatistics.m_bets++;
+        myStatistics[nbPlayers].turnStatistics.bets++;
         break;
     default:
         break;
     }
     if (myAction == ActionType::Raise && currentHand.getRaisersPositions().size() > 1)
     {
-        myStatistics[nbPlayers].m_turnStatistics.m_3Bets++;
+        myStatistics[nbPlayers].turnStatistics.threeBets++;
     }
 }
 void PlayerFsm::updateRiverStatistics(const int nbPlayers)
@@ -360,35 +360,35 @@ void PlayerFsm::updateRiverStatistics(const int nbPlayers)
 
     if (myCurrentHandActions.getRiverActions().size() == 1)
     {
-        myStatistics[nbPlayers].m_riverStatistics.m_hands++;
+        myStatistics[nbPlayers].riverStatistics.hands++;
     }
 
     switch (myAction)
     {
     case ActionType::Allin:
-        myStatistics[nbPlayers].m_riverStatistics.m_raises++;
+        myStatistics[nbPlayers].riverStatistics.raises++;
         break;
     case ActionType::Raise:
-        myStatistics[nbPlayers].m_riverStatistics.m_raises++;
+        myStatistics[nbPlayers].riverStatistics.raises++;
         break;
     case ActionType::Fold:
-        myStatistics[nbPlayers].m_riverStatistics.m_folds++;
+        myStatistics[nbPlayers].riverStatistics.folds++;
         break;
     case ActionType::Check:
-        myStatistics[nbPlayers].m_riverStatistics.m_checks++;
+        myStatistics[nbPlayers].riverStatistics.checks++;
         break;
     case ActionType::Call:
-        myStatistics[nbPlayers].m_riverStatistics.m_calls++;
+        myStatistics[nbPlayers].riverStatistics.calls++;
         break;
     case ActionType::Bet:
-        myStatistics[nbPlayers].m_riverStatistics.m_bets++;
+        myStatistics[nbPlayers].riverStatistics.bets++;
         break;
     default:
         break;
     }
     if (myAction == ActionType::Raise && currentHand.getRaisersPositions().size() > 1)
     {
-        myStatistics[nbPlayers].m_riverStatistics.m_3Bets++;
+        myStatistics[nbPlayers].riverStatistics.threeBets++;
     }
 }
     */
@@ -726,15 +726,15 @@ bool PlayerFsm::canBluff(const GameState gameState) const
             continue;
         }
 
-        PreflopStatistics preflopStats = (*it)->getStatistics(nbPlayers).getPreflopStatistics();
+        PreflopStatistics preflopStats = (*it)->getStatistics(nbPlayers).preflopStatistics;
 
         // if not enough hands, then try to use the statistics collected for (nbPlayers + 1), they should be more
         // accurate
-        if (preflopStats.m_hands < MIN_HANDS_STATISTICS_ACCURATE && nbPlayers < 10 &&
-            (*it)->getStatistics(nbPlayers + 1).getPreflopStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE)
+        if (preflopStats.hands < MIN_HANDS_STATISTICS_ACCURATE && nbPlayers < 10 &&
+            (*it)->getStatistics(nbPlayers + 1).preflopStatistics.hands > MIN_HANDS_STATISTICS_ACCURATE)
         {
 
-            preflopStats = (*it)->getStatistics(nbPlayers + 1).getPreflopStatistics();
+            preflopStats = (*it)->getStatistics(nbPlayers + 1).preflopStatistics;
         }
 
         if ((*it)->getStatistics(nbPlayers).getWentToShowDown() >= 40 &&
@@ -751,7 +751,7 @@ bool PlayerFsm::canBluff(const GameState gameState) const
 
         if (gameState == GameStatePreflop)
         {
-            if (preflopStats.getPreflopCall3BetsFrequency() > 40)
+            if (preflopStats.getPreflopCallthreeBetsFrequency() > 40)
             {
                 return false;
             }
@@ -775,7 +775,7 @@ bool PlayerFsm::isInVeryLooseMode(const int nbPlayers) const
 {
     PlayerStatistics stats = getStatistics(nbPlayers);
 
-    PreflopStatistics preflop = stats.getPreflopStatistics();
+    PreflopStatistics preflop = stats.preflopStatistics;
 
     if (preflop.getLastActionsNumber(ActionType::Allin) + preflop.getLastActionsNumber(ActionType::Raise) +
             preflop.getLastActionsNumber(ActionType::Call) >

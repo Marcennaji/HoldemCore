@@ -173,11 +173,11 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
     if (ctx.commonContext.preflopRaisesNumber == 1)
     {
         PreflopStatistics raiserStats =
-            ctx.commonContext.preflopLastRaiser->getStatistics(ctx.commonContext.nbPlayers).getPreflopStatistics();
+            ctx.commonContext.preflopLastRaiser->getStatistics(ctx.commonContext.nbPlayers).preflopStatistics;
 
         if (!isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2, stringRaisingRange) &&
             ctx.perPlayerContext.myM > 20 && ctx.perPlayerContext.myCash > ctx.commonContext.highestSet * 20 &&
-            ctx.perPlayerContext.myPosition > UtgPlusTwo && raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE &&
+            ctx.perPlayerContext.myPosition > UtgPlusTwo && raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE &&
             ctx.perPlayerContext.myPosition > ctx.commonContext.preflopLastRaiser->getPosition() &&
             ctx.commonContext.preflopLastRaiser->getCash() > ctx.commonContext.highestSet * 10 &&
             !ctx.commonContext.isPreflopBigBet && ctx.commonContext.preflopCallsNumber < 2)
@@ -185,7 +185,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
             if (ctx.perPlayerContext.myCanBluff && ctx.perPlayerContext.myPosition > LATE &&
                 ctx.commonContext.preflopRaisesNumber == 1 &&
                 !isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2, ACES + BROADWAYS) &&
-                raiserStats.getPreflopCall3BetsFrequency() < 30)
+                raiserStats.getPreflopCallthreeBetsFrequency() < 30)
             {
 
                 speculativeHandedAdded = true;
@@ -205,7 +205,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
                 {
                     if (!isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2,
                                         PAIRS + ACES + BROADWAYS) &&
-                        raiserStats.getPreflopCall3BetsFrequency() < 30)
+                        raiserStats.getPreflopCallthreeBetsFrequency() < 30)
                     {
 
                         int rand = 0;
@@ -225,12 +225,12 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
     if (!speculativeHandedAdded && ctx.commonContext.preflopRaisesNumber == 2)
     {
         PreflopStatistics raiserStats =
-            ctx.commonContext.preflopLastRaiser->getStatistics(ctx.commonContext.nbPlayers).getPreflopStatistics();
+            ctx.commonContext.preflopLastRaiser->getStatistics(ctx.commonContext.nbPlayers).preflopStatistics;
 
         if (!isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2, stringRaisingRange) &&
             !isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2, OFFSUITED_BROADWAYS) &&
             ctx.perPlayerContext.myM > 20 && ctx.perPlayerContext.myCash > ctx.commonContext.highestSet * 60 &&
-            ctx.perPlayerContext.myPosition > MiddlePlusOne && raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE &&
+            ctx.perPlayerContext.myPosition > MiddlePlusOne && raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE &&
             ctx.perPlayerContext.myPosition > ctx.commonContext.preflopLastRaiser->getPosition() &&
             ctx.commonContext.preflopLastRaiser->getCash() > ctx.commonContext.highestSet * 20 &&
             !ctx.commonContext.isPreflopBigBet && ctx.commonContext.preflopCallsNumber < 2)
@@ -575,17 +575,16 @@ bool ManiacBotStrategy::turnShouldCall(CurrentHandContext& ctx)
     }
 
     TurnStatistics raiserStats =
-        ctx.commonContext.turnLastRaiser->getStatistics(ctx.commonContext.nbPlayers).getTurnStatistics();
+        ctx.commonContext.turnLastRaiser->getStatistics(ctx.commonContext.nbPlayers).turnStatistics;
 
     // if not enough hands, then try to use the statistics collected for (nbPlayers + 1), they should be more
     // accurate
-    if (raiserStats.m_hands < MIN_HANDS_STATISTICS_ACCURATE && ctx.commonContext.nbPlayers < 10 &&
-        ctx.commonContext.turnLastRaiser->getStatistics(ctx.commonContext.nbPlayers + 1).getTurnStatistics().m_hands >
+    if (raiserStats.hands < MIN_HANDS_STATISTICS_ACCURATE && ctx.commonContext.nbPlayers < 10 &&
+        ctx.commonContext.turnLastRaiser->getStatistics(ctx.commonContext.nbPlayers + 1).turnStatistics.hands >
             MIN_HANDS_STATISTICS_ACCURATE)
     {
 
-        raiserStats =
-            ctx.commonContext.turnLastRaiser->getStatistics(ctx.commonContext.nbPlayers + 1).getTurnStatistics();
+        raiserStats = ctx.commonContext.turnLastRaiser->getStatistics(ctx.commonContext.nbPlayers + 1).turnStatistics;
     }
 
     if (ctx.perPlayerContext.myHandSimulation.winRanged * 100 < ctx.commonContext.potOdd &&
@@ -597,7 +596,7 @@ bool ManiacBotStrategy::turnShouldCall(CurrentHandContext& ctx)
     if (ctx.commonContext.turnBetsOrRaisesNumber == 2 && ctx.perPlayerContext.myHandSimulation.winRanged < 0.8 &&
         ctx.perPlayerContext.myHandSimulation.win < 0.9)
     {
-        if (raiserStats.m_hands <= MIN_HANDS_STATISTICS_ACCURATE)
+        if (raiserStats.hands <= MIN_HANDS_STATISTICS_ACCURATE)
         {
             return false;
         }
@@ -609,7 +608,7 @@ bool ManiacBotStrategy::turnShouldCall(CurrentHandContext& ctx)
     if (ctx.commonContext.turnBetsOrRaisesNumber > 2 && ctx.perPlayerContext.myHandSimulation.winRanged < 0.8 &&
         ctx.perPlayerContext.myHandSimulation.win < 0.9)
     {
-        if (raiserStats.m_hands <= MIN_HANDS_STATISTICS_ACCURATE)
+        if (raiserStats.hands <= MIN_HANDS_STATISTICS_ACCURATE)
         {
             return false;
         }

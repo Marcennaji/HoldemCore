@@ -150,13 +150,13 @@ void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(CurrentHandConte
 
     const int nbPlayers = ctx.commonContext.nbPlayers;
 
-    PreflopStatistics preflop = ctx.perPlayerContext.myStatistics.getPreflopStatistics();
+    PreflopStatistics preflop = ctx.perPlayerContext.myStatistics.preflopStatistics;
 
     // if no raise and the BB checks :
     if (ctx.perPlayerContext.myCurrentHandActions.getPreflopActions().back() == ActionType::Check)
     {
 
-        if (preflop.m_hands >= MIN_HANDS_STATISTICS_ACCURATE)
+        if (preflop.hands >= MIN_HANDS_STATISTICS_ACCURATE)
         {
             setEstimatedRange(
                 RangeRefiner::deduceRange(getEstimatedRange(), getStringRange(nbPlayers, preflop.getPreflopRaise())));
@@ -185,9 +185,9 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext&
 
     // update my unplausible hands (unplausible to my opponents eyes), given what I did on flop
 
-    FlopStatistics flop = ctx.perPlayerContext.myStatistics.getFlopStatistics();
+    FlopStatistics flop = ctx.perPlayerContext.myStatistics.flopStatistics;
 
-    PreflopStatistics preflop = ctx.perPlayerContext.myStatistics.getPreflopStatistics();
+    PreflopStatistics preflop = ctx.perPlayerContext.myStatistics.preflopStatistics;
 
     if (ctx.perPlayerContext.myIsInVeryLooseMode)
     {
@@ -286,8 +286,8 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(CurrentHandContext&
 
     // update my unplausible hands (unplausible to my opponents eyes), given what I did on turn
 
-    TurnStatistics turn = stats.getTurnStatistics();
-    PreflopStatistics preflop = stats.getPreflopStatistics();
+    TurnStatistics turn = stats.turnStatistics;
+    PreflopStatistics preflop = stats.preflopStatistics;
 
     if (ctx.perPlayerContext.myIsInVeryLooseMode)
     {
@@ -379,9 +379,9 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(CurrentHandContext
 
     // update my unplausible hands (unplausible to my opponents eyes), given what I did on river
 
-    RiverStatistics river = stats.getRiverStatistics();
+    RiverStatistics river = stats.riverStatistics;
 
-    PreflopStatistics preflop = stats.getPreflopStatistics();
+    PreflopStatistics preflop = stats.preflopStatistics;
 
     if (ctx.perPlayerContext.myIsInVeryLooseMode)
     {

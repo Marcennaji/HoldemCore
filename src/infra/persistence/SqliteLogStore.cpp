@@ -96,10 +96,10 @@ void SqliteLogStore::createDatabase()
     mySql += ", pf_checks LARGEINT ";
     mySql += ", pf_calls LARGEINT ";
     mySql += ", pf_raises LARGEINT ";
-    mySql += ", pf_3Bets LARGEINT ";
-    mySql += ", pf_call3Bets LARGEINT ";
-    mySql += ", pf_call3BetsOpportunities LARGEINT ";
-    mySql += ", pf_4Bets LARGEINT ";
+    mySql += ", pf_threeBets LARGEINT ";
+    mySql += ", pf_callthreeBets LARGEINT ";
+    mySql += ", pf_callthreeBetsOpportunities LARGEINT ";
+    mySql += ", pf_fourBets LARGEINT ";
     // flop stats :
     mySql += ", f_hands LARGEINT ";
     mySql += ", f_folds LARGEINT ";
@@ -107,8 +107,8 @@ void SqliteLogStore::createDatabase()
     mySql += ", f_bets LARGEINT ";
     mySql += ", f_calls LARGEINT ";
     mySql += ", f_raises LARGEINT ";
-    mySql += ", f_3Bets LARGEINT ";
-    mySql += ", f_4Bets LARGEINT ";
+    mySql += ", f_threeBets LARGEINT ";
+    mySql += ", f_fourBets LARGEINT ";
     mySql += ", f_continuationBets LARGEINT ";
     mySql += ", f_continuationBetsOpportunities LARGEINT ";
     // turn stats :
@@ -118,8 +118,8 @@ void SqliteLogStore::createDatabase()
     mySql += ", t_calls LARGEINT ";
     mySql += ", t_bets LARGEINT ";
     mySql += ", t_raises LARGEINT ";
-    mySql += ", t_3Bets LARGEINT ";
-    mySql += ", t_4Bets LARGEINT ";
+    mySql += ", t_threeBets LARGEINT ";
+    mySql += ", t_fourBets LARGEINT ";
     // river stats :
     mySql += ", r_hands LARGEINT ";
     mySql += ", r_folds LARGEINT ";
@@ -127,8 +127,8 @@ void SqliteLogStore::createDatabase()
     mySql += ", r_checks LARGEINT ";
     mySql += ", r_calls LARGEINT ";
     mySql += ", r_raises LARGEINT ";
-    mySql += ", r_3Bets LARGEINT ";
-    mySql += ", r_4Bets LARGEINT ";
+    mySql += ", r_threeBets LARGEINT ";
+    mySql += ", r_fourBets LARGEINT ";
 
     mySql += ", PRIMARY KEY(strategy_name, nb_players));";
 
@@ -155,12 +155,13 @@ void SqliteLogStore::initializeStrategyStatistics(const string playerName, const
 
     mySql += "INSERT OR REPLACE INTO PlayersStatistics (";
     mySql += "strategy_name,nb_players";
-    mySql += ",pf_hands,pf_checks,pf_calls,pf_raises,pf_3Bets,pf_call3Bets,pf_call3BetsOpportunities,pf_4Bets,pf_folds,"
+    mySql += ",pf_hands,pf_checks,pf_calls,pf_raises,pf_threeBets,pf_callthreeBets,pf_callthreeBetsOpportunities,pf_"
+             "fourBets,pf_folds,"
              "pf_limps";
-    mySql += ",f_hands,f_checks,f_bets,f_calls,f_raises,f_3Bets,f_4Bets,f_folds,f_continuationBets,f_"
+    mySql += ",f_hands,f_checks,f_bets,f_calls,f_raises,f_threeBets,f_fourBets,f_folds,f_continuationBets,f_"
              "continuationBetsOpportunities";
-    mySql += ",t_hands,t_checks,t_bets,t_calls,t_raises,t_3Bets,t_4Bets,t_folds";
-    mySql += ",r_hands,r_checks,r_bets,r_calls,r_raises,r_3Bets,r_4Bets,r_folds";
+    mySql += ",t_hands,t_checks,t_bets,t_calls,t_raises,t_threeBets,t_fourBets,t_folds";
+    mySql += ",r_hands,r_checks,r_bets,r_calls,r_raises,r_threeBets,r_fourBets,r_folds";
     mySql += ") VALUES (";
     mySql += "'";
     mySql += playerName;
@@ -405,55 +406,54 @@ void SqliteLogStore::updatePlayersStatistics(PlayerList seatsList)
     for (itC = seatsList->begin(); itC != seatsList->end(); ++itC)
     {
 
-        if ((*itC)->getStatistics(i).getPreflopStatistics().m_hands == 0)
+        if ((*itC)->getStatistics(i).preflopStatistics.hands == 0)
         {
             return;
         }
 
         mySql = "UPDATE PlayersStatistics SET ";
 
-        mySql += "pf_hands = " + std::to_string((*itC)->getStatistics(i).getPreflopStatistics().m_hands);
-        mySql += ",pf_checks = " + std::to_string((*itC)->getStatistics(i).getPreflopStatistics().m_checks);
-        mySql += ",pf_calls = " + std::to_string((*itC)->getStatistics(i).getPreflopStatistics().m_calls);
-        mySql += ",pf_raises = " + std::to_string((*itC)->getStatistics(i).getPreflopStatistics().m_raises);
-        mySql += ",pf_3Bets = " + std::to_string((*itC)->getStatistics(i).getPreflopStatistics().m_3Bets);
-        mySql += ",pf_call3Bets = " + std::to_string((*itC)->getStatistics(i).getPreflopStatistics().m_call3Bets);
-        mySql += ",pf_call3BetsOpportunities = " +
-                 std::to_string((*itC)->getStatistics(i).getPreflopStatistics().m_call3BetsOpportunities);
-        mySql += ",pf_4Bets = " + std::to_string((*itC)->getStatistics(i).getPreflopStatistics().m_4Bets);
-        mySql += ",pf_folds = " + std::to_string((*itC)->getStatistics(i).getPreflopStatistics().m_folds);
-        mySql += ",pf_limps = " + std::to_string((*itC)->getStatistics(i).getPreflopStatistics().m_limps);
+        mySql += "pf_hands = " + std::to_string((*itC)->getStatistics(i).preflopStatistics.hands);
+        mySql += ",pf_checks = " + std::to_string((*itC)->getStatistics(i).preflopStatistics.checks);
+        mySql += ",pf_calls = " + std::to_string((*itC)->getStatistics(i).preflopStatistics.calls);
+        mySql += ",pf_raises = " + std::to_string((*itC)->getStatistics(i).preflopStatistics.raises);
+        mySql += ",pf_threeBets = " + std::to_string((*itC)->getStatistics(i).preflopStatistics.threeBets);
+        mySql += ",pf_callthreeBets = " + std::to_string((*itC)->getStatistics(i).preflopStatistics.callthreeBets);
+        mySql += ",pf_callthreeBetsOpportunities = " +
+                 std::to_string((*itC)->getStatistics(i).preflopStatistics.callthreeBetsOpportunities);
+        mySql += ",pf_fourBets = " + std::to_string((*itC)->getStatistics(i).preflopStatistics.fourBets);
+        mySql += ",pf_folds = " + std::to_string((*itC)->getStatistics(i).preflopStatistics.folds);
+        mySql += ",pf_limps = " + std::to_string((*itC)->getStatistics(i).preflopStatistics.limps);
 
-        mySql += ",f_hands = " + std::to_string((*itC)->getStatistics(i).getFlopStatistics().m_hands);
-        mySql += ",f_bets = " + std::to_string((*itC)->getStatistics(i).getFlopStatistics().m_bets);
-        mySql += ",f_checks = " + std::to_string((*itC)->getStatistics(i).getFlopStatistics().m_checks);
-        mySql += ",f_calls = " + std::to_string((*itC)->getStatistics(i).getFlopStatistics().m_calls);
-        mySql += ",f_raises = " + std::to_string((*itC)->getStatistics(i).getFlopStatistics().m_raises);
-        mySql += ",f_3Bets = " + std::to_string((*itC)->getStatistics(i).getFlopStatistics().m_3Bets);
-        mySql += ",f_4Bets = " + std::to_string((*itC)->getStatistics(i).getFlopStatistics().m_4Bets);
-        mySql += ",f_folds = " + std::to_string((*itC)->getStatistics(i).getFlopStatistics().m_folds);
-        mySql +=
-            ",f_continuationBets = " + std::to_string((*itC)->getStatistics(i).getFlopStatistics().m_continuationBets);
+        mySql += ",f_hands = " + std::to_string((*itC)->getStatistics(i).flopStatistics.hands);
+        mySql += ",f_bets = " + std::to_string((*itC)->getStatistics(i).flopStatistics.bets);
+        mySql += ",f_checks = " + std::to_string((*itC)->getStatistics(i).flopStatistics.checks);
+        mySql += ",f_calls = " + std::to_string((*itC)->getStatistics(i).flopStatistics.calls);
+        mySql += ",f_raises = " + std::to_string((*itC)->getStatistics(i).flopStatistics.raises);
+        mySql += ",f_threeBets = " + std::to_string((*itC)->getStatistics(i).flopStatistics.threeBets);
+        mySql += ",f_fourBets = " + std::to_string((*itC)->getStatistics(i).flopStatistics.fourBets);
+        mySql += ",f_folds = " + std::to_string((*itC)->getStatistics(i).flopStatistics.folds);
+        mySql += ",f_continuationBets = " + std::to_string((*itC)->getStatistics(i).flopStatistics.continuationBets);
         mySql += ",f_continuationBetsOpportunities = " +
-                 std::to_string((*itC)->getStatistics(i).getFlopStatistics().m_continuationBetsOpportunities);
+                 std::to_string((*itC)->getStatistics(i).flopStatistics.continuationBetsOpportunities);
 
-        mySql += ",t_hands = " + std::to_string((*itC)->getStatistics(i).getTurnStatistics().m_hands);
-        mySql += ",t_checks = " + std::to_string((*itC)->getStatistics(i).getTurnStatistics().m_checks);
-        mySql += ",t_bets = " + std::to_string((*itC)->getStatistics(i).getTurnStatistics().m_bets);
-        mySql += ",t_calls = " + std::to_string((*itC)->getStatistics(i).getTurnStatistics().m_calls);
-        mySql += ",t_raises = " + std::to_string((*itC)->getStatistics(i).getTurnStatistics().m_raises);
-        mySql += ",t_3Bets = " + std::to_string((*itC)->getStatistics(i).getTurnStatistics().m_3Bets);
-        mySql += ",t_4Bets = " + std::to_string((*itC)->getStatistics(i).getTurnStatistics().m_4Bets);
-        mySql += ",t_folds = " + std::to_string((*itC)->getStatistics(i).getTurnStatistics().m_folds);
+        mySql += ",t_hands = " + std::to_string((*itC)->getStatistics(i).turnStatistics.hands);
+        mySql += ",t_checks = " + std::to_string((*itC)->getStatistics(i).turnStatistics.checks);
+        mySql += ",t_bets = " + std::to_string((*itC)->getStatistics(i).turnStatistics.bets);
+        mySql += ",t_calls = " + std::to_string((*itC)->getStatistics(i).turnStatistics.calls);
+        mySql += ",t_raises = " + std::to_string((*itC)->getStatistics(i).turnStatistics.raises);
+        mySql += ",t_threeBets = " + std::to_string((*itC)->getStatistics(i).turnStatistics.threeBets);
+        mySql += ",t_fourBets = " + std::to_string((*itC)->getStatistics(i).turnStatistics.fourBets);
+        mySql += ",t_folds = " + std::to_string((*itC)->getStatistics(i).turnStatistics.folds);
 
-        mySql += ",r_hands = " + std::to_string((*itC)->getStatistics(i).getRiverStatistics().m_hands);
-        mySql += ",r_checks = " + std::to_string((*itC)->getStatistics(i).getRiverStatistics().m_checks);
-        mySql += ",r_bets = " + std::to_string((*itC)->getStatistics(i).getRiverStatistics().m_bets);
-        mySql += ",r_calls = " + std::to_string((*itC)->getStatistics(i).getRiverStatistics().m_calls);
-        mySql += ",r_raises = " + std::to_string((*itC)->getStatistics(i).getRiverStatistics().m_raises);
-        mySql += ",r_3Bets = " + std::to_string((*itC)->getStatistics(i).getRiverStatistics().m_3Bets);
-        mySql += ",r_4Bets = " + std::to_string((*itC)->getStatistics(i).getRiverStatistics().m_4Bets);
-        mySql += ",r_folds = " + std::to_string((*itC)->getStatistics(i).getRiverStatistics().m_folds);
+        mySql += ",r_hands = " + std::to_string((*itC)->getStatistics(i).riverStatistics.hands);
+        mySql += ",r_checks = " + std::to_string((*itC)->getStatistics(i).riverStatistics.checks);
+        mySql += ",r_bets = " + std::to_string((*itC)->getStatistics(i).riverStatistics.bets);
+        mySql += ",r_calls = " + std::to_string((*itC)->getStatistics(i).riverStatistics.calls);
+        mySql += ",r_raises = " + std::to_string((*itC)->getStatistics(i).riverStatistics.raises);
+        mySql += ",r_threeBets = " + std::to_string((*itC)->getStatistics(i).riverStatistics.threeBets);
+        mySql += ",r_fourBets = " + std::to_string((*itC)->getStatistics(i).riverStatistics.fourBets);
+        mySql += ",r_folds = " + std::to_string((*itC)->getStatistics(i).riverStatistics.folds);
 
         mySql +=
             " WHERE strategy_name = '" + (*itC)->getStrategyName() + "' AND nb_players = " + std::to_string(i) + ";";
@@ -566,47 +566,47 @@ void SqliteLogStore::updatePlayerStatistics(PlayerStatistics& stats, const std::
 {
     static const std::unordered_map<std::string, std::function<void(PlayerStatistics&, int)>> columnMapping = {
         // Preflop statistics
-        {"pf_hands", [](PlayerStatistics& s, int v) { s.m_preflopStatistics.m_hands = v; }},
-        {"pf_folds", [](PlayerStatistics& s, int v) { s.m_preflopStatistics.m_folds = v; }},
-        {"pf_checks", [](PlayerStatistics& s, int v) { s.m_preflopStatistics.m_checks = v; }},
-        {"pf_calls", [](PlayerStatistics& s, int v) { s.m_preflopStatistics.m_calls = v; }},
-        {"pf_raises", [](PlayerStatistics& s, int v) { s.m_preflopStatistics.m_raises = v; }},
-        {"pf_limps", [](PlayerStatistics& s, int v) { s.m_preflopStatistics.m_limps = v; }},
-        {"pf_3Bets", [](PlayerStatistics& s, int v) { s.m_preflopStatistics.m_3Bets = v; }},
-        {"pf_call3Bets", [](PlayerStatistics& s, int v) { s.m_preflopStatistics.m_call3Bets = v; }},
-        {"pf_call3BetsOpportunities",
-         [](PlayerStatistics& s, int v) { s.m_preflopStatistics.m_call3BetsOpportunities = v; }},
-        {"pf_4Bets", [](PlayerStatistics& s, int v) { s.m_preflopStatistics.m_4Bets = v; }},
+        {"pf_hands", [](PlayerStatistics& s, int v) { s.preflopStatistics.hands = v; }},
+        {"pf_folds", [](PlayerStatistics& s, int v) { s.preflopStatistics.folds = v; }},
+        {"pf_checks", [](PlayerStatistics& s, int v) { s.preflopStatistics.checks = v; }},
+        {"pf_calls", [](PlayerStatistics& s, int v) { s.preflopStatistics.calls = v; }},
+        {"pf_raises", [](PlayerStatistics& s, int v) { s.preflopStatistics.raises = v; }},
+        {"pf_limps", [](PlayerStatistics& s, int v) { s.preflopStatistics.limps = v; }},
+        {"pf_threeBets", [](PlayerStatistics& s, int v) { s.preflopStatistics.threeBets = v; }},
+        {"pf_callthreeBets", [](PlayerStatistics& s, int v) { s.preflopStatistics.callthreeBets = v; }},
+        {"pf_callthreeBetsOpportunities",
+         [](PlayerStatistics& s, int v) { s.preflopStatistics.callthreeBetsOpportunities = v; }},
+        {"pf_fourBets", [](PlayerStatistics& s, int v) { s.preflopStatistics.fourBets = v; }},
         // Flop statistics
-        {"f_hands", [](PlayerStatistics& s, int v) { s.m_flopStatistics.m_hands = v; }},
-        {"f_folds", [](PlayerStatistics& s, int v) { s.m_flopStatistics.m_folds = v; }},
-        {"f_checks", [](PlayerStatistics& s, int v) { s.m_flopStatistics.m_checks = v; }},
-        {"f_calls", [](PlayerStatistics& s, int v) { s.m_flopStatistics.m_calls = v; }},
-        {"f_raises", [](PlayerStatistics& s, int v) { s.m_flopStatistics.m_raises = v; }},
-        {"f_bets", [](PlayerStatistics& s, int v) { s.m_flopStatistics.m_bets = v; }},
-        {"f_3Bets", [](PlayerStatistics& s, int v) { s.m_flopStatistics.m_3Bets = v; }},
-        {"f_4Bets", [](PlayerStatistics& s, int v) { s.m_flopStatistics.m_4Bets = v; }},
-        {"f_continuationBets", [](PlayerStatistics& s, int v) { s.m_flopStatistics.m_continuationBets = v; }},
+        {"f_hands", [](PlayerStatistics& s, int v) { s.flopStatistics.hands = v; }},
+        {"f_folds", [](PlayerStatistics& s, int v) { s.flopStatistics.folds = v; }},
+        {"f_checks", [](PlayerStatistics& s, int v) { s.flopStatistics.checks = v; }},
+        {"f_calls", [](PlayerStatistics& s, int v) { s.flopStatistics.calls = v; }},
+        {"f_raises", [](PlayerStatistics& s, int v) { s.flopStatistics.raises = v; }},
+        {"f_bets", [](PlayerStatistics& s, int v) { s.flopStatistics.bets = v; }},
+        {"f_threeBets", [](PlayerStatistics& s, int v) { s.flopStatistics.threeBets = v; }},
+        {"f_fourBets", [](PlayerStatistics& s, int v) { s.flopStatistics.fourBets = v; }},
+        {"f_continuationBets", [](PlayerStatistics& s, int v) { s.flopStatistics.continuationBets = v; }},
         {"f_continuationBetsOpportunities",
-         [](PlayerStatistics& s, int v) { s.m_flopStatistics.m_continuationBetsOpportunities = v; }},
+         [](PlayerStatistics& s, int v) { s.flopStatistics.continuationBetsOpportunities = v; }},
         // Turn statistics
-        {"t_hands", [](PlayerStatistics& s, int v) { s.m_turnStatistics.m_hands = v; }},
-        {"t_folds", [](PlayerStatistics& s, int v) { s.m_turnStatistics.m_folds = v; }},
-        {"t_checks", [](PlayerStatistics& s, int v) { s.m_turnStatistics.m_checks = v; }},
-        {"t_calls", [](PlayerStatistics& s, int v) { s.m_turnStatistics.m_calls = v; }},
-        {"t_raises", [](PlayerStatistics& s, int v) { s.m_turnStatistics.m_raises = v; }},
-        {"t_bets", [](PlayerStatistics& s, int v) { s.m_turnStatistics.m_bets = v; }},
-        {"t_3Bets", [](PlayerStatistics& s, int v) { s.m_turnStatistics.m_3Bets = v; }},
-        {"t_4Bets", [](PlayerStatistics& s, int v) { s.m_turnStatistics.m_4Bets = v; }},
+        {"t_hands", [](PlayerStatistics& s, int v) { s.turnStatistics.hands = v; }},
+        {"t_folds", [](PlayerStatistics& s, int v) { s.turnStatistics.folds = v; }},
+        {"t_checks", [](PlayerStatistics& s, int v) { s.turnStatistics.checks = v; }},
+        {"t_calls", [](PlayerStatistics& s, int v) { s.turnStatistics.calls = v; }},
+        {"t_raises", [](PlayerStatistics& s, int v) { s.turnStatistics.raises = v; }},
+        {"t_bets", [](PlayerStatistics& s, int v) { s.turnStatistics.bets = v; }},
+        {"t_threeBets", [](PlayerStatistics& s, int v) { s.turnStatistics.threeBets = v; }},
+        {"t_fourBets", [](PlayerStatistics& s, int v) { s.turnStatistics.fourBets = v; }},
         // River statistics
-        {"r_hands", [](PlayerStatistics& s, int v) { s.m_riverStatistics.m_hands = v; }},
-        {"r_folds", [](PlayerStatistics& s, int v) { s.m_riverStatistics.m_folds = v; }},
-        {"r_checks", [](PlayerStatistics& s, int v) { s.m_riverStatistics.m_checks = v; }},
-        {"r_calls", [](PlayerStatistics& s, int v) { s.m_riverStatistics.m_calls = v; }},
-        {"r_raises", [](PlayerStatistics& s, int v) { s.m_riverStatistics.m_raises = v; }},
-        {"r_bets", [](PlayerStatistics& s, int v) { s.m_riverStatistics.m_bets = v; }},
-        {"r_3Bets", [](PlayerStatistics& s, int v) { s.m_riverStatistics.m_3Bets = v; }},
-        {"r_4Bets", [](PlayerStatistics& s, int v) { s.m_riverStatistics.m_4Bets = v; }},
+        {"r_hands", [](PlayerStatistics& s, int v) { s.riverStatistics.hands = v; }},
+        {"r_folds", [](PlayerStatistics& s, int v) { s.riverStatistics.folds = v; }},
+        {"r_checks", [](PlayerStatistics& s, int v) { s.riverStatistics.checks = v; }},
+        {"r_calls", [](PlayerStatistics& s, int v) { s.riverStatistics.calls = v; }},
+        {"r_raises", [](PlayerStatistics& s, int v) { s.riverStatistics.raises = v; }},
+        {"r_bets", [](PlayerStatistics& s, int v) { s.riverStatistics.bets = v; }},
+        {"r_threeBets", [](PlayerStatistics& s, int v) { s.riverStatistics.threeBets = v; }},
+        {"r_fourBets", [](PlayerStatistics& s, int v) { s.riverStatistics.fourBets = v; }},
     };
 
     auto it = columnMapping.find(columnName);

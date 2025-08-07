@@ -155,11 +155,11 @@ int TightAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
     if (ctx.commonContext.preflopRaisesNumber == 1)
     {
         PreflopStatistics raiserStats =
-            ctx.commonContext.preflopLastRaiser->getStatistics(ctx.commonContext.nbPlayers).getPreflopStatistics();
+            ctx.commonContext.preflopLastRaiser->getStatistics(ctx.commonContext.nbPlayers).preflopStatistics;
 
         if (!isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2, stringRaisingRange) &&
             ctx.perPlayerContext.myM > 20 && ctx.perPlayerContext.myCash > ctx.commonContext.highestSet * 20 &&
-            ctx.perPlayerContext.myPosition > MiddlePlusOne && raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE &&
+            ctx.perPlayerContext.myPosition > MiddlePlusOne && raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE &&
             ctx.perPlayerContext.myPosition > ctx.commonContext.preflopLastRaiser->getPosition() &&
             ctx.commonContext.preflopLastRaiser->getCash() > ctx.commonContext.highestSet * 10 &&
             !ctx.commonContext.isPreflopBigBet && ctx.commonContext.preflopCallsNumber < 2)
@@ -167,7 +167,7 @@ int TightAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
 
             if (ctx.perPlayerContext.myCanBluff && ctx.perPlayerContext.myPosition > LATE &&
                 !isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2, ACES + BROADWAYS) &&
-                raiserStats.getPreflopCall3BetsFrequency() < 30)
+                raiserStats.getPreflopCallthreeBetsFrequency() < 30)
             {
 
                 int rand = 0;
@@ -182,7 +182,7 @@ int TightAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
             {
                 if (isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2,
                                    LOW_PAIRS + CONNECTORS + SUITED_ONE_GAPED + SUITED_TWO_GAPED) &&
-                    raiserStats.getPreflopCall3BetsFrequency() < 30)
+                    raiserStats.getPreflopCallthreeBetsFrequency() < 30)
                 {
 
                     speculativeHandedAdded = true;
@@ -561,16 +561,15 @@ bool TightAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx)
     }
 
     TurnStatistics raiserStats =
-        ctx.commonContext.turnLastRaiser->getStatistics(ctx.commonContext.nbPlayers).getTurnStatistics();
+        ctx.commonContext.turnLastRaiser->getStatistics(ctx.commonContext.nbPlayers).turnStatistics;
 
     // if not enough hands, then try to use the statistics collected for (nbPlayers + 1), they should be more accurate
-    if (raiserStats.m_hands < MIN_HANDS_STATISTICS_ACCURATE && ctx.commonContext.nbPlayers < 10 &&
-        ctx.commonContext.turnLastRaiser->getStatistics(ctx.commonContext.nbPlayers + 1).getTurnStatistics().m_hands >
+    if (raiserStats.hands < MIN_HANDS_STATISTICS_ACCURATE && ctx.commonContext.nbPlayers < 10 &&
+        ctx.commonContext.turnLastRaiser->getStatistics(ctx.commonContext.nbPlayers + 1).turnStatistics.hands >
             MIN_HANDS_STATISTICS_ACCURATE)
     {
 
-        raiserStats =
-            ctx.commonContext.turnLastRaiser->getStatistics(ctx.commonContext.nbPlayers + 1).getTurnStatistics();
+        raiserStats = ctx.commonContext.turnLastRaiser->getStatistics(ctx.commonContext.nbPlayers + 1).turnStatistics;
     }
 
     if (ctx.perPlayerContext.myHandSimulation.winRanged * 100 < ctx.commonContext.potOdd &&
@@ -582,7 +581,7 @@ bool TightAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx)
     if (ctx.commonContext.turnBetsOrRaisesNumber == 2 && ctx.perPlayerContext.myHandSimulation.winRanged < 0.8 &&
         ctx.perPlayerContext.myHandSimulation.win < 0.9)
     {
-        if (raiserStats.m_hands <= MIN_HANDS_STATISTICS_ACCURATE)
+        if (raiserStats.hands <= MIN_HANDS_STATISTICS_ACCURATE)
         {
             return false;
         }
@@ -594,7 +593,7 @@ bool TightAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx)
     if (ctx.commonContext.turnBetsOrRaisesNumber > 2 && ctx.perPlayerContext.myHandSimulation.winRanged < 0.9 &&
         ctx.perPlayerContext.myHandSimulation.win < 0.95)
     {
-        if (raiserStats.m_hands <= MIN_HANDS_STATISTICS_ACCURATE)
+        if (raiserStats.hands <= MIN_HANDS_STATISTICS_ACCURATE)
         {
             return false;
         }
@@ -788,21 +787,20 @@ bool TightAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx)
     }
 
     RiverStatistics raiserStats =
-        ctx.commonContext.lastVPIPPlayer->getStatistics(ctx.commonContext.nbPlayers).getRiverStatistics();
+        ctx.commonContext.lastVPIPPlayer->getStatistics(ctx.commonContext.nbPlayers).riverStatistics;
 
     // if not enough hands, then try to use the statistics collected for (nbPlayers + 1), they should be more accurate
-    if (raiserStats.m_hands < MIN_HANDS_STATISTICS_ACCURATE && ctx.commonContext.nbPlayers < 10 &&
-        ctx.commonContext.lastVPIPPlayer->getStatistics(ctx.commonContext.nbPlayers + 1).getTurnStatistics().m_hands >
+    if (raiserStats.hands < MIN_HANDS_STATISTICS_ACCURATE && ctx.commonContext.nbPlayers < 10 &&
+        ctx.commonContext.lastVPIPPlayer->getStatistics(ctx.commonContext.nbPlayers + 1).turnStatistics.hands >
             MIN_HANDS_STATISTICS_ACCURATE)
     {
-        raiserStats =
-            ctx.commonContext.lastVPIPPlayer->getStatistics(ctx.commonContext.nbPlayers + 1).getRiverStatistics();
+        raiserStats = ctx.commonContext.lastVPIPPlayer->getStatistics(ctx.commonContext.nbPlayers + 1).riverStatistics;
     }
 
     if (ctx.perPlayerContext.myHandSimulation.winRanged * 100 < ctx.commonContext.potOdd &&
         ctx.perPlayerContext.myHandSimulation.winRanged < 0.94)
     {
-        if (raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getAgressionFrequency() < 40)
+        if (raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getAgressionFrequency() < 40)
         {
             return false;
         }
@@ -810,7 +808,7 @@ bool TightAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx)
 
     if (ctx.perPlayerContext.myHandSimulation.winRanged < .7 && nbRaises == 1)
     {
-        if (raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE &&
+        if (raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE &&
             ctx.commonContext.lastVPIPPlayer->getStatistics(ctx.commonContext.nbPlayers).getWentToShowDown() < 40)
         {
             return false;
@@ -819,7 +817,7 @@ bool TightAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx)
 
     if (ctx.perPlayerContext.myHandSimulation.winRanged < .9 && nbRaises > 1)
     {
-        if (raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE &&
+        if (raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE &&
             ctx.commonContext.lastVPIPPlayer->getStatistics(ctx.commonContext.nbPlayers).getWentToShowDown() < 40)
         {
             return false;
@@ -832,7 +830,7 @@ bool TightAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx)
         ctx.perPlayerContext.myM > 8)
     {
 
-        if (raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE &&
+        if (raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE &&
             ctx.commonContext.lastVPIPPlayer->getStatistics(ctx.commonContext.nbPlayers).getWentToShowDown() < 50)
         {
             return false;
@@ -842,7 +840,7 @@ bool TightAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx)
     // assume that if there was more than 1 player to play after the raiser and he is not a maniac, he shouldn't bluff
     // TODO
     /*if (ctx.commonContext.nbRunningPlayers > 2 && ctx.perPlayerContext.myHandSimulation.winRanged < .6 &&
-        (raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getAgressionFactor() < 4 &&
+        (raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getAgressionFactor() < 4 &&
          raiserStats.getAgressionFrequency() < 50))
     {
 
@@ -861,7 +859,7 @@ bool TightAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx)
             return false;
     }*/
 
-    if (raiserStats.m_hands <= MIN_HANDS_STATISTICS_ACCURATE &&
+    if (raiserStats.hands <= MIN_HANDS_STATISTICS_ACCURATE &&
         ctx.commonContext.potOdd * 1.5 > ctx.perPlayerContext.myHandSimulation.winRanged * 100)
     {
         return false;

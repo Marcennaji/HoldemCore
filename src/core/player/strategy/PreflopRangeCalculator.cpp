@@ -189,16 +189,16 @@ float PreflopRangeCalculator::adjustCallForRaises(const CurrentHandContext& ctx,
         return callingRange;
     }
 
-    PreflopStatistics raiserStats = lastRaiser->getStatistics(nbPlayers).getPreflopStatistics();
+    PreflopStatistics raiserStats = lastRaiser->getStatistics(nbPlayers).preflopStatistics;
 
     // Use fallback statistics if necessary
-    if (raiserStats.m_hands < MIN_HANDS_STATISTICS_ACCURATE && nbPlayers < 10 &&
-        lastRaiser->getStatistics(nbPlayers + 1).getPreflopStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE)
+    if (raiserStats.hands < MIN_HANDS_STATISTICS_ACCURATE && nbPlayers < 10 &&
+        lastRaiser->getStatistics(nbPlayers + 1).preflopStatistics.hands > MIN_HANDS_STATISTICS_ACCURATE)
     {
-        raiserStats = lastRaiser->getStatistics(nbPlayers + 1).getPreflopStatistics();
+        raiserStats = lastRaiser->getStatistics(nbPlayers + 1).preflopStatistics;
     }
 
-    if (raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getPreflopRaise() != 0)
+    if (raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getPreflopRaise() != 0)
     {
         callingRange =
             adjustCallForRaiserStats(callingRange, raiserStats, nbRaises, nbPlayers, myPosition, nbRunningPlayers);
@@ -369,15 +369,15 @@ float PreflopRangeCalculator::adjustRaiseForRaiser(const CurrentHandContext& ctx
     const bool isPreflopBigBet = ctx.commonContext.isPreflopBigBet;
     std::shared_ptr<Player> lastRaiser = ctx.commonContext.preflopLastRaiser;
 
-    PreflopStatistics raiserStats = lastRaiser->getStatistics(nbPlayers).getPreflopStatistics();
+    PreflopStatistics raiserStats = lastRaiser->getStatistics(nbPlayers).preflopStatistics;
 
-    if (raiserStats.m_hands < MIN_HANDS_STATISTICS_ACCURATE && nbPlayers < 10 &&
-        lastRaiser->getStatistics(nbPlayers + 1).getPreflopStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE)
+    if (raiserStats.hands < MIN_HANDS_STATISTICS_ACCURATE && nbPlayers < 10 &&
+        lastRaiser->getStatistics(nbPlayers + 1).preflopStatistics.hands > MIN_HANDS_STATISTICS_ACCURATE)
     {
-        raiserStats = lastRaiser->getStatistics(nbPlayers + 1).getPreflopStatistics();
+        raiserStats = lastRaiser->getStatistics(nbPlayers + 1).preflopStatistics;
     }
 
-    if (raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getPreflopRaise() != 0)
+    if (raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getPreflopRaise() != 0)
     {
         raisingRange = adjustRaiseForRaiserStats(raiserStats, raisingRange, nbRaises, nbPlayers);
     }

@@ -19,22 +19,22 @@ class PreflopStatistics
     float getPreflopRaise() const;
     float getPreflop3Bet() const;
     float getPreflop4Bet() const;
-    float getPreflopCall3BetsFrequency() const;
+    float getPreflopCallthreeBetsFrequency() const;
     void addLastAction(ActionType);
     int getLastActionsNumber(ActionType p) const;
 
     void reset();
 
-    long m_hands;
-    long m_folds;
-    long m_limps;
-    long m_checks;
-    long m_calls;
-    long m_raises;
-    long m_3Bets;
-    long m_call3Bets;
-    long m_call3BetsOpportunities;
-    long m_4Bets;
+    long hands;
+    long folds;
+    long limps;
+    long checks;
+    long calls;
+    long raises;
+    long threeBets;
+    long callthreeBets;
+    long callthreeBetsOpportunities;
+    long fourBets;
 
     static const int LAST_ACTIONS_STACK_SIZE;
 
@@ -52,16 +52,16 @@ class FlopStatistics
 
     void reset();
 
-    long m_hands;
-    long m_folds;
-    long m_checks;
-    long m_calls;
-    long m_raises;
-    long m_3Bets;
-    long m_4Bets;
-    long m_bets;
-    long m_continuationBetsOpportunities;
-    long m_continuationBets;
+    long hands;
+    long folds;
+    long checks;
+    long calls;
+    long raises;
+    long threeBets;
+    long fourBets;
+    long bets;
+    long continuationBetsOpportunities;
+    long continuationBets;
 };
 
 class TurnStatistics
@@ -73,14 +73,14 @@ class TurnStatistics
     float getAgressionFactor() const;
     float getAgressionFrequency() const;
 
-    long m_hands;
-    long m_folds;
-    long m_checks;
-    long m_calls;
-    long m_bets;
-    long m_raises;
-    long m_3Bets;
-    long m_4Bets;
+    long hands;
+    long folds;
+    long checks;
+    long calls;
+    long bets;
+    long raises;
+    long threeBets;
+    long fourBets;
 };
 
 class RiverStatistics
@@ -92,14 +92,14 @@ class RiverStatistics
     float getAgressionFactor() const;
     float getAgressionFrequency() const;
 
-    long m_hands;
-    long m_folds;
-    long m_checks;
-    long m_calls;
-    long m_bets;
-    long m_raises;
-    long m_3Bets;
-    long m_4Bets;
+    long hands;
+    long folds;
+    long checks;
+    long calls;
+    long bets;
+    long raises;
+    long threeBets;
+    long fourBets;
 };
 
 class PlayerStatistics
@@ -108,18 +108,13 @@ class PlayerStatistics
     PlayerStatistics() { reset(); }
     ~PlayerStatistics() = default;
 
-    const PreflopStatistics& getPreflopStatistics() const;
-    const FlopStatistics& getFlopStatistics() const;
-    const TurnStatistics& getTurnStatistics() const;
-    const RiverStatistics& getRiverStatistics() const;
     float getWentToShowDown() const;
-
     void reset(); // init to zero
 
     long m_toTalHands;
-    PreflopStatistics m_preflopStatistics;
-    FlopStatistics m_flopStatistics;
-    TurnStatistics m_turnStatistics;
-    RiverStatistics m_riverStatistics;
+    PreflopStatistics preflopStatistics;
+    FlopStatistics flopStatistics;
+    TurnStatistics turnStatistics;
+    RiverStatistics riverStatistics;
 };
 } // namespace pkt::core

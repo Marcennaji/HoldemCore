@@ -9,42 +9,24 @@ namespace pkt::core
 
 const int PreflopStatistics::LAST_ACTIONS_STACK_SIZE = 10;
 
-const PreflopStatistics& PlayerStatistics::getPreflopStatistics() const
-{
-    return m_preflopStatistics;
-}
-const FlopStatistics& PlayerStatistics::getFlopStatistics() const
-{
-    return m_flopStatistics;
-}
-
-const TurnStatistics& PlayerStatistics::getTurnStatistics() const
-{
-    return m_turnStatistics;
-}
-const RiverStatistics& PlayerStatistics::getRiverStatistics() const
-{
-    return m_riverStatistics;
-}
-
 void PlayerStatistics::reset()
 {
 
-    m_preflopStatistics.reset();
-    m_flopStatistics.reset();
-    m_turnStatistics.reset();
-    m_riverStatistics.reset();
+    preflopStatistics.reset();
+    flopStatistics.reset();
+    turnStatistics.reset();
+    riverStatistics.reset();
 }
 
 float PlayerStatistics::getWentToShowDown() const
 {
 
-    if ((m_riverStatistics.m_hands - m_riverStatistics.m_folds) == 0)
+    if ((riverStatistics.hands - riverStatistics.folds) == 0)
     {
         return 0;
     }
 
-    return ((m_riverStatistics.m_hands - m_riverStatistics.m_folds) * 100) / (m_flopStatistics.m_hands);
+    return ((riverStatistics.hands - riverStatistics.folds) * 100) / (flopStatistics.hands);
 }
 
 void PreflopStatistics::addLastAction(ActionType p)
@@ -72,26 +54,26 @@ int PreflopStatistics::getLastActionsNumber(ActionType p) const
 void PreflopStatistics::reset()
 {
 
-    m_hands = 0;
-    m_folds = 0;
-    m_checks = 0;
-    m_calls = 0;
-    m_raises = 0;
-    m_limps = 0;
-    m_3Bets = 0;
-    m_call3Bets = 0;
-    m_call3BetsOpportunities = 0;
-    m_4Bets = 0;
+    hands = 0;
+    folds = 0;
+    checks = 0;
+    calls = 0;
+    raises = 0;
+    limps = 0;
+    threeBets = 0;
+    callthreeBets = 0;
+    callthreeBetsOpportunities = 0;
+    fourBets = 0;
 }
 float PreflopStatistics::getVoluntaryPutMoneyInPot() const
 {
 
-    if (m_hands == 0 || (m_raises + m_calls == 0))
+    if (hands == 0 || (raises + calls == 0))
     {
         return 0;
     }
 
-    float f = (float) ((m_raises + m_calls) * 100) / (float) m_hands;
+    float f = (float) ((raises + calls) * 100) / (float) hands;
 
     return (f > 100 ? 100 : f);
 }
@@ -99,48 +81,48 @@ float PreflopStatistics::getVoluntaryPutMoneyInPot() const
 float PreflopStatistics::getPreflopRaise() const
 {
 
-    if (m_hands == 0 || m_raises == 0)
+    if (hands == 0 || raises == 0)
     {
         return 0;
     }
 
-    float f = (float) ((m_raises * 100) / (float) m_hands);
+    float f = (float) ((raises * 100) / (float) hands);
 
     return (f > 100 ? 100 : f);
 }
 float PreflopStatistics::getPreflop3Bet() const
 {
 
-    if (m_hands == 0 || m_3Bets == 0)
+    if (hands == 0 || threeBets == 0)
     {
         return 0;
     }
 
-    float f = (float) ((m_3Bets * 100) / (float) m_hands);
+    float f = (float) ((threeBets * 100) / (float) hands);
 
     return (f > 100 ? 100 : f);
 }
 float PreflopStatistics::getPreflop4Bet() const
 {
 
-    if (m_hands == 0 || m_4Bets == 0)
+    if (hands == 0 || fourBets == 0)
     {
         return 0;
     }
 
-    float f = (float) ((m_4Bets * 100) / (float) m_hands);
+    float f = (float) ((fourBets * 100) / (float) hands);
 
     return (f > 100 ? 100 : f);
 }
-float PreflopStatistics::getPreflopCall3BetsFrequency() const
+float PreflopStatistics::getPreflopCallthreeBetsFrequency() const
 {
 
-    if (m_call3BetsOpportunities == 0)
+    if (callthreeBetsOpportunities == 0)
     {
         return 0;
     }
 
-    float f = (float) (m_call3Bets) / (float) (m_call3BetsOpportunities) * 100;
+    float f = (float) (callthreeBets) / (float) (callthreeBetsOpportunities) * 100;
 
     return (f > 100 ? 100 : f);
 }
@@ -148,130 +130,130 @@ float PreflopStatistics::getPreflopCall3BetsFrequency() const
 void FlopStatistics::reset()
 {
 
-    m_hands = 0;
-    m_folds = 0;
-    m_checks = 0;
-    m_bets = 0;
-    m_calls = 0;
-    m_raises = 0;
-    m_3Bets = 0;
-    m_4Bets = 0;
-    m_continuationBetsOpportunities = 0;
-    m_continuationBets = 0;
+    hands = 0;
+    folds = 0;
+    checks = 0;
+    bets = 0;
+    calls = 0;
+    raises = 0;
+    threeBets = 0;
+    fourBets = 0;
+    continuationBetsOpportunities = 0;
+    continuationBets = 0;
 }
 float FlopStatistics::getAgressionFactor() const
 {
 
-    if (m_raises + m_bets == 0 || m_calls == 0)
+    if (raises + bets == 0 || calls == 0)
     {
         return 0;
     }
 
-    return (float) (m_raises + m_bets) / (float) m_calls;
+    return (float) (raises + bets) / (float) calls;
 }
 
 float FlopStatistics::getAgressionFrequency() const
 {
 
-    if ((float) (m_raises + m_bets + m_calls + m_checks + m_folds) == 0.0)
+    if ((float) (raises + bets + calls + checks + folds) == 0.0)
     {
         return 0.0;
     }
 
-    if ((float) (m_raises + m_bets) == 0.0)
+    if ((float) (raises + bets) == 0.0)
     {
         return 0.0;
     }
 
-    return (float) (m_raises + m_bets) / (float) (m_raises + m_bets + m_calls + m_checks + m_folds) * 100;
+    return (float) (raises + bets) / (float) (raises + bets + calls + checks + folds) * 100;
 }
 
 float FlopStatistics::getContinuationBetFrequency() const
 {
 
-    if (m_continuationBetsOpportunities == 0)
+    if (continuationBetsOpportunities == 0)
     {
         return 0;
     }
 
-    return (float) (m_continuationBets) / (float) (m_continuationBetsOpportunities) * 100;
+    return (float) (continuationBets) / (float) (continuationBetsOpportunities) * 100;
 }
 
 void TurnStatistics::reset()
 {
 
-    m_hands = 0;
-    m_folds = 0;
-    m_checks = 0;
-    m_bets = 0;
-    m_calls = 0;
-    m_raises = 0;
-    m_3Bets = 0;
-    m_4Bets = 0;
+    hands = 0;
+    folds = 0;
+    checks = 0;
+    bets = 0;
+    calls = 0;
+    raises = 0;
+    threeBets = 0;
+    fourBets = 0;
 }
 
 float TurnStatistics::getAgressionFrequency() const
 {
 
-    if ((float) (m_raises + m_bets + m_calls + m_checks + m_folds) == 0.0)
+    if ((float) (raises + bets + calls + checks + folds) == 0.0)
     {
         return 0.0;
     }
 
-    if ((float) (m_raises + m_bets) == 0.0)
+    if ((float) (raises + bets) == 0.0)
     {
         return 0.0;
     }
 
-    return (float) (m_raises + m_bets) / (float) (m_raises + m_bets + m_calls + m_checks + m_folds) * 100;
+    return (float) (raises + bets) / (float) (raises + bets + calls + checks + folds) * 100;
 }
 
 float TurnStatistics::getAgressionFactor() const
 {
 
-    if (m_raises + m_bets == 0 || m_calls == 0)
+    if (raises + bets == 0 || calls == 0)
     {
         return 0;
     }
 
-    return (float) (m_raises + m_bets) / (float) m_calls;
+    return (float) (raises + bets) / (float) calls;
 }
 void RiverStatistics::reset()
 {
 
-    m_hands = 0;
-    m_folds = 0;
-    m_checks = 0;
-    m_bets = 0;
-    m_calls = 0;
-    m_raises = 0;
-    m_3Bets = 0;
-    m_4Bets = 0;
+    hands = 0;
+    folds = 0;
+    checks = 0;
+    bets = 0;
+    calls = 0;
+    raises = 0;
+    threeBets = 0;
+    fourBets = 0;
 }
 float RiverStatistics::getAgressionFrequency() const
 {
 
-    if ((float) (m_raises + m_bets + m_calls + m_checks + m_folds) == 0.0)
+    if ((float) (raises + bets + calls + checks + folds) == 0.0)
     {
         return 0.0;
     }
 
-    if ((float) (m_raises + m_bets) == 0.0)
+    if ((float) (raises + bets) == 0.0)
     {
         return 0.0;
     }
 
-    return (float) (m_raises + m_bets) / (float) (m_raises + m_bets + m_calls + m_checks + m_folds) * 100;
+    return (float) (raises + bets) / (float) (raises + bets + calls + checks + folds) * 100;
 }
 float RiverStatistics::getAgressionFactor() const
 {
 
-    if (m_raises + m_bets == 0 || m_calls == 0)
+    if (raises + bets == 0 || calls == 0)
     {
         return 0;
     }
 
-    return (float) (m_raises + m_bets) / (float) m_calls;
+    return (float) (raises + bets) / (float) calls;
 }
 
 } // namespace pkt::core
