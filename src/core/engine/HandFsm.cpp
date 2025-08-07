@@ -88,6 +88,7 @@ void HandFsm::applyActionEffects(const PlayerAction& action)
     switch (action.type)
     {
     case ActionType::Fold:
+        player->setActive(false);
         updateRunningPlayersListFsm(myRunningPlayersList);
         break;
 

@@ -36,14 +36,11 @@ class IBotStrategy;
 class PlayerFsm
 {
   public:
-    PlayerFsm(const GameEvents&, int id, std::string name, int sC, bool aS, int mB);
+    PlayerFsm(const GameEvents&, int id, std::string name, int cash);
 
     virtual ~PlayerFsm() = default;
 
     int getId() const;
-    void setId(int newId);
-
-    void setName(const std::string& theValue);
     std::string getName() const;
 
     void setCash(int theValue);
@@ -59,8 +56,8 @@ class PlayerFsm
     virtual std::string getStrategyName() const = 0;
     virtual bool isBot() const = 0;
 
-    void setButton(int theValue);
-    int getButton() const;
+    void setButton(Button theValue);
+    Button getButton() const;
 
     void setCards(int* theValue);
     void getCards(int* theValue) const;
@@ -70,6 +67,9 @@ class PlayerFsm
 
     void setCardsFlip(bool theValue);
     bool getCardsFlip() const;
+
+    void setActive(bool theValue);
+    bool isActive() const;
 
     void setHandRanking(int theValue);
     int getHandRanking() const;
@@ -118,7 +118,6 @@ class PlayerFsm
     int getPreflopPotOdd() const;
 
     void resetForNewHand();
-    void setButton(Button);
 
   protected:
     void loadStatistics();
@@ -129,26 +128,17 @@ class PlayerFsm
 
     bool canBluff(const GameState) const;
 
-    // attributes
-
     const GameEvents& myEvents;
-
     CurrentHandActions myCurrentHandActions;
     std::unique_ptr<CurrentHandContext> myCurrentHandContext;
-
-    // const
-    int myID;
-    std::string myName;
-
-    // vars
+    const int myID;
+    const std::string myName;
     PlayerPosition myPosition;
     std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> myStatistics;
     int myHandRanking{0};
-
     int myCards[2];
     std::string myCard1;
     std::string myCard2;
-
     int myCash{0};
     int myCashAtHandStart{0};
 
@@ -171,12 +161,13 @@ class PlayerFsm
     int myLastRelativeSet{0};
 
     ActionType myAction{ActionType::None};
-    int myButton;        // 0 = none, 1 = dealer, 2 =small, 3 = big
-    bool myTurn{0};      // 0 = no, 1 = yes
-    bool myCardsFlip{0}; // 0 = cards are not fliped, 1 = cards are already flipped,
+    Button myButton;
+    bool myTurn{false};
+    bool myCardsFlip{false}; // 0 = cards are not fliped, 1 = cards are already flipped,
     int lastMoneyWon{0};
     int myPreflopPotOdd;
     std::unique_ptr<RangeEstimator> myRangeEstimator;
+    bool myIsActive{false};
 
   private:
     std::map<int, float> evaluateOpponentsStrengths() const;

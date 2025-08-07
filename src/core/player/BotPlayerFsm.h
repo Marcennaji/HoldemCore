@@ -14,7 +14,7 @@ class BotPlayerFsm : public PlayerFsm
 {
 
   public:
-    BotPlayerFsm(const GameEvents&, int id, std::string name, int sC, bool aS, int mB);
+    BotPlayerFsm(const GameEvents&, int id, std::string name, int cash);
 
     ~BotPlayerFsm();
 

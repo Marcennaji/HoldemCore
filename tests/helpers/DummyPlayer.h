@@ -30,9 +30,7 @@ class DummyPlayerFsm : public pkt::core::player::BotPlayerFsm
         : pkt::core::player::BotPlayerFsm(events,                             // const GameEvents&
                                           id,                                 // Player ID
                                           "DummyBotFsm" + std::to_string(id), // Player Name
-                                          1000,                               // Starting Cash
-                                          true,                               // Active Status
-                                          0)                                  // Minimum Bet
+                                          1000)                               // starting cash
     {
         setStrategy(std::make_unique<pkt::core::player::LooseAggressiveBotStrategy>());
     }

@@ -17,8 +17,8 @@ namespace pkt::core::player
 
 using namespace std;
 
-BotPlayerFsm::BotPlayerFsm(const GameEvents& events, int id, std::string name, int sC, bool aS, int mB)
-    : PlayerFsm(events, id, name, sC, aS, mB)
+BotPlayerFsm::BotPlayerFsm(const GameEvents& events, int id, std::string name, int cash)
+    : PlayerFsm(events, id, name, cash)
 {
 }
 

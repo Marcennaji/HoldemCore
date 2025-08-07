@@ -23,8 +23,8 @@ namespace pkt::core::player
 
 using namespace std;
 
-PlayerFsm::PlayerFsm(const GameEvents& events, int id, std::string name, int sC, bool aS, int mB)
-    : myID(id), myName(name), myCash(sC), myButton(mB), myEvents(events)
+PlayerFsm::PlayerFsm(const GameEvents& events, int id, std::string name, int cash)
+    : myID(id), myName(name), myCash(cash), myEvents(events)
 {
     myRangeEstimator = std::make_unique<RangeEstimator>(myID);
     myCurrentHandContext = std::make_unique<CurrentHandContext>();
@@ -51,15 +51,6 @@ CurrentHandActions& PlayerFsm::getCurrentHandActions()
     return myCurrentHandActions;
 }
 
-void PlayerFsm::setId(int newId)
-{
-    myID = newId;
-}
-
-void PlayerFsm::setName(const std::string& theValue)
-{
-    myName = theValue;
-}
 std::string PlayerFsm::getName() const
 {
     return myName;
@@ -104,11 +95,11 @@ ActionType PlayerFsm::getAction() const
     return myAction;
 }
 
-void PlayerFsm::setButton(int theValue)
+void PlayerFsm::setButton(Button theValue)
 {
     myButton = theValue;
 }
-int PlayerFsm::getButton() const
+Button PlayerFsm::getButton() const
 {
     return myButton;
 }
@@ -150,6 +141,16 @@ void PlayerFsm::setCardsFlip(bool theValue)
 bool PlayerFsm::getCardsFlip() const
 {
     return myCardsFlip;
+}
+
+void PlayerFsm::setActive(bool theValue)
+{
+    myIsActive = theValue;
+}
+
+bool PlayerFsm::isActive() const
+{
+    return myIsActive;
 }
 
 void PlayerFsm::setHandRanking(int theValue)
@@ -855,11 +856,8 @@ float PlayerFsm::calculatePreflopCallingRange(CurrentHandContext& ctx) const
 void PlayerFsm::resetForNewHand()
 {
     setCardsFlip(0);
+    setActive(true);
     getCurrentHandActions().reset();
-}
-void PlayerFsm::setButton(Button b)
-{
-    myButton = b;
 }
 
 } // namespace pkt::core::player

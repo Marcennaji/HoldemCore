@@ -17,5 +17,4 @@ target_include_directories(engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src
 )
 
-# Link engine to core
 target_link_libraries(engine PUBLIC core player)
