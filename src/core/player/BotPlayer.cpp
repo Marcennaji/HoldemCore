@@ -130,11 +130,10 @@ void BotPlayer::doPreflopAction()
     updateCurrentHandContext(GameStatePreflop);
 
     std::ostringstream logMessage;
-    logMessage << "\t" << getPositionLabel(myPosition) << "\t" << myName << "\t" << getCardsValueString() << "\t"
+    logMessage << "\tdoPreflopAction for" << getPositionLabel(myPosition) << "\t" << myName << "\t"
+               << getCardsValueString() << "\t"
                << "stack = " << myCash << ", stack when starting the betting round = " << myCashAtHandStart
-               << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
-               << "\tpreflop raise : "
-               << getStatistics(myCurrentHandContext->nbPlayers).getPreflopStatistics().getPreflopRaise() << " % ";
+               << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() << endl;
     GlobalServices::instance().logger()->info(logMessage.str());
 
     myBetAmount = 0;
@@ -194,11 +193,10 @@ void BotPlayer::doFlopAction()
 
     std::ostringstream logMessage;
     logMessage << "\n";
-    logMessage << "\t" << getPositionLabel(myPosition) << "\t" << myName << "\t" << getCardsValueString() << "\t"
+    logMessage << "\tdoFlopAction for" << getPositionLabel(myPosition) << "\t" << myName << "\t"
+               << getCardsValueString() << "\t"
                << "stack = " << myCash
-               << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
-               << "\tPFR : " << getStatistics(myCurrentHandContext->nbPlayers).getPreflopStatistics().getPreflopRaise()
-               << "\n";
+               << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() << endl;
     GlobalServices::instance().logger()->verbose(logMessage.str());
 
     myBetAmount = 0;
@@ -266,11 +264,10 @@ void BotPlayer::doTurnAction()
 
     std::ostringstream logMessage;
     logMessage << "\n";
-    logMessage << "\t" << getPositionLabel(myPosition) << "\t" << myName << "\t" << getCardsValueString() << "\t"
+    logMessage << "\tdoTurnAction for " << getPositionLabel(myPosition) << "\t" << myName << "\t"
+               << getCardsValueString() << "\t"
                << "stack = " << myCash
-               << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
-               << "\tPFR : " << getStatistics(myCurrentHandContext->nbPlayers).getPreflopStatistics().getPreflopRaise()
-               << "\n";
+               << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() << endl;
     GlobalServices::instance().logger()->verbose(logMessage.str());
 
     myBetAmount = 0;
@@ -338,11 +335,10 @@ void BotPlayer::doRiverAction()
 
     std::ostringstream logMessage;
     logMessage << "\n";
-    logMessage << "\t" << getPositionLabel(myPosition) << "\t" << myName << "\t" << getCardsValueString() << "\t"
+    logMessage << "\tdoRiverAction for " << getPositionLabel(myPosition) << "\t" << myName << "\t"
+               << getCardsValueString() << "\t"
                << "stack = " << myCash
-               << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets()
-               << "\tPFR : " << getStatistics(myCurrentHandContext->nbPlayers).getPreflopStatistics().getPreflopRaise()
-               << "\n";
+               << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() << endl;
     GlobalServices::instance().logger()->verbose(logMessage.str());
 
     myBetAmount = 0;
@@ -534,44 +530,9 @@ void BotPlayer::evaluateBetAmount()
     currentHand->getCurrentBettingRound()->setHighestSet(highestSet);
 }
 
-float BotPlayer::calculatePreflopCallingRange(CurrentHandContext& context) const
+float BotPlayer::calculatePreflopCallingRange(CurrentHandContext& ctx) const
 {
-    return myStrategy->getPreflopRangeCalculator()->calculatePreflopCallingRange(context);
-}
-
-PlayerAction BotPlayer::decidePreflopActionFsm()
-{
-    updateCurrentHandContext(GameStatePreflop);
-
-    PlayerAction action;
-    action.playerId = getId();
-
-    const int raiseAmount = myStrategy->preflopShouldRaise(*myCurrentHandContext);
-    const bool shouldCall = myStrategy->preflopShouldCall(*myCurrentHandContext);
-    const bool isBigBlind = myPosition == BB;
-    const bool noRaises = currentHand->getPreflopRaisesNumber() == 0;
-
-    myPreflopPotOdd = getPotOdd();
-
-    if (raiseAmount > 0)
-    {
-        action.type = ActionType::Raise;
-        action.amount = raiseAmount;
-    }
-    else if (noRaises && isBigBlind)
-    {
-        action.type = ActionType::Check;
-    }
-    else if (shouldCall)
-    {
-        action.type = ActionType::Call;
-    }
-    else
-    {
-        action.type = ActionType::Fold;
-    }
-
-    return action;
+    return myStrategy->getPreflopRangeCalculator()->calculatePreflopCallingRange(ctx);
 }
 
 } // namespace pkt::core::player

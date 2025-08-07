@@ -6,6 +6,7 @@
 
 #include <list>
 #include <sstream>
+#include <string.h>
 
 namespace Simulate
 {
@@ -614,7 +615,7 @@ CardMask MakeCard(const char* s)
 {
     char cs[] = "00";
 
-    std::strcpy(cs, s);
+    strcpy(cs, s);
 
     int c;
     CardMask hand;

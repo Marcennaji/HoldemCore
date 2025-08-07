@@ -1,17 +1,14 @@
 #pragma once
-#include "core/engine/round_states/BettingStateBase.h"
 #include "core/interfaces/hand/IActionProcessor.h"
 #include "core/interfaces/hand/IDebuggableState.h"
+#include "core/interfaces/hand/IHandState.h"
 #include "core/interfaces/hand/IRoundCompletionChecker.h"
 
 namespace pkt::core
 {
 class GameEvents;
 
-class FlopState : public BettingStateBase,
-                  public IActionProcessor,
-                  public IRoundCompletionChecker,
-                  public IDebuggableState
+class FlopState : public IHandState, public IActionProcessor, public IRoundCompletionChecker, public IDebuggableState
 {
   public:
     FlopState(const GameEvents& events);

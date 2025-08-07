@@ -49,15 +49,15 @@ bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx)
 
     const char** rangesString;
 
-    if (ctx.nbPlayers == 2)
+    if (ctx.commonContext.nbPlayers == 2)
     {
         rangesString = TOP_RANGE_2_PLAYERS;
     }
-    else if (ctx.nbPlayers == 3)
+    else if (ctx.commonContext.nbPlayers == 3)
     {
         rangesString = TOP_RANGE_3_PLAYERS;
     }
-    else if (ctx.nbPlayers == 4)
+    else if (ctx.commonContext.nbPlayers == 4)
     {
         rangesString = TOP_RANGE_4_PLAYERS;
     }
@@ -68,17 +68,18 @@ bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx)
 
     stringCallingRange = rangesString[(int) callingRange];
 
-    if (ctx.preflopRaisesNumber < 3)
+    if (ctx.commonContext.preflopRaisesNumber < 3)
     {
 
         GlobalServices::instance().logger()->verbose("\t\tLAG adding high pairs to the initial calling range.");
         stringCallingRange += HIGH_PAIRS;
     }
 
-    std::shared_ptr<Player> lastRaiser = ctx.preflopLastRaiser;
+    std::shared_ptr<Player> lastRaiser = ctx.commonContext.preflopLastRaiser;
 
-    if (ctx.preflopRaisesNumber < 2 && ctx.myCash >= ctx.pot * 10 && lastRaiser != nullptr &&
-        lastRaiser->getCash() >= ctx.pot * 10 && !ctx.isPreflopBigBet)
+    if (ctx.commonContext.preflopRaisesNumber < 2 && ctx.perPlayerContext.myCash >= ctx.commonContext.pot * 10 &&
+        lastRaiser != nullptr && lastRaiser->getCash() >= ctx.commonContext.pot * 10 &&
+        !ctx.commonContext.isPreflopBigBet)
     {
 
         GlobalServices::instance().logger()->verbose(
@@ -87,7 +88,9 @@ bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx)
         stringCallingRange += HIGH_SUITED_ACES;
         stringCallingRange += PAIRS;
 
-        if (ctx.nbRunningPlayers > 2 && ctx.preflopRaisesNumber + ctx.preflopCallsNumber > 1 && ctx.myPosition >= LATE)
+        if (ctx.commonContext.nbRunningPlayers > 2 &&
+            ctx.commonContext.preflopRaisesNumber + ctx.commonContext.preflopCallsNumber > 1 &&
+            ctx.perPlayerContext.myPosition >= LATE)
         {
             stringCallingRange += SUITED_CONNECTORS;
             stringCallingRange += SUITED_ONE_GAPED;
@@ -99,9 +102,11 @@ bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx)
     }
 
     // defend against 3bet bluffs :
-    if (ctx.preflopRaisesNumber == 2 && ctx.myCurrentHandActions.getPreflopActions().size() > 0 &&
-        ctx.myCurrentHandActions.getPreflopActions().back() == ActionType::Raise && ctx.myCash >= ctx.pot * 10 &&
-        lastRaiser != nullptr && lastRaiser->getCash() >= ctx.pot * 10 && !ctx.isPreflopBigBet)
+    if (ctx.commonContext.preflopRaisesNumber == 2 &&
+        ctx.perPlayerContext.myCurrentHandActions.getPreflopActions().size() > 0 &&
+        ctx.perPlayerContext.myCurrentHandActions.getPreflopActions().back() == ActionType::Raise &&
+        ctx.perPlayerContext.myCash >= ctx.commonContext.pot * 10 && lastRaiser != nullptr &&
+        lastRaiser->getCash() >= ctx.commonContext.pot * 10 && !ctx.commonContext.isPreflopBigBet)
     {
 
         int rand = 0;
@@ -120,7 +125,7 @@ bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx)
     }
     GlobalServices::instance().logger()->verbose("\t\tLAG final calling range : " + stringCallingRange);
 
-    return isCardsInRange(ctx.myCard1, ctx.myCard2, stringCallingRange);
+    return isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2, stringCallingRange);
 }
 
 int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
@@ -133,7 +138,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
         return 0; // never raise : call or fold
     }
 
-    if (ctx.preflopRaisesNumber > 2)
+    if (ctx.commonContext.preflopRaisesNumber > 2)
     {
         return 0; // never 5-bet : call or fold
     }
@@ -142,15 +147,15 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
 
     const char** rangesString;
 
-    if (ctx.nbPlayers == 2)
+    if (ctx.commonContext.nbPlayers == 2)
     {
         rangesString = TOP_RANGE_2_PLAYERS;
     }
-    else if (ctx.nbPlayers == 3)
+    else if (ctx.commonContext.nbPlayers == 3)
     {
         rangesString = TOP_RANGE_3_PLAYERS;
     }
-    else if (ctx.nbPlayers == 4)
+    else if (ctx.commonContext.nbPlayers == 4)
     {
         rangesString = TOP_RANGE_4_PLAYERS;
     }
@@ -166,19 +171,21 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
     // determine when to 3-bet without a real hand
     bool speculativeHandedAdded = false;
 
-    if (ctx.preflopRaisesNumber == 1)
+    if (ctx.commonContext.preflopRaisesNumber == 1)
     {
-        PreflopStatistics raiserStats = ctx.preflopLastRaiser->getStatistics(ctx.nbPlayers).getPreflopStatistics();
+        PreflopStatistics raiserStats =
+            ctx.commonContext.preflopLastRaiser->getStatistics(ctx.commonContext.nbPlayers).getPreflopStatistics();
 
-        if (!isCardsInRange(ctx.myCard1, ctx.myCard2, stringRaisingRange) && ctx.myM > 20 &&
-            ctx.myCash > ctx.highestSet * 20 && ctx.myPosition > MIDDLE &&
-            raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE &&
-            ctx.myPosition > ctx.preflopLastRaiser->getPosition() &&
-            ctx.preflopLastRaiser->getCash() > ctx.highestSet * 10 && !ctx.isPreflopBigBet &&
-            ctx.preflopCallsNumber < 2)
+        if (!isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2, stringRaisingRange) &&
+            ctx.perPlayerContext.myM > 20 && ctx.perPlayerContext.myCash > ctx.commonContext.highestSet * 20 &&
+            ctx.perPlayerContext.myPosition > MIDDLE && raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE &&
+            ctx.perPlayerContext.myPosition > ctx.commonContext.preflopLastRaiser->getPosition() &&
+            ctx.commonContext.preflopLastRaiser->getCash() > ctx.commonContext.highestSet * 10 &&
+            !ctx.commonContext.isPreflopBigBet && ctx.commonContext.preflopCallsNumber < 2)
         {
 
-            if (ctx.myCanBluff && ctx.myPosition > LATE && !isCardsInRange(ctx.myCard1, ctx.myCard2, ACES + BROADWAYS))
+            if (ctx.perPlayerContext.myCanBluff && ctx.perPlayerContext.myPosition > LATE &&
+                !isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2, ACES + BROADWAYS))
             {
 
                 speculativeHandedAdded = true;
@@ -186,7 +193,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
             }
             else
             {
-                if (isCardsInRange(ctx.myCard1, ctx.myCard2,
+                if (isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2,
                                    LOW_PAIRS + CONNECTORS + SUITED_ONE_GAPED + SUITED_TWO_GAPED) &&
                     raiserStats.getPreflopCall3BetsFrequency() < 30)
                 {
@@ -197,7 +204,8 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
                 }
                 else
                 {
-                    if (!isCardsInRange(ctx.myCard1, ctx.myCard2, PAIRS + ACES + BROADWAYS) &&
+                    if (!isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2,
+                                        PAIRS + ACES + BROADWAYS) &&
                         raiserStats.getPreflopCall3BetsFrequency() < 30)
                     {
 
@@ -215,21 +223,23 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
         }
     }
     // determine when to 4-bet without a real hand
-    if (!speculativeHandedAdded && ctx.preflopRaisesNumber == 2)
+    if (!speculativeHandedAdded && ctx.commonContext.preflopRaisesNumber == 2)
     {
-        PreflopStatistics raiserStats = ctx.preflopLastRaiser->getStatistics(ctx.nbPlayers).getPreflopStatistics();
+        PreflopStatistics raiserStats =
+            ctx.commonContext.preflopLastRaiser->getStatistics(ctx.commonContext.nbPlayers).getPreflopStatistics();
 
-        if (!isCardsInRange(ctx.myCard1, ctx.myCard2, stringRaisingRange) &&
-            !isCardsInRange(ctx.myCard1, ctx.myCard2, OFFSUITED_BROADWAYS) && ctx.myM > 20 &&
-            ctx.myCash > ctx.highestSet * 60 && ctx.myPosition > MiddlePlusOne &&
-            raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE &&
-            ctx.myPosition > ctx.preflopLastRaiser->getPosition() &&
-            ctx.preflopLastRaiser->getCash() > ctx.highestSet * 20 && !ctx.isPreflopBigBet &&
-            ctx.preflopCallsNumber < 2)
+        if (!isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2, stringRaisingRange) &&
+            !isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2, OFFSUITED_BROADWAYS) &&
+            ctx.perPlayerContext.myM > 20 && ctx.perPlayerContext.myCash > ctx.commonContext.highestSet * 60 &&
+            ctx.perPlayerContext.myPosition > MiddlePlusOne && raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE &&
+            ctx.perPlayerContext.myPosition > ctx.commonContext.preflopLastRaiser->getPosition() &&
+            ctx.commonContext.preflopLastRaiser->getCash() > ctx.commonContext.highestSet * 20 &&
+            !ctx.commonContext.isPreflopBigBet && ctx.commonContext.preflopCallsNumber < 2)
         {
 
-            if (ctx.myCanBluff && ctx.myPosition > LATE &&
-                isCardsInRange(ctx.myCard1, ctx.myCard2, HIGH_SUITED_CONNECTORS) && raiserStats.getPreflop3Bet() > 8)
+            if (ctx.perPlayerContext.myCanBluff && ctx.perPlayerContext.myPosition > LATE &&
+                isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2, HIGH_SUITED_CONNECTORS) &&
+                raiserStats.getPreflop3Bet() > 8)
             {
 
                 speculativeHandedAdded = true;
@@ -238,17 +248,22 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
             }
         }
     }
-    if (!speculativeHandedAdded && !isCardsInRange(ctx.myCard1, ctx.myCard2, stringRaisingRange))
+    if (!speculativeHandedAdded &&
+        !isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2, stringRaisingRange))
     {
         return 0;
     }
 
     // sometimes, just call a single raise instead of raising, even with a strong hand
     // nb. raising range 100 means that I want to steal a bet or BB
-    if (!speculativeHandedAdded && ctx.preflopCallsNumber == 0 && ctx.preflopRaisesNumber == 1 && raisingRange < 100 &&
-        !(isCardsInRange(ctx.myCard1, ctx.myCard2, LOW_PAIRS + MEDIUM_PAIRS) && ctx.nbPlayers < 4) &&
-        !(isCardsInRange(ctx.myCard1, ctx.myCard2, HIGH_PAIRS) && ctx.preflopCallsNumber > 0) &&
-        isCardsInRange(ctx.myCard1, ctx.myCard2, RangeEstimator::getStringRange(ctx.nbPlayers, 4)))
+    if (!speculativeHandedAdded && ctx.commonContext.preflopCallsNumber == 0 &&
+        ctx.commonContext.preflopRaisesNumber == 1 && raisingRange < 100 &&
+        !(isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2, LOW_PAIRS + MEDIUM_PAIRS) &&
+          ctx.commonContext.nbPlayers < 4) &&
+        !(isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2, HIGH_PAIRS) &&
+          ctx.commonContext.preflopCallsNumber > 0) &&
+        isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2,
+                       RangeEstimator::getStringRange(ctx.commonContext.nbPlayers, 4)))
     {
 
         int rand = 0;
@@ -267,7 +282,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
 int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx)
 {
 
-    if (ctx.flopBetsOrRaisesNumber > 0)
+    if (ctx.commonContext.flopBetsOrRaisesNumber > 0)
     {
         return 0;
     }
@@ -278,90 +293,97 @@ int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx)
     }
 
     // donk bets :
-    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.preflopLastRaiser->getId() != ctx.myID)
+    if (ctx.commonContext.flopBetsOrRaisesNumber > 0 &&
+        ctx.commonContext.preflopLastRaiser->getId() != ctx.perPlayerContext.myID)
     {
-        if (ctx.preflopLastRaiser->getPosition() > ctx.myPosition)
+        if (ctx.commonContext.preflopLastRaiser->getPosition() > ctx.perPlayerContext.myPosition)
         {
 
-            if (getDrawingProbability(ctx.myPostFlopAnalysisFlags) > 25)
+            if (getDrawingProbability(ctx.perPlayerContext.myPostFlopAnalysisFlags) > 25)
             {
                 int rand = 0;
                 GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
                 if (rand == 1)
                 {
-                    return ctx.pot * 0.6;
+                    return ctx.commonContext.pot * 0.6;
                 }
             }
 
-            if ((ctx.myPostFlopAnalysisFlags.isTwoPair || ctx.myPostFlopAnalysisFlags.isTrips ||
-                 ctx.myPostFlopAnalysisFlags.isStraight) &&
-                ctx.myPostFlopAnalysisFlags.isFlushDrawPossible)
+            if ((ctx.perPlayerContext.myPostFlopAnalysisFlags.isTwoPair ||
+                 ctx.perPlayerContext.myPostFlopAnalysisFlags.isTrips ||
+                 ctx.perPlayerContext.myPostFlopAnalysisFlags.isStraight) &&
+                ctx.perPlayerContext.myPostFlopAnalysisFlags.isFlushDrawPossible)
             {
-                return ctx.pot * 0.6;
+                return ctx.commonContext.pot * 0.6;
             }
 
             // if the flop is dry, try to get the pot
-            if (ctx.nbPlayers < 3 && ctx.myCanBluff && getBoardCardsHigherThan(ctx.stringBoard, "Jh") < 2 &&
-                getBoardCardsHigherThan(ctx.stringBoard, "Kh") == 0 && !ctx.myPostFlopAnalysisFlags.isFlushDrawPossible)
+            if (ctx.commonContext.nbPlayers < 3 && ctx.perPlayerContext.myCanBluff &&
+                getBoardCardsHigherThan(ctx.commonContext.stringBoard, "Jh") < 2 &&
+                getBoardCardsHigherThan(ctx.commonContext.stringBoard, "Kh") == 0 &&
+                !ctx.perPlayerContext.myPostFlopAnalysisFlags.isFlushDrawPossible)
             {
 
                 int rand = 0;
                 GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
                 if (rand == 1)
                 {
-                    return ctx.pot * 0.6;
+                    return ctx.commonContext.pot * 0.6;
                 }
             }
         }
     }
 
     // don't bet if in position, and pretty good drawing probs
-    if (getDrawingProbability(ctx.myPostFlopAnalysisFlags) > 20 && ctx.myHavePosition)
+    if (getDrawingProbability(ctx.perPlayerContext.myPostFlopAnalysisFlags) > 20 && ctx.perPlayerContext.myHavePosition)
     {
         return 0;
     }
 
     // if pretty good hand
-    if ((ctx.myHandSimulation.winRanged > 0.5 || ctx.myHandSimulation.win > 0.9) && ctx.myHandSimulation.win > 0.5)
+    if ((ctx.perPlayerContext.myHandSimulation.winRanged > 0.5 || ctx.perPlayerContext.myHandSimulation.win > 0.9) &&
+        ctx.perPlayerContext.myHandSimulation.win > 0.5)
     {
 
         // always bet if my hand will lose a lot of its value on next betting rounds
-        if (ctx.myHandSimulation.winRanged - ctx.myHandSimulation.winSd > 0.1)
+        if (ctx.perPlayerContext.myHandSimulation.winRanged - ctx.perPlayerContext.myHandSimulation.winSd > 0.1)
         {
-            return ctx.pot;
+            return ctx.commonContext.pot;
         }
 
         int rand = 0;
         GlobalServices::instance().randomizer()->getRand(1, 7, 1, &rand);
-        if (rand == 3 && !ctx.myHavePosition)
+        if (rand == 3 && !ctx.perPlayerContext.myHavePosition)
         {
             return 0; // may check-raise or check-call
         }
 
         // if no raise preflop, or if more than 1 opponent
-        if (ctx.preflopRaisesNumber == 0 || ctx.nbRunningPlayers > 2)
+        if (ctx.commonContext.preflopRaisesNumber == 0 || ctx.commonContext.nbRunningPlayers > 2)
         {
 
-            if (ctx.nbRunningPlayers < 4)
+            if (ctx.commonContext.nbRunningPlayers < 4)
             {
-                return ctx.pot * 0.8;
+                return ctx.commonContext.pot * 0.8;
             }
             else
             {
-                return ctx.pot * 1.2;
+                return ctx.commonContext.pot * 1.2;
             }
         }
 
         // if i have raised preflop, bet
-        if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getId() == ctx.myID && ctx.preflopRaisesNumber > 0)
+        if (ctx.commonContext.preflopRaisesNumber > 0 &&
+            ctx.commonContext.preflopLastRaiser->getId() == ctx.perPlayerContext.myID &&
+            ctx.commonContext.preflopRaisesNumber > 0)
         {
-            if (ctx.nbRunningPlayers < 4)
+            if (ctx.commonContext.nbRunningPlayers < 4)
             {
-                return ctx.pot * 0.8;
+                return ctx.commonContext.pot * 0.8;
             }
             else
             {
-                return ctx.pot;
+                return ctx.commonContext.pot;
             }
         }
     }
@@ -371,20 +393,23 @@ int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx)
         ///////////  if bad flop for me
 
         // if there was a lot of action preflop, and i was not the last raiser : don't bet
-        if (ctx.preflopRaisesNumber > 2 && ctx.preflopLastRaiser->getId() != ctx.myID)
+        if (ctx.commonContext.preflopRaisesNumber > 2 &&
+            ctx.commonContext.preflopLastRaiser->getId() != ctx.perPlayerContext.myID)
         {
             return 0;
         }
 
         // if I was the last raiser preflop, I may bet with not much
-        if (ctx.preflopRaisesNumber > 0 && ctx.preflopLastRaiser->getId() == ctx.myID && ctx.nbRunningPlayers < 4 &&
-            ctx.myCash > ctx.pot * 4 && ctx.myCanBluff)
+        if (ctx.commonContext.preflopRaisesNumber > 0 &&
+            ctx.commonContext.preflopLastRaiser->getId() == ctx.perPlayerContext.myID &&
+            ctx.commonContext.nbRunningPlayers < 4 && ctx.perPlayerContext.myCash > ctx.commonContext.pot * 4 &&
+            ctx.perPlayerContext.myCanBluff)
         {
 
-            if (ctx.myHandSimulation.winRanged > 0.2)
+            if (ctx.perPlayerContext.myHandSimulation.winRanged > 0.2)
             {
 
-                return ctx.pot * 0.8;
+                return ctx.commonContext.pot * 0.8;
             }
         }
     }
@@ -394,27 +419,28 @@ int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx)
 bool LooseAggressiveBotStrategy::flopShouldCall(CurrentHandContext& ctx)
 {
 
-    if (ctx.flopBetsOrRaisesNumber == 0)
+    if (ctx.commonContext.flopBetsOrRaisesNumber == 0)
     {
         return false;
     }
 
-    if (isDrawingProbOk(ctx.myPostFlopAnalysisFlags, ctx.potOdd))
+    if (isDrawingProbOk(ctx.perPlayerContext.myPostFlopAnalysisFlags, ctx.commonContext.potOdd))
     {
         return true;
     }
 
-    if (ctx.myHandSimulation.winRanged == 1 && ctx.myHandSimulation.win > 0.5)
+    if (ctx.perPlayerContext.myHandSimulation.winRanged == 1 && ctx.perPlayerContext.myHandSimulation.win > 0.5)
     {
         return true;
     }
 
-    if (ctx.myHandSimulation.winRanged * 100 < ctx.potOdd * 0.9 && ctx.myHandSimulation.win < 0.92)
+    if (ctx.perPlayerContext.myHandSimulation.winRanged * 100 < ctx.commonContext.potOdd * 0.9 &&
+        ctx.perPlayerContext.myHandSimulation.win < 0.92)
     {
         return false;
     }
 
-    if (ctx.myHandSimulation.winRanged < 0.25 && ctx.myHandSimulation.win < 0.9)
+    if (ctx.perPlayerContext.myHandSimulation.winRanged < 0.25 && ctx.perPlayerContext.myHandSimulation.win < 0.9)
     {
         return false;
     }
@@ -425,7 +451,7 @@ bool LooseAggressiveBotStrategy::flopShouldCall(CurrentHandContext& ctx)
 int LooseAggressiveBotStrategy::flopShouldRaise(CurrentHandContext& ctx)
 {
 
-    const int nbRaises = ctx.flopBetsOrRaisesNumber;
+    const int nbRaises = ctx.commonContext.flopBetsOrRaisesNumber;
 
     if (nbRaises == 0)
     {
@@ -438,57 +464,63 @@ int LooseAggressiveBotStrategy::flopShouldRaise(CurrentHandContext& ctx)
     // if (nbRaises == 1 && myFlopHandSimulation.win < 0.90)
     // return false;
 
-    if (nbRaises == 2 && ctx.myHandSimulation.win < 0.95)
+    if (nbRaises == 2 && ctx.perPlayerContext.myHandSimulation.win < 0.95)
     {
         return 0;
     }
 
-    if (nbRaises == 3 && ctx.myHandSimulation.win < 0.98)
+    if (nbRaises == 3 && ctx.perPlayerContext.myHandSimulation.win < 0.98)
     {
         return 0;
     }
 
-    if (nbRaises > 3 && ctx.myHandSimulation.win != 1)
+    if (nbRaises > 3 && ctx.perPlayerContext.myHandSimulation.win != 1)
     {
         return 0;
     }
 
-    if ((isDrawingProbOk(ctx.myPostFlopAnalysisFlags, ctx.potOdd) || ctx.myHavePosition) && ctx.nbRunningPlayers == 2 &&
-        !(ctx.myHandSimulation.winRanged * 100 < ctx.potOdd) && ctx.myCanBluff && nbRaises < 2)
+    if ((isDrawingProbOk(ctx.perPlayerContext.myPostFlopAnalysisFlags, ctx.commonContext.potOdd) ||
+         ctx.perPlayerContext.myHavePosition) &&
+        ctx.commonContext.nbRunningPlayers == 2 &&
+        !(ctx.perPlayerContext.myHandSimulation.winRanged * 100 < ctx.commonContext.potOdd) &&
+        ctx.perPlayerContext.myCanBluff && nbRaises < 2)
     {
 
         int rand = 0;
         GlobalServices::instance().randomizer()->getRand(1, 3, 1, &rand);
         if (rand == 2)
         {
-            return ctx.pot;
+            return ctx.commonContext.pot;
         }
     }
 
-    if (ctx.myHandSimulation.winRanged * 100 < ctx.potOdd)
+    if (ctx.perPlayerContext.myHandSimulation.winRanged * 100 < ctx.commonContext.potOdd)
     {
 
-        if (ctx.potOdd < 30 && ctx.nbRunningPlayers < 4)
+        if (ctx.commonContext.potOdd < 30 && ctx.commonContext.nbRunningPlayers < 4)
         {
 
             int rand = 0;
             GlobalServices::instance().randomizer()->getRand(1, 6, 1, &rand);
-            if (rand == 2 && ctx.myHandSimulation.winRanged > 0.3 && ctx.myHandSimulation.win > 0.5)
+            if (rand == 2 && ctx.perPlayerContext.myHandSimulation.winRanged > 0.3 &&
+                ctx.perPlayerContext.myHandSimulation.win > 0.5)
             {
-                return ctx.pot;
+                return ctx.commonContext.pot;
                 ;
             }
         }
         return 0;
     }
 
-    if (ctx.myHandSimulation.winRanged > 0.85 && ctx.myHandSimulation.win > 0.5 && nbRaises < 3)
+    if (ctx.perPlayerContext.myHandSimulation.winRanged > 0.85 && ctx.perPlayerContext.myHandSimulation.win > 0.5 &&
+        nbRaises < 3)
     {
-        return ctx.pot;
+        return ctx.commonContext.pot;
     }
-    if (ctx.myHandSimulation.winRanged > 0.7 && ctx.myHandSimulation.win > 0.5 && nbRaises < 2)
+    if (ctx.perPlayerContext.myHandSimulation.winRanged > 0.7 && ctx.perPlayerContext.myHandSimulation.win > 0.5 &&
+        nbRaises < 2)
     {
-        return ctx.pot;
+        return ctx.commonContext.pot;
     }
 
     return 0;
@@ -497,8 +529,8 @@ int LooseAggressiveBotStrategy::flopShouldRaise(CurrentHandContext& ctx)
 int LooseAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx)
 {
 
-    const int pot = ctx.pot + ctx.sets;
-    const int nbRaises = ctx.turnBetsOrRaisesNumber;
+    const int pot = ctx.commonContext.pot + ctx.commonContext.sets;
+    const int nbRaises = ctx.commonContext.turnBetsOrRaisesNumber;
 
     if (nbRaises > 0)
     {
@@ -508,29 +540,34 @@ int LooseAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx)
         }
     }
 
-    if (ctx.flopBetsOrRaisesNumber > 1 && !ctx.myFlopIsAggressor && ctx.myHandSimulation.winRanged < 0.8 &&
-        ctx.myHandSimulation.win < 0.9)
+    if (ctx.commonContext.flopBetsOrRaisesNumber > 1 && !ctx.perPlayerContext.myFlopIsAggressor &&
+        ctx.perPlayerContext.myHandSimulation.winRanged < 0.8 && ctx.perPlayerContext.myHandSimulation.win < 0.9)
     {
         return 0;
     }
 
-    if (ctx.flopBetsOrRaisesNumber == 0 && ctx.myHavePosition && ctx.nbRunningPlayers < 4 &&
-        getDrawingProbability(ctx.myPostFlopAnalysisFlags) < 15 && ctx.myCash > pot * 4)
+    if (ctx.commonContext.flopBetsOrRaisesNumber == 0 && ctx.perPlayerContext.myHavePosition &&
+        ctx.commonContext.nbRunningPlayers < 4 &&
+        getDrawingProbability(ctx.perPlayerContext.myPostFlopAnalysisFlags) < 15 &&
+        ctx.perPlayerContext.myCash > pot * 4)
     {
         return pot * 0.6;
     }
 
-    if (ctx.myHandSimulation.winRanged < 0.5 && ctx.myHandSimulation.win < 0.9 && !ctx.myHavePosition)
+    if (ctx.perPlayerContext.myHandSimulation.winRanged < 0.5 && ctx.perPlayerContext.myHandSimulation.win < 0.9 &&
+        !ctx.perPlayerContext.myHavePosition)
     {
         return 0;
     }
 
-    if (ctx.myHandSimulation.winRanged > 0.5 && ctx.myHandSimulation.win > 0.5 && ctx.myHavePosition)
+    if (ctx.perPlayerContext.myHandSimulation.winRanged > 0.5 && ctx.perPlayerContext.myHandSimulation.win > 0.5 &&
+        ctx.perPlayerContext.myHavePosition)
     {
         return pot * 0.6;
     }
 
-    if (getDrawingProbability(ctx.myPostFlopAnalysisFlags) > 20 && !ctx.myHavePosition)
+    if (getDrawingProbability(ctx.perPlayerContext.myPostFlopAnalysisFlags) > 20 &&
+        !ctx.perPlayerContext.myHavePosition)
     {
         int rand = 0;
         GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
@@ -542,7 +579,7 @@ int LooseAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx)
     else
     {
         // no draw, not a good hand, but last to speak and nobody has bet
-        if (ctx.myHavePosition && ctx.myCanBluff)
+        if (ctx.perPlayerContext.myHavePosition && ctx.perPlayerContext.myCanBluff)
         {
             int rand = 0;
             GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
@@ -558,33 +595,37 @@ int LooseAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx)
 
 bool LooseAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx)
 {
-    if (ctx.turnBetsOrRaisesNumber == 0)
+    if (ctx.commonContext.turnBetsOrRaisesNumber == 0)
     {
         return false;
     }
 
-    if (isDrawingProbOk(ctx.myPostFlopAnalysisFlags, ctx.potOdd))
+    if (isDrawingProbOk(ctx.perPlayerContext.myPostFlopAnalysisFlags, ctx.commonContext.potOdd))
     {
         return true;
     }
 
-    TurnStatistics raiserStats = ctx.turnLastRaiser->getStatistics(ctx.nbPlayers).getTurnStatistics();
+    TurnStatistics raiserStats =
+        ctx.commonContext.turnLastRaiser->getStatistics(ctx.commonContext.nbPlayers).getTurnStatistics();
 
     // if not enough hands, then try to use the statistics collected for (nbPlayers + 1), they should be more accurate
-    if (raiserStats.m_hands < MIN_HANDS_STATISTICS_ACCURATE && ctx.nbPlayers < 10 &&
-        ctx.turnLastRaiser->getStatistics(ctx.nbPlayers + 1).getTurnStatistics().m_hands >
+    if (raiserStats.m_hands < MIN_HANDS_STATISTICS_ACCURATE && ctx.commonContext.nbPlayers < 10 &&
+        ctx.commonContext.turnLastRaiser->getStatistics(ctx.commonContext.nbPlayers + 1).getTurnStatistics().m_hands >
             MIN_HANDS_STATISTICS_ACCURATE)
     {
 
-        raiserStats = ctx.turnLastRaiser->getStatistics(ctx.nbPlayers + 1).getTurnStatistics();
+        raiserStats =
+            ctx.commonContext.turnLastRaiser->getStatistics(ctx.commonContext.nbPlayers + 1).getTurnStatistics();
     }
 
-    if (ctx.myHandSimulation.winRanged * 100 < ctx.potOdd && ctx.myHandSimulation.winRanged < 0.94)
+    if (ctx.perPlayerContext.myHandSimulation.winRanged * 100 < ctx.commonContext.potOdd &&
+        ctx.perPlayerContext.myHandSimulation.winRanged < 0.94)
     {
         return false;
     }
 
-    if (ctx.turnBetsOrRaisesNumber == 2 && ctx.myHandSimulation.winRanged < 0.8 && ctx.myHandSimulation.win < 0.9)
+    if (ctx.commonContext.turnBetsOrRaisesNumber == 2 && ctx.perPlayerContext.myHandSimulation.winRanged < 0.8 &&
+        ctx.perPlayerContext.myHandSimulation.win < 0.9)
     {
         if (raiserStats.m_hands <= MIN_HANDS_STATISTICS_ACCURATE)
         {
@@ -595,7 +636,8 @@ bool LooseAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx)
             return false;
         }
     }
-    if (ctx.turnBetsOrRaisesNumber > 2 && ctx.myHandSimulation.winRanged < 0.9 && ctx.myHandSimulation.win < 0.9)
+    if (ctx.commonContext.turnBetsOrRaisesNumber > 2 && ctx.perPlayerContext.myHandSimulation.winRanged < 0.9 &&
+        ctx.perPlayerContext.myHandSimulation.win < 0.9)
     {
         if (raiserStats.m_hands <= MIN_HANDS_STATISTICS_ACCURATE)
         {
@@ -607,19 +649,20 @@ bool LooseAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx)
         }
     }
 
-    if (ctx.myHandSimulation.winRanged < 0.6 && ctx.myHandSimulation.win < 0.9 &&
-        (ctx.flopBetsOrRaisesNumber > 0 || raiserStats.getAgressionFrequency() < 30))
+    if (ctx.perPlayerContext.myHandSimulation.winRanged < 0.6 && ctx.perPlayerContext.myHandSimulation.win < 0.9 &&
+        (ctx.commonContext.flopBetsOrRaisesNumber > 0 || raiserStats.getAgressionFrequency() < 30))
     {
         return false;
     }
 
-    if (!ctx.myPreflopIsAggressor && !ctx.myFlopIsAggressor && ctx.myHandSimulation.winRanged < 0.8 &&
-        ctx.myHandSimulation.win < 0.9 && raiserStats.getAgressionFrequency() < 30 && !ctx.myHavePosition)
+    if (!ctx.perPlayerContext.myPreflopIsAggressor && !ctx.perPlayerContext.myFlopIsAggressor &&
+        ctx.perPlayerContext.myHandSimulation.winRanged < 0.8 && ctx.perPlayerContext.myHandSimulation.win < 0.9 &&
+        raiserStats.getAgressionFrequency() < 30 && !ctx.perPlayerContext.myHavePosition)
     {
         return false;
     }
 
-    if (ctx.myHandSimulation.winRanged < 0.25 && ctx.myHandSimulation.win < 0.9)
+    if (ctx.perPlayerContext.myHandSimulation.winRanged < 0.25 && ctx.perPlayerContext.myHandSimulation.win < 0.9)
     {
         return false;
     }
@@ -629,7 +672,7 @@ bool LooseAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx)
 
 int LooseAggressiveBotStrategy::turnShouldRaise(CurrentHandContext& ctx)
 {
-    if (ctx.turnBetsOrRaisesNumber == 0)
+    if (ctx.commonContext.turnBetsOrRaisesNumber == 0)
     {
         if (shouldPotControl(ctx))
         {
@@ -637,17 +680,18 @@ int LooseAggressiveBotStrategy::turnShouldRaise(CurrentHandContext& ctx)
         }
     }
 
-    if (ctx.turnBetsOrRaisesNumber == 2 && ctx.myHandSimulation.win < 0.95)
+    if (ctx.commonContext.turnBetsOrRaisesNumber == 2 && ctx.perPlayerContext.myHandSimulation.win < 0.95)
     {
         return 0;
     }
 
-    if (ctx.turnBetsOrRaisesNumber > 2 && ctx.myHandSimulation.win != 1)
+    if (ctx.commonContext.turnBetsOrRaisesNumber > 2 && ctx.perPlayerContext.myHandSimulation.win != 1)
     {
         return 0;
     }
 
-    if (ctx.myHandSimulation.winRanged > 0.98 && ctx.myHandSimulation.win > 0.98 && ctx.myHandSimulation.winSd > 0.9)
+    if (ctx.perPlayerContext.myHandSimulation.winRanged > 0.98 && ctx.perPlayerContext.myHandSimulation.win > 0.98 &&
+        ctx.perPlayerContext.myHandSimulation.winSd > 0.9)
     {
         int rand = 0;
         GlobalServices::instance().randomizer()->getRand(1, 4, 1, &rand);
@@ -657,36 +701,42 @@ int LooseAggressiveBotStrategy::turnShouldRaise(CurrentHandContext& ctx)
         }
     }
 
-    if (ctx.myHandSimulation.win == 1 || (ctx.myHandSimulation.winRanged == 1 && ctx.turnBetsOrRaisesNumber < 3))
+    if (ctx.perPlayerContext.myHandSimulation.win == 1 ||
+        (ctx.perPlayerContext.myHandSimulation.winRanged == 1 && ctx.commonContext.turnBetsOrRaisesNumber < 3))
     {
-        return ctx.pot * 0.6;
+        return ctx.commonContext.pot * 0.6;
     }
 
-    if (ctx.myHandSimulation.winRanged * 100 < ctx.potOdd && ctx.myHandSimulation.winRanged < 0.94)
+    if (ctx.perPlayerContext.myHandSimulation.winRanged * 100 < ctx.commonContext.potOdd &&
+        ctx.perPlayerContext.myHandSimulation.winRanged < 0.94)
     {
         return 0;
     }
 
-    if (ctx.myHandSimulation.winRanged > 0.7 && ctx.myHandSimulation.win > 0.7 && ctx.turnBetsOrRaisesNumber == 1 &&
-        ctx.flopBetsOrRaisesNumber < 2)
+    if (ctx.perPlayerContext.myHandSimulation.winRanged > 0.7 && ctx.perPlayerContext.myHandSimulation.win > 0.7 &&
+        ctx.commonContext.turnBetsOrRaisesNumber == 1 && ctx.commonContext.flopBetsOrRaisesNumber < 2)
     {
 
-        return ctx.pot * 0.6;
+        return ctx.commonContext.pot * 0.6;
     }
-    if (ctx.myHandSimulation.winRanged > 0.94 && ctx.myHandSimulation.win > 0.94 && ctx.turnBetsOrRaisesNumber < 4)
+    if (ctx.perPlayerContext.myHandSimulation.winRanged > 0.94 && ctx.perPlayerContext.myHandSimulation.win > 0.94 &&
+        ctx.commonContext.turnBetsOrRaisesNumber < 4)
     {
-        return ctx.pot * 0.6;
+        return ctx.commonContext.pot * 0.6;
     }
 
-    if ((isDrawingProbOk(ctx.myPostFlopAnalysisFlags, ctx.potOdd) || ctx.myHavePosition) && ctx.nbRunningPlayers == 2 &&
-        !(ctx.myHandSimulation.winRanged * 100 < ctx.potOdd) && ctx.myCanBluff && ctx.turnBetsOrRaisesNumber < 2)
+    if ((isDrawingProbOk(ctx.perPlayerContext.myPostFlopAnalysisFlags, ctx.commonContext.potOdd) ||
+         ctx.perPlayerContext.myHavePosition) &&
+        ctx.commonContext.nbRunningPlayers == 2 &&
+        !(ctx.perPlayerContext.myHandSimulation.winRanged * 100 < ctx.commonContext.potOdd) &&
+        ctx.perPlayerContext.myCanBluff && ctx.commonContext.turnBetsOrRaisesNumber < 2)
     {
 
         int rand = 0;
         GlobalServices::instance().randomizer()->getRand(1, 4, 1, &rand);
         if (rand == 1)
         {
-            return ctx.pot * 0.6;
+            return ctx.commonContext.pot * 0.6;
         }
     }
     return 0;
@@ -695,36 +745,37 @@ int LooseAggressiveBotStrategy::turnShouldRaise(CurrentHandContext& ctx)
 int LooseAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx)
 {
 
-    if (ctx.riverBetsOrRaisesNumber > 0)
+    if (ctx.commonContext.riverBetsOrRaisesNumber > 0)
     {
         return 0;
     }
 
     // blocking bet if my chances to win are weak, but not ridiculous
-    if (!ctx.myHavePosition && ctx.myHandSimulation.winRanged < 0.7 && ctx.myHandSimulation.winRanged > 0.4 &&
-        ctx.myHandSimulation.winSd > 0.5)
+    if (!ctx.perPlayerContext.myHavePosition && ctx.perPlayerContext.myHandSimulation.winRanged < 0.7 &&
+        ctx.perPlayerContext.myHandSimulation.winRanged > 0.4 && ctx.perPlayerContext.myHandSimulation.winSd > 0.5)
     {
         int rand = 0;
         GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
         if (rand == 1)
         {
-            return ctx.pot * 0.33;
+            return ctx.commonContext.pot * 0.33;
         }
     }
 
     // bluff if no chance to win, and if I was the agressor on the turn
-    if (ctx.myTurnIsAggressor)
+    if (ctx.perPlayerContext.myTurnIsAggressor)
     {
 
-        if (ctx.myHandSimulation.winRanged < .15 && ctx.myHandSimulation.winSd > 0.3 && ctx.nbRunningPlayers < 4 &&
-            ctx.myCash >= ctx.pot && ctx.myCanBluff)
+        if (ctx.perPlayerContext.myHandSimulation.winRanged < .15 &&
+            ctx.perPlayerContext.myHandSimulation.winSd > 0.3 && ctx.commonContext.nbRunningPlayers < 4 &&
+            ctx.perPlayerContext.myCash >= ctx.commonContext.pot && ctx.perPlayerContext.myCanBluff)
         {
 
             int rand = 0;
             GlobalServices::instance().randomizer()->getRand(1, 4, 1, &rand);
             if (rand == 1)
             {
-                return ctx.pot * 0.8;
+                return ctx.commonContext.pot * 0.8;
             }
         }
     }
@@ -733,23 +784,25 @@ int LooseAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx)
     GlobalServices::instance().randomizer()->getRand(40, 80, 1, &rand);
     float coeff = (float) rand / (float) 100;
 
-    if (ctx.myHandSimulation.winSd > .94 || (ctx.myHavePosition && ctx.myHandSimulation.winSd > .9))
+    if (ctx.perPlayerContext.myHandSimulation.winSd > .94 ||
+        (ctx.perPlayerContext.myHavePosition && ctx.perPlayerContext.myHandSimulation.winSd > .9))
     {
         int rand = 0;
         GlobalServices::instance().randomizer()->getRand(1, 5, 1, &rand);
-        if (rand != 1 || ctx.myHavePosition)
+        if (rand != 1 || ctx.perPlayerContext.myHavePosition)
         {
-            return ctx.pot * coeff;
+            return ctx.commonContext.pot * coeff;
         }
     }
-    if (ctx.myHandSimulation.winSd > 0.5 &&
-        (ctx.myHandSimulation.winRanged > .8 || (ctx.myHavePosition && ctx.myHandSimulation.winRanged > .7)))
+    if (ctx.perPlayerContext.myHandSimulation.winSd > 0.5 &&
+        (ctx.perPlayerContext.myHandSimulation.winRanged > .8 ||
+         (ctx.perPlayerContext.myHavePosition && ctx.perPlayerContext.myHandSimulation.winRanged > .7)))
     {
         int rand = 0;
         GlobalServices::instance().randomizer()->getRand(1, 3, 1, &rand);
-        if (rand == 1 || ctx.myHavePosition)
+        if (rand == 1 || ctx.perPlayerContext.myHavePosition)
         {
-            return ctx.pot * coeff;
+            return ctx.commonContext.pot * coeff;
         }
     }
     return 0;
@@ -758,45 +811,50 @@ int LooseAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx)
 bool LooseAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx)
 {
 
-    const int nbRaises = ctx.riverBetsOrRaisesNumber;
+    const int nbRaises = ctx.commonContext.riverBetsOrRaisesNumber;
 
     if (nbRaises == 0)
     {
         return false;
     }
 
-    RiverStatistics raiserStats = ctx.lastVPIPPlayer->getStatistics(ctx.nbPlayers).getRiverStatistics();
+    RiverStatistics raiserStats =
+        ctx.commonContext.lastVPIPPlayer->getStatistics(ctx.commonContext.nbPlayers).getRiverStatistics();
 
     // if not enough hands, then try to use the statistics collected for (nbPlayers + 1), they should be more accurate
-    if (raiserStats.m_hands < MIN_HANDS_STATISTICS_ACCURATE && ctx.nbPlayers < 10 &&
-        ctx.lastVPIPPlayer->getStatistics(ctx.nbPlayers + 1).getTurnStatistics().m_hands >
+    if (raiserStats.m_hands < MIN_HANDS_STATISTICS_ACCURATE && ctx.commonContext.nbPlayers < 10 &&
+        ctx.commonContext.lastVPIPPlayer->getStatistics(ctx.commonContext.nbPlayers + 1).getTurnStatistics().m_hands >
             MIN_HANDS_STATISTICS_ACCURATE)
     {
-        raiserStats = ctx.lastVPIPPlayer->getStatistics(ctx.nbPlayers + 1).getRiverStatistics();
+        raiserStats =
+            ctx.commonContext.lastVPIPPlayer->getStatistics(ctx.commonContext.nbPlayers + 1).getRiverStatistics();
     }
 
-    if (ctx.myHandSimulation.win > .95)
+    if (ctx.perPlayerContext.myHandSimulation.win > .95)
     {
         return true;
     }
 
-    if (ctx.myHandSimulation.winRanged * 100 < ctx.potOdd && ctx.myHandSimulation.winSd < 0.97)
+    if (ctx.perPlayerContext.myHandSimulation.winRanged * 100 < ctx.commonContext.potOdd &&
+        ctx.perPlayerContext.myHandSimulation.winSd < 0.97)
     {
         return false;
     }
 
-    if (ctx.myHandSimulation.winRanged < .3 && ctx.myHandSimulation.winSd < 0.97)
+    if (ctx.perPlayerContext.myHandSimulation.winRanged < .3 && ctx.perPlayerContext.myHandSimulation.winSd < 0.97)
     {
         return false;
     }
 
     // if hazardous call may cost me my stack, don't call even with good odds
-    if (ctx.potOdd > 10 && ctx.myHandSimulation.winRanged < .5 && ctx.myHandSimulation.winSd < 0.97 &&
-        ctx.highestSet >= ctx.myCash + ctx.mySet && ctx.myM > 8)
+    if (ctx.commonContext.potOdd > 10 && ctx.perPlayerContext.myHandSimulation.winRanged < .5 &&
+        ctx.perPlayerContext.myHandSimulation.winSd < 0.97 &&
+        ctx.commonContext.highestSet >= ctx.perPlayerContext.myCash + ctx.perPlayerContext.mySet &&
+        ctx.perPlayerContext.myM > 8)
     {
 
         if (raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE &&
-            ctx.lastVPIPPlayer->getStatistics(ctx.nbPlayers).getWentToShowDown() < 50)
+            ctx.commonContext.lastVPIPPlayer->getStatistics(ctx.commonContext.nbPlayers).getWentToShowDown() < 50)
         {
             return false;
         }
@@ -804,8 +862,8 @@ bool LooseAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx)
 
     // assume that if there was more than 1 player to play after the raiser and he is not a maniac, he shouldn't bluff
     // TODO
-    /*if (ctx.nbRunningPlayers > 2 && ctx.myHandSimulation.winRanged < .6 &&
-        ctx.myHandSimulation.winSd < 0.97 &&
+    /*if (ctx.commonContext.nbRunningPlayers > 2 && ctx.perPlayerContext.myHandSimulation.winRanged < .6 &&
+        ctx.perPlayerContext.myHandSimulation.winSd < 0.97 &&
         (raiserStats.m_hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getAgressionFactor() < 4 &&
          raiserStats.getAgressionFrequency() < 50))
     {
@@ -816,7 +874,7 @@ bool LooseAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx)
         for (it_c = currentHand->getRunningPlayersList()->begin(); it_c != currentHand->getRunningPlayersList()->end();
              ++it_c)
         {
-            if ((*it_c)->getPosition() > ctx.lastVPIPPlayer->getPosition())
+            if ((*it_c)->getPosition() > ctx.commonContext.lastVPIPPlayer->getPosition())
             {
                 playersAfterRaiser++;
             }
@@ -825,7 +883,8 @@ bool LooseAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx)
             return false;
     }*/
 
-    if (raiserStats.m_hands <= MIN_HANDS_STATISTICS_ACCURATE && ctx.potOdd * 1.5 > ctx.myHandSimulation.winRanged * 100)
+    if (raiserStats.m_hands <= MIN_HANDS_STATISTICS_ACCURATE &&
+        ctx.commonContext.potOdd * 1.5 > ctx.perPlayerContext.myHandSimulation.winRanged * 100)
     {
         return false;
     }
@@ -836,21 +895,23 @@ bool LooseAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx)
 int LooseAggressiveBotStrategy::riverShouldRaise(CurrentHandContext& ctx)
 {
 
-    if (ctx.riverBetsOrRaisesNumber == 0)
+    if (ctx.commonContext.riverBetsOrRaisesNumber == 0)
     {
         return 0;
     }
 
     //  TODO : analyze previous actions, and determine if we must bet for value, without the nuts
-    if (ctx.riverBetsOrRaisesNumber < 3 && ctx.myHandSimulation.winRanged > .98 && ctx.myHandSimulation.winSd > 0.5)
+    if (ctx.commonContext.riverBetsOrRaisesNumber < 3 && ctx.perPlayerContext.myHandSimulation.winRanged > .98 &&
+        ctx.perPlayerContext.myHandSimulation.winSd > 0.5)
     {
-        return ctx.pot * 0.8;
+        return ctx.commonContext.pot * 0.8;
     }
 
-    if (ctx.riverBetsOrRaisesNumber < 2 && ctx.myHandSimulation.winRanged * 100 > ctx.potOdd &&
-        ctx.myHandSimulation.winRanged > 0.9 && ctx.myHandSimulation.winSd > 0.5)
+    if (ctx.commonContext.riverBetsOrRaisesNumber < 2 &&
+        ctx.perPlayerContext.myHandSimulation.winRanged * 100 > ctx.commonContext.potOdd &&
+        ctx.perPlayerContext.myHandSimulation.winRanged > 0.9 && ctx.perPlayerContext.myHandSimulation.winSd > 0.5)
     {
-        return ctx.pot * 0.6;
+        return ctx.commonContext.pot * 0.6;
     }
 
     return 0;

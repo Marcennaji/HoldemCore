@@ -33,21 +33,6 @@ namespace pkt::core::player
 
 class IBotStrategy;
 
-// values are odd %, according to the outs number. Array index is the number of outs
-static int outsOddsOneCard[] = {
-    0,  2,  4,  6,  8,  11, /* 0 to 5 outs */
-    13, 15, 17, 19, 21,     /* 6 to 10 outs */
-    24, 26, 28, 30, 32,     /* 11 to 15 outs */
-    34, 36, 39, 41, 43      /* 16 to 20 outs */
-};
-
-static int outsOddsTwoCard[] = {
-    0,  4,  8,  13, 17, 20, /* 0 to 5 outs */
-    24, 28, 32, 35, 38,     /* 6 to 10 outs */
-    42, 45, 48, 51, 54,     /* 11 to 15 outs */
-    57, 60, 62, 65, 68      /* 16 to 20 outs */
-};
-
 class Player
 {
   public:
@@ -112,7 +97,7 @@ class Player
     const PlayerStatistics& getStatistics(const int nbPlayers) const;
     CurrentHandContext& getCurrentHandContext() { return *myCurrentHandContext; };
 
-    virtual float calculatePreflopCallingRange(CurrentHandContext& context) const;
+    virtual float calculatePreflopCallingRange(CurrentHandContext& ctx) const;
 
     const PostFlopAnalysisFlags getPostFlopAnalysisFlags() const;
     CurrentHandActions& getCurrentHandActions();
@@ -142,7 +127,6 @@ class Player
     float getMaxOpponentsStrengths() const;
     bool isPreflopBigBet() const;
     float getOpponentWinningHandsPercentage(const int idPlayer, std::string board) const;
-    void logUnplausibleHands(GameState g);
 
     bool canBluff(const GameState) const;
 

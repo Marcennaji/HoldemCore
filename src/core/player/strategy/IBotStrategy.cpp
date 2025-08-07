@@ -19,52 +19,56 @@ int IBotStrategy::computePreflopRaiseAmount(CurrentHandContext& ctx)
 {
     int myRaiseAmount = 0;
 
-    const int nbRaises = ctx.preflopRaisesNumber;
-    const int nbCalls = ctx.preflopCallsNumber;
-    const int nbPlayers = ctx.nbPlayers;
+    const int nbRaises = ctx.commonContext.preflopRaisesNumber;
+    const int nbCalls = ctx.commonContext.preflopCallsNumber;
+    const int nbPlayers = ctx.commonContext.nbPlayers;
 
-    const int bigBlind = ctx.smallBlind * 2;
+    const int bigBlind = ctx.commonContext.smallBlind * 2;
 
     if (nbRaises == 0)
     { // first to raise
 
-        myRaiseAmount = (ctx.myM > 8 ? 2 * bigBlind : 1.5 * bigBlind);
+        myRaiseAmount = (ctx.perPlayerContext.myM > 8 ? 2 * bigBlind : 1.5 * bigBlind);
 
         if (nbPlayers > 4)
         { // adjust for position
-            if (ctx.myPosition < MIDDLE)
+            if (ctx.perPlayerContext.myPosition < MIDDLE)
             {
                 myRaiseAmount += bigBlind;
             }
-            if (ctx.myPosition == BUTTON)
+            if (ctx.perPlayerContext.myPosition == BUTTON)
             {
-                myRaiseAmount -= ctx.smallBlind;
+                myRaiseAmount -= ctx.commonContext.smallBlind;
             }
         }
-        if (ctx.preflopCallsNumber > 0)
+        if (ctx.commonContext.preflopCallsNumber > 0)
         { // increase raise amount if there are limpers
-            myRaiseAmount += (ctx.preflopCallsNumber * bigBlind);
+            myRaiseAmount += (ctx.commonContext.preflopCallsNumber * bigBlind);
         }
     }
     else
     {
 
-        int totalPot = ctx.sets;
+        int totalPot = ctx.commonContext.sets;
 
         if (nbRaises == 1)
         { // will 3bet
-            myRaiseAmount = totalPot * (ctx.myPosition > ctx.preflopLastRaiser->getPosition() ? 1.2 : 1.4);
+            myRaiseAmount =
+                totalPot *
+                (ctx.perPlayerContext.myPosition > ctx.commonContext.preflopLastRaiser->getPosition() ? 1.2 : 1.4);
         }
         if (nbRaises > 1)
         { // will 4bet or more
-            myRaiseAmount = totalPot * (ctx.myPosition > ctx.preflopLastRaiser->getPosition() ? 1 : 1.2);
+            myRaiseAmount =
+                totalPot *
+                (ctx.perPlayerContext.myPosition > ctx.commonContext.preflopLastRaiser->getPosition() ? 1 : 1.2);
         }
     }
 
     // if i would be commited in the pot with the computed amount, just go allin preflop
-    if (myRaiseAmount > (ctx.myCash * 0.3))
+    if (myRaiseAmount > (ctx.perPlayerContext.myCash * 0.3))
     {
-        myRaiseAmount = ctx.myCash;
+        myRaiseAmount = ctx.perPlayerContext.myCash;
     }
 
     return myRaiseAmount;
@@ -72,39 +76,44 @@ int IBotStrategy::computePreflopRaiseAmount(CurrentHandContext& ctx)
 
 bool IBotStrategy::shouldPotControl(CurrentHandContext& ctx)
 {
-    assert(ctx.gameState == GameStateFlop || ctx.gameState == GameStateTurn);
+    assert(ctx.commonContext.gameState == GameStateFlop || ctx.commonContext.gameState == GameStateTurn);
 
-    const int bigBlind = ctx.smallBlind * 2;
-    const int potThreshold = (ctx.gameState == GameStateFlop) ? bigBlind * 20 : bigBlind * 40;
+    const int bigBlind = ctx.commonContext.smallBlind * 2;
+    const int potThreshold = (ctx.commonContext.gameState == GameStateFlop) ? bigBlind * 20 : bigBlind * 40;
     bool potControl = false;
 
-    if (ctx.pot >= potThreshold)
+    if (ctx.commonContext.pot >= potThreshold)
     {
-        if (ctx.myPostFlopAnalysisFlags.isPocketPair && !ctx.myPostFlopAnalysisFlags.isOverPair)
+        if (ctx.perPlayerContext.myPostFlopAnalysisFlags.isPocketPair &&
+            !ctx.perPlayerContext.myPostFlopAnalysisFlags.isOverPair)
         {
             potControl = true;
         }
 
-        if (ctx.myPostFlopAnalysisFlags.isFullHousePossible &&
-            !(ctx.myPostFlopAnalysisFlags.isTrips || ctx.myPostFlopAnalysisFlags.isFlush ||
-              ctx.myPostFlopAnalysisFlags.isFullHouse || ctx.myPostFlopAnalysisFlags.isQuads))
+        if (ctx.perPlayerContext.myPostFlopAnalysisFlags.isFullHousePossible &&
+            !(ctx.perPlayerContext.myPostFlopAnalysisFlags.isTrips ||
+              ctx.perPlayerContext.myPostFlopAnalysisFlags.isFlush ||
+              ctx.perPlayerContext.myPostFlopAnalysisFlags.isFullHouse ||
+              ctx.perPlayerContext.myPostFlopAnalysisFlags.isQuads))
         {
             potControl = true;
         }
 
-        if (ctx.gameState == GameStateFlop)
+        if (ctx.commonContext.gameState == GameStateFlop)
         {
-            if ((ctx.myPostFlopAnalysisFlags.isOverPair || ctx.myPostFlopAnalysisFlags.isTopPair) &&
-                ctx.mySet > bigBlind * 20)
+            if ((ctx.perPlayerContext.myPostFlopAnalysisFlags.isOverPair ||
+                 ctx.perPlayerContext.myPostFlopAnalysisFlags.isTopPair) &&
+                ctx.perPlayerContext.mySet > bigBlind * 20)
             {
                 potControl = true;
             }
         }
-        else if (ctx.gameState == GameStateTurn)
+        else if (ctx.commonContext.gameState == GameStateTurn)
         {
-            if (ctx.myPostFlopAnalysisFlags.isOverPair ||
-                (ctx.myPostFlopAnalysisFlags.isTwoPair && !ctx.myPostFlopAnalysisFlags.isFullHousePossible) ||
-                (ctx.myPostFlopAnalysisFlags.isTrips && ctx.mySet > bigBlind * 60))
+            if (ctx.perPlayerContext.myPostFlopAnalysisFlags.isOverPair ||
+                (ctx.perPlayerContext.myPostFlopAnalysisFlags.isTwoPair &&
+                 !ctx.perPlayerContext.myPostFlopAnalysisFlags.isFullHousePossible) ||
+                (ctx.perPlayerContext.myPostFlopAnalysisFlags.isTrips && ctx.perPlayerContext.mySet > bigBlind * 60))
             {
                 potControl = true;
             }

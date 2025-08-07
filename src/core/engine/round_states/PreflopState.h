@@ -1,12 +1,12 @@
 #pragma once
-#include "core/engine/round_states/BettingStateBase.h"
 #include "core/interfaces/hand/IActionProcessor.h"
 #include "core/interfaces/hand/IDebuggableState.h"
+#include "core/interfaces/hand/IHandState.h"
 #include "core/interfaces/hand/IRoundCompletionChecker.h"
 
 namespace pkt::core::player
 {
-class Player;
+class PlayerFsm;
 }
 
 namespace pkt::core
@@ -14,10 +14,7 @@ namespace pkt::core
 
 class GameEvents;
 
-class PreflopState : public BettingStateBase,
-                     public IActionProcessor,
-                     public IRoundCompletionChecker,
-                     public IDebuggableState
+class PreflopState : public IHandState, public IActionProcessor, public IRoundCompletionChecker, public IDebuggableState
 {
   public:
     PreflopState(const GameEvents& events, const int smallBlind, unsigned dealerPlayerId);
@@ -31,7 +28,7 @@ class PreflopState : public BettingStateBase,
 
     void logStateInfo(const HandFsm&) const override;
     std::string getStateName() const override { return "Preflop"; }
-    void promptPlayerAction(HandFsm&, player::Player& player);
+    void promptPlayerAction(HandFsm&, player::PlayerFsm& player);
 
   private:
     void assignButtons(HandFsm& hand);

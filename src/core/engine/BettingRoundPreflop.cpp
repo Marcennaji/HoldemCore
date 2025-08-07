@@ -154,19 +154,31 @@ void BettingRoundPreflop::proceedToFlop()
 
 void BettingRoundPreflop::handleNextPlayerTurn()
 {
-    GlobalServices::instance().logger()->verbose("Determining the next player's turn.");
+    GlobalServices::instance().logger()->verbose("Preflop: Determining the next player's turn.");
 
-    auto currentPlayersTurnIt = getPlayerListIteratorById(getHand()->getRunningPlayersList(), getCurrentPlayerTurnId());
-    if (currentPlayersTurnIt == getHand()->getRunningPlayersList()->end())
+    auto currentPlayersTurnIt = getPlayerListIteratorById(getHand()->getSeatsList(), getCurrentPlayerTurnId());
+    if (currentPlayersTurnIt == getHand()->getSeatsList()->end())
     {
+        string ids;
+        for (auto i = getHand()->getSeatsList()->begin(); i != getHand()->getSeatsList()->end(); ++i)
+        {
+            ids += " " + to_string((*i)->getId());
+        }
+        GlobalServices::instance().logger()->error(
+            "BettingRoundPreflop::handleNextPlayerTurn() (1): couldn't find player with id " +
+            std::to_string(getCurrentPlayerTurnId()) + " in the seats list. List contains following ids :" + ids);
+
         throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
     }
 
     ++currentPlayersTurnIt;
-    if (currentPlayersTurnIt == getHand()->getRunningPlayersList()->end())
+    if (currentPlayersTurnIt == getHand()->getSeatsList()->end())
     {
-        currentPlayersTurnIt = getHand()->getRunningPlayersList()->begin();
+        currentPlayersTurnIt = getHand()->getSeatsList()->begin();
     }
+    while ((*currentPlayersTurnIt)->getAction() == ActionType::Fold ||
+           (*currentPlayersTurnIt)->getAction() == ActionType::Allin)
+        ++currentPlayersTurnIt;
 
     setCurrentPlayerTurnId((*currentPlayersTurnIt)->getId());
 
@@ -175,9 +187,18 @@ void BettingRoundPreflop::handleNextPlayerTurn()
         setFirstRound(false);
     }
 
-    currentPlayersTurnIt = getPlayerListIteratorById(getHand()->getRunningPlayersList(), getCurrentPlayerTurnId());
-    if (currentPlayersTurnIt == getHand()->getRunningPlayersList()->end())
+    currentPlayersTurnIt = getPlayerListIteratorById(getHand()->getSeatsList(), getCurrentPlayerTurnId());
+    if (currentPlayersTurnIt == getHand()->getSeatsList()->end())
     {
+        string ids;
+        for (auto i = getHand()->getSeatsList()->begin(); i != getHand()->getSeatsList()->end(); ++i)
+        {
+            ids += " " + to_string((*i)->getId());
+        }
+        GlobalServices::instance().logger()->error(
+            "BettingRoundPreflop::handleNextPlayerTurn() (2) : couldn't find player with id " +
+            std::to_string(getCurrentPlayerTurnId()) + " in the seats list. List contains following ids :" + ids);
+
         throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
     }
     (*currentPlayersTurnIt)->setTurn(true);
@@ -201,7 +222,6 @@ void BettingRoundPreflop::handleNextPlayerTurn()
     }
     else
     {
-
         GlobalServices::instance().logger()->verbose("Giving action to next bot player: " +
                                                      (*currentPlayersTurnIt)->getName());
         giveActionToNextBotPlayer();

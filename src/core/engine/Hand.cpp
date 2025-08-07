@@ -278,59 +278,6 @@ void Hand::setBlinds()
     }
 }
 
-void Hand::updateRunningPlayersList()
-{
-    GlobalServices::instance().logger()->verbose("Updating myRunningPlayersList...");
-
-    PlayerListIterator it, it1;
-
-    for (it = myRunningPlayersList->begin(); it != myRunningPlayersList->end();)
-    {
-        GlobalServices::instance().logger()->verbose("Checking player: " + (*it)->getName() +
-                                                     ", action: " + playerActionToString((*it)->getAction()));
-
-        if ((*it)->getAction() == ActionType::Fold || (*it)->getAction() == ActionType::Allin)
-        {
-            GlobalServices::instance().logger()->verbose(
-                "Removing player: " + (*it)->getName() +
-                " from myRunningPlayersList due to action: " + playerActionToString((*it)->getAction()));
-
-            it = myRunningPlayersList->erase(it);
-
-            if (!myRunningPlayersList->empty())
-            {
-                GlobalServices::instance().logger()->verbose(
-                    "myRunningPlayersList is not empty after removal. Updating current player's turn.");
-
-                it1 = it;
-                if (it1 == myRunningPlayersList->begin())
-                {
-                    GlobalServices::instance().logger()->verbose(
-                        "Iterator points to the beginning of the list. Wrapping around to the end.");
-                    it1 = myRunningPlayersList->end();
-                }
-                --it1;
-
-                GlobalServices::instance().logger()->verbose("Setting current player's turn to: " + (*it1)->getName() +
-                                                             " (ID: " + std::to_string((*it1)->getId()) + ")");
-                getCurrentBettingRound()->setCurrentPlayerTurnId((*it1)->getId());
-            }
-            else
-            {
-                GlobalServices::instance().logger()->verbose("myRunningPlayersList is now empty after removal.");
-            }
-        }
-        else
-        {
-            GlobalServices::instance().logger()->verbose(
-                "Player: " + (*it)->getName() + " remains in myRunningPlayersList. Moving to the next player.");
-            ++it;
-        }
-    }
-
-    GlobalServices::instance().logger()->verbose("Finished updating myRunningPlayersList.");
-}
-
 void Hand::resolveHandConditions()
 {
     GlobalServices::instance().logger()->verbose("Executing resolveHandConditions() for betting round: " +
@@ -348,7 +295,7 @@ void Hand::resolveHandConditions()
                                                      ", set: " + std::to_string(player->getSet()));
     }
 
-    updateRunningPlayersList();
+    updateRunningPlayersList(myRunningPlayersList);
 
     // Determine number of all-in players
     int allInPlayersCounter = 0;

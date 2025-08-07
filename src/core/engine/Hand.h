@@ -93,9 +93,6 @@ class Hand : public IHand
 
     const GameEvents& getEvents() const { return myEvents; }
 
-  protected:
-    void updateRunningPlayersList();
-
   private:
     std::shared_ptr<EngineFactory> myFactory;
     const GameEvents& myEvents;

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "core/engine/model/PlayerPosition.h"
 #include "typedefs.h"
 
 #include <iostream>
@@ -59,5 +60,10 @@ PlayerListIterator getPlayerListIteratorById(PlayerList list, unsigned id);
 
 std::shared_ptr<PlayerFsm> getPlayerFsmById(PlayerFsmList list, unsigned id);
 PlayerFsmListIterator getPlayerFsmListIteratorById(PlayerFsmList list, unsigned id);
+
+void updateRunningPlayersList(PlayerList&);
+void updateRunningPlayersListFsm(PlayerFsmList&);
+
+std::string getPositionLabel(pkt::core::PlayerPosition);
 
 } // namespace pkt::core::player

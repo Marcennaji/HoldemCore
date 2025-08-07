@@ -1,8 +1,10 @@
 
 #include "Helpers.h"
 #include "core/engine/CardUtilities.h"
+#include "core/engine/model/ButtonState.h"
 #include "core/player/Player.h"
 #include "core/player/PlayerFsm.h"
+#include "core/services/GlobalServices.h"
 
 #include <algorithm>
 #include <cmath>
@@ -15,6 +17,21 @@
 namespace pkt::core::player
 {
 using namespace std;
+
+// values are odd %, according to the outs number. Array index is the number of outs
+static int outsOddsOneCard[] = {
+    0,  2,  4,  6,  8,  11, /* 0 to 5 outs */
+    13, 15, 17, 19, 21,     /* 6 to 10 outs */
+    24, 26, 28, 30, 32,     /* 11 to 15 outs */
+    34, 36, 39, 41, 43      /* 16 to 20 outs */
+};
+
+static int outsOddsTwoCard[] = {
+    0,  4,  8,  13, 17, 20, /* 0 to 5 outs */
+    24, 28, 32, 35, 38,     /* 6 to 10 outs */
+    42, 45, 48, 51, 54,     /* 11 to 15 outs */
+    57, 60, 62, 65, 68      /* 16 to 20 outs */
+};
 
 void shufflePlayers(std::list<std::shared_ptr<Player>>& players, unsigned humanId)
 {
@@ -277,15 +294,152 @@ std::shared_ptr<Player> getPlayerById(PlayerList list, unsigned id)
 PlayerFsmListIterator getPlayerFsmListIteratorById(PlayerFsmList list, unsigned id)
 {
     return std::find_if(list->begin(), list->end(),
-                        [id](const std::shared_ptr<PlayerFsm>& p) { return p->getLegacyPlayer()->getId() == id; });
+                        [id](const std::shared_ptr<PlayerFsm>& p) { return p->getId() == id; });
 }
 std::shared_ptr<PlayerFsm> getPlayerFsmById(PlayerFsmList list, unsigned id)
 {
     for (auto i = list->begin(); i != list->end(); ++i)
     {
-        if ((*i)->getLegacyPlayer()->getId() == id)
+        if ((*i)->getId() == id)
             return *i;
     }
     return nullptr;
+}
+void updateRunningPlayersList(PlayerList& myRunningPlayersList)
+{
+    GlobalServices::instance().logger()->verbose("Updating myRunningPlayersList...");
+
+    PlayerListIterator it, it1;
+
+    for (it = myRunningPlayersList->begin(); it != myRunningPlayersList->end();)
+    {
+        GlobalServices::instance().logger()->verbose("Checking player: " + (*it)->getName() +
+                                                     ", action: " + playerActionToString((*it)->getAction()));
+
+        if ((*it)->getAction() == ActionType::Fold || (*it)->getAction() == ActionType::Allin)
+        {
+            GlobalServices::instance().logger()->verbose(
+                "Removing player: " + (*it)->getName() +
+                " from myRunningPlayersList due to action: " + playerActionToString((*it)->getAction()));
+
+            it = myRunningPlayersList->erase(it);
+
+            if (!myRunningPlayersList->empty())
+            {
+                GlobalServices::instance().logger()->verbose(
+                    "myRunningPlayersList is not empty after removal. Updating current player's turn.");
+
+                it1 = it;
+                if (it1 == myRunningPlayersList->begin())
+                {
+                    GlobalServices::instance().logger()->verbose(
+                        "Iterator points to the beginning of the list. Wrapping around to the end.");
+                    it1 = myRunningPlayersList->end();
+                }
+                --it1;
+            }
+            else
+            {
+                GlobalServices::instance().logger()->verbose("myRunningPlayersList is now empty after removal.");
+            }
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    GlobalServices::instance().logger()->verbose("Finished updating myRunningPlayersList.");
+}
+
+void updateRunningPlayersListFsm(PlayerFsmList& myRunningPlayersListFsm)
+{
+    GlobalServices::instance().logger()->verbose("Updating myRunningPlayersListFsm...");
+
+    PlayerFsmListIterator it, it1;
+
+    for (it = myRunningPlayersListFsm->begin(); it != myRunningPlayersListFsm->end();)
+    {
+        GlobalServices::instance().logger()->verbose("Checking player: " + (*it)->getName() +
+                                                     ", action: " + playerActionToString((*it)->getAction()));
+
+        if ((*it)->getAction() == ActionType::Fold || (*it)->getAction() == ActionType::Allin)
+        {
+            GlobalServices::instance().logger()->verbose(
+                "Removing player: " + (*it)->getName() +
+                " from myRunningPlayersListFsm due to action: " + playerActionToString((*it)->getAction()));
+
+            it = myRunningPlayersListFsm->erase(it);
+
+            if (!myRunningPlayersListFsm->empty())
+            {
+                GlobalServices::instance().logger()->verbose(
+                    "myRunningPlayersListFsm is not empty after removal. Updating current player's turn.");
+
+                it1 = it;
+                if (it1 == myRunningPlayersListFsm->begin())
+                {
+                    GlobalServices::instance().logger()->verbose(
+                        "Iterator points to the beginning of the list. Wrapping around to the end.");
+                    it1 = myRunningPlayersListFsm->end();
+                }
+                --it1;
+            }
+            else
+            {
+                GlobalServices::instance().logger()->verbose("myRunningPlayersListFsm is now empty after removal.");
+            }
+        }
+        else
+        {
+            GlobalServices::instance().logger()->verbose(
+                "Player: " + (*it)->getName() + " remains in myRunningPlayersListFsm. Moving to the next player.");
+            ++it;
+        }
+    }
+
+    GlobalServices::instance().logger()->verbose("Finished updating myRunningPlayersListFsm.");
+}
+
+std::string getPositionLabel(PlayerPosition p)
+{
+
+    switch (p)
+    {
+
+    case UTG:
+        return "UTG";
+        break;
+    case UtgPlusOne:
+        return "UtgPlusOne";
+        break;
+    case UtgPlusTwo:
+        return "UtgPlusTwo";
+        break;
+    case MIDDLE:
+        return "MIDDLE";
+        break;
+    case MiddlePlusOne:
+        return "MiddlePlusOne";
+        break;
+    case LATE:
+        return "LATE";
+        break;
+    case CUTOFF:
+        return "CUTOFF";
+        break;
+    case BUTTON:
+        return "BUTTON";
+        break;
+    case SB:
+        return "SB";
+        break;
+    case BB:
+        return "BB";
+        break;
+    default:
+        return "unknown";
+        break;
+    }
 }
 } // namespace pkt::core::player

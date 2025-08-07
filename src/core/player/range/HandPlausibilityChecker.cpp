@@ -10,9 +10,9 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(const PostFlopAnal
                                                               CurrentHandContext& ctx)
 {
 
-    const int nbPlayers = ctx.nbPlayers;
-    const bool bHavePosition = ctx.myHavePosition;
-    auto& flop = ctx.myStatistics.getFlopStatistics();
+    const int nbPlayers = ctx.commonContext.nbPlayers;
+    const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
+    auto& flop = ctx.perPlayerContext.myStatistics.getFlopStatistics();
 
     // the player is in position, he didn't bet on flop, he is not usually passive, and everybody checked on flop :
 
@@ -24,7 +24,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(const PostFlopAnal
 
         // woudn't slow play a medium hand on a dangerous board
         if (!testedHand.isFullHousePossible &&
-            ((testedHand.isMiddlePair && !testedHand.isFullHousePossible && ctx.nbRunningPlayers < 4) ||
+            ((testedHand.isMiddlePair && !testedHand.isFullHousePossible && ctx.commonContext.nbRunningPlayers < 4) ||
              testedHand.isTopPair || testedHand.isOverPair ||
              (testedHand.isTwoPair && !testedHand.isFullHousePossible)) &&
             testedHand.isFlushDrawPossible && testedHand.isStraightDrawPossible)
@@ -42,7 +42,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(const PostFlopAnal
         // wouldn't be passive with a decent hand, on position, if more than 1 opponent
         if (!testedHand.isFullHousePossible &&
             (testedHand.isTopPair || testedHand.isOverPair || testedHand.isTwoPair || testedHand.isTrips) &&
-            ctx.nbRunningPlayers > 2)
+            ctx.commonContext.nbRunningPlayers > 2)
         {
             return true;
         }
@@ -60,9 +60,9 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopAnalys
                                                             CurrentHandContext& ctx)
 {
 
-    const int nbPlayers = ctx.nbPlayers;
-    const bool bHavePosition = ctx.myHavePosition;
-    auto& flop = ctx.myStatistics.getFlopStatistics();
+    const int nbPlayers = ctx.commonContext.nbPlayers;
+    const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
+    auto& flop = ctx.perPlayerContext.myStatistics.getFlopStatistics();
 
     if (flop.getAgressionFactor() > 3 && flop.getAgressionFrequency() > 50 &&
         flop.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
@@ -70,7 +70,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopAnalys
         return false; // he is very agressive, so don't make any guess
     }
 
-    if (ctx.myIsInVeryLooseMode)
+    if (ctx.perPlayerContext.myIsInVeryLooseMode)
     {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
     }
@@ -82,12 +82,12 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopAnalys
 
     // the player made a donk bet on the flop, and is not a maniac player : he should have at least a middle or top pair
     // or a draw
-    if (!bHavePosition && !ctx.myPreflopIsAggressor)
+    if (!bHavePosition && !ctx.perPlayerContext.myPreflopIsAggressor)
     {
 
         if (testedHand.isOverCards || testedHand.straightOuts >= 8 || testedHand.flushOuts >= 8)
         {
-            return (ctx.nbRunningPlayers > 2 ? true : false);
+            return (ctx.commonContext.nbRunningPlayers > 2 ? true : false);
         }
 
         if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight ||
@@ -117,7 +117,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopAnalys
     }
 
     // on a 3 or more players pot : if the player bets in position, he should have at least a middle pair
-    if (bHavePosition && ctx.nbRunningPlayers > 2)
+    if (bHavePosition && ctx.commonContext.nbRunningPlayers > 2)
     {
 
         if (testedHand.isOverCards || testedHand.straightOuts >= 8 || testedHand.flushOuts >= 8)
@@ -152,7 +152,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopAnalys
     }
 
     // on a 3 or more players pot : if the player is first to act, and bets, he should have at least a top pair
-    if (ctx.nbChecks == 0 && ctx.nbRunningPlayers > 2)
+    if (ctx.perPlayerContext.nbChecks == 0 && ctx.commonContext.nbRunningPlayers > 2)
     {
 
         if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight ||
@@ -187,16 +187,16 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(const PostFlopAnaly
                                                              CurrentHandContext& ctx)
 {
 
-    const int nbPlayers = ctx.nbPlayers;
-    const bool bHavePosition = ctx.myHavePosition;
-    auto& flop = ctx.myStatistics.getFlopStatistics();
+    const int nbPlayers = ctx.commonContext.nbPlayers;
+    const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
+    auto& flop = ctx.perPlayerContext.myStatistics.getFlopStatistics();
 
-    if (ctx.potOdd < 20)
+    if (ctx.commonContext.potOdd < 20)
     {
         return false;
     }
 
-    if (ctx.myIsInVeryLooseMode)
+    if (ctx.perPlayerContext.myIsInVeryLooseMode)
     {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
     }
@@ -206,9 +206,10 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(const PostFlopAnaly
         return true;
     }
 
-    if (ctx.flopBetsOrRaisesNumber > 0 && ctx.myCurrentHandActions.getFlopActions().back() == ActionType::Call &&
-        !(ctx.myStatistics.getWentToShowDown() > 35 &&
-          ctx.myStatistics.getRiverStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE))
+    if (ctx.commonContext.flopBetsOrRaisesNumber > 0 &&
+        ctx.perPlayerContext.myCurrentHandActions.getFlopActions().back() == ActionType::Call &&
+        !(ctx.perPlayerContext.myStatistics.getWentToShowDown() > 35 &&
+          ctx.perPlayerContext.myStatistics.getRiverStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE))
     {
 
         if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight ||
@@ -222,18 +223,19 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(const PostFlopAnaly
                 return true;
             }
 
-            if (ctx.flopBetsOrRaisesNumber > 1 && testedHand.isOnePair && !testedHand.isTopPair &&
+            if (ctx.commonContext.flopBetsOrRaisesNumber > 1 && testedHand.isOnePair && !testedHand.isTopPair &&
                 !testedHand.isOverPair)
             {
                 return true;
             }
 
-            if (ctx.flopBetsOrRaisesNumber > 2 && (testedHand.isOnePair || testedHand.isOverCards))
+            if (ctx.commonContext.flopBetsOrRaisesNumber > 2 && (testedHand.isOnePair || testedHand.isOverCards))
             {
                 return true;
             }
 
-            if (ctx.nbRunningPlayers > 2 && testedHand.isOnePair && !testedHand.isTopPair && !testedHand.isOverPair)
+            if (ctx.commonContext.nbRunningPlayers > 2 && testedHand.isOnePair && !testedHand.isTopPair &&
+                !testedHand.isOverPair)
             {
                 return true;
             }
@@ -246,9 +248,9 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopAnal
                                                               CurrentHandContext& ctx)
 {
 
-    const int nbPlayers = ctx.nbPlayers;
-    const bool bHavePosition = ctx.myHavePosition;
-    auto& flop = ctx.myStatistics.getFlopStatistics();
+    const int nbPlayers = ctx.commonContext.nbPlayers;
+    const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
+    auto& flop = ctx.perPlayerContext.myStatistics.getFlopStatistics();
 
     if (flop.getAgressionFactor() > 3 && flop.getAgressionFrequency() > 50 &&
         flop.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
@@ -256,7 +258,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopAnal
         return false; // he is usually very agressive, so don't make any guess
     }
 
-    if (ctx.myIsInVeryLooseMode)
+    if (ctx.perPlayerContext.myIsInVeryLooseMode)
     {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
     }
@@ -267,11 +269,11 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopAnal
     }
 
     // the player has check-raised the flop, and is not a maniac player : he should have at least a top pair or a draw
-    if (ctx.nbChecks == 1)
+    if (ctx.perPlayerContext.nbChecks == 1)
     {
 
         if ((testedHand.isOverCards || testedHand.flushOuts >= 8 || testedHand.straightOuts >= 8) &&
-            ctx.nbRunningPlayers > 2)
+            ctx.commonContext.nbRunningPlayers > 2)
         {
             return true;
         }
@@ -295,7 +297,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopAnal
     }
 
     // the player has raised or reraised the flop, and is not a maniac player : he should have at least a top pair
-    if (ctx.nbRaises > 0)
+    if (ctx.perPlayerContext.nbRaises > 0)
     {
 
         if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight ||
@@ -314,12 +316,12 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopAnal
                 return true;
             }
 
-            if (ctx.flopBetsOrRaisesNumber > 3 && (testedHand.isOnePair))
+            if (ctx.commonContext.flopBetsOrRaisesNumber > 3 && (testedHand.isOnePair))
             {
                 return true;
             }
 
-            if (ctx.flopBetsOrRaisesNumber > 4 && (testedHand.isTwoPair))
+            if (ctx.commonContext.flopBetsOrRaisesNumber > 4 && (testedHand.isTwoPair))
             {
                 return true;
             }
@@ -333,11 +335,11 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopAllin(const PostFlopAnal
                                                               CurrentHandContext& ctx)
 {
 
-    const int nbPlayers = ctx.nbPlayers;
-    const bool bHavePosition = ctx.myHavePosition;
-    auto& flop = ctx.myStatistics.getFlopStatistics();
+    const int nbPlayers = ctx.commonContext.nbPlayers;
+    const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
+    auto& flop = ctx.perPlayerContext.myStatistics.getFlopStatistics();
 
-    if (ctx.potOdd < 20)
+    if (ctx.commonContext.potOdd < 20)
     {
         return false;
     }
@@ -348,7 +350,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopAllin(const PostFlopAnal
         return false; // he is usually very agressive, so don't make any guess
     }
 
-    if (ctx.myIsInVeryLooseMode)
+    if (ctx.perPlayerContext.myIsInVeryLooseMode)
     {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
     }
@@ -372,12 +374,12 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopAllin(const PostFlopAnal
             return true;
         }
 
-        if (ctx.flopBetsOrRaisesNumber > 3 && (testedHand.isOnePair))
+        if (ctx.commonContext.flopBetsOrRaisesNumber > 3 && (testedHand.isOnePair))
         {
             return true;
         }
 
-        if (ctx.flopBetsOrRaisesNumber > 4 && (testedHand.isTwoPair))
+        if (ctx.commonContext.flopBetsOrRaisesNumber > 4 && (testedHand.isTwoPair))
         {
             return true;
         }
@@ -389,8 +391,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCheck(const PostFlopAnal
                                                               CurrentHandContext& ctx)
 {
 
-    const bool bHavePosition = ctx.myHavePosition;
-    auto& turn = ctx.myStatistics.getTurnStatistics();
+    const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
+    auto& turn = ctx.perPlayerContext.myStatistics.getTurnStatistics();
 
     // the player is in position, he isn't usually passive, and everybody checked
     if (bHavePosition && !(turn.getAgressionFactor() < 2 && turn.getAgressionFrequency() < 30 &&
@@ -403,7 +405,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCheck(const PostFlopAnal
         }
 
         // woudn't slow play a medium hand on a dangerous board, if there was no action on flop
-        if (((testedHand.usesFirst || testedHand.usesSecond) && ctx.flopBetsOrRaisesNumber == 0 &&
+        if (((testedHand.usesFirst || testedHand.usesSecond) && ctx.commonContext.flopBetsOrRaisesNumber == 0 &&
                  testedHand.isTopPair ||
              (testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isTrips) &&
             testedHand.isFlushDrawPossible)
@@ -414,7 +416,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCheck(const PostFlopAnal
         // wouldn't be passive with a decent hand, on position, if more than 1 opponent
         if (((testedHand.usesFirst || testedHand.usesSecond) &&
              ((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isTrips)) &&
-            ctx.nbRunningPlayers > 2)
+            ctx.commonContext.nbRunningPlayers > 2)
         {
             return true;
         }
@@ -427,8 +429,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnBet(const PostFlopAnalys
                                                             CurrentHandContext& ctx)
 {
 
-    const bool bHavePosition = ctx.myHavePosition;
-    auto& turn = ctx.myStatistics.getTurnStatistics();
+    const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
+    auto& turn = ctx.perPlayerContext.myStatistics.getTurnStatistics();
 
     if (turn.getAgressionFactor() > 3 && turn.getAgressionFrequency() > 50 &&
         turn.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
@@ -436,7 +438,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnBet(const PostFlopAnalys
         return false; // he is usually very agressive, so don't make any guess
     }
 
-    if (ctx.myIsInVeryLooseMode)
+    if (ctx.perPlayerContext.myIsInVeryLooseMode)
     {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
     }
@@ -447,11 +449,11 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnBet(const PostFlopAnalys
     }
 
     // the player made a donk bet on turn, and is not a maniac player : he should have at least a top pair
-    if (!bHavePosition && !ctx.myFlopIsAggressor && ctx.flopBetsOrRaisesNumber > 0)
+    if (!bHavePosition && !ctx.perPlayerContext.myFlopIsAggressor && ctx.commonContext.flopBetsOrRaisesNumber > 0)
     {
 
         if ((testedHand.isOverCards || testedHand.flushOuts >= 8 || testedHand.straightOuts >= 8) &&
-            ctx.nbRunningPlayers > 2)
+            ctx.commonContext.nbRunningPlayers > 2)
         {
             return true;
         }
@@ -481,15 +483,15 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopAnaly
                                                              CurrentHandContext& ctx)
 {
 
-    const bool bHavePosition = ctx.myHavePosition;
-    auto& turn = ctx.myStatistics.getTurnStatistics();
+    const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
+    auto& turn = ctx.perPlayerContext.myStatistics.getTurnStatistics();
 
-    if (ctx.potOdd < 20)
+    if (ctx.commonContext.potOdd < 20)
     {
         return false;
     }
 
-    if (ctx.myIsInVeryLooseMode)
+    if (ctx.perPlayerContext.myIsInVeryLooseMode)
     {
         return false; // he is (temporarily ?) very loose, so don't make any guess
     }
@@ -500,10 +502,11 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopAnaly
     }
 
     // the player called a bet on flop and turn, and he is not loose
-    if (ctx.turnBetsOrRaisesNumber > 0 && ctx.flopBetsOrRaisesNumber > 0 &&
-        ctx.myCurrentHandActions.getTurnActions().back() == ActionType::Call && !ctx.myFlopIsAggressor &&
-        !(ctx.myStatistics.getWentToShowDown() > 30 &&
-          ctx.myStatistics.getRiverStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE))
+    if (ctx.commonContext.turnBetsOrRaisesNumber > 0 && ctx.commonContext.flopBetsOrRaisesNumber > 0 &&
+        ctx.perPlayerContext.myCurrentHandActions.getTurnActions().back() == ActionType::Call &&
+        !ctx.perPlayerContext.myFlopIsAggressor &&
+        !(ctx.perPlayerContext.myStatistics.getWentToShowDown() > 30 &&
+          ctx.perPlayerContext.myStatistics.getRiverStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE))
     {
 
         if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight ||
@@ -522,16 +525,17 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopAnaly
                 return true;
             }
 
-            if (ctx.turnBetsOrRaisesNumber > 2 && testedHand.isOnePair)
+            if (ctx.commonContext.turnBetsOrRaisesNumber > 2 && testedHand.isOnePair)
             {
                 return true;
             }
         }
     }
     // the player called a raise on turn, and is not loose : he has at least a top pair or a good draw
-    if (ctx.turnBetsOrRaisesNumber > 1 && ctx.myCurrentHandActions.getTurnActions().back() == ActionType::Call &&
-        !(ctx.myStatistics.getWentToShowDown() > 35 &&
-          ctx.myStatistics.getRiverStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE))
+    if (ctx.commonContext.turnBetsOrRaisesNumber > 1 &&
+        ctx.perPlayerContext.myCurrentHandActions.getTurnActions().back() == ActionType::Call &&
+        !(ctx.perPlayerContext.myStatistics.getWentToShowDown() > 35 &&
+          ctx.perPlayerContext.myStatistics.getRiverStatistics().m_hands > MIN_HANDS_STATISTICS_ACCURATE))
     {
 
         if (!(((testedHand.isTwoPair && !testedHand.isFullHousePossible) && !testedHand.isFullHousePossible) ||
@@ -560,8 +564,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopAnal
                                                               CurrentHandContext& ctx)
 {
 
-    const bool bHavePosition = ctx.myHavePosition;
-    auto& turn = ctx.myStatistics.getTurnStatistics();
+    const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
+    auto& turn = ctx.perPlayerContext.myStatistics.getTurnStatistics();
 
     if (turn.getAgressionFactor() > 3 && turn.getAgressionFrequency() > 50 &&
         turn.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
@@ -569,7 +573,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopAnal
         return false; // he is very agressive, so don't make any guess
     }
 
-    if (ctx.myIsInVeryLooseMode)
+    if (ctx.perPlayerContext.myIsInVeryLooseMode)
     {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
     }
@@ -580,7 +584,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopAnal
     }
 
     // if nobody has bet the flop, he should at least have a top pair
-    if (ctx.flopBetsOrRaisesNumber == 0)
+    if (ctx.commonContext.flopBetsOrRaisesNumber == 0)
     {
 
         if (testedHand.isTopPair || testedHand.isOverPair ||
@@ -595,7 +599,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopAnal
         }
     }
     // if he was not the agressor on flop, and an other player has bet the flop, then he should have at least a top pair
-    if (!ctx.myFlopIsAggressor && ctx.flopBetsOrRaisesNumber > 0)
+    if (!ctx.perPlayerContext.myFlopIsAggressor && ctx.commonContext.flopBetsOrRaisesNumber > 0)
     {
 
         if (testedHand.isTopPair || testedHand.isOverPair ||
@@ -610,7 +614,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopAnal
         }
     }
     // the player has raised twice the turn, and is not a maniac player : he should have at least two pairs
-    if (ctx.nbRaises == 2 &&
+    if (ctx.perPlayerContext.nbRaises == 2 &&
         !((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight || testedHand.isFlush ||
           testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads || testedHand.isStFlush))
     {
@@ -618,8 +622,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopAnal
     }
 
     // the player has raised 3 times the turn, and is not a maniac player : he should have better than a set
-    if (ctx.nbRaises > 2 && !(testedHand.isStraight || testedHand.isFlush || testedHand.isFullHouse ||
-                              testedHand.isQuads || testedHand.isStFlush))
+    if (ctx.perPlayerContext.nbRaises > 2 && !(testedHand.isStraight || testedHand.isFlush || testedHand.isFullHouse ||
+                                               testedHand.isQuads || testedHand.isStFlush))
     {
         return true;
     }
@@ -631,10 +635,10 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnAllin(const PostFlopAnal
                                                               CurrentHandContext& ctx)
 {
 
-    const bool bHavePosition = ctx.myHavePosition;
-    auto& turn = ctx.myStatistics.getTurnStatistics();
+    const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
+    auto& turn = ctx.perPlayerContext.myStatistics.getTurnStatistics();
 
-    if (ctx.potOdd < 20)
+    if (ctx.commonContext.potOdd < 20)
     {
         return false;
     }
@@ -645,7 +649,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnAllin(const PostFlopAnal
         return false; // he is usually very agressive, so don't make any guess
     }
 
-    if (ctx.myIsInVeryLooseMode)
+    if (ctx.perPlayerContext.myIsInVeryLooseMode)
     {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
     }
@@ -656,7 +660,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnAllin(const PostFlopAnal
     }
 
     // the player has raised twice the turn, and is not a maniac player : he should have at least two pairs
-    if (ctx.nbRaises == 2 &&
+    if (ctx.perPlayerContext.nbRaises == 2 &&
         !((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight || testedHand.isFlush ||
           testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads || testedHand.isStFlush))
     {
@@ -664,8 +668,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnAllin(const PostFlopAnal
     }
 
     // the player has raised 3 times the turn, and is not a maniac player : he should have better than a set
-    if (ctx.nbRaises > 2 && !(testedHand.isStraight || testedHand.isFlush || testedHand.isFullHouse ||
-                              testedHand.isQuads || testedHand.isStFlush))
+    if (ctx.perPlayerContext.nbRaises > 2 && !(testedHand.isStraight || testedHand.isFlush || testedHand.isFullHouse ||
+                                               testedHand.isQuads || testedHand.isStFlush))
     {
         return true;
     }
@@ -677,8 +681,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCheck(const PostFlopAna
                                                                CurrentHandContext& ctx)
 {
 
-    const bool bHavePosition = ctx.myHavePosition;
-    auto& river = ctx.myStatistics.getRiverStatistics();
+    const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
+    auto& river = ctx.perPlayerContext.myStatistics.getRiverStatistics();
 
     // todo
 
@@ -689,8 +693,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(const PostFlopAnaly
                                                              CurrentHandContext& ctx)
 {
 
-    const bool bHavePosition = ctx.myHavePosition;
-    auto& river = ctx.myStatistics.getRiverStatistics();
+    const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
+    auto& river = ctx.perPlayerContext.myStatistics.getRiverStatistics();
 
     if (river.getAgressionFactor() > 3 && river.getAgressionFrequency() > 50 &&
         river.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
@@ -698,7 +702,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(const PostFlopAnaly
         return false; // he is usually very agressive, so don't make any guess
     }
 
-    if (ctx.myIsInVeryLooseMode)
+    if (ctx.perPlayerContext.myIsInVeryLooseMode)
     {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
     }
@@ -710,8 +714,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(const PostFlopAnaly
 
     // the player has bet the river, was not the agressor on turn and river, and is not a maniac player : he should
     // have at least 2 pairs
-    if (ctx.flopBetsOrRaisesNumber > 1 && !ctx.myFlopIsAggressor && ctx.turnBetsOrRaisesNumber > 1 &&
-        !ctx.myTurnIsAggressor)
+    if (ctx.commonContext.flopBetsOrRaisesNumber > 1 && !ctx.perPlayerContext.myFlopIsAggressor &&
+        ctx.commonContext.turnBetsOrRaisesNumber > 1 && !ctx.perPlayerContext.myTurnIsAggressor)
     {
 
         if ((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight || testedHand.isFlush ||
@@ -727,9 +731,9 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(const PostFlopAnaly
 
     // the player has bet the river, is out of position on a multi-players pot, in a hand with some action, and is
     // not a maniac player : he should have at least 2 pairs
-    if (!bHavePosition && ctx.nbRunningPlayers > 2 &&
-        ((ctx.flopBetsOrRaisesNumber > 1 && !ctx.myFlopIsAggressor) ||
-         (ctx.turnBetsOrRaisesNumber > 1 && !ctx.myTurnIsAggressor)))
+    if (!bHavePosition && ctx.commonContext.nbRunningPlayers > 2 &&
+        ((ctx.commonContext.flopBetsOrRaisesNumber > 1 && !ctx.perPlayerContext.myFlopIsAggressor) ||
+         (ctx.commonContext.turnBetsOrRaisesNumber > 1 && !ctx.perPlayerContext.myTurnIsAggressor)))
     {
 
         if ((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight || testedHand.isFlush ||
@@ -749,10 +753,10 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(const PostFlopAnal
                                                               CurrentHandContext& ctx)
 {
 
-    const bool bHavePosition = ctx.myHavePosition;
-    auto& river = ctx.myStatistics.getRiverStatistics();
+    const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
+    auto& river = ctx.perPlayerContext.myStatistics.getRiverStatistics();
 
-    if (ctx.potOdd < 20)
+    if (ctx.commonContext.potOdd < 20)
     {
         return false;
     }
@@ -763,7 +767,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(const PostFlopAnal
         return false; // he is usually very agressive, so don't make any guess
     }
 
-    if (ctx.myIsInVeryLooseMode)
+    if (ctx.perPlayerContext.myIsInVeryLooseMode)
     {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
     }
@@ -775,7 +779,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(const PostFlopAnal
 
     // the player has called the river on a multi-players pot, and is not a loose player : he should have at least a
     // top pair
-    if (ctx.nbRunningPlayers > 2)
+    if (ctx.commonContext.nbRunningPlayers > 2)
     {
 
         if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight ||
@@ -802,8 +806,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(const PostFlopAna
                                                                CurrentHandContext& ctx)
 {
 
-    const bool bHavePosition = ctx.myHavePosition;
-    auto& river = ctx.myStatistics.getRiverStatistics();
+    const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
+    auto& river = ctx.perPlayerContext.myStatistics.getRiverStatistics();
 
     if (river.getAgressionFactor() > 3 && river.getAgressionFrequency() > 50 &&
         river.m_hands > MIN_HANDS_STATISTICS_ACCURATE)
@@ -811,7 +815,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(const PostFlopAna
         return false; // he is usually very agressive, so don't make any guess
     }
 
-    if (ctx.myIsInVeryLooseMode)
+    if (ctx.perPlayerContext.myIsInVeryLooseMode)
     {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
     }
@@ -834,9 +838,9 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(const PostFlopAna
 
     // the player has raised the river, is out of position on a multi-players pot, in a hand with some action, and
     // is not a maniac player : he should have at least a set
-    if (!bHavePosition && ctx.nbRunningPlayers > 2 &&
-        ((ctx.flopBetsOrRaisesNumber > 1 && !ctx.myFlopIsAggressor) ||
-         (ctx.turnBetsOrRaisesNumber > 1 && !ctx.myTurnIsAggressor)))
+    if (!bHavePosition && ctx.commonContext.nbRunningPlayers > 2 &&
+        ((ctx.commonContext.flopBetsOrRaisesNumber > 1 && !ctx.perPlayerContext.myFlopIsAggressor) ||
+         (ctx.commonContext.turnBetsOrRaisesNumber > 1 && !ctx.perPlayerContext.myTurnIsAggressor)))
     {
 
         if (testedHand.isStraight || testedHand.isFlush || testedHand.isFullHouse || testedHand.isTrips ||
@@ -851,15 +855,15 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(const PostFlopAna
     }
 
     // the player has raised twice the river, and is not a maniac player : he should have at least trips
-    if (ctx.nbRaises == 2 && !(testedHand.isStraight || testedHand.isFlush || testedHand.isFullHouse ||
-                               testedHand.isTrips || testedHand.isQuads || testedHand.isStFlush))
+    if (ctx.perPlayerContext.nbRaises == 2 && !(testedHand.isStraight || testedHand.isFlush || testedHand.isFullHouse ||
+                                                testedHand.isTrips || testedHand.isQuads || testedHand.isStFlush))
     {
         return true;
     }
 
     // the player has raised 3 times the river, and is not a maniac player : he should have better than a set
-    if (ctx.nbRaises > 2 && !(testedHand.isStraight || testedHand.isFlush || testedHand.isFullHouse ||
-                              testedHand.isQuads || testedHand.isStFlush))
+    if (ctx.perPlayerContext.nbRaises > 2 && !(testedHand.isStraight || testedHand.isFlush || testedHand.isFullHouse ||
+                                               testedHand.isQuads || testedHand.isStFlush))
     {
         return true;
     }
@@ -871,10 +875,10 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverAllin(const PostFlopAna
                                                                CurrentHandContext& ctx)
 {
 
-    const bool bHavePosition = ctx.myHavePosition;
-    auto& river = ctx.myStatistics.getRiverStatistics();
+    const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
+    auto& river = ctx.perPlayerContext.myStatistics.getRiverStatistics();
 
-    if (ctx.potOdd < 20)
+    if (ctx.commonContext.potOdd < 20)
     {
         return false;
     }
@@ -885,7 +889,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverAllin(const PostFlopAna
         return false; // he is usually very agressive, so don't make any guess
     }
 
-    if (ctx.myIsInVeryLooseMode)
+    if (ctx.perPlayerContext.myIsInVeryLooseMode)
     {
         return false; // he is (temporarily ?) very agressive, so don't make any guess
     }
@@ -897,8 +901,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverAllin(const PostFlopAna
 
     // the player has raised twice or more the river, and is not a maniac player : he should have at least a
     // straight
-    if (ctx.nbRaises > 1 && !(testedHand.isStraight || testedHand.isFlush || testedHand.isFullHouse ||
-                              testedHand.isQuads || testedHand.isStFlush))
+    if (ctx.perPlayerContext.nbRaises > 1 && !(testedHand.isStraight || testedHand.isFlush || testedHand.isFullHouse ||
+                                               testedHand.isQuads || testedHand.isStFlush))
     {
         return true;
     }

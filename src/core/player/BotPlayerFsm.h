@@ -4,41 +4,32 @@
 
 #pragma once
 
-#include "Player.h"
+#include "PlayerFsm.h"
 
 #include "core/player/strategy/IBotStrategy.h"
 
 namespace pkt::core::player
 {
-class BotPlayer : public Player
+class BotPlayerFsm : public PlayerFsm
 {
 
   public:
-    BotPlayer(const GameEvents&, int id, std::string name, int sC, bool aS, int mB);
+    BotPlayerFsm(const GameEvents&, int id, std::string name, int sC, bool aS, int mB);
 
-    ~BotPlayer();
+    ~BotPlayerFsm();
 
     void setStrategy(std::unique_ptr<IBotStrategy> strategy) { myStrategy = std::move(strategy); }
-    void action();
-    void doPreflopAction();
-    void doFlopAction();
-    void doTurnAction();
-    void doRiverAction();
     virtual std::string getStrategyName() const override
     {
         return myStrategy ? myStrategy->getStrategyName() : "Unknown Strategy";
     }
 
-    float calculatePreflopCallingRange(CurrentHandContext& ctx) const override;
+    PlayerAction decidePreflopAction();
 
     bool isBot() const override { return true; }
 
   private:
-    void evaluateBetAmount();
-
     std::unique_ptr<IBotStrategy> myStrategy;
-    int myBetAmount = 0;
-    int myRaiseAmount = 0;
 };
 
 } // namespace pkt::core::player

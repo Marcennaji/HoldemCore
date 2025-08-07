@@ -5,7 +5,7 @@
 #include "HandFsm.h"
 #include "core/engine/Exception.h"
 #include "core/engine/model/PlayerAction.h"
-#include "core/player/BotPlayer.h"
+#include "core/player/BotPlayerFsm.h"
 #include "core/player/Helpers.h"
 #include "core/player/Player.h"
 
@@ -20,10 +20,9 @@ PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsig
 
 void PreflopState::enter(HandFsm& hand)
 {
-    myHighestSet = 2 * mySmallBlind;
+    hand.getBettingState()->updateHighestSet(2 * mySmallBlind);
     assignButtons(hand);
     setBlinds(hand);
-    resetRaiser();
 
     if (myEvents.onBettingRoundStarted)
         myEvents.onBettingRoundStarted(GameStatePreflop);
@@ -40,9 +39,9 @@ bool PreflopState::isActionAllowed(const HandFsm& hand, const PlayerAction actio
     if (!player)
         return false;
 
-    const int cash = player->getLegacyPlayer()->getCash();
+    const int cash = player->getCash();
 
-    const int amountToCall = getHighestSet() - player->getLegacyPlayer()->getSet();
+    const int amountToCall = hand.getBettingState()->getHighestSet() - player->getSet();
 
     switch (action.type)
     {
@@ -72,13 +71,13 @@ bool PreflopState::isActionAllowed(const HandFsm& hand, const PlayerAction actio
     return false;
 }
 
-void PreflopState::promptPlayerAction(HandFsm& hand, Player& player)
+void PreflopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
 {
     if (!player.isBot())
         return;
 
-    auto& bot = static_cast<BotPlayer&>(player);
-    const PlayerAction action = bot.decidePreflopActionFsm();
+    auto& bot = static_cast<BotPlayerFsm&>(player);
+    const PlayerAction action = bot.decidePreflopAction();
     hand.handlePlayerAction(action);
 }
 
@@ -100,7 +99,7 @@ bool PreflopState::isRoundComplete(const HandFsm& hand) const
 
     for (auto itC = hand.getRunningPlayersList()->begin(); itC != hand.getRunningPlayersList()->end(); ++itC)
     {
-        if ((*itC)->getLegacyPlayer()->getSet() != myHighestSet)
+        if ((*itC)->getSet() != hand.getBettingState()->getHighestSet())
         {
             return false;
         }
@@ -213,16 +212,16 @@ void PreflopState::setBlinds(HandFsm& hand)
         {
 
             // All in ?
-            if ((*itC)->getLegacyPlayer()->getCash() <= mySmallBlind)
+            if ((*itC)->getCash() <= mySmallBlind)
             {
 
-                (*itC)->getLegacyPlayer()->setSet((*itC)->getLegacyPlayer()->getCash());
+                (*itC)->setSet((*itC)->getCash());
                 // 1 to do not log this
-                (*itC)->getLegacyPlayer()->setAction(ActionType::Allin, 1);
+                (*itC)->setAction(ActionType::Allin, 1);
             }
             else
             {
-                (*itC)->getLegacyPlayer()->setSet(mySmallBlind);
+                (*itC)->setSet(mySmallBlind);
             }
         }
     }
@@ -235,16 +234,16 @@ void PreflopState::setBlinds(HandFsm& hand)
         {
 
             // all in ?
-            if ((*itC)->getLegacyPlayer()->getCash() <= 2 * mySmallBlind)
+            if ((*itC)->getCash() <= 2 * mySmallBlind)
             {
 
-                (*itC)->getLegacyPlayer()->setSet((*itC)->getLegacyPlayer()->getCash());
+                (*itC)->setSet((*itC)->getCash());
                 // 1 to do not log this
-                (*itC)->getLegacyPlayer()->setAction(ActionType::Allin, 1);
+                (*itC)->setAction(ActionType::Allin, 1);
             }
             else
             {
-                (*itC)->getLegacyPlayer()->setSet(2 * mySmallBlind);
+                (*itC)->setSet(2 * mySmallBlind);
             }
         }
     }

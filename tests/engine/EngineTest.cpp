@@ -86,7 +86,7 @@ void EngineTest::createPlayersFsmLists(size_t playerCount)
     {
         auto player = std::make_shared<DummyPlayer>(i, myEvents);
         player->setAction(ActionType::None);
-        auto playerFsm = std::make_shared<PlayerFsm>(player);
+        auto playerFsm = std::make_shared<DummyPlayerFsm>(i, myEvents);
         mySeatsListFsm->push_back(playerFsm);
     }
 

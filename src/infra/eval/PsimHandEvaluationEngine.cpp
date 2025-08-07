@@ -11,9 +11,7 @@ using namespace std;
 
 unsigned int PsimHandEvaluationEngine::rankHand(const char* hand)
 {
-    GlobalServices::instance().logger()->verbose("Calling psim for hand ranking");
     unsigned int result = ::RankHand(hand);
-    GlobalServices::instance().logger()->verbose("hand ranking computed, is " + std::to_string(result));
     return result;
 }
 HandSimulationStats PsimHandEvaluationEngine::convertSimResults(const SimResults& s)

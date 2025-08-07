@@ -34,7 +34,7 @@ bool PreflopStateTest::isPlayerStillActive(unsigned id) const
 {
     for (const auto& p : *myHandFsm->getRunningPlayersList())
     {
-        if (p->getLegacyPlayer()->getId() == id)
+        if (p->getId() == id)
             return true;
     }
     return false;
@@ -53,8 +53,7 @@ TEST_F(PreflopStateTest, StartHandHeadsUpInitializePlayersCorrectly)
     auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 1);
     EXPECT_EQ(playerBb->getButton(), ButtonBigBlind);
 
-    EXPECT_EQ(playerSb->getLegacyPlayer()->getCash(),
-              playerBb->getLegacyPlayer()->getCash() + gameData.firstSmallBlind);
+    EXPECT_EQ(playerSb->getCash(), playerBb->getCash() + gameData.firstSmallBlind);
 }
 TEST_F(PreflopStateTest, StartHand3BotsInitializePlayersCorrectly)
 {
@@ -68,10 +67,8 @@ TEST_F(PreflopStateTest, StartHand3BotsInitializePlayersCorrectly)
     auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
     EXPECT_EQ(playerBb->getButton(), ButtonBigBlind);
 
-    EXPECT_EQ(playerDealer->getLegacyPlayer()->getCash(),
-              playerBb->getLegacyPlayer()->getCash() + gameData.firstSmallBlind * 2);
-    EXPECT_EQ(playerSb->getLegacyPlayer()->getCash(),
-              playerBb->getLegacyPlayer()->getCash() + gameData.firstSmallBlind);
+    EXPECT_EQ(playerDealer->getCash(), playerBb->getCash() + gameData.firstSmallBlind * 2);
+    EXPECT_EQ(playerSb->getCash(), playerBb->getCash() + gameData.firstSmallBlind);
 }
 TEST_F(PreflopStateTest, StartHand6BotsInitializePlayersCorrectly)
 {
@@ -91,16 +88,11 @@ TEST_F(PreflopStateTest, StartHand6BotsInitializePlayersCorrectly)
     auto playerUtgPlusTwo = getPlayerFsmById(myRunningPlayersListFsm, 5);
     EXPECT_EQ(playerUtgPlusTwo->getButton(), ButtonNone);
 
-    EXPECT_EQ(playerDealer->getLegacyPlayer()->getCash(),
-              playerBb->getLegacyPlayer()->getCash() + gameData.firstSmallBlind * 2);
-    EXPECT_EQ(playerSb->getLegacyPlayer()->getCash(),
-              playerBb->getLegacyPlayer()->getCash() + gameData.firstSmallBlind);
-    EXPECT_EQ(playerUtg->getLegacyPlayer()->getCash(),
-              playerBb->getLegacyPlayer()->getCash() + gameData.firstSmallBlind * 2);
-    EXPECT_EQ(playerUtgPlusOne->getLegacyPlayer()->getCash(),
-              playerBb->getLegacyPlayer()->getCash() + gameData.firstSmallBlind * 2);
-    EXPECT_EQ(playerUtgPlusTwo->getLegacyPlayer()->getCash(),
-              playerBb->getLegacyPlayer()->getCash() + gameData.firstSmallBlind * 2);
+    EXPECT_EQ(playerDealer->getCash(), playerBb->getCash() + gameData.firstSmallBlind * 2);
+    EXPECT_EQ(playerSb->getCash(), playerBb->getCash() + gameData.firstSmallBlind);
+    EXPECT_EQ(playerUtg->getCash(), playerBb->getCash() + gameData.firstSmallBlind * 2);
+    EXPECT_EQ(playerUtgPlusOne->getCash(), playerBb->getCash() + gameData.firstSmallBlind * 2);
+    EXPECT_EQ(playerUtgPlusTwo->getCash(), playerBb->getCash() + gameData.firstSmallBlind * 2);
 }
 TEST_F(PreflopStateTest, StartHandShouldGoToPreflop)
 {

@@ -5,6 +5,12 @@ namespace pkt::core::player
 
 void CurrentHandContext::reset()
 {
+    commonContext.reset();
+    perPlayerContext.reset();
+}
+
+void CommonHandContext::reset()
+{
     // Common data
     gameState = GameStateNone;
     preflopRaisesNumber = 0;
@@ -12,11 +18,7 @@ void CurrentHandContext::reset()
     flopBetsOrRaisesNumber = 0;
     turnBetsOrRaisesNumber = 0;
     riverBetsOrRaisesNumber = 0;
-    nbChecks = 0;
-    nbRaises = 0;
-    nbBets = 0;
-    nbAllins = 0;
-    nbCalls = 0;
+
     nbPlayers = 0;
     nbRunningPlayers = 0;
     preflopLastRaiser = nullptr;
@@ -31,6 +33,14 @@ void CurrentHandContext::reset()
     isPreflopBigBet = false;
     smallBlind = 0;
     stringBoard.clear();
+}
+void PerPlayerHandContext::reset()
+{
+    nbChecks = 0;
+    nbRaises = 0;
+    nbBets = 0;
+    nbAllins = 0;
+    nbCalls = 0;
 
     // Player-specific data
     myPreflopCallingRange = -1;
@@ -65,5 +75,4 @@ void CurrentHandContext::reset()
         0.0f  // d90
     };
 }
-
 } // namespace pkt::core::player

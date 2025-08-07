@@ -34,7 +34,6 @@ class RangeEstimator
   public:
     RangeEstimator(int playerId);
 
-    void setHand(IHand* hand);
     void setEstimatedRange(const std::string& range);
     std::string getEstimatedRange() const;
 
@@ -56,6 +55,5 @@ class RangeEstimator
     std::unique_ptr<PreflopRangeEstimator> myPreflopRangeEstimator;
     std::string myEstimatedRange;
     int myPlayerId;
-    IHand* myHand{nullptr};
 };
 } // namespace pkt::core::player

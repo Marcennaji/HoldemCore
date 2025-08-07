@@ -12,14 +12,14 @@ class StrategyTest : public ::testing::Test
 
     void SetUp() override
     {
-        ctx.nbPlayers = 6;
-        ctx.nbRunningPlayers = 6;
-        ctx.pot = 100;
-        ctx.highestSet = 20;
-        ctx.myCash = 1000;
-        ctx.mySet = 0;
-        ctx.myID = 1;
-        ctx.smallBlind = 10;
+        ctx.commonContext.nbPlayers = 6;
+        ctx.commonContext.nbRunningPlayers = 6;
+        ctx.commonContext.pot = 100;
+        ctx.commonContext.highestSet = 20;
+        ctx.perPlayerContext.myCash = 1000;
+        ctx.perPlayerContext.mySet = 0;
+        ctx.perPlayerContext.myID = 1;
+        ctx.commonContext.smallBlind = 10;
     }
 };
 

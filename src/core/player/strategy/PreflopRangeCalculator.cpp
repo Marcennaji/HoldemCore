@@ -88,18 +88,18 @@ void PreflopRangeCalculator::initializeRanges(const int utgHeadsUpRange, const i
     }
 }
 
-float PreflopRangeCalculator::calculatePreflopCallingRange(CurrentHandContext& context) const
+float PreflopRangeCalculator::calculatePreflopCallingRange(CurrentHandContext& ctx) const
 {
-    const int nbRaises = context.preflopRaisesNumber;
-    const int nbCalls = context.preflopCallsNumber;
-    const int nbPlayers = context.nbPlayers;
-    const PlayerPosition myPosition = context.myPosition;
-    const int potOdd = context.potOdd;
-    const int myCash = context.myCash;
-    const bool isPreflopBigBet = context.isPreflopBigBet;
-    const int mySet = context.mySet;
-    const int smallBlind = context.smallBlind;
-    const int myM = context.myM;
+    const int nbRaises = ctx.commonContext.preflopRaisesNumber;
+    const int nbCalls = ctx.commonContext.preflopCallsNumber;
+    const int nbPlayers = ctx.commonContext.nbPlayers;
+    const PlayerPosition myPosition = ctx.perPlayerContext.myPosition;
+    const int potOdd = ctx.commonContext.potOdd;
+    const int myCash = ctx.perPlayerContext.myCash;
+    const bool isPreflopBigBet = ctx.commonContext.isPreflopBigBet;
+    const int mySet = ctx.perPlayerContext.mySet;
+    const int smallBlind = ctx.commonContext.smallBlind;
+    const int myM = ctx.perPlayerContext.myM;
 
     float callingRange = getRange(myPosition, nbPlayers);
 
@@ -124,16 +124,17 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(CurrentHandContext& c
     }
 
     // Handle raises
-    callingRange = adjustCallForRaises(context, callingRange);
+    callingRange = adjustCallForRaises(ctx, callingRange);
 
     // Tighten range for big bets
     if (isPreflopBigBet)
     {
-        callingRange = adjustCallForBigBet(callingRange, potOdd, myCash, context.highestSet, mySet, smallBlind);
+        callingRange =
+            adjustCallForBigBet(callingRange, potOdd, myCash, ctx.commonContext.highestSet, mySet, smallBlind);
     }
 
     // Adjust for loose/aggressive raiser
-    if (shouldAdjustCallForLooseRaiser(context, nbCalls, nbRaises))
+    if (shouldAdjustCallForLooseRaiser(ctx, nbCalls, nbRaises))
     {
         callingRange = std::max(callingRange, 20.0f);
     }
@@ -145,7 +146,7 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(CurrentHandContext& c
     }
 
     // Adjust for all-in raiser
-    if (shouldCallForAllIn(context, potOdd, nbRaises))
+    if (shouldCallForAllIn(ctx, potOdd, nbRaises))
     {
         callingRange = 100.0f;
     }
@@ -176,13 +177,13 @@ float PreflopRangeCalculator::clampCallingRange(float callingRange) const
     return callingRange;
 }
 
-float PreflopRangeCalculator::adjustCallForRaises(const CurrentHandContext& context, float callingRange) const
+float PreflopRangeCalculator::adjustCallForRaises(const CurrentHandContext& ctx, float callingRange) const
 {
-    const int nbRaises = context.preflopRaisesNumber;
-    const int nbPlayers = context.nbPlayers;
-    const PlayerPosition myPosition = context.myPosition;
-    const int nbRunningPlayers = context.nbRunningPlayers;
-    std::shared_ptr<Player> lastRaiser = context.preflopLastRaiser;
+    const int nbRaises = ctx.commonContext.preflopRaisesNumber;
+    const int nbPlayers = ctx.commonContext.nbPlayers;
+    const PlayerPosition myPosition = ctx.perPlayerContext.myPosition;
+    const int nbRunningPlayers = ctx.commonContext.nbRunningPlayers;
+    std::shared_ptr<Player> lastRaiser = ctx.commonContext.preflopLastRaiser;
     if (!lastRaiser)
     {
         return callingRange;
@@ -295,13 +296,13 @@ float PreflopRangeCalculator::adjustCallForBigBet(float callingRange, int potOdd
     return callingRange;
 }
 
-bool PreflopRangeCalculator::shouldAdjustCallForLooseRaiser(const CurrentHandContext& context, int nbCalls,
+bool PreflopRangeCalculator::shouldAdjustCallForLooseRaiser(const CurrentHandContext& ctx, int nbCalls,
                                                             int nbRaises) const
 {
-    std::shared_ptr<Player> lastRaiser = context.preflopLastRaiser;
-    const PlayerPosition myPosition = context.myPosition;
+    std::shared_ptr<Player> lastRaiser = ctx.commonContext.preflopLastRaiser;
+    const PlayerPosition myPosition = ctx.perPlayerContext.myPosition;
 
-    return lastRaiser->isInVeryLooseMode(context.nbPlayers) &&
+    return lastRaiser->isInVeryLooseMode(ctx.commonContext.nbPlayers) &&
            (myPosition >= LATE || myPosition == SB || myPosition == BB) && nbCalls == 0 && nbRaises == 1;
 }
 
@@ -310,22 +311,22 @@ bool PreflopRangeCalculator::shouldCallForGoodOdds(int potOdd, int myM, PlayerPo
     return potOdd <= 30 && myM > 15 && (myPosition >= LATE || myPosition == SB || myPosition == BB);
 }
 
-bool PreflopRangeCalculator::shouldCallForAllIn(const CurrentHandContext& context, int potOdd, int nbRaises) const
+bool PreflopRangeCalculator::shouldCallForAllIn(const CurrentHandContext& ctx, int potOdd, int nbRaises) const
 {
-    std::shared_ptr<Player> lastRaiser = context.preflopLastRaiser;
-    const PlayerPosition myPosition = context.myPosition;
+    std::shared_ptr<Player> lastRaiser = ctx.commonContext.preflopLastRaiser;
+    const PlayerPosition myPosition = ctx.perPlayerContext.myPosition;
 
-    return context.myM > 10 && potOdd <= 20 && nbRaises < 2 && lastRaiser->getAction() == ActionType::Allin &&
-           (myPosition >= LATE || myPosition == SB || myPosition == BB);
+    return ctx.perPlayerContext.myM > 10 && potOdd <= 20 && nbRaises < 2 &&
+           lastRaiser->getAction() == ActionType::Allin && (myPosition >= LATE || myPosition == SB || myPosition == BB);
 }
 
-float PreflopRangeCalculator::calculatePreflopRaisingRange(CurrentHandContext& context) const
+float PreflopRangeCalculator::calculatePreflopRaisingRange(CurrentHandContext& ctx) const
 {
-    const int nbRaises = context.preflopRaisesNumber;
-    const int nbCalls = context.preflopCallsNumber;
-    const int nbPlayers = context.nbPlayers;
-    const PlayerPosition myPosition = context.myPosition;
-    const bool canBluff = context.myCanBluff;
+    const int nbRaises = ctx.commonContext.preflopRaisesNumber;
+    const int nbCalls = ctx.commonContext.preflopCallsNumber;
+    const int nbPlayers = ctx.commonContext.nbPlayers;
+    const PlayerPosition myPosition = ctx.perPlayerContext.myPosition;
+    const bool canBluff = ctx.perPlayerContext.myCanBluff;
 
     float raisingRange = getRange(myPosition, nbPlayers) * 0.8;
 
@@ -338,14 +339,14 @@ float PreflopRangeCalculator::calculatePreflopRaisingRange(CurrentHandContext& c
 
     if (nbRaises > 0)
     {
-        raisingRange = adjustRaiseForRaiser(context, raisingRange);
+        raisingRange = adjustRaiseForRaiser(ctx, raisingRange);
     }
     else
     {
-        raisingRange = adjustRaiseForNoRaiser(context, raisingRange, canBluff);
+        raisingRange = adjustRaiseForNoRaiser(ctx, raisingRange, canBluff);
     }
 
-    raisingRange = adjustRaiseForStack(context, raisingRange);
+    raisingRange = adjustRaiseForStack(ctx, raisingRange);
 
     return clampRaiseRange(raisingRange);
 }
@@ -357,16 +358,16 @@ float PreflopRangeCalculator::adjustRaiseForLimpers(float raisingRange) const
     return raisingRange * 0.7;
 }
 
-float PreflopRangeCalculator::adjustRaiseForRaiser(const CurrentHandContext& context, float raisingRange) const
+float PreflopRangeCalculator::adjustRaiseForRaiser(const CurrentHandContext& ctx, float raisingRange) const
 {
-    const int nbRaises = context.preflopRaisesNumber;
-    const int nbPlayers = context.nbPlayers;
-    const int potOdd = context.potOdd;
-    const int myCash = context.myCash;
-    const int mySet = context.mySet;
-    const int smallBlind = context.smallBlind;
-    const bool isPreflopBigBet = context.isPreflopBigBet;
-    std::shared_ptr<Player> lastRaiser = context.preflopLastRaiser;
+    const int nbRaises = ctx.commonContext.preflopRaisesNumber;
+    const int nbPlayers = ctx.commonContext.nbPlayers;
+    const int potOdd = ctx.commonContext.potOdd;
+    const int myCash = ctx.perPlayerContext.myCash;
+    const int mySet = ctx.perPlayerContext.mySet;
+    const int smallBlind = ctx.commonContext.smallBlind;
+    const bool isPreflopBigBet = ctx.commonContext.isPreflopBigBet;
+    std::shared_ptr<Player> lastRaiser = ctx.commonContext.preflopLastRaiser;
 
     PreflopStatistics raiserStats = lastRaiser->getStatistics(nbPlayers).getPreflopStatistics();
 
@@ -387,7 +388,8 @@ float PreflopRangeCalculator::adjustRaiseForRaiser(const CurrentHandContext& con
 
     if (isPreflopBigBet)
     {
-        raisingRange = adjustRaiseForBigBet(raisingRange, potOdd, myCash, context.highestSet, mySet, smallBlind);
+        raisingRange =
+            adjustRaiseForBigBet(raisingRange, potOdd, myCash, ctx.commonContext.highestSet, mySet, smallBlind);
     }
 
     return raisingRange;
@@ -433,13 +435,13 @@ float PreflopRangeCalculator::adjustRaiseForNoRaiserStats(float raisingRange, in
 
     return raisingRange;
 }
-float PreflopRangeCalculator::adjustRaiseForNoRaiser(const CurrentHandContext& context, float raisingRange,
+float PreflopRangeCalculator::adjustRaiseForNoRaiser(const CurrentHandContext& ctx, float raisingRange,
                                                      bool canBluff) const
 {
-    const int nbPlayers = context.nbPlayers;
-    const PlayerPosition myPosition = context.myPosition;
-    const std::string myCard1 = context.myCard1;
-    const std::string myCard2 = context.myCard2;
+    const int nbPlayers = ctx.commonContext.nbPlayers;
+    const PlayerPosition myPosition = ctx.perPlayerContext.myPosition;
+    const std::string myCard1 = ctx.perPlayerContext.myCard1;
+    const std::string myCard2 = ctx.perPlayerContext.myCard2;
 
     if (!isCardsInRange(myCard1, myCard2, RangeEstimator::getStringRange(nbPlayers, raisingRange)) &&
         (myPosition == SB || myPosition == BUTTON || myPosition == CUTOFF) && canBluff)
@@ -456,11 +458,11 @@ float PreflopRangeCalculator::adjustRaiseForNoRaiser(const CurrentHandContext& c
 
     return raisingRange;
 }
-float PreflopRangeCalculator::adjustRaiseForStack(const CurrentHandContext& context, float raisingRange) const
+float PreflopRangeCalculator::adjustRaiseForStack(const CurrentHandContext& ctx, float raisingRange) const
 {
-    const int myM = context.myM;
-    const int nbPlayers = context.nbPlayers;
-    const int nbRaises = context.preflopRaisesNumber;
+    const int myM = ctx.perPlayerContext.myM;
+    const int nbPlayers = ctx.commonContext.nbPlayers;
+    const int nbRaises = ctx.commonContext.preflopRaisesNumber;
 
     static const int mToMinimumRange[] = {65, 45, 44, 43, 40, 39, 38, 37, 36, 35, /* M = 1 (full ring) */
                                           34, 33, 33, 33, 33, 33, 33, 32, 31,     /* M = 2 */
