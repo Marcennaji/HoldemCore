@@ -8,7 +8,7 @@
 #include <core/services/GlobalServices.h>
 #include "core/engine/EngineDefs.h"
 #include "core/engine/model/GameState.h"
-#include "core/engine/model/PlayerStatistics.h"
+#include "core/player/PlayerStatistics.h"
 
 #include <filesystem>
 #include <string>
@@ -22,8 +22,8 @@ namespace pkt::infra
 {
 
 using core::ILogger;
-using core::PlayerStatistics;
 using core::player::PlayerList;
+using core::player::PlayerStatistics;
 
 class SqliteLogStore
 {

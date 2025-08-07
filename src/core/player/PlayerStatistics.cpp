@@ -4,7 +4,7 @@
 
 #include "PlayerStatistics.h"
 
-namespace pkt::core
+namespace pkt::core::player
 {
 
 const int PreflopStatistics::LAST_ACTIONS_STACK_SIZE = 10;
@@ -256,4 +256,4 @@ float RiverStatistics::getAgressionFactor() const
     return (float) (raises + bets) / (float) calls;
 }
 
-} // namespace pkt::core
+} // namespace pkt::core::player

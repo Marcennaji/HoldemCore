@@ -6,7 +6,7 @@
 
 #include <core/engine/EngineDefs.h>
 #include <core/engine/HandEvaluator.h>
-#include <core/engine/model/PlayerStatistics.h>
+#include <core/player/PlayerStatistics.h>
 #include "core/engine/model/ButtonState.h"
 
 #include "CurrentHandActions.h"

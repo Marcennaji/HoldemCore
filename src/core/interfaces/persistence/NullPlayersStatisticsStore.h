@@ -6,7 +6,7 @@
 
 #include "IPlayersStatisticsStore.h"
 #include "core/engine/EngineDefs.h"
-#include "core/engine/model/PlayerStatistics.h"
+#include "core/player/PlayerStatistics.h"
 
 #include <array>
 
@@ -17,7 +17,7 @@ class NullPlayersStatisticsStore : public IPlayersStatisticsStore
 {
   public:
     NullPlayersStatisticsStore()
-        : myNullPlayerStatistics{PlayerStatistics()} // Initialize with default PlayerStatistics
+        : myNullPlayerStatistics{pkt::core::player::PlayerStatistics()} // Initialize with default PlayerStatistics
     {
         // Ensure all PlayerStatistics are reset to zero
         for (auto& stats : myNullPlayerStatistics)
@@ -27,7 +27,7 @@ class NullPlayersStatisticsStore : public IPlayersStatisticsStore
     }
     virtual ~NullPlayersStatisticsStore() = default;
 
-    virtual std::array<pkt::core::PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1>
+    virtual std::array<pkt::core::player::PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1>
     getPlayerStatistics(const std::string& playerName) override
     {
         return myNullPlayerStatistics;
@@ -36,6 +36,6 @@ class NullPlayersStatisticsStore : public IPlayersStatisticsStore
     virtual void updatePlayersStatistics(pkt::core::player::PlayerList) override {}
 
   private:
-    std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> myNullPlayerStatistics;
+    std::array<pkt::core::player::PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> myNullPlayerStatistics;
 };
 } //  namespace pkt::core

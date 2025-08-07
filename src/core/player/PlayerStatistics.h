@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include "PlayerAction.h"
+#include "core/engine/model/PlayerAction.h"
 
 #include <deque>
 
-namespace pkt::core
+namespace pkt::core::player
 {
 
 class PreflopStatistics
@@ -117,4 +117,4 @@ class PlayerStatistics
     TurnStatistics turnStatistics;
     RiverStatistics riverStatistics;
 };
-} // namespace pkt::core
+} // namespace pkt::core::player

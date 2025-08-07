@@ -6,8 +6,8 @@
 
 #include <core/engine/EngineDefs.h>
 #include <core/engine/HandEvaluator.h>
-#include <core/engine/model/PlayerStatistics.h>
 #include <core/interfaces/IHand.h>
+#include <core/player/PlayerStatistics.h>
 
 #include "CurrentHandActions.h"
 #include "range/RangeEstimator.h"

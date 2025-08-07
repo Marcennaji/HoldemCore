@@ -1,7 +1,7 @@
 #pragma once
 
 #include <core/engine/model/PlayerPosition.h>
-#include <core/engine/model/PlayerStatistics.h>
+#include <core/player/PlayerStatistics.h>
 
 #include <vector>
 

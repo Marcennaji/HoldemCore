@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/engine/model/PlayerStatistics.h>
+#include <core/player/PlayerStatistics.h>
 #include <core/player/strategy/CurrentHandContext.h>
 
 #include <string>

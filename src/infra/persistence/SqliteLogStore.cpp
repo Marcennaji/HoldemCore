@@ -6,10 +6,10 @@
 #include <core/player/typedefs.h>
 #include "core/engine/CardUtilities.h"
 #include "core/engine/EngineDefs.h"
-#include "core/engine/model/PlayerStatistics.h"
 #include "core/interfaces/NullLogger.h"
 #include "core/player/HumanPlayer.h"
 #include "core/player/Player.h"
+#include "core/player/PlayerStatistics.h"
 #include "core/player/strategy/LooseAggressiveBotStrategy.h"
 #include "core/player/strategy/ManiacBotStrategy.h"
 #include "core/player/strategy/TightAggressiveBotStrategy.h"

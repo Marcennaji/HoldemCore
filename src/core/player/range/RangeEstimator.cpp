@@ -1,11 +1,11 @@
 #include "RangeEstimator.h"
 
-#include <core/engine/model/PlayerStatistics.h>
 #include <core/engine/model/Ranges.h>
 #include <core/interfaces/IHand.h>
 #include <core/interfaces/persistence/IPlayersStatisticsStore.h>
 #include <core/player/Helpers.h>
 #include <core/player/Player.h>
+#include <core/player/PlayerStatistics.h>
 #include <core/player/range/HandPlausibilityChecker.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include <core/services/GlobalServices.h>

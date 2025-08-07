@@ -5,7 +5,7 @@
 #pragma once
 
 #include <core/engine/EngineDefs.h>
-#include <core/engine/model/PlayerStatistics.h>
+#include <core/player/PlayerStatistics.h>
 #include "PreflopRangeEstimator.h"
 
 #include <memory>
