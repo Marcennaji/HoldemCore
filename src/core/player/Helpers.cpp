@@ -1,6 +1,7 @@
 
 #include "Helpers.h"
 #include "core/engine/CardUtilities.h"
+#include "core/engine/Exception.h"
 #include "core/engine/model/ButtonState.h"
 #include "core/player/Player.h"
 #include "core/player/PlayerFsm.h"
@@ -441,5 +442,34 @@ std::string getPositionLabel(PlayerPosition p)
         return "unknown";
         break;
     }
+}
+
+PlayerListIterator findPlayerOrThrow(PlayerList seats, unsigned id)
+{
+    auto it = getPlayerListIteratorById(seats, id);
+    if (it == seats->end())
+    {
+        string ids;
+        for (auto i = seats->begin(); i != seats->end(); ++i)
+            ids += " " + to_string((*i)->getId());
+        GlobalServices::instance().logger()->error("Couldn't find player with id " + to_string(id) +
+                                                   " in the seats list. List contains following ids :" + ids);
+        throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
+    }
+    return it;
+}
+
+PlayerListIterator nextActivePlayer(PlayerList seats, PlayerListIterator it)
+{
+    ++it;
+    if (it == seats->end())
+        it = seats->begin();
+    while ((*it)->getAction() == ActionType::Fold || (*it)->getAction() == ActionType::Allin)
+    {
+        ++it;
+        if (it == seats->end())
+            it = seats->begin();
+    }
+    return it;
 }
 } // namespace pkt::core::player

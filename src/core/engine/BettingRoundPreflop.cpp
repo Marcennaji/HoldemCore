@@ -152,80 +152,42 @@ void BettingRoundPreflop::proceedToFlop()
     GlobalServices::instance().logger()->verbose("Flop setup completed.");
 }
 
+void BettingRoundPreflop::handlePlayerTurnEvents(PlayerListIterator it)
+{
+    it->get()->setTurn(true);
+
+    if (myEvents.onPlayerStatusChanged)
+        myEvents.onPlayerStatusChanged(getCurrentPlayerTurnId(), true);
+
+    if (myEvents.onPlayerActed)
+        myEvents.onPlayerActed({getCurrentPlayerTurnId(), ActionType::None, 0});
+
+    if (!it->get()->isBot())
+    {
+        if (myEvents.onAwaitingHumanInput)
+            myEvents.onAwaitingHumanInput();
+    }
+    else
+    {
+        GlobalServices::instance().logger()->verbose("Giving action to next bot player: " + it->get()->getName());
+        giveActionToNextBotPlayer();
+    }
+}
 void BettingRoundPreflop::handleNextPlayerTurn()
 {
     GlobalServices::instance().logger()->verbose("Preflop: Determining the next player's turn.");
 
-    auto currentPlayersTurnIt = getPlayerListIteratorById(getHand()->getSeatsList(), getCurrentPlayerTurnId());
-    if (currentPlayersTurnIt == getHand()->getSeatsList()->end())
-    {
-        string ids;
-        for (auto i = getHand()->getSeatsList()->begin(); i != getHand()->getSeatsList()->end(); ++i)
-        {
-            ids += " " + to_string((*i)->getId());
-        }
-        GlobalServices::instance().logger()->error(
-            "BettingRoundPreflop::handleNextPlayerTurn() (1): couldn't find player with id " +
-            std::to_string(getCurrentPlayerTurnId()) + " in the seats list. List contains following ids :" + ids);
+    auto seats = getHand()->getSeatsList();
+    auto currentPlayersTurnIt = findPlayerOrThrow(seats, getCurrentPlayerTurnId());
 
-        throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
-    }
-
-    ++currentPlayersTurnIt;
-    if (currentPlayersTurnIt == getHand()->getSeatsList()->end())
-    {
-        currentPlayersTurnIt = getHand()->getSeatsList()->begin();
-    }
-    while ((*currentPlayersTurnIt)->getAction() == ActionType::Fold ||
-           (*currentPlayersTurnIt)->getAction() == ActionType::Allin)
-        ++currentPlayersTurnIt;
-
+    currentPlayersTurnIt = nextActivePlayer(seats, currentPlayersTurnIt);
     setCurrentPlayerTurnId((*currentPlayersTurnIt)->getId());
 
     if (getCurrentPlayerTurnId() == getFirstRoundLastPlayersTurnId())
-    {
         setFirstRound(false);
-    }
 
-    currentPlayersTurnIt = getPlayerListIteratorById(getHand()->getSeatsList(), getCurrentPlayerTurnId());
-    if (currentPlayersTurnIt == getHand()->getSeatsList()->end())
-    {
-        string ids;
-        for (auto i = getHand()->getSeatsList()->begin(); i != getHand()->getSeatsList()->end(); ++i)
-        {
-            ids += " " + to_string((*i)->getId());
-        }
-        GlobalServices::instance().logger()->error(
-            "BettingRoundPreflop::handleNextPlayerTurn() (2) : couldn't find player with id " +
-            std::to_string(getCurrentPlayerTurnId()) + " in the seats list. List contains following ids :" + ids);
-
-        throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
-    }
-    (*currentPlayersTurnIt)->setTurn(true);
-
-    if (myEvents.onPlayerStatusChanged)
-    {
-        myEvents.onPlayerStatusChanged(getCurrentPlayerTurnId(), true);
-    }
-
-    if (myEvents.onPlayerActed)
-    {
-        myEvents.onPlayerActed({getCurrentPlayerTurnId(), ActionType::None, 0});
-    }
-
-    if (!(*currentPlayersTurnIt)->isBot())
-    {
-        if (myEvents.onAwaitingHumanInput)
-        {
-            myEvents.onAwaitingHumanInput();
-        }
-    }
-    else
-    {
-        GlobalServices::instance().logger()->verbose("Giving action to next bot player: " +
-                                                     (*currentPlayersTurnIt)->getName());
-        giveActionToNextBotPlayer();
-    }
+    currentPlayersTurnIt = findPlayerOrThrow(seats, getCurrentPlayerTurnId());
+    handlePlayerTurnEvents(currentPlayersTurnIt);
 
     GlobalServices::instance().logger()->verbose("Next player's turn determined. Player ID: " +
                                                  std::to_string(getCurrentPlayerTurnId()));

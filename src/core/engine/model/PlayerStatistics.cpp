@@ -11,7 +11,6 @@ const int PreflopStatistics::LAST_ACTIONS_STACK_SIZE = 10;
 
 const PreflopStatistics& PlayerStatistics::getPreflopStatistics() const
 {
-
     return m_preflopStatistics;
 }
 const FlopStatistics& PlayerStatistics::getFlopStatistics() const

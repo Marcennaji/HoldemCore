@@ -25,6 +25,7 @@ class BettingRoundPreflop : public BettingRound
     void handleFirstRun();
     void handleMultiPlayerFirstRun(pkt::core::player::PlayerListIterator bigBlindPositionIt);
     void handleHeadsUpFirstRun(pkt::core::player::PlayerListIterator bigBlindPositionIt);
+    void handlePlayerTurnEvents(player::PlayerListIterator it);
 
     void proceedToFlop();
     void handleNextPlayerTurn();

@@ -20,8 +20,9 @@ using namespace std;
 using namespace pkt::core::player;
 
 BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int sB, GameState gS)
-    : IBettingRound(), myHand(hi), myBettingRoundId(gS), myDealerPlayerId(dP), mySmallBlind(sB), myMinimumRaise(2 * sB),
-      myEvents(events)
+    : IBettingRound(), myEvents(events), myHand(hi), myBettingRoundId(gS), myDealerPlayerId(dP), mySmallBlind(sB),
+      myMinimumRaise(2 * sB)
+
 {
     PlayerListConstIterator itC;
 

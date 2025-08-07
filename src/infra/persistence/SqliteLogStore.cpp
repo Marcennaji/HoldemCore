@@ -28,7 +28,7 @@ using namespace std;
 using namespace pkt::core;
 using namespace pkt::core::player;
 
-SqliteLogStore::SqliteLogStore(const std::string& logDir) : mySqliteLogFileName(""), myLogDir(logDir), mySql("")
+SqliteLogStore::SqliteLogStore(const std::string& logDir) : mySqliteLogFileName(""), mySql(""), myLogDir(logDir)
 {
 }
 

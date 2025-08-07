@@ -61,6 +61,9 @@ PlayerListIterator getPlayerListIteratorById(PlayerList list, unsigned id);
 std::shared_ptr<PlayerFsm> getPlayerFsmById(PlayerFsmList list, unsigned id);
 PlayerFsmListIterator getPlayerFsmListIteratorById(PlayerFsmList list, unsigned id);
 
+PlayerListIterator findPlayerOrThrow(PlayerList seats, unsigned id);
+PlayerListIterator nextActivePlayer(PlayerList seats, PlayerListIterator it);
+
 void updateRunningPlayersList(PlayerList&);
 void updateRunningPlayersListFsm(PlayerFsmList&);
 
