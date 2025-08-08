@@ -20,7 +20,6 @@ int IBotStrategy::computePreflopRaiseAmount(CurrentHandContext& ctx)
     int myRaiseAmount = 0;
 
     const int nbRaises = ctx.commonContext.preflopRaisesNumber;
-    const int nbCalls = ctx.commonContext.preflopCallsNumber;
     const int nbPlayers = ctx.commonContext.nbPlayers;
 
     const int bigBlind = ctx.commonContext.smallBlind * 2;

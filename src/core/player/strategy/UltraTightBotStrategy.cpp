@@ -23,10 +23,8 @@ namespace pkt::core::player
 
 using namespace std;
 
-UltraTightBotStrategy::UltraTightBotStrategy() : IBotStrategy()
+UltraTightBotStrategy::UltraTightBotStrategy() : IBotStrategy("UltraTight")
 {
-    setStrategyName("UltraTight");
-
     // initialize utg starting range, in a full table
     int utgFullTableRange = 0;
     GlobalServices::instance().randomizer()->getRand(1, 2, 1, &utgFullTableRange);

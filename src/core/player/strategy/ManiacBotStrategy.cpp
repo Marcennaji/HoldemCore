@@ -23,10 +23,8 @@ namespace pkt::core::player
 
 using namespace std;
 
-ManiacBotStrategy::ManiacBotStrategy() : IBotStrategy()
+ManiacBotStrategy::ManiacBotStrategy() : IBotStrategy("Maniac")
 {
-    setStrategyName("Maniac");
-
     // initialize utg starting range, in a full table
     int utgFullTableRange = 0;
     GlobalServices::instance().randomizer()->getRand(30, 35, 1, &utgFullTableRange);
