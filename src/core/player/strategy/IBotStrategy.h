@@ -20,6 +20,29 @@ class IBotPreflopStrategy
 
     virtual bool preflopShouldCall(CurrentHandContext&) = 0;
     virtual int preflopShouldRaise(CurrentHandContext&) = 0;
+
+    int computePreflopRaiseAmount(CurrentHandContext&);
+
+  private:
+    int computeFirstRaiseAmount(const CurrentHandContext& ctx, int bigBlind) const;
+
+    // Adjust raise amount based on player position
+    void adjustRaiseForPosition(const CurrentHandContext& ctx, int& raiseAmount, int bigBlind) const;
+
+    // Adjust raise amount based on limpers
+    void adjustRaiseForLimpers(const CurrentHandContext& ctx, int& raiseAmount, int bigBlind) const;
+
+    // Compute re-raise amount (3-bet, 4-bet, etc.)
+    int computeReRaiseAmount(const CurrentHandContext& ctx, int bigBlind) const;
+
+    // Compute 3-bet amount
+    int computeThreeBetAmount(const CurrentHandContext& ctx, int totalPot) const;
+
+    // Compute 4-bet or more amount
+    int computeFourBetOrMoreAmount(const CurrentHandContext& ctx, int totalPot) const;
+
+    // Finalize the raise amount (e.g., ensure it doesn't exceed player's cash)
+    int finalizeRaiseAmount(const CurrentHandContext& ctx, int raiseAmount) const;
 };
 
 class IBotFlopStrategy
@@ -72,7 +95,6 @@ class IBotStrategy : public IBotPreflopStrategy,
     }
     void initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange);
 
-    int computePreflopRaiseAmount(CurrentHandContext&);
     bool shouldPotControl(CurrentHandContext&);
 
     bool myShouldCall = false;
@@ -80,6 +102,11 @@ class IBotStrategy : public IBotPreflopStrategy,
     const std::string myStrategyName;
 
   private:
+    bool shouldPotControlForPocketPair(const CurrentHandContext& ctx) const;
+    bool shouldPotControlForFullHousePossibility(const CurrentHandContext& ctx) const;
+    bool shouldPotControlOnFlop(const CurrentHandContext& ctx, int bigBlind) const;
+    bool shouldPotControlOnTurn(const CurrentHandContext& ctx, int bigBlind) const;
+    void logPotControl() const;
     std::unique_ptr<PreflopRangeCalculator> myPreflopRangeCalculator;
 };
 } // namespace pkt::core::player
