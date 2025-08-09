@@ -20,7 +20,7 @@ using namespace std;
 using namespace pkt::core::player;
 
 BettingRoundPreflop::BettingRoundPreflop(const GameEvents& events, IHand* hi, unsigned dP, int sB)
-    : BettingRound(events, hi, dP, sB, GameStatePreflop)
+    : BettingRound(events, hi, dP, sB, Preflop)
 {
     setHighestSet(2 * getSmallBlind());
 }
@@ -124,7 +124,7 @@ void BettingRoundPreflop::proceedToFlop()
 {
     GlobalServices::instance().logger()->verbose("Proceeding to the flop.");
 
-    getHand()->setCurrentRoundState(GameStateFlop);
+    getHand()->setCurrentRoundState(Flop);
 
     for (PlayerListConstIterator itC = getHand()->getRunningPlayersList()->begin();
          itC != getHand()->getRunningPlayersList()->end(); ++itC)
@@ -140,7 +140,7 @@ void BettingRoundPreflop::proceedToFlop()
         myEvents.onPotUpdated(getHand()->getBoard()->getPot());
     }
 
-    for (unsigned int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
+    for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
     {
         if (myEvents.onPlayerActed)
         {

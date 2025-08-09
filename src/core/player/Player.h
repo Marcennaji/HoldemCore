@@ -97,7 +97,7 @@ class Player
     const PlayerStatistics& getStatistics(const int nbPlayers) const;
     CurrentHandContext& getCurrentHandContext() { return *myCurrentHandContext; };
 
-    virtual float calculatePreflopCallingRange(CurrentHandContext& ctx) const;
+    virtual float calculatePreflopCallingRange(const CurrentHandContext& ctx) const;
 
     const PostFlopAnalysisFlags getPostFlopAnalysisFlags() const;
     CurrentHandActions& getCurrentHandActions();

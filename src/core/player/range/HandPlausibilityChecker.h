@@ -15,23 +15,26 @@ class CurrentHandActions;
 class HandPlausibilityChecker
 {
   public:
-    static bool isUnplausibleHandGivenFlopCheck(const PostFlopAnalysisFlags& testedHand, CurrentHandContext& ctx);
-    static bool isUnplausibleHandGivenFlopBet(const PostFlopAnalysisFlags& testedHand, CurrentHandContext& ctx);
-    static bool isUnplausibleHandGivenFlopCall(const PostFlopAnalysisFlags& testedHand, CurrentHandContext& ctx);
-    static bool isUnplausibleHandGivenFlopRaise(const PostFlopAnalysisFlags& testedHand, CurrentHandContext& ctx);
-    static bool isUnplausibleHandGivenFlopAllin(const PostFlopAnalysisFlags& testedHand, CurrentHandContext& ctx);
+    static bool isUnplausibleHandGivenFlopCheck(const PostFlopAnalysisFlags& testedHand, const CurrentHandContext& ctx);
+    static bool isUnplausibleHandGivenFlopBet(const PostFlopAnalysisFlags& testedHand, const CurrentHandContext& ctx);
+    static bool isUnplausibleHandGivenFlopCall(const PostFlopAnalysisFlags& testedHand, const CurrentHandContext& ctx);
+    static bool isUnplausibleHandGivenFlopRaise(const PostFlopAnalysisFlags& testedHand, const CurrentHandContext& ctx);
+    static bool isUnplausibleHandGivenFlopAllin(const PostFlopAnalysisFlags& testedHand, const CurrentHandContext& ctx);
 
-    static bool isUnplausibleHandGivenTurnCheck(const PostFlopAnalysisFlags& testedHand, CurrentHandContext& ctx);
-    static bool isUnplausibleHandGivenTurnBet(const PostFlopAnalysisFlags& testedHand, CurrentHandContext& ctx);
-    static bool isUnplausibleHandGivenTurnCall(const PostFlopAnalysisFlags& testedHand, CurrentHandContext& ctx);
-    static bool isUnplausibleHandGivenTurnRaise(const PostFlopAnalysisFlags& testedHand, CurrentHandContext& ctx);
-    static bool isUnplausibleHandGivenTurnAllin(const PostFlopAnalysisFlags& testedHand, CurrentHandContext& ctx);
+    static bool isUnplausibleHandGivenTurnCheck(const PostFlopAnalysisFlags& testedHand, const CurrentHandContext& ctx);
+    static bool isUnplausibleHandGivenTurnBet(const PostFlopAnalysisFlags& testedHand, const CurrentHandContext& ctx);
+    static bool isUnplausibleHandGivenTurnCall(const PostFlopAnalysisFlags& testedHand, const CurrentHandContext& ctx);
+    static bool isUnplausibleHandGivenTurnRaise(const PostFlopAnalysisFlags& testedHand, const CurrentHandContext& ctx);
+    static bool isUnplausibleHandGivenTurnAllin(const PostFlopAnalysisFlags& testedHand, const CurrentHandContext& ctx);
 
-    static bool isUnplausibleHandGivenRiverCheck(const PostFlopAnalysisFlags& testedHand, CurrentHandContext& ctx);
-    static bool isUnplausibleHandGivenRiverBet(const PostFlopAnalysisFlags& testedHand, CurrentHandContext& ctx);
-    static bool isUnplausibleHandGivenRiverCall(const PostFlopAnalysisFlags& testedHand, CurrentHandContext& ctx);
-    static bool isUnplausibleHandGivenRiverRaise(const PostFlopAnalysisFlags& testedHand, CurrentHandContext& ctx);
-    static bool isUnplausibleHandGivenRiverAllin(const PostFlopAnalysisFlags& testedHand, CurrentHandContext& ctx);
+    static bool isUnplausibleHandGivenRiverCheck(const PostFlopAnalysisFlags& testedHand,
+                                                 const CurrentHandContext& ctx);
+    static bool isUnplausibleHandGivenRiverBet(const PostFlopAnalysisFlags& testedHand, const CurrentHandContext& ctx);
+    static bool isUnplausibleHandGivenRiverCall(const PostFlopAnalysisFlags& testedHand, const CurrentHandContext& ctx);
+    static bool isUnplausibleHandGivenRiverRaise(const PostFlopAnalysisFlags& testedHand,
+                                                 const CurrentHandContext& ctx);
+    static bool isUnplausibleHandGivenRiverAllin(const PostFlopAnalysisFlags& testedHand,
+                                                 const CurrentHandContext& ctx);
 };
 
 } // namespace pkt::core::player

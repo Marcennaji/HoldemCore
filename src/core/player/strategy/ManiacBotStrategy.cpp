@@ -33,7 +33,7 @@ ManiacBotStrategy::ManiacBotStrategy() : IBotStrategy("Maniac")
 
 ManiacBotStrategy::~ManiacBotStrategy() = default;
 
-bool ManiacBotStrategy::preflopShouldCall(CurrentHandContext& ctx)
+bool ManiacBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
 {
 
     float callingRange = getPreflopRangeCalculator()->calculatePreflopCallingRange(ctx);
@@ -125,7 +125,7 @@ bool ManiacBotStrategy::preflopShouldCall(CurrentHandContext& ctx)
     return isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2, stringCallingRange);
 }
 
-int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
+int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
 {
 
     float raisingRange = getPreflopRangeCalculator()->calculatePreflopRaisingRange(ctx);
@@ -279,7 +279,7 @@ int ManiacBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
     return computePreflopRaiseAmount(ctx);
 }
 
-int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx)
+int ManiacBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.flopBetsOrRaisesNumber > 0)
@@ -399,7 +399,7 @@ int ManiacBotStrategy::flopShouldBet(CurrentHandContext& ctx)
 
     return 0;
 }
-bool ManiacBotStrategy::flopShouldCall(CurrentHandContext& ctx)
+bool ManiacBotStrategy::flopShouldCall(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.flopBetsOrRaisesNumber == 0)
@@ -431,7 +431,7 @@ bool ManiacBotStrategy::flopShouldCall(CurrentHandContext& ctx)
     return true;
 }
 
-int ManiacBotStrategy::flopShouldRaise(CurrentHandContext& ctx)
+int ManiacBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
 {
 
     const int nbRaises = ctx.commonContext.flopBetsOrRaisesNumber;
@@ -504,7 +504,7 @@ int ManiacBotStrategy::flopShouldRaise(CurrentHandContext& ctx)
     return 0;
 }
 
-int ManiacBotStrategy::turnShouldBet(CurrentHandContext& ctx)
+int ManiacBotStrategy::turnShouldBet(const CurrentHandContext& ctx)
 {
 
     const int pot = ctx.commonContext.pot + ctx.commonContext.sets;
@@ -560,7 +560,7 @@ int ManiacBotStrategy::turnShouldBet(CurrentHandContext& ctx)
     return 0;
 }
 
-bool ManiacBotStrategy::turnShouldCall(CurrentHandContext& ctx)
+bool ManiacBotStrategy::turnShouldCall(const CurrentHandContext& ctx)
 {
     if (ctx.commonContext.turnBetsOrRaisesNumber == 0)
     {
@@ -637,7 +637,7 @@ bool ManiacBotStrategy::turnShouldCall(CurrentHandContext& ctx)
     return true;
 }
 
-int ManiacBotStrategy::turnShouldRaise(CurrentHandContext& ctx)
+int ManiacBotStrategy::turnShouldRaise(const CurrentHandContext& ctx)
 {
     if (ctx.commonContext.turnBetsOrRaisesNumber == 0)
     {
@@ -704,7 +704,7 @@ int ManiacBotStrategy::turnShouldRaise(CurrentHandContext& ctx)
     return 0;
 }
 
-int ManiacBotStrategy::riverShouldBet(CurrentHandContext& ctx)
+int ManiacBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.riverBetsOrRaisesNumber > 0)
@@ -770,7 +770,7 @@ int ManiacBotStrategy::riverShouldBet(CurrentHandContext& ctx)
     return 0;
 }
 
-bool ManiacBotStrategy::riverShouldCall(CurrentHandContext& ctx)
+bool ManiacBotStrategy::riverShouldCall(const CurrentHandContext& ctx)
 {
     const int nbRaises = ctx.commonContext.riverBetsOrRaisesNumber;
 
@@ -806,7 +806,7 @@ bool ManiacBotStrategy::riverShouldCall(CurrentHandContext& ctx)
     return true;
 }
 
-int ManiacBotStrategy::riverShouldRaise(CurrentHandContext& ctx)
+int ManiacBotStrategy::riverShouldRaise(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.riverBetsOrRaisesNumber == 0)

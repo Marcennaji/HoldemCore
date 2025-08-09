@@ -25,7 +25,7 @@ void PreflopState::enter(HandFsm& hand)
     setBlinds(hand);
 
     if (myEvents.onBettingRoundStarted)
-        myEvents.onBettingRoundStarted(GameStatePreflop);
+        myEvents.onBettingRoundStarted(Preflop);
 }
 
 void PreflopState::exit(HandFsm& /*hand*/)

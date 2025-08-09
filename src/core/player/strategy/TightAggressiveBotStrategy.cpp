@@ -33,7 +33,191 @@ TightAggressiveBotStrategy::TightAggressiveBotStrategy() : IBotStrategy("TightAg
 
 TightAggressiveBotStrategy::~TightAggressiveBotStrategy() = default;
 
-bool TightAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx)
+PlayerAction TightAggressiveBotStrategy::decidePreflop(const CurrentHandContext& ctx)
+{
+    PlayerAction resultingAction;
+
+    bool shouldCall = preflopShouldCall(ctx);         // should at least call, and maybe raise
+    resultingAction.amount = preflopShouldRaise(ctx); // amount > 0 if decide to raise
+
+    if (resultingAction.amount > 0)
+    {
+        shouldCall = false;
+    }
+
+    // if last to speak, a hand not good enough to raise, and nobody has raised : I check
+    if (ctx.commonContext.preflopRaisesNumber == 0 && resultingAction.amount == 0 &&
+        ctx.perPlayerContext.myPosition == BB)
+    {
+        resultingAction.type = ActionType::Check;
+    }
+    else
+    {
+        if (shouldCall)
+        {
+            resultingAction.type = ActionType::Call;
+        }
+        else if (resultingAction.amount > 0)
+        {
+            resultingAction.type = ActionType::Raise;
+        }
+        else
+        {
+            resultingAction.type = ActionType::Fold;
+        }
+    }
+    return resultingAction;
+}
+PlayerAction TightAggressiveBotStrategy::decideFlop(const CurrentHandContext& ctx)
+{
+    PlayerAction resultingAction;
+    int betAmount = 0;
+    int raiseAmount = 0;
+    bool shouldCall = false;
+
+    if (ctx.commonContext.flopBetsOrRaisesNumber == 0)
+    {
+        betAmount = flopShouldBet(ctx);
+    }
+    else
+    {
+        shouldCall = flopShouldCall(ctx);
+        raiseAmount = flopShouldRaise(ctx);
+    }
+
+    if (raiseAmount)
+    {
+        shouldCall = false;
+    }
+
+    if (ctx.commonContext.flopBetsOrRaisesNumber == 0 && !raiseAmount && !betAmount)
+    {
+        resultingAction.type = ActionType::Check;
+    }
+    else
+    {
+        if (betAmount)
+        {
+            resultingAction.type = ActionType::Bet;
+            resultingAction.amount = betAmount;
+        }
+        else if (shouldCall)
+        {
+            resultingAction.type = ActionType::Call;
+        }
+        else if (raiseAmount)
+        {
+            resultingAction.type = ActionType::Raise;
+            resultingAction.amount = raiseAmount;
+        }
+        else
+        {
+            resultingAction.type = ActionType::Fold;
+        }
+    }
+
+    return resultingAction;
+}
+PlayerAction TightAggressiveBotStrategy::decideTurn(const CurrentHandContext& ctx)
+{
+    PlayerAction resultingAction;
+    int betAmount = 0;
+    int raiseAmount = 0;
+
+    bool shouldCall = false;
+
+    if (ctx.commonContext.turnBetsOrRaisesNumber == 0)
+    {
+        betAmount = turnShouldBet(ctx);
+    }
+    else
+    {
+        shouldCall = turnShouldCall(ctx);
+        raiseAmount = turnShouldRaise(ctx);
+    }
+
+    if (raiseAmount)
+    {
+        shouldCall = false;
+    }
+
+    if (ctx.commonContext.turnBetsOrRaisesNumber == 0 && !raiseAmount && !betAmount)
+    {
+        resultingAction.type = ActionType::Check;
+    }
+    else
+    {
+        if (betAmount)
+        {
+            resultingAction.type = ActionType::Bet;
+            resultingAction.amount = betAmount;
+        }
+        else if (shouldCall)
+        {
+            resultingAction.type = ActionType::Call;
+        }
+        else if (raiseAmount)
+        {
+            resultingAction.type = ActionType::Raise;
+            resultingAction.amount = raiseAmount;
+        }
+        else
+        {
+            resultingAction.type = ActionType::Fold;
+        }
+    }
+    return resultingAction;
+}
+PlayerAction TightAggressiveBotStrategy::decideRiver(const CurrentHandContext& ctx)
+{
+    PlayerAction resultingAction;
+    int betAmount = 0;
+    int raiseAmount = 0;
+    bool shouldCall = false;
+
+    if (ctx.commonContext.riverBetsOrRaisesNumber == 0)
+    {
+        betAmount = riverShouldBet(ctx);
+    }
+    else
+    {
+        shouldCall = riverShouldCall(ctx);
+        raiseAmount = riverShouldRaise(ctx);
+    }
+
+    if (raiseAmount)
+    {
+        shouldCall = false;
+    }
+
+    if (ctx.commonContext.riverBetsOrRaisesNumber == 0 && !raiseAmount && !betAmount)
+    {
+        resultingAction.type = ActionType::Check;
+    }
+    else
+    {
+        if (betAmount)
+        {
+            resultingAction.type = ActionType::Bet;
+            resultingAction.amount = betAmount;
+        }
+        else if (shouldCall)
+        {
+            resultingAction.type = ActionType::Call;
+        }
+        else if (raiseAmount)
+        {
+            resultingAction.type = ActionType::Raise;
+            resultingAction.amount = raiseAmount;
+        }
+        else
+        {
+            resultingAction.type = ActionType::Fold;
+        }
+    }
+    return resultingAction;
+}
+bool TightAggressiveBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
 {
 
     float callingRange = getPreflopRangeCalculator()->calculatePreflopCallingRange(ctx);
@@ -107,7 +291,7 @@ bool TightAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx)
     return isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2, stringCallingRange);
 }
 
-int TightAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
+int TightAggressiveBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
 {
 
     float raisingRange = getPreflopRangeCalculator()->calculatePreflopRaisingRange(ctx);
@@ -222,7 +406,7 @@ int TightAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
     return computePreflopRaiseAmount(ctx);
 }
 
-int TightAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx)
+int TightAggressiveBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.flopBetsOrRaisesNumber > 0)
@@ -237,6 +421,7 @@ int TightAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx)
 
     // donk bets :
     if (ctx.commonContext.flopBetsOrRaisesNumber > 0 && ctx.commonContext.preflopRaisesNumber > 0 &&
+        ctx.commonContext.preflopLastRaiser &&
         ctx.commonContext.preflopLastRaiser->getId() != ctx.perPlayerContext.myID)
     {
         if (ctx.commonContext.preflopLastRaiser->getPosition() > ctx.perPlayerContext.myPosition)
@@ -336,14 +521,15 @@ int TightAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx)
         ///////////  if bad flop for me
 
         // if there was a lot of action preflop, and i was not the last raiser : don't bet
-        if (ctx.commonContext.preflopRaisesNumber > 1 &&
+        if (ctx.commonContext.preflopRaisesNumber > 1 && ctx.commonContext.preflopLastRaiser &&
             ctx.commonContext.preflopLastRaiser->getId() != ctx.perPlayerContext.myID)
         {
             return 0;
         }
 
         // if I was the last raiser preflop, I may bet with not much
-        if (ctx.commonContext.preflopLastRaiser->getId() == ctx.perPlayerContext.myID &&
+        if (ctx.commonContext.preflopLastRaiser &&
+            ctx.commonContext.preflopLastRaiser->getId() == ctx.perPlayerContext.myID &&
             ctx.commonContext.nbRunningPlayers < 4 && ctx.perPlayerContext.myCash > ctx.commonContext.pot * 5 &&
             ctx.perPlayerContext.myCanBluff)
         {
@@ -354,7 +540,7 @@ int TightAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx)
 
     return 0;
 }
-bool TightAggressiveBotStrategy::flopShouldCall(CurrentHandContext& ctx)
+bool TightAggressiveBotStrategy::flopShouldCall(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.flopBetsOrRaisesNumber == 0)
@@ -386,7 +572,7 @@ bool TightAggressiveBotStrategy::flopShouldCall(CurrentHandContext& ctx)
     return true;
 }
 
-int TightAggressiveBotStrategy::flopShouldRaise(CurrentHandContext& ctx)
+int TightAggressiveBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
 {
 
     const int nbRaises = ctx.commonContext.flopBetsOrRaisesNumber;
@@ -466,7 +652,7 @@ int TightAggressiveBotStrategy::flopShouldRaise(CurrentHandContext& ctx)
     return 0;
 }
 
-int TightAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx)
+int TightAggressiveBotStrategy::turnShouldBet(const CurrentHandContext& ctx)
 {
 
     const int pot = ctx.commonContext.pot + ctx.commonContext.sets;
@@ -546,7 +732,7 @@ int TightAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx)
     return 0;
 }
 
-bool TightAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx)
+bool TightAggressiveBotStrategy::turnShouldCall(const CurrentHandContext& ctx)
 {
     if (ctx.commonContext.turnBetsOrRaisesNumber == 0)
     {
@@ -622,7 +808,7 @@ bool TightAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx)
     return true;
 }
 
-int TightAggressiveBotStrategy::turnShouldRaise(CurrentHandContext& ctx)
+int TightAggressiveBotStrategy::turnShouldRaise(const CurrentHandContext& ctx)
 {
     if (ctx.commonContext.turnBetsOrRaisesNumber == 0)
     {
@@ -682,7 +868,7 @@ int TightAggressiveBotStrategy::turnShouldRaise(CurrentHandContext& ctx)
     return 0;
 }
 
-int TightAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx)
+int TightAggressiveBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.riverBetsOrRaisesNumber > 0)
@@ -774,7 +960,7 @@ int TightAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx)
     return 0;
 }
 
-bool TightAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx)
+bool TightAggressiveBotStrategy::riverShouldCall(const CurrentHandContext& ctx)
 {
 
     const int nbRaises = ctx.commonContext.riverBetsOrRaisesNumber;
@@ -866,7 +1052,7 @@ bool TightAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx)
     return true;
 }
 
-int TightAggressiveBotStrategy::riverShouldRaise(CurrentHandContext& ctx)
+int TightAggressiveBotStrategy::riverShouldRaise(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.riverBetsOrRaisesNumber == 0)

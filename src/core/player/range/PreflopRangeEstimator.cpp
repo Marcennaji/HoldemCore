@@ -20,7 +20,7 @@ PreflopRangeEstimator::PreflopRangeEstimator(int playerId) : myPlayerId(playerId
 {
 }
 
-string PreflopRangeEstimator::computeEstimatedPreflopRange(CurrentHandContext& ctx)
+string PreflopRangeEstimator::computeEstimatedPreflopRange(const CurrentHandContext& ctx)
 {
     string estimatedRange;
 
@@ -65,7 +65,7 @@ string PreflopRangeEstimator::computeEstimatedPreflopRange(CurrentHandContext& c
     return estimatedRange;
 }
 
-std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(CurrentHandContext& ctx) const
+std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(const CurrentHandContext& ctx) const
 {
     const int nbPlayers = ctx.commonContext.nbPlayers;
 
@@ -187,7 +187,7 @@ std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(Cu
     return RangeEstimator::getStringRange(nbPlayers, range);
 }
 
-std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromCaller(CurrentHandContext& ctx) const
+std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromCaller(const CurrentHandContext& ctx) const
 {
     // The player is not the last raiser but has called a raise or limped in preflop
 

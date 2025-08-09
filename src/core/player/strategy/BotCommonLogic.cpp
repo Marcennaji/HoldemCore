@@ -1,4 +1,4 @@
-#include "IBotStrategy.h"
+#include "BotCommonLogic.h"
 
 #include <core/engine/model/Ranges.h>
 #include <core/player/Helpers.h>
@@ -10,17 +10,12 @@ using namespace std;
 namespace pkt::core::player
 {
 
-void IBotStrategy::initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange)
+bool BotCommonLogic::shouldPotControl(const CurrentHandContext& ctx)
 {
-    myPreflopRangeCalculator->initializeRanges(utgHeadsUpRange, utgFullTableRange);
-}
-
-bool IBotStrategy::shouldPotControl(CurrentHandContext& ctx)
-{
-    assert(ctx.commonContext.gameState == GameStateFlop || ctx.commonContext.gameState == GameStateTurn);
+    assert(ctx.commonContext.gameState == Flop || ctx.commonContext.gameState == Turn);
 
     const int bigBlind = ctx.commonContext.smallBlind * 2;
-    const int potThreshold = (ctx.commonContext.gameState == GameStateFlop) ? bigBlind * 20 : bigBlind * 40;
+    const int potThreshold = (ctx.commonContext.gameState == Flop) ? bigBlind * 20 : bigBlind * 40;
 
     if (ctx.commonContext.pot < potThreshold)
     {
@@ -39,13 +34,13 @@ bool IBotStrategy::shouldPotControl(CurrentHandContext& ctx)
         return true;
     }
 
-    if (ctx.commonContext.gameState == GameStateFlop && shouldPotControlOnFlop(ctx, bigBlind))
+    if (ctx.commonContext.gameState == Flop && shouldPotControlOnFlop(ctx, bigBlind))
     {
         logPotControl();
         return true;
     }
 
-    if (ctx.commonContext.gameState == GameStateTurn && shouldPotControlOnTurn(ctx, bigBlind))
+    if (ctx.commonContext.gameState == Turn && shouldPotControlOnTurn(ctx, bigBlind))
     {
         logPotControl();
         return true;
@@ -54,37 +49,37 @@ bool IBotStrategy::shouldPotControl(CurrentHandContext& ctx)
     return false;
 }
 
-bool IBotStrategy::shouldPotControlForPocketPair(const CurrentHandContext& ctx) const
+bool BotCommonLogic::shouldPotControlForPocketPair(const CurrentHandContext& ctx) const
 {
     return ctx.perPlayerContext.myPostFlopAnalysisFlags.isPocketPair &&
            !ctx.perPlayerContext.myPostFlopAnalysisFlags.isOverPair;
 }
 
-bool IBotStrategy::shouldPotControlForFullHousePossibility(const CurrentHandContext& ctx) const
+bool BotCommonLogic::shouldPotControlForFullHousePossibility(const CurrentHandContext& ctx) const
 {
     const auto& flags = ctx.perPlayerContext.myPostFlopAnalysisFlags;
     return flags.isFullHousePossible && !(flags.isTrips || flags.isFlush || flags.isFullHouse || flags.isQuads);
 }
 
-bool IBotStrategy::shouldPotControlOnFlop(const CurrentHandContext& ctx, int bigBlind) const
+bool BotCommonLogic::shouldPotControlOnFlop(const CurrentHandContext& ctx, int bigBlind) const
 {
     const auto& flags = ctx.perPlayerContext.myPostFlopAnalysisFlags;
     return (flags.isOverPair || flags.isTopPair) && ctx.perPlayerContext.mySet > bigBlind * 20;
 }
 
-bool IBotStrategy::shouldPotControlOnTurn(const CurrentHandContext& ctx, int bigBlind) const
+bool BotCommonLogic::shouldPotControlOnTurn(const CurrentHandContext& ctx, int bigBlind) const
 {
     const auto& flags = ctx.perPlayerContext.myPostFlopAnalysisFlags;
     return flags.isOverPair || (flags.isTwoPair && !flags.isFullHousePossible) ||
            (flags.isTrips && ctx.perPlayerContext.mySet > bigBlind * 60);
 }
 
-void IBotStrategy::logPotControl() const
+void BotCommonLogic::logPotControl() const
 {
     GlobalServices::instance().logger()->verbose("\t\tShould control pot");
 }
 
-int IBotPreflopStrategy::computePreflopRaiseAmount(CurrentHandContext& ctx)
+int BotCommonLogic::computePreflopRaiseAmount(const CurrentHandContext& ctx)
 {
     const int bigBlind = ctx.commonContext.smallBlind * 2;
 
@@ -96,7 +91,7 @@ int IBotPreflopStrategy::computePreflopRaiseAmount(CurrentHandContext& ctx)
     return computeReRaiseAmount(ctx, bigBlind);
 }
 
-int IBotPreflopStrategy::computeFirstRaiseAmount(const CurrentHandContext& ctx, int bigBlind) const
+int BotCommonLogic::computeFirstRaiseAmount(const CurrentHandContext& ctx, int bigBlind) const
 {
     int raiseAmount = (ctx.perPlayerContext.myM > 8 ? 2 * bigBlind : 1.5 * bigBlind);
 
@@ -106,7 +101,7 @@ int IBotPreflopStrategy::computeFirstRaiseAmount(const CurrentHandContext& ctx, 
     return finalizeRaiseAmount(ctx, raiseAmount);
 }
 
-void IBotPreflopStrategy::adjustRaiseForPosition(const CurrentHandContext& ctx, int& raiseAmount, int bigBlind) const
+void BotCommonLogic::adjustRaiseForPosition(const CurrentHandContext& ctx, int& raiseAmount, int bigBlind) const
 {
     if (ctx.commonContext.nbPlayers > 4)
     {
@@ -121,7 +116,7 @@ void IBotPreflopStrategy::adjustRaiseForPosition(const CurrentHandContext& ctx, 
     }
 }
 
-void IBotPreflopStrategy::adjustRaiseForLimpers(const CurrentHandContext& ctx, int& raiseAmount, int bigBlind) const
+void BotCommonLogic::adjustRaiseForLimpers(const CurrentHandContext& ctx, int& raiseAmount, int bigBlind) const
 {
     if (ctx.commonContext.preflopCallsNumber > 0)
     {
@@ -129,7 +124,7 @@ void IBotPreflopStrategy::adjustRaiseForLimpers(const CurrentHandContext& ctx, i
     }
 }
 
-int IBotPreflopStrategy::computeReRaiseAmount(const CurrentHandContext& ctx, int bigBlind) const
+int BotCommonLogic::computeReRaiseAmount(const CurrentHandContext& ctx, int bigBlind) const
 {
     const int totalPot = ctx.commonContext.sets;
     const int nbRaises = ctx.commonContext.preflopRaisesNumber;
@@ -148,18 +143,18 @@ int IBotPreflopStrategy::computeReRaiseAmount(const CurrentHandContext& ctx, int
     return finalizeRaiseAmount(ctx, raiseAmount);
 }
 
-int IBotPreflopStrategy::computeThreeBetAmount(const CurrentHandContext& ctx, int totalPot) const
+int BotCommonLogic::computeThreeBetAmount(const CurrentHandContext& ctx, int totalPot) const
 {
     return totalPot *
            (ctx.perPlayerContext.myPosition > ctx.commonContext.preflopLastRaiser->getPosition() ? 1.2 : 1.4);
 }
 
-int IBotPreflopStrategy::computeFourBetOrMoreAmount(const CurrentHandContext& ctx, int totalPot) const
+int BotCommonLogic::computeFourBetOrMoreAmount(const CurrentHandContext& ctx, int totalPot) const
 {
     return totalPot * (ctx.perPlayerContext.myPosition > ctx.commonContext.preflopLastRaiser->getPosition() ? 1 : 1.2);
 }
 
-int IBotPreflopStrategy::finalizeRaiseAmount(const CurrentHandContext& ctx, int raiseAmount) const
+int BotCommonLogic::finalizeRaiseAmount(const CurrentHandContext& ctx, int raiseAmount) const
 {
     if (raiseAmount > (ctx.perPlayerContext.myCash * 0.3))
     {

@@ -38,7 +38,7 @@ std::string RangeEstimator::getEstimatedRange() const
     return myEstimatedRange;
 }
 
-void RangeEstimator::computeEstimatedPreflopRange(CurrentHandContext& ctx)
+void RangeEstimator::computeEstimatedPreflopRange(const CurrentHandContext& ctx)
 {
     setEstimatedRange(myPreflopRangeEstimator->computeEstimatedPreflopRange(ctx));
 }
@@ -138,7 +138,7 @@ std::string RangeEstimator::getStringRange(int nbPlayers, int range)
     }
 }
 // purpose : remove some unplausible hands (to my opponents eyes), given what I did preflop
-void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(CurrentHandContext& ctx)
+void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(const CurrentHandContext& ctx)
 {
 
     computeEstimatedPreflopRange(ctx);
@@ -174,7 +174,7 @@ void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(CurrentHandConte
     }
 }
 
-void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext& ctx)
+void RangeEstimator::updateUnplausibleRangesGivenFlopActions(const CurrentHandContext& ctx)
 {
 
     const int nbPlayers = ctx.commonContext.nbPlayers;
@@ -273,7 +273,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(CurrentHandContext&
 }
 
 // purpose : remove some unplausible hands, who would normally be in the estimated preflop range
-void RangeEstimator::updateUnplausibleRangesGivenTurnActions(CurrentHandContext& ctx)
+void RangeEstimator::updateUnplausibleRangesGivenTurnActions(const CurrentHandContext& ctx)
 {
 
     const int nbPlayers = ctx.commonContext.nbPlayers;
@@ -365,7 +365,7 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(CurrentHandContext&
 }
 
 // purpose : remove some unplausible hands, woul would normally be in the estimated preflop range
-void RangeEstimator::updateUnplausibleRangesGivenRiverActions(CurrentHandContext& ctx)
+void RangeEstimator::updateUnplausibleRangesGivenRiverActions(const CurrentHandContext& ctx)
 {
 
     const int nbPlayers = ctx.commonContext.nbPlayers;

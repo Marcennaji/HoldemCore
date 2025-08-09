@@ -31,11 +31,11 @@ class BettingRound : public IBettingRound
     IHand* getHand() const;
     void findLastActivePlayerBeforeSmallBlind();
     bool checkAllHighestSet();
-    void setCurrentPlayerTurnId(unsigned theValue);
-    unsigned getCurrentPlayerTurnId() const;
+    void setCurrentPlayerTurnId(int theValue);
+    int getCurrentPlayerTurnId() const;
 
-    void setFirstRoundLastPlayersTurnId(unsigned theValue);
-    unsigned getFirstRoundLastPlayersTurnId() const;
+    void setFirstRoundLastPlayersTurnId(int theValue);
+    int getFirstRoundLastPlayersTurnId() const;
 
     void setHighestSet(int theValue);
     int getHighestSet() const;
@@ -46,9 +46,9 @@ class BettingRound : public IBettingRound
     void setFirstRound(bool theValue);
     bool getFirstRound() const;
 
-    unsigned getSmallBlindPlayerId() const;
+    int getSmallBlindPlayerId() const;
 
-    unsigned getBigBlindPlayerId() const;
+    int getBigBlindPlayerId() const;
 
     void setSmallBlind(int theValue);
     int getSmallBlind() const;
@@ -70,8 +70,8 @@ class BettingRound : public IBettingRound
     const GameState myBettingRoundId;
     int myDealerPlayerId{0};
 
-    unsigned mySmallBlindPlayerId{0};
-    unsigned myBigBlindPlayerId{0};
+    int mySmallBlindPlayerId{0};
+    int myBigBlindPlayerId{0};
 
     int mySmallBlind;
     int myHighestSet{0};
@@ -82,8 +82,8 @@ class BettingRound : public IBettingRound
     bool myFirstRunGui{true}; // HACK
     bool myFirstRound{true};
 
-    unsigned myCurrentPlayerTurnId{0};
-    unsigned myFirstRoundLastPlayersTurnId{0};
+    int myCurrentPlayerTurnId{0};
+    int myFirstRoundLastPlayersTurnId{0};
 
     bool myLogBoardCardsDone{false};
 };

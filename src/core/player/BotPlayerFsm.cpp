@@ -27,7 +27,7 @@ BotPlayerFsm::~BotPlayerFsm() = default;
 PlayerAction BotPlayerFsm::decidePreflopAction()
 {
 #if (False)
-    updateCurrentHandContext(GameStatePreflop);
+    updateCurrentHandContext(Preflop);
 
     PlayerAction action;
     action.playerId = getId();

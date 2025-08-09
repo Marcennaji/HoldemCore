@@ -58,7 +58,7 @@ struct CommonHandContext
 {
     void reset();
     // data that is common to all players
-    GameState gameState = GameStateNone; // current game state, e.g. PREFLOP, FLOP, TURN, RIVER, SHOWDOWN
+    GameState gameState = None; // current game state, e.g. PREFLOP, FLOP, TURN, RIVER, SHOWDOWN
     int preflopRaisesNumber = 0;
     int preflopCallsNumber = 0;
     int flopBetsOrRaisesNumber = 0; // including allins

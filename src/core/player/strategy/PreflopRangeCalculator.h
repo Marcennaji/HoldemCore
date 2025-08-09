@@ -13,8 +13,8 @@ class PreflopRangeCalculator
 {
   public:
     PreflopRangeCalculator() = default;
-    float calculatePreflopCallingRange(CurrentHandContext& ctx) const;
-    float calculatePreflopRaisingRange(CurrentHandContext& ctx) const;
+    float calculatePreflopCallingRange(const CurrentHandContext& ctx) const;
+    float calculatePreflopRaisingRange(const CurrentHandContext& ctx) const;
 
     int getRange(PlayerPosition p, int nbPlayers) const;
     void initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange);

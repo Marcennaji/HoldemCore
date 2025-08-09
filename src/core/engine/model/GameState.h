@@ -9,11 +9,11 @@ namespace pkt::core
 {
 enum GameState
 {
-    GameStatePreflop = 0,
-    GameStateFlop,
-    GameStateTurn,
-    GameStateRiver,
-    GameStatePostRiver,
-    GameStateNone
+    Preflop,
+    Flop,
+    Turn,
+    River,
+    PostRiver,
+    None
 };
 }

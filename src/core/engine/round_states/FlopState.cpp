@@ -13,7 +13,7 @@ FlopState::FlopState(const GameEvents& events) : myEvents(events)
 void FlopState::enter(HandFsm& hand)
 {
     if (myEvents.onBettingRoundStarted)
-        myEvents.onBettingRoundStarted(GameStateFlop);
+        myEvents.onBettingRoundStarted(Flop);
 }
 
 void FlopState::exit(HandFsm& hand)

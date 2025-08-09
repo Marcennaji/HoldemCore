@@ -12,7 +12,7 @@ void CurrentHandContext::reset()
 void CommonHandContext::reset()
 {
     // Common data
-    gameState = GameStateNone;
+    gameState = None;
     preflopRaisesNumber = 0;
     preflopCallsNumber = 0;
     flopBetsOrRaisesNumber = 0;

@@ -88,7 +88,7 @@ void PreflopRangeCalculator::initializeRanges(const int utgHeadsUpRange, const i
     }
 }
 
-float PreflopRangeCalculator::calculatePreflopCallingRange(CurrentHandContext& ctx) const
+float PreflopRangeCalculator::calculatePreflopCallingRange(const CurrentHandContext& ctx) const
 {
     const int nbRaises = ctx.commonContext.preflopRaisesNumber;
     const int nbCalls = ctx.commonContext.preflopCallsNumber;
@@ -320,7 +320,7 @@ bool PreflopRangeCalculator::shouldCallForAllIn(const CurrentHandContext& ctx, i
            lastRaiser->getAction() == ActionType::Allin && (myPosition >= LATE || myPosition == SB || myPosition == BB);
 }
 
-float PreflopRangeCalculator::calculatePreflopRaisingRange(CurrentHandContext& ctx) const
+float PreflopRangeCalculator::calculatePreflopRaisingRange(const CurrentHandContext& ctx) const
 {
     const int nbRaises = ctx.commonContext.preflopRaisesNumber;
     const int nbCalls = ctx.commonContext.preflopCallsNumber;

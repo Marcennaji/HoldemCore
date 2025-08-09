@@ -17,7 +17,7 @@ using namespace std;
 using namespace pkt::core::player;
 
 BettingRoundPostRiver::BettingRoundPostRiver(const GameEvents& events, IHand* hi, int dP, int sB)
-    : BettingRound(events, hi, dP, sB, GameStatePostRiver)
+    : BettingRound(events, hi, dP, sB, PostRiver)
 {
 }
 

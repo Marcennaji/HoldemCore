@@ -603,15 +603,15 @@ std::string Player::getStringBoard() const
 
     int cardsOnBoard;
 
-    if (currentHand->getCurrentRoundState() == GameStateFlop)
+    if (currentHand->getCurrentRoundState() == Flop)
     {
         cardsOnBoard = 3;
     }
-    else if (currentHand->getCurrentRoundState() == GameStateTurn)
+    else if (currentHand->getCurrentRoundState() == Turn)
     {
         cardsOnBoard = 4;
     }
-    else if (currentHand->getCurrentRoundState() == GameStateRiver)
+    else if (currentHand->getCurrentRoundState() == River)
     {
         cardsOnBoard = 5;
     }
@@ -890,22 +890,22 @@ bool Player::isPreflopBigBet() const
 bool Player::isAgressor(const GameState gameState) const
 {
 
-    if (gameState == GameStatePreflop && currentHand->getPreflopLastRaiserId() == myID)
+    if (gameState == Preflop && currentHand->getPreflopLastRaiserId() == myID)
     {
         return true;
     }
 
-    if (gameState == GameStateFlop && currentHand->getFlopLastRaiserId() == myID)
+    if (gameState == Flop && currentHand->getFlopLastRaiserId() == myID)
     {
         return true;
     }
 
-    if (gameState == GameStateTurn && currentHand->getTurnLastRaiserId() == myID)
+    if (gameState == Turn && currentHand->getTurnLastRaiserId() == myID)
     {
         return true;
     }
 
-    if (gameState == GameStateRiver && currentHand->getLastRaiserId() == myID)
+    if (gameState == River && currentHand->getLastRaiserId() == myID)
     {
         return true;
     }
@@ -960,7 +960,7 @@ bool Player::canBluff(const GameState gameState) const
             return false;
         }
 
-        if (gameState == GameStatePreflop)
+        if (gameState == Preflop)
         {
             if (preflopStats.getPreflopCallthreeBetsFrequency() > 40)
             {
@@ -1061,10 +1061,10 @@ void Player::updateCurrentHandContext(const GameState state)
     myCurrentHandContext->perPlayerContext.myCurrentHandActions = myCurrentHandActions;
     myCurrentHandContext->perPlayerContext.myHavePosition =
         Player::getHavePosition(myPosition, currentHand->getRunningPlayersList());
-    myCurrentHandContext->perPlayerContext.myPreflopIsAggressor = isAgressor(GameStatePreflop);
-    myCurrentHandContext->perPlayerContext.myFlopIsAggressor = isAgressor(GameStateFlop);
-    myCurrentHandContext->perPlayerContext.myTurnIsAggressor = isAgressor(GameStateTurn);
-    myCurrentHandContext->perPlayerContext.myRiverIsAggressor = isAgressor(GameStateRiver);
+    myCurrentHandContext->perPlayerContext.myPreflopIsAggressor = isAgressor(Preflop);
+    myCurrentHandContext->perPlayerContext.myFlopIsAggressor = isAgressor(Flop);
+    myCurrentHandContext->perPlayerContext.myTurnIsAggressor = isAgressor(Turn);
+    myCurrentHandContext->perPlayerContext.myRiverIsAggressor = isAgressor(River);
     myCurrentHandContext->perPlayerContext.myStatistics = getStatistics(currentHand->getSeatsList()->size());
     myCurrentHandContext->perPlayerContext.myID = myID;
     myCurrentHandContext->perPlayerContext.myIsInVeryLooseMode = isInVeryLooseMode(currentHand->getSeatsList()->size());
@@ -1080,7 +1080,7 @@ void Player::updateCurrentHandContext(const GameState state)
     myCurrentHandContext->perPlayerContext.myPostFlopAnalysisFlags = getPostFlopAnalysisFlags();
 }
 
-float Player::calculatePreflopCallingRange(CurrentHandContext& ctx) const
+float Player::calculatePreflopCallingRange(const CurrentHandContext& ctx) const
 {
     return myRangeEstimator->getStandardCallingRange(currentHand->getSeatsList()->size());
 }

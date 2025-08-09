@@ -7,7 +7,7 @@ namespace pkt::core::player
 {
 
 bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(const PostFlopAnalysisFlags& testedHand,
-                                                              CurrentHandContext& ctx)
+                                                              const CurrentHandContext& ctx)
 {
 
     const int nbPlayers = ctx.commonContext.nbPlayers;
@@ -57,7 +57,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(const PostFlopAnal
 }
 
 bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopAnalysisFlags& testedHand,
-                                                            CurrentHandContext& ctx)
+                                                            const CurrentHandContext& ctx)
 {
 
     const int nbPlayers = ctx.commonContext.nbPlayers;
@@ -184,7 +184,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopAnalys
 }
 
 bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(const PostFlopAnalysisFlags& testedHand,
-                                                             CurrentHandContext& ctx)
+                                                             const CurrentHandContext& ctx)
 {
 
     const int nbPlayers = ctx.commonContext.nbPlayers;
@@ -245,7 +245,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(const PostFlopAnaly
 }
 
 bool HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopAnalysisFlags& testedHand,
-                                                              CurrentHandContext& ctx)
+                                                              const CurrentHandContext& ctx)
 {
 
     const int nbPlayers = ctx.commonContext.nbPlayers;
@@ -332,7 +332,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopAnal
 }
 
 bool HandPlausibilityChecker::isUnplausibleHandGivenFlopAllin(const PostFlopAnalysisFlags& testedHand,
-                                                              CurrentHandContext& ctx)
+                                                              const CurrentHandContext& ctx)
 {
 
     const int nbPlayers = ctx.commonContext.nbPlayers;
@@ -388,7 +388,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopAllin(const PostFlopAnal
 }
 
 bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCheck(const PostFlopAnalysisFlags& testedHand,
-                                                              CurrentHandContext& ctx)
+                                                              const CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
@@ -426,7 +426,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCheck(const PostFlopAnal
 }
 
 bool HandPlausibilityChecker::isUnplausibleHandGivenTurnBet(const PostFlopAnalysisFlags& testedHand,
-                                                            CurrentHandContext& ctx)
+                                                            const CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
@@ -480,7 +480,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnBet(const PostFlopAnalys
 }
 
 bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopAnalysisFlags& testedHand,
-                                                             CurrentHandContext& ctx)
+                                                             const CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
@@ -561,7 +561,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopAnaly
 }
 
 bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopAnalysisFlags& testedHand,
-                                                              CurrentHandContext& ctx)
+                                                              const CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
@@ -632,7 +632,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopAnal
 }
 
 bool HandPlausibilityChecker::isUnplausibleHandGivenTurnAllin(const PostFlopAnalysisFlags& testedHand,
-                                                              CurrentHandContext& ctx)
+                                                              const CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
@@ -678,7 +678,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnAllin(const PostFlopAnal
 }
 
 bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCheck(const PostFlopAnalysisFlags& testedHand,
-                                                               CurrentHandContext& ctx)
+                                                               const CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
@@ -690,7 +690,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCheck(const PostFlopAna
 }
 
 bool HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(const PostFlopAnalysisFlags& testedHand,
-                                                             CurrentHandContext& ctx)
+                                                             const CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
@@ -750,7 +750,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(const PostFlopAnaly
 }
 
 bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(const PostFlopAnalysisFlags& testedHand,
-                                                              CurrentHandContext& ctx)
+                                                              const CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
@@ -803,7 +803,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(const PostFlopAnal
 }
 
 bool HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(const PostFlopAnalysisFlags& testedHand,
-                                                               CurrentHandContext& ctx)
+                                                               const CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
@@ -872,7 +872,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(const PostFlopAna
 }
 
 bool HandPlausibilityChecker::isUnplausibleHandGivenRiverAllin(const PostFlopAnalysisFlags& testedHand,
-                                                               CurrentHandContext& ctx)
+                                                               const CurrentHandContext& ctx)
 {
 
     const bool bHavePosition = ctx.perPlayerContext.myHavePosition;

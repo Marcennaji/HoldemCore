@@ -21,7 +21,7 @@ enum class ActionType
 
 struct PlayerAction
 {
-    unsigned int playerId;
+    int playerId;
     ActionType type;
     int amount = 0;
 };

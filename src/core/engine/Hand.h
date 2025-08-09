@@ -36,10 +36,10 @@ class Hand : public IHand
     pkt::core::player::PlayerList getRunningPlayersList() const { return myRunningPlayersList; }
 
     std::shared_ptr<IBoard> getBoard() const { return myBoard; }
-    std::shared_ptr<IBettingRound> getPreflop() const { return myBettingRounds[GameStatePreflop]; }
-    std::shared_ptr<IBettingRound> getFlop() const { return myBettingRounds[GameStateFlop]; }
-    std::shared_ptr<IBettingRound> getTurn() const { return myBettingRounds[GameStateTurn]; }
-    std::shared_ptr<IBettingRound> getRiver() const { return myBettingRounds[GameStateRiver]; }
+    std::shared_ptr<IBettingRound> getPreflop() const { return myBettingRounds[Preflop]; }
+    std::shared_ptr<IBettingRound> getFlop() const { return myBettingRounds[Flop]; }
+    std::shared_ptr<IBettingRound> getTurn() const { return myBettingRounds[Turn]; }
+    std::shared_ptr<IBettingRound> getRiver() const { return myBettingRounds[River]; }
     std::shared_ptr<IBettingRound> getCurrentBettingRound() const { return myBettingRounds[myCurrentRound]; }
 
     void setStartQuantityPlayers(int theValue) { myStartQuantityPlayers = theValue; }
@@ -108,8 +108,8 @@ class Hand : public IHand
     unsigned myDealerPlayerId;
     unsigned mySmallBlindPlayerId;
     unsigned myBigBlindPlayerId;
-    GameState myCurrentRound{GameStatePreflop};
-    GameState myRoundBeforePostRiver{GameStatePreflop};
+    GameState myCurrentRound{Preflop};
+    GameState myRoundBeforePostRiver{Preflop};
     int mySmallBlind;
     int myStartCash;
 

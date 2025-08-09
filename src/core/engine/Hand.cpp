@@ -329,8 +329,8 @@ void Hand::resolveHandConditions()
             myEvents.onPotUpdated(myBoard->getPot());
         }
 
-        myCurrentRound = GameStatePostRiver;
-        GlobalServices::instance().logger()->verbose("Set current round to GameStatePostRiver.");
+        myCurrentRound = PostRiver;
+        GlobalServices::instance().logger()->verbose("Set current round to PostRiver.");
     }
     else
     {
@@ -373,13 +373,13 @@ void Hand::resolveHandConditions()
             myEvents.onFlipHoleCardsAllIn();
         }
 
-        if (myCurrentRound < GameStatePostRiver)
+        if (myCurrentRound < PostRiver)
         {
             myCurrentRound = GameState(myCurrentRound + 1);
             GlobalServices::instance().logger()->verbose("Advanced to next round: " + std::to_string(myCurrentRound));
         }
 
-        if (myCurrentRound >= GameStateFlop)
+        if (myCurrentRound >= Flop)
         {
             int tempBoardCardsArray[5];
             myBoard->getCards(tempBoardCardsArray);
@@ -397,7 +397,7 @@ void Hand::resolveHandConditions()
         }
     }
 
-    if (myCurrentRound < GameStatePostRiver)
+    if (myCurrentRound < PostRiver)
     {
         myRoundBeforePostRiver = myCurrentRound;
     }

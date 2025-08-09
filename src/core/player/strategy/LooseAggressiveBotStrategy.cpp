@@ -34,7 +34,7 @@ LooseAggressiveBotStrategy::LooseAggressiveBotStrategy() : IBotStrategy("LooseAg
 
 LooseAggressiveBotStrategy::~LooseAggressiveBotStrategy() = default;
 
-bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx)
+bool LooseAggressiveBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
 {
 
     float callingRange = getPreflopRangeCalculator()->calculatePreflopCallingRange(ctx);
@@ -126,7 +126,7 @@ bool LooseAggressiveBotStrategy::preflopShouldCall(CurrentHandContext& ctx)
     return isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2, stringCallingRange);
 }
 
-int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
+int LooseAggressiveBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
 {
 
     float raisingRange = getPreflopRangeCalculator()->calculatePreflopRaisingRange(ctx);
@@ -277,7 +277,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
     return computePreflopRaiseAmount(ctx);
 }
 
-int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx)
+int LooseAggressiveBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.flopBetsOrRaisesNumber > 0)
@@ -414,7 +414,7 @@ int LooseAggressiveBotStrategy::flopShouldBet(CurrentHandContext& ctx)
 
     return 0;
 }
-bool LooseAggressiveBotStrategy::flopShouldCall(CurrentHandContext& ctx)
+bool LooseAggressiveBotStrategy::flopShouldCall(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.flopBetsOrRaisesNumber == 0)
@@ -446,7 +446,7 @@ bool LooseAggressiveBotStrategy::flopShouldCall(CurrentHandContext& ctx)
     return true;
 }
 
-int LooseAggressiveBotStrategy::flopShouldRaise(CurrentHandContext& ctx)
+int LooseAggressiveBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
 {
 
     const int nbRaises = ctx.commonContext.flopBetsOrRaisesNumber;
@@ -524,7 +524,7 @@ int LooseAggressiveBotStrategy::flopShouldRaise(CurrentHandContext& ctx)
     return 0;
 }
 
-int LooseAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx)
+int LooseAggressiveBotStrategy::turnShouldBet(const CurrentHandContext& ctx)
 {
 
     const int pot = ctx.commonContext.pot + ctx.commonContext.sets;
@@ -591,7 +591,7 @@ int LooseAggressiveBotStrategy::turnShouldBet(CurrentHandContext& ctx)
     return 0;
 }
 
-bool LooseAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx)
+bool LooseAggressiveBotStrategy::turnShouldCall(const CurrentHandContext& ctx)
 {
     if (ctx.commonContext.turnBetsOrRaisesNumber == 0)
     {
@@ -667,7 +667,7 @@ bool LooseAggressiveBotStrategy::turnShouldCall(CurrentHandContext& ctx)
     return true;
 }
 
-int LooseAggressiveBotStrategy::turnShouldRaise(CurrentHandContext& ctx)
+int LooseAggressiveBotStrategy::turnShouldRaise(const CurrentHandContext& ctx)
 {
     if (ctx.commonContext.turnBetsOrRaisesNumber == 0)
     {
@@ -739,7 +739,7 @@ int LooseAggressiveBotStrategy::turnShouldRaise(CurrentHandContext& ctx)
     return 0;
 }
 
-int LooseAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx)
+int LooseAggressiveBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.riverBetsOrRaisesNumber > 0)
@@ -805,7 +805,7 @@ int LooseAggressiveBotStrategy::riverShouldBet(CurrentHandContext& ctx)
     return 0;
 }
 
-bool LooseAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx)
+bool LooseAggressiveBotStrategy::riverShouldCall(const CurrentHandContext& ctx)
 {
 
     const int nbRaises = ctx.commonContext.riverBetsOrRaisesNumber;
@@ -888,7 +888,7 @@ bool LooseAggressiveBotStrategy::riverShouldCall(CurrentHandContext& ctx)
     return true;
 }
 
-int LooseAggressiveBotStrategy::riverShouldRaise(CurrentHandContext& ctx)
+int LooseAggressiveBotStrategy::riverShouldRaise(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.riverBetsOrRaisesNumber == 0)

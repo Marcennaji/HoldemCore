@@ -18,12 +18,12 @@ class IBettingRound
 
     virtual GameState getBettingRoundId() const = 0;
 
-    virtual void setCurrentPlayerTurnId(unsigned) = 0;
-    virtual unsigned getCurrentPlayerTurnId() const = 0;
+    virtual void setCurrentPlayerTurnId(int) = 0;
+    virtual int getCurrentPlayerTurnId() const = 0;
 
-    virtual unsigned getSmallBlindPlayerId() const = 0;
+    virtual int getSmallBlindPlayerId() const = 0;
 
-    virtual unsigned getBigBlindPlayerId() const = 0;
+    virtual int getBigBlindPlayerId() const = 0;
 
     virtual void setHighestSet(int) = 0;
     virtual int getHighestSet() const = 0;

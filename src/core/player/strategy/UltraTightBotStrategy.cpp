@@ -33,7 +33,7 @@ UltraTightBotStrategy::UltraTightBotStrategy() : IBotStrategy("UltraTight")
 
 UltraTightBotStrategy::~UltraTightBotStrategy() = default;
 
-bool UltraTightBotStrategy::preflopShouldCall(CurrentHandContext& ctx)
+bool UltraTightBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
 {
 
     float callingRange = getPreflopRangeCalculator()->calculatePreflopCallingRange(ctx);
@@ -107,7 +107,7 @@ bool UltraTightBotStrategy::preflopShouldCall(CurrentHandContext& ctx)
     return isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2, stringCallingRange);
 }
 
-int UltraTightBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
+int UltraTightBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
 {
 
     float raisingRange = getPreflopRangeCalculator()->calculatePreflopRaisingRange(ctx);
@@ -222,7 +222,7 @@ int UltraTightBotStrategy::preflopShouldRaise(CurrentHandContext& ctx)
     return computePreflopRaiseAmount(ctx);
 }
 
-int UltraTightBotStrategy::flopShouldBet(CurrentHandContext& ctx)
+int UltraTightBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.flopBetsOrRaisesNumber > 0)
@@ -358,7 +358,7 @@ int UltraTightBotStrategy::flopShouldBet(CurrentHandContext& ctx)
 
     return 0;
 }
-bool UltraTightBotStrategy::flopShouldCall(CurrentHandContext& ctx)
+bool UltraTightBotStrategy::flopShouldCall(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.flopBetsOrRaisesNumber == 0)
@@ -390,7 +390,7 @@ bool UltraTightBotStrategy::flopShouldCall(CurrentHandContext& ctx)
     return true;
 }
 
-int UltraTightBotStrategy::flopShouldRaise(CurrentHandContext& ctx)
+int UltraTightBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
 {
 
     const int nbRaises = ctx.commonContext.flopBetsOrRaisesNumber;
@@ -470,7 +470,7 @@ int UltraTightBotStrategy::flopShouldRaise(CurrentHandContext& ctx)
     return 0;
 }
 
-int UltraTightBotStrategy::turnShouldBet(CurrentHandContext& ctx)
+int UltraTightBotStrategy::turnShouldBet(const CurrentHandContext& ctx)
 {
 
     const int pot = ctx.commonContext.pot + ctx.commonContext.sets;
@@ -550,7 +550,7 @@ int UltraTightBotStrategy::turnShouldBet(CurrentHandContext& ctx)
     return 0;
 }
 
-bool UltraTightBotStrategy::turnShouldCall(CurrentHandContext& ctx)
+bool UltraTightBotStrategy::turnShouldCall(const CurrentHandContext& ctx)
 {
     if (ctx.commonContext.turnBetsOrRaisesNumber == 0)
     {
@@ -626,7 +626,7 @@ bool UltraTightBotStrategy::turnShouldCall(CurrentHandContext& ctx)
     return true;
 }
 
-int UltraTightBotStrategy::turnShouldRaise(CurrentHandContext& ctx)
+int UltraTightBotStrategy::turnShouldRaise(const CurrentHandContext& ctx)
 {
     if (ctx.commonContext.turnBetsOrRaisesNumber == 0)
     {
@@ -686,7 +686,7 @@ int UltraTightBotStrategy::turnShouldRaise(CurrentHandContext& ctx)
     return 0;
 }
 
-int UltraTightBotStrategy::riverShouldBet(CurrentHandContext& ctx)
+int UltraTightBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.riverBetsOrRaisesNumber > 0)
@@ -772,7 +772,7 @@ int UltraTightBotStrategy::riverShouldBet(CurrentHandContext& ctx)
     return 0;
 }
 
-bool UltraTightBotStrategy::riverShouldCall(CurrentHandContext& ctx)
+bool UltraTightBotStrategy::riverShouldCall(const CurrentHandContext& ctx)
 {
 
     const int nbRaises = ctx.commonContext.riverBetsOrRaisesNumber;
@@ -872,7 +872,7 @@ bool UltraTightBotStrategy::riverShouldCall(CurrentHandContext& ctx)
     return true;
 }
 
-int UltraTightBotStrategy::riverShouldRaise(CurrentHandContext& ctx)
+int UltraTightBotStrategy::riverShouldRaise(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.riverBetsOrRaisesNumber == 0)

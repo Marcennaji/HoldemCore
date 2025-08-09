@@ -30,19 +30,19 @@ void BotPlayer::action()
     switch (currentHand->getCurrentRoundState())
     {
 
-    case GameStatePreflop:
+    case Preflop:
         doPreflopAction();
         break;
 
-    case GameStateFlop:
+    case Flop:
         doFlopAction();
         break;
 
-    case GameStateTurn:
+    case Turn:
         doTurnAction();
         break;
 
-    case GameStateRiver:
+    case River:
         doRiverAction();
         break;
 
@@ -100,22 +100,22 @@ void BotPlayer::action()
 
     if (myAction != ActionType::Fold)
     {
-        if (currentHand->getCurrentRoundState() == GameStatePreflop)
+        if (currentHand->getCurrentRoundState() == Preflop)
         {
             GlobalServices::instance().logger()->info(
                 "--> Preflop estimated range : " + myRangeEstimator->getEstimatedRange() + '\n');
         }
-        else if (currentHand->getCurrentRoundState() == GameStateFlop)
+        else if (currentHand->getCurrentRoundState() == Flop)
         {
             GlobalServices::instance().logger()->verbose(
                 "--> Flop estimated range : " + myRangeEstimator->getEstimatedRange() + '\n');
         }
-        else if (currentHand->getCurrentRoundState() == GameStateTurn)
+        else if (currentHand->getCurrentRoundState() == Turn)
         {
             GlobalServices::instance().logger()->verbose(
                 "--> Turn estimated range : " + myRangeEstimator->getEstimatedRange() + '\n');
         }
-        else if (currentHand->getCurrentRoundState() == GameStateRiver)
+        else if (currentHand->getCurrentRoundState() == River)
         {
             GlobalServices::instance().logger()->verbose(
                 "--> River estimated range : " + myRangeEstimator->getEstimatedRange() + '\n');
@@ -127,270 +127,156 @@ void BotPlayer::action()
 
 void BotPlayer::doPreflopAction()
 {
-    updateCurrentHandContext(GameStatePreflop);
+    updateCurrentHandContext(Preflop);
 
+    // Log the current state
     std::ostringstream logMessage;
-    logMessage << "\tdoPreflopAction for" << getPositionLabel(myPosition) << "\t" << myName << "\t"
+    logMessage << "\tdoPreflopAction for " << getPositionLabel(myPosition) << "\t" << myName << "\t"
                << getCardsValueString() << "\t"
                << "stack = " << myCash << ", stack when starting the betting round = " << myCashAtHandStart
-               << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() << endl;
+               << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() << std::endl;
     GlobalServices::instance().logger()->info(logMessage.str());
 
-    myBetAmount = 0;
-    bool shouldCall = myStrategy->preflopShouldCall(*myCurrentHandContext);
-    myRaiseAmount = myStrategy->preflopShouldRaise(*myCurrentHandContext);
+    PlayerAction action = myStrategy->decideAction(*myCurrentHandContext);
 
-    myPreflopPotOdd = getPotOdd();
+    // Update the player's action and amounts
+    myAction = action.type;
+    if (myAction == ActionType::Bet)
+        myBetAmount = action.amount;
+    if (myAction == ActionType::Raise)
+        myRaiseAmount = action.amount;
 
-    if (myRaiseAmount > 0)
-    {
-        shouldCall = false;
-    }
-
-    // if last to speak, and nobody has raised : I can check
-    if (currentHand->getPreflopRaisesNumber() == 0 && !myRaiseAmount && myPosition == BB)
-    {
-        myAction = ActionType::Check;
-    }
-    else
-    {
-        if (myBetAmount > 0)
-        {
-            myAction = ActionType::Bet;
-        }
-        else if (shouldCall)
-        {
-            myAction = ActionType::Call;
-        }
-        else if (myRaiseAmount > 0)
-        {
-            myAction = ActionType::Raise;
-        }
-        else
-        {
-            myAction = ActionType::Fold;
-        }
-    }
-
+    // Handle specific preflop logic
     if (myAction == ActionType::Raise || myAction == ActionType::Allin)
     {
         currentHand->setPreflopLastRaiserId(myID);
     }
 
+    // Record the action
     myCurrentHandActions.getPreflopActions().push_back(myAction);
 
+    // Update statistics and ranges
     updatePreflopStatistics();
 
     if (myAction != ActionType::Fold)
     {
-        updateCurrentHandContext(GameStatePreflop);
+        updateCurrentHandContext(Preflop);
         myRangeEstimator->updateUnplausibleRangesGivenPreflopActions(*myCurrentHandContext);
     }
 }
 void BotPlayer::doFlopAction()
 {
-    updateCurrentHandContext(GameStateFlop);
+    updateCurrentHandContext(Flop);
 
+    // Log the current state
     std::ostringstream logMessage;
-    logMessage << "\n";
-    logMessage << "\tdoFlopAction for" << getPositionLabel(myPosition) << "\t" << myName << "\t"
+    logMessage << "\tdoFlopAction for " << getPositionLabel(myPosition) << "\t" << myName << "\t"
                << getCardsValueString() << "\t"
                << "stack = " << myCash
-               << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() << endl;
+               << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() << std::endl;
     GlobalServices::instance().logger()->verbose(logMessage.str());
 
-    myBetAmount = 0;
-    myRaiseAmount = 0;
-    bool shouldCall = false;
+    // Use the strategy to decide the action
+    PlayerAction action = myStrategy->decideAction(*myCurrentHandContext);
 
-    if (currentHand->getFlopBetsOrRaisesNumber() == 0)
-    {
-        myBetAmount = myStrategy->flopShouldBet(*myCurrentHandContext);
-    }
-    else
-    {
-        shouldCall = myStrategy->flopShouldCall(*myCurrentHandContext);
-        myRaiseAmount = myStrategy->flopShouldRaise(*myCurrentHandContext);
-    }
+    // Update the player's action and amounts
+    myAction = action.type;
+    if (myAction == ActionType::Bet)
+        myBetAmount = action.amount;
+    if (myAction == ActionType::Raise)
+        myRaiseAmount = action.amount;
 
-    if (myRaiseAmount)
-    {
-        shouldCall = false;
-    }
-
-    if (currentHand->getFlopBetsOrRaisesNumber() == 0 && !myRaiseAmount && !myBetAmount)
-    {
-        myAction = ActionType::Check;
-    }
-    else
-    {
-        if (myBetAmount)
-        {
-            myAction = ActionType::Bet;
-        }
-        else if (shouldCall)
-        {
-            myAction = ActionType::Call;
-        }
-        else if (myRaiseAmount)
-        {
-            myAction = ActionType::Raise;
-        }
-        else
-        {
-            myAction = ActionType::Fold;
-        }
-    }
-
+    // Handle specific flop logic
     if (myAction == ActionType::Bet || myAction == ActionType::Raise || myAction == ActionType::Allin)
     {
         currentHand->setFlopLastRaiserId(myID);
     }
 
+    // Record the action
     myCurrentHandActions.getFlopActions().push_back(myAction);
 
+    // Update statistics and ranges
     updateFlopStatistics();
 
     if (myAction != ActionType::Fold)
     {
-        updateCurrentHandContext(GameStateFlop);
+        updateCurrentHandContext(Flop);
         myRangeEstimator->updateUnplausibleRangesGivenFlopActions(*myCurrentHandContext);
     }
 }
 void BotPlayer::doTurnAction()
 {
+    updateCurrentHandContext(Turn);
 
-    updateCurrentHandContext(GameStateTurn);
-
+    // Log the current state
     std::ostringstream logMessage;
-    logMessage << "\n";
     logMessage << "\tdoTurnAction for " << getPositionLabel(myPosition) << "\t" << myName << "\t"
                << getCardsValueString() << "\t"
                << "stack = " << myCash
-               << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() << endl;
+               << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() << std::endl;
     GlobalServices::instance().logger()->verbose(logMessage.str());
 
-    myBetAmount = 0;
-    myRaiseAmount = 0;
-    bool shouldCall = false;
+    // Use the strategy to decide the action
+    PlayerAction action = myStrategy->decideAction(*myCurrentHandContext);
 
-    if (currentHand->getTurnBetsOrRaisesNumber() == 0)
-    {
-        myBetAmount = myStrategy->turnShouldBet(*myCurrentHandContext);
-    }
-    else
-    {
-        shouldCall = myStrategy->turnShouldCall(*myCurrentHandContext);
-        myRaiseAmount = myStrategy->turnShouldRaise(*myCurrentHandContext);
-    }
+    // Update the player's action and amounts
+    myAction = action.type;
+    if (myAction == ActionType::Bet)
+        myBetAmount = action.amount;
+    if (myAction == ActionType::Raise)
+        myRaiseAmount = action.amount;
 
-    if (myRaiseAmount)
-    {
-        shouldCall = false;
-    }
-
-    if (currentHand->getTurnBetsOrRaisesNumber() == 0 && !myRaiseAmount && !myBetAmount)
-    {
-        myAction = ActionType::Check;
-    }
-    else
-    {
-        if (myBetAmount)
-        {
-            myAction = ActionType::Bet;
-        }
-        else if (shouldCall)
-        {
-            myAction = ActionType::Call;
-        }
-        else if (myRaiseAmount)
-        {
-            myAction = ActionType::Raise;
-        }
-        else
-        {
-            myAction = ActionType::Fold;
-        }
-    }
-
+    // Handle specific turn logic
     if (myAction == ActionType::Bet || myAction == ActionType::Raise || myAction == ActionType::Allin)
     {
         currentHand->setTurnLastRaiserId(myID);
     }
 
+    // Record the action
     myCurrentHandActions.getTurnActions().push_back(myAction);
 
+    // Update statistics and ranges
     updateTurnStatistics();
 
     if (myAction != ActionType::Fold)
     {
-        updateCurrentHandContext(GameStateTurn);
+        updateCurrentHandContext(Turn);
         myRangeEstimator->updateUnplausibleRangesGivenTurnActions(*myCurrentHandContext);
     }
 }
 void BotPlayer::doRiverAction()
 {
+    updateCurrentHandContext(River);
 
-    updateCurrentHandContext(GameStateRiver);
-
+    // Log the current state
     std::ostringstream logMessage;
-    logMessage << "\n";
     logMessage << "\tdoRiverAction for " << getPositionLabel(myPosition) << "\t" << myName << "\t"
                << getCardsValueString() << "\t"
                << "stack = " << myCash
-               << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() << endl;
+               << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() << std::endl;
     GlobalServices::instance().logger()->verbose(logMessage.str());
 
-    myBetAmount = 0;
-    myRaiseAmount = 0;
-    bool shouldCall = false;
+    // Use the strategy to decide the action
+    PlayerAction action = myStrategy->decideAction(*myCurrentHandContext);
 
-    if (currentHand->getRiverBetsOrRaisesNumber() == 0)
-    {
-        myBetAmount = myStrategy->riverShouldBet(*myCurrentHandContext);
-    }
-    else
-    {
-        shouldCall = myStrategy->riverShouldCall(*myCurrentHandContext);
-        myRaiseAmount = myStrategy->riverShouldRaise(*myCurrentHandContext);
-    }
+    myPreflopPotOdd = getPotOdd();
 
-    if (myRaiseAmount)
-    {
-        shouldCall = false;
-    }
+    // Update the player's action and amounts
+    myAction = action.type;
+    if (myAction == ActionType::Bet)
+        myBetAmount = action.amount;
+    if (myAction == ActionType::Raise)
+        myRaiseAmount = action.amount;
 
-    if (currentHand->getRiverBetsOrRaisesNumber() == 0 && !myRaiseAmount && !myBetAmount)
-    {
-        myAction = ActionType::Check;
-    }
-    else
-    {
-        if (myBetAmount)
-        {
-            myAction = ActionType::Bet;
-        }
-        else if (shouldCall)
-        {
-            myAction = ActionType::Call;
-        }
-        else if (myRaiseAmount)
-        {
-            myAction = ActionType::Raise;
-        }
-        else
-        {
-            myAction = ActionType::Fold;
-        }
-    }
-
+    // Record the action
     myCurrentHandActions.getRiverActions().push_back(myAction);
 
+    // Update statistics and ranges
     updateRiverStatistics();
 
     if (myAction != ActionType::Fold)
     {
-        updateCurrentHandContext(GameStateRiver);
+        updateCurrentHandContext(River);
         myRangeEstimator->updateUnplausibleRangesGivenRiverActions(*myCurrentHandContext);
     }
 }
@@ -530,7 +416,7 @@ void BotPlayer::evaluateBetAmount()
     currentHand->getCurrentBettingRound()->setHighestSet(highestSet);
 }
 
-float BotPlayer::calculatePreflopCallingRange(CurrentHandContext& ctx) const
+float BotPlayer::calculatePreflopCallingRange(const CurrentHandContext& ctx) const
 {
     return myStrategy->getPreflopRangeCalculator()->calculatePreflopCallingRange(ctx);
 }

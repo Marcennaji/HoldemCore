@@ -133,7 +133,7 @@ TEST_F(BettingRoundsLegacyTest, ActionOrderStartsCorrectlyInHeadsUpPreflop)
 
     const auto& history = myHand->getHandActionHistory();
     const auto& preflop = history.front();
-    ASSERT_EQ(preflop.round, GameStatePreflop);
+    ASSERT_EQ(preflop.round, Preflop);
     ASSERT_FALSE(preflop.actions.empty());
 
     auto dealerIt = getPlayerListIteratorById(myHand->getSeatsList(), myHand->getDealerPlayerId());
@@ -151,7 +151,7 @@ TEST_F(BettingRoundsLegacyTest, FirstToActPostflopIsLeftOfDealer)
     const auto& history = myHand->getHandActionHistory();
     for (const auto& round : history)
     {
-        if (round.round == GameStateFlop || round.round == GameStateTurn || round.round == GameStateRiver)
+        if (round.round == Flop || round.round == Turn || round.round == River)
         {
             ASSERT_FALSE(round.actions.empty());
             unsigned dealerId = myHand->getDealerPlayerId();
@@ -236,7 +236,7 @@ TEST_F(BettingRoundsLegacyTest, NoPlayerStartsPostFlopRoundWithRaise)
     const auto& history = myHand->getHandActionHistory();
     for (const auto& round : history)
     {
-        if (round.round == GameStateFlop || round.round == GameStateTurn || round.round == GameStateRiver)
+        if (round.round == Flop || round.round == Turn || round.round == River)
         {
 
             // Check the first action in the round
@@ -254,7 +254,7 @@ TEST_F(BettingRoundsLegacyTest, NoPlayerStartsPostflopRoundByFolding)
     const auto& history = myHand->getHandActionHistory();
     for (const auto& round : history)
     {
-        if (round.round == GameStateFlop || round.round == GameStateTurn || round.round == GameStateRiver)
+        if (round.round == Flop || round.round == Turn || round.round == River)
         {
             ASSERT_FALSE(round.actions.empty()) << "Postflop round has no actions.";
 
@@ -296,7 +296,7 @@ TEST_F(BettingRoundsLegacyTest, NoPlayerFoldsPostFlopWhenNoBet)
     const auto& history = myHand->getHandActionHistory();
     for (const auto& round : history)
     {
-        if (round.round == GameStateFlop || round.round == GameStateTurn || round.round == GameStateRiver)
+        if (round.round == Flop || round.round == Turn || round.round == River)
         {
 
             bool hasBetOrRaise = false;
@@ -435,7 +435,7 @@ TEST_F(BettingRoundsLegacyTest, NoBettingInPostRiverRound)
     const auto& history = myHand->getHandActionHistory();
     for (const auto& round : history)
     {
-        if (round.round == GameStatePostRiver)
+        if (round.round == PostRiver)
         {
             for (const auto& [playerId, action] : round.actions)
             {

@@ -29,7 +29,7 @@ class BotPlayer : public Player
         return myStrategy ? myStrategy->getStrategyName() : "Unknown Strategy";
     }
 
-    float calculatePreflopCallingRange(CurrentHandContext& ctx) const override;
+    float calculatePreflopCallingRange(const CurrentHandContext& ctx) const override;
 
     bool isBot() const override { return true; }
 

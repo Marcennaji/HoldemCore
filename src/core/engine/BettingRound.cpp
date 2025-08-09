@@ -235,7 +235,7 @@ void BettingRound::proceedToNextBettingRound()
         myEvents.onPotUpdated(myHand->getBoard()->getPot());
     }
 
-    for (unsigned int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
+    for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++)
     {
         if (myEvents.onPlayerActed)
         {
@@ -255,13 +255,13 @@ void BettingRound::logBoardCards()
 
         switch (myBettingRoundId)
         {
-        case GameStateFlop:
+        case Flop:
             GlobalServices::instance().logger()->info(
                 "\n\n************************* FLOP " + CardUtilities::getCardString(tempBoardCardsArray[0]) + " " +
                 CardUtilities::getCardString(tempBoardCardsArray[1]) + " " +
                 CardUtilities::getCardString(tempBoardCardsArray[2]) + "  *************************\n\n");
             break;
-        case GameStateTurn:
+        case Turn:
             GlobalServices::instance().logger()->info(
                 "\n\n************************* TURN " + CardUtilities::getCardString(tempBoardCardsArray[0]) + " " +
                 CardUtilities::getCardString(tempBoardCardsArray[1]) + " " +
@@ -269,7 +269,7 @@ void BettingRound::logBoardCards()
                 CardUtilities::getCardString(tempBoardCardsArray[3]) + "  *************************\n\n");
 
             break;
-        case GameStateRiver:
+        case River:
             GlobalServices::instance().logger()->info(
                 "\n\n************************* RIVER " + CardUtilities::getCardString(tempBoardCardsArray[0]) + " " +
                 CardUtilities::getCardString(tempBoardCardsArray[1]) + " " +
@@ -395,20 +395,20 @@ IHand* BettingRound::getHand() const
     return myHand;
 }
 
-void BettingRound::setCurrentPlayerTurnId(unsigned theValue)
+void BettingRound::setCurrentPlayerTurnId(int theValue)
 {
     myCurrentPlayerTurnId = theValue;
 }
-unsigned BettingRound::getCurrentPlayerTurnId() const
+int BettingRound::getCurrentPlayerTurnId() const
 {
     return myCurrentPlayerTurnId;
 }
 
-void BettingRound::setFirstRoundLastPlayersTurnId(unsigned theValue)
+void BettingRound::setFirstRoundLastPlayersTurnId(int theValue)
 {
     myFirstRoundLastPlayersTurnId = theValue;
 }
-unsigned BettingRound::getFirstRoundLastPlayersTurnId() const
+int BettingRound::getFirstRoundLastPlayersTurnId() const
 {
     return myFirstRoundLastPlayersTurnId;
 }
@@ -440,12 +440,12 @@ bool BettingRound::getFirstRound() const
     return myFirstRound;
 }
 
-unsigned BettingRound::getSmallBlindPlayerId() const
+int BettingRound::getSmallBlindPlayerId() const
 {
     return mySmallBlindPlayerId;
 }
 
-unsigned BettingRound::getBigBlindPlayerId() const
+int BettingRound::getBigBlindPlayerId() const
 {
     return myBigBlindPlayerId;
 }

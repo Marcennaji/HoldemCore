@@ -27,7 +27,7 @@ class EngineTest : public ::testing::Test
 
     std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::PlayerFsm>>> mySeatsListFsm;
     std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::PlayerFsm>>> myRunningPlayersListFsm;
-    pkt::core::GameState myLastGameState = pkt::core::GameStateNone;
+    pkt::core::GameState myLastGameState = pkt::core::None;
 
     void SetUp() override;
 
