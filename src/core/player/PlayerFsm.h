@@ -31,7 +31,7 @@ class HandFsm;
 namespace pkt::core::player
 {
 
-class IBotStrategy;
+class BotStrategy;
 
 class PlayerFsm
 {

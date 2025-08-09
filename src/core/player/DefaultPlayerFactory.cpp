@@ -1,7 +1,7 @@
 #include "DefaultPlayerFactory.h"
 #include "BotPlayer.h"
 #include "HumanPlayer.h"
-#include "core/player/strategy/IBotStrategy.h"
+#include "core/player/strategy/BotStrategy.h"
 
 namespace pkt::core::player
 {

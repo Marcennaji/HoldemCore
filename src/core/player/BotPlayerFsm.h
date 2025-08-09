@@ -6,7 +6,7 @@
 
 #include "PlayerFsm.h"
 
-#include "core/player/strategy/IBotStrategy.h"
+#include "core/player/strategy/BotStrategy.h"
 
 namespace pkt::core::player
 {
@@ -18,7 +18,7 @@ class BotPlayerFsm : public PlayerFsm
 
     ~BotPlayerFsm();
 
-    void setStrategy(std::unique_ptr<IBotStrategy> strategy) { myStrategy = std::move(strategy); }
+    void setStrategy(std::unique_ptr<BotStrategy> strategy) { myStrategy = std::move(strategy); }
     virtual std::string getStrategyName() const override
     {
         return myStrategy ? myStrategy->getStrategyName() : "Unknown Strategy";
@@ -29,7 +29,7 @@ class BotPlayerFsm : public PlayerFsm
     bool isBot() const override { return true; }
 
   private:
-    std::unique_ptr<IBotStrategy> myStrategy;
+    std::unique_ptr<BotStrategy> myStrategy;
 };
 
 } // namespace pkt::core::player

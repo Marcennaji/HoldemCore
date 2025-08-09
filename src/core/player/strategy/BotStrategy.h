@@ -13,10 +13,10 @@ namespace pkt::core::player
 // Forward declaration
 struct CurrentHandContext;
 
-class IBotStrategy
+class BotStrategy
 {
   public:
-    virtual ~IBotStrategy() = default;
+    virtual ~BotStrategy() = default;
 
     PlayerAction decideAction(const CurrentHandContext& ctx)
     {
@@ -42,7 +42,7 @@ class IBotStrategy
     }
 
   protected:
-    IBotStrategy(const std::string& name)
+    BotStrategy(const std::string& name)
         : myStrategyName(name), myPreflopRangeCalculator(std::make_unique<PreflopRangeCalculator>())
     {
     }

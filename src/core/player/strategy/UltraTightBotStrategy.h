@@ -3,27 +3,21 @@
 // Licensed under the MIT License — see LICENSE file for details.
 #pragma once
 
-#include "core/player/strategy/BotCommonLogic.h"
-#include "core/player/strategy/IBotStrategy.h"
+#include "core/player/strategy/BotStrategy.h"
+#include "core/player/strategy/BotStrategyBase.h"
 
 namespace pkt::core::player
 {
 // Forward declaration
 struct CurrentHandContext;
-class UltraTightBotStrategy : public IBotStrategy, public BotCommonLogic
+class UltraTightBotStrategy : public BotStrategyBase
 {
 
   public:
     UltraTightBotStrategy();
-
     ~UltraTightBotStrategy();
 
   protected:
-    PlayerAction decidePreflop(const CurrentHandContext&) override { return {0, ActionType::Fold, 0}; };
-    PlayerAction decideFlop(const CurrentHandContext&) override { return {0, ActionType::Fold, 0}; };
-    PlayerAction decideTurn(const CurrentHandContext&) override { return {0, ActionType::Fold, 0}; };
-    PlayerAction decideRiver(const CurrentHandContext&) override { return {0, ActionType::Fold, 0}; };
-
     bool preflopShouldCall(const CurrentHandContext& ctx);
     bool flopShouldCall(const CurrentHandContext& ctx);
     bool turnShouldCall(const CurrentHandContext& ctx);

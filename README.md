@@ -7,7 +7,7 @@ Cross-platform, event-driven C++ engine with bot opponents and 1 human player (o
 
 ## 🎯 Project Goal
 
-PokerTraining is an offline, open-source poker simulation tool designed to help players practice against a variety of opponents.
+PokerTraining is an offline, open-source poker simulation tool designed to help players practice against a variety of opponents. Its goal is also to allow bots implementers (C++ developers) to test their poker strategies and focus only on the poker logic, without bothering about all the technical stuff (hands and rounds management, cards, etc)
 
 - Train against tight, loose, aggressive, or random bots  
 - Customize your poker table: number of players, stack size, small blind value, opponent profiles  
@@ -30,11 +30,11 @@ PokerTraining is an offline, open-source poker simulation tool designed to help 
 
 ### 3. **Bot Strategies with Dependency Injection**
 
-- Clean separation of `BotPlayer` and `IBotStrategy`
+- Clean separation of `BotPlayer` and `BotStrategy`
 - Includes: `TightAggressive`, `LooseAggressive`, `Maniac`, `UltraTight`
 - Strategies are testable via `CurrentHandContext`
 - Bots may dynamically switch strategies mid-game based on context (e.g., stack size)
-- Easy to create custom bots implementing the simple `IBotStrategy` interface
+- Easy to create custom bots implementing the simple `BotStrategy` interface
 
 ### 4. **Range Management & Equity Evaluation**
 
@@ -58,7 +58,7 @@ PokerTraining is an offline, open-source poker simulation tool designed to help 
 
 ---
 
-## 🚧 Current Status : under active refactoring
+## 🚧 Current Status : unstable, under active refactoring
 
 This project was originally created and published on SourceForge by Marc Ennaji in 2011. It has been migrated on Github during 2025.
 The current version is a complete architectural rewrite, for a better decoupling, modularity, maintainability, testability, and cross-platform UI support. It is currently under **active refactoring**, with major milestones already completed:

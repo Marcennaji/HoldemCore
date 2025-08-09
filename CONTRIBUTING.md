@@ -23,7 +23,7 @@ To keep the project maintainable and high-quality, please respect the following 
 
 ### ✅ Extend via interfaces
 
-* Use **interfaces** (e.g. `IBotStrategy`, etc.) to allow new implementations.
+* Use **interfaces** (e.g. `BotStrategy`, etc.) to allow new implementations.
 * Favor testable, modular patterns like Strategy, Factory, and Observer.
 
 ### ✅ Prefer clean, small commits
@@ -43,7 +43,7 @@ To keep the project maintainable and high-quality, please respect the following 
 | Area             | Location           | Notes                                        |
 | ---------------- | ------------------ | -------------------------------------------- |
 | Engine Logic     | `src/core/engine/` | Hand management, board logic, betting rounds |
-| Player/Bots      | `src/core/player/` | `BotPlayer`, `IBotStrategy`, `PlayerFactory` |
+| Player/Bots      | `src/core/player/` | `BotPlayer`, `BotStrategy`, `PlayerFactory` |
 | Events           | `src/core/events/` | Add new `GameEvents` if needed               |
 | WebSocket Server | `src/server/`      | Handles protocol and message routing         |
 | Unit Tests       | `tests/core/...`   | All logic should be testable                 |

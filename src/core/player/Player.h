@@ -31,7 +31,7 @@ class IHand;
 namespace pkt::core::player
 {
 
-class IBotStrategy;
+class BotStrategy;
 
 class Player
 {

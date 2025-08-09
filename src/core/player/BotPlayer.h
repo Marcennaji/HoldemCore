@@ -6,7 +6,7 @@
 
 #include "Player.h"
 
-#include "core/player/strategy/IBotStrategy.h"
+#include "core/player/strategy/BotStrategy.h"
 
 namespace pkt::core::player
 {
@@ -18,7 +18,7 @@ class BotPlayer : public Player
 
     ~BotPlayer();
 
-    void setStrategy(std::unique_ptr<IBotStrategy> strategy) { myStrategy = std::move(strategy); }
+    void setStrategy(std::unique_ptr<BotStrategy> strategy) { myStrategy = std::move(strategy); }
     void action();
     void doPreflopAction();
     void doFlopAction();
@@ -36,7 +36,7 @@ class BotPlayer : public Player
   private:
     void evaluateBetAmount();
 
-    std::unique_ptr<IBotStrategy> myStrategy;
+    std::unique_ptr<BotStrategy> myStrategy;
     int myBetAmount = 0;
     int myRaiseAmount = 0;
 };

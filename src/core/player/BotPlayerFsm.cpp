@@ -2,8 +2,8 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 #include "BotPlayerFsm.h"
+#include <core/player/strategy/BotStrategy.h>
 #include <core/player/strategy/CurrentHandContext.h>
-#include <core/player/strategy/IBotStrategy.h>
 #include <core/services/GlobalServices.h>
 #include "core/player/strategy/CurrentHandContext.h"
 
