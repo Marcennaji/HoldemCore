@@ -94,7 +94,7 @@ void HandFsm::applyActionEffects(const PlayerAction& action)
 
     case ActionType::Call:
     {
-        player->setSet(action.amount);
+        player->addBetAmount(action.amount);
 
         // myPot += toCall;
         break;
@@ -114,10 +114,6 @@ void HandFsm::applyActionEffects(const PlayerAction& action)
         */
         break;
     }
-    case ActionType::None:
-    {
-        break;
-    }
     case ActionType::Bet:
     {
         break;
@@ -127,6 +123,10 @@ void HandFsm::applyActionEffects(const PlayerAction& action)
         break;
     }
     case ActionType::Allin:
+    {
+        break;
+    }
+    case ActionType::None:
     {
         break;
     }
@@ -206,7 +206,7 @@ CommonHandContext HandFsm::updateCurrentHandContext(const GameState state)
     handContext.pot = myBoard->getPot();
     // handContext.potOdd = getPotOdd();
     handContext.sets = myBoard->getSets();
-    handContext.highestSet = getBettingState()->getHighestSet();
+    handContext.highestBetAmount = getBettingState()->getHighestSet();
     handContext.stringBoard = getStringBoard();
     handContext.preflopLastRaiserFsm = getPlayerFsmById(getSeatsList(), getBettingState()->getPreflopLastRaiserId());
     handContext.preflopRaisesNumber = getBettingState()->getPreflopRaisesNumber();
@@ -260,7 +260,7 @@ std::string HandFsm::getStringBoard() const
 
 int HandFsm::getPotOdd(const int playerCash, const int playerSet) const
 {
-    const int highestSet = min(playerCash, getBettingState()->getHighestSet());
+    const int highestBetAmount = min(playerCash, getBettingState()->getHighestSet());
 
     int pot = myBoard->getPot() + myBoard->getSets();
 
@@ -271,10 +271,10 @@ int HandFsm::getPotOdd(const int playerCash, const int playerSet) const
         return 0;
     }
 
-    int odd = (highestSet - playerSet) * 100 / pot;
+    int odd = (highestBetAmount - playerSet) * 100 / pot;
     if (odd < 0)
     {
-        odd = -odd; // happens if mySet > highestSet
+        odd = -odd; // happens if myTotalBetAmount > highestBetAmount
     }
 
     return odd;

@@ -48,9 +48,9 @@ class Player
 
     void setCash(int theValue);
     int getCash() const;
-    void setSet(int theValue);
+    void addBetAmount(int theValue);
     void setSetNull();
-    int getSet() const;
+    int getTotalBetAmount() const;
     int getLastRelativeSet() const;
 
     void setHand(IHand*);
@@ -160,9 +160,9 @@ class Player
      * Tracks the cumulative amount the player has bet across all rounds.
      * Used in pot distribution calculations to determine the player's share of the pot.
      * Example:
-     * If a player bets 200 in the preflop and 300 on the flop, mySet would be 500.
+     * If a player bets 200 in the preflop and 300 on the flop, myTotalBetAmount would be 500.
      */
-    int mySet{0};
+    int myTotalBetAmount{0};
 
     /**
      * Purpose: Represents the amount of chips the player has committed to the pot during the most recent betting

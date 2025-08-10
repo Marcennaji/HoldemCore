@@ -29,7 +29,7 @@ void CommonHandContext::reset()
     pot = 0;
     potOdd = 0;
     sets = 0;
-    highestSet = 0;
+    highestBetAmount = 0;
     isPreflopBigBet = false;
     smallBlind = 0;
     stringBoard.clear();
@@ -45,7 +45,7 @@ void PerPlayerHandContext::reset()
     // Player-specific data
     myPreflopCallingRange = -1;
     myCash = 0;
-    mySet = 0;
+    myTotalBetAmount = 0;
     myM = 0;
     myID = 0;
     myCard1.clear();

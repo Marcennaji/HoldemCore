@@ -239,21 +239,21 @@ int Player::getCash() const
     return myCash;
 }
 
-void Player::setSet(int theValue)
+void Player::addBetAmount(int theValue)
 {
     myLastRelativeSet = theValue;
-    mySet += theValue;
+    myTotalBetAmount += theValue;
     myCash -= theValue;
 }
 
 void Player::setSetNull()
 {
-    mySet = 0;
+    myTotalBetAmount = 0;
     myLastRelativeSet = 0;
 }
-int Player::getSet() const
+int Player::getTotalBetAmount() const
 {
-    return mySet;
+    return myTotalBetAmount;
 }
 int Player::getLastRelativeSet() const
 {
@@ -656,7 +656,7 @@ bool Player::getHavePosition(PlayerPosition myPos, PlayerList runningPlayers)
 int Player::getPotOdd() const
 {
 
-    const int highestSet = min(myCash, currentHand->getCurrentBettingRound()->getHighestSet());
+    const int highestBetAmount = min(myCash, currentHand->getCurrentBettingRound()->getHighestSet());
 
     int pot = currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets();
 
@@ -668,10 +668,10 @@ int Player::getPotOdd() const
         return 0;
     }
 
-    int odd = (highestSet - mySet) * 100 / pot;
+    int odd = (highestBetAmount - myTotalBetAmount) * 100 / pot;
     if (odd < 0)
     {
-        odd = -odd; // happens if mySet > highestSet
+        odd = -odd; // happens if myTotalBetAmount > highestBetAmount
     }
 
     return odd;
@@ -877,9 +877,10 @@ bool Player::isPreflopBigBet() const
         return true;
     }
 
-    const int highestSet = min(myCash, currentHand->getCurrentBettingRound()->getHighestSet());
+    const int highestBetAmount = min(myCash, currentHand->getCurrentBettingRound()->getHighestSet());
 
-    if (highestSet > currentHand->getSmallBlind() * 8 && highestSet - mySet > mySet * 6)
+    if (highestBetAmount > currentHand->getSmallBlind() * 8 &&
+        highestBetAmount - myTotalBetAmount > myTotalBetAmount * 6)
     {
         return true;
     }
@@ -1011,7 +1012,7 @@ void Player::updateCurrentHandContext(const GameState state)
     myCurrentHandContext->commonContext.pot = currentHand->getBoard()->getPot();
     myCurrentHandContext->commonContext.potOdd = getPotOdd();
     myCurrentHandContext->commonContext.sets = currentHand->getBoard()->getSets();
-    myCurrentHandContext->commonContext.highestSet = currentHand->getCurrentBettingRound()->getHighestSet();
+    myCurrentHandContext->commonContext.highestBetAmount = currentHand->getCurrentBettingRound()->getHighestSet();
     myCurrentHandContext->commonContext.stringBoard = getStringBoard();
     myCurrentHandContext->commonContext.preflopLastRaiser =
         getPlayerById(currentHand->getSeatsList(), currentHand->getPreflopLastRaiserId());
@@ -1056,7 +1057,7 @@ void Player::updateCurrentHandContext(const GameState state)
 
     // Player-specific, visible from the opponents :
     myCurrentHandContext->perPlayerContext.myCash = myCash;
-    myCurrentHandContext->perPlayerContext.mySet = mySet;
+    myCurrentHandContext->perPlayerContext.myTotalBetAmount = myTotalBetAmount;
     myCurrentHandContext->perPlayerContext.myM = static_cast<int>(getM());
     myCurrentHandContext->perPlayerContext.myCurrentHandActions = myCurrentHandActions;
     myCurrentHandContext->perPlayerContext.myHavePosition =

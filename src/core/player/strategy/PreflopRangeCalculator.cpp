@@ -97,7 +97,7 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(const CurrentHandCont
     const int potOdd = ctx.commonContext.potOdd;
     const int myCash = ctx.perPlayerContext.myCash;
     const bool isPreflopBigBet = ctx.commonContext.isPreflopBigBet;
-    const int mySet = ctx.perPlayerContext.mySet;
+    const int myTotalBetAmount = ctx.perPlayerContext.myTotalBetAmount;
     const int smallBlind = ctx.commonContext.smallBlind;
     const int myM = ctx.perPlayerContext.myM;
 
@@ -129,8 +129,8 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(const CurrentHandCont
     // Tighten range for big bets
     if (isPreflopBigBet)
     {
-        callingRange =
-            adjustCallForBigBet(callingRange, potOdd, myCash, ctx.commonContext.highestSet, mySet, smallBlind);
+        callingRange = adjustCallForBigBet(callingRange, potOdd, myCash, ctx.commonContext.highestBetAmount,
+                                           myTotalBetAmount, smallBlind);
     }
 
     // Adjust for loose/aggressive raiser
@@ -263,25 +263,29 @@ float PreflopRangeCalculator::adjustCallForNoStats(float callingRange, int nbRai
     return callingRange;
 }
 
-float PreflopRangeCalculator::adjustCallForBigBet(float callingRange, int potOdd, int myCash, int highestSetOrigin,
-                                                  int mySet, int smallBlind) const
+float PreflopRangeCalculator::adjustCallForBigBet(float callingRange, int potOdd, int myCash,
+                                                  int highestBetAmountOrigin, int myTotalBetAmount,
+                                                  int smallBlind) const
 {
 
-    const int highestSet = std::min(myCash, highestSetOrigin);
+    const int highestBetAmount = std::min(myCash, highestBetAmountOrigin);
 
-    if (potOdd <= 70 && highestSet > smallBlind * 20 && highestSet - mySet > mySet * 6)
+    if (potOdd <= 70 && highestBetAmount > smallBlind * 20 &&
+        highestBetAmount - myTotalBetAmount > myTotalBetAmount * 6)
     {
         callingRange = 1.5f;
     }
-    else if ((potOdd > 70 && potOdd < 85) || (highestSet > smallBlind * 8 && highestSet < smallBlind * 10))
+    else if ((potOdd > 70 && potOdd < 85) || (highestBetAmount > smallBlind * 8 && highestBetAmount < smallBlind * 10))
     {
         callingRange *= 0.7f;
     }
-    else if ((potOdd >= 85 && potOdd < 95) || (highestSet >= smallBlind * 10 && highestSet < smallBlind * 15))
+    else if ((potOdd >= 85 && potOdd < 95) ||
+             (highestBetAmount >= smallBlind * 10 && highestBetAmount < smallBlind * 15))
     {
         callingRange *= 0.5f;
     }
-    else if ((potOdd >= 95 && potOdd < 99) || (highestSet >= smallBlind * 15 && highestSet < smallBlind * 20))
+    else if ((potOdd >= 95 && potOdd < 99) ||
+             (highestBetAmount >= smallBlind * 15 && highestBetAmount < smallBlind * 20))
     {
         callingRange *= 0.3f;
     }
@@ -364,7 +368,7 @@ float PreflopRangeCalculator::adjustRaiseForRaiser(const CurrentHandContext& ctx
     const int nbPlayers = ctx.commonContext.nbPlayers;
     const int potOdd = ctx.commonContext.potOdd;
     const int myCash = ctx.perPlayerContext.myCash;
-    const int mySet = ctx.perPlayerContext.mySet;
+    const int myTotalBetAmount = ctx.perPlayerContext.myTotalBetAmount;
     const int smallBlind = ctx.commonContext.smallBlind;
     const bool isPreflopBigBet = ctx.commonContext.isPreflopBigBet;
     std::shared_ptr<Player> lastRaiser = ctx.commonContext.preflopLastRaiser;
@@ -388,8 +392,8 @@ float PreflopRangeCalculator::adjustRaiseForRaiser(const CurrentHandContext& ctx
 
     if (isPreflopBigBet)
     {
-        raisingRange =
-            adjustRaiseForBigBet(raisingRange, potOdd, myCash, ctx.commonContext.highestSet, mySet, smallBlind);
+        raisingRange = adjustRaiseForBigBet(raisingRange, potOdd, myCash, ctx.commonContext.highestBetAmount,
+                                            myTotalBetAmount, smallBlind);
     }
 
     return raisingRange;
@@ -512,24 +516,28 @@ float PreflopRangeCalculator::clampRaiseRange(float raisingRange) const
 
     return raisingRange;
 }
-float PreflopRangeCalculator::adjustRaiseForBigBet(float raisingRange, int potOdd, int myCash, int highestSetOrigin,
-                                                   int mySet, int smallBlind) const
+float PreflopRangeCalculator::adjustRaiseForBigBet(float raisingRange, int potOdd, int myCash,
+                                                   int highestBetAmountOrigin, int myTotalBetAmount,
+                                                   int smallBlind) const
 {
-    const int highestSet = std::min(myCash, highestSetOrigin);
+    const int highestBetAmount = std::min(myCash, highestBetAmountOrigin);
 
-    if (potOdd <= 70 && highestSet > smallBlind * 20 && highestSet - mySet > mySet * 6)
+    if (potOdd <= 70 && highestBetAmount > smallBlind * 20 &&
+        highestBetAmount - myTotalBetAmount > myTotalBetAmount * 6)
     {
         raisingRange = 1.5f;
     }
-    else if ((potOdd > 70 && potOdd < 85) || (highestSet > smallBlind * 8 && highestSet < smallBlind * 10))
+    else if ((potOdd > 70 && potOdd < 85) || (highestBetAmount > smallBlind * 8 && highestBetAmount < smallBlind * 10))
     {
         raisingRange *= 0.6f;
     }
-    else if ((potOdd >= 85 && potOdd < 95) || (highestSet >= smallBlind * 10 && highestSet < smallBlind * 15))
+    else if ((potOdd >= 85 && potOdd < 95) ||
+             (highestBetAmount >= smallBlind * 10 && highestBetAmount < smallBlind * 15))
     {
         raisingRange *= 0.4f;
     }
-    else if ((potOdd >= 95 && potOdd < 99) || (highestSet >= smallBlind * 15 && highestSet < smallBlind * 20))
+    else if ((potOdd >= 95 && potOdd < 99) ||
+             (highestBetAmount >= smallBlind * 15 && highestBetAmount < smallBlind * 20))
     {
         raisingRange = std::min(1.0f, raisingRange * 0.3f);
     }

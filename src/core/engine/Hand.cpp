@@ -148,7 +148,7 @@ void Hand::assignButtons()
     // delete all buttons
     for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
-        (*it)->setButton(ButtonNone);
+        (*it)->setButton(Button::Unspecified);
     }
 
     // assign dealer button
@@ -157,7 +157,7 @@ void Hand::assignButtons()
     {
         throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
     }
-    (*it)->setButton(ButtonDealer);
+    (*it)->setButton(Dealer);
 
     // assign Small Blind next to dealer. ATTENTION: in heads up it is big blind
     // assign big blind next to small blind. ATTENTION: in heads up it is small blind
@@ -236,20 +236,20 @@ void Hand::setBlinds()
     {
 
         // small blind
-        if ((*itC)->getButton() == ButtonSmallBlind)
+        if ((*itC)->getButton() == SmallBlind)
         {
 
             // All in ?
             if ((*itC)->getCash() <= mySmallBlind)
             {
 
-                (*itC)->setSet((*itC)->getCash());
+                (*itC)->addBetAmount((*itC)->getCash());
                 // 1 to do not log this
                 (*itC)->setAction(ActionType::Allin, 1);
             }
             else
             {
-                (*itC)->setSet(mySmallBlind);
+                (*itC)->addBetAmount(mySmallBlind);
             }
         }
     }
@@ -259,20 +259,20 @@ void Hand::setBlinds()
     {
 
         // big blind
-        if ((*itC)->getButton() == ButtonBigBlind)
+        if ((*itC)->getButton() == BigBlind)
         {
 
             // all in ?
             if ((*itC)->getCash() <= 2 * mySmallBlind)
             {
 
-                (*itC)->setSet((*itC)->getCash());
+                (*itC)->addBetAmount((*itC)->getCash());
                 // 1 to do not log this
                 (*itC)->setAction(ActionType::Allin, 1);
             }
             else
             {
-                (*itC)->setSet(2 * mySmallBlind);
+                (*itC)->addBetAmount(2 * mySmallBlind);
             }
         }
     }
@@ -292,7 +292,7 @@ void Hand::resolveHandConditions()
     {
         GlobalServices::instance().logger()->verbose("Player " + player->getName() +
                                                      " action: " + playerActionToString(player->getAction()) +
-                                                     ", set: " + std::to_string(player->getSet()));
+                                                     ", set: " + std::to_string(player->getTotalBetAmount()));
     }
 
     updateRunningPlayersList(myRunningPlayersList);
@@ -346,7 +346,7 @@ void Hand::resolveHandConditions()
             GlobalServices::instance().logger()->verbose("All players but one are all-in.");
             for (itC = myRunningPlayersList->begin(); itC != myRunningPlayersList->end(); ++itC)
             {
-                if ((*itC)->getSet() >= myBettingRounds[myCurrentRound]->getHighestSet())
+                if ((*itC)->getTotalBetAmount() >= myBettingRounds[myCurrentRound]->getHighestSet())
                 {
                     myAllInCondition = true;
                     myBoard->setAllInCondition(true);

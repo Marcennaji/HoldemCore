@@ -62,7 +62,7 @@ class Board : public IBoard
 
     int myCards[5];
     int myPot{0};
-    int mySets{0};
+    int myTotalBetAmounts{0};
     unsigned myDealerPlayerId;
     bool myAllInCondition{false};
     unsigned myLastActionPlayerId{0};

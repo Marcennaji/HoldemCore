@@ -156,10 +156,10 @@ int UltraTightBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
             ctx.commonContext.preflopLastRaiser->getStatistics(ctx.commonContext.nbPlayers).preflopStatistics;
 
         if (!isCardsInRange(ctx.perPlayerContext.myCard1, ctx.perPlayerContext.myCard2, stringRaisingRange) &&
-            ctx.perPlayerContext.myM > 20 && ctx.perPlayerContext.myCash > ctx.commonContext.highestSet * 20 &&
+            ctx.perPlayerContext.myM > 20 && ctx.perPlayerContext.myCash > ctx.commonContext.highestBetAmount * 20 &&
             ctx.perPlayerContext.myPosition > MiddlePlusOne && raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE &&
             ctx.perPlayerContext.myPosition > ctx.commonContext.preflopLastRaiser->getPosition() &&
-            ctx.commonContext.preflopLastRaiser->getCash() > ctx.commonContext.highestSet * 10 &&
+            ctx.commonContext.preflopLastRaiser->getCash() > ctx.commonContext.highestBetAmount * 10 &&
             !ctx.commonContext.isPreflopBigBet && ctx.commonContext.preflopCallsNumber < 2)
         {
 
@@ -827,7 +827,7 @@ bool UltraTightBotStrategy::riverShouldCall(const CurrentHandContext& ctx)
     // if hazardous call may cost me my stack, don't call even with good odds
     if (ctx.commonContext.potOdd > 10 && ctx.perPlayerContext.myHandSimulation.winRanged < .5 &&
         ctx.perPlayerContext.myHandSimulation.winSd < 0.8 &&
-        ctx.commonContext.highestSet >= ctx.perPlayerContext.myCash + ctx.perPlayerContext.mySet &&
+        ctx.commonContext.highestBetAmount >= ctx.perPlayerContext.myCash + ctx.perPlayerContext.myTotalBetAmount &&
         ctx.perPlayerContext.myM > 8)
     {
 

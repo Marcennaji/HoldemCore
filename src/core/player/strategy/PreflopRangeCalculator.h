@@ -39,7 +39,7 @@ class PreflopRangeCalculator
     float adjustCallForRaiserStats(float callingRange, const PreflopStatistics& raiserStats, int nbRaises,
                                    int nbPlayers, PlayerPosition myPosition, int nbRunningPlayers) const;
     float adjustCallForNoStats(float callingRange, int nbRaises) const;
-    float adjustCallForBigBet(float callingRange, int potOdd, int myCash, int highestSet, int mySet,
+    float adjustCallForBigBet(float callingRange, int potOdd, int myCash, int highestBetAmount, int myTotalBetAmount,
                               int smallBlind) const;
     bool shouldAdjustCallForLooseRaiser(const CurrentHandContext& ctx, int nbCalls, int nbRaises) const;
     bool shouldCallForGoodOdds(int potOdd, int myM, PlayerPosition myPosition) const;
@@ -53,7 +53,7 @@ class PreflopRangeCalculator
     float adjustRaiseForNoRaiserStats(float raisingRange, int nbRaises) const;
     float adjustRaiseForNoRaiser(const CurrentHandContext& ctx, float raisingRange, bool canBluff) const;
     float adjustRaiseForStack(const CurrentHandContext& ctx, float raisingRange) const;
-    float adjustRaiseForBigBet(float raisingRange, int potOdd, int myCash, int highestSet, int mySet,
+    float adjustRaiseForBigBet(float raisingRange, int potOdd, int myCash, int highestBetAmount, int myTotalBetAmount,
                                int smallBlind) const;
     float clampRaiseRange(float raisingRange) const;
 };

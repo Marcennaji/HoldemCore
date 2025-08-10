@@ -45,10 +45,10 @@ class PlayerFsm
 
     void setCash(int theValue);
     int getCash() const;
-    void setSet(int theValue);
-    void setSetNull();
-    int getSet() const;
-    int getLastRelativeSet() const;
+    void addBetAmount(int theValue);
+    void resetBetAmount();
+    int getTotalBetAmount() const;
+    int getLastBetAmount() const;
 
     void setAction(ActionType theValue, bool blind = 0);
     ActionType getAction() const;
@@ -143,29 +143,29 @@ class PlayerFsm
     int myCashAtHandStart{0};
 
     /**
-     * Purpose: Represents the total amount of chips the player has committed to the pot during the game.
+     * Purpose: Represents the total amount of chips the player has committed to the pot during the hand.
      * Usage:
      * Tracks the cumulative amount the player has bet across all rounds.
      * Used in pot distribution calculations to determine the player's share of the pot.
      * Example:
-     * If a player bets 200 in the preflop and 300 on the flop, mySet would be 500.
+     * If a player bets 200 in the preflop and 300 on the flop, myTotalBetAmount would be 500.
      */
-    int mySet{0};
+    int myTotalBetAmount{0};
 
     /**
      * Purpose: Represents the amount of chips the player has committed to the pot during the most recent betting
      * action. Usage: Tracks the player's contribution during the current betting action (e.g., a call, raise, or
      * all-in). Helps calculate the player's odds and contributions for the current pot level. Example: If a player
-     * raises by 300 chips, myLastRelativeSet would be set to 300
+     * raises by 300 chips, myLastBetAmount would be set to 300
      */
-    int myLastRelativeSet{0};
+    int myLastBetAmount{0};
 
     ActionType myAction{ActionType::None};
-    Button myButton;
+    Button myButton{Button::Unspecified};
     bool myTurn{false};
     bool myCardsFlip{false}; // 0 = cards are not fliped, 1 = cards are already flipped,
     int lastMoneyWon{0};
-    int myPreflopPotOdd;
+    int myPreflopPotOdd{0};
     std::unique_ptr<RangeEstimator> myRangeEstimator;
     bool myIsActive{false};
 

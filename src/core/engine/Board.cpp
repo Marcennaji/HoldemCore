@@ -46,20 +46,20 @@ void Board::setRunningPlayersList(PlayerList runningPlayers)
 void Board::collectSets()
 {
 
-    mySets = 0;
+    myTotalBetAmounts = 0;
 
     PlayerListConstIterator itC;
     for (itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
     {
-        mySets += (*itC)->getSet();
+        myTotalBetAmounts += (*itC)->getTotalBetAmount();
     }
 }
 
 void Board::collectPot()
 {
 
-    myPot += mySets;
-    mySets = 0;
+    myPot += myTotalBetAmounts;
+    myTotalBetAmounts = 0;
 
     PlayerListIterator it;
     for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
@@ -250,11 +250,11 @@ void Board::setPot(int theValue)
 }
 int Board::getSets() const
 {
-    return mySets;
+    return myTotalBetAmounts;
 }
 void Board::setSets(int theValue)
 {
-    mySets = theValue;
+    myTotalBetAmounts = theValue;
 }
 
 std::list<unsigned> Board::getWinners() const

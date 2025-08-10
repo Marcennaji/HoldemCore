@@ -11,10 +11,11 @@
 
 namespace pkt::core::player
 {
+
+// data that depends on the player that is using the strategy
 struct PerPlayerHandContext
 {
     void reset();
-    // data that depends on the player that is using the strategy
     int nbChecks = 0; // number of checks in the current betting round
     int nbRaises = 0; // number of raises in the current betting round
     int nbBets = 0;   // number of bets in the current betting round
@@ -23,7 +24,7 @@ struct PerPlayerHandContext
 
     float myPreflopCallingRange = -1;
     int myCash = 0;
-    int mySet = 0;
+    int myTotalBetAmount = 0;
     int myM = 0;
     int myID = 0;
     std::string myCard1 = "";
@@ -38,7 +39,7 @@ struct PerPlayerHandContext
     bool myTurnIsAggressor = false;
     bool myRiverIsAggressor = false;
     bool myIsInVeryLooseMode = false; // true if the player is in very loose mode (e.g. playing a lot of hands)
-    PostFlopAnalysisFlags myPostFlopAnalysisFlags{};
+    PostFlopAnalysisFlags myPostFlopAnalysisFlags{}; // what are the possibilities, given the board and the hole cards
 
     HandSimulationStats myHandSimulation = {
         0.0f, // win
@@ -54,10 +55,11 @@ struct PerPlayerHandContext
     };
 };
 
+// data that is common to all players
 struct CommonHandContext
 {
     void reset();
-    // data that is common to all players
+
     GameState gameState = None; // current game state, e.g. PREFLOP, FLOP, TURN, RIVER, SHOWDOWN
     int preflopRaisesNumber = 0;
     int preflopCallsNumber = 0;
@@ -81,7 +83,7 @@ struct CommonHandContext
     int pot = 0;
     int potOdd = 0;
     int sets = 0;
-    int highestSet = 0;
+    int highestBetAmount = 0;
     bool isPreflopBigBet = false;
     int smallBlind = 0;
     std::string stringBoard; // string representation of the board's cards

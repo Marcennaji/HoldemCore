@@ -29,7 +29,7 @@ BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int
     // determine bigBlindPosition
     for (itC = myHand->getSeatsList()->begin(); itC != myHand->getSeatsList()->end(); ++itC)
     {
-        if ((*itC)->getButton() == ButtonBigBlind)
+        if ((*itC)->getButton() == BigBlind)
         {
             myBigBlindPlayerId = (*itC)->getId();
             break;
@@ -43,7 +43,7 @@ BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int
     // determine smallBlindPosition
     for (itC = myHand->getSeatsList()->begin(); itC != myHand->getSeatsList()->end(); ++itC)
     {
-        if ((*itC)->getButton() == ButtonSmallBlind)
+        if ((*itC)->getButton() == SmallBlind)
         {
             mySmallBlindPlayerId = (*itC)->getId();
             break;
@@ -175,7 +175,7 @@ bool BettingRound::allBetsAreDone() const
 
     for (itC = myHand->getRunningPlayersList()->begin(); itC != myHand->getRunningPlayersList()->end(); ++itC)
     {
-        if (myHighestSet != (*itC)->getSet())
+        if (myHighestSet != (*itC)->getTotalBetAmount())
         {
             return false;
         }
@@ -487,7 +487,7 @@ bool BettingRound::checkAllHighestSet()
     for (PlayerListConstIterator itC = getHand()->getRunningPlayersList()->begin();
          itC != getHand()->getRunningPlayersList()->end(); ++itC)
     {
-        if (getHighestSet() != (*itC)->getSet())
+        if (getHighestSet() != (*itC)->getTotalBetAmount())
         {
             allHighestSet = false;
             break;

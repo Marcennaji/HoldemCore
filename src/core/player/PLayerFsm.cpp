@@ -65,25 +65,25 @@ int PlayerFsm::getCash() const
     return myCash;
 }
 
-void PlayerFsm::setSet(int theValue)
+void PlayerFsm::addBetAmount(int theValue)
 {
-    myLastRelativeSet = theValue;
-    mySet += theValue;
+    myLastBetAmount = theValue;
+    myTotalBetAmount += theValue;
     myCash -= theValue;
 }
 
-void PlayerFsm::setSetNull()
+void PlayerFsm::resetBetAmount()
 {
-    mySet = 0;
-    myLastRelativeSet = 0;
+    myTotalBetAmount = 0;
+    myLastBetAmount = 0;
 }
-int PlayerFsm::getSet() const
+int PlayerFsm::getTotalBetAmount() const
 {
-    return mySet;
+    return myTotalBetAmount;
 }
-int PlayerFsm::getLastRelativeSet() const
+int PlayerFsm::getLastBetAmount() const
 {
-    return myLastRelativeSet;
+    return myLastBetAmount;
 }
 
 void PlayerFsm::setAction(ActionType theValue, bool blind)
@@ -667,9 +667,10 @@ bool PlayerFsm::isPreflopBigBet() const
         return true;
     }
 
-    const int highestSet = min(myCash, currentHand.getCurrentBettingRound()->getHighestSet());
+    const int highestBetAmount = min(myCash, currentHand.getCurrentBettingRound()->getHighestSet());
 
-    if (highestSet > currentHand.getSmallBlind() * 8 && highestSet - mySet > mySet * 6)
+    if (highestBetAmount > currentHand.getSmallBlind() * 8 &&
+        highestBetAmount - myTotalBetAmount > myTotalBetAmount * 6)
     {
         return true;
     }
@@ -820,7 +821,7 @@ void PlayerFsm::updateCurrentHandContext(const GameState state, HandFsm& current
 
     // Player-specific, visible from the opponents :
     myCurrentHandContext->perPlayerContext.myCash = myCash;
-    myCurrentHandContext->perPlayerContext.mySet = mySet;
+    myCurrentHandContext->perPlayerContext.myTotalBetAmount = myTotalBetAmount;
     myCurrentHandContext->perPlayerContext.myM = static_cast<int>(getM());
     myCurrentHandContext->perPlayerContext.myCurrentHandActions = myCurrentHandActions;
     myCurrentHandContext->perPlayerContext.myHavePosition =

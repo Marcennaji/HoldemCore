@@ -283,22 +283,22 @@ void BotPlayer::doRiverAction()
 void BotPlayer::evaluateBetAmount()
 {
 
-    int highestSet = currentHand->getCurrentBettingRound()->getHighestSet();
+    int highestBetAmount = currentHand->getCurrentBettingRound()->getHighestSet();
 
     if (myAction == ActionType::Call)
     {
 
         // all in
-        if (highestSet >= myCash + mySet)
+        if (highestBetAmount >= myCash + myTotalBetAmount)
         {
-            mySet += myCash;
+            myTotalBetAmount += myCash;
             myCash = 0;
             myAction = ActionType::Allin;
         }
         else
         {
-            myCash = myCash - highestSet + mySet;
-            mySet = highestSet;
+            myCash = myCash - highestBetAmount + myTotalBetAmount;
+            myTotalBetAmount = highestBetAmount;
         }
     }
 
@@ -319,17 +319,17 @@ void BotPlayer::evaluateBetAmount()
                 currentHand->getCurrentBettingRound()->setFullBetRule(true);
             }
             currentHand->getCurrentBettingRound()->setMinimumRaise(myCash);
-            mySet = myCash;
+            myTotalBetAmount = myCash;
             myCash = 0;
             myAction = ActionType::Allin;
-            highestSet = mySet;
+            highestBetAmount = myTotalBetAmount;
         }
         else
         {
             currentHand->getCurrentBettingRound()->setMinimumRaise(myBetAmount);
             myCash = myCash - myBetAmount;
-            mySet = myBetAmount;
-            highestSet = mySet;
+            myTotalBetAmount = myBetAmount;
+            highestBetAmount = myTotalBetAmount;
         }
         currentHand->setLastActionPlayerId(myID);
     }
@@ -346,16 +346,16 @@ void BotPlayer::evaluateBetAmount()
         if (currentHand->getCurrentBettingRound()->getFullBetRule())
         { // full bet rule -> only call possible
             // all in
-            if (highestSet >= myCash + mySet)
+            if (highestBetAmount >= myCash + myTotalBetAmount)
             {
-                mySet += myCash;
+                myTotalBetAmount += myCash;
                 myCash = 0;
                 myAction = ActionType::Allin;
             }
             else
             {
-                myCash = myCash - highestSet + mySet;
-                mySet = highestSet;
+                myCash = myCash - highestBetAmount + myTotalBetAmount;
+                myTotalBetAmount = highestBetAmount;
                 myAction = ActionType::Call;
             }
         }
@@ -366,15 +366,16 @@ void BotPlayer::evaluateBetAmount()
                 myRaiseAmount = currentHand->getCurrentBettingRound()->getMinimumRaise();
             }
             // all in
-            if (highestSet + myRaiseAmount >= myCash + mySet)
+            if (highestBetAmount + myRaiseAmount >= myCash + myTotalBetAmount)
             {
-                if (highestSet + currentHand->getCurrentBettingRound()->getMinimumRaise() > myCash + mySet)
+                if (highestBetAmount + currentHand->getCurrentBettingRound()->getMinimumRaise() >
+                    myCash + myTotalBetAmount)
                 {
                     // perhaps full bet rule
-                    if (highestSet >= myCash + mySet)
+                    if (highestBetAmount >= myCash + myTotalBetAmount)
                     {
                         // only call all-in
-                        mySet += myCash;
+                        myTotalBetAmount += myCash;
                         myCash = 0;
                         myAction = ActionType::Allin;
                     }
@@ -384,36 +385,36 @@ void BotPlayer::evaluateBetAmount()
                         currentHand->getCurrentBettingRound()->setFullBetRule(true);
                         currentHand->setLastActionPlayerId(myID);
 
-                        mySet += myCash;
-                        currentHand->getCurrentBettingRound()->setMinimumRaise(mySet - highestSet);
+                        myTotalBetAmount += myCash;
+                        currentHand->getCurrentBettingRound()->setMinimumRaise(myTotalBetAmount - highestBetAmount);
                         myCash = 0;
                         myAction = ActionType::Allin;
-                        highestSet = mySet;
+                        highestBetAmount = myTotalBetAmount;
                     }
                 }
                 else
                 {
                     currentHand->setLastActionPlayerId(myID);
 
-                    mySet += myCash;
-                    currentHand->getCurrentBettingRound()->setMinimumRaise(mySet - highestSet);
+                    myTotalBetAmount += myCash;
+                    currentHand->getCurrentBettingRound()->setMinimumRaise(myTotalBetAmount - highestBetAmount);
                     myCash = 0;
                     myAction = ActionType::Allin;
-                    highestSet = mySet;
+                    highestBetAmount = myTotalBetAmount;
                 }
             }
             else
             {
                 currentHand->getCurrentBettingRound()->setMinimumRaise(myRaiseAmount);
-                myCash = myCash + mySet - highestSet - myRaiseAmount;
-                mySet = highestSet + myRaiseAmount;
-                highestSet = mySet;
+                myCash = myCash + myTotalBetAmount - highestBetAmount - myRaiseAmount;
+                myTotalBetAmount = highestBetAmount + myRaiseAmount;
+                highestBetAmount = myTotalBetAmount;
                 currentHand->setLastActionPlayerId(myID);
             }
         }
     }
 
-    currentHand->getCurrentBettingRound()->setHighestSet(highestSet);
+    currentHand->getCurrentBettingRound()->setHighestSet(highestBetAmount);
 }
 
 float BotPlayer::calculatePreflopCallingRange(const CurrentHandContext& ctx) const

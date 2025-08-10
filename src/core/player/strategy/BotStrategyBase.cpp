@@ -247,14 +247,14 @@ bool BotStrategyBase::shouldPotControlForFullHousePossibility(const CurrentHandC
 bool BotStrategyBase::shouldPotControlOnFlop(const CurrentHandContext& ctx, int bigBlind) const
 {
     const auto& flags = ctx.perPlayerContext.myPostFlopAnalysisFlags;
-    return (flags.isOverPair || flags.isTopPair) && ctx.perPlayerContext.mySet > bigBlind * 20;
+    return (flags.isOverPair || flags.isTopPair) && ctx.perPlayerContext.myTotalBetAmount > bigBlind * 20;
 }
 
 bool BotStrategyBase::shouldPotControlOnTurn(const CurrentHandContext& ctx, int bigBlind) const
 {
     const auto& flags = ctx.perPlayerContext.myPostFlopAnalysisFlags;
     return flags.isOverPair || (flags.isTwoPair && !flags.isFullHousePossible) ||
-           (flags.isTrips && ctx.perPlayerContext.mySet > bigBlind * 60);
+           (flags.isTrips && ctx.perPlayerContext.myTotalBetAmount > bigBlind * 60);
 }
 
 void BotStrategyBase::logPotControl() const

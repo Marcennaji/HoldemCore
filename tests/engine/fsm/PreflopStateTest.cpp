@@ -49,9 +49,9 @@ TEST_F(PreflopStateTest, StartHandHeadsUpInitializePlayersCorrectly)
     myHandFsm->start();
 
     auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    EXPECT_EQ(playerSb->getButton(), ButtonSmallBlind);
+    EXPECT_EQ(playerSb->getButton(), SmallBlind);
     auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    EXPECT_EQ(playerBb->getButton(), ButtonBigBlind);
+    EXPECT_EQ(playerBb->getButton(), BigBlind);
 
     EXPECT_EQ(playerSb->getCash(), playerBb->getCash() + gameData.firstSmallBlind);
 }
@@ -61,11 +61,11 @@ TEST_F(PreflopStateTest, StartHand3BotsInitializePlayersCorrectly)
     myHandFsm->start();
 
     auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    EXPECT_EQ(playerDealer->getButton(), ButtonDealer);
+    EXPECT_EQ(playerDealer->getButton(), Dealer);
     auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    EXPECT_EQ(playerSb->getButton(), ButtonSmallBlind);
+    EXPECT_EQ(playerSb->getButton(), SmallBlind);
     auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
-    EXPECT_EQ(playerBb->getButton(), ButtonBigBlind);
+    EXPECT_EQ(playerBb->getButton(), BigBlind);
 
     EXPECT_EQ(playerDealer->getCash(), playerBb->getCash() + gameData.firstSmallBlind * 2);
     EXPECT_EQ(playerSb->getCash(), playerBb->getCash() + gameData.firstSmallBlind);
@@ -76,17 +76,17 @@ TEST_F(PreflopStateTest, StartHand6BotsInitializePlayersCorrectly)
     myHandFsm->start();
 
     auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    EXPECT_EQ(playerDealer->getButton(), ButtonDealer);
+    EXPECT_EQ(playerDealer->getButton(), Dealer);
     auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    EXPECT_EQ(playerSb->getButton(), ButtonSmallBlind);
+    EXPECT_EQ(playerSb->getButton(), SmallBlind);
     auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
-    EXPECT_EQ(playerBb->getButton(), ButtonBigBlind);
+    EXPECT_EQ(playerBb->getButton(), BigBlind);
     auto playerUtg = getPlayerFsmById(myRunningPlayersListFsm, 3);
-    EXPECT_EQ(playerUtg->getButton(), ButtonNone);
+    EXPECT_EQ(playerUtg->getButton(), Unspecified);
     auto playerUtgPlusOne = getPlayerFsmById(myRunningPlayersListFsm, 4);
-    EXPECT_EQ(playerUtg->getButton(), ButtonNone);
+    EXPECT_EQ(playerUtgPlusOne->getButton(), Unspecified);
     auto playerUtgPlusTwo = getPlayerFsmById(myRunningPlayersListFsm, 5);
-    EXPECT_EQ(playerUtgPlusTwo->getButton(), ButtonNone);
+    EXPECT_EQ(playerUtgPlusTwo->getButton(), Unspecified);
 
     EXPECT_EQ(playerDealer->getCash(), playerBb->getCash() + gameData.firstSmallBlind * 2);
     EXPECT_EQ(playerSb->getCash(), playerBb->getCash() + gameData.firstSmallBlind);
@@ -107,11 +107,11 @@ TEST_F(PreflopStateTest, OnlyCallsPreflopShouldGoToFlop)
     myHandFsm->start();
 
     auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    EXPECT_EQ(playerDealer->getButton(), ButtonDealer);
+    EXPECT_EQ(playerDealer->getButton(), Dealer);
     auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    EXPECT_EQ(playerSb->getButton(), ButtonSmallBlind);
+    EXPECT_EQ(playerSb->getButton(), SmallBlind);
     auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
-    EXPECT_EQ(playerBb->getButton(), ButtonBigBlind);
+    EXPECT_EQ(playerBb->getButton(), BigBlind);
 
     myHandFsm->handlePlayerAction({0, ActionType::Call, 20});
     myHandFsm->handlePlayerAction({1, ActionType::Call, 10});

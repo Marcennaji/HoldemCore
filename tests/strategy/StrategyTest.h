@@ -15,9 +15,9 @@ class StrategyTest : public ::testing::Test
         ctx.commonContext.nbPlayers = 6;
         ctx.commonContext.nbRunningPlayers = 6;
         ctx.commonContext.pot = 100;
-        ctx.commonContext.highestSet = 20;
+        ctx.commonContext.highestBetAmount = 20;
         ctx.perPlayerContext.myCash = 1000;
-        ctx.perPlayerContext.mySet = 0;
+        ctx.perPlayerContext.myTotalBetAmount = 0;
         ctx.perPlayerContext.myID = 1;
         ctx.commonContext.smallBlind = 10;
     }
