@@ -838,11 +838,8 @@ void PlayerFsm::updateCurrentHandContext(const GameState state, HandFsm& current
 
 float PlayerFsm::calculatePreflopCallingRange(const CurrentHandContext& ctx) const
 {
-#if (False)
-    return myRangeEstimator->getStandardCallingRange(mySeatsList->size());
-#else
+    // return myRangeEstimator->getStandardCallingRange(mySeatsList->size());
     return 50;
-#endif
 }
 
 void PlayerFsm::resetForNewHand()

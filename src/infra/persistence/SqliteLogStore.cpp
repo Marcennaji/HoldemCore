@@ -143,10 +143,10 @@ void SqliteLogStore::createDatabase()
     {
         initializeStrategyStatistics(HumanPlayer::getName(), j);
         // initialize players statistics for all bot strategies
-        initializeStrategyStatistics(tightAggressiveStrategy.getStrategyName(), j);
-        initializeStrategyStatistics(looseAggressiveStrategy.getStrategyName(), j);
-        initializeStrategyStatistics(maniacStrategy.getStrategyName(), j);
-        initializeStrategyStatistics(ultraTightStrategy.getStrategyName(), j);
+        initializeStrategyStatistics("tightAggressive", j);
+        initializeStrategyStatistics("looseAggressive", j);
+        initializeStrategyStatistics("maniac", j);
+        initializeStrategyStatistics("ultraTight", j);
     }
 }
 
@@ -182,10 +182,10 @@ void SqliteLogStore::updateRankingGameLosers(PlayerList seatsList)
     {
         if ((*itC)->getCash() == 0)
         {
-            mySql += "INSERT OR IGNORE INTO Ranking VALUES ('" + (*itC)->getStrategyName() + "', 0, 0, 0);";
-            const int lostStack = getIntegerValue((*itC)->getStrategyName(), "Ranking", "lost_stack") + 1;
+            mySql += "INSERT OR IGNORE INTO Ranking VALUES ('" + (*itC)->getName() + "', 0, 0, 0);";
+            const int lostStack = getIntegerValue((*itC)->getName(), "Ranking", "lost_stack") + 1;
             mySql += "UPDATE Ranking SET lost_stack = " + std::to_string(lostStack);
-            mySql += " WHERE strategy_name = '" + (*itC)->getStrategyName() + "';";
+            mySql += " WHERE strategy_name = '" + (*itC)->getName() + "';";
         }
     }
 
@@ -210,10 +210,10 @@ void SqliteLogStore::updateRankingGameWinner(PlayerList seatsList)
         {
             if ((*itC)->getCash() > 0)
             {
-                mySql += "INSERT OR IGNORE INTO Ranking VALUES ('" + (*itC)->getStrategyName() + "', 0, 0, 0);";
-                const int wonGame = getIntegerValue((*itC)->getStrategyName(), "Ranking", "won_game") + 1;
+                mySql += "INSERT OR IGNORE INTO Ranking VALUES ('" + (*itC)->getName() + "', 0, 0, 0);";
+                const int wonGame = getIntegerValue((*itC)->getName(), "Ranking", "won_game") + 1;
                 mySql += "UPDATE Ranking SET won_game = " + std::to_string(wonGame);
-                mySql += " WHERE strategy_name = '" + (*itC)->getStrategyName() + "';";
+                mySql += " WHERE strategy_name = '" + (*itC)->getName() + "';";
             }
         }
     }
@@ -228,10 +228,10 @@ void SqliteLogStore::updateRankingPlayedGames(PlayerList seatsList)
     PlayerListConstIterator itC;
     for (itC = seatsList->begin(); itC != seatsList->end(); ++itC)
     {
-        mySql += "INSERT OR IGNORE INTO Ranking VALUES ('" + (*itC)->getStrategyName() + "', 0, 0, 0);";
-        const int playedGames = getIntegerValue((*itC)->getStrategyName(), "Ranking", "played_games") + 1;
+        mySql += "INSERT OR IGNORE INTO Ranking VALUES ('" + (*itC)->getName() + "', 0, 0, 0);";
+        const int playedGames = getIntegerValue((*itC)->getName(), "Ranking", "played_games") + 1;
         mySql += "UPDATE Ranking SET played_games = " + std::to_string(playedGames);
-        mySql += " WHERE strategy_name = '" + (*itC)->getStrategyName() + "';";
+        mySql += " WHERE strategy_name = '" + (*itC)->getName() + "';";
     }
 
     execTransaction();
@@ -455,8 +455,7 @@ void SqliteLogStore::updatePlayersStatistics(PlayerList seatsList)
         mySql += ",r_fourBets = " + std::to_string((*itC)->getStatistics(i).riverStatistics.fourBets);
         mySql += ",r_folds = " + std::to_string((*itC)->getStatistics(i).riverStatistics.folds);
 
-        mySql +=
-            " WHERE strategy_name = '" + (*itC)->getStrategyName() + "' AND nb_players = " + std::to_string(i) + ";";
+        mySql += " WHERE strategy_name = '" + (*itC)->getName() + "' AND nb_players = " + std::to_string(i) + ";";
 
         execTransaction();
     }

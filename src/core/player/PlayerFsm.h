@@ -8,6 +8,7 @@
 #include <core/engine/HandEvaluator.h>
 #include <core/player/PlayerStatistics.h>
 #include "core/engine/model/ButtonState.h"
+#include "core/player/strategy/PlayerStrategy.h"
 
 #include "CurrentHandActions.h"
 #include "range/RangeEstimator.h"
@@ -43,6 +44,14 @@ class PlayerFsm
     int getId() const;
     std::string getName() const;
 
+    void setStrategy(std::unique_ptr<PlayerStrategy> strategy) { myStrategy = std::move(strategy); }
+
+    PlayerAction decideAction(const CurrentHandContext& ctx)
+    {
+        assert(myStrategy && "PlayerStrategy must be set before deciding action");
+        return myStrategy->decideAction(ctx);
+    }
+
     void setCash(int theValue);
     int getCash() const;
     void addBetAmount(int theValue);
@@ -52,9 +61,6 @@ class PlayerFsm
 
     void setAction(ActionType theValue, bool blind = 0);
     ActionType getAction() const;
-
-    virtual std::string getStrategyName() const = 0;
-    virtual bool isBot() const = 0;
 
     void setButton(Button theValue);
     Button getButton() const;
@@ -162,10 +168,11 @@ class PlayerFsm
     int lastMoneyWon{0};
     int myPreflopPotOdd{0};
     std::unique_ptr<RangeEstimator> myRangeEstimator;
-    bool myIsActive{false};
+    bool myIsActive{false}; // an active player is a player who hasn't fold and isn't allin
 
   private:
     std::map<int, float> evaluateOpponentsStrengths() const;
     const HandSimulationStats computeHandSimulation() const;
+    std::unique_ptr<PlayerStrategy> myStrategy;
 };
 } // namespace pkt::core::player

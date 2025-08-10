@@ -7,18 +7,19 @@
 
 #include <core/player/Player.h>
 #include <core/player/strategy/PreflopRangeCalculator.h>
+#include "PlayerStrategy.h"
 
 namespace pkt::core::player
 {
 // Forward declaration
 struct CurrentHandContext;
 
-class BotStrategy
+class BotStrategy : public PlayerStrategy
 {
   public:
     virtual ~BotStrategy() = default;
 
-    PlayerAction decideAction(const CurrentHandContext& ctx)
+    PlayerAction decideAction(const CurrentHandContext& ctx) override
     {
         switch (ctx.commonContext.gameState)
         {
@@ -35,17 +36,13 @@ class BotStrategy
         }
     }
 
-    const std::string& getStrategyName() const { return myStrategyName; }
     const std::unique_ptr<PreflopRangeCalculator>& getPreflopRangeCalculator() const
     {
         return myPreflopRangeCalculator;
     }
 
   protected:
-    BotStrategy(const std::string& name)
-        : myStrategyName(name), myPreflopRangeCalculator(std::make_unique<PreflopRangeCalculator>())
-    {
-    }
+    BotStrategy() : myPreflopRangeCalculator(std::make_unique<PreflopRangeCalculator>()) {}
 
     void initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange)
     {
@@ -58,7 +55,6 @@ class BotStrategy
     virtual PlayerAction decideTurn(const CurrentHandContext&) = 0;
     virtual PlayerAction decideRiver(const CurrentHandContext&) = 0;
 
-    const std::string myStrategyName;
     std::unique_ptr<PreflopRangeCalculator> myPreflopRangeCalculator;
 };
 

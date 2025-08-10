@@ -23,7 +23,7 @@ namespace pkt::core::player
 
 using namespace std;
 
-LooseAggressiveBotStrategy::LooseAggressiveBotStrategy() : BotStrategy("LooseAggressive")
+LooseAggressiveBotStrategy::LooseAggressiveBotStrategy()
 {
 
     // initialize utg starting range, in a full table

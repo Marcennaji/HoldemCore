@@ -23,7 +23,7 @@ namespace pkt::core::player
 
 using namespace std;
 
-ManiacBotStrategy::ManiacBotStrategy() : BotStrategy("Maniac")
+ManiacBotStrategy::ManiacBotStrategy()
 {
     // initialize utg starting range, in a full table
     int utgFullTableRange = 0;

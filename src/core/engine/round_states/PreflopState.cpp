@@ -5,9 +5,9 @@
 #include "HandFsm.h"
 #include "core/engine/Exception.h"
 #include "core/engine/model/PlayerAction.h"
-#include "core/player/BotPlayerFsm.h"
 #include "core/player/Helpers.h"
 #include "core/player/Player.h"
+#include "core/player/PlayerFsm.h"
 
 namespace pkt::core
 {
@@ -73,11 +73,7 @@ bool PreflopState::isActionAllowed(const HandFsm& hand, const PlayerAction actio
 
 void PreflopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
 {
-    if (!player.isBot())
-        return;
-
-    auto& bot = static_cast<BotPlayerFsm&>(player);
-    const PlayerAction action = bot.decidePreflopAction();
+    const PlayerAction action = player.decideAction(player.getCurrentHandContext());
     hand.handlePlayerAction(action);
 }
 

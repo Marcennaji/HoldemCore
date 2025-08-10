@@ -15,8 +15,6 @@ class HumanPlayer : public Player
 
     ~HumanPlayer();
 
-    virtual std::string getStrategyName() const override { return "HumanPlayer"; }
-
     static std::string getName() { return "You"; }
 
     bool isBot() const override { return false; }
