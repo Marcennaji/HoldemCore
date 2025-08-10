@@ -154,8 +154,6 @@ void BettingRoundPreflop::proceedToFlop()
 
 void BettingRoundPreflop::handlePlayerTurnEvents(PlayerListIterator it)
 {
-    it->get()->setTurn(true);
-
     if (myEvents.onPlayerStatusChanged)
         myEvents.onPlayerStatusChanged(getCurrentPlayerTurnId(), true);
 

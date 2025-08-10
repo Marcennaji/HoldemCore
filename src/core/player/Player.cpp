@@ -299,15 +299,6 @@ void Player::getCards(int* theValue) const
     }
 }
 
-void Player::setTurn(bool theValue)
-{
-    myTurn = theValue;
-}
-bool Player::getTurn() const
-{
-    return myTurn;
-}
-
 void Player::setCardsFlip(bool theValue)
 {
     myCardsFlip = theValue;

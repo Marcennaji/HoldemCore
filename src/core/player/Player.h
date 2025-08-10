@@ -67,9 +67,6 @@ class Player
     void setCards(int* theValue);
     void getCards(int* theValue) const;
 
-    void setTurn(bool theValue);
-    bool getTurn() const;
-
     void setCardsFlip(bool theValue);
     bool getCardsFlip() const;
 
@@ -173,8 +170,8 @@ class Player
     int myLastRelativeSet{0};
 
     ActionType myAction{ActionType::None};
-    int myButton;        // 0 = none, 1 = dealer, 2 =small, 3 = big
-    bool myTurn{0};      // 0 = no, 1 = yes
+    int myButton; // 0 = none, 1 = dealer, 2 =small, 3 = big
+
     bool myCardsFlip{0}; // 0 = cards are not fliped, 1 = cards are already flipped,
     int lastMoneyWon{0};
     int myPreflopPotOdd;

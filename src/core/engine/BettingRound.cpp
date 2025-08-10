@@ -143,7 +143,6 @@ void BettingRound::run()
             throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
         }
 
-        (*currentPlayersTurnIt)->setTurn(true);
         GlobalServices::instance().logger()->verbose(
             "BettingRound::run() : Next running player is: " + (*currentPlayersTurnIt)->getName() +
             " with ID: " + std::to_string((*currentPlayersTurnIt)->getId()));

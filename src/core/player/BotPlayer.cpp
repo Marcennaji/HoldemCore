@@ -57,8 +57,6 @@ void BotPlayer::action()
         myEvents.onPotUpdated(currentHand->getBoard()->getPot());
     }
 
-    myTurn = 0;
-
     std::ostringstream logMessage;
 
     if (myAction == ActionType::Fold)

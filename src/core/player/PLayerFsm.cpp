@@ -125,15 +125,6 @@ void PlayerFsm::getCards(int* theValue) const
     }
 }
 
-void PlayerFsm::setTurn(bool theValue)
-{
-    myTurn = theValue;
-}
-bool PlayerFsm::getTurn() const
-{
-    return myTurn;
-}
-
 void PlayerFsm::setCardsFlip(bool theValue)
 {
     myCardsFlip = theValue;

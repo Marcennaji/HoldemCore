@@ -62,9 +62,6 @@ class PlayerFsm
     void setCards(int* theValue);
     void getCards(int* theValue) const;
 
-    void setTurn(bool theValue);
-    bool getTurn() const;
-
     void setCardsFlip(bool theValue);
     bool getCardsFlip() const;
 
@@ -84,7 +81,6 @@ class PlayerFsm
 
     const PlayerPosition getPosition() const;
     void setPosition();
-    std::string getPositionLabel(PlayerPosition p) const;
 
     static bool getHavePosition(PlayerPosition myPos, PlayerFsmList runningPlayers);
 
@@ -162,7 +158,6 @@ class PlayerFsm
 
     ActionType myAction{ActionType::None};
     Button myButton{Button::Unspecified};
-    bool myTurn{false};
     bool myCardsFlip{false}; // 0 = cards are not fliped, 1 = cards are already flipped,
     int lastMoneyWon{0};
     int myPreflopPotOdd{0};
