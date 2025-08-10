@@ -26,6 +26,7 @@ void CommonHandContext::reset()
     turnLastRaiser = nullptr;
     lastVPIPPlayer = nullptr;
     callersPositions.clear();
+    raisersPositions.clear();
     pot = 0;
     potOdd = 0;
     sets = 0;

@@ -73,7 +73,9 @@ bool PreflopState::isActionAllowed(const HandFsm& hand, const PlayerAction actio
 
 void PreflopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
 {
+    player.updateCurrentHandContext(Preflop, hand);
     const PlayerAction action = player.decideAction(player.getCurrentHandContext());
+
     hand.handlePlayerAction(action);
 }
 

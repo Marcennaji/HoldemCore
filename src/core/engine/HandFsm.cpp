@@ -203,6 +203,7 @@ CommonHandContext HandFsm::updateCurrentHandContext(const GameState state)
     handContext.nbRunningPlayers = getRunningPlayersList()->size();
     handContext.lastVPIPPlayerFsm = getPlayerFsmById(getSeatsList(), getBettingState()->getLastRaiserId());
     handContext.callersPositions = myBettingState->getCallersPositions();
+    handContext.raisersPositions = myBettingState->getRaisersPositions();
     handContext.pot = myBoard->getPot();
     // handContext.potOdd = getPotOdd();
     handContext.sets = myBoard->getSets();

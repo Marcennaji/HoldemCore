@@ -32,8 +32,6 @@ class HandFsm;
 namespace pkt::core::player
 {
 
-class BotStrategy;
-
 class PlayerFsm
 {
   public:
@@ -102,11 +100,10 @@ class PlayerFsm
     const PostFlopAnalysisFlags getPostFlopAnalysisFlags() const;
     CurrentHandActions& getCurrentHandActions();
 
-    /*void updatePreflopStatistics(const int nbPlayers);
+    void updatePreflopStatistics(const int nbPlayers);
     void updateFlopStatistics(const int nbPlayers);
     void updateTurnStatistics(const int nbPlayers);
     void updateRiverStatistics(const int nbPlayers);
-    */
 
     void setPreflopPotOdd(const int potOdd);
 

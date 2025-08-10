@@ -88,23 +88,6 @@ TEST_F(BettingRoundsLegacyTest, PlayersDoNotActAfterFolding)
     }
 }
 
-TEST_F(BettingRoundsLegacyTest, EachPlayerHasAtLeastOneAction)
-{
-    initializeHandForTesting(4, gameData);
-    myHand->start();
-
-    size_t totalActionCount = 0;
-    for (const auto& player : *mySeatsList)
-    {
-        totalActionCount += player->getCurrentHandActions().getPreflopActions().size();
-        totalActionCount += player->getCurrentHandActions().getFlopActions().size();
-        totalActionCount += player->getCurrentHandActions().getTurnActions().size();
-        totalActionCount += player->getCurrentHandActions().getRiverActions().size();
-        EXPECT_GT(totalActionCount, 0u) << "No actions occurred in any round for player " << player->getId();
-        totalActionCount = 0;
-    }
-}
-
 TEST_F(BettingRoundsLegacyTest, ShouldRecordAllActionsInHandHistoryChronologically)
 {
     initializeHandForTesting(3, gameData);

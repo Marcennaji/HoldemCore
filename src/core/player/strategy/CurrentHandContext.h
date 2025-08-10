@@ -80,6 +80,7 @@ struct CommonHandContext
     std::shared_ptr<PlayerFsm> lastVPIPPlayerFsm = nullptr; // last player who voluntarily put money in the pot
 
     std::vector<pkt::core::PlayerPosition> callersPositions;
+    std::vector<pkt::core::PlayerPosition> raisersPositions;
     int pot = 0;
     int potOdd = 0;
     int sets = 0;

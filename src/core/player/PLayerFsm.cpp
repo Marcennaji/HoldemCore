@@ -189,7 +189,7 @@ void PlayerFsm::resetPlayerStatistics()
         myStatistics[i].reset();
     }
 }
-/*
+
 void PlayerFsm::updatePreflopStatistics(const int nbPlayers)
 {
 
@@ -222,7 +222,7 @@ void PlayerFsm::updatePreflopStatistics(const int nbPlayers)
 
     myStatistics[nbPlayers].preflopStatistics.addLastAction(myAction); // keep track of the last 10 actions
 
-    if (myAction == ActionType::Call && currentHand.getRaisersPositions().size() == 0)
+    if (myAction == ActionType::Call && myCurrentHandContext->commonContext.raisersPositions.size() == 0)
     { //
         myStatistics[nbPlayers].preflopStatistics.limps++;
     }
@@ -240,12 +240,13 @@ void PlayerFsm::updatePreflopStatistics(const int nbPlayers)
     if (myAction == ActionType::Raise || myAction == ActionType::Allin)
     {
 
-        if (playerRaises == 1 && currentHand.getRaisersPositions().size() == 2)
+        if (playerRaises == 1 && myCurrentHandContext->commonContext.raisersPositions.size() == 2)
         {
             myStatistics[nbPlayers].preflopStatistics.threeBets++;
         }
 
-        if (playerRaises == 2 || (playerRaises == 1 && currentHand.getRaisersPositions().size() == 3))
+        if (playerRaises == 2 ||
+            (playerRaises == 1 && myCurrentHandContext->commonContext.raisersPositions.size() == 3))
         {
             myStatistics[nbPlayers].preflopStatistics.fourBets++;
         }
@@ -296,13 +297,14 @@ void PlayerFsm::updateFlopStatistics(const int nbPlayers)
     default:
         break;
     }
-    if (myAction == ActionType::Raise && currentHand.getRaisersPositions().size() > 1)
+    if (myAction == ActionType::Raise && myCurrentHandContext->commonContext.raisersPositions.size() > 1)
     {
         myStatistics[nbPlayers].flopStatistics.threeBets++;
     }
 
     // continuation bets
-    if (currentHand.getPreflopLastRaiserId() == myID)
+    if (myCurrentHandContext->commonContext.preflopLastRaiserFsm &&
+        myCurrentHandContext->commonContext.preflopLastRaiserFsm->getId() == myID)
     {
         myStatistics[nbPlayers].flopStatistics.continuationBetsOpportunities++;
         if (myAction == ActionType::Bet)
@@ -342,7 +344,7 @@ void PlayerFsm::updateTurnStatistics(const int nbPlayers)
     default:
         break;
     }
-    if (myAction == ActionType::Raise && currentHand.getRaisersPositions().size() > 1)
+    if (myAction == ActionType::Raise && myCurrentHandContext->commonContext.raisersPositions.size() > 1)
     {
         myStatistics[nbPlayers].turnStatistics.threeBets++;
     }
@@ -378,12 +380,11 @@ void PlayerFsm::updateRiverStatistics(const int nbPlayers)
     default:
         break;
     }
-    if (myAction == ActionType::Raise && currentHand.getRaisersPositions().size() > 1)
+    if (myAction == ActionType::Raise && myCurrentHandContext->commonContext.raisersPositions.size() > 1)
     {
         myStatistics[nbPlayers].riverStatistics.threeBets++;
     }
 }
-    */
 
 void PlayerFsm::loadStatistics()
 {
@@ -399,19 +400,14 @@ void PlayerFsm::loadStatistics()
 
 const PostFlopAnalysisFlags PlayerFsm::getPostFlopAnalysisFlags() const
 {
-#if (False)
     std::string stringHand = getCardsValueString();
-    std::string stringBoard = getStringBoard();
+    std::string stringBoard = myCurrentHandContext->commonContext.stringBoard;
 
-    return GlobalServices::instance().handEvaluationEngine()->analyzeHand(getCardsValueString(), getStringBoard());
-#else
-    PostFlopAnalysisFlags flags;
-    return flags;
-#endif
+    return GlobalServices::instance().handEvaluationEngine()->analyzeHand(getCardsValueString(), stringBoard);
 }
 bool PlayerFsm::checkIfINeedToShowCards() const
 {
-#if (False)
+#if false
     std::list<unsigned> playerNeedToShowCardsList = currentHand.getBoard()->getPlayerNeedToShowCards();
     for (std::list<unsigned>::iterator it = playerNeedToShowCardsList.begin(); it != playerNeedToShowCardsList.end();
          ++it)
@@ -422,7 +418,6 @@ bool PlayerFsm::checkIfINeedToShowCards() const
         }
     }
 #endif
-
     return false;
 }
 
@@ -551,10 +546,10 @@ float PlayerFsm::getMaxOpponentsStrengths() const
 // get an opponent winning hands % against me, giving his supposed range
 float PlayerFsm::getOpponentWinningHandsPercentage(const int opponentId, std::string board) const
 {
-#if (False)
+#if (false)
     float result = 0;
 
-    auto opponent = *getPlayerFsmListIteratorById(mySeatsList, opponentId);
+    auto opponent = *getPlayerFsmListIteratorById(myCurrentHandContext->commonContext.mySeatsList, opponentId);
 
     assert(myHandRanking > 0);
 
@@ -620,7 +615,7 @@ float PlayerFsm::getOpponentWinningHandsPercentage(const int opponentId, std::st
     assert(nbWinningHands / ranges.size() <= 1.0);
     return (float) nbWinningHands / (float) newRanges.size();
 #else
-    return 0.5;
+    return 0;
 #endif
 }
 
@@ -838,8 +833,7 @@ void PlayerFsm::updateCurrentHandContext(const GameState state, HandFsm& current
 
 float PlayerFsm::calculatePreflopCallingRange(const CurrentHandContext& ctx) const
 {
-    // return myRangeEstimator->getStandardCallingRange(mySeatsList->size());
-    return 50;
+    return myRangeEstimator->getStandardCallingRange(ctx.commonContext.nbRunningPlayers);
 }
 
 void PlayerFsm::resetForNewHand()
