@@ -14,7 +14,6 @@ class PlayerStrategy
   public:
     virtual ~PlayerStrategy() = default;
 
-    // This is the only method FSM needs to call
     virtual PlayerAction decideAction(const CurrentHandContext& ctx) = 0;
 };
 

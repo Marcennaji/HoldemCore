@@ -100,9 +100,9 @@ TEST_F(BettingRoundsLegacyTest, EachPlayerHasAtLeastOneAction)
         totalActionCount += player->getCurrentHandActions().getFlopActions().size();
         totalActionCount += player->getCurrentHandActions().getTurnActions().size();
         totalActionCount += player->getCurrentHandActions().getRiverActions().size();
+        EXPECT_GT(totalActionCount, 0u) << "No actions occurred in any round for player " << player->getId();
+        totalActionCount = 0;
     }
-
-    EXPECT_GT(totalActionCount, 0u) << "No actions occurred in any round.";
 }
 
 TEST_F(BettingRoundsLegacyTest, ShouldRecordAllActionsInHandHistoryChronologically)
