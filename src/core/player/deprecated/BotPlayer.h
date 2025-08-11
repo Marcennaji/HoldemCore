@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Player.h"
+#include "core/player/deprecated/Player.h"
 
 #include "core/player/strategy/BotStrategy.h"
 

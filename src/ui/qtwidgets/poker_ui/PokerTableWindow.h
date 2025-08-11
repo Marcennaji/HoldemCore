@@ -9,7 +9,7 @@
 #include <memory>
 
 #include "core/engine/model/GameState.h"
-#include "core/player/Player.h"
+#include "core/player/deprecated/Player.h"
 #include "core/session/Session.h"
 
 namespace pkt::core

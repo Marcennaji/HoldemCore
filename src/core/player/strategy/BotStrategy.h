@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <core/player/Player.h>
+#include <core/player/deprecated/Player.h>
 #include <core/player/strategy/PreflopRangeCalculator.h>
 #include "PlayerStrategy.h"
 

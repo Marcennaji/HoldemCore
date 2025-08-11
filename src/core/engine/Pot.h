@@ -3,7 +3,7 @@
 #include <list>
 #include <memory>
 #include <vector>
-#include "core/player/Player.h"
+#include "core/player/deprecated/Player.h"
 
 namespace pkt::core
 {

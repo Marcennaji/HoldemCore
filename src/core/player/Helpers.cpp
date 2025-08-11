@@ -3,8 +3,8 @@
 #include "core/engine/CardUtilities.h"
 #include "core/engine/Exception.h"
 #include "core/engine/model/ButtonState.h"
-#include "core/player/Player.h"
 #include "core/player/PlayerFsm.h"
+#include "core/player/deprecated/Player.h"
 #include "core/services/GlobalServices.h"
 
 #include <algorithm>

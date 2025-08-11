@@ -5,12 +5,12 @@
 #pragma once
 
 #include "EngineFactory.h"
-#include "Player.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
 #include "core/interfaces/IBettingRound.h"
 #include "core/interfaces/IBoard.h"
 #include "core/interfaces/IHand.h"
+#include "core/player/deprecated/Player.h"
 
 #include <memory>
 #include <vector>

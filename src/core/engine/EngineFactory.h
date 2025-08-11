@@ -12,7 +12,7 @@
 #include "core/interfaces/IBoard.h"
 #include "core/interfaces/IHand.h"
 
-#include <core/player/Player.h>
+#include <core/player/deprecated/Player.h>
 
 #include <memory>
 #include <vector>

@@ -1,6 +1,6 @@
 #include "DefaultPlayerFactory.h"
-#include "BotPlayer.h"
-#include "HumanPlayer.h"
+#include <core/player/deprecated/BotPlayer.h>
+#include "core/player/deprecated/HumanPlayer.h"
 #include "core/player/strategy/BotStrategy.h"
 
 namespace pkt::core::player

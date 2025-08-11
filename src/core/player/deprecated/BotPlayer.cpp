@@ -1,7 +1,7 @@
 // PokerTraining — Texas Hold'em simulator
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
-#include "BotPlayer.h"
+#include <core/player/deprecated/BotPlayer.h>
 #include <core/player/strategy/BotStrategy.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include <core/services/GlobalServices.h>

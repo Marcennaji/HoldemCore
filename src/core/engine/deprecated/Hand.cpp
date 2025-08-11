@@ -2,7 +2,7 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
-#include "Hand.h"
+#include "core/engine/deprecated/Hand.h"
 #include <core/services/GlobalServices.h>
 #include "CardUtilities.h"
 #include "GameEvents.h"

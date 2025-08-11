@@ -6,7 +6,7 @@
 
 #include "core/interfaces/IBettingRound.h"
 #include "core/interfaces/IHand.h"
-#include "core/player/HumanPlayer.h"
+#include "core/player/deprecated/HumanPlayer.h"
 
 namespace pkt::core
 {

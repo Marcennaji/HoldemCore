@@ -2,7 +2,7 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
-#include "BettingRoundPreflop.h"
+#include "core/engine/deprecated/BettingRoundPreflop.h"
 
 #include "Exception.h"
 #include "model/EngineError.h"
@@ -11,7 +11,7 @@
 #include "core/services/GlobalServices.h"
 
 #include "Helpers.h"
-#include "Player.h"
+#include "core/player/deprecated/Player.h"
 
 namespace pkt::core
 {

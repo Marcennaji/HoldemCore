@@ -1,8 +1,8 @@
 #pragma once
 #include <core/engine/GameEvents.h>
 #include <core/interfaces/NullLogger.h>
-#include <core/player/BotPlayer.h>
 #include <core/player/PlayerFsm.h>
+#include <core/player/deprecated/BotPlayer.h>
 #include <core/player/strategy/LooseAggressiveBotStrategy.h>
 
 namespace pkt::test

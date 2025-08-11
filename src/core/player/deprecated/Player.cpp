@@ -2,7 +2,7 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
-#include "Player.h"
+#include "core/player/deprecated/Player.h"
 
 #include <core/engine/CardUtilities.h>
 #include <core/engine/HandEvaluator.h>

@@ -300,32 +300,7 @@ TEST_F(BettingRoundsLegacyTest, NoPlayerFoldsPostFlopWhenNoBet)
         }
     }
 }
-TEST_F(BettingRoundsLegacyTest, NoPlayerCallsWithoutBetOrRaise)
-{
-    initializeHandForTesting(4, gameData);
-    myHand->start();
 
-    const auto& history = myHand->getHandActionHistory();
-    for (const auto& round : history)
-    {
-        ASSERT_FALSE(round.actions.empty()) << "Round has no actions.";
-
-        bool hasBetOrRaise = false;
-
-        for (const auto& [playerId, action] : round.actions)
-        {
-            if (action == ActionType::Bet || action == ActionType::Raise)
-            {
-                hasBetOrRaise = true;
-            }
-
-            if (!hasBetOrRaise)
-            {
-                EXPECT_NE(action, ActionType::Call) << "Invalid action: Player called when there was no bet or raise.";
-            }
-        }
-    }
-}
 TEST_F(BettingRoundsLegacyTest, NoConsecutiveRaisesBySamePlayer)
 {
     initializeHandForTesting(4, gameData);

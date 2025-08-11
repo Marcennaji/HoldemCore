@@ -6,8 +6,8 @@
 #include "core/engine/Exception.h"
 #include "core/engine/model/PlayerAction.h"
 #include "core/player/Helpers.h"
-#include "core/player/Player.h"
 #include "core/player/PlayerFsm.h"
+#include "core/player/deprecated/Player.h"
 
 namespace pkt::core
 {

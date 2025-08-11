@@ -9,7 +9,7 @@
 #include "model/EngineError.h"
 
 #include <core/engine/CardUtilities.h>
-#include <core/player/BotPlayer.h>
+#include <core/player/deprecated/BotPlayer.h>
 #include <core/services/GlobalServices.h>
 #include "core/player/Helpers.h"
 

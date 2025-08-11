@@ -8,8 +8,8 @@
 
 #include <core/services/GlobalServices.h>
 #include "Exception.h"
-#include "Player.h"
 #include "Pot.h"
+#include "core/player/deprecated/Player.h"
 #include "model/EngineError.h"
 
 #include <algorithm>

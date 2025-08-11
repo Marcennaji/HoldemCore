@@ -2,11 +2,11 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
-#include "BettingRoundPostRiver.h"
+#include "core/engine/deprecated/BettingRoundPostRiver.h"
 #include "core/interfaces/IHand.h"
 #include "core/services/GlobalServices.h"
 
-#include "Player.h"
+#include "core/player/deprecated/Player.h"
 
 #include <iostream>
 

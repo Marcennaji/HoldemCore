@@ -5,10 +5,10 @@
 #include <list>
 #include <memory>
 #include "core/engine/Board.h"
-#include "core/engine/Hand.h"
+#include "core/engine/deprecated/Hand.h"
 #include "core/engine/model/GameState.h"
 #include "core/interfaces/NullLogger.h"
-#include "core/player/Player.h"
+#include "core/player/deprecated/Player.h"
 #include "core/player/typedefs.h"
 
 namespace pkt::test
