@@ -123,6 +123,10 @@ size_t Hand::dealBoardCards()
 
 void Hand::start()
 {
+    if (myEvents.onBettingRoundStarted)
+    {
+        myEvents.onBettingRoundStarted(getCurrentBettingRound()->getBettingRoundId());
+    }
     if (myEvents.onDealHoleCards)
     {
         myEvents.onDealHoleCards();

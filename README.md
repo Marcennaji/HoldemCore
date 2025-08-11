@@ -29,7 +29,7 @@ It is also designed for **bot developers** to easily implement and test custom p
 - ⚪ CLI mode for headless or manual human input (currently working)
 
 ### 3. **Bot Strategies**
-- Clear separation of `BotPlayer` and `BotStrategy`
+- Clear separation of `Player` and `BotStrategy`
 - Minimal `BotStrategy` interface (4 template methods: `decidePreflop`, `decideFlop`, `decideTurn`, `decideRiver`)
 - Built-in bots:
   - Tight Aggressive
@@ -49,7 +49,6 @@ public:
 
     PlayerAction decidePreflop(const CurrentHandContext& ctx) override {
         // Custom logic here
-        return PlayerAction{}; // return a default action or implement logic
     }
     // ... same for decideFlop, decideTurn, decideRiver
 };
@@ -70,7 +69,7 @@ player.setStrategy(std::make_unique<MyCustomBotStrategy>());
 
 ### 5. **Finite State Machine for Streets**
 - Ongoing refactor to model hand progress:
-  - Preflop → Flop → Turn → River → Showdown
+  - Preflop → Flop → Turn → River → PostRiver
 - Ensures predictable and maintainable game flow
 
 ### 6. **Testing Infrastructure**
@@ -80,7 +79,7 @@ player.setStrategy(std::make_unique<MyCustomBotStrategy>());
 
 ## 🔧 Technologies Used
 - **C++17**
-- **Qt Widgets** (current UI, being refactored)
+- **Qt Widgets** (current UI)
 - **GoogleTest**
 - **uWebSockets** (planned WebSocket server)
 - **Flutter** (planned UI)
@@ -119,7 +118,7 @@ src/
 ├── core/             # Engine logic
 │   ├── engine/       # Hand, board, betting, evaluator
 │   ├── events/       # GameEvents definition
-│   ├── player/       # Player, BotPlayer, BotStrategy
+│   ├── player/       # Player, BotStrategy
 │   ├── session/      # Session & game management
 ├── ui/
 │   └── qtwidgets/    # Qt Widgets UI

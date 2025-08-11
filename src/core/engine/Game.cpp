@@ -20,10 +20,8 @@ using namespace std;
 using namespace pkt::core::player;
 
 Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, const PlayerList& playersList,
-           const GameData& gameData, const StartData& startData, int gameId)
-    : myFactory(factory), myEvents(events), myStartQuantityPlayers(startData.numberOfPlayers),
-      myStartCash(gameData.startMoney), myStartSmallBlind(gameData.firstSmallBlind), myGameId(gameId),
-      myCurrentSmallBlind(gameData.firstSmallBlind), myGameData(gameData), myStartData(startData)
+           const GameData& gameData, const StartData& startData)
+    : myEngineFactory(factory), myEvents(events), myGameData(gameData), myStartData(startData)
 {
     myDealerPlayerId = startData.startDealerPlayerId;
 
@@ -45,7 +43,7 @@ Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, con
     }
 
     // create board
-    myCurrentBoard = myFactory->createBoard(myDealerPlayerId);
+    myCurrentBoard = myEngineFactory->createBoard(myDealerPlayerId);
 
     // create players lists
     mySeatsList.reset(new std::list<std::shared_ptr<Player>>);
@@ -76,35 +74,18 @@ Game::~Game()
     mySeatsList->clear();
 }
 
-std::shared_ptr<IHand> Game::getCurrentHand()
+void Game::startNewHand()
 {
-    return myCurrentHand;
-}
-
-const std::shared_ptr<IHand> Game::getCurrentHand() const
-{
-    return myCurrentHand;
-}
-
-void Game::initHand()
-{
-
-    size_t i;
-    PlayerListConstIterator itC;
-    PlayerListIterator it;
-
-    // set player action none
-    for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
+    for (auto& player : *mySeatsList)
     {
-        (*it)->setAction(ActionType::None);
+        player->setAction(ActionType::None);
     }
 
     myRunningPlayersList->clear();
     (*myRunningPlayersList) = (*mySeatsList);
 
-    // create Hand
-    myCurrentHand =
-        myFactory->createHand(myFactory, myCurrentBoard, mySeatsList, myRunningPlayersList, myGameData, myStartData);
+    myCurrentHand = myEngineFactory->createHand(myEngineFactory, myCurrentBoard, mySeatsList, myRunningPlayersList,
+                                                myGameData, myStartData);
 
     bool nextDealerFound = false;
 
@@ -114,7 +95,7 @@ void Game::initHand()
         throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
     }
 
-    for (i = 0; i < mySeatsList->size(); i++)
+    for (int i = 0; i < mySeatsList->size(); i++)
     {
 
         ++dealerPositionIt;
@@ -122,26 +103,18 @@ void Game::initHand()
         {
             dealerPositionIt = mySeatsList->begin();
         }
-        itC = getPlayerListIteratorById(myCurrentHand->getSeatsList(), (*dealerPositionIt)->getId());
+        auto playerIterator = getPlayerListIteratorById(myCurrentHand->getSeatsList(), (*dealerPositionIt)->getId());
 
-        if (itC != mySeatsList->end())
+        if (playerIterator != mySeatsList->end())
         {
             nextDealerFound = true;
-            myDealerPlayerId = (*itC)->getId();
+            myDealerPlayerId = (*playerIterator)->getId();
             break;
         }
     }
     if (!nextDealerFound)
     {
         throw Exception(__FILE__, __LINE__, EngineError::NextDealerNotFound);
-    }
-}
-
-void Game::startHand()
-{
-    if (myEvents.onBettingRoundStarted)
-    {
-        myEvents.onBettingRoundStarted(myCurrentHand->getCurrentBettingRound()->getBettingRoundId());
     }
 
     myCurrentHand->start();

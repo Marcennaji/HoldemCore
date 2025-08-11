@@ -23,12 +23,8 @@ class Session
 
     void startGame(const GameData& gameData, const StartData& startData);
 
-    std::shared_ptr<Game> getCurrentGame();
-
   private:
-    int myCurrentGameNum{0};
-
-    std::shared_ptr<Game> myCurrentGame;
+    std::unique_ptr<Game> myCurrentGame;
     GameEvents myEvents;
 };
 

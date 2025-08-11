@@ -26,45 +26,14 @@ class Game
 
   public:
     Game(const GameEvents&, std::shared_ptr<EngineFactory> factory, const pkt::core::player::PlayerList& playersList,
-         const GameData& gameData, const StartData& startData, int gameId);
+         const GameData& gameData, const StartData& startData);
 
     ~Game();
 
-    void initHand();
-    void startHand();
-
-    std::shared_ptr<IHand> getCurrentHand();
-    const std::shared_ptr<IHand> getCurrentHand() const;
-
-    pkt::core::player::PlayerList getSeatsList() const { return mySeatsList; }
-    pkt::core::player::PlayerList getRunningPlayersList() const { return myRunningPlayersList; }
-
-    void setStartQuantityPlayers(int theValue) { myStartQuantityPlayers = theValue; }
-    int getStartQuantityPlayers() const { return myStartQuantityPlayers; }
-
-    void setStartSmallBlind(int theValue) { myStartSmallBlind = theValue; }
-    int getStartSmallBlind() const { return myStartSmallBlind; }
-
-    void setStartCash(int theValue) { myStartCash = theValue; }
-    int getStartCash() const { return myStartCash; }
-
-    int getGameId() const { return myGameId; }
-
-    void setCurrentSmallBlind(int theValue) { myCurrentSmallBlind = theValue; }
-    int getCurrentSmallBlind() const { return myCurrentSmallBlind; }
-
-    unsigned getDealerPlayerId() const { return myDealerPlayerId; }
-
-    void replaceDealer(unsigned oldDealer, unsigned newDealer)
-    {
-        if (myDealerPlayerId == oldDealer)
-        {
-            myDealerPlayerId = newDealer;
-        }
-    }
+    void startNewHand();
 
   private:
-    std::shared_ptr<EngineFactory> myFactory;
+    std::shared_ptr<EngineFactory> myEngineFactory;
 
     const GameEvents& myEvents;
     std::shared_ptr<IHand> myCurrentHand;
@@ -73,20 +42,9 @@ class Game
     pkt::core::player::PlayerList mySeatsList;
     pkt::core::player::PlayerList myRunningPlayersList; // nonfolded and nonallin active players
 
-    // start variables
-    int myStartQuantityPlayers;
-    int myStartCash;
-    int myStartSmallBlind;
-    int myGameId;
-
-    // running variables
-    int myCurrentSmallBlind;
     unsigned myDealerPlayerId{0};
-    int myLastHandBlindsRaised{1};
-    int myLastTimeBlindsRaised{0};
     GameData myGameData;
     StartData myStartData;
-    std::list<int> myBlindsList;
 };
 
 } // namespace pkt::core

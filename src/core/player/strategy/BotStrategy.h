@@ -49,7 +49,7 @@ class BotStrategy : public PlayerStrategy
         myPreflopRangeCalculator->initializeRanges(utgHeadsUpRange, utgFullTableRange);
     }
 
-    // bots strategies implementers must override these methods
+    // bots strategies implementers must override only these methods
     virtual PlayerAction decidePreflop(const CurrentHandContext&) = 0;
     virtual PlayerAction decideFlop(const CurrentHandContext&) = 0;
     virtual PlayerAction decideTurn(const CurrentHandContext&) = 0;

@@ -38,7 +38,6 @@ Session::~Session() = default;
 void Session::startGame(const GameData& gameData, const StartData& startData)
 {
     myCurrentGame.reset();
-    myCurrentGameNum++;
 
     if (myEvents.onGameInitialized)
     {
@@ -70,14 +69,8 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
         p->setId(id++);
     }
 
-    myCurrentGame = std::make_unique<Game>(myEvents, engineFactory, playersList, gameData, startData, myCurrentGameNum);
-
-    myCurrentGame->initHand();
-    myCurrentGame->startHand();
+    myCurrentGame = std::make_unique<Game>(myEvents, engineFactory, playersList, gameData, startData);
+    myCurrentGame->startNewHand();
 }
 
-std::shared_ptr<Game> Session::getCurrentGame()
-{
-    return myCurrentGame;
-}
 } // namespace pkt::core
