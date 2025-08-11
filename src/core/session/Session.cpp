@@ -35,41 +35,49 @@ Session::Session(const GameEvents& events) : myEvents(events)
 
 Session::~Session() = default;
 
+pkt::core::player::PlayerList Session::createPlayersList(DefaultPlayerFactory& playerFactory, int numberOfPlayers,
+                                                         unsigned startMoney, const TableProfile& tableProfile)
+{
+    auto playersList = std::make_shared<std::list<std::shared_ptr<Player>>>();
+
+    playersList->push_back(playerFactory.createHumanPlayer(0, startMoney));
+
+    for (int i = 1; i < numberOfPlayers; ++i)
+        playersList->push_back(playerFactory.createBotPlayer(i, tableProfile, startMoney));
+
+    // Shuffle bots but keep human first
+    shufflePlayers(*playersList, 0);
+
+    // Reassign IDs after shuffle
+    int id = 0;
+    for (auto& p : *playersList)
+        p->setId(id++);
+
+    return playersList;
+}
+
 void Session::startGame(const GameData& gameData, const StartData& startData)
 {
     myCurrentGame.reset();
 
     if (myEvents.onGameInitialized)
-    {
         myEvents.onGameInitialized(gameData.guiSpeed);
-    }
 
     auto engineFactory = std::make_shared<EngineFactory>(myEvents);
-
     auto strategyAssigner = std::make_unique<StrategyAssigner>(gameData.tableProfile, startData.numberOfPlayers - 1);
-
     auto playerFactory = std::make_unique<DefaultPlayerFactory>(myEvents, strategyAssigner.get());
 
-    auto playersList = std::make_shared<std::list<std::shared_ptr<Player>>>();
+    auto playersList =
+        createPlayersList(*playerFactory, startData.numberOfPlayers, gameData.startMoney, gameData.tableProfile);
 
-    playersList->push_back(playerFactory->createHumanPlayer(0, gameData.startMoney));
+    // Board is fully prepared here
+    auto board = engineFactory->createBoard(startData.startDealerPlayerId);
+    board->setSeatsList(playersList);
+    board->setRunningPlayersList(playersList);
 
-    for (int i = 1; i < startData.numberOfPlayers; ++i)
-    {
-        playersList->push_back(playerFactory->createBotPlayer(i, gameData.tableProfile, gameData.startMoney));
-    }
+    myCurrentGame = std::make_unique<Game>(myEvents, engineFactory, board, playersList, startData.startDealerPlayerId,
+                                           gameData, startData);
 
-    // Shuffle bots but keep human first
-    shufflePlayers(*playersList, 0);
-
-    // Reassign player IDs after shuffle
-    int id = 0;
-    for (auto& p : *playersList)
-    {
-        p->setId(id++);
-    }
-
-    myCurrentGame = std::make_unique<Game>(myEvents, engineFactory, playersList, gameData, startData);
     myCurrentGame->startNewHand();
 }
 

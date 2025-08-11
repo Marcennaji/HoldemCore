@@ -38,7 +38,7 @@ int main(int argc, char** argv)
     QString userPath = QString::fromStdString(dirs.userDataDir);
 
     GuiAppController controller(appPath, logPath, userPath);
-    StartWindow* mainWindow = controller.createMainWindow();
+    controller.createMainWindow();
 
     return QApplication::exec();
 }

@@ -37,7 +37,7 @@ class SqliteLogStore
     void updateRankingGameLosers(PlayerList seatsList);
     void updateRankingGameWinner(PlayerList seatsList);
     void updateRankingPlayedGames(PlayerList seatsList);
-    void updateUnplausibleHand(const std::string card1, const std::string card2, const bool human,
+    void updateUnplausibleHand(const std::string& card1, const std::string& card2, const bool human,
                                const char bettingRound, const int nbPlayers);
     void updatePlayersStatistics(PlayerList seatsList);
 
@@ -45,9 +45,9 @@ class SqliteLogStore
 
   private:
     void createDatabase();
-    void initializeStrategyStatistics(const std::string playerName, const int nbPlayers);
+    void initializeStrategyStatistics(const std::string& playerName, const int nbPlayers);
     void execTransaction();
-    int getIntegerValue(const std::string playerName, const std::string tableName, const std::string attributeName);
+    int getIntegerValue(const std::string& playerName, const std::string& tableName, const std::string& attributeName);
     void createRankingTable();
     void createUnplausibleHandsTable();
 

@@ -19,50 +19,18 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, const PlayerList& playersList,
-           const GameData& gameData, const StartData& startData)
-    : myEngineFactory(factory), myEvents(events), myGameData(gameData), myStartData(startData)
+Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
+           PlayerList seatsList, unsigned dealerId, const GameData& gameData, const StartData& startData)
+    : myEngineFactory(factory), myEvents(events), myCurrentBoard(board), mySeatsList(seatsList),
+      myDealerPlayerId(dealerId), myGameData(gameData), myStartData(startData)
 {
-    myDealerPlayerId = startData.startDealerPlayerId;
+    // Running players list starts identical to seats list
+    myRunningPlayersList = std::make_shared<std::list<std::shared_ptr<Player>>>(*mySeatsList);
 
-    // determine dealer position
-    PlayerListConstIterator playerI = playersList->begin();
-    PlayerListConstIterator playerEnd = playersList->end();
-
-    while (playerI != playerEnd)
-    {
-        if ((*playerI)->getId() == myDealerPlayerId)
-        {
-            break;
-        }
-        ++playerI;
-    }
-    if (playerI == playerEnd)
-    {
+    // Validate dealer exists
+    auto it = getPlayerListIteratorById(mySeatsList, dealerId);
+    if (it == mySeatsList->end())
         throw Exception(__FILE__, __LINE__, EngineError::DealerNotFound);
-    }
-
-    // create board
-    myCurrentBoard = myEngineFactory->createBoard(myDealerPlayerId);
-
-    // create players lists
-    mySeatsList.reset(new std::list<std::shared_ptr<Player>>);
-    myRunningPlayersList.reset(new std::list<std::shared_ptr<Player>>);
-
-    // Create a deep copy of playersList for mySeatsList
-    for (const auto& player : *playersList)
-    {
-        mySeatsList->push_back(player);
-    }
-
-    // Create a separate deep copy of playersList for myRunningPlayersList
-    for (const auto& player : *playersList)
-    {
-        myRunningPlayersList->push_back(player);
-    }
-
-    myCurrentBoard->setSeatsList(mySeatsList);
-    myCurrentBoard->setRunningPlayersList(myRunningPlayersList);
 
     GlobalServices::instance().rankingStore()->updateRankingPlayedGames(mySeatsList);
 }
@@ -71,53 +39,60 @@ Game::~Game()
 {
     myRunningPlayersList->clear();
     mySeatsList->clear();
-    mySeatsList->clear();
 }
 
 void Game::startNewHand()
 {
+    resetPlayerActions();
+    resetRunningPlayers();
+    createNewHand();
+    findNextDealer();
+    myCurrentHand->start();
+}
+
+void Game::resetPlayerActions()
+{
     for (auto& player : *mySeatsList)
-    {
         player->setAction(ActionType::None);
-    }
+}
 
+void Game::resetRunningPlayers()
+{
     myRunningPlayersList->clear();
-    (*myRunningPlayersList) = (*mySeatsList);
+    *myRunningPlayersList = *mySeatsList;
+}
 
+void Game::createNewHand()
+{
     myCurrentHand = myEngineFactory->createHand(myEngineFactory, myCurrentBoard, mySeatsList, myRunningPlayersList,
                                                 myGameData, myStartData);
+}
 
+void Game::findNextDealer()
+{
     bool nextDealerFound = false;
+    auto dealerPos = getPlayerListIteratorById(myCurrentHand->getSeatsList(), myDealerPlayerId);
 
-    auto dealerPositionIt = getPlayerListIteratorById(myCurrentHand->getSeatsList(), myDealerPlayerId);
-    if (dealerPositionIt == mySeatsList->end())
-    {
+    if (dealerPos == mySeatsList->end())
         throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
-    }
 
-    for (int i = 0; i < mySeatsList->size(); i++)
+    for (size_t i = 0; i < mySeatsList->size(); ++i)
     {
+        ++dealerPos;
+        if (dealerPos == mySeatsList->end())
+            dealerPos = mySeatsList->begin();
 
-        ++dealerPositionIt;
-        if (dealerPositionIt == mySeatsList->end())
+        auto playerIt = getPlayerListIteratorById(myCurrentHand->getSeatsList(), (*dealerPos)->getId());
+        if (playerIt != mySeatsList->end())
         {
-            dealerPositionIt = mySeatsList->begin();
-        }
-        auto playerIterator = getPlayerListIteratorById(myCurrentHand->getSeatsList(), (*dealerPositionIt)->getId());
-
-        if (playerIterator != mySeatsList->end())
-        {
+            myDealerPlayerId = (*playerIt)->getId();
             nextDealerFound = true;
-            myDealerPlayerId = (*playerIterator)->getId();
             break;
         }
     }
-    if (!nextDealerFound)
-    {
-        throw Exception(__FILE__, __LINE__, EngineError::NextDealerNotFound);
-    }
 
-    myCurrentHand->start();
+    if (!nextDealerFound)
+        throw Exception(__FILE__, __LINE__, EngineError::NextDealerNotFound);
 }
 
 } // namespace pkt::core

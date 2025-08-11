@@ -134,15 +134,10 @@ void SqliteLogStore::createDatabase()
 
     execTransaction();
 
-    auto looseAggressiveStrategy = LooseAggressiveBotStrategy();
-    auto tightAggressiveStrategy = TightAggressiveBotStrategy();
-    auto maniacStrategy = ManiacBotStrategy();
-    auto ultraTightStrategy = UltraTightBotStrategy();
-
     for (int j = 2; j <= MAX_NUMBER_OF_PLAYERS; j++)
     {
         initializeStrategyStatistics(HumanPlayer::getName(), j);
-        // initialize players statistics for all bot strategies
+        // initialize players statistics for builtin bots strategies
         initializeStrategyStatistics("tightAggressive", j);
         initializeStrategyStatistics("looseAggressive", j);
         initializeStrategyStatistics("maniac", j);
@@ -150,7 +145,7 @@ void SqliteLogStore::createDatabase()
     }
 }
 
-void SqliteLogStore::initializeStrategyStatistics(const string playerName, const int nbPlayers)
+void SqliteLogStore::initializeStrategyStatistics(const string& playerName, const int nbPlayers)
 {
 
     mySql += "INSERT OR REPLACE INTO PlayersStatistics (";
@@ -176,7 +171,6 @@ void SqliteLogStore::updateRankingGameLosers(PlayerList seatsList)
 {
     createRankingTable();
 
-    int losers = 0;
     PlayerListConstIterator itC;
     for (itC = seatsList->begin(); itC != seatsList->end(); ++itC)
     {
@@ -224,7 +218,6 @@ void SqliteLogStore::updateRankingPlayedGames(PlayerList seatsList)
 {
     createRankingTable();
 
-    int losers = 0;
     PlayerListConstIterator itC;
     for (itC = seatsList->begin(); itC != seatsList->end(); ++itC)
     {
@@ -236,8 +229,8 @@ void SqliteLogStore::updateRankingPlayedGames(PlayerList seatsList)
 
     execTransaction();
 }
-int SqliteLogStore::getIntegerValue(const std::string playerName, const std::string tableName,
-                                    const std::string attributeName)
+int SqliteLogStore::getIntegerValue(const std::string& playerName, const std::string& tableName,
+                                    const std::string& attributeName)
 {
 
     int result = 0;
@@ -289,7 +282,7 @@ void SqliteLogStore::createRankingTable()
     mySql += ", PRIMARY KEY(strategy_name));";
     execTransaction();
 }
-void SqliteLogStore::updateUnplausibleHand(const std::string card1, const std::string card2, const bool human,
+void SqliteLogStore::updateUnplausibleHand(const std::string& card1, const std::string& card2, const bool human,
                                            const char bettingRound, const int nbPlayers)
 {
     createUnplausibleHandsTable();
@@ -325,7 +318,6 @@ void SqliteLogStore::updateUnplausibleHand(const std::string card1, const std::s
         }
     }
 
-    int losers = 0;
     mySql += "INSERT OR IGNORE INTO UnplausibleHands VALUES ('" + hand.str() + "','" + bettingRound + "'," +
              std::to_string(nbPlayers) + (human ? ", 1" : ", 0") + ", 0);";
 

@@ -23,24 +23,29 @@ class EngineFactory;
 
 class Game
 {
-
   public:
-    Game(const GameEvents&, std::shared_ptr<EngineFactory> factory, const pkt::core::player::PlayerList& playersList,
-         const GameData& gameData, const StartData& startData);
+    Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
+         pkt::core::player::PlayerList seatsList, unsigned dealerId, const GameData& gameData,
+         const StartData& startData);
 
     ~Game();
 
     void startNewHand();
 
   private:
-    std::shared_ptr<EngineFactory> myEngineFactory;
+    void resetPlayerActions();
+    void resetRunningPlayers();
+    void createNewHand();
+    void findNextDealer();
 
+  private:
+    std::shared_ptr<EngineFactory> myEngineFactory;
     const GameEvents& myEvents;
     std::shared_ptr<IHand> myCurrentHand;
     std::shared_ptr<IBoard> myCurrentBoard;
 
     pkt::core::player::PlayerList mySeatsList;
-    pkt::core::player::PlayerList myRunningPlayersList; // nonfolded and nonallin active players
+    pkt::core::player::PlayerList myRunningPlayersList;
 
     unsigned myDealerPlayerId{0};
     GameData myGameData;
