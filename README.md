@@ -154,6 +154,8 @@ make
 - **[poker-eval](https://github.com/atinm/poker-eval)** — C library, used by psim for hand evaluation  
 - **[SQLite3](https://www.sqlite.org/index.html)** — Embedded SQL database  
 
+The core engine is decoupled from these components thanks to dependency injection, so they can be swapped or extended with minimal changes.
+
 > See `third_party/` for licenses.
 
 ---

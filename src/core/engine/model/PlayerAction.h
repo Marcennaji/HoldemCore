@@ -21,8 +21,8 @@ enum class ActionType
 
 struct PlayerAction
 {
-    int playerId;
-    ActionType type;
+    int playerId = -1;
+    ActionType type = ActionType::None;
     int amount = 0;
 };
 

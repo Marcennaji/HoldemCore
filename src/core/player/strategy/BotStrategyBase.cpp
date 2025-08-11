@@ -12,6 +12,7 @@ namespace pkt::core::player
 PlayerAction BotStrategyBase::decidePreflop(const CurrentHandContext& ctx)
 {
     PlayerAction resultingAction;
+    resultingAction.playerId = ctx.perPlayerContext.myID;
 
     bool shouldCall = preflopShouldCall(ctx);         // should at least call, and maybe raise
     resultingAction.amount = preflopShouldRaise(ctx); // amount > 0 if decide to raise
@@ -47,6 +48,8 @@ PlayerAction BotStrategyBase::decidePreflop(const CurrentHandContext& ctx)
 PlayerAction BotStrategyBase::decideFlop(const CurrentHandContext& ctx)
 {
     PlayerAction resultingAction;
+    resultingAction.playerId = ctx.perPlayerContext.myID;
+
     int betAmount = 0;
     int raiseAmount = 0;
     bool shouldCall = false;
@@ -97,6 +100,8 @@ PlayerAction BotStrategyBase::decideFlop(const CurrentHandContext& ctx)
 PlayerAction BotStrategyBase::decideTurn(const CurrentHandContext& ctx)
 {
     PlayerAction resultingAction;
+    resultingAction.playerId = ctx.perPlayerContext.myID;
+
     int betAmount = 0;
     int raiseAmount = 0;
 
@@ -147,6 +152,8 @@ PlayerAction BotStrategyBase::decideTurn(const CurrentHandContext& ctx)
 PlayerAction BotStrategyBase::decideRiver(const CurrentHandContext& ctx)
 {
     PlayerAction resultingAction;
+    resultingAction.playerId = ctx.perPlayerContext.myID;
+
     int betAmount = 0;
     int raiseAmount = 0;
     bool shouldCall = false;
