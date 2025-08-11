@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <core/engine/EngineDefs.h>
 #include <core/engine/HandEvaluator.h>
-#include <core/player/PlayerStatistics.h>
+
 #include "core/engine/model/ButtonState.h"
+#include "core/player/PlayerStatisticsUpdater.h"
 #include "core/player/strategy/PlayerStrategy.h"
 
 #include "CurrentHandActions.h"
@@ -86,24 +86,14 @@ class PlayerFsm
     const PlayerPosition getPosition() const;
     void setPosition();
 
-    static bool getHavePosition(PlayerPosition myPos, PlayerFsmList runningPlayers);
-
     bool checkIfINeedToShowCards() const;
 
-    float getM() const;
-
-    const PlayerStatistics& getStatistics(const int nbPlayers) const;
     CurrentHandContext& getCurrentHandContext() { return *myCurrentHandContext; };
 
     virtual float calculatePreflopCallingRange(const CurrentHandContext& ctx) const;
 
     const PostFlopAnalysisFlags getPostFlopAnalysisFlags() const;
     CurrentHandActions& getCurrentHandActions();
-
-    void updatePreflopStatistics(const int nbPlayers);
-    void updateFlopStatistics(const int nbPlayers);
-    void updateTurnStatistics(const int nbPlayers);
-    void updateRiverStatistics(const int nbPlayers);
 
     void setPreflopPotOdd(const int potOdd);
 
@@ -119,8 +109,6 @@ class PlayerFsm
     void resetForNewHand();
 
   protected:
-    void loadStatistics();
-    void resetPlayerStatistics();
     float getMaxOpponentsStrengths() const;
     bool isPreflopBigBet() const;
     float getOpponentWinningHandsPercentage(const int idPlayer, std::string board) const;
@@ -133,7 +121,7 @@ class PlayerFsm
     const int myID;
     const std::string myName;
     PlayerPosition myPosition;
-    std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> myStatistics;
+
     int myHandRanking{0};
     int myCards[2];
     std::string myCard1;
@@ -171,5 +159,6 @@ class PlayerFsm
     std::map<int, float> evaluateOpponentsStrengths() const;
     const HandSimulationStats computeHandSimulation() const;
     std::unique_ptr<PlayerStrategy> myStrategy;
+    std::unique_ptr<PlayerStatisticsUpdater> myStatisticsUpdater;
 };
 } // namespace pkt::core::player

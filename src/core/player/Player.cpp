@@ -361,7 +361,7 @@ void Player::updatePreflopStatistics()
 
     if (myCurrentHandActions.getPreflopActions().size() == 1)
     {
-        myStatistics[nbPlayers].m_toTalHands++;
+        myStatistics[nbPlayers].totalHands++;
         myStatistics[nbPlayers].preflopStatistics.hands++;
     }
 
@@ -624,11 +624,11 @@ std::string Player::getStringBoard() const
     return stringBoard;
 }
 
-bool Player::getHavePosition(PlayerPosition myPos, PlayerList runningPlayers)
+bool Player::hasPosition(PlayerPosition myPos, PlayerList runningPlayers)
 {
     // return true if myPos is last to play, false if not
 
-    bool havePosition = true;
+    bool hasPosition = true;
 
     PlayerListConstIterator itC;
 
@@ -637,11 +637,11 @@ bool Player::getHavePosition(PlayerPosition myPos, PlayerList runningPlayers)
 
         if ((*itC)->getPosition() > myPos)
         {
-            havePosition = false;
+            hasPosition = false;
         }
     }
 
-    return havePosition;
+    return hasPosition;
 }
 
 int Player::getPotOdd() const
@@ -1052,7 +1052,7 @@ void Player::updateCurrentHandContext(const GameState state)
     myCurrentHandContext->perPlayerContext.myM = static_cast<int>(getM());
     myCurrentHandContext->perPlayerContext.myCurrentHandActions = myCurrentHandActions;
     myCurrentHandContext->perPlayerContext.myHavePosition =
-        Player::getHavePosition(myPosition, currentHand->getRunningPlayersList());
+        Player::hasPosition(myPosition, currentHand->getRunningPlayersList());
     myCurrentHandContext->perPlayerContext.myPreflopIsAggressor = isAgressor(Preflop);
     myCurrentHandContext->perPlayerContext.myFlopIsAggressor = isAgressor(Flop);
     myCurrentHandContext->perPlayerContext.myTurnIsAggressor = isAgressor(Turn);

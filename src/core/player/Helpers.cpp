@@ -472,4 +472,23 @@ PlayerListIterator nextActivePlayer(PlayerList seats, PlayerListIterator it)
     }
     return it;
 }
+bool hasPosition(PlayerPosition position, PlayerFsmList runningPlayers)
+{
+    // return true if position is last to play, false if not
+
+    bool hasPosition = true;
+
+    PlayerFsmListConstIterator itC;
+
+    for (itC = runningPlayers->begin(); itC != runningPlayers->end(); ++itC)
+    {
+
+        if ((*itC)->getPosition() > position)
+        {
+            hasPosition = false;
+        }
+    }
+
+    return hasPosition;
+}
 } // namespace pkt::core::player

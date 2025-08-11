@@ -111,7 +111,7 @@ class PlayerStatistics
     float getWentToShowDown() const;
     void reset(); // init to zero
 
-    long m_toTalHands;
+    long totalHands;
     PreflopStatistics preflopStatistics;
     FlopStatistics flopStatistics;
     TurnStatistics turnStatistics;

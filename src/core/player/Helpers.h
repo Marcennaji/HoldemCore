@@ -69,4 +69,6 @@ void updateRunningPlayersListFsm(PlayerFsmList&);
 
 std::string getPositionLabel(pkt::core::PlayerPosition);
 
+bool hasPosition(PlayerPosition myPos, PlayerFsmList);
+
 } // namespace pkt::core::player

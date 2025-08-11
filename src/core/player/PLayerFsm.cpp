@@ -28,7 +28,8 @@ PlayerFsm::PlayerFsm(const GameEvents& events, int id, std::string name, int cas
 {
     myRangeEstimator = std::make_unique<RangeEstimator>(myID);
     myCurrentHandContext = std::make_unique<CurrentHandContext>();
-    loadStatistics();
+    myStatisticsUpdater = std::make_unique<PlayerStatisticsUpdater>();
+    myStatisticsUpdater->loadStatistics(name);
 
     int i;
     for (i = 0; i < 2; i++)
@@ -104,6 +105,7 @@ Button PlayerFsm::getButton() const
     return myButton;
 }
 
+// will contain human-readable string, i.e "Qc" or "Ts"
 void PlayerFsm::setCards(int* theValue)
 {
 
@@ -112,7 +114,6 @@ void PlayerFsm::setCards(int* theValue)
         myCards[i] = theValue[i];
     }
 
-    // will contain human-readable string, i.e "Qc" or "Ts"
     myCard1 = CardUtilities::getCardString(myCards[0]);
     myCard2 = CardUtilities::getCardString(myCards[1]);
 }
@@ -175,287 +176,6 @@ std::string PlayerFsm::getCardsValueString() const
 {
     std::string s = myCard1 + " " + myCard2;
     return s;
-}
-
-const PlayerStatistics& PlayerFsm::getStatistics(const int nbPlayers) const
-{
-    return myStatistics[nbPlayers];
-}
-void PlayerFsm::resetPlayerStatistics()
-{
-
-    for (int i = 0; i <= MAX_NUMBER_OF_PLAYERS; i++)
-    {
-        myStatistics[i].reset();
-    }
-}
-
-void PlayerFsm::updatePreflopStatistics(const int nbPlayers)
-{
-
-    if (myCurrentHandActions.getPreflopActions().size() == 1)
-    {
-        myStatistics[nbPlayers].m_toTalHands++;
-        myStatistics[nbPlayers].preflopStatistics.hands++;
-    }
-
-    switch (myAction)
-    {
-    case ActionType::Allin:
-        myStatistics[nbPlayers].preflopStatistics.raises++;
-        break;
-    case ActionType::Raise:
-        myStatistics[nbPlayers].preflopStatistics.raises++;
-        break;
-    case ActionType::Fold:
-        myStatistics[nbPlayers].preflopStatistics.folds++;
-        break;
-    case ActionType::Check:
-        myStatistics[nbPlayers].preflopStatistics.checks++;
-        break;
-    case ActionType::Call:
-        myStatistics[nbPlayers].preflopStatistics.calls++;
-        break;
-    default:
-        break;
-    }
-
-    myStatistics[nbPlayers].preflopStatistics.addLastAction(myAction); // keep track of the last 10 actions
-
-    if (myAction == ActionType::Call && myCurrentHandContext->commonContext.raisersPositions.size() == 0)
-    { //
-        myStatistics[nbPlayers].preflopStatistics.limps++;
-    }
-
-    int playerRaises = 0;
-    for (std::vector<ActionType>::const_iterator i = myCurrentHandActions.getPreflopActions().begin();
-         i != myCurrentHandActions.getPreflopActions().end(); i++)
-    {
-        if (*i == ActionType::Raise || *i == ActionType::Allin)
-        {
-            playerRaises++;
-        }
-    }
-
-    if (myAction == ActionType::Raise || myAction == ActionType::Allin)
-    {
-
-        if (playerRaises == 1 && myCurrentHandContext->commonContext.raisersPositions.size() == 2)
-        {
-            myStatistics[nbPlayers].preflopStatistics.threeBets++;
-        }
-
-        if (playerRaises == 2 ||
-            (playerRaises == 1 && myCurrentHandContext->commonContext.raisersPositions.size() == 3))
-        {
-            myStatistics[nbPlayers].preflopStatistics.fourBets++;
-        }
-    }
-    else
-    {
-
-        if (playerRaises == 1)
-        {
-
-            myStatistics[nbPlayers].preflopStatistics.callthreeBetsOpportunities++;
-
-            if (myAction == ActionType::Call)
-            {
-                myStatistics[nbPlayers].preflopStatistics.callthreeBets++;
-            }
-        }
-    }
-}
-void PlayerFsm::updateFlopStatistics(const int nbPlayers)
-{
-
-    if (myCurrentHandActions.getFlopActions().size() == 1)
-    {
-        myStatistics[nbPlayers].flopStatistics.hands++;
-    }
-
-    switch (myAction)
-    {
-    case ActionType::Allin:
-        myStatistics[nbPlayers].flopStatistics.raises++;
-        break;
-    case ActionType::Raise:
-        myStatistics[nbPlayers].flopStatistics.raises++;
-        break;
-    case ActionType::Fold:
-        myStatistics[nbPlayers].flopStatistics.folds++;
-        break;
-    case ActionType::Check:
-        myStatistics[nbPlayers].flopStatistics.checks++;
-        break;
-    case ActionType::Call:
-        myStatistics[nbPlayers].flopStatistics.calls++;
-        break;
-    case ActionType::Bet:
-        myStatistics[nbPlayers].flopStatistics.bets++;
-        break;
-    default:
-        break;
-    }
-    if (myAction == ActionType::Raise && myCurrentHandContext->commonContext.raisersPositions.size() > 1)
-    {
-        myStatistics[nbPlayers].flopStatistics.threeBets++;
-    }
-
-    // continuation bets
-    if (myCurrentHandContext->commonContext.preflopLastRaiserFsm &&
-        myCurrentHandContext->commonContext.preflopLastRaiserFsm->getId() == myID)
-    {
-        myStatistics[nbPlayers].flopStatistics.continuationBetsOpportunities++;
-        if (myAction == ActionType::Bet)
-        {
-            myStatistics[nbPlayers].flopStatistics.continuationBets++;
-        }
-    }
-}
-void PlayerFsm::updateTurnStatistics(const int nbPlayers)
-{
-
-    if (myCurrentHandActions.getTurnActions().size() == 1)
-    {
-        myStatistics[nbPlayers].turnStatistics.hands++;
-    }
-
-    switch (myAction)
-    {
-    case ActionType::Allin:
-        myStatistics[nbPlayers].turnStatistics.raises++;
-        break;
-    case ActionType::Raise:
-        myStatistics[nbPlayers].turnStatistics.raises++;
-        break;
-    case ActionType::Fold:
-        myStatistics[nbPlayers].turnStatistics.folds++;
-        break;
-    case ActionType::Check:
-        myStatistics[nbPlayers].turnStatistics.checks++;
-        break;
-    case ActionType::Call:
-        myStatistics[nbPlayers].turnStatistics.calls++;
-        break;
-    case ActionType::Bet:
-        myStatistics[nbPlayers].turnStatistics.bets++;
-        break;
-    default:
-        break;
-    }
-    if (myAction == ActionType::Raise && myCurrentHandContext->commonContext.raisersPositions.size() > 1)
-    {
-        myStatistics[nbPlayers].turnStatistics.threeBets++;
-    }
-}
-void PlayerFsm::updateRiverStatistics(const int nbPlayers)
-{
-
-    if (myCurrentHandActions.getRiverActions().size() == 1)
-    {
-        myStatistics[nbPlayers].riverStatistics.hands++;
-    }
-
-    switch (myAction)
-    {
-    case ActionType::Allin:
-        myStatistics[nbPlayers].riverStatistics.raises++;
-        break;
-    case ActionType::Raise:
-        myStatistics[nbPlayers].riverStatistics.raises++;
-        break;
-    case ActionType::Fold:
-        myStatistics[nbPlayers].riverStatistics.folds++;
-        break;
-    case ActionType::Check:
-        myStatistics[nbPlayers].riverStatistics.checks++;
-        break;
-    case ActionType::Call:
-        myStatistics[nbPlayers].riverStatistics.calls++;
-        break;
-    case ActionType::Bet:
-        myStatistics[nbPlayers].riverStatistics.bets++;
-        break;
-    default:
-        break;
-    }
-    if (myAction == ActionType::Raise && myCurrentHandContext->commonContext.raisersPositions.size() > 1)
-    {
-        myStatistics[nbPlayers].riverStatistics.threeBets++;
-    }
-}
-
-void PlayerFsm::loadStatistics()
-{
-
-    resetPlayerStatistics(); // reset stats to 0
-
-    myStatistics = GlobalServices::instance().playersStatisticsStore()->getPlayerStatistics(myName);
-    if (myStatistics.empty())
-    {
-        myStatistics.fill(PlayerStatistics());
-    }
-}
-
-const PostFlopAnalysisFlags PlayerFsm::getPostFlopAnalysisFlags() const
-{
-    std::string stringHand = getCardsValueString();
-    std::string stringBoard = myCurrentHandContext->commonContext.stringBoard;
-
-    return GlobalServices::instance().handEvaluationEngine()->analyzeHand(getCardsValueString(), stringBoard);
-}
-bool PlayerFsm::checkIfINeedToShowCards() const
-{
-#if false
-    std::list<unsigned> playerNeedToShowCardsList = currentHand.getBoard()->getPlayerNeedToShowCards();
-    for (std::list<unsigned>::iterator it = playerNeedToShowCardsList.begin(); it != playerNeedToShowCardsList.end();
-         ++it)
-    {
-        if (*it == myID)
-        {
-            return true;
-        }
-    }
-#endif
-    return false;
-}
-
-bool PlayerFsm::getHavePosition(PlayerPosition myPos, PlayerFsmList runningPlayers)
-{
-    // return true if myPos is last to play, false if not
-
-    bool havePosition = true;
-
-    PlayerFsmListConstIterator itC;
-
-    for (itC = runningPlayers->begin(); itC != runningPlayers->end(); ++itC)
-    {
-
-        if ((*itC)->getPosition() > myPos)
-        {
-            havePosition = false;
-        }
-    }
-
-    return havePosition;
-}
-
-float PlayerFsm::getM() const
-{
-#if (False)
-    int blinds = currentHand.getSmallBlind() + (currentHand.getSmallBlind() * 2); // assume for now that BB is 2 * SB
-    if (blinds > 0 && myCash > 0)
-    {
-        return (float) myCash / blinds;
-    }
-    else
-    {
-        return 0;
-    }
-#else
-    return 50;
-#endif
 }
 
 const HandSimulationStats PlayerFsm::computeHandSimulation() const
@@ -761,7 +481,7 @@ void PlayerFsm::setPreflopPotOdd(const int potOdd)
 
 bool PlayerFsm::isInVeryLooseMode(const int nbPlayers) const
 {
-    PlayerStatistics stats = getStatistics(nbPlayers);
+    PlayerStatistics stats = myStatisticsUpdater->getStatistics(nbPlayers);
 
     PreflopStatistics preflop = stats.preflopStatistics;
 
@@ -808,10 +528,10 @@ void PlayerFsm::updateCurrentHandContext(const GameState state, HandFsm& current
     // Player-specific, visible from the opponents :
     myCurrentHandContext->perPlayerContext.myCash = myCash;
     myCurrentHandContext->perPlayerContext.myTotalBetAmount = myTotalBetAmount;
-    myCurrentHandContext->perPlayerContext.myM = static_cast<int>(getM());
+    myCurrentHandContext->perPlayerContext.myM = static_cast<int>(currentHand.getM(myCash));
     myCurrentHandContext->perPlayerContext.myCurrentHandActions = myCurrentHandActions;
     myCurrentHandContext->perPlayerContext.myHavePosition =
-        PlayerFsm::getHavePosition(myPosition, currentHand.getRunningPlayersList());
+        hasPosition(myPosition, currentHand.getRunningPlayersList());
     myCurrentHandContext->perPlayerContext.myPreflopIsAggressor = isAgressor(Preflop);
     myCurrentHandContext->perPlayerContext.myFlopIsAggressor = isAgressor(Flop);
     myCurrentHandContext->perPlayerContext.myTurnIsAggressor = isAgressor(Turn);
@@ -841,6 +561,28 @@ void PlayerFsm::resetForNewHand()
     setCardsFlip(0);
     setActive(true);
     getCurrentHandActions().reset();
+}
+const PostFlopAnalysisFlags PlayerFsm::getPostFlopAnalysisFlags() const
+{
+    std::string stringHand = getCardsValueString();
+    std::string stringBoard = myCurrentHandContext->commonContext.stringBoard;
+
+    return GlobalServices::instance().handEvaluationEngine()->analyzeHand(getCardsValueString(), stringBoard);
+}
+bool PlayerFsm::checkIfINeedToShowCards() const
+{
+#if false
+    std::list<unsigned> playerNeedToShowCardsList = currentHand.getBoard()->getPlayerNeedToShowCards();
+    for (std::list<unsigned>::iterator it = playerNeedToShowCardsList.begin(); it != playerNeedToShowCardsList.end();
+         ++it)
+    {
+        if (*it == myID)
+        {
+            return true;
+        }
+    }
+#endif
+    return false;
 }
 
 } // namespace pkt::core::player

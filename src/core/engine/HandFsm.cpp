@@ -223,7 +223,18 @@ CommonHandContext HandFsm::updateCurrentHandContext(const GameState state)
 
     return handContext;
 }
-
+float HandFsm::getM(int cash) const
+{
+    int blinds = mySmallBlind + (mySmallBlind * 2);
+    if (blinds > 0 && cash > 0)
+    {
+        return (float) cash / blinds;
+    }
+    else
+    {
+        return 0;
+    }
+}
 std::string HandFsm::getStringBoard() const
 {
 
