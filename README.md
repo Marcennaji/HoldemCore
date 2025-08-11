@@ -1,119 +1,156 @@
 # PokerTraining
 
 **Texas Hold'em Poker Training Simulator**  
-Cross-platform, event-driven C++ engine with bot opponents and 1 human player (optional), customizable bot strategies, and frontend-agnostic architecture.
+Cross-platform, event-driven C++ engine with bot opponents and optional human player, customizable bot strategies, and frontend-agnostic architecture.
 
 ---
 
 ## 🎯 Project Goal
 
-PokerTraining is an offline, open-source poker simulation tool designed to help players practice against a variety of opponents. Its goal is also to allow bots implementers (C++ developers) to test their poker strategies and focus only on the poker logic, without bothering about all the technical stuff (hands and rounds management, cards, etc)
+PokerTraining is an offline, open-source poker simulation tool designed to help players practice against a variety of opponents.  
+It is also designed for **bot developers** to easily implement and test custom poker strategies, focusing purely on poker logic without dealing with the underlying mechanics of game management.
 
-- Train against tight, loose, aggressive, or random bots  
-- Customize your poker table: number of players, stack size, small blind value, opponent profiles  
-- Run entirely offline (desktop or mobile)
+- Train against tight, loose, aggressive, or random bots — or implement your own  
+- Customize table parameters: number of players, stack size, small blind, opponent profiles  
+- Run entirely offline (desktop, mobile, or CLI)
 
 ---
 
 ## 🧱 Architecture Highlights
 
 ### 1. **Decoupled C++ Engine** (`src/core/`)
+- **Fully UI-independent** 
+- Manages game state, hand resolution, betting rounds, player actions
+- Event-driven via plain `GameEvents` callback struct
 
-- Fully independent of UI (no Qt dependency)
-- Handles game state, hand resolution, betting rounds
-- Event-driven via a plain `GameEvents` callback struct
-
-### 2. **Multiple Frontends (Planned)**
-
+### 2. **Multiple Frontends**
 - ✅ Qt Widgets UI (in progress)
-- 🟡 Flutter/Web frontend (planned)
+- 🟡 Flutter/Web UI (planned)
+- ⚪ CLI mode for headless or manual human input (currently working)
 
-### 3. **Bot Strategies with Dependency Injection**
+### 3. **Bot Strategies**
+- Clear separation of `BotPlayer` and `BotStrategy`
+- Minimal `BotStrategy` interface (4 template methods: `decidePreflop`, `decideFlop`, `decideTurn`, `decideRiver`)
+- Default logic can be partially overridden by bot developers
+- Built-in bots:
+  - Tight Aggressive
+  - Loose Aggressive
+  - Maniac
+  - Ultra Tight
+- Strategies can switch mid-game (e.g., stack size changes)
+- Testable in isolation using `CurrentHandContext`
 
-- Clean separation of `BotPlayer` and `BotStrategy`
-- Includes: `TightAggressive`, `LooseAggressive`, `Maniac`, `UltraTight`
-- Strategies are testable via `CurrentHandContext`
-- Bots may dynamically switch strategies mid-game based on context (e.g., stack size)
-- Easy to create custom bots implementing the simple `BotStrategy` interface
+**Example custom bot:**
+```cpp
+class MyCustomBotStrategy : public BotStrategy {
+public:
+    MyCustomBotStrategy() : BotStrategy("MyCustom") {}
+    PlayerAction decidePreflop(const CurrentHandContext& ctx) override {
+        // Custom logic here
+    }
+};
+```
 
 ### 4. **Range Management & Equity Evaluation**
+- Bots estimate opponent ranges using only public information
+- Range pruning based on table actions & statistics (SQLite persistence)
+- Flexible preflop/streets decision logic
 
-- Bot players estimate opponent ranges based on current hand actions and historical statistics (stored in DB)
-- Range pruning is based only on public information (no cheating!)
-- Sophisticated preflop call/raise logic using multiple parameters
+### 5. **Finite State Machine for Streets**
+- Ongoing refactor to model hand progress:
+  - Preflop → Flop → Turn → River → Showdown
+- Ensures predictable and maintainable game flow
 
-### 5. **Testing Infrastructure**
-
-- GoogleTest-based unit tests located in the `tests/` directory
+### 6. **Testing Infrastructure**
+- GoogleTest-based unit tests in `tests/`
 
 ---
 
 ## 🔧 Technologies Used
-
-- C++17
-- Qt Widgets (for current UI)
-- GoogleTest
-- uWebSockets (planned WebSocket server)
-- Flutter (planned UI)
+- **C++17**
+- **Qt Widgets** (current UI, being refactored)
+- **GoogleTest**
+- **uWebSockets** (planned WebSocket server)
+- **Flutter** (planned UI)
+- **SQLite3**
 
 ---
 
-## 🚧 Current Status : unstable, under active refactoring
+## 🚀 Current Status — *Unstable, redesign of core engine using an FSM is on active development*
+Originally created by Marc Ennaji in 2011 (SourceForge), migrated to GitHub in 2025.  
+Currently in **major architectural rewrite** to improve decoupling, modularity, maintainability, and testability.
 
-This project was originally created and published on SourceForge by Marc Ennaji in 2011. It has been migrated on Github during 2025.
-The current version is a complete architectural rewrite, for a better decoupling, modularity, maintainability, testability, and cross-platform UI support. It is currently under **active refactoring**, with major milestones already completed:
+✅ Core engine is now headless  
+✅ `GameEvents` decouples UI from logic  
+✅ Minimalistic `BotStrategy` API with overridable defaults  
+✅ CLI-based manual play for human player  
+✅ FSM-based street handling in progress  
 
-✅ Engine is now headless  
-✅ `GameEvents` emit UI updates without any UI dependency  
-✅ Strategies refactored and unit-tested  
-✅ Engine is ready to be wrapped in a WebSocket server for multi-platform frontends  
+---
 
-🔜 Next steps:
-- Ongoing : completely redesign the transition between a hand's streets (Preflop->Flop->Turn->River->PostRiver) using a Finished State Machine (FSM)
-- Completely rewrite the Qt Widgets poker table UI for a clean and modern layout
-- Build JSON-based WebSocket protocol  
-- Develop Flutter UI for Android/Web  
-- Reach an 'A' CppDepend rating and high SonarQube score  
+## 📋 Roadmap
+
+**Short-term**
+- Complete FSM-based hand street transitions
+- Rewrite Qt Widgets table UI with modern layout
+- Refactor some classes to improve design
+
+**Medium-term**
+- Implement WebSocket server & JSON protocol
+- Build Flutter UIs for Android and Web
 
 ---
 
 ## 📁 Project Structure (Simplified)
-
 ```
 src/
 ├── core/             # Engine logic
 │   ├── engine/       # Hand, board, betting, evaluator
 │   ├── events/       # GameEvents definition
-│   ├── player/       # Player, BotPlayer, strategies
-│   ├── session/      # Session & Game management
+│   ├── player/       # Player, BotPlayer, BotStrategy
+│   ├── session/      # Session & game management
 ├── ui/
-│   └── qtwidgets/    # Qt Widgets UI (views, controllers)
+│   └── qtwidgets/    # Qt Widgets UI
 ├── server/           # WebSocket server (planned)
-├── tests/            # GoogleTest tests
-└── third_party/      # hand simulation, SQLite3, etc.
+├── tests/            # Unit tests
+└── third_party/      # External dependencies
+```
+
+---
+
+## 💻 Building & Running
+
+### Requirements
+- CMake 3.15+
+- C++17 compiler
+- Qt6 (only if building the qt UI)
+- (Optional) GoogleTest for running tests
+
+### Build Instructions
+```bash
+git clone https://github.com/Marcennaji/PokerTraining.git
+cd PokerTraining
+mkdir build && cd build
+cmake ..
+make
 ```
 
 ---
 
 ## 📚 Third-Party Components
 
-This project uses or integrates the following third-party libraries:
+- **[psim](https://github.com/christophschmalhofer/poker/tree/master/XPokerEval/XPokerEval.PokerSim)** — Poker hand simulator and evaluator  
+- **[poker-eval](https://github.com/atinm/poker-eval)** — C library, used by psim for hand evaluation  
+- **[SQLite3](https://www.sqlite.org/index.html)** — Embedded SQL database  
 
-- **[psim](https://github.com/christophschmalhofer/poker/tree/master/XPokerEval/XPokerEval.PokerSim)** — A fast poker hand simulator and evaluator for hand ranking and simulations  
-- **[poker-eval](https://github.com/atinm/poker-eval)** — A C library for poker hand evaluation originally developed by Andrew Prock  
-- **[SQLite3](https://www.sqlite.org/index.html)** — A self-contained, high-reliability embedded SQL database engine for persistent data storage  
-
-> All third-party libraries are used in accordance with their respective open-source licenses.  
-> See the `third_party/` directory for license information.
+> See `third_party/` for licenses.
 
 ---
 
-## 🙋 Contributing
-
+## 🤝 Contributing
 See [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ---
 
 ## 📝 License
-
 MIT — free to use, learn from, and contribute to.

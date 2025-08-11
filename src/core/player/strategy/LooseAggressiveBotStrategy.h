@@ -19,19 +19,19 @@ class LooseAggressiveBotStrategy : public BotStrategyBase
     ~LooseAggressiveBotStrategy();
 
   protected:
-    bool preflopShouldCall(const CurrentHandContext& ctx);
-    bool flopShouldCall(const CurrentHandContext& ctx);
-    bool turnShouldCall(const CurrentHandContext& ctx);
-    bool riverShouldCall(const CurrentHandContext& ctx);
+    virtual bool preflopShouldCall(const CurrentHandContext& ctx);
+    virtual bool flopShouldCall(const CurrentHandContext& ctx);
+    virtual bool turnShouldCall(const CurrentHandContext& ctx);
+    virtual bool riverShouldCall(const CurrentHandContext& ctx);
 
-    int preflopShouldRaise(const CurrentHandContext& ctx);
-    int flopShouldRaise(const CurrentHandContext& ctx);
-    int turnShouldRaise(const CurrentHandContext& ctx);
-    int riverShouldRaise(const CurrentHandContext& ctx);
+    virtual int preflopShouldRaise(const CurrentHandContext& ctx);
+    virtual int flopShouldRaise(const CurrentHandContext& ctx);
+    virtual int turnShouldRaise(const CurrentHandContext& ctx);
+    virtual int riverShouldRaise(const CurrentHandContext& ctx);
 
-    int flopShouldBet(const CurrentHandContext& ctx);
-    int turnShouldBet(const CurrentHandContext& ctx);
-    int riverShouldBet(const CurrentHandContext& ctx);
+    virtual int flopShouldBet(const CurrentHandContext& ctx);
+    virtual int turnShouldBet(const CurrentHandContext& ctx);
+    virtual int riverShouldBet(const CurrentHandContext& ctx);
 };
 
 } // namespace pkt::core::player
