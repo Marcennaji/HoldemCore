@@ -29,10 +29,6 @@ void EngineTest::SetUp()
     auto randomizer = std::make_shared<FakeRandomizer>();
     randomizer->values = {3, 5, 7};
     services.setRandomizer(randomizer);
-
-    // Run test using logic that relies on GlobalServices::randomizer()
-
-    // Restore default impl after test if needed
 }
 
 void EngineTest::TearDown()

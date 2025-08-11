@@ -31,24 +31,36 @@ It is also designed for **bot developers** to easily implement and test custom p
 ### 3. **Bot Strategies**
 - Clear separation of `BotPlayer` and `BotStrategy`
 - Minimal `BotStrategy` interface (4 template methods: `decidePreflop`, `decideFlop`, `decideTurn`, `decideRiver`)
-- Default logic can be partially overridden by bot developers
 - Built-in bots:
   - Tight Aggressive
   - Loose Aggressive
   - Maniac
   - Ultra Tight
+- If needed, built-in bots' shared logic can be reused by bot developers, by deriving a new strategy from `BotStrategyBase` (instead of directly from `BotStrategy`).  
 - Strategies can switch mid-game (e.g., stack size changes)
 - Testable in isolation using `CurrentHandContext`
 
 **Example custom bot:**
+
 ```cpp
 class MyCustomBotStrategy : public BotStrategy {
 public:
-    MyCustomBotStrategy() : BotStrategy("MyCustom") {}
+    MyCustomBotStrategy() : BotStrategy() {}
+
     PlayerAction decidePreflop(const CurrentHandContext& ctx) override {
         // Custom logic here
+        return PlayerAction{}; // return a default action or implement logic
     }
+    // ... same for decideFlop, decideTurn, decideRiver
 };
+```
+
+Then:
+
+```cpp
+Player player(events, playerName /*, other params if any */); 
+player.setStrategy(std::make_unique<MyCustomBotStrategy>());
+
 ```
 
 ### 4. **Range Management & Equity Evaluation**
