@@ -22,9 +22,9 @@ void PlayerStatisticsUpdater::resetPlayerStatistics()
 
 void PlayerStatisticsUpdater::updatePreflopStatistics(const CurrentHandContext& ctx, const ActionType& action)
 {
-    const int nbPlayers = ctx.commonContext.nbPlayers;
+    const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
 
-    if (ctx.perPlayerContext.myCurrentHandActions.getPreflopActions().size() == 1)
+    if (ctx.personalContext.actions.currentHandActions.getActions(GameState::Preflop).size() == 1)
     {
         myStatistics[nbPlayers].totalHands++;
         myStatistics[nbPlayers].preflopStatistics.hands++;
@@ -53,14 +53,14 @@ void PlayerStatisticsUpdater::updatePreflopStatistics(const CurrentHandContext& 
 
     myStatistics[nbPlayers].preflopStatistics.addLastAction(action); // keep track of the last 10 actions
 
-    if (action == ActionType::Call && ctx.commonContext.raisersPositions.size() == 0)
+    if (action == ActionType::Call && ctx.commonContext.playersContext.raisersPositions.size() == 0)
     { //
         myStatistics[nbPlayers].preflopStatistics.limps++;
     }
 
     int playerRaises = 0;
-    for (auto i = ctx.perPlayerContext.myCurrentHandActions.getPreflopActions().begin();
-         i != ctx.perPlayerContext.myCurrentHandActions.getPreflopActions().end(); i++)
+    for (auto i = ctx.personalContext.actions.currentHandActions.getActions(GameState::Preflop).begin();
+         i != ctx.personalContext.actions.currentHandActions.getActions(GameState::Preflop).end(); i++)
     {
         if (*i == ActionType::Raise || *i == ActionType::Allin)
         {
@@ -71,12 +71,12 @@ void PlayerStatisticsUpdater::updatePreflopStatistics(const CurrentHandContext& 
     if (action == ActionType::Raise || action == ActionType::Allin)
     {
 
-        if (playerRaises == 1 && ctx.commonContext.raisersPositions.size() == 2)
+        if (playerRaises == 1 && ctx.commonContext.playersContext.raisersPositions.size() == 2)
         {
             myStatistics[nbPlayers].preflopStatistics.threeBets++;
         }
 
-        if (playerRaises == 2 || (playerRaises == 1 && ctx.commonContext.raisersPositions.size() == 3))
+        if (playerRaises == 2 || (playerRaises == 1 && ctx.commonContext.playersContext.raisersPositions.size() == 3))
         {
             myStatistics[nbPlayers].preflopStatistics.fourBets++;
         }
@@ -98,9 +98,9 @@ void PlayerStatisticsUpdater::updatePreflopStatistics(const CurrentHandContext& 
 }
 void PlayerStatisticsUpdater::updateFlopStatistics(const CurrentHandContext& ctx, const ActionType& action)
 {
-    const int nbPlayers = ctx.commonContext.nbPlayers;
+    const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
 
-    if (ctx.perPlayerContext.myCurrentHandActions.getFlopActions().size() == 1)
+    if (ctx.personalContext.actions.currentHandActions.getActions(GameState::Flop).size() == 1)
     {
         myStatistics[nbPlayers].flopStatistics.hands++;
     }
@@ -128,14 +128,14 @@ void PlayerStatisticsUpdater::updateFlopStatistics(const CurrentHandContext& ctx
     default:
         break;
     }
-    if (action == ActionType::Raise && ctx.commonContext.raisersPositions.size() > 1)
+    if (action == ActionType::Raise && ctx.commonContext.playersContext.raisersPositions.size() > 1)
     {
         myStatistics[nbPlayers].flopStatistics.threeBets++;
     }
 
     // continuation bets
-    if (ctx.commonContext.preflopLastRaiserFsm &&
-        ctx.commonContext.preflopLastRaiserFsm->getId() == ctx.perPlayerContext.myID)
+    if (ctx.commonContext.playersContext.preflopLastRaiserFsm &&
+        ctx.commonContext.playersContext.preflopLastRaiserFsm->getId() == ctx.personalContext.id)
     {
         myStatistics[nbPlayers].flopStatistics.continuationBetsOpportunities++;
         if (action == ActionType::Bet)
@@ -146,9 +146,9 @@ void PlayerStatisticsUpdater::updateFlopStatistics(const CurrentHandContext& ctx
 }
 void PlayerStatisticsUpdater::updateTurnStatistics(const CurrentHandContext& ctx, const ActionType& action)
 {
-    const int nbPlayers = ctx.commonContext.nbPlayers;
+    const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
 
-    if (ctx.perPlayerContext.myCurrentHandActions.getTurnActions().size() == 1)
+    if (ctx.personalContext.actions.currentHandActions.getActions(GameState::Turn).size() == 1)
     {
         myStatistics[nbPlayers].turnStatistics.hands++;
     }
@@ -176,16 +176,16 @@ void PlayerStatisticsUpdater::updateTurnStatistics(const CurrentHandContext& ctx
     default:
         break;
     }
-    if (action == ActionType::Raise && ctx.commonContext.raisersPositions.size() > 1)
+    if (action == ActionType::Raise && ctx.commonContext.playersContext.raisersPositions.size() > 1)
     {
         myStatistics[nbPlayers].turnStatistics.threeBets++;
     }
 }
 void PlayerStatisticsUpdater::updateRiverStatistics(const CurrentHandContext& ctx, const ActionType& action)
 {
-    const int nbPlayers = ctx.commonContext.nbPlayers;
+    const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
 
-    if (ctx.perPlayerContext.myCurrentHandActions.getRiverActions().size() == 1)
+    if (ctx.personalContext.actions.currentHandActions.getActions(GameState::River).size() == 1)
     {
         myStatistics[nbPlayers].riverStatistics.hands++;
     }
@@ -213,7 +213,7 @@ void PlayerStatisticsUpdater::updateRiverStatistics(const CurrentHandContext& ct
     default:
         break;
     }
-    if (action == ActionType::Raise && ctx.commonContext.raisersPositions.size() > 1)
+    if (action == ActionType::Raise && ctx.commonContext.playersContext.raisersPositions.size() > 1)
     {
         myStatistics[nbPlayers].riverStatistics.threeBets++;
     }

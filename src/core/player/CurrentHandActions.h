@@ -2,7 +2,9 @@
 #pragma once
 
 #include <core/engine/model/PlayerAction.h>
+#include "core/engine/model/GameState.h"
 
+#include <map>
 #include <vector>
 
 namespace pkt::core::player
@@ -11,25 +13,16 @@ namespace pkt::core::player
 class CurrentHandActions
 {
   public:
-    CurrentHandActions() { reset(); };
+    CurrentHandActions();
     ~CurrentHandActions() = default;
 
-    void reset(); // init to zero
+    void reset();
 
-    std::vector<ActionType>& getPreflopActions();
-    std::vector<ActionType>& getFlopActions();
-    std::vector<ActionType>& getTurnActions();
-    std::vector<ActionType>& getRiverActions();
-
-    const std::vector<ActionType>& getPreflopActions() const { return m_preflopActions; };
-    const std::vector<ActionType>& getFlopActions() const { return m_flopActions; };
-    const std::vector<ActionType>& getTurnActions() const { return m_turnActions; };
-    const std::vector<ActionType>& getRiverActions() const { return m_riverActions; };
+    std::vector<ActionType>& getActions(const GameState& state) { return myActionsByState[state]; };
+    const std::vector<ActionType>& getActions(const GameState& state) const { return myActionsByState.at(state); };
+    int getActionsNumber(const GameState& state, const ActionType& actionType) const;
 
   protected:
-    std::vector<ActionType> m_preflopActions;
-    std::vector<ActionType> m_flopActions;
-    std::vector<ActionType> m_turnActions;
-    std::vector<ActionType> m_riverActions;
+    std::map<GameState, std::vector<pkt::core::ActionType>> myActionsByState;
 };
 } // namespace pkt::core::player

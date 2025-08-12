@@ -79,10 +79,10 @@ TEST_F(BettingRoundsLegacyTest, PlayersDoNotActAfterFolding)
             }
         };
 
-        checkRound(player->getCurrentHandActions().getPreflopActions());
-        checkRound(player->getCurrentHandActions().getFlopActions());
-        checkRound(player->getCurrentHandActions().getTurnActions());
-        checkRound(player->getCurrentHandActions().getRiverActions());
+        checkRound(player->getCurrentHandActions().getActions(GameState::Preflop));
+        checkRound(player->getCurrentHandActions().getActions(GameState::Flop));
+        checkRound(player->getCurrentHandActions().getActions(GameState::Turn));
+        checkRound(player->getCurrentHandActions().getActions(GameState::River));
 
         EXPECT_FALSE(actedAfterFold) << "Player " << player->getId() << " acted after folding.";
     }

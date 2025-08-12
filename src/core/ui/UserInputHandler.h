@@ -28,8 +28,8 @@ class UserInputHandler
         while (!valid)
         {
             std::cout << "\n=== Your Turn ===\n";
-            std::cout << "Position: " << positionToString(ctx.perPlayerContext.myPosition) << "\n";
-            std::cout << "Pot size: " << ctx.commonContext.pot << "\n";
+            std::cout << "Position: " << positionToString(ctx.personalContext.position) << "\n";
+            std::cout << "Pot size: " << ctx.commonContext.bettingContext.pot << "\n";
             std::cout << "Choose action: (c)all, (r)aise, (f)old, chec(k): ";
 
             char choice{};

@@ -359,7 +359,7 @@ void Player::updatePreflopStatistics()
 
     const int nbPlayers = currentHand->getSeatsList()->size();
 
-    if (myCurrentHandActions.getPreflopActions().size() == 1)
+    if (myCurrentHandActions.getActions(GameState::Preflop).size() == 1)
     {
         myStatistics[nbPlayers].totalHands++;
         myStatistics[nbPlayers].preflopStatistics.hands++;
@@ -394,8 +394,8 @@ void Player::updatePreflopStatistics()
     }
 
     int playerRaises = 0;
-    for (std::vector<ActionType>::const_iterator i = myCurrentHandActions.getPreflopActions().begin();
-         i != myCurrentHandActions.getPreflopActions().end(); i++)
+    for (std::vector<ActionType>::const_iterator i = myCurrentHandActions.getActions(GameState::Preflop).begin();
+         i != myCurrentHandActions.getActions(GameState::Preflop).end(); i++)
     {
         if (*i == ActionType::Raise || *i == ActionType::Allin)
         {
@@ -436,7 +436,7 @@ void Player::updateFlopStatistics()
 
     const int nbPlayers = currentHand->getSeatsList()->size();
 
-    if (myCurrentHandActions.getFlopActions().size() == 1)
+    if (myCurrentHandActions.getActions(GameState::Flop).size() == 1)
     {
         myStatistics[nbPlayers].flopStatistics.hands++;
     }
@@ -484,7 +484,7 @@ void Player::updateTurnStatistics()
 
     const int nbPlayers = currentHand->getSeatsList()->size();
 
-    if (myCurrentHandActions.getTurnActions().size() == 1)
+    if (myCurrentHandActions.getActions(GameState::Turn).size() == 1)
     {
         myStatistics[nbPlayers].turnStatistics.hands++;
     }
@@ -522,7 +522,7 @@ void Player::updateRiverStatistics()
 
     const int nbPlayers = currentHand->getSeatsList()->size();
 
-    if (myCurrentHandActions.getRiverActions().size() == 1)
+    if (myCurrentHandActions.getActions(GameState::River).size() == 1)
     {
         myStatistics[nbPlayers].riverStatistics.hands++;
     }
@@ -996,80 +996,60 @@ void Player::updateCurrentHandContext(const GameState state)
 {
     // general (and shared) game state
     myCurrentHandContext->commonContext.gameState = state;
-    myCurrentHandContext->commonContext.nbRunningPlayers = currentHand->getRunningPlayersList()->size();
-    myCurrentHandContext->commonContext.lastVPIPPlayer =
-        getPlayerById(currentHand->getSeatsList(), currentHand->getLastRaiserId());
-    myCurrentHandContext->commonContext.callersPositions = currentHand->getCallersPositions();
-    myCurrentHandContext->commonContext.pot = currentHand->getBoard()->getPot();
-    myCurrentHandContext->commonContext.potOdd = getPotOdd();
-    myCurrentHandContext->commonContext.sets = currentHand->getBoard()->getSets();
-    myCurrentHandContext->commonContext.highestBetAmount = currentHand->getCurrentBettingRound()->getHighestSet();
-    myCurrentHandContext->commonContext.stringBoard = getStringBoard();
-    myCurrentHandContext->commonContext.preflopLastRaiser =
-        getPlayerById(currentHand->getSeatsList(), currentHand->getPreflopLastRaiserId());
-    myCurrentHandContext->commonContext.preflopRaisesNumber = currentHand->getPreflopRaisesNumber();
-    myCurrentHandContext->commonContext.preflopCallsNumber = currentHand->getPreflopCallsNumber();
-    myCurrentHandContext->commonContext.isPreflopBigBet = isPreflopBigBet();
-    myCurrentHandContext->commonContext.flopBetsOrRaisesNumber = currentHand->getFlopBetsOrRaisesNumber();
-    myCurrentHandContext->commonContext.flopLastRaiser =
-        getPlayerById(currentHand->getSeatsList(), currentHand->getFlopLastRaiserId());
-    myCurrentHandContext->commonContext.turnBetsOrRaisesNumber = currentHand->getTurnBetsOrRaisesNumber();
-    myCurrentHandContext->commonContext.turnLastRaiser =
-        getPlayerById(currentHand->getSeatsList(), currentHand->getTurnLastRaiserId());
-    myCurrentHandContext->commonContext.riverBetsOrRaisesNumber = currentHand->getRiverBetsOrRaisesNumber();
-    myCurrentHandContext->commonContext.nbPlayers = currentHand->getSeatsList()->size();
     myCurrentHandContext->commonContext.smallBlind = currentHand->getSmallBlind();
+    myCurrentHandContext->commonContext.stringBoard = getStringBoard();
 
-    for (std::vector<ActionType>::const_iterator i = myCurrentHandActions.getFlopActions().begin();
-         i != myCurrentHandActions.getFlopActions().end(); i++)
-    {
+    myCurrentHandContext->commonContext.playersContext.flopLastRaiser =
+        getPlayerById(currentHand->getSeatsList(), currentHand->getFlopLastRaiserId());
+    myCurrentHandContext->commonContext.playersContext.runningPlayersList = currentHand->getRunningPlayersList();
+    myCurrentHandContext->commonContext.playersContext.lastVPIPPlayer =
+        getPlayerById(currentHand->getSeatsList(), currentHand->getLastRaiserId());
+    myCurrentHandContext->commonContext.playersContext.callersPositions = currentHand->getCallersPositions();
+    myCurrentHandContext->commonContext.playersContext.preflopLastRaiser =
+        getPlayerById(currentHand->getSeatsList(), currentHand->getPreflopLastRaiserId());
+    myCurrentHandContext->commonContext.playersContext.turnLastRaiser =
+        getPlayerById(currentHand->getSeatsList(), currentHand->getTurnLastRaiserId());
+    myCurrentHandContext->commonContext.playersContext.nbPlayers = currentHand->getSeatsList()->size();
 
-        if (*i == ActionType::Raise)
-        {
-            myCurrentHandContext->perPlayerContext.nbRaises++;
-        }
-        else if (*i == ActionType::Bet)
-        {
-            myCurrentHandContext->perPlayerContext.nbBets++;
-        }
-        else if (*i == ActionType::Check)
-        {
-            myCurrentHandContext->perPlayerContext.nbChecks++;
-        }
-        else if (*i == ActionType::Call)
-        {
-            myCurrentHandContext->perPlayerContext.nbCalls++;
-        }
-        else if (*i == ActionType::Allin)
-        {
-            myCurrentHandContext->perPlayerContext.nbAllins++;
-        }
-    }
+    myCurrentHandContext->commonContext.bettingContext.preflopRaisesNumber = currentHand->getPreflopRaisesNumber();
+    myCurrentHandContext->commonContext.bettingContext.preflopCallsNumber = currentHand->getPreflopCallsNumber();
+    myCurrentHandContext->commonContext.bettingContext.isPreflopBigBet = isPreflopBigBet();
+    myCurrentHandContext->commonContext.bettingContext.flopBetsOrRaisesNumber =
+        currentHand->getFlopBetsOrRaisesNumber();
+    myCurrentHandContext->commonContext.bettingContext.turnBetsOrRaisesNumber =
+        currentHand->getTurnBetsOrRaisesNumber();
+    myCurrentHandContext->commonContext.bettingContext.riverBetsOrRaisesNumber =
+        currentHand->getRiverBetsOrRaisesNumber();
+    myCurrentHandContext->commonContext.bettingContext.pot = currentHand->getBoard()->getPot();
+    myCurrentHandContext->commonContext.bettingContext.potOdd = getPotOdd();
+    myCurrentHandContext->commonContext.bettingContext.sets = currentHand->getBoard()->getSets();
+    myCurrentHandContext->commonContext.bettingContext.highestBetAmount =
+        currentHand->getCurrentBettingRound()->getHighestSet();
 
     // Player-specific, visible from the opponents :
-    myCurrentHandContext->perPlayerContext.myCash = myCash;
-    myCurrentHandContext->perPlayerContext.myTotalBetAmount = myTotalBetAmount;
-    myCurrentHandContext->perPlayerContext.myM = static_cast<int>(getM());
-    myCurrentHandContext->perPlayerContext.myCurrentHandActions = myCurrentHandActions;
-    myCurrentHandContext->perPlayerContext.myHavePosition =
+    myCurrentHandContext->personalContext.cash = myCash;
+    myCurrentHandContext->personalContext.totalBetAmount = myTotalBetAmount;
+    myCurrentHandContext->personalContext.m = static_cast<int>(getM());
+    myCurrentHandContext->personalContext.actions.currentHandActions = myCurrentHandActions;
+    myCurrentHandContext->personalContext.hasPosition =
         Player::hasPosition(myPosition, currentHand->getRunningPlayersList());
-    myCurrentHandContext->perPlayerContext.myPreflopIsAggressor = isAgressor(Preflop);
-    myCurrentHandContext->perPlayerContext.myFlopIsAggressor = isAgressor(Flop);
-    myCurrentHandContext->perPlayerContext.myTurnIsAggressor = isAgressor(Turn);
-    myCurrentHandContext->perPlayerContext.myRiverIsAggressor = isAgressor(River);
-    myCurrentHandContext->perPlayerContext.myStatistics = getStatistics(currentHand->getSeatsList()->size());
-    myCurrentHandContext->perPlayerContext.myID = myID;
-    myCurrentHandContext->perPlayerContext.myIsInVeryLooseMode = isInVeryLooseMode(currentHand->getSeatsList()->size());
-    myCurrentHandContext->perPlayerContext.myPosition = myPosition;
+    myCurrentHandContext->personalContext.actions.preflopIsAggressor = isAgressor(Preflop);
+    myCurrentHandContext->personalContext.actions.flopIsAggressor = isAgressor(Flop);
+    myCurrentHandContext->personalContext.actions.turnIsAggressor = isAgressor(Turn);
+    myCurrentHandContext->personalContext.actions.riverIsAggressor = isAgressor(River);
+    myCurrentHandContext->personalContext.statistics = getStatistics(currentHand->getSeatsList()->size());
+    myCurrentHandContext->personalContext.id = myID;
+    myCurrentHandContext->personalContext.actions.isInVeryLooseMode =
+        isInVeryLooseMode(currentHand->getSeatsList()->size());
+    myCurrentHandContext->personalContext.position = myPosition;
 
     // player specific, hidden from the opponents :
-    myCurrentHandContext->perPlayerContext.myCard1 = myCard1;
-    myCurrentHandContext->perPlayerContext.myCard2 = myCard2;
-    myCurrentHandContext->perPlayerContext.myCanBluff = canBluff(state);
-    myCurrentHandContext->perPlayerContext.myPreflopCallingRange = calculatePreflopCallingRange(*myCurrentHandContext);
+    myCurrentHandContext->personalContext.card1 = myCard1;
+    myCurrentHandContext->personalContext.card2 = myCard2;
+    myCurrentHandContext->personalContext.preflopCallingRange = calculatePreflopCallingRange(*myCurrentHandContext);
     // guess what the opponents might have and evaluate our strength, given our hole cards and the board cards (if any)
-    myCurrentHandContext->perPlayerContext.myHandSimulation = computeHandSimulation();
-    myCurrentHandContext->perPlayerContext.myPostFlopAnalysisFlags = getPostFlopAnalysisFlags();
+    myCurrentHandContext->personalContext.myHandSimulation = computeHandSimulation();
+    myCurrentHandContext->personalContext.postFlopAnalysisFlags = getPostFlopAnalysisFlags();
 }
 
 float Player::calculatePreflopCallingRange(const CurrentHandContext& ctx) const

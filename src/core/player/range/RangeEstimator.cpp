@@ -145,15 +145,14 @@ void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(const CurrentHan
     const string originalEstimatedRange = getEstimatedRange();
 
     GlobalServices::instance().logger()->verbose("\tPlausible range on preflop for player " +
-                                                 std::to_string(ctx.perPlayerContext.myID) + " :\t" +
-                                                 getEstimatedRange());
+                                                 std::to_string(ctx.personalContext.id) + " :\t" + getEstimatedRange());
 
-    const int nbPlayers = ctx.commonContext.nbPlayers;
+    const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
 
-    PreflopStatistics preflop = ctx.perPlayerContext.myStatistics.preflopStatistics;
+    PreflopStatistics preflop = ctx.personalContext.statistics.preflopStatistics;
 
     // if no raise and the BB checks :
-    if (ctx.perPlayerContext.myCurrentHandActions.getPreflopActions().back() == ActionType::Check)
+    if (ctx.personalContext.actions.currentHandActions.getActions(GameState::Preflop).back() == ActionType::Check)
     {
 
         if (preflop.hands >= MIN_HANDS_STATISTICS_ACCURATE)
@@ -177,7 +176,7 @@ void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(const CurrentHan
 void RangeEstimator::updateUnplausibleRangesGivenFlopActions(const CurrentHandContext& ctx)
 {
 
-    const int nbPlayers = ctx.commonContext.nbPlayers;
+    const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
     const string originalEstimatedRange = getEstimatedRange();
     string unplausibleRanges;
 
@@ -185,11 +184,11 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(const CurrentHandCo
 
     // update my unplausible hands (unplausible to my opponents eyes), given what I did on flop
 
-    FlopStatistics flop = ctx.perPlayerContext.myStatistics.flopStatistics;
+    FlopStatistics flop = ctx.personalContext.statistics.flopStatistics;
 
-    PreflopStatistics preflop = ctx.perPlayerContext.myStatistics.preflopStatistics;
+    PreflopStatistics preflop = ctx.personalContext.statistics.preflopStatistics;
 
-    if (ctx.perPlayerContext.myIsInVeryLooseMode)
+    if (ctx.personalContext.actions.isInVeryLooseMode)
     {
         GlobalServices::instance().logger()->verbose(
             "\tSeems to be (temporarily ?) on very loose mode : estimated range is\t" + getEstimatedRange());
@@ -210,13 +209,13 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(const CurrentHandCo
 
         bool removeHand = false;
 
-        if (ctx.perPlayerContext.myCurrentHandActions.getFlopActions().empty())
+        if (ctx.personalContext.actions.currentHandActions.getActions(GameState::Flop).empty())
         {
             // no flop action, so we can't remove any hand
             return;
         }
 
-        ActionType myAction = ctx.perPlayerContext.myCurrentHandActions.getFlopActions().back();
+        ActionType myAction = ctx.personalContext.actions.currentHandActions.getActions(GameState::Flop).back();
 
         if (myAction == ActionType::Call)
         {
@@ -276,9 +275,9 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(const CurrentHandCo
 void RangeEstimator::updateUnplausibleRangesGivenTurnActions(const CurrentHandContext& ctx)
 {
 
-    const int nbPlayers = ctx.commonContext.nbPlayers;
-    const PlayerStatistics& stats = ctx.perPlayerContext.myStatistics;
-    const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
+    const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
+    const PlayerStatistics& stats = ctx.personalContext.statistics;
+    const bool bHavePosition = ctx.personalContext.hasPosition;
     const string originalEstimatedRange = getEstimatedRange();
     string unplausibleRanges;
 
@@ -289,7 +288,7 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(const CurrentHandCo
     TurnStatistics turn = stats.turnStatistics;
     PreflopStatistics preflop = stats.preflopStatistics;
 
-    if (ctx.perPlayerContext.myIsInVeryLooseMode)
+    if (ctx.personalContext.actions.isInVeryLooseMode)
     {
         GlobalServices::instance().logger()->verbose(
             "\tSeems to be (temporarily ?) on very loose mode : estimated range is\t" + getEstimatedRange());
@@ -309,7 +308,7 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(const CurrentHandCo
             GlobalServices::instance().handEvaluationEngine()->analyzeHand(stringHand, ctx.commonContext.stringBoard);
 
         bool removeHand = false;
-        ActionType myAction = ctx.perPlayerContext.myCurrentHandActions.getTurnActions().back();
+        ActionType myAction = ctx.personalContext.actions.currentHandActions.getActions(GameState::Turn).back();
 
         if (myAction == ActionType::Call)
         {
@@ -368,9 +367,9 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(const CurrentHandCo
 void RangeEstimator::updateUnplausibleRangesGivenRiverActions(const CurrentHandContext& ctx)
 {
 
-    const int nbPlayers = ctx.commonContext.nbPlayers;
-    const PlayerStatistics& stats = ctx.perPlayerContext.myStatistics;
-    const bool bHavePosition = ctx.perPlayerContext.myHavePosition;
+    const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
+    const PlayerStatistics& stats = ctx.personalContext.statistics;
+    const bool bHavePosition = ctx.personalContext.hasPosition;
     const string originalEstimatedRange = getEstimatedRange();
     string unplausibleRanges;
 
@@ -383,7 +382,7 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(const CurrentHandC
 
     PreflopStatistics preflop = stats.preflopStatistics;
 
-    if (ctx.perPlayerContext.myIsInVeryLooseMode)
+    if (ctx.personalContext.actions.isInVeryLooseMode)
     {
         GlobalServices::instance().logger()->verbose("\tSeems to be on very loose mode : estimated range is\t" +
                                                      getEstimatedRange());
@@ -404,23 +403,26 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(const CurrentHandC
 
         bool removeHand = false;
 
-        if (ctx.perPlayerContext.myCurrentHandActions.getRiverActions().back() == ActionType::Call)
+        if (ctx.personalContext.actions.currentHandActions.getActions(GameState::River).back() == ActionType::Call)
         {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(postFlopFlags, ctx);
         }
-        else if (ctx.perPlayerContext.myCurrentHandActions.getRiverActions().back() == ActionType::Check)
+        else if (ctx.personalContext.actions.currentHandActions.getActions(GameState::River).back() ==
+                 ActionType::Check)
         {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverCheck(postFlopFlags, ctx);
         }
-        else if (ctx.perPlayerContext.myCurrentHandActions.getRiverActions().back() == ActionType::Raise)
+        else if (ctx.personalContext.actions.currentHandActions.getActions(GameState::River).back() ==
+                 ActionType::Raise)
         {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(postFlopFlags, ctx);
         }
-        else if (ctx.perPlayerContext.myCurrentHandActions.getRiverActions().back() == ActionType::Bet)
+        else if (ctx.personalContext.actions.currentHandActions.getActions(GameState::River).back() == ActionType::Bet)
         {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(postFlopFlags, ctx);
         }
-        else if (ctx.perPlayerContext.myCurrentHandActions.getRiverActions().back() == ActionType::Allin)
+        else if (ctx.personalContext.actions.currentHandActions.getActions(GameState::River).back() ==
+                 ActionType::Allin)
         {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverAllin(postFlopFlags, ctx);
         }

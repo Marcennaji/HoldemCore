@@ -4,6 +4,7 @@
 #include <core/player/Helpers.h>
 #include <core/services/GlobalServices.h>
 #include "CurrentHandContext.h"
+#include "core/player/PlayerFsm.h"
 
 using namespace std;
 
@@ -12,7 +13,7 @@ namespace pkt::core::player
 PlayerAction BotStrategyBase::decidePreflop(const CurrentHandContext& ctx)
 {
     PlayerAction resultingAction;
-    resultingAction.playerId = ctx.perPlayerContext.myID;
+    resultingAction.playerId = ctx.personalContext.id;
 
     bool shouldCall = preflopShouldCall(ctx);         // should at least call, and maybe raise
     resultingAction.amount = preflopShouldRaise(ctx); // amount > 0 if decide to raise
@@ -23,8 +24,8 @@ PlayerAction BotStrategyBase::decidePreflop(const CurrentHandContext& ctx)
     }
 
     // if last to speak, a hand not good enough to raise, and nobody has raised : I check
-    if (ctx.commonContext.preflopRaisesNumber == 0 && resultingAction.amount == 0 &&
-        ctx.perPlayerContext.myPosition == BB)
+    if (ctx.commonContext.bettingContext.preflopRaisesNumber == 0 && resultingAction.amount == 0 &&
+        ctx.personalContext.position == BB)
     {
         resultingAction.type = ActionType::Check;
     }
@@ -48,13 +49,13 @@ PlayerAction BotStrategyBase::decidePreflop(const CurrentHandContext& ctx)
 PlayerAction BotStrategyBase::decideFlop(const CurrentHandContext& ctx)
 {
     PlayerAction resultingAction;
-    resultingAction.playerId = ctx.perPlayerContext.myID;
+    resultingAction.playerId = ctx.personalContext.id;
 
     int betAmount = 0;
     int raiseAmount = 0;
     bool shouldCall = false;
 
-    if (ctx.commonContext.flopBetsOrRaisesNumber == 0)
+    if (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber == 0)
     {
         betAmount = flopShouldBet(ctx);
     }
@@ -69,7 +70,7 @@ PlayerAction BotStrategyBase::decideFlop(const CurrentHandContext& ctx)
         shouldCall = false;
     }
 
-    if (ctx.commonContext.flopBetsOrRaisesNumber == 0 && !raiseAmount && !betAmount)
+    if (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber == 0 && !raiseAmount && !betAmount)
     {
         resultingAction.type = ActionType::Check;
     }
@@ -100,14 +101,14 @@ PlayerAction BotStrategyBase::decideFlop(const CurrentHandContext& ctx)
 PlayerAction BotStrategyBase::decideTurn(const CurrentHandContext& ctx)
 {
     PlayerAction resultingAction;
-    resultingAction.playerId = ctx.perPlayerContext.myID;
+    resultingAction.playerId = ctx.personalContext.id;
 
     int betAmount = 0;
     int raiseAmount = 0;
 
     bool shouldCall = false;
 
-    if (ctx.commonContext.turnBetsOrRaisesNumber == 0)
+    if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber == 0)
     {
         betAmount = turnShouldBet(ctx);
     }
@@ -122,7 +123,7 @@ PlayerAction BotStrategyBase::decideTurn(const CurrentHandContext& ctx)
         shouldCall = false;
     }
 
-    if (ctx.commonContext.turnBetsOrRaisesNumber == 0 && !raiseAmount && !betAmount)
+    if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber == 0 && !raiseAmount && !betAmount)
     {
         resultingAction.type = ActionType::Check;
     }
@@ -152,13 +153,13 @@ PlayerAction BotStrategyBase::decideTurn(const CurrentHandContext& ctx)
 PlayerAction BotStrategyBase::decideRiver(const CurrentHandContext& ctx)
 {
     PlayerAction resultingAction;
-    resultingAction.playerId = ctx.perPlayerContext.myID;
+    resultingAction.playerId = ctx.personalContext.id;
 
     int betAmount = 0;
     int raiseAmount = 0;
     bool shouldCall = false;
 
-    if (ctx.commonContext.riverBetsOrRaisesNumber == 0)
+    if (ctx.commonContext.bettingContext.riverBetsOrRaisesNumber == 0)
     {
         betAmount = riverShouldBet(ctx);
     }
@@ -173,7 +174,7 @@ PlayerAction BotStrategyBase::decideRiver(const CurrentHandContext& ctx)
         shouldCall = false;
     }
 
-    if (ctx.commonContext.riverBetsOrRaisesNumber == 0 && !raiseAmount && !betAmount)
+    if (ctx.commonContext.bettingContext.riverBetsOrRaisesNumber == 0 && !raiseAmount && !betAmount)
     {
         resultingAction.type = ActionType::Check;
     }
@@ -207,7 +208,7 @@ bool BotStrategyBase::shouldPotControl(const CurrentHandContext& ctx)
     const int bigBlind = ctx.commonContext.smallBlind * 2;
     const int potThreshold = (ctx.commonContext.gameState == Flop) ? bigBlind * 20 : bigBlind * 40;
 
-    if (ctx.commonContext.pot < potThreshold)
+    if (ctx.commonContext.bettingContext.pot < potThreshold)
     {
         return false; // No need for pot control if the pot is below the threshold
     }
@@ -241,27 +242,27 @@ bool BotStrategyBase::shouldPotControl(const CurrentHandContext& ctx)
 
 bool BotStrategyBase::shouldPotControlForPocketPair(const CurrentHandContext& ctx) const
 {
-    return ctx.perPlayerContext.myPostFlopAnalysisFlags.isPocketPair &&
-           !ctx.perPlayerContext.myPostFlopAnalysisFlags.isOverPair;
+    return ctx.personalContext.postFlopAnalysisFlags.isPocketPair &&
+           !ctx.personalContext.postFlopAnalysisFlags.isOverPair;
 }
 
 bool BotStrategyBase::shouldPotControlForFullHousePossibility(const CurrentHandContext& ctx) const
 {
-    const auto& flags = ctx.perPlayerContext.myPostFlopAnalysisFlags;
+    const auto& flags = ctx.personalContext.postFlopAnalysisFlags;
     return flags.isFullHousePossible && !(flags.isTrips || flags.isFlush || flags.isFullHouse || flags.isQuads);
 }
 
 bool BotStrategyBase::shouldPotControlOnFlop(const CurrentHandContext& ctx, int bigBlind) const
 {
-    const auto& flags = ctx.perPlayerContext.myPostFlopAnalysisFlags;
-    return (flags.isOverPair || flags.isTopPair) && ctx.perPlayerContext.myTotalBetAmount > bigBlind * 20;
+    const auto& flags = ctx.personalContext.postFlopAnalysisFlags;
+    return (flags.isOverPair || flags.isTopPair) && ctx.personalContext.totalBetAmount > bigBlind * 20;
 }
 
 bool BotStrategyBase::shouldPotControlOnTurn(const CurrentHandContext& ctx, int bigBlind) const
 {
-    const auto& flags = ctx.perPlayerContext.myPostFlopAnalysisFlags;
+    const auto& flags = ctx.personalContext.postFlopAnalysisFlags;
     return flags.isOverPair || (flags.isTwoPair && !flags.isFullHousePossible) ||
-           (flags.isTrips && ctx.perPlayerContext.myTotalBetAmount > bigBlind * 60);
+           (flags.isTrips && ctx.personalContext.totalBetAmount > bigBlind * 60);
 }
 
 void BotStrategyBase::logPotControl() const
@@ -273,7 +274,7 @@ int BotStrategyBase::computePreflopRaiseAmount(const CurrentHandContext& ctx)
 {
     const int bigBlind = ctx.commonContext.smallBlind * 2;
 
-    if (ctx.commonContext.preflopRaisesNumber == 0)
+    if (ctx.commonContext.bettingContext.preflopRaisesNumber == 0)
     {
         return computeFirstRaiseAmount(ctx, bigBlind);
     }
@@ -283,7 +284,7 @@ int BotStrategyBase::computePreflopRaiseAmount(const CurrentHandContext& ctx)
 
 int BotStrategyBase::computeFirstRaiseAmount(const CurrentHandContext& ctx, int bigBlind) const
 {
-    int raiseAmount = (ctx.perPlayerContext.myM > 8 ? 2 * bigBlind : 1.5 * bigBlind);
+    int raiseAmount = (ctx.personalContext.m > 8 ? 2 * bigBlind : 1.5 * bigBlind);
 
     adjustRaiseForPosition(ctx, raiseAmount, bigBlind);
     adjustRaiseForLimpers(ctx, raiseAmount, bigBlind);
@@ -293,13 +294,13 @@ int BotStrategyBase::computeFirstRaiseAmount(const CurrentHandContext& ctx, int 
 
 void BotStrategyBase::adjustRaiseForPosition(const CurrentHandContext& ctx, int& raiseAmount, int bigBlind) const
 {
-    if (ctx.commonContext.nbPlayers > 4)
+    if (ctx.commonContext.playersContext.nbPlayers > 4)
     {
-        if (ctx.perPlayerContext.myPosition < MIDDLE)
+        if (ctx.personalContext.position < MIDDLE)
         {
             raiseAmount += bigBlind;
         }
-        else if (ctx.perPlayerContext.myPosition == BUTTON)
+        else if (ctx.personalContext.position == BUTTON)
         {
             raiseAmount -= ctx.commonContext.smallBlind;
         }
@@ -308,16 +309,16 @@ void BotStrategyBase::adjustRaiseForPosition(const CurrentHandContext& ctx, int&
 
 void BotStrategyBase::adjustRaiseForLimpers(const CurrentHandContext& ctx, int& raiseAmount, int bigBlind) const
 {
-    if (ctx.commonContext.preflopCallsNumber > 0)
+    if (ctx.commonContext.bettingContext.preflopCallsNumber > 0)
     {
-        raiseAmount += (ctx.commonContext.preflopCallsNumber * bigBlind);
+        raiseAmount += (ctx.commonContext.bettingContext.preflopCallsNumber * bigBlind);
     }
 }
 
 int BotStrategyBase::computeReRaiseAmount(const CurrentHandContext& ctx, int bigBlind) const
 {
-    const int totalPot = ctx.commonContext.sets;
-    const int nbRaises = ctx.commonContext.preflopRaisesNumber;
+    const int totalPot = ctx.commonContext.bettingContext.sets;
+    const int nbRaises = ctx.commonContext.bettingContext.preflopRaisesNumber;
 
     int raiseAmount = 0;
 
@@ -335,22 +336,84 @@ int BotStrategyBase::computeReRaiseAmount(const CurrentHandContext& ctx, int big
 
 int BotStrategyBase::computeThreeBetAmount(const CurrentHandContext& ctx, int totalPot) const
 {
-    return totalPot *
-           (ctx.perPlayerContext.myPosition > ctx.commonContext.preflopLastRaiser->getPosition() ? 1.2 : 1.4);
+    return totalPot * (ctx.personalContext.position > ctx.commonContext.playersContext.preflopLastRaiser->getPosition()
+                           ? 1.2
+                           : 1.4);
 }
 
 int BotStrategyBase::computeFourBetOrMoreAmount(const CurrentHandContext& ctx, int totalPot) const
 {
-    return totalPot * (ctx.perPlayerContext.myPosition > ctx.commonContext.preflopLastRaiser->getPosition() ? 1 : 1.2);
+    return totalPot *
+           (ctx.personalContext.position > ctx.commonContext.playersContext.preflopLastRaiser->getPosition() ? 1 : 1.2);
 }
 
 int BotStrategyBase::finalizeRaiseAmount(const CurrentHandContext& ctx, int raiseAmount) const
 {
-    if (raiseAmount > (ctx.perPlayerContext.myCash * 0.3))
+    if (raiseAmount > (ctx.personalContext.cash * 0.3))
     {
-        return ctx.perPlayerContext.myCash; // Go all-in if committed
+        return ctx.personalContext.cash; // Go all-in if committed
     }
 
     return raiseAmount;
+}
+bool BotStrategyBase::isPossibleToBluff(const CurrentHandContext& ctx) const
+{
+
+    // check if there is no calling station at the table
+    // check also if my opponents stacks are big enough to bluff them
+
+    const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
+    const int nbRaises = ctx.commonContext.bettingContext.preflopRaisesNumber;
+
+    PlayerFsmList players = ctx.commonContext.playersContext.runningPlayersListFsm;
+
+    if (players->size() == 1)
+    {
+        // all other players are allin
+        return false;
+    }
+
+    for (PlayerFsmListIterator it = players->begin(); it != players->end(); ++it)
+    {
+
+        if ((*it)->getId() == ctx.personalContext.id)
+        {
+            continue;
+        }
+
+        PreflopStatistics preflopStats = (*it)->getStatisticsUpdater()->getStatistics(nbPlayers).preflopStatistics;
+
+        // if not enough hands, then try to use the statistics collected for (nbPlayers + 1), they should be more
+        // accurate
+        if (preflopStats.hands < MIN_HANDS_STATISTICS_ACCURATE && nbPlayers < 10 &&
+            (*it)->getStatisticsUpdater()->getStatistics(nbPlayers + 1).preflopStatistics.hands >
+                MIN_HANDS_STATISTICS_ACCURATE)
+        {
+
+            preflopStats = (*it)->getStatisticsUpdater()->getStatistics(nbPlayers + 1).preflopStatistics;
+        }
+
+        if ((*it)->getStatisticsUpdater()->getStatistics(nbPlayers).getWentToShowDown() >= 40 &&
+            preflopStats.getVoluntaryPutMoneyInPot() - preflopStats.getPreflopRaise() > 15 &&
+            preflopStats.getVoluntaryPutMoneyInPot() > 20)
+        {
+            return false; // seems to be a calling station
+        }
+
+        if ((*it)->getCash() < ctx.commonContext.bettingContext.pot * 3)
+        {
+            return false;
+        }
+
+        if (ctx.commonContext.gameState == Preflop)
+        {
+            if (preflopStats.getPreflopCallthreeBetsFrequency() > 40)
+            {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 } // namespace pkt::core::player

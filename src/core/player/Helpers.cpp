@@ -238,7 +238,7 @@ const int getDrawingProbability(const PostFlopAnalysisFlags& postFlopAnalysis)
         if (lastRaiserId != -1)
         {
             std::shared_ptr<Player> lastRaiser = getPlayerByUniqueId(lastRaiserId);
-            const std::vector<PlayerAction>& actions = lastRaiser->getCurrentHandActions().getFlopActions();
+            const std::vector<PlayerAction>& actions = lastRaiser->getCurrentHandActions().getActions(GameState::Flop);
 
             for (std::vector<PlayerAction>::const_iterator itAction = actions.begin(); itAction != actions.end();
                  itAction++)

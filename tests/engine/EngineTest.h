@@ -43,6 +43,7 @@ class EngineTest : public ::testing::Test
     // Helper function to create a PlayerList with mock players
     void createPlayersLists(size_t playerCount);
     void initializeHandWithPlayers(size_t activePlayerCount, pkt::core::GameData);
+
     void createPlayersFsmLists(size_t playerCount);
     void initializeHandFsmWithPlayers(size_t activePlayerCount, pkt::core::GameData);
 

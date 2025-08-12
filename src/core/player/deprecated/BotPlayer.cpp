@@ -151,7 +151,7 @@ void BotPlayer::doPreflopAction()
     }
 
     // Record the action
-    myCurrentHandActions.getPreflopActions().push_back(myAction);
+    myCurrentHandActions.getActions(GameState::Preflop).push_back(myAction);
 
     // Update statistics and ranges
     updatePreflopStatistics();
@@ -191,7 +191,7 @@ void BotPlayer::doFlopAction()
     }
 
     // Record the action
-    myCurrentHandActions.getFlopActions().push_back(myAction);
+    myCurrentHandActions.getActions(GameState::Flop).push_back(myAction);
 
     // Update statistics and ranges
     updateFlopStatistics();
@@ -231,7 +231,7 @@ void BotPlayer::doTurnAction()
     }
 
     // Record the action
-    myCurrentHandActions.getTurnActions().push_back(myAction);
+    myCurrentHandActions.getActions(GameState::Turn).push_back(myAction);
 
     // Update statistics and ranges
     updateTurnStatistics();
@@ -267,7 +267,7 @@ void BotPlayer::doRiverAction()
         myRaiseAmount = action.amount;
 
     // Record the action
-    myCurrentHandActions.getRiverActions().push_back(myAction);
+    myCurrentHandActions.getActions(GameState::River).push_back(myAction);
 
     // Update statistics and ranges
     updateRiverStatistics();

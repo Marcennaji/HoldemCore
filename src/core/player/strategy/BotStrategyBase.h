@@ -17,6 +17,7 @@ class BotStrategyBase : public virtual BotStrategy
 
     int computePreflopRaiseAmount(const CurrentHandContext&);
     bool shouldPotControl(const CurrentHandContext&);
+    bool isPossibleToBluff(const CurrentHandContext& ctx) const;
     bool myShouldCall;
     bool myShouldRaise;
 

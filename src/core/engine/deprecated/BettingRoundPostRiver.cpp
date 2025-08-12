@@ -83,8 +83,8 @@ void BettingRoundPostRiver::run()
         for (itC = getHand()->getSeatsList()->begin(); itC != getHand()->getSeatsList()->end(); ++itC)
         {
 
-            if ((*itC)->getCurrentHandActions().getPreflopActions().size() > 0 &&
-                (*itC)->getCurrentHandActions().getPreflopActions().at(0) != ActionType::Fold)
+            if ((*itC)->getCurrentHandActions().getActions(GameState::Preflop).size() > 0 &&
+                (*itC)->getCurrentHandActions().getActions(GameState::Preflop).at(0) != ActionType::Fold)
             {
 
                 if (myEvents.onShowHoleCards)

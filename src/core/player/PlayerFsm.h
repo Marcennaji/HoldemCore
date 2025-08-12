@@ -69,9 +69,6 @@ class PlayerFsm
     void setCardsFlip(bool theValue);
     bool getCardsFlip() const;
 
-    void setActive(bool theValue);
-    bool isActive() const;
-
     void setHandRanking(int theValue);
     int getHandRanking() const;
 
@@ -108,12 +105,12 @@ class PlayerFsm
 
     void resetForNewHand();
 
+    const std::unique_ptr<PlayerStatisticsUpdater>& getStatisticsUpdater() const { return myStatisticsUpdater; }
+
   protected:
     float getMaxOpponentsStrengths() const;
     bool isPreflopBigBet() const;
     float getOpponentWinningHandsPercentage(const int idPlayer, std::string board) const;
-
-    bool canBluff(const GameState) const;
 
     const GameEvents& myEvents;
     CurrentHandActions myCurrentHandActions;
@@ -153,7 +150,6 @@ class PlayerFsm
     int lastMoneyWon{0};
     int myPreflopPotOdd{0};
     std::unique_ptr<RangeEstimator> myRangeEstimator;
-    bool myIsActive{false}; // an active player is a player who hasn't fold and isn't allin
 
   private:
     std::map<int, float> evaluateOpponentsStrengths() const;

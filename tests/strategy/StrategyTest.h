@@ -2,23 +2,27 @@
 #include <core/player/strategy/CurrentHandContext.h>
 #include <gtest/gtest.h>
 #include "DummyPlayer.h"
+#include "EngineTest.h"
 
 namespace pkt::test
 {
-class StrategyTest : public ::testing::Test
+class StrategyTest : public EngineTest
 {
   protected:
     pkt::core::player::CurrentHandContext ctx;
 
     void SetUp() override
     {
-        ctx.commonContext.nbPlayers = 6;
-        ctx.commonContext.nbRunningPlayers = 6;
-        ctx.commonContext.pot = 100;
-        ctx.commonContext.highestBetAmount = 20;
-        ctx.perPlayerContext.myCash = 1000;
-        ctx.perPlayerContext.myTotalBetAmount = 0;
-        ctx.perPlayerContext.myID = 1;
+        EngineTest::SetUp();
+
+        initializeHandForTesting(6, gameData);
+        ctx.commonContext.playersContext.nbPlayers = 6;
+        ctx.commonContext.playersContext.runningPlayersList = myRunningPlayersList;
+        ctx.commonContext.bettingContext.pot = 100;
+        ctx.commonContext.bettingContext.highestBetAmount = 20;
+        ctx.personalContext.cash = 1000;
+        ctx.personalContext.totalBetAmount = 0;
+        ctx.personalContext.id = 1;
         ctx.commonContext.smallBlind = 10;
     }
 };

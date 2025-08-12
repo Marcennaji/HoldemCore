@@ -74,7 +74,7 @@ int BettingState::getPreflopCallsNumber()
     for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
 
-        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getPreflopActions();
+        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getActions(GameState::Preflop);
 
         if (find(actions.begin(), actions.end(), ActionType::Call) != actions.end())
         {
@@ -91,7 +91,7 @@ int BettingState::getPreflopRaisesNumber()
     for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
 
-        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getPreflopActions();
+        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getActions(GameState::Preflop);
 
         for (std::vector<ActionType>::const_iterator itAction = actions.begin(); itAction != actions.end(); itAction++)
         {
@@ -112,7 +112,7 @@ int BettingState::getFlopBetsOrRaisesNumber()
     for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
 
-        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getFlopActions();
+        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getActions(GameState::Flop);
 
         for (std::vector<ActionType>::const_iterator itAction = actions.begin(); itAction != actions.end(); itAction++)
         {
@@ -133,7 +133,7 @@ int BettingState::getTurnBetsOrRaisesNumber()
     for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
 
-        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getTurnActions();
+        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getActions(GameState::Turn);
 
         for (std::vector<ActionType>::const_iterator itAction = actions.begin(); itAction != actions.end(); itAction++)
         {
@@ -154,7 +154,7 @@ int BettingState::getRiverBetsOrRaisesNumber()
     for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
 
-        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getRiverActions();
+        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getActions(GameState::River);
 
         for (std::vector<ActionType>::const_iterator itAction = actions.begin(); itAction != actions.end(); itAction++)
         {

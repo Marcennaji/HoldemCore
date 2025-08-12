@@ -135,16 +135,6 @@ bool PlayerFsm::getCardsFlip() const
     return myCardsFlip;
 }
 
-void PlayerFsm::setActive(bool theValue)
-{
-    myIsActive = theValue;
-}
-
-bool PlayerFsm::isActive() const
-{
-    return myIsActive;
-}
-
 void PlayerFsm::setHandRanking(int theValue)
 {
     myHandRanking = theValue;
@@ -409,65 +399,6 @@ bool PlayerFsm::isAgressor(const GameState gameState) const
 #endif
     return false;
 }
-bool PlayerFsm::canBluff(const GameState gameState) const
-{
-
-    // check if there is no calling station at the table
-    // check also if my opponents stacks are big enough to bluff them
-#if (False)
-    const int nbPlayers = mySeatsList->size();
-    const int nbRaises = currentHand.getPreflopRaisesNumber();
-
-    PlayerFsmList players = currentHand.getRunningPlayersList();
-
-    if (players->size() == 1)
-    {
-        // all other players are allin
-        return false;
-    }
-
-    for (PlayerFsmListIterator it = players->begin(); it != players->end(); ++it)
-    {
-
-        if ((*it)->getId() == myID)
-        {
-            continue;
-        }
-
-        PreflopStatistics preflopStats = (*it)->getStatistics(nbPlayers).preflopStatistics;
-
-        // if not enough hands, then try to use the statistics collected for (nbPlayers + 1), they should be more
-        // accurate
-        if (preflopStats.hands < MIN_HANDS_STATISTICS_ACCURATE && nbPlayers < 10 &&
-            (*it)->getStatistics(nbPlayers + 1).preflopStatistics.hands > MIN_HANDS_STATISTICS_ACCURATE)
-        {
-
-            preflopStats = (*it)->getStatistics(nbPlayers + 1).preflopStatistics;
-        }
-
-        if ((*it)->getStatistics(nbPlayers).getWentToShowDown() >= 40 &&
-            preflopStats.getVoluntaryPutMoneyInPot() - preflopStats.getPreflopRaise() > 15 &&
-            preflopStats.getVoluntaryPutMoneyInPot() > 20)
-        {
-            return false; // seems to be a calling station
-        }
-
-        if ((*it)->getCash() < currentHand.getBoard()->getPot() * 3)
-        {
-            return false;
-        }
-
-        if (gameState == Preflop)
-        {
-            if (preflopStats.getPreflopCallthreeBetsFrequency() > 40)
-            {
-                return false;
-            }
-        }
-    }
-#endif
-    return true;
-}
 
 int PlayerFsm::getPreflopPotOdd() const
 {
@@ -499,67 +430,38 @@ bool PlayerFsm::isInVeryLooseMode(const int nbPlayers) const
 
 void PlayerFsm::updateCurrentHandContext(const GameState state, HandFsm& currentHand)
 {
-    for (std::vector<ActionType>::const_iterator i = myCurrentHandActions.getFlopActions().begin();
-         i != myCurrentHandActions.getFlopActions().end(); i++)
-    {
-
-        if (*i == ActionType::Raise)
-        {
-            myCurrentHandContext->perPlayerContext.nbRaises++;
-        }
-        else if (*i == ActionType::Bet)
-        {
-            myCurrentHandContext->perPlayerContext.nbBets++;
-        }
-        else if (*i == ActionType::Check)
-        {
-            myCurrentHandContext->perPlayerContext.nbChecks++;
-        }
-        else if (*i == ActionType::Call)
-        {
-            myCurrentHandContext->perPlayerContext.nbCalls++;
-        }
-        else if (*i == ActionType::Allin)
-        {
-            myCurrentHandContext->perPlayerContext.nbAllins++;
-        }
-    }
-
     // Player-specific, visible from the opponents :
-    myCurrentHandContext->perPlayerContext.myCash = myCash;
-    myCurrentHandContext->perPlayerContext.myTotalBetAmount = myTotalBetAmount;
-    myCurrentHandContext->perPlayerContext.myM = static_cast<int>(currentHand.getM(myCash));
-    myCurrentHandContext->perPlayerContext.myCurrentHandActions = myCurrentHandActions;
-    myCurrentHandContext->perPlayerContext.myHavePosition =
-        hasPosition(myPosition, currentHand.getRunningPlayersList());
-    myCurrentHandContext->perPlayerContext.myPreflopIsAggressor = isAgressor(Preflop);
-    myCurrentHandContext->perPlayerContext.myFlopIsAggressor = isAgressor(Flop);
-    myCurrentHandContext->perPlayerContext.myTurnIsAggressor = isAgressor(Turn);
-    myCurrentHandContext->perPlayerContext.myRiverIsAggressor = isAgressor(River);
-    // myCurrentHandContext->perPlayerContext.myStatistics = getStatistics(mySeatsList->size());
-    myCurrentHandContext->perPlayerContext.myID = myID;
-    // myCurrentHandContext->perPlayerContext.myIsInVeryLooseMode = isInVeryLooseMode(mySeatsList->size());
-    myCurrentHandContext->perPlayerContext.myPosition = myPosition;
+    myCurrentHandContext->personalContext.cash = myCash;
+    myCurrentHandContext->personalContext.totalBetAmount = myTotalBetAmount;
+    myCurrentHandContext->personalContext.m = static_cast<int>(currentHand.getM(myCash));
+    myCurrentHandContext->personalContext.actions.currentHandActions = myCurrentHandActions;
+    myCurrentHandContext->personalContext.hasPosition = hasPosition(myPosition, currentHand.getRunningPlayersList());
+    myCurrentHandContext->personalContext.actions.preflopIsAggressor = isAgressor(Preflop);
+    myCurrentHandContext->personalContext.actions.flopIsAggressor = isAgressor(Flop);
+    myCurrentHandContext->personalContext.actions.turnIsAggressor = isAgressor(Turn);
+    myCurrentHandContext->personalContext.actions.riverIsAggressor = isAgressor(River);
+    // myCurrentHandContext->personalContext.statistics = getStatistics(mySeatsList->size());
+    myCurrentHandContext->personalContext.id = myID;
+    // myCurrentHandContext->personalContext.actions.isInVeryLooseMode = isInVeryLooseMode(mySeatsList->size());
+    myCurrentHandContext->personalContext.position = myPosition;
 
     // player specific, hidden from the opponents :
-    myCurrentHandContext->perPlayerContext.myCard1 = myCard1;
-    myCurrentHandContext->perPlayerContext.myCard2 = myCard2;
-    myCurrentHandContext->perPlayerContext.myCanBluff = canBluff(state);
-    myCurrentHandContext->perPlayerContext.myPreflopCallingRange = calculatePreflopCallingRange(*myCurrentHandContext);
+    myCurrentHandContext->personalContext.card1 = myCard1;
+    myCurrentHandContext->personalContext.card2 = myCard2;
+    myCurrentHandContext->personalContext.preflopCallingRange = calculatePreflopCallingRange(*myCurrentHandContext);
     // guess what the opponents might have and evaluate our strength, given our hole cards and the board cards (if any)
-    myCurrentHandContext->perPlayerContext.myHandSimulation = computeHandSimulation();
-    myCurrentHandContext->perPlayerContext.myPostFlopAnalysisFlags = getPostFlopAnalysisFlags();
+    myCurrentHandContext->personalContext.myHandSimulation = computeHandSimulation();
+    myCurrentHandContext->personalContext.postFlopAnalysisFlags = getPostFlopAnalysisFlags();
 }
 
 float PlayerFsm::calculatePreflopCallingRange(const CurrentHandContext& ctx) const
 {
-    return myRangeEstimator->getStandardCallingRange(ctx.commonContext.nbRunningPlayers);
+    return myRangeEstimator->getStandardCallingRange(ctx.commonContext.playersContext.runningPlayersList->size());
 }
 
 void PlayerFsm::resetForNewHand()
 {
     setCardsFlip(0);
-    setActive(true);
     getCurrentHandActions().reset();
 }
 const PostFlopAnalysisFlags PlayerFsm::getPostFlopAnalysisFlags() const
@@ -569,6 +471,7 @@ const PostFlopAnalysisFlags PlayerFsm::getPostFlopAnalysisFlags() const
 
     return GlobalServices::instance().handEvaluationEngine()->analyzeHand(getCardsValueString(), stringBoard);
 }
+
 bool PlayerFsm::checkIfINeedToShowCards() const
 {
 #if false

@@ -2,35 +2,39 @@
 
 #include "CurrentHandActions.h"
 
+#include <core/engine/model/GameState.h>
+
 namespace pkt::core::player
 {
 
+CurrentHandActions::CurrentHandActions()
+{
+    myActionsByState[GameState::Preflop] = {};
+    myActionsByState[GameState::Flop] = {};
+    myActionsByState[GameState::Turn] = {};
+    myActionsByState[GameState::River] = {};
+};
+
 void CurrentHandActions::reset()
 {
-
-    m_preflopActions.clear();
-    m_flopActions.clear();
-    m_turnActions.clear();
-    m_riverActions.clear();
+    myActionsByState[GameState::Preflop].clear();
+    myActionsByState[GameState::Flop].clear();
+    myActionsByState[GameState::Turn].clear();
+    myActionsByState[GameState::River].clear();
 }
 
-std::vector<ActionType>& CurrentHandActions::getPreflopActions()
+int CurrentHandActions::getActionsNumber(const GameState& state, const ActionType& actionType) const
 {
-    return m_preflopActions;
-}
+    int count = 0;
 
-std::vector<ActionType>& CurrentHandActions::getFlopActions()
-{
-    return m_flopActions;
-}
+    for (const auto& action : myActionsByState.at(state))
+    {
+        if (action == actionType)
+        {
+            count++;
+        }
+    }
 
-std::vector<ActionType>& CurrentHandActions::getTurnActions()
-{
-    return m_turnActions;
-}
-
-std::vector<ActionType>& CurrentHandActions::getRiverActions()
-{
-    return m_riverActions;
+    return count;
 }
 } // namespace pkt::core::player

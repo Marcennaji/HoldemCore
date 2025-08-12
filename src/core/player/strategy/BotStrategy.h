@@ -32,7 +32,7 @@ class BotStrategy : public PlayerStrategy
         case River:
             return decideRiver(ctx);
         default:
-            return {ctx.perPlayerContext.myID, ActionType::None, 0};
+            return {ctx.personalContext.id, ActionType::None, 0};
         }
     }
 
