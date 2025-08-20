@@ -86,10 +86,10 @@ player.setStrategy(std::make_unique<MyCustomBotStrategy>());
 - **SQLite3**
 
 ---
+## 🚀 Current Status — *Ongoing refactoring with FSM-based core redesign*
+Originally created by Marc Ennaji in 2011 on SourceForge, the project earned a 5-star rating and over 11,000 downloads.  
+In 2025 it was migrated to GitHub and is now undergoing a **major architectural rewrite** to improve decoupling, modularity, maintainability, and testability — while also enabling support for multiple UIs.
 
-## 🚀 Current Status — *Unstable, redesign of core engine using an FSM is on active development*
-Originally created by Marc Ennaji in 2011 (SourceForge), migrated to GitHub in 2025.  
-Currently in **major architectural rewrite** to improve decoupling, modularity, maintainability, and testability.
 
 ✅ Core engine is now headless  
 ✅ `GameEvents` decouples UI from logic  
