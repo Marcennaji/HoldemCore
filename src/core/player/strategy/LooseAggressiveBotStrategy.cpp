@@ -174,6 +174,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx
 
     if (ctx.commonContext.bettingContext.preflopRaisesNumber == 1)
     {
+        assert(ctx.commonContext.playersContext.preflopLastRaiser != nullptr);
         PreflopStatistics raiserStats = ctx.commonContext.playersContext.preflopLastRaiser
                                             ->getStatistics(ctx.commonContext.playersContext.nbPlayers)
                                             .preflopStatistics;
@@ -230,6 +231,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx
     // determine when to 4-bet without a real hand
     if (!speculativeHandedAdded && ctx.commonContext.bettingContext.preflopRaisesNumber == 2)
     {
+        assert(ctx.commonContext.playersContext.preflopLastRaiser != nullptr);
         PreflopStatistics raiserStats = ctx.commonContext.playersContext.preflopLastRaiser
                                             ->getStatistics(ctx.commonContext.playersContext.nbPlayers)
                                             .preflopStatistics;
@@ -291,11 +293,6 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx
 int LooseAggressiveBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
 {
 
-    if (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber > 0)
-    {
-        return 0;
-    }
-
     if (shouldPotControl(ctx))
     {
         return 0;
@@ -303,6 +300,7 @@ int LooseAggressiveBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
 
     // donk bets :
     if (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber > 0 &&
+        ctx.commonContext.playersContext.preflopLastRaiser != nullptr &&
         ctx.commonContext.playersContext.preflopLastRaiser->getId() != ctx.personalContext.id)
     {
         if (ctx.commonContext.playersContext.preflopLastRaiser->getPosition() > ctx.personalContext.position)
@@ -384,6 +382,7 @@ int LooseAggressiveBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
 
         // if i have raised preflop, bet
         if (ctx.commonContext.bettingContext.preflopRaisesNumber > 0 &&
+            ctx.commonContext.playersContext.preflopLastRaiser != nullptr &&
             ctx.commonContext.playersContext.preflopLastRaiser->getId() == ctx.personalContext.id &&
             ctx.commonContext.bettingContext.preflopRaisesNumber > 0)
         {
@@ -404,6 +403,7 @@ int LooseAggressiveBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
 
         // if there was a lot of action preflop, and i was not the last raiser : don't bet
         if (ctx.commonContext.bettingContext.preflopRaisesNumber > 2 &&
+            ctx.commonContext.playersContext.preflopLastRaiser != nullptr &&
             ctx.commonContext.playersContext.preflopLastRaiser->getId() != ctx.personalContext.id)
         {
             return 0;

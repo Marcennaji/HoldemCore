@@ -69,6 +69,7 @@ string PreflopRangeEstimator::computeEstimatedPreflopRange(const CurrentHandCont
 std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(const CurrentHandContext& ctx) const
 {
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
+    assert(ctx.commonContext.playersContext.preflopLastRaiser != nullptr);
 
     float range = 0;
 

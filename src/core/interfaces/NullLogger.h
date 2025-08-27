@@ -16,6 +16,7 @@ class NullLogger : public ILogger
     virtual void error(const std::string& msg) override {}
     virtual void info(const std::string& msg) override {}
     virtual void verbose(const std::string& msg) override {}
+    virtual void debug(const std::string& msg) override {}
 };
 
 } // namespace pkt::core

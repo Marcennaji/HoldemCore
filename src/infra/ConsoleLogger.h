@@ -20,5 +20,6 @@ class ConsoleLogger : public pkt::core::ILogger
     void error(const std::string& msg) override;
     void info(const std::string& msg) override;
     void verbose(const std::string& msg) override;
+    void debug(const std::string& msg) override;
 };
 } // namespace pkt::infra

@@ -1,8 +1,8 @@
 #pragma once
 #include <core/player/strategy/CurrentHandContext.h>
-#include <gtest/gtest.h>
 #include "DummyPlayer.h"
 #include "EngineTest.h"
+#include "test_common.h"
 
 namespace pkt::test
 {

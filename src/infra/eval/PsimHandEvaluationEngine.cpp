@@ -81,19 +81,19 @@ HandSimulationStats PsimHandEvaluationEngine::simulateHandEquity(const std::stri
         r.winRanged = r.win / 4;
     }
     HandSimulationStats stats = convertSimResults(r);
-    GlobalServices::instance().logger()->verbose("hand equity is computed");
+    GlobalServices::instance().logger()->debug("hand equity is computed");
     return stats;
 }
 pkt::core::PostFlopAnalysisFlags PsimHandEvaluationEngine::analyzeHand(const std::string& hand,
                                                                        const std::string& board)
 {
-    GlobalServices::instance().logger()->verbose("Calling psim for postflop hand analysis");
+    GlobalServices::instance().logger()->debug("Calling psim for postflop hand analysis");
 
     PostFlopState r;
     GetHandState((hand + board).c_str(), &r);
     PostFlopAnalysisFlags flags = convertPostFlopState(r);
 
-    GlobalServices::instance().logger()->verbose("postflop hand analysis is done");
+    GlobalServices::instance().logger()->debug("postflop hand analysis is done");
 
     return flags;
 }

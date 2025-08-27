@@ -1,5 +1,5 @@
-#include <gtest/gtest.h>
 #include "core/player/Helpers.h"
+#include "test_common.h"
 
 using namespace pkt::core::player;
 

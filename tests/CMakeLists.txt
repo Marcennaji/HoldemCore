@@ -10,7 +10,7 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-# add all the cpp files in the tests directory
+# Add all test cpp files
 file(GLOB_RECURSE TEST_SOURCES "*.cpp")
 
 add_executable(core_tests
@@ -19,6 +19,7 @@ add_executable(core_tests
 
 target_include_directories(core_tests
     PRIVATE
+    ${PROJECT_SOURCE_DIR}/tests
     ${PROJECT_SOURCE_DIR}/tests/strategy
     ${PROJECT_SOURCE_DIR}/tests/helpers
     ${PROJECT_SOURCE_DIR}/tests/engine
@@ -27,7 +28,7 @@ target_include_directories(core_tests
     ${PROJECT_SOURCE_DIR}/src
 )
 
-# Link with main engine and GoogleTest
+# Link with engine and gtest
 target_link_libraries(core_tests
     PRIVATE
     player
@@ -35,6 +36,12 @@ target_link_libraries(core_tests
     service
     infra
     gtest_main
+)
+
+# Disable GoogleTest SEH handling for this target
+target_compile_definitions(core_tests
+    PRIVATE
+    GTEST_HAS_SEH=0
 )
 
 include(GoogleTest)

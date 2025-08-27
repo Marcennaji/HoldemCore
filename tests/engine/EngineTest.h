@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include <gtest/gtest.h>
 #include <list>
 #include <memory>
 #include "core/engine/Board.h"
@@ -10,6 +9,7 @@
 #include "core/interfaces/NullLogger.h"
 #include "core/player/deprecated/Player.h"
 #include "core/player/typedefs.h"
+#include "test_common.h"
 
 namespace pkt::test
 {

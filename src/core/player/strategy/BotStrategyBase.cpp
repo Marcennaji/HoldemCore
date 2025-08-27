@@ -336,6 +336,7 @@ int BotStrategyBase::computeReRaiseAmount(const CurrentHandContext& ctx, int big
 
 int BotStrategyBase::computeThreeBetAmount(const CurrentHandContext& ctx, int totalPot) const
 {
+    assert(ctx.commonContext.playersContext.preflopLastRaiser != nullptr);
     return totalPot * (ctx.personalContext.position > ctx.commonContext.playersContext.preflopLastRaiser->getPosition()
                            ? 1.2
                            : 1.4);
@@ -343,6 +344,7 @@ int BotStrategyBase::computeThreeBetAmount(const CurrentHandContext& ctx, int to
 
 int BotStrategyBase::computeFourBetOrMoreAmount(const CurrentHandContext& ctx, int totalPot) const
 {
+    assert(ctx.commonContext.playersContext.preflopLastRaiser != nullptr);
     return totalPot *
            (ctx.personalContext.position > ctx.commonContext.playersContext.preflopLastRaiser->getPosition() ? 1 : 1.2);
 }
@@ -366,6 +368,11 @@ bool BotStrategyBase::isPossibleToBluff(const CurrentHandContext& ctx) const
     const int nbRaises = ctx.commonContext.bettingContext.preflopRaisesNumber;
 
     PlayerFsmList players = ctx.commonContext.playersContext.runningPlayersListFsm;
+    if (players == nullptr)
+    {
+        return false; // TODO remove this after FSM migration is complete (is a legacy code temporary compatibility
+                      // hack)
+    }
 
     if (players->size() == 1)
     {

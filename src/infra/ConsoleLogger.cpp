@@ -32,4 +32,12 @@ void ConsoleLogger::verbose(const std::string& msg)
         std::cout << "[VERBOSE] " << msg << std::endl;
     }
 }
+
+void ConsoleLogger::debug(const std::string& msg)
+{
+    if (myLogLevel >= LogLevel::Debug)
+    {
+        std::cout << "[DEBUG] " << msg << std::endl;
+    }
+}
 } // namespace pkt::infra

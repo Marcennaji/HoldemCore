@@ -24,6 +24,7 @@ class ILogger
     virtual void error(const std::string& msg) = 0;
     virtual void info(const std::string& msg) = 0;
     virtual void verbose(const std::string& msg) = 0;
+    virtual void debug(const std::string& msg) = 0;
 
   protected:
     LogLevel myLogLevel{LogLevel::Info};
