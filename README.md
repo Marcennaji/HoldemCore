@@ -16,6 +16,19 @@ It is also designed for **bot developers** to easily implement and test custom p
 
 ---
 
+## 👨‍💻 About the Author
+
+Maintained by **Marc Ennaji**, freelance **senior software engineer**  
+[LinkedIn profile](https://www.linkedin.com/in/marcennaji/)
+
+- Expertise in **cross-platform development** (C++, Python)  
+- Passionate about **refactoring legacy code** into **modern, testable architectures**  
+- Focused on **clean, modular design** and maintainability  
+
+📫 Available for freelance collaborations — feel free to reach out!
+
+---
+
 ## 🧱 Architecture Highlights
 
 ### 1. **Decoupled C++ Engine** (`src/core/`)
@@ -26,7 +39,6 @@ It is also designed for **bot developers** to easily implement and test custom p
 ### 2. **Multiple Frontends**
 - ✅ Qt Widgets UI (in progress)
 - 🟡 Flutter/Web UI (planned)
-- ⚪ CLI mode for headless or manual human input (currently working)
 
 ### 3. **Bot Strategies**
 - Clear separation of `Player` and `BotStrategy`
@@ -86,9 +98,19 @@ player.setStrategy(std::make_unique<MyCustomBotStrategy>());
 - **SQLite3**
 
 ---
-## 🚀 Current Status — *Ongoing refactoring with FSM-based core redesign*
-Originally created by Marc Ennaji in 2011 on SourceForge, the project earned a 5-star rating and over 11,000 downloads.  
-In 2025 it was migrated to GitHub and is now undergoing a **major architectural rewrite** to improve decoupling, modularity, maintainability, and testability — while also enabling support for multiple UIs.
+## 🕰 Project history and current Status — *Ongoing refactoring with FSM-based core redesign*
+
+- **2011** — Initial version published on SourceForge (5⭐ project, >11,000 downloads).  
+  At that time, the project built upon portions of the open-source **PokerTH** codebase (GPLv2),  
+  but focused mainly on adding **poker bot strategies and AI logic**.  
+
+- **2025 (today)** — Migrated to GitHub and undergoing a **major architectural rewrite**.  
+  The legacy PokerTH engine code is being **progressively refactored and replaced** with  
+  a new **FSM-driven, modular architecture**, designed for **testability** and to support  
+  multiple UIs (Qt Widgets, QML, and web frontends).  
+
+Soon, the engine will be **fully original** and only retain conceptual influence from PokerTH.  
+
 
 
 ✅ Core engine is now headless  
@@ -99,12 +121,14 @@ In 2025 it was migrated to GitHub and is now undergoing a **major architectural 
 
 ---
 
-## 📋 Roadmap
+## 📋 Roadmap 
 
 **Short-term**
-- Complete FSM-based hand street transitions
-- Rewrite Qt Widgets table UI with modern layout
-- Refactor some classes to improve design
+- Finalize FSM-based hand street transitions
+- Redesign Qt Widgets table UI with a modern layout
+- Expand unit test coverage to the entire core engine
+- Continue major refactoring of legacy components
+
 
 **Medium-term**
 - Implement WebSocket server & JSON protocol
@@ -166,4 +190,15 @@ See [CONTRIBUTING.md](CONTRIBUTING.md)
 ---
 
 ## 📝 License
-MIT — free to use, learn from, and contribute to.
+
+This project, **PokerTraining**, is released under the **MIT License** —  
+you are free to use, learn from, and contribute to it.
+
+⚖️ **Note on legacy code:**  
+- The very first version of PokerTraining (2011, SourceForge) was based on and built upon portions of the open-source **PokerTH** engine, which is licensed under **GPLv2**.  
+- That early codebase focused mainly on adding **poker bot strategies and AI logic**.  
+- Since 2025, the engine has been undergoing a **progressive rewrite**:  
+  nearly all of the original PokerTH-derived code has been replaced with a **fully original, modular, MIT-licensed codebase**.  
+
+🙏 Acknowledgment to the **PokerTH project** for providing the foundation that helped inspire the early stages of PokerTraining.
+
