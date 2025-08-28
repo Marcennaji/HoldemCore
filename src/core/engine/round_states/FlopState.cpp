@@ -1,6 +1,7 @@
 #include "FlopState.h"
 #include "GameEvents.h"
 #include "HandFsm.h"
+#include "PostRiverState.h"
 #include "TurnState.h"
 #include "core/engine/model/PlayerAction.h"
 #include "core/player/Helpers.h"
@@ -75,6 +76,11 @@ void FlopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
 
 std::unique_ptr<IHandState> FlopState::computeNextState(HandFsm& hand, PlayerAction action)
 {
+    if (hand.getRunningPlayersList()->size() == 1)
+    {
+        exit(hand);
+        return std::make_unique<PostRiverState>(myEvents);
+    }
     if (isRoundComplete(hand))
     {
         exit(hand);

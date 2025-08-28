@@ -75,6 +75,7 @@ void RiverState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
 
 std::unique_ptr<IHandState> RiverState::computeNextState(HandFsm& hand, PlayerAction action)
 {
+
     if (isRoundComplete(hand))
     {
         exit(hand);

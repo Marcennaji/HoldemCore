@@ -84,6 +84,7 @@ void HandFsm::handlePlayerAction(PlayerAction action)
 void HandFsm::applyActionEffects(const PlayerAction& action)
 {
     auto player = getPlayerFsmById(myRunningPlayersList, action.playerId);
+    player->setAction(action.type);
 
     switch (action.type)
     {

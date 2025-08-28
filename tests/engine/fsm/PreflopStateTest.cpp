@@ -119,7 +119,7 @@ TEST_F(PreflopStateTest, OnlyCallsPreflopShouldGoToFlop)
 
     EXPECT_EQ(myLastGameState, Flop);
 }
-TEST_F(PreflopStateTest, DISABLED_EverybodyFoldPreflopShouldGoToPostRiver)
+TEST_F(PreflopStateTest, EverybodyFoldPreflopShouldGoToPostRiver)
 {
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
