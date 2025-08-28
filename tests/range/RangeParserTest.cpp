@@ -1,5 +1,6 @@
-#include "core/player/range/RangeParser.h"
 #include "test_common.h"
+
+#include "core/player/range/RangeParser.h"
 
 using namespace pkt::core::player;
 

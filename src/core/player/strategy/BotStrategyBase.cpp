@@ -368,10 +368,12 @@ bool BotStrategyBase::isPossibleToBluff(const CurrentHandContext& ctx) const
     const int nbRaises = ctx.commonContext.bettingContext.preflopRaisesNumber;
 
     PlayerFsmList players = ctx.commonContext.playersContext.runningPlayersListFsm;
+
     if (players == nullptr)
     {
-        return false; // TODO remove this after FSM migration is complete (is a legacy code temporary compatibility
-                      // hack)
+        GlobalServices::instance().logger()->info(
+            "BotStrategyBase::isPossibleToBluff() is not compatible with legacy (non FSM) code");
+        return false; // TODO remove this after FSM migration is complete
     }
 
     if (players->size() == 1)

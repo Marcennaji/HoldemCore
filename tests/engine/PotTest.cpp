@@ -1,9 +1,8 @@
-// tests/engine/PotTest.cpp
-
-#include "core/engine/Pot.h"
-#include "DummyPlayer.h"
-#include "core/player/typedefs.h"
 #include "test_common.h"
+
+#include "DummyPlayer.h"
+#include "core/engine/Pot.h"
+#include "core/player/typedefs.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;

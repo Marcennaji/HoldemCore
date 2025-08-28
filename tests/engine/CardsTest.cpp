@@ -1,7 +1,8 @@
+#include "test_common.h"
+
 #include "CardsTest.h"
 
 #include <memory>
-#include "test_common.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;

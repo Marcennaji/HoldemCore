@@ -1,7 +1,8 @@
+#include "test_common.h"
+
 #include <core/player/strategy/TightAggressiveBotStrategy.h>
 #include "StrategyTest.h"
 #include "core/interfaces/NullLogger.h"
-#include "test_common.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;

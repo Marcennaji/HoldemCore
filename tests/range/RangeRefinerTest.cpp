@@ -1,5 +1,6 @@
-#include "core/player/range/RangeRefiner.h"
 #include "test_common.h"
+
+#include "core/player/range/RangeRefiner.h"
 
 using namespace pkt::core::player;
 

@@ -1,4 +1,3 @@
-// test_common.h
 #pragma once
 
 #undef GTEST_HAS_SEH

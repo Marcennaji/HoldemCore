@@ -1,5 +1,6 @@
-#include "core/player/Helpers.h"
 #include "test_common.h"
+
+#include "core/player/Helpers.h"
 
 using namespace pkt::core::player;
 
