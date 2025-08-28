@@ -1,7 +1,7 @@
-#include "FlopState.h"
+#include "RiverState.h"
 #include "GameEvents.h"
 #include "HandFsm.h"
-#include "TurnState.h"
+#include "PostRiverState.h"
 #include "core/engine/model/PlayerAction.h"
 #include "core/player/Helpers.h"
 #include "core/player/PlayerFsm.h"
@@ -10,28 +10,28 @@ namespace pkt::core
 {
 using namespace pkt::core::player;
 
-FlopState::FlopState(const GameEvents& events) : myEvents(events)
+RiverState::RiverState(const GameEvents& events) : myEvents(events)
 {
 }
 
-void FlopState::enter(HandFsm& hand)
+void RiverState::enter(HandFsm& hand)
 {
     // Reset betting amounts for new round
     hand.getBettingState()->resetHighestSet();
 
-    // Deal flop cards
-    // hand.getBoard()->dealFlop();
+    // Deal river card
+    // hand.getBoard()->dealRiver();
 
     if (myEvents.onBettingRoundStarted)
-        myEvents.onBettingRoundStarted(Flop);
+        myEvents.onBettingRoundStarted(River);
 }
 
-void FlopState::exit(HandFsm& /*hand*/)
+void RiverState::exit(HandFsm& /*hand*/)
 {
-    // No special exit logic for Flop
+    // No special exit logic for River
 }
 
-bool FlopState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const
+bool RiverState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const
 {
     auto player = getPlayerFsmById(hand.getRunningPlayersList(), action.playerId);
     if (!player)
@@ -65,26 +65,26 @@ bool FlopState::isActionAllowed(const HandFsm& hand, const PlayerAction action) 
     }
 }
 
-void FlopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
+void RiverState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
 {
-    player.updateCurrentHandContext(Flop, hand);
+    player.updateCurrentHandContext(River, hand);
     const PlayerAction action = player.decideAction(player.getCurrentHandContext());
 
     hand.handlePlayerAction(action);
 }
 
-std::unique_ptr<IHandState> FlopState::computeNextState(HandFsm& hand, PlayerAction action)
+std::unique_ptr<IHandState> RiverState::computeNextState(HandFsm& hand, PlayerAction action)
 {
     if (isRoundComplete(hand))
     {
         exit(hand);
-        return std::make_unique<TurnState>(myEvents);
+        return std::make_unique<PostRiverState>(myEvents);
     }
 
     return nullptr;
 }
 
-bool FlopState::isRoundComplete(const HandFsm& hand) const
+bool RiverState::isRoundComplete(const HandFsm& hand) const
 {
     if (hand.getRunningPlayersList()->size() <= 1)
         return true;
@@ -100,7 +100,7 @@ bool FlopState::isRoundComplete(const HandFsm& hand) const
     return true;
 }
 
-void FlopState::logStateInfo(const HandFsm& /*hand*/) const
+void RiverState::logStateInfo(const HandFsm& /*hand*/) const
 {
     // TODO: add logging (e.g. pot size, board cards, etc.)
 }

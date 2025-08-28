@@ -8,18 +8,18 @@ namespace pkt::core::player
 {
 class PlayerFsm;
 }
-namespace pkt::core::player
-{
-class PlayerFsm;
-}
+
 namespace pkt::core
 {
 class GameEvents;
 
-class FlopState : public IHandState, public IActionProcessor, public IRoundCompletionChecker, public IDebuggableState
+class PostRiverState : public IHandState,
+                       public IActionProcessor,
+                       public IRoundCompletionChecker,
+                       public IDebuggableState
 {
   public:
-    explicit FlopState(const GameEvents& events);
+    explicit PostRiverState(const GameEvents& events);
 
     void enter(HandFsm&) override;
     void exit(HandFsm&) override;
@@ -29,7 +29,7 @@ class FlopState : public IHandState, public IActionProcessor, public IRoundCompl
     bool isActionAllowed(const HandFsm&, const PlayerAction) const override;
 
     void logStateInfo(const HandFsm&) const override;
-    std::string getStateName() const override { return "Flop"; }
+    std::string getStateName() const override { return "PostRiver"; }
     void promptPlayerAction(HandFsm&, player::PlayerFsm& player);
 
   private:
