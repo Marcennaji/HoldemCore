@@ -1,4 +1,5 @@
 #pragma once
+
 #include <core/engine/GameEvents.h>
 #include <core/interfaces/NullLogger.h>
 #include <core/player/PlayerFsm.h>

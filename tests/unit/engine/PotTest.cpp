@@ -1,6 +1,6 @@
-#include "test_common.h"
+#include "common/common.h"
 
-#include "DummyPlayer.h"
+#include "common/DummyPlayer.h"
 #include "core/engine/Pot.h"
 #include "core/player/typedefs.h"
 

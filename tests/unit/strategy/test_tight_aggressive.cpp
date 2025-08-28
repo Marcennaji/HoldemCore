@@ -1,4 +1,4 @@
-#include "test_common.h"
+#include "common/common.h"
 
 #include <core/player/strategy/TightAggressiveBotStrategy.h>
 #include "StrategyTest.h"

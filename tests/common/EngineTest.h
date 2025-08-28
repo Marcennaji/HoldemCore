@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "test_common.h"
+#include "common/common.h"
 
 #include "core/engine/Board.h"
 #include "core/engine/deprecated/Hand.h"

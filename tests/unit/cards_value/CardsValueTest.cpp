@@ -1,8 +1,8 @@
+#include "common/common.h"
 #include "core/engine/HandEvaluator.h"
 #include "core/services/GlobalServices.h"
 #include "infra/ConsoleLogger.h"
 #include "infra/eval/PsimHandEvaluationEngine.h"
-#include "test_common.h"
 
 using namespace pkt::core;
 namespace pkt::test

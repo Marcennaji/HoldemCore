@@ -1,12 +1,12 @@
 
 #pragma once
 
-#include "EngineTest.h"
+#include "common/EngineTest.h"
 
 namespace pkt::test
 {
 
-class BettingRoundsLegacyTest : public EngineTest
+class PreflopStateTest : public EngineTest
 {
   protected:
     void SetUp() override;
