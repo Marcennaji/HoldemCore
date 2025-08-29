@@ -43,8 +43,9 @@ bool PreflopState::isActionAllowed(const HandFsm& hand, const PlayerAction actio
                                                    " not found");
         return false;
     }
-    int currentHighest = hand.getBettingState()->getHighestSet();
-    int playerBet = player->getTotalBetAmount();
+
+    const int currentHighestBet = hand.getBettingState()->getHighestSet();
+    const int playerBet = player->getTotalBetAmount();
 
     switch (action.type)
     {
@@ -52,20 +53,32 @@ bool PreflopState::isActionAllowed(const HandFsm& hand, const PlayerAction actio
         return true;
 
     case ActionType::Check:
-        return action.amount == 0;
+        return playerBet == currentHighestBet && action.amount == 0;
 
     case ActionType::Call:
-        return action.amount == currentHighest - playerBet && player->getCash() >= action.amount;
+    {
+        const int amountToCall = currentHighestBet - playerBet;
+        return action.amount == amountToCall && player->getCash() >= amountToCall;
+    }
 
     case ActionType::Bet:
-        return action.amount > 0 && action.amount <= player->getCash();
+        return currentHighestBet == 0 && action.amount > 0 && action.amount <= player->getCash();
 
     case ActionType::Raise:
-        if (action.amount <= player->getCash() && action.amount >= currentHighest)
-        {
-            return true;
-        }
-        return false;
+    {
+        if (action.amount <= currentHighestBet)
+            return false;
+
+        int minRaise = hand.getBettingState()->getMinRaise(mySmallBlind);
+        if (action.amount < currentHighestBet + minRaise)
+            return false;
+
+        const int extraChipsRequired = action.amount - playerBet;
+        if (extraChipsRequired > player->getCash())
+            return false;
+
+        return true;
+    }
 
     case ActionType::Allin:
         return player->getCash() > 0;
@@ -73,8 +86,6 @@ bool PreflopState::isActionAllowed(const HandFsm& hand, const PlayerAction actio
     default:
         return false;
     }
-
-    return false;
 }
 
 void PreflopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)

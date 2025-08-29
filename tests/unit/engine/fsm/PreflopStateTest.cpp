@@ -190,4 +190,42 @@ TEST_F(PreflopStateTest, ReraiseUpdatesHighestBetAndKeepsRoundOpen)
     EXPECT_EQ(bettingState->getPreflopLastRaiserId(), playerBb->getId());
 }
 
+TEST_F(PreflopStateTest, RaiseBelowMinimumShouldBeRejected)
+{
+    initializeHandFsmForTesting(3, gameData);
+    myHandFsm->start();
+
+    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+
+    // Step 1: dealer folds
+    myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
+    EXPECT_TRUE(isPlayerStillActive(playerSb->getId()));
+    EXPECT_TRUE(isPlayerStillActive(playerBb->getId()));
+    EXPECT_EQ(myLastGameState, Preflop);
+
+    // Step 2: SB attempts an invalid raise (to less than BB + SB)
+    int currentHighest = myHandFsm->getBettingState()->getHighestSet();
+    int invalidRaise = currentHighest + (myHandFsm->getSmallBlind() / 2); // too small
+
+    auto actionProcessor = myHandFsm->getActionProcessor();
+    ASSERT_NE(actionProcessor, nullptr);
+
+    bool actionAllowed =
+        actionProcessor->isActionAllowed(*myHandFsm, {playerSb->getId(), ActionType::Raise, invalidRaise});
+
+    // FSM should reject this action
+    EXPECT_FALSE(actionAllowed);
+
+    // SB’s total bet must remain unchanged
+    EXPECT_EQ(playerSb->getTotalBetAmount(), myHandFsm->getSmallBlind());
+
+    // Current highest bet is still the BB
+    EXPECT_EQ(myHandFsm->getBettingState()->getHighestSet(), myHandFsm->getSmallBlind() * 2);
+
+    // Step 3: verify game state is still waiting for SB
+    // EXPECT_EQ(myHandFsm->getCurrentPlayer()->getId(), playerSb->getId());
+}
+
 } // namespace pkt::test

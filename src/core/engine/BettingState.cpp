@@ -12,6 +12,30 @@ BettingState::BettingState(PlayerFsmList& seats, PlayerFsmList& runningPlayers)
     : mySeatsList(seats), myRunningPlayersList(runningPlayers)
 {
 }
+int BettingState::getMinRaise(int smallBlind) const
+{
+    if (!myLastRaiserId.has_value())
+    {
+        // No raise yet: minimum raise is usually the big blind (preflop) or small blind
+        return smallBlind;
+    }
+
+    // Compute previous raise amount
+    int lastRaiserTotal = 0;
+    for (auto player = myRunningPlayersList->begin(); player != myRunningPlayersList->end(); ++player)
+    {
+        if ((*player)->getId() == myLastRaiserId.value())
+        {
+            lastRaiserTotal = (*player)->getTotalBetAmount();
+            break;
+        }
+    }
+
+    int prevHighest = myHighestSet;
+    int prevRaise = prevHighest - lastRaiserTotal;
+
+    return prevRaise;
+}
 
 bool BettingState::isRoundComplete(const HandFsm& hand) const
 {

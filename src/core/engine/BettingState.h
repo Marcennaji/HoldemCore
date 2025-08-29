@@ -15,6 +15,7 @@ class BettingState
     BettingState(pkt::core::player::PlayerFsmList& seats, pkt::core::player::PlayerFsmList& runningPlayers);
     bool isRoundComplete(const HandFsm& hand) const;
     int getHighestSet() const;
+    int getMinRaise(int smallBlind) const;
     void updateHighestSet(int amount);
     void resetHighestSet() { myHighestSet = 0; }
     void recordRaise(unsigned int id) { myLastRaiserId = id; }

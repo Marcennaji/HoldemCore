@@ -91,6 +91,11 @@ void HandFsm::applyActionEffects(const PlayerAction& action)
 
     int currentHighest = getBettingState()->getHighestSet();
     int playerBet = player->getTotalBetAmount();
+    int amountToCall = currentHighest - playerBet;
+    if (player->getCash() < amountToCall)
+    {
+        amountToCall = player->getCash();
+    }
 
     switch (action.type)
     {
@@ -100,7 +105,7 @@ void HandFsm::applyActionEffects(const PlayerAction& action)
 
     case ActionType::Call:
     {
-        player->addBetAmount(action.amount);
+        player->addBetAmount(amountToCall);
         break;
     }
 
@@ -420,6 +425,16 @@ PlayerPosition HandFsm::getPlayerPosition(const int playerId)
     assert(position != UNKNOWN);
 
     return position;
+}
+
+IActionProcessor* HandFsm::getActionProcessor() const
+{
+    return dynamic_cast<IActionProcessor*>(myState.get());
+}
+
+int HandFsm::getSmallBlind() const
+{
+    return mySmallBlind;
 }
 
 } // namespace pkt::core
