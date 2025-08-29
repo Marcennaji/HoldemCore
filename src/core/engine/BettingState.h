@@ -17,7 +17,6 @@ class BettingState
     int getHighestSet() const;
     void updateHighestSet(int amount);
     void resetHighestSet() { myHighestSet = 0; }
-
     void recordRaise(unsigned int id) { myLastRaiserId = id; }
 
     std::optional<unsigned int> getLastRaiserId() const { return myLastRaiserId; }

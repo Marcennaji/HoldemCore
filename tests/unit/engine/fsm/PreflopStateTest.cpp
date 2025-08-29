@@ -128,4 +128,66 @@ TEST_F(PreflopStateTest, EverybodyFoldPreflopShouldGoToPostRiver)
 
     EXPECT_EQ(myLastGameState, PostRiver);
 }
+
+TEST_F(PreflopStateTest, OneRaiseKeepsBettingRoundOpen)
+{
+    initializeHandFsmForTesting(3, gameData);
+    myHandFsm->start();
+
+    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+
+    // step 1 : dealer fold
+    myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
+    EXPECT_TRUE(isPlayerStillActive(playerSb->getId()));
+    EXPECT_TRUE(isPlayerStillActive(playerBb->getId()));
+    EXPECT_EQ(myLastGameState, Preflop); // still in preflop
+
+    // step 2 : small blind raises to 40 (min-raise on blind 20)
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Raise, 40});
+    EXPECT_EQ(myLastGameState, Preflop); // round not finished yet
+
+    // step 3 : big blind calls 20
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call, 20});
+
+    // now, the bets are equal → transition to Flop
+    EXPECT_EQ(myLastGameState, Flop);
+}
+
+TEST_F(PreflopStateTest, ReraiseUpdatesHighestBetAndKeepsRoundOpen)
+{
+    initializeHandFsmForTesting(3, gameData);
+    myHandFsm->start();
+
+    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+
+    // Step 1: dealer folds
+    myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
+    EXPECT_TRUE(isPlayerStillActive(playerSb->getId()));
+    EXPECT_TRUE(isPlayerStillActive(playerBb->getId()));
+    EXPECT_EQ(myLastGameState, Preflop);
+
+    // Step 2: small blind opens with a raise to 40
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Raise, 40});
+    EXPECT_EQ(myLastGameState, Preflop); // still in preflop
+
+    // Step 3: big blind re-raises to 80
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Raise, 80});
+    EXPECT_EQ(myLastGameState, Preflop); // still in preflop after re-raise
+
+    // Step 4: small blind calls the difference (40)
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call, 40});
+
+    // now, the bets are equal → transition to Flop
+    EXPECT_EQ(myLastGameState, Flop);
+
+    // Verify highest bet and last raiser
+    auto bettingState = myHandFsm->getBettingState();
+    EXPECT_EQ(bettingState->getHighestSet(), 0); // reset to 0 on the new round
+    EXPECT_EQ(bettingState->getPreflopLastRaiserId(), playerBb->getId());
+}
+
 } // namespace pkt::test

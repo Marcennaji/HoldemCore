@@ -109,14 +109,13 @@ player.setStrategy(std::make_unique<MyCustomBotStrategy>());
   a new **FSM-driven, modular architecture**, designed for **testability** and to support  
   multiple UIs (Qt Widgets, QML, and web frontends).  
 
-Soon, the engine will be **fully original** and only retain conceptual influence from PokerTH.  
+Soon, the engine will be **fully original**.  
 
 
 
 ✅ Core engine is now headless  
 ✅ `GameEvents` decouples UI from logic  
-✅ Minimalistic `BotStrategy` API with overridable defaults  
-✅ CLI-based manual play for human player  
+✅ Minimalistic `BotStrategy` API with overridable defaults   
 ✅ FSM-based street handling in progress  
 
 ---
@@ -127,7 +126,7 @@ Soon, the engine will be **fully original** and only retain conceptual influence
 - Finalize FSM-based hand street transitions
 - Redesign Qt Widgets table UI with a modern layout
 - Expand unit test coverage to the entire core engine
-- Continue major refactoring of legacy components
+- Continue major refactoring, or removal, of remaining legacy components
 
 
 **Medium-term**
@@ -147,7 +146,7 @@ src/
 ├── ui/
 │   └── qtwidgets/    # Qt Widgets UI
 ├── server/           # WebSocket server (planned)
-├── tests/            # Unit tests
+├── tests/            # Unit tests and end-to-end tests
 └── third_party/      # External dependencies
 ```
 

@@ -275,4 +275,5 @@ void BettingState::setTurnLastRaiserId(int id)
 {
     myTurnLastRaiserId = id;
 }
+
 } // namespace pkt::core

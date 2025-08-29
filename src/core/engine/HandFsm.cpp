@@ -37,16 +37,16 @@ HandFsm::~HandFsm() = default;
 
 void HandFsm::start()
 {
-    GlobalServices::instance().logger()->verbose(
+    GlobalServices::instance().logger()->info(
         "\n----------------------  New hand initialization (FSM)  -------------------------------\n");
 
     initAndShuffleDeck();
     size_t cardsArrayIndex = dealBoardCards();
     dealHoleCards(cardsArrayIndex);
 
-    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
+    for (auto player = mySeatsList->begin(); player != mySeatsList->end(); ++player)
     {
-        (*it)->resetForNewHand();
+        (*player)->resetForNewHand();
     }
 
     getBettingState()->setPreflopLastRaiserId(-1);
@@ -84,7 +84,13 @@ void HandFsm::handlePlayerAction(PlayerAction action)
 void HandFsm::applyActionEffects(const PlayerAction& action)
 {
     auto player = getPlayerFsmById(myRunningPlayersList, action.playerId);
+    if (!player)
+        return;
+
     player->setAction(action.type);
+
+    int currentHighest = getBettingState()->getHighestSet();
+    int playerBet = player->getTotalBetAmount();
 
     switch (action.type)
     {
@@ -95,44 +101,42 @@ void HandFsm::applyActionEffects(const PlayerAction& action)
     case ActionType::Call:
     {
         player->addBetAmount(action.amount);
-
-        // myPot += toCall;
         break;
     }
 
     case ActionType::Raise:
     {
-        /*int toCall = currentBet() - player.currentBet();
-        int raiseAmount = action.amount();
-        int totalPutIn = toCall + raiseAmount;
-
-        player.stack -= totalPutIn;
-        player.addToCurrentBet(totalPutIn);
-        myPot += totalPutIn;
-        myCurrentBet = player.currentBet(); // update table's highest bet
-        myLastAggressor = player.id();
-        */
+        int raiseIncrement = action.amount - playerBet;
+        player->addBetAmount(raiseIncrement);
+        getBettingState()->updateHighestSet(action.amount);
+        getBettingState()->setPreflopLastRaiserId(player->getId());
         break;
     }
+
     case ActionType::Bet:
     {
+        int betIncrement = action.amount - playerBet;
+        player->addBetAmount(betIncrement);
+        getBettingState()->updateHighestSet(action.amount);
         break;
     }
+
     case ActionType::Check:
     {
         break;
     }
+
     case ActionType::Allin:
     {
+        // Temporary: simply commit all chips
+        player->addBetAmount(player->getCash());
         break;
-    }
-    case ActionType::None:
-    {
-        break;
-    }
     }
 
-    // myActionHistory.push_back(action);
+    case ActionType::None:
+    default:
+        break;
+    }
 }
 
 void HandFsm::initAndShuffleDeck()

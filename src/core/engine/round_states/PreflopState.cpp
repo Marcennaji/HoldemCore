@@ -8,6 +8,7 @@
 #include "core/player/Helpers.h"
 #include "core/player/PlayerFsm.h"
 #include "core/player/deprecated/Player.h"
+#include "core/services/GlobalServices.h"
 
 namespace pkt::core
 {
@@ -37,11 +38,13 @@ bool PreflopState::isActionAllowed(const HandFsm& hand, const PlayerAction actio
 {
     auto player = getPlayerFsmById(hand.getRunningPlayersList(), action.playerId);
     if (!player)
+    {
+        GlobalServices::instance().logger()->error("PreflopState: Player " + std::to_string(action.playerId) +
+                                                   " not found");
         return false;
-
-    const int cash = player->getCash();
-
-    const int amountToCall = hand.getBettingState()->getHighestSet() - player->getTotalBetAmount();
+    }
+    int currentHighest = hand.getBettingState()->getHighestSet();
+    int playerBet = player->getTotalBetAmount();
 
     switch (action.type)
     {
@@ -52,17 +55,20 @@ bool PreflopState::isActionAllowed(const HandFsm& hand, const PlayerAction actio
         return action.amount == 0;
 
     case ActionType::Call:
-        return action.amount == amountToCall && cash >= action.amount;
+        return action.amount == currentHighest - playerBet && player->getCash() >= action.amount;
 
     case ActionType::Bet:
-        return action.amount > 0 && action.amount <= cash;
+        return action.amount > 0 && action.amount <= player->getCash();
 
     case ActionType::Raise:
-        // TODO: enforce minimum raise rules here
-        return action.amount <= cash;
+        if (action.amount <= player->getCash() && action.amount >= currentHighest)
+        {
+            return true;
+        }
+        return false;
 
     case ActionType::Allin:
-        return cash > 0;
+        return player->getCash() > 0;
 
     default:
         return false;
