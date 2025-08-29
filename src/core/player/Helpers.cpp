@@ -1,5 +1,6 @@
 
 #include "Helpers.h"
+#include "core/engine/BettingState.h"
 #include "core/engine/CardUtilities.h"
 #include "core/engine/Exception.h"
 #include "core/engine/model/ButtonState.h"
@@ -490,5 +491,52 @@ bool hasPosition(PlayerPosition position, PlayerFsmList runningPlayers)
     }
 
     return hasPosition;
+}
+
+bool validatePlayerAction(const PlayerFsm& player, const PlayerAction& action, const BettingState& bettingState,
+                          int smallBlind)
+{
+    const int currentHighestBet = bettingState.getHighestSet();
+    const int playerBet = player.getTotalBetAmount();
+
+    switch (action.type)
+    {
+    case ActionType::Fold:
+        return true;
+
+    case ActionType::Check:
+        return playerBet == currentHighestBet && action.amount == 0;
+
+    case ActionType::Call:
+    {
+        // take into account a call which would also be an allin, with a stack < to the amount to call
+        return player.getCash() > 0;
+    }
+
+    case ActionType::Bet:
+        return currentHighestBet == 0 && action.amount > 0 && action.amount <= player.getCash();
+
+    case ActionType::Raise:
+    {
+        if (action.amount <= currentHighestBet)
+            return false;
+
+        int minRaise = bettingState.getMinRaise(smallBlind);
+        if (action.amount < currentHighestBet + minRaise)
+            return false;
+
+        const int extraChipsRequired = action.amount - playerBet;
+        if (extraChipsRequired > player.getCash())
+            return false;
+
+        return true;
+    }
+
+    case ActionType::Allin:
+        return player.getCash() > 0;
+
+    default:
+        return false;
+    }
 }
 } // namespace pkt::core::player

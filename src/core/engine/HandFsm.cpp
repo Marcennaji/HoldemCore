@@ -133,8 +133,16 @@ void HandFsm::applyActionEffects(const PlayerAction& action)
 
     case ActionType::Allin:
     {
-        // Temporary: simply commit all chips
-        player->addBetAmount(player->getCash());
+        int toCommit = player->getCash(); // all remaining stack
+        int newTotalBet = player->getTotalBetAmount() + toCommit;
+
+        player->setTotalBetAmount(newTotalBet);
+        player->setCash(0);
+
+        if (newTotalBet > getBettingState()->getHighestSet())
+        {
+            getBettingState()->updateHighestSet(newTotalBet);
+        }
         break;
     }
 

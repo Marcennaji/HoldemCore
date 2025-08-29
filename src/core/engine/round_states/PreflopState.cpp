@@ -43,49 +43,7 @@ bool PreflopState::isActionAllowed(const HandFsm& hand, const PlayerAction actio
                                                    " not found");
         return false;
     }
-
-    const int currentHighestBet = hand.getBettingState()->getHighestSet();
-    const int playerBet = player->getTotalBetAmount();
-
-    switch (action.type)
-    {
-    case ActionType::Fold:
-        return true;
-
-    case ActionType::Check:
-        return playerBet == currentHighestBet && action.amount == 0;
-
-    case ActionType::Call:
-    {
-        const int amountToCall = currentHighestBet - playerBet;
-        return action.amount == amountToCall && player->getCash() >= amountToCall;
-    }
-
-    case ActionType::Bet:
-        return currentHighestBet == 0 && action.amount > 0 && action.amount <= player->getCash();
-
-    case ActionType::Raise:
-    {
-        if (action.amount <= currentHighestBet)
-            return false;
-
-        int minRaise = hand.getBettingState()->getMinRaise(mySmallBlind);
-        if (action.amount < currentHighestBet + minRaise)
-            return false;
-
-        const int extraChipsRequired = action.amount - playerBet;
-        if (extraChipsRequired > player->getCash())
-            return false;
-
-        return true;
-    }
-
-    case ActionType::Allin:
-        return player->getCash() > 0;
-
-    default:
-        return false;
-    }
+    return validatePlayerAction(*player, action, *hand.getBettingState(), mySmallBlind);
 }
 
 void PreflopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)

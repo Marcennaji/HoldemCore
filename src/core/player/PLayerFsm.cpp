@@ -82,6 +82,10 @@ int PlayerFsm::getTotalBetAmount() const
 {
     return myTotalBetAmount;
 }
+void PlayerFsm::setTotalBetAmount(int theValue)
+{
+    myTotalBetAmount = theValue;
+}
 int PlayerFsm::getLastBetAmount() const
 {
     return myLastBetAmount;

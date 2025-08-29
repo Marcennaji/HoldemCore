@@ -215,7 +215,6 @@ TEST_F(PreflopStateTest, RaiseBelowMinimumShouldBeRejected)
     bool actionAllowed =
         actionProcessor->isActionAllowed(*myHandFsm, {playerSb->getId(), ActionType::Raise, invalidRaise});
 
-    // FSM should reject this action
     EXPECT_FALSE(actionAllowed);
 
     // SB’s total bet must remain unchanged
@@ -223,9 +222,27 @@ TEST_F(PreflopStateTest, RaiseBelowMinimumShouldBeRejected)
 
     // Current highest bet is still the BB
     EXPECT_EQ(myHandFsm->getBettingState()->getHighestSet(), myHandFsm->getSmallBlind() * 2);
+}
 
-    // Step 3: verify game state is still waiting for SB
-    // EXPECT_EQ(myHandFsm->getCurrentPlayer()->getId(), playerSb->getId());
+TEST_F(PreflopStateTest, AllInInsteadOfRaiseIsAccepted)
+{
+    initializeHandFsmForTesting(3, gameData);
+    myHandFsm->start();
+
+    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+
+    // dealer goes allin
+    myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Allin});
+
+    EXPECT_EQ(myHandFsm->getBettingState()->getHighestSet(), 1000);
+
+    // dealer must have no chips left
+    EXPECT_EQ(playerDealer->getCash(), 0);
+
+    // Round is not yet closed — SB and BB still need to act
+    EXPECT_EQ(myLastGameState, Preflop);
 }
 
 } // namespace pkt::test
