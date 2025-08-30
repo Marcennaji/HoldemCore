@@ -187,7 +187,7 @@ TEST_F(PreflopStateTest, ReraiseUpdatesHighestBetAndKeepsRoundOpen)
     // Verify highest bet and last raiser
     auto bettingActions = myHandFsm->getBettingActions();
     EXPECT_EQ(bettingActions->getHighestSet(), 0); // reset to 0 on the new round
-    EXPECT_EQ(bettingActions->getPreflopLastRaiserId(), playerBb->getId());
+    EXPECT_EQ(bettingActions->getPreflop().getLastRaiserId(), playerBb->getId());
 }
 
 TEST_F(PreflopStateTest, RaiseBelowMinimumShouldBeRejected)

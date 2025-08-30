@@ -9,7 +9,9 @@ namespace pkt::core
 using namespace pkt::core::player;
 
 BettingActions::BettingActions(PlayerFsmList& seats, PlayerFsmList& runningPlayers)
-    : mySeatsList(seats), myRunningPlayersList(runningPlayers)
+    : mySeatsList(seats), myRunningPlayersList(runningPlayers), myPreflop(GameState::Preflop, seats, runningPlayers),
+      myFlop(GameState::Flop, seats, runningPlayers), myTurn(GameState::Turn, seats, runningPlayers),
+      myRiver(GameState::River, seats, runningPlayers)
 {
 }
 int BettingActions::getMinRaise(int smallBlind) const
@@ -91,106 +93,6 @@ void BettingActions::setLastActionPlayerId(int theValue)
     // myBoard->setLastActionPlayerId(theValue);
 }
 
-int BettingActions::getPreflopCallsNumber()
-{
-    int calls = 0;
-
-    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
-    {
-
-        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getActions(GameState::Preflop);
-
-        if (find(actions.begin(), actions.end(), ActionType::Call) != actions.end())
-        {
-            calls++;
-        }
-    }
-    return calls;
-}
-int BettingActions::getPreflopRaisesNumber()
-{
-
-    int raises = 0;
-
-    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
-    {
-
-        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getActions(GameState::Preflop);
-
-        for (std::vector<ActionType>::const_iterator itAction = actions.begin(); itAction != actions.end(); itAction++)
-        {
-            if ((*itAction) == ActionType::Raise || (*itAction) == ActionType::Allin)
-            {
-                raises++;
-            }
-        }
-    }
-
-    return raises;
-}
-int BettingActions::getFlopBetsOrRaisesNumber()
-{
-
-    int bets = 0;
-
-    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
-    {
-
-        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getActions(GameState::Flop);
-
-        for (std::vector<ActionType>::const_iterator itAction = actions.begin(); itAction != actions.end(); itAction++)
-        {
-            if ((*itAction) == ActionType::Raise || (*itAction) == ActionType::Allin || (*itAction) == ActionType::Bet)
-            {
-                bets++;
-            }
-        }
-    }
-
-    return bets;
-}
-int BettingActions::getTurnBetsOrRaisesNumber()
-{
-
-    int bets = 0;
-
-    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
-    {
-
-        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getActions(GameState::Turn);
-
-        for (std::vector<ActionType>::const_iterator itAction = actions.begin(); itAction != actions.end(); itAction++)
-        {
-            if ((*itAction) == ActionType::Raise || (*itAction) == ActionType::Allin || (*itAction) == ActionType::Bet)
-            {
-                bets++;
-            }
-        }
-    }
-
-    return bets;
-}
-int BettingActions::getRiverBetsOrRaisesNumber()
-{
-
-    int bets = 0;
-
-    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
-    {
-
-        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getActions(GameState::River);
-
-        for (std::vector<ActionType>::const_iterator itAction = actions.begin(); itAction != actions.end(); itAction++)
-        {
-            if ((*itAction) == ActionType::Raise || (*itAction) == ActionType::Allin || (*itAction) == ActionType::Bet)
-            {
-                bets++;
-            }
-        }
-    }
-
-    return bets;
-}
 std::vector<PlayerPosition> BettingActions::getRaisersPositions()
 {
 
@@ -272,32 +174,4 @@ int BettingActions::getLastRaiserId()
         return -1;
     }
 }
-int BettingActions::getPreflopLastRaiserId()
-{
-    return myPreflopLastRaiserId;
-}
-
-void BettingActions::setPreflopLastRaiserId(int id)
-{
-    myPreflopLastRaiserId = id;
-}
-int BettingActions::getFlopLastRaiserId()
-{
-    return myFlopLastRaiserId;
-}
-
-void BettingActions::setFlopLastRaiserId(int id)
-{
-    myFlopLastRaiserId = id;
-}
-int BettingActions::getTurnLastRaiserId()
-{
-    return myTurnLastRaiserId;
-}
-
-void BettingActions::setTurnLastRaiserId(int id)
-{
-    myTurnLastRaiserId = id;
-}
-
 } // namespace pkt::core

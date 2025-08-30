@@ -1,10 +1,11 @@
 #pragma once
 
-#include <optional>
+#include "core/engine/BettingRoundActions.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/interfaces/hand/IHandState.h"
 #include "core/player/typedefs.h"
 
+#include <optional>
 #include <vector>
 
 namespace pkt::core
@@ -24,34 +25,29 @@ class BettingActions
 
     void resetRaiser() { myLastRaiserId = std::nullopt; }
 
-    int getPreflopCallsNumber();
-    int getPreflopRaisesNumber();
-    int getFlopBetsOrRaisesNumber();
-    int getTurnBetsOrRaisesNumber();
-    int getRiverBetsOrRaisesNumber();
+    BettingRoundActions& getPreflop() { return myPreflop; }
+    BettingRoundActions& getFlop() { return myFlop; }
+    BettingRoundActions& getTurn() { return myTurn; }
+    BettingRoundActions& getRiver() { return myRiver; }
 
     std::vector<PlayerPosition> getRaisersPositions();
     std::vector<PlayerPosition> getCallersPositions();
     int getLastRaiserId();
-    int getPreflopLastRaiserId();
-    void setPreflopLastRaiserId(int id);
-    int getFlopLastRaiserId();
-    void setFlopLastRaiserId(int id);
-    int getTurnLastRaiserId();
-    void setTurnLastRaiserId(int id);
     void setLastActionPlayerId(int theValue);
     int getLastActionPlayerId() const { return myLastActionPlayerId; }
 
-  protected:
+  private:
+    BettingRoundActions myPreflop;
+    BettingRoundActions myFlop;
+    BettingRoundActions myTurn;
+    BettingRoundActions myRiver;
+
     bool haveAllPlayersCalledOrFolded(const HandFsm& hand) const;
     bool isOnlyOnePlayerRemaining(const HandFsm& hand) const;
     int myHighestSet = 0;
     std::optional<unsigned int> myLastRaiserId = std::nullopt;
     int myLastActionPlayerId;
     int myPreviousPlayerId{-1};
-    int myPreflopLastRaiserId;
-    int myFlopLastRaiserId;
-    int myTurnLastRaiserId;
 
     const pkt::core::player::PlayerFsmList& mySeatsList;
     const pkt::core::player::PlayerFsmList& myRunningPlayersList;
