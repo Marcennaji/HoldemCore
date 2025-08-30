@@ -18,7 +18,7 @@ TurnState::TurnState(const GameEvents& events) : myEvents(events)
 void TurnState::enter(HandFsm& hand)
 {
     // Reset betting amounts for new round
-    hand.getBettingState()->resetHighestSet();
+    hand.getBettingActions()->resetHighestSet();
 
     // Deal turn card
     // hand.getBoard()->dealTurn();
@@ -39,7 +39,7 @@ bool TurnState::isActionAllowed(const HandFsm& hand, const PlayerAction action) 
         return false;
 
     const int cash = player->getCash();
-    const int amountToCall = hand.getBettingState()->getHighestSet() - player->getTotalBetAmount();
+    const int amountToCall = hand.getBettingActions()->getHighestSet() - player->getTotalBetAmount();
 
     switch (action.type)
     {
@@ -98,7 +98,7 @@ bool TurnState::isRoundComplete(const HandFsm& hand) const
 
     for (auto itC = hand.getRunningPlayersList()->begin(); itC != hand.getRunningPlayersList()->end(); ++itC)
     {
-        if ((*itC)->getTotalBetAmount() != hand.getBettingState()->getHighestSet())
+        if ((*itC)->getTotalBetAmount() != hand.getBettingActions()->getHighestSet())
         {
             return false;
         }

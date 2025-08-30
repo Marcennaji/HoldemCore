@@ -9,10 +9,10 @@
 
 namespace pkt::core
 {
-class BettingState
+class BettingActions
 {
   public:
-    BettingState(pkt::core::player::PlayerFsmList& seats, pkt::core::player::PlayerFsmList& runningPlayers);
+    BettingActions(pkt::core::player::PlayerFsmList& seats, pkt::core::player::PlayerFsmList& runningPlayers);
     bool isRoundComplete(const HandFsm& hand) const;
     int getHighestSet() const;
     int getMinRaise(int smallBlind) const;

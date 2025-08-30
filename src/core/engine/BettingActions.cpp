@@ -1,5 +1,5 @@
 
-#include "BettingState.h"
+#include "BettingActions.h"
 #include "core/engine/HandFsm.h"
 #include "core/player/PlayerFsm.h"
 #include "core/player/typedefs.h"
@@ -8,11 +8,11 @@ namespace pkt::core
 {
 using namespace pkt::core::player;
 
-BettingState::BettingState(PlayerFsmList& seats, PlayerFsmList& runningPlayers)
+BettingActions::BettingActions(PlayerFsmList& seats, PlayerFsmList& runningPlayers)
     : mySeatsList(seats), myRunningPlayersList(runningPlayers)
 {
 }
-int BettingState::getMinRaise(int smallBlind) const
+int BettingActions::getMinRaise(int smallBlind) const
 {
     if (!myLastRaiserId.has_value())
     {
@@ -37,25 +37,25 @@ int BettingState::getMinRaise(int smallBlind) const
     return prevRaise;
 }
 
-bool BettingState::isRoundComplete(const HandFsm& hand) const
+bool BettingActions::isRoundComplete(const HandFsm& hand) const
 {
     if (isOnlyOnePlayerRemaining(hand))
         return true;
 
     return haveAllPlayersCalledOrFolded(hand);
 }
-int BettingState::getHighestSet() const
+int BettingActions::getHighestSet() const
 {
     return myHighestSet;
 }
 
-void BettingState::updateHighestSet(int amount)
+void BettingActions::updateHighestSet(int amount)
 {
     if (amount > myHighestSet)
         myHighestSet = amount;
 }
 
-bool BettingState::haveAllPlayersCalledOrFolded(const HandFsm& hand) const
+bool BettingActions::haveAllPlayersCalledOrFolded(const HandFsm& hand) const
 {
 
     const auto& players = hand.getRunningPlayersList();
@@ -80,18 +80,18 @@ bool BettingState::haveAllPlayersCalledOrFolded(const HandFsm& hand) const
     return true;
 }
 
-bool BettingState::isOnlyOnePlayerRemaining(const HandFsm& hand) const
+bool BettingActions::isOnlyOnePlayerRemaining(const HandFsm& hand) const
 {
     return hand.getRunningPlayersList()->size() == 1;
 }
 
-void BettingState::setLastActionPlayerId(int theValue)
+void BettingActions::setLastActionPlayerId(int theValue)
 {
     myLastActionPlayerId = theValue;
     // myBoard->setLastActionPlayerId(theValue);
 }
 
-int BettingState::getPreflopCallsNumber()
+int BettingActions::getPreflopCallsNumber()
 {
     int calls = 0;
 
@@ -107,7 +107,7 @@ int BettingState::getPreflopCallsNumber()
     }
     return calls;
 }
-int BettingState::getPreflopRaisesNumber()
+int BettingActions::getPreflopRaisesNumber()
 {
 
     int raises = 0;
@@ -128,7 +128,7 @@ int BettingState::getPreflopRaisesNumber()
 
     return raises;
 }
-int BettingState::getFlopBetsOrRaisesNumber()
+int BettingActions::getFlopBetsOrRaisesNumber()
 {
 
     int bets = 0;
@@ -149,7 +149,7 @@ int BettingState::getFlopBetsOrRaisesNumber()
 
     return bets;
 }
-int BettingState::getTurnBetsOrRaisesNumber()
+int BettingActions::getTurnBetsOrRaisesNumber()
 {
 
     int bets = 0;
@@ -170,7 +170,7 @@ int BettingState::getTurnBetsOrRaisesNumber()
 
     return bets;
 }
-int BettingState::getRiverBetsOrRaisesNumber()
+int BettingActions::getRiverBetsOrRaisesNumber()
 {
 
     int bets = 0;
@@ -191,7 +191,7 @@ int BettingState::getRiverBetsOrRaisesNumber()
 
     return bets;
 }
-std::vector<PlayerPosition> BettingState::getRaisersPositions()
+std::vector<PlayerPosition> BettingActions::getRaisersPositions()
 {
 
     std::vector<PlayerPosition> positions;
@@ -207,7 +207,7 @@ std::vector<PlayerPosition> BettingState::getRaisersPositions()
     return positions;
 }
 
-std::vector<PlayerPosition> BettingState::getCallersPositions()
+std::vector<PlayerPosition> BettingActions::getCallersPositions()
 {
 
     std::vector<PlayerPosition> positions;
@@ -222,7 +222,7 @@ std::vector<PlayerPosition> BettingState::getCallersPositions()
     }
     return positions;
 }
-int BettingState::getLastRaiserId()
+int BettingActions::getLastRaiserId()
 {
 
     auto lastRaiser = mySeatsList->end();
@@ -272,30 +272,30 @@ int BettingState::getLastRaiserId()
         return -1;
     }
 }
-int BettingState::getPreflopLastRaiserId()
+int BettingActions::getPreflopLastRaiserId()
 {
     return myPreflopLastRaiserId;
 }
 
-void BettingState::setPreflopLastRaiserId(int id)
+void BettingActions::setPreflopLastRaiserId(int id)
 {
     myPreflopLastRaiserId = id;
 }
-int BettingState::getFlopLastRaiserId()
+int BettingActions::getFlopLastRaiserId()
 {
     return myFlopLastRaiserId;
 }
 
-void BettingState::setFlopLastRaiserId(int id)
+void BettingActions::setFlopLastRaiserId(int id)
 {
     myFlopLastRaiserId = id;
 }
-int BettingState::getTurnLastRaiserId()
+int BettingActions::getTurnLastRaiserId()
 {
     return myTurnLastRaiserId;
 }
 
-void BettingState::setTurnLastRaiserId(int id)
+void BettingActions::setTurnLastRaiserId(int id)
 {
     myTurnLastRaiserId = id;
 }

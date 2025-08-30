@@ -21,7 +21,7 @@ PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsig
 
 void PreflopState::enter(HandFsm& hand)
 {
-    hand.getBettingState()->updateHighestSet(2 * mySmallBlind);
+    hand.getBettingActions()->updateHighestSet(2 * mySmallBlind);
     assignButtons(hand);
     setBlinds(hand);
 
@@ -43,7 +43,7 @@ bool PreflopState::isActionAllowed(const HandFsm& hand, const PlayerAction actio
                                                    " not found");
         return false;
     }
-    return validatePlayerAction(*player, action, *hand.getBettingState(), mySmallBlind);
+    return validatePlayerAction(*player, action, *hand.getBettingActions(), mySmallBlind);
 }
 
 void PreflopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
@@ -77,7 +77,7 @@ bool PreflopState::isRoundComplete(const HandFsm& hand) const
 
     for (auto itC = hand.getRunningPlayersList()->begin(); itC != hand.getRunningPlayersList()->end(); ++itC)
     {
-        if ((*itC)->getTotalBetAmount() != hand.getBettingState()->getHighestSet())
+        if ((*itC)->getTotalBetAmount() != hand.getBettingActions()->getHighestSet())
         {
             return false;
         }

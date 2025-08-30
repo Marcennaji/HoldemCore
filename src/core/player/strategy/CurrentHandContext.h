@@ -30,7 +30,7 @@ struct PlayersInHandContext
     std::vector<pkt::core::PlayerPosition> raisersPositions;
 };
 
-struct BettingStateContext
+struct HandBettingContext
 {
     int preflopRaisesNumber = 0;
     int preflopCallsNumber = 0;
@@ -93,7 +93,7 @@ struct CommonHandContext
     int smallBlind = 0;
     std::string stringBoard; // string representation of the board's cards, for example "As Ks Qs"
     PlayersInHandContext playersContext;
-    BettingStateContext bettingContext;
+    HandBettingContext bettingContext;
 };
 
 struct CurrentHandContext

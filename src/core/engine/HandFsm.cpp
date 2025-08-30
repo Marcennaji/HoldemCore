@@ -49,7 +49,7 @@ void HandFsm::start()
         (*player)->resetForNewHand();
     }
 
-    getBettingState()->setPreflopLastRaiserId(-1);
+    getBettingActions()->setPreflopLastRaiserId(-1);
 
     myState = std::make_unique<PreflopState>(myEvents, mySmallBlind, myDealerPlayerId);
     myState->enter(*this);
@@ -89,7 +89,7 @@ void HandFsm::applyActionEffects(const PlayerAction& action)
 
     player->setAction(action.type);
 
-    int currentHighest = getBettingState()->getHighestSet();
+    int currentHighest = getBettingActions()->getHighestSet();
     int playerBet = player->getTotalBetAmount();
     int amountToCall = currentHighest - playerBet;
     if (player->getCash() < amountToCall)
@@ -113,8 +113,9 @@ void HandFsm::applyActionEffects(const PlayerAction& action)
     {
         int raiseIncrement = action.amount - playerBet;
         player->addBetAmount(raiseIncrement);
-        getBettingState()->updateHighestSet(action.amount);
-        getBettingState()->setPreflopLastRaiserId(player->getId());
+        getBettingActions()->updateHighestSet(action.amount);
+        getBettingActions()->setPreflopLastRaiserId(
+            player->getId()); // TODO: Implement proper last raiser tracking based on the real game state
         break;
     }
 
@@ -122,7 +123,7 @@ void HandFsm::applyActionEffects(const PlayerAction& action)
     {
         int betIncrement = action.amount - playerBet;
         player->addBetAmount(betIncrement);
-        getBettingState()->updateHighestSet(action.amount);
+        getBettingActions()->updateHighestSet(action.amount);
         break;
     }
 
@@ -133,15 +134,16 @@ void HandFsm::applyActionEffects(const PlayerAction& action)
 
     case ActionType::Allin:
     {
-        int toCommit = player->getCash(); // all remaining stack
-        int newTotalBet = player->getTotalBetAmount() + toCommit;
+        int newTotalBet = player->getTotalBetAmount() + player->getCash();
 
         player->setTotalBetAmount(newTotalBet);
         player->setCash(0);
 
-        if (newTotalBet > getBettingState()->getHighestSet())
+        if (newTotalBet > getBettingActions()->getHighestSet())
         {
-            getBettingState()->updateHighestSet(newTotalBet);
+            getBettingActions()->updateHighestSet(newTotalBet);
+            getBettingActions()->setPreflopLastRaiserId(
+                player->getId()); // TODO: Implement proper last raiser tracking based on the real game state
         }
         break;
     }
@@ -222,26 +224,26 @@ CommonHandContext HandFsm::updateCurrentHandContext(const GameState state)
 
     handContext.playersContext.runningPlayersListFsm = getRunningPlayersList();
     handContext.playersContext.lastVPIPPlayerFsm =
-        getPlayerFsmById(getSeatsList(), getBettingState()->getLastRaiserId());
-    handContext.playersContext.callersPositions = myBettingState->getCallersPositions();
-    handContext.playersContext.raisersPositions = myBettingState->getRaisersPositions();
+        getPlayerFsmById(getSeatsList(), getBettingActions()->getLastRaiserId());
+    handContext.playersContext.callersPositions = myBettingActions->getCallersPositions();
+    handContext.playersContext.raisersPositions = myBettingActions->getRaisersPositions();
     handContext.playersContext.preflopLastRaiserFsm =
-        getPlayerFsmById(getSeatsList(), getBettingState()->getPreflopLastRaiserId());
+        getPlayerFsmById(getSeatsList(), getBettingActions()->getPreflopLastRaiserId());
     handContext.playersContext.turnLastRaiserFsm =
-        getPlayerFsmById(getSeatsList(), getBettingState()->getTurnLastRaiserId());
+        getPlayerFsmById(getSeatsList(), getBettingActions()->getTurnLastRaiserId());
     handContext.playersContext.flopLastRaiserFsm =
-        getPlayerFsmById(getSeatsList(), getBettingState()->getFlopLastRaiserId());
+        getPlayerFsmById(getSeatsList(), getBettingActions()->getFlopLastRaiserId());
 
     handContext.bettingContext.pot = myBoard->getPot();
     // handContext.bettingContext.potOdd = getPotOdd();
     handContext.bettingContext.sets = myBoard->getSets();
-    handContext.bettingContext.highestBetAmount = getBettingState()->getHighestSet();
-    handContext.bettingContext.preflopRaisesNumber = getBettingState()->getPreflopRaisesNumber();
-    handContext.bettingContext.preflopCallsNumber = getBettingState()->getPreflopCallsNumber();
-    // handContext.bettingContext.isPreflopBigBet = getBettingState()->isPreflopBigBet();
-    handContext.bettingContext.flopBetsOrRaisesNumber = getBettingState()->getFlopBetsOrRaisesNumber();
-    handContext.bettingContext.turnBetsOrRaisesNumber = getBettingState()->getTurnBetsOrRaisesNumber();
-    handContext.bettingContext.riverBetsOrRaisesNumber = getBettingState()->getRiverBetsOrRaisesNumber();
+    handContext.bettingContext.highestBetAmount = getBettingActions()->getHighestSet();
+    handContext.bettingContext.preflopRaisesNumber = getBettingActions()->getPreflopRaisesNumber();
+    handContext.bettingContext.preflopCallsNumber = getBettingActions()->getPreflopCallsNumber();
+    // handContext.bettingContext.isPreflopBigBet = getBettingActions()->isPreflopBigBet();
+    handContext.bettingContext.flopBetsOrRaisesNumber = getBettingActions()->getFlopBetsOrRaisesNumber();
+    handContext.bettingContext.turnBetsOrRaisesNumber = getBettingActions()->getTurnBetsOrRaisesNumber();
+    handContext.bettingContext.riverBetsOrRaisesNumber = getBettingActions()->getRiverBetsOrRaisesNumber();
     handContext.playersContext.nbPlayers = getSeatsList()->size();
 
     return handContext;
@@ -295,7 +297,7 @@ std::string HandFsm::getStringBoard() const
 
 int HandFsm::getPotOdd(const int playerCash, const int playerSet) const
 {
-    const int highestBetAmount = min(playerCash, getBettingState()->getHighestSet());
+    const int highestBetAmount = min(playerCash, getBettingActions()->getHighestSet());
 
     int pot = myBoard->getPot() + myBoard->getSets();
 

@@ -22,7 +22,7 @@ void EngineTest::SetUp()
     myFactory = std::make_shared<EngineFactory>(myEvents);
     auto& services = pkt::core::GlobalServices::instance();
     auto logger = std::make_shared<pkt::infra::ConsoleLogger>();
-    logger->setLogLevel(pkt::core::LogLevel::Debug);
+    logger->setLogLevel(pkt::core::LogLevel::Quiet);
     services.setLogger(logger);
     services.setHandEvaluationEngine(std::make_shared<pkt::infra::PsimHandEvaluationEngine>());
     auto randomizer = std::make_shared<FakeRandomizer>();

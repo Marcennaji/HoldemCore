@@ -1,6 +1,6 @@
 
 #include "Helpers.h"
-#include "core/engine/BettingState.h"
+#include "core/engine/BettingActions.h"
 #include "core/engine/CardUtilities.h"
 #include "core/engine/Exception.h"
 #include "core/engine/model/ButtonState.h"
@@ -493,10 +493,10 @@ bool hasPosition(PlayerPosition position, PlayerFsmList runningPlayers)
     return hasPosition;
 }
 
-bool validatePlayerAction(const PlayerFsm& player, const PlayerAction& action, const BettingState& bettingState,
+bool validatePlayerAction(const PlayerFsm& player, const PlayerAction& action, const BettingActions& bettingActions,
                           int smallBlind)
 {
-    const int currentHighestBet = bettingState.getHighestSet();
+    const int currentHighestBet = bettingActions.getHighestSet();
     const int playerBet = player.getTotalBetAmount();
 
     switch (action.type)
@@ -521,7 +521,7 @@ bool validatePlayerAction(const PlayerFsm& player, const PlayerAction& action, c
         if (action.amount <= currentHighestBet)
             return false;
 
-        int minRaise = bettingState.getMinRaise(smallBlind);
+        int minRaise = bettingActions.getMinRaise(smallBlind);
         if (action.amount < currentHighestBet + minRaise)
             return false;
 

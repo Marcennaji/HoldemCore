@@ -12,7 +12,7 @@ HandPlayersState::HandPlayersState(PlayerFsmList seats, PlayerFsmList runningPla
     : mySeatsList(seats), myRunningPlayersList(runningPlayers)
 
 {
-    myBettingState = make_shared<BettingState>(mySeatsList, myRunningPlayersList);
+    myBettingActions = make_shared<BettingActions>(mySeatsList, myRunningPlayersList);
 }
 
 } // namespace pkt::core

@@ -185,9 +185,9 @@ TEST_F(PreflopStateTest, ReraiseUpdatesHighestBetAndKeepsRoundOpen)
     EXPECT_EQ(myLastGameState, Flop);
 
     // Verify highest bet and last raiser
-    auto bettingState = myHandFsm->getBettingState();
-    EXPECT_EQ(bettingState->getHighestSet(), 0); // reset to 0 on the new round
-    EXPECT_EQ(bettingState->getPreflopLastRaiserId(), playerBb->getId());
+    auto bettingActions = myHandFsm->getBettingActions();
+    EXPECT_EQ(bettingActions->getHighestSet(), 0); // reset to 0 on the new round
+    EXPECT_EQ(bettingActions->getPreflopLastRaiserId(), playerBb->getId());
 }
 
 TEST_F(PreflopStateTest, RaiseBelowMinimumShouldBeRejected)
@@ -206,7 +206,7 @@ TEST_F(PreflopStateTest, RaiseBelowMinimumShouldBeRejected)
     EXPECT_EQ(myLastGameState, Preflop);
 
     // Step 2: SB attempts an invalid raise (to less than BB + SB)
-    int currentHighest = myHandFsm->getBettingState()->getHighestSet();
+    int currentHighest = myHandFsm->getBettingActions()->getHighestSet();
     int invalidRaise = currentHighest + (myHandFsm->getSmallBlind() / 2); // too small
 
     auto actionProcessor = myHandFsm->getActionProcessor();
@@ -221,7 +221,7 @@ TEST_F(PreflopStateTest, RaiseBelowMinimumShouldBeRejected)
     EXPECT_EQ(playerSb->getTotalBetAmount(), myHandFsm->getSmallBlind());
 
     // Current highest bet is still the BB
-    EXPECT_EQ(myHandFsm->getBettingState()->getHighestSet(), myHandFsm->getSmallBlind() * 2);
+    EXPECT_EQ(myHandFsm->getBettingActions()->getHighestSet(), myHandFsm->getSmallBlind() * 2);
 }
 
 TEST_F(PreflopStateTest, AllInInsteadOfRaiseIsAccepted)
@@ -236,7 +236,7 @@ TEST_F(PreflopStateTest, AllInInsteadOfRaiseIsAccepted)
     // dealer goes allin
     myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Allin});
 
-    EXPECT_EQ(myHandFsm->getBettingState()->getHighestSet(), 1000);
+    EXPECT_EQ(myHandFsm->getBettingActions()->getHighestSet(), 1000);
 
     // dealer must have no chips left
     EXPECT_EQ(playerDealer->getCash(), 0);

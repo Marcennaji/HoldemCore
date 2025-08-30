@@ -17,7 +17,7 @@ struct PostFlopAnalysisFlags;
 
 namespace pkt::core
 {
-class BettingState;
+class BettingActions;
 struct PlayerAction;
 } // namespace pkt::core
 
@@ -77,7 +77,7 @@ std::string getPositionLabel(pkt::core::PlayerPosition);
 
 bool hasPosition(PlayerPosition myPos, PlayerFsmList);
 
-bool validatePlayerAction(const PlayerFsm& player, const PlayerAction& action, const BettingState& bettingState,
+bool validatePlayerAction(const PlayerFsm& player, const PlayerAction& action, const BettingActions& bettingActions,
                           int smallBlind);
 
 } // namespace pkt::core::player
