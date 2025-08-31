@@ -31,8 +31,6 @@ Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
     auto it = getPlayerListIteratorById(mySeatsList, dealerId);
     if (it == mySeatsList->end())
         throw Exception(__FILE__, __LINE__, EngineError::DealerNotFound);
-
-    GlobalServices::instance().rankingStore()->updateRankingPlayedGames(mySeatsList);
 }
 
 Game::~Game()

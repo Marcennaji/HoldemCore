@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "IPlayersStatisticsStore.h"
+#include "PlayersStatisticsStore.h"
 #include "core/engine/EngineDefs.h"
 #include "core/player/PlayerStatistics.h"
 
@@ -13,7 +13,7 @@
 namespace pkt::core
 {
 
-class NullPlayersStatisticsStore : public IPlayersStatisticsStore
+class NullPlayersStatisticsStore : public PlayersStatisticsStore
 {
   public:
     NullPlayersStatisticsStore()

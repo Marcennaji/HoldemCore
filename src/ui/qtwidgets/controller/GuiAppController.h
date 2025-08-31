@@ -4,7 +4,6 @@
 #include <core/engine/GameEvents.h>
 
 #include <core/session/Session.h>
-#include <infra/persistence/SqliteLogStore.h>
 
 #include <QString>
 #include <memory>
@@ -22,16 +21,13 @@ class StartWindow;
 class GuiAppController
 {
   public:
-    GuiAppController(const QString& appPath, const QString& logPath, const QString& userDataPath);
+    GuiAppController(const QString& appPath);
     ~GuiAppController();
 
     StartWindow* createMainWindow();
 
   private:
     QString myAppDataPath;
-    QString myLogPath;
-    QString myUserDataPath;
-    std::unique_ptr<pkt::infra::SqliteLogStore> myDbStatisticsLogger;
     std::unique_ptr<PokerTableWindow> myPokerTableWindow;
     std::shared_ptr<pkt::core::Session> mySession;
     pkt::core::GameEvents myEvents;

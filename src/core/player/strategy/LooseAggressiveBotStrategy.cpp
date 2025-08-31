@@ -383,8 +383,7 @@ int LooseAggressiveBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
         // if i have raised preflop, bet
         if (ctx.commonContext.bettingContext.preflopRaisesNumber > 0 &&
             ctx.commonContext.playersContext.preflopLastRaiser != nullptr &&
-            ctx.commonContext.playersContext.preflopLastRaiser->getId() == ctx.personalContext.id &&
-            ctx.commonContext.bettingContext.preflopRaisesNumber > 0)
+            ctx.commonContext.playersContext.preflopLastRaiser->getId() == ctx.personalContext.id)
         {
             if (ctx.commonContext.playersContext.runningPlayersList->size() < 4)
             {

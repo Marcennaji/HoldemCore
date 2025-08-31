@@ -67,9 +67,6 @@ void BettingRoundPostRiver::run()
             }
         }
     }
-
-    GlobalServices::instance().rankingStore()->updateRankingGameLosers(getHand()->getSeatsList());
-    GlobalServices::instance().rankingStore()->updateRankingGameWinner(getHand()->getSeatsList());
     GlobalServices::instance().playersStatisticsStore()->updatePlayersStatistics(getHand()->getSeatsList());
 
     if (myEvents.onShowdownStarted)

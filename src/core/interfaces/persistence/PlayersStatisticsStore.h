@@ -13,10 +13,10 @@
 namespace pkt::core
 {
 
-class IPlayersStatisticsStore
+class PlayersStatisticsStore
 {
   public:
-    virtual ~IPlayersStatisticsStore() = default;
+    virtual ~PlayersStatisticsStore() = default;
 
     virtual std::array<pkt::core::player::PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1>
     getPlayerStatistics(const std::string& playerName) = 0;

@@ -6,6 +6,8 @@
 #include <infra/ConsoleLogger.h>
 #include <infra/eval/PsimHandEvaluationEngine.h>
 #include "core/services/GlobalServices.h"
+#include "infra/persistence/SqliteDb.h"
+#include "infra/persistence/SqlitePlayersStatisticsStore.h"
 
 #include <ui/qtwidgets/controller/GuiAppController.h>
 #include <ui/qtwidgets/startwindow/StartWindow.h>
@@ -35,9 +37,12 @@ int main(int argc, char** argv)
     pkt::infra::AppDirectories dirs = pkt::infra::AppDirectories::initialize();
     QString appPath = QString::fromStdString(dirs.appDataDir);
     QString logPath = QString::fromStdString(dirs.logDir);
-    QString userPath = QString::fromStdString(dirs.userDataDir);
 
-    GuiAppController controller(appPath, logPath, userPath);
+    auto db = std::make_shared<pkt::infra::SqliteDb>(dirs.logDir + string("/pokerTraining.db"));
+
+    services.setPlayersStatisticsStore(std::make_unique<pkt::infra::SqlitePlayersStatisticsStore>(db));
+
+    GuiAppController controller(appPath);
     controller.createMainWindow();
 
     return QApplication::exec();

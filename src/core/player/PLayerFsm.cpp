@@ -9,8 +9,7 @@
 
 #include <core/engine/HandFsm.h>
 #include <core/engine/model/Ranges.h>
-#include <core/interfaces/persistence/IHandAuditStore.h>
-#include <core/interfaces/persistence/IPlayersStatisticsStore.h>
+#include <core/interfaces/persistence/PlayersStatisticsStore.h>
 #include <core/player/range/RangeParser.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include <core/services/GlobalServices.h>
