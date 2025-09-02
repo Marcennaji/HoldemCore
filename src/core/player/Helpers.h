@@ -80,4 +80,7 @@ bool hasPosition(PlayerPosition myPos, PlayerFsmList);
 bool validatePlayerAction(const PlayerFsm& player, const PlayerAction& action, const BettingActions& bettingActions,
                           int smallBlind);
 
+int circularOffset(int fromId, int toId, const PlayerFsmList& players);
+PlayerPosition computePositionFromOffset(int offset, int nbPlayers);
+
 } // namespace pkt::core::player

@@ -15,6 +15,9 @@ class HandPlayersState
     const pkt::core::player::PlayerFsmList getSeatsList() const { return mySeatsList; }
     const pkt::core::player::PlayerFsmList getRunningPlayersList() const { return myRunningPlayersList; }
     std::shared_ptr<BettingActions> getBettingActions() const { return myBettingActions; }
+    int getDealerPlayerId() const { return myDealerPlayerId; }
+    int getSmallBlindPlayerId() const { return mySmallBlindPlayerId; }
+    int getBigBlindPlayerId() const { return myBigBlindPlayerId; }
 
   protected:
     pkt::core::player::PlayerFsmList mySeatsList;          // all players

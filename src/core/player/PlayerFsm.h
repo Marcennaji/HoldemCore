@@ -82,7 +82,7 @@ class PlayerFsm
     std::string getCardsValueString() const;
 
     const PlayerPosition getPosition() const;
-    void setPosition();
+    void setPosition(const HandFsm& hand);
 
     bool checkIfINeedToShowCards() const;
 
@@ -104,7 +104,7 @@ class PlayerFsm
     std::unique_ptr<RangeEstimator>& getRangeEstimator() { return myRangeEstimator; }
     int getPreflopPotOdd() const;
 
-    void resetForNewHand();
+    void resetForNewHand(const HandFsm& hand);
 
     const std::unique_ptr<PlayerStatisticsUpdater>& getStatisticsUpdater() const { return myStatisticsUpdater; }
 

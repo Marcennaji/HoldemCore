@@ -467,10 +467,13 @@ float PlayerFsm::calculatePreflopCallingRange(const CurrentHandContext& ctx) con
     return myRangeEstimator->getStandardCallingRange(ctx.commonContext.playersContext.runningPlayersListFsm->size());
 }
 
-void PlayerFsm::resetForNewHand()
+void PlayerFsm::resetForNewHand(const HandFsm& hand)
 {
     setCardsFlip(0);
     getCurrentHandActions().reset();
+    setCashAtHandStart(getCash());
+    setPosition(hand);
+    getRangeEstimator()->setEstimatedRange("");
 }
 const PostFlopAnalysisFlags PlayerFsm::getPostFlopAnalysisFlags() const
 {
@@ -494,6 +497,27 @@ bool PlayerFsm::checkIfINeedToShowCards() const
     }
 #endif
     return false;
+}
+void PlayerFsm::setPosition(const HandFsm& hand)
+{
+    myPosition = UNKNOWN;
+
+    const int dealerId = hand.getDealerPlayerId();
+    const PlayerFsmList players = hand.getSeatsList();
+    const int nbPlayers = players->size();
+
+    if (myID == dealerId)
+    {
+        myPosition = BUTTON;
+    }
+    else
+    {
+        // Compute relative offset clockwise from dealer
+        int offset = circularOffset(dealerId, myID, players);
+        myPosition = computePositionFromOffset(offset, nbPlayers);
+    }
+
+    assert(myPosition != UNKNOWN);
 }
 
 } // namespace pkt::core::player

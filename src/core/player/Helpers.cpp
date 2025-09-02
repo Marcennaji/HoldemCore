@@ -539,4 +539,127 @@ bool validatePlayerAction(const PlayerFsm& player, const PlayerAction& action, c
         return false;
     }
 }
+
+// Helper to compute the relative offset in the circular table
+int circularOffset(int fromId, int toId, const PlayerFsmList& players)
+{
+    int distance = 0;
+    bool found = false;
+    for (auto& p : *players)
+    {
+        if (p->getId() == fromId)
+            found = true;
+        else if (found)
+            distance++;
+        if (p->getId() == toId)
+            break;
+    }
+    return distance;
+}
+
+PlayerPosition computePositionFromOffset(int offset, int nbPlayers)
+{
+    // Dealer always at 0
+    switch (nbPlayers)
+    {
+    case 2:
+        return offset == 0 ? BUTTON : BB;
+    case 3:
+        return (offset == 0) ? BUTTON : (offset == 1 ? SB : BB);
+    case 4:
+        return (offset == 0) ? BUTTON : (offset == 1 ? SB : (offset == 2 ? BB : UTG));
+    case 5:
+        if (offset == 0)
+            return BUTTON;
+        if (offset == 1)
+            return SB;
+        if (offset == 2)
+            return BB;
+        if (offset == 3)
+            return UTG;
+        return CUTOFF;
+    case 6:
+        if (offset == 0)
+            return BUTTON;
+        if (offset == 1)
+            return SB;
+        if (offset == 2)
+            return BB;
+        if (offset == 3)
+            return UTG;
+        if (offset == 4)
+            return MIDDLE;
+        return CUTOFF;
+    case 7:
+        if (offset == 0)
+            return BUTTON;
+        if (offset == 1)
+            return SB;
+        if (offset == 2)
+            return BB;
+        if (offset == 3)
+            return UTG;
+        if (offset == 4)
+            return MIDDLE;
+        if (offset == 5)
+            return CUTOFF;
+        return LATE;
+    case 8:
+        if (offset == 0)
+            return BUTTON;
+        if (offset == 1)
+            return SB;
+        if (offset == 2)
+            return BB;
+        if (offset == 3)
+            return UTG;
+        if (offset == 4)
+            return UtgPlusOne;
+        if (offset == 5)
+            return MIDDLE;
+        if (offset == 6)
+            return CUTOFF;
+        return LATE;
+    case 9:
+        if (offset == 0)
+            return BUTTON;
+        if (offset == 1)
+            return SB;
+        if (offset == 2)
+            return BB;
+        if (offset == 3)
+            return UTG;
+        if (offset == 4)
+            return UtgPlusOne;
+        if (offset == 5)
+            return MIDDLE;
+        if (offset == 6)
+            return MiddlePlusOne;
+        if (offset == 7)
+            return CUTOFF;
+        return LATE;
+    case 10:
+        if (offset == 0)
+            return BUTTON;
+        if (offset == 1)
+            return SB;
+        if (offset == 2)
+            return BB;
+        if (offset == 3)
+            return UTG;
+        if (offset == 4)
+            return UtgPlusOne;
+        if (offset == 5)
+            return UtgPlusTwo;
+        if (offset == 6)
+            return MIDDLE;
+        if (offset == 7)
+            return MiddlePlusOne;
+        if (offset == 8)
+            return CUTOFF;
+        return LATE;
+    default:
+        return UNKNOWN;
+    }
+}
 } // namespace pkt::core::player

@@ -46,7 +46,7 @@ void HandFsm::start()
 
     for (auto player = mySeatsList->begin(); player != mySeatsList->end(); ++player)
     {
-        (*player)->resetForNewHand();
+        (*player)->resetForNewHand(*this);
     }
 
     getBettingActions()->getPreflop().setLastRaiserId(-1);
@@ -202,10 +202,6 @@ void HandFsm::dealHoleCards(size_t cardsArrayIndex)
         string humanReadableHand = CardUtilities::getCardStringValue(tempPlayerAndBoardArray, 7);
         (*it)->setCards(tempPlayerArray);
         (*it)->setHandRanking(HandEvaluator::evaluateHand(humanReadableHand.c_str()));
-        GlobalServices::instance().logger()->verbose(
-            "Player " + (*it)->getName() + " dealt cards: " + CardUtilities::getCardString(tempPlayerArray[0]) + " " +
-            CardUtilities::getCardString(tempPlayerArray[1]) +
-            ", hand strength = " + std::to_string((*it)->getHandRanking()));
     }
 }
 
