@@ -27,9 +27,12 @@ void TurnState::enter(HandFsm& hand)
         myEvents.onBettingRoundStarted(Turn);
 }
 
-void TurnState::exit(HandFsm& /*hand*/)
+void TurnState::exit(HandFsm& hand)
 {
-    // No special exit logic for Turn
+    for (auto& player : *hand.getSeatsList())
+    {
+        player->getStatisticsUpdater()->updateTurnStatistics(player->getCurrentHandContext());
+    }
 }
 
 bool TurnState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const

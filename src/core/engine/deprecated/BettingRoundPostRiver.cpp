@@ -67,7 +67,8 @@ void BettingRoundPostRiver::run()
             }
         }
     }
-    GlobalServices::instance().playersStatisticsStore()->updatePlayersStatistics(getHand()->getSeatsList());
+    // commented out, as not compatible any more with FSM player
+    // GlobalServices::instance().playersStatisticsStore()->savePlayersStatistics(getHand()->getSeatsList());
 
     if (myEvents.onShowdownStarted)
     {

@@ -19,8 +19,8 @@ class PlayersStatisticsStore
     virtual ~PlayersStatisticsStore() = default;
 
     virtual std::array<pkt::core::player::PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1>
-    getPlayerStatistics(const std::string& playerName) = 0;
+    loadPlayerStatistics(const std::string& playerName) = 0;
 
-    virtual void updatePlayersStatistics(pkt::core::player::PlayerList) = 0;
+    virtual void savePlayersStatistics(pkt::core::player::PlayerFsmList) = 0;
 };
 } //  namespace pkt::core

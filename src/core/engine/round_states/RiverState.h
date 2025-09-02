@@ -26,7 +26,7 @@ class RiverState : public IHandState, public IActionProcessor, public IRoundComp
     bool isActionAllowed(const HandFsm&, const PlayerAction) const override;
 
     void logStateInfo(const HandFsm&) const override;
-    std::string getStateName() const override { return "River"; }
+    GameState getGameState() const override { return GameState::River; }
     void promptPlayerAction(HandFsm&, player::PlayerFsm& player);
 
   private:

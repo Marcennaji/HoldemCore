@@ -26,9 +26,12 @@ void RiverState::enter(HandFsm& hand)
         myEvents.onBettingRoundStarted(River);
 }
 
-void RiverState::exit(HandFsm& /*hand*/)
+void RiverState::exit(HandFsm& hand)
 {
-    // No special exit logic for River
+    for (auto& player : *hand.getSeatsList())
+    {
+        player->getStatisticsUpdater()->updateRiverStatistics(player->getCurrentHandContext());
+    }
 }
 
 bool RiverState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const

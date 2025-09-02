@@ -28,12 +28,12 @@ class NullPlayersStatisticsStore : public PlayersStatisticsStore
     virtual ~NullPlayersStatisticsStore() = default;
 
     virtual std::array<pkt::core::player::PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1>
-    getPlayerStatistics(const std::string& playerName) override
+    loadPlayerStatistics(const std::string& playerName) override
     {
         return myNullPlayerStatistics;
     }
 
-    virtual void updatePlayersStatistics(pkt::core::player::PlayerList) override {}
+    virtual void savePlayersStatistics(pkt::core::player::PlayerFsmList) override {}
 
   private:
     std::array<pkt::core::player::PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> myNullPlayerStatistics;

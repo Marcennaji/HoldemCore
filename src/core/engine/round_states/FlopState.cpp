@@ -27,9 +27,12 @@ void FlopState::enter(HandFsm& hand)
         myEvents.onBettingRoundStarted(Flop);
 }
 
-void FlopState::exit(HandFsm& /*hand*/)
+void FlopState::exit(HandFsm& hand)
 {
-    // No special exit logic for Flop
+    for (auto& player : *hand.getSeatsList())
+    {
+        player->getStatisticsUpdater()->updateFlopStatistics(player->getCurrentHandContext());
+    }
 }
 
 bool FlopState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const

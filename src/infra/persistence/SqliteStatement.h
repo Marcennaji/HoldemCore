@@ -26,11 +26,9 @@ class SqliteStatement
         }
     }
 
-    // Non-copiable
     SqliteStatement(const SqliteStatement&) = delete;
     SqliteStatement& operator=(const SqliteStatement&) = delete;
 
-    // Déplaçable
     SqliteStatement(SqliteStatement&& other) noexcept : myStmt(other.myStmt) { other.myStmt = nullptr; }
 
     SqliteStatement& operator=(SqliteStatement&& other) noexcept
@@ -47,7 +45,7 @@ class SqliteStatement
         return *this;
     }
 
-    // Binding des paramètres (index 1-based)
+    // parameters binding  (index 1-based)
     void bindInt(int index, int value) { check(sqlite3_bind_int(myStmt, index, value)); }
 
     void bindInt64(int index, sqlite3_int64 value) { check(sqlite3_bind_int64(myStmt, index, value)); }
@@ -61,7 +59,7 @@ class SqliteStatement
 
     void bindNull(int index) { check(sqlite3_bind_null(myStmt, index)); }
 
-    // Exécution : step renvoie true si une ligne est disponible
+    // Execution: step returns true if a row is available
     bool step()
     {
         int rc = sqlite3_step(myStmt);
@@ -78,7 +76,7 @@ class SqliteStatement
 
     void reset() { check(sqlite3_reset(myStmt)); }
 
-    // Lecture de colonnes (index 0-based)
+    // column reading (index 0-based)
     int getInt(int col) const { return sqlite3_column_int(myStmt, col); }
 
     sqlite3_int64 getInt64(int col) const { return sqlite3_column_int64(myStmt, col); }

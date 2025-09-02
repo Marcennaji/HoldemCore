@@ -27,7 +27,7 @@ class PreflopState : public IHandState, public IActionProcessor, public IRoundCo
     bool isActionAllowed(const HandFsm&, const PlayerAction) const override;
 
     void logStateInfo(const HandFsm&) const override;
-    std::string getStateName() const override { return "Preflop"; }
+    GameState getGameState() const override { return GameState::Preflop; }
     void promptPlayerAction(HandFsm&, player::PlayerFsm& player);
 
   private:

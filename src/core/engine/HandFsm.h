@@ -35,8 +35,8 @@ class HandFsm : public IHandLifecycle, public IHandPlayerAction, public HandPlay
     void dealHoleCards(size_t lastArrayIndex) override;
     void initAndShuffleDeck() override;
 
-    void handlePlayerAction(PlayerAction action) override;
-    pkt::core::player::CommonHandContext updateCurrentHandContext(const GameState);
+    void handlePlayerAction(const PlayerAction& action) override;
+    pkt::core::player::HandCommonContext updateHandCommonContext(const GameState);
 
     std::string getStringBoard() const;
     int getPotOdd(const int playerCash, const int playerSet) const;

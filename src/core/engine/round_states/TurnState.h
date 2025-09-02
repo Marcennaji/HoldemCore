@@ -26,7 +26,7 @@ class TurnState : public IHandState, public IActionProcessor, public IRoundCompl
     bool isActionAllowed(const HandFsm&, const PlayerAction) const override;
 
     void logStateInfo(const HandFsm&) const override;
-    std::string getStateName() const override { return "Turn"; }
+    GameState getGameState() const override { return GameState::Turn; }
     void promptPlayerAction(HandFsm&, player::PlayerFsm& player);
 
   private:

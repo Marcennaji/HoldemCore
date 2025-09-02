@@ -560,7 +560,7 @@ void Player::loadStatistics()
 
     resetPlayerStatistics(); // reset stats to 0
 
-    myStatistics = GlobalServices::instance().playersStatisticsStore()->getPlayerStatistics(myName);
+    myStatistics = GlobalServices::instance().playersStatisticsStore()->loadPlayerStatistics(myName);
     if (myStatistics.empty())
     {
         myStatistics.fill(PlayerStatistics());

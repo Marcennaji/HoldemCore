@@ -20,10 +20,10 @@ class PlayerStatisticsUpdater
 
     // Return the statistics for the specified number of players
     const PlayerStatistics& getStatistics(const int nbPlayers) const;
-    void updatePreflopStatistics(const CurrentHandContext& ctx, const ActionType& action);
-    void updateFlopStatistics(const CurrentHandContext& ctx, const ActionType& action);
-    void updateTurnStatistics(const CurrentHandContext& ctx, const ActionType& action);
-    void updateRiverStatistics(const CurrentHandContext& ctx, const ActionType& action);
+    void updatePreflopStatistics(const CurrentHandContext& ctx);
+    void updateFlopStatistics(const CurrentHandContext& ctx);
+    void updateTurnStatistics(const CurrentHandContext& ctx);
+    void updateRiverStatistics(const CurrentHandContext& ctx);
 
   private:
     std::array<pkt::core::player::PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> myStatistics;

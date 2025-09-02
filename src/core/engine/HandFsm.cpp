@@ -57,12 +57,17 @@ void HandFsm::start()
 
 void HandFsm::end()
 {
+    GlobalServices::instance().playersStatisticsStore()->savePlayersStatistics(mySeatsList);
     myState.reset();
 }
 
-void HandFsm::handlePlayerAction(PlayerAction action)
+void HandFsm::handlePlayerAction(const PlayerAction& action)
 {
     if (!myState)
+        return;
+
+    auto player = getPlayerFsmById(myRunningPlayersList, action.playerId);
+    if (!player)
         return;
 
     if (auto* processor = dynamic_cast<IActionProcessor*>(myState.get()))
@@ -72,12 +77,16 @@ void HandFsm::handlePlayerAction(PlayerAction action)
 
         applyActionEffects(action);
 
+        player->getCurrentHandActions().getActions(myState->getGameState()).push_back(action.type);
+
         auto next = processor->computeNextState(*this, action);
         if (next)
         {
             myState->exit(*this);
             myState = std::move(next);
             myState->enter(*this);
+            if (myState->isTerminal())
+                end();
         }
     }
 }
@@ -214,10 +223,10 @@ size_t HandFsm::dealBoardCards()
     return cardsArrayIndex;
 }
 
-CommonHandContext HandFsm::updateCurrentHandContext(const GameState state)
+HandCommonContext HandFsm::updateHandCommonContext(const GameState state)
 {
     // general (and shared) game state
-    CommonHandContext handContext;
+    HandCommonContext handContext;
     handContext.gameState = state;
     handContext.stringBoard = getStringBoard();
     handContext.smallBlind = mySmallBlind;
@@ -265,15 +274,15 @@ std::string HandFsm::getStringBoard() const
 
     int cardsOnBoard;
 
-    if (myState->getStateName() == "Flop")
+    if (myState->getGameState() == GameState::Flop)
     {
         cardsOnBoard = 3;
     }
-    else if (myState->getStateName() == "Turn")
+    else if (myState->getGameState() == GameState::Turn)
     {
         cardsOnBoard = 4;
     }
-    else if (myState->getStateName() == "River")
+    else if (myState->getGameState() == GameState::River)
     {
         cardsOnBoard = 5;
     }

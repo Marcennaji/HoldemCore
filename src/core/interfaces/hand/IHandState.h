@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/engine/model/GameState.h"
+
 #include <string>
 
 namespace pkt::core
@@ -14,7 +16,8 @@ class IHandState
 
     virtual void enter(HandFsm& hand) = 0;
     virtual void exit(HandFsm& hand) = 0;
+    virtual bool isTerminal() const { return false; }
 
-    virtual std::string getStateName() const = 0;
+    virtual GameState getGameState() const = 0;
 };
 } // namespace pkt::core

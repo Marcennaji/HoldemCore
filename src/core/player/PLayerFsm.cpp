@@ -433,6 +433,9 @@ bool PlayerFsm::isInVeryLooseMode(const int nbPlayers) const
 
 void PlayerFsm::updateCurrentHandContext(const GameState state, HandFsm& currentHand)
 {
+    // common context
+    myCurrentHandContext->commonContext = currentHand.updateHandCommonContext(state);
+
     // Player-specific, visible from the opponents :
     myCurrentHandContext->personalContext.cash = myCash;
     myCurrentHandContext->personalContext.totalBetAmount = myTotalBetAmount;
@@ -443,9 +446,11 @@ void PlayerFsm::updateCurrentHandContext(const GameState state, HandFsm& current
     myCurrentHandContext->personalContext.actions.flopIsAggressor = isAgressor(Flop);
     myCurrentHandContext->personalContext.actions.turnIsAggressor = isAgressor(Turn);
     myCurrentHandContext->personalContext.actions.riverIsAggressor = isAgressor(River);
-    // myCurrentHandContext->personalContext.statistics = getStatistics(mySeatsList->size());
+    myCurrentHandContext->personalContext.statistics =
+        myStatisticsUpdater->getStatistics(myCurrentHandContext->commonContext.playersContext.nbPlayers);
     myCurrentHandContext->personalContext.id = myID;
-    // myCurrentHandContext->personalContext.actions.isInVeryLooseMode = isInVeryLooseMode(mySeatsList->size());
+    myCurrentHandContext->personalContext.actions.isInVeryLooseMode =
+        isInVeryLooseMode(myCurrentHandContext->commonContext.playersContext.nbPlayers);
     myCurrentHandContext->personalContext.position = myPosition;
 
     // player specific, hidden from the opponents :
@@ -459,7 +464,7 @@ void PlayerFsm::updateCurrentHandContext(const GameState state, HandFsm& current
 
 float PlayerFsm::calculatePreflopCallingRange(const CurrentHandContext& ctx) const
 {
-    return myRangeEstimator->getStandardCallingRange(ctx.commonContext.playersContext.runningPlayersList->size());
+    return myRangeEstimator->getStandardCallingRange(ctx.commonContext.playersContext.runningPlayersListFsm->size());
 }
 
 void PlayerFsm::resetForNewHand()

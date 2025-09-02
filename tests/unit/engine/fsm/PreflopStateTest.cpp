@@ -41,6 +41,7 @@ bool PreflopStateTest::isPlayerStillActive(unsigned id) const
 }
 void PreflopStateTest::TearDown()
 {
+    EngineTest::TearDown();
 }
 
 TEST_F(PreflopStateTest, StartHandHeadsUpInitializePlayersCorrectly)

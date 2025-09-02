@@ -27,9 +27,10 @@ class PostRiverState : public IHandState,
 
     bool isRoundComplete(const HandFsm&) const override;
     bool isActionAllowed(const HandFsm&, const PlayerAction) const override;
+    bool isTerminal() const override { return true; }
 
     void logStateInfo(const HandFsm&) const override;
-    std::string getStateName() const override { return "PostRiver"; }
+    GameState getGameState() const override { return GameState::PostRiver; }
     void promptPlayerAction(HandFsm&, player::PlayerFsm& player);
 
   private:

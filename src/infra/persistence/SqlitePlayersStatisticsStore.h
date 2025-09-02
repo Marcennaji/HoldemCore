@@ -13,15 +13,10 @@
 #include <filesystem>
 #include <string>
 
-#define SQL_LOG_FILE "pokerTraining.db"
-
-struct sqlite3;
-struct sqlite3_stmt;
-
 namespace pkt::infra
 {
 
-using core::player::PlayerList;
+using core::player::PlayerFsmList;
 using core::player::PlayerStatistics;
 
 class SqlitePlayersStatisticsStore : public pkt::core::PlayersStatisticsStore
@@ -32,15 +27,12 @@ class SqlitePlayersStatisticsStore : public pkt::core::PlayersStatisticsStore
 
     ~SqlitePlayersStatisticsStore();
 
-    void updatePlayersStatistics(PlayerList seatsList);
-
-    std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> getPlayerStatistics(const std::string& playerName);
+    void savePlayersStatistics(PlayerFsmList seatsList) override;
+    std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1>
+    loadPlayerStatistics(const std::string& playerName) override;
 
   private:
     void initializeStrategyStatistics(const std::string& playerName, const int nbPlayers);
-    void updatePlayerStatistics(PlayerStatistics& stats, const std::string& columnName, sqlite3_stmt* stmt,
-                                int nCol) const;
-
     std::shared_ptr<SqliteDb> myDb;
     std::string mySql;
 };

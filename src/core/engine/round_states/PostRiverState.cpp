@@ -26,7 +26,6 @@ void PostRiverState::enter(HandFsm& hand)
 
 void PostRiverState::exit(HandFsm& /*hand*/)
 {
-    // Nothing to do on exit; this is usually a terminal state.
 }
 
 std::unique_ptr<IHandState> PostRiverState::computeNextState(HandFsm& /*hand*/, const PlayerAction /*action*/)

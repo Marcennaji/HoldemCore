@@ -87,7 +87,7 @@ struct PerPlayerHandContext
 };
 
 // data that is common to all players
-struct CommonHandContext
+struct HandCommonContext
 {
     GameState gameState = None;
     int smallBlind = 0;
@@ -98,7 +98,7 @@ struct CommonHandContext
 
 struct CurrentHandContext
 {
-    CommonHandContext commonContext;
+    HandCommonContext commonContext;
     PerPlayerHandContext personalContext;
 };
 

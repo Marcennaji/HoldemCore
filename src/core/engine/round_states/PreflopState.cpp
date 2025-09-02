@@ -29,9 +29,13 @@ void PreflopState::enter(HandFsm& hand)
         myEvents.onBettingRoundStarted(Preflop);
 }
 
-void PreflopState::exit(HandFsm& /*hand*/)
+void PreflopState::exit(HandFsm& hand)
 {
-    // No exit action needed for Preflop
+    for (auto& player : *hand.getSeatsList())
+    {
+        player->updateCurrentHandContext(GameState::Preflop, hand);
+        player->getStatisticsUpdater()->updatePreflopStatistics(player->getCurrentHandContext());
+    }
 }
 
 bool PreflopState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const

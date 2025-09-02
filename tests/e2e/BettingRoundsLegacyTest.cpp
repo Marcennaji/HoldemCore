@@ -286,7 +286,7 @@ TEST_F(BettingRoundsLegacyTest, NoPlayerFoldsPostFlopWhenNoBet)
 
             for (const auto& [playerId, action] : round.actions)
             {
-                if (action == ActionType::Bet || action == ActionType::Raise)
+                if (action == ActionType::Bet || action == ActionType::Raise || action == ActionType::Allin)
                 {
                     hasBetOrRaise = true;
                 }
