@@ -6,7 +6,7 @@
 
 #include <core/engine/HandEvaluator.h>
 
-#include "core/engine/model/ButtonState.h"
+#include "core/engine/model/PlayerPosition.h"
 #include "core/player/PlayerStatisticsUpdater.h"
 #include "core/player/strategy/PlayerStrategy.h"
 
@@ -60,9 +60,6 @@ class PlayerFsm
 
     void setAction(ActionType theValue, bool blind = 0);
     ActionType getAction() const;
-
-    void setButton(Button theValue);
-    Button getButton() const;
 
     void setCards(int* theValue);
     void getCards(int* theValue) const;
@@ -146,7 +143,6 @@ class PlayerFsm
     int myLastBetAmount{0};
 
     ActionType myAction{ActionType::None};
-    Button myButton{Button::Unspecified};
     bool myCardsFlip{false}; // 0 = cards are not fliped, 1 = cards are already flipped,
     int lastMoneyWon{0};
     int myPreflopPotOdd{0};

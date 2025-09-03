@@ -90,7 +90,7 @@ bool LooseAggressiveBotStrategy::preflopShouldCall(const CurrentHandContext& ctx
         if (ctx.commonContext.playersContext.runningPlayersList->size() > 2 &&
             ctx.commonContext.bettingContext.preflopRaisesNumber + ctx.commonContext.bettingContext.preflopCallsNumber >
                 1 &&
-            ctx.personalContext.position >= LATE)
+            ctx.personalContext.position >= Late)
         {
             stringCallingRange += SUITED_CONNECTORS;
             stringCallingRange += SUITED_ONE_GAPED;
@@ -182,7 +182,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx
         if (!isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, stringRaisingRange) &&
             ctx.personalContext.m > 20 &&
             ctx.personalContext.cash > ctx.commonContext.bettingContext.highestBetAmount * 20 &&
-            ctx.personalContext.position > MIDDLE && raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE &&
+            ctx.personalContext.position > Middle && raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE &&
             ctx.personalContext.position > ctx.commonContext.playersContext.preflopLastRaiser->getPosition() &&
             ctx.commonContext.playersContext.preflopLastRaiser->getCash() >
                 ctx.commonContext.bettingContext.highestBetAmount * 10 &&
@@ -190,7 +190,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx
             ctx.commonContext.bettingContext.preflopCallsNumber < 2)
         {
 
-            if (isPossibleToBluff(ctx) && ctx.personalContext.position > LATE &&
+            if (isPossibleToBluff(ctx) && ctx.personalContext.position > Late &&
                 !isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, ACES + BROADWAYS))
             {
 
@@ -248,7 +248,7 @@ int LooseAggressiveBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx
             ctx.commonContext.bettingContext.preflopCallsNumber < 2)
         {
 
-            if (isPossibleToBluff(ctx) && ctx.personalContext.position > LATE &&
+            if (isPossibleToBluff(ctx) && ctx.personalContext.position > Late &&
                 isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, HIGH_SUITED_CONNECTORS) &&
                 raiserStats.getPreflop3Bet() > 8)
             {

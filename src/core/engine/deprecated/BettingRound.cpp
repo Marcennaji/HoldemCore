@@ -5,7 +5,7 @@
 #include "BettingRound.h"
 
 #include "Exception.h"
-#include "model/ButtonState.h"
+#include "core/engine/deprecated/ButtonState.h"
 #include "model/EngineError.h"
 
 #include <core/engine/CardUtilities.h>
@@ -29,7 +29,7 @@ BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int
     // determine bigBlindPosition
     for (itC = myHand->getSeatsList()->begin(); itC != myHand->getSeatsList()->end(); ++itC)
     {
-        if ((*itC)->getButton() == BigBlind)
+        if ((*itC)->getButton() == ButtonState::BB)
         {
             myBigBlindPlayerId = (*itC)->getId();
             break;
@@ -43,7 +43,7 @@ BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int
     // determine smallBlindPosition
     for (itC = myHand->getSeatsList()->begin(); itC != myHand->getSeatsList()->end(); ++itC)
     {
-        if ((*itC)->getButton() == SmallBlind)
+        if ((*itC)->getButton() == ButtonState::SB)
         {
             mySmallBlindPlayerId = (*itC)->getId();
             break;

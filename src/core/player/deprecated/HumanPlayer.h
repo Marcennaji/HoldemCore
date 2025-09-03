@@ -11,7 +11,7 @@ class HumanPlayer : public Player
 {
 
   public:
-    HumanPlayer(const GameEvents&, int id, int sC, bool aS, int mB);
+    HumanPlayer(const GameEvents&, int id, int sC, bool aS, ButtonState mB);
 
     ~HumanPlayer();
 

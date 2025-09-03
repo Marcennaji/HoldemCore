@@ -89,7 +89,7 @@ bool ManiacBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
         if (ctx.commonContext.playersContext.runningPlayersList->size() > 2 &&
             ctx.commonContext.bettingContext.preflopRaisesNumber + ctx.commonContext.bettingContext.preflopCallsNumber >
                 1 &&
-            ctx.personalContext.position >= MIDDLE)
+            ctx.personalContext.position >= Middle)
         {
             stringCallingRange += CONNECTORS;
             stringCallingRange += SUITED_ONE_GAPED;
@@ -180,14 +180,14 @@ int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
         if (!isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, stringRaisingRange) &&
             ctx.personalContext.m > 20 &&
             ctx.personalContext.cash > ctx.commonContext.bettingContext.highestBetAmount * 20 &&
-            ctx.personalContext.position > UtgPlusTwo && raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE &&
+            ctx.personalContext.position > UnderTheGunPlusTwo && raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE &&
             ctx.personalContext.position > ctx.commonContext.playersContext.preflopLastRaiser->getPosition() &&
             ctx.commonContext.playersContext.preflopLastRaiser->getCash() >
                 ctx.commonContext.bettingContext.highestBetAmount * 10 &&
             !ctx.commonContext.bettingContext.isPreflopBigBet &&
             ctx.commonContext.bettingContext.preflopCallsNumber < 2)
         {
-            if (isPossibleToBluff(ctx) && ctx.personalContext.position > LATE &&
+            if (isPossibleToBluff(ctx) && ctx.personalContext.position > Late &&
                 ctx.commonContext.bettingContext.preflopRaisesNumber == 1 &&
                 !isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, ACES + BROADWAYS) &&
                 raiserStats.getPreflopCallthreeBetsFrequency() < 30)
@@ -245,7 +245,7 @@ int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
             ctx.commonContext.bettingContext.preflopCallsNumber < 2)
         {
 
-            if (isPossibleToBluff(ctx) && ctx.personalContext.position > LATE && raiserStats.getPreflop3Bet() > 8)
+            if (isPossibleToBluff(ctx) && ctx.personalContext.position > Late && raiserStats.getPreflop3Bet() > 8)
             {
                 int rand = 0;
                 GlobalServices::instance().randomizer()->getRand(1, 5, 1, &rand);

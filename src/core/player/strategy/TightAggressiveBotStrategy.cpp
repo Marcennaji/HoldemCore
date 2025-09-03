@@ -70,7 +70,7 @@ bool TightAggressiveBotStrategy::preflopShouldCall(const CurrentHandContext& ctx
     if (ctx.commonContext.playersContext.runningPlayersList->size() > 2 &&
         ctx.commonContext.bettingContext.preflopRaisesNumber + ctx.commonContext.bettingContext.preflopCallsNumber >
             1 &&
-        ctx.commonContext.bettingContext.preflopRaisesNumber == 1 && ctx.personalContext.position >= LATE &&
+        ctx.commonContext.bettingContext.preflopRaisesNumber == 1 && ctx.personalContext.position >= Late &&
         ctx.personalContext.cash >= ctx.commonContext.bettingContext.pot * 10 && lastRaiser != nullptr &&
         lastRaiser->getCash() >= ctx.commonContext.bettingContext.pot * 20 &&
         !ctx.commonContext.bettingContext.isPreflopBigBet)
@@ -170,7 +170,7 @@ int TightAggressiveBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx
             ctx.commonContext.bettingContext.preflopCallsNumber < 2)
         {
 
-            if (isPossibleToBluff(ctx) && ctx.personalContext.position > LATE &&
+            if (isPossibleToBluff(ctx) && ctx.personalContext.position > Late &&
                 !isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, ACES + BROADWAYS) &&
                 raiserStats.getPreflopCallthreeBetsFrequency() < 30)
             {

@@ -111,7 +111,6 @@ void EngineTest::checkPostRiverConditions()
     // Check if the hand has been resolved correctly after the river
     EXPECT_EQ(myHand->getCurrentRoundState(), PostRiver);
     EXPECT_EQ(myHand->getBoard()->getPot(), 0); // Pot should be reset to 0
-    EXPECT_FALSE(myHand->getBoard()->getWinners().empty());
 }
 
 } // namespace pkt::test

@@ -2,8 +2,8 @@
 #include <core/services/GlobalServices.h>
 #include "CardUtilities.h"
 #include "GameEvents.h"
+#include "core/engine/model/PlayerPosition.h"
 #include "core/player/Helpers.h"
-#include "model/ButtonState.h"
 
 #include "Exception.h"
 #include "model/EngineError.h"
@@ -320,126 +320,6 @@ int HandFsm::getPotOdd(const int playerCash, const int playerSet) const
     }
 
     return odd;
-}
-PlayerPosition HandFsm::getPlayerPosition(const int playerId)
-{
-
-    PlayerPosition position = UNKNOWN;
-
-    const int dealerPlayerId = myDealerPlayerId;
-    const int nbPlayers = mySeatsList->size();
-
-    // first dimension is my relative position, after the dealer.
-    // Second dimension is the corrresponding position, depending on the number of players (from 0 to 10)
-    const PlayerPosition onDealerPositionPlus[MAX_NUMBER_OF_PLAYERS][MAX_NUMBER_OF_PLAYERS + 1] = {
-        // 0 player	1 player	2 players	3 players	4 players		5 players		6 players		7 players 8
-        // players		9 players		10 players
-        {UNKNOWN, UNKNOWN, BUTTON, BUTTON, BUTTON, BUTTON, BUTTON, BUTTON, BUTTON, BUTTON,
-         BUTTON},                                                                   // my position = dealer
-        {UNKNOWN, UNKNOWN, BB, SB, SB, SB, SB, SB, SB, SB, SB},                     // my position = dealer + 1
-        {UNKNOWN, UNKNOWN, UNKNOWN, BB, BB, BB, BB, BB, BB, BB, BB},                // my position = dealer + 2
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, CUTOFF, UTG, UTG, UTG, UTG, UTG, UTG}, // my position = dealer + 3
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, CUTOFF, MIDDLE, MIDDLE, UtgPlusOne, UtgPlusOne,
-         UtgPlusOne}, // my position = dealer + 4
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, CUTOFF, LATE, MIDDLE, UtgPlusTwo,
-         UtgPlusTwo}, // my position = dealer + 5
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, CUTOFF, LATE, MIDDLE,
-         MIDDLE}, // my position = dealer + 6
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, CUTOFF, LATE,
-         MiddlePlusOne}, // my position = dealer + 7
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, CUTOFF,
-         LATE}, // my position = dealer + 8
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN,
-         CUTOFF} // my position = dealer + 9
-    };
-
-    // first dimension is my relative position, BEHIND the dealer.
-    // Second are the corrresponding positions, depending on the number of players
-    const PlayerPosition onDealerPositionMinus[10][11] = {
-        // 0 player	1 player	2 players	3 players	4 players		5 players		6 players		7 players 8
-        // players		9 players		10 players
-        {UNKNOWN, UNKNOWN, BUTTON, BUTTON, BUTTON, BUTTON, BUTTON, BUTTON, BUTTON, BUTTON,
-         BUTTON},                                                                           // my position = dealer
-        {UNKNOWN, UNKNOWN, BB, BB, CUTOFF, CUTOFF, CUTOFF, CUTOFF, CUTOFF, CUTOFF, CUTOFF}, // my position = dealer - 1
-        {UNKNOWN, UNKNOWN, UNKNOWN, SB, BB, UTG, MIDDLE, LATE, LATE, LATE, LATE},           // my position = dealer - 2
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, SB, BB, UTG, MIDDLE, MIDDLE, MiddlePlusOne,
-         MiddlePlusOne}, // my position = dealer - 3
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, SB, BB, UTG, UtgPlusOne, UtgPlusTwo,
-         MIDDLE}, // my position = dealer - 4
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, SB, BB, UTG, UtgPlusOne,
-         UtgPlusTwo}, // my position = dealer - 5
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, SB, BB, UTG,
-         UtgPlusOne}, // my position = dealer - 6
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, SB, BB,
-         UTG}, // my position = dealer - 7
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, SB,
-         BB}, // my position = dealer - 8
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN,
-         SB} // my position = dealer - 9
-
-    };
-
-    if (playerId == dealerPlayerId)
-    {
-        position = BUTTON;
-    }
-    else
-    {
-
-        // get my relative position from the dealer
-        PlayerFsmListIterator itC;
-        PlayerFsmList players = mySeatsList;
-
-        int pos = 0;
-
-        if (playerId > dealerPlayerId)
-        {
-
-            bool dealerFound = false;
-            for (itC = players->begin(); itC != players->end(); ++itC)
-            {
-                if ((*itC)->getId() == dealerPlayerId)
-                {
-                    dealerFound = true;
-                }
-                else if (dealerFound)
-                {
-                    pos++;
-                }
-                if ((*itC)->getId() == playerId)
-                {
-                    break;
-                }
-            }
-            position = onDealerPositionPlus[pos][nbPlayers];
-        }
-        else
-        {
-            // playerId < dealerPlayerId
-            bool positionFound = false;
-            for (itC = players->begin(); itC != players->end(); ++itC)
-            {
-
-                if ((*itC)->getId() == playerId)
-                {
-                    positionFound = true;
-                }
-                else if (positionFound)
-                {
-                    pos++;
-                }
-                if ((*itC)->getId() == dealerPlayerId)
-                {
-                    break;
-                }
-            }
-            position = onDealerPositionMinus[pos][nbPlayers];
-        }
-    }
-
-    assert(position != UNKNOWN);
-
-    return position;
 }
 
 IActionProcessor* HandFsm::getActionProcessor() const

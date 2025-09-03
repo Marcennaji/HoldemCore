@@ -31,7 +31,7 @@ void PreflopRangeCalculator::initializeRanges(const int utgHeadsUpRange, const i
 
     assert(myUtgStartingRange[7] < myUtgStartingRange[6]);
 
-    // we have the UTG starting ranges. Now, deduce the starting ranges for other positions :
+    // we have the UnderTheGun starting ranges. Now, deduce the starting ranges for other positions :
 
     myUtgPlusOneStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
     for (int i = 2; i < myUtgPlusOneStartingRange.size(); i++)
@@ -106,7 +106,7 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(const CurrentHandCont
     GlobalServices::instance().logger()->verbose("Initial calling range : " + std::to_string(callingRange));
 
     // Handle no raises and no calls
-    if (nbRaises == 0 && nbCalls == 0 && myPosition != BUTTON && myPosition != SB)
+    if (nbRaises == 0 && nbCalls == 0 && myPosition != Button && myPosition != SmallBlind)
     {
         return -1; // Never limp unless on button or small blind
     }
@@ -216,7 +216,7 @@ float PreflopRangeCalculator::adjustCallForRaiserStats(float callingRange, const
                                                        int nbRaises, int nbPlayers, PlayerPosition myPosition,
                                                        int nbRunningPlayers) const
 {
-    if ((myPosition == BUTTON || myPosition == CUTOFF) && nbRunningPlayers > 5)
+    if ((myPosition == Button || myPosition == Cutoff) && nbRunningPlayers > 5)
     {
         callingRange = raiserStats.getPreflopRaise() * (nbPlayers > 3 ? 0.7f : 0.9f);
     }
@@ -308,12 +308,12 @@ bool PreflopRangeCalculator::shouldAdjustCallForLooseRaiser(const CurrentHandCon
     const PlayerPosition myPosition = ctx.personalContext.position;
 
     return lastRaiser->isInVeryLooseMode(ctx.commonContext.playersContext.nbPlayers) &&
-           (myPosition >= LATE || myPosition == SB || myPosition == BB) && nbCalls == 0 && nbRaises == 1;
+           (myPosition >= Late || myPosition == SmallBlind || myPosition == BigBlind) && nbCalls == 0 && nbRaises == 1;
 }
 
 bool PreflopRangeCalculator::shouldCallForGoodOdds(int potOdd, int myM, PlayerPosition myPosition) const
 {
-    return potOdd <= 30 && myM > 15 && (myPosition >= LATE || myPosition == SB || myPosition == BB);
+    return potOdd <= 30 && myM > 15 && (myPosition >= Late || myPosition == SmallBlind || myPosition == BigBlind);
 }
 
 bool PreflopRangeCalculator::shouldCallForAllIn(const CurrentHandContext& ctx, int potOdd, int nbRaises) const
@@ -322,7 +322,7 @@ bool PreflopRangeCalculator::shouldCallForAllIn(const CurrentHandContext& ctx, i
     const PlayerPosition myPosition = ctx.personalContext.position;
 
     return ctx.personalContext.m > 10 && potOdd <= 20 && nbRaises < 2 && lastRaiser->getAction() == ActionType::Allin &&
-           (myPosition >= LATE || myPosition == SB || myPosition == BB);
+           (myPosition >= Late || myPosition == SmallBlind || myPosition == BigBlind);
 }
 
 float PreflopRangeCalculator::calculatePreflopRaisingRange(const CurrentHandContext& ctx) const
@@ -450,7 +450,7 @@ float PreflopRangeCalculator::adjustRaiseForNoRaiser(const CurrentHandContext& c
     const std::string myCard2 = ctx.personalContext.card2;
 
     if (!isCardsInRange(myCard1, myCard2, RangeEstimator::getStringRange(nbPlayers, raisingRange)) &&
-        (myPosition == SB || myPosition == BUTTON || myPosition == CUTOFF) && canBluff)
+        (myPosition == SmallBlind || myPosition == Button || myPosition == Cutoff) && canBluff)
     {
         int rand = 0;
         GlobalServices::instance().randomizer()->getRand(1, 3, 1, &rand);
@@ -558,34 +558,34 @@ int PreflopRangeCalculator::getRange(PlayerPosition p, const int nbPlayers) cons
     switch (p)
     {
 
-    case UTG:
+    case UnderTheGun:
         return myUtgStartingRange[nbPlayers];
         break;
-    case UtgPlusOne:
+    case UnderTheGunPlusOne:
         return myUtgPlusOneStartingRange[nbPlayers];
         break;
-    case UtgPlusTwo:
+    case UnderTheGunPlusTwo:
         return myUtgPlusTwoStartingRange[nbPlayers];
         break;
-    case MIDDLE:
+    case Middle:
         return myMiddleStartingRange[nbPlayers];
         break;
     case MiddlePlusOne:
         return myMiddlePlusOneStartingRange[nbPlayers];
         break;
-    case LATE:
+    case Late:
         return myLateStartingRange[nbPlayers];
         break;
-    case CUTOFF:
+    case Cutoff:
         return myCutoffStartingRange[nbPlayers];
         break;
-    case BUTTON:
+    case Button:
         return myButtonStartingRange[nbPlayers];
         break;
-    case SB:
+    case SmallBlind:
         return mySmallBlindStartingRange[nbPlayers];
         break;
-    case BB:
+    case BigBlind:
         return myBigBlindStartingRange[nbPlayers];
         break;
     default:

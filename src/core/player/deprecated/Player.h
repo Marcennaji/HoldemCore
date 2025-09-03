@@ -8,6 +8,7 @@
 #include <core/engine/HandEvaluator.h>
 #include <core/interfaces/IHand.h>
 #include <core/player/PlayerStatistics.h>
+#include "core/engine/deprecated/ButtonState.h"
 
 #include "CurrentHandActions.h"
 #include "range/RangeEstimator.h"
@@ -25,6 +26,7 @@
 namespace pkt::core
 {
 class IHand;
+enum ButtonState;
 
 } // namespace pkt::core
 
@@ -36,7 +38,7 @@ class BotStrategy;
 class Player
 {
   public:
-    Player(const GameEvents&, int id, std::string name, int sC, bool aS, int mB);
+    Player(const GameEvents&, int id, std::string name, int sC, bool aS, ButtonState b);
 
     virtual ~Player() = default;
 
@@ -60,8 +62,8 @@ class Player
 
     virtual bool isBot() const = 0;
 
-    void setButton(int theValue);
-    int getButton() const;
+    void setButton(ButtonState theValue);
+    ButtonState getButton() const;
 
     void setCards(int* theValue);
     void getCards(int* theValue) const;
@@ -169,7 +171,7 @@ class Player
     int myLastRelativeSet{0};
 
     ActionType myAction{ActionType::None};
-    int myButton; // 0 = none, 1 = dealer, 2 =small, 3 = big
+    ButtonState myButton{ButtonState::Unspecified};
 
     bool myCardsFlip{0}; // 0 = cards are not fliped, 1 = cards are already flipped,
     int lastMoneyWon{0};

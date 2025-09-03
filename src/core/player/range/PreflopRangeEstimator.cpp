@@ -38,7 +38,8 @@ string PreflopRangeEstimator::computeEstimatedPreflopRange(const CurrentHandCont
 
     // if the player was BB and has checked preflop, then he can have anything, except his approximative BB raising
     // range
-    if (ctx.commonContext.bettingContext.preflopRaisesNumber == 0 && ctx.personalContext.position == BB)
+    if (ctx.commonContext.bettingContext.preflopRaisesNumber == 0 &&
+        ctx.personalContext.position == PlayerPosition::BigBlind)
     {
         const float raiseFactor = (preflop.hands >= MIN_HANDS_STATISTICS_ACCURATE)
                                       ? preflop.getPreflopRaise() * 0.8
@@ -146,14 +147,14 @@ std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(co
     if (nbPlayers > 3)
     {
         // Adjust range based on position
-        if (ctx.commonContext.playersContext.preflopLastRaiser->getPosition() == UTG ||
-            ctx.commonContext.playersContext.preflopLastRaiser->getPosition() == UtgPlusOne ||
-            ctx.commonContext.playersContext.preflopLastRaiser->getPosition() == UtgPlusTwo)
+        if (ctx.commonContext.playersContext.preflopLastRaiser->getPosition() == UnderTheGun ||
+            ctx.commonContext.playersContext.preflopLastRaiser->getPosition() == UnderTheGunPlusOne ||
+            ctx.commonContext.playersContext.preflopLastRaiser->getPosition() == UnderTheGunPlusTwo)
         {
             range = range * 0.9;
         }
-        else if (ctx.commonContext.playersContext.preflopLastRaiser->getPosition() == BUTTON ||
-                 ctx.commonContext.playersContext.preflopLastRaiser->getPosition() == CUTOFF)
+        else if (ctx.commonContext.playersContext.preflopLastRaiser->getPosition() == Button ||
+                 ctx.commonContext.playersContext.preflopLastRaiser->getPosition() == Cutoff)
         {
             range = range * 1.5;
         }
@@ -259,12 +260,12 @@ float PreflopRangeEstimator::adjustRangeForPosition(const CurrentHandContext& ct
 
     if (nbPlayers > 3)
     {
-        if (ctx.personalContext.position == UTG || ctx.personalContext.position == UtgPlusOne ||
-            ctx.personalContext.position == UtgPlusTwo)
+        if (ctx.personalContext.position == UnderTheGun || ctx.personalContext.position == UnderTheGunPlusOne ||
+            ctx.personalContext.position == UnderTheGunPlusTwo)
         {
             range *= 0.9;
         }
-        else if (ctx.personalContext.position == BUTTON || ctx.personalContext.position == CUTOFF)
+        else if (ctx.personalContext.position == Button || ctx.personalContext.position == Cutoff)
         {
             range *= 1.4;
         }

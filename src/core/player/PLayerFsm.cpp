@@ -99,15 +99,6 @@ ActionType PlayerFsm::getAction() const
     return myAction;
 }
 
-void PlayerFsm::setButton(Button theValue)
-{
-    myButton = theValue;
-}
-Button PlayerFsm::getButton() const
-{
-    return myButton;
-}
-
 // will contain human-readable string, i.e "Qc" or "Ts"
 void PlayerFsm::setCards(int* theValue)
 {
@@ -500,24 +491,17 @@ bool PlayerFsm::checkIfINeedToShowCards() const
 }
 void PlayerFsm::setPosition(const HandFsm& hand)
 {
-    myPosition = UNKNOWN;
+    myPosition = Unknown;
 
     const int dealerId = hand.getDealerPlayerId();
     const PlayerFsmList players = hand.getSeatsList();
     const int nbPlayers = players->size();
 
-    if (myID == dealerId)
-    {
-        myPosition = BUTTON;
-    }
-    else
-    {
-        // Compute relative offset clockwise from dealer
-        int offset = circularOffset(dealerId, myID, players);
-        myPosition = computePositionFromOffset(offset, nbPlayers);
-    }
+    // Compute relative offset clockwise from dealer
+    int offset = circularOffset(dealerId, myID, players);
+    myPosition = computePositionFromOffset(offset, nbPlayers);
 
-    assert(myPosition != UNKNOWN);
+    assert(myPosition != Unknown);
 }
 
 } // namespace pkt::core::player

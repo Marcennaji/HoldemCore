@@ -40,7 +40,6 @@ class HandFsm : public IHandLifecycle, public IHandPlayerAction, public HandPlay
 
     std::string getStringBoard() const;
     int getPotOdd(const int playerCash, const int playerSet) const;
-    PlayerPosition getPlayerPosition(const int playerId);
     float getM(int cash) const;
     int getSmallBlind() const;
 

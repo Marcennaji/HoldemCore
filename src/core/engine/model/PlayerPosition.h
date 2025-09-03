@@ -8,17 +8,18 @@ namespace pkt::core
 
 enum PlayerPosition
 {
-    UNKNOWN = 0,
-    SB = 1,
-    BB = 2,
-    UTG = 3,
-    UtgPlusOne = 4,
-    UtgPlusTwo = 5,
-    MIDDLE = 6,
+    Unknown = 0,
+    SmallBlind = 1,
+    BigBlind = 2,
+    UnderTheGun = 3,
+    UnderTheGunPlusOne = 4,
+    UnderTheGunPlusTwo = 5,
+    Middle = 6,
     MiddlePlusOne = 7,
-    LATE = 8,
-    CUTOFF = 9,
-    BUTTON = 10
+    Late = 8,
+    Cutoff = 9,
+    Button = 10,
+    ButtonSmallBlind = 11
 };
 
 } // namespace pkt::core

@@ -50,9 +50,9 @@ TEST_F(PreflopStateTest, StartHandHeadsUpInitializePlayersCorrectly)
     myHandFsm->start();
 
     auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    EXPECT_EQ(playerSb->getButton(), SmallBlind);
+    EXPECT_EQ(playerSb->getPosition(), PlayerPosition::ButtonSmallBlind);
     auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    EXPECT_EQ(playerBb->getButton(), BigBlind);
+    EXPECT_EQ(playerBb->getPosition(), PlayerPosition::BigBlind);
 
     EXPECT_EQ(playerSb->getCash(), playerBb->getCash() + gameData.firstSmallBlind);
 }
@@ -62,11 +62,11 @@ TEST_F(PreflopStateTest, StartHand3BotsInitializePlayersCorrectly)
     myHandFsm->start();
 
     auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    EXPECT_EQ(playerDealer->getButton(), Dealer);
+    EXPECT_EQ(playerDealer->getPosition(), PlayerPosition::Button);
     auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    EXPECT_EQ(playerSb->getButton(), SmallBlind);
+    EXPECT_EQ(playerSb->getPosition(), PlayerPosition::SmallBlind);
     auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
-    EXPECT_EQ(playerBb->getButton(), BigBlind);
+    EXPECT_EQ(playerBb->getPosition(), PlayerPosition::BigBlind);
 
     EXPECT_EQ(playerDealer->getCash(), playerBb->getCash() + gameData.firstSmallBlind * 2);
     EXPECT_EQ(playerSb->getCash(), playerBb->getCash() + gameData.firstSmallBlind);
@@ -77,23 +77,23 @@ TEST_F(PreflopStateTest, StartHand6BotsInitializePlayersCorrectly)
     myHandFsm->start();
 
     auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    EXPECT_EQ(playerDealer->getButton(), Dealer);
+    EXPECT_EQ(playerDealer->getPosition(), PlayerPosition::Button);
     auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    EXPECT_EQ(playerSb->getButton(), SmallBlind);
+    EXPECT_EQ(playerSb->getPosition(), PlayerPosition::SmallBlind);
     auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
-    EXPECT_EQ(playerBb->getButton(), BigBlind);
+    EXPECT_EQ(playerBb->getPosition(), PlayerPosition::BigBlind);
     auto playerUtg = getPlayerFsmById(myRunningPlayersListFsm, 3);
-    EXPECT_EQ(playerUtg->getButton(), Unspecified);
-    auto playerUtgPlusOne = getPlayerFsmById(myRunningPlayersListFsm, 4);
-    EXPECT_EQ(playerUtgPlusOne->getButton(), Unspecified);
-    auto playerUtgPlusTwo = getPlayerFsmById(myRunningPlayersListFsm, 5);
-    EXPECT_EQ(playerUtgPlusTwo->getButton(), Unspecified);
+    EXPECT_EQ(playerUtg->getPosition(), PlayerPosition::UnderTheGun);
+    auto playerMiddle = getPlayerFsmById(myRunningPlayersListFsm, 4);
+    EXPECT_EQ(playerMiddle->getPosition(), PlayerPosition::Middle);
+    auto playerCutoff = getPlayerFsmById(myRunningPlayersListFsm, 5);
+    EXPECT_EQ(playerCutoff->getPosition(), PlayerPosition::Cutoff);
 
     EXPECT_EQ(playerDealer->getCash(), playerBb->getCash() + gameData.firstSmallBlind * 2);
     EXPECT_EQ(playerSb->getCash(), playerBb->getCash() + gameData.firstSmallBlind);
     EXPECT_EQ(playerUtg->getCash(), playerBb->getCash() + gameData.firstSmallBlind * 2);
-    EXPECT_EQ(playerUtgPlusOne->getCash(), playerBb->getCash() + gameData.firstSmallBlind * 2);
-    EXPECT_EQ(playerUtgPlusTwo->getCash(), playerBb->getCash() + gameData.firstSmallBlind * 2);
+    EXPECT_EQ(playerMiddle->getCash(), playerBb->getCash() + gameData.firstSmallBlind * 2);
+    EXPECT_EQ(playerCutoff->getCash(), playerBb->getCash() + gameData.firstSmallBlind * 2);
 }
 TEST_F(PreflopStateTest, StartHandShouldGoToPreflop)
 {
@@ -108,11 +108,11 @@ TEST_F(PreflopStateTest, OnlyCallsPreflopShouldGoToFlop)
     myHandFsm->start();
 
     auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    EXPECT_EQ(playerDealer->getButton(), Dealer);
+    EXPECT_EQ(playerDealer->getPosition(), PlayerPosition::Button);
     auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    EXPECT_EQ(playerSb->getButton(), SmallBlind);
+    EXPECT_EQ(playerSb->getPosition(), PlayerPosition::SmallBlind);
     auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
-    EXPECT_EQ(playerBb->getButton(), BigBlind);
+    EXPECT_EQ(playerBb->getPosition(), PlayerPosition::BigBlind);
 
     myHandFsm->handlePlayerAction({0, ActionType::Call, 20});
     myHandFsm->handlePlayerAction({1, ActionType::Call, 10});

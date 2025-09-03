@@ -12,7 +12,7 @@ namespace pkt::core::player
 
 using namespace std;
 
-HumanPlayer::HumanPlayer(const GameEvents& events, int id, int sC, bool aS, int mB)
+HumanPlayer::HumanPlayer(const GameEvents& events, int id, int sC, bool aS, ButtonState mB)
     : Player(events, id, HumanPlayer::getName(), sC, aS, mB)
 {
 }

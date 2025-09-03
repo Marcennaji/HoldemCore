@@ -67,7 +67,7 @@ struct PerPlayerHandContext
     int id = 0;
     std::string card1 = "";
     std::string card2 = "";
-    pkt::core::PlayerPosition position = PlayerPosition::UNKNOWN;
+    pkt::core::PlayerPosition position = PlayerPosition::Unknown;
 
     PlayerStatistics statistics{};
     PostFlopAnalysisFlags postFlopAnalysisFlags{}; // what are the possibilities, given the board and the hole cards ?

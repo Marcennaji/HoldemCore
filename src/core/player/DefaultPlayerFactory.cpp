@@ -13,14 +13,15 @@ DefaultPlayerFactory::DefaultPlayerFactory(const GameEvents& events, StrategyAss
 
 std::shared_ptr<Player> DefaultPlayerFactory::createHumanPlayer(int id, int startMoney)
 {
-    return std::make_shared<HumanPlayer>(myEvents, id, startMoney, true, 0);
+    return std::make_shared<HumanPlayer>(myEvents, id, startMoney, true, ButtonState::Unspecified);
 }
 
 std::shared_ptr<Player> DefaultPlayerFactory::createBotPlayer(int id, TableProfile profile, int startMoney)
 {
     auto strategy = myStrategyAssigner->chooseStrategyFor(id);
 
-    auto bot = std::make_shared<BotPlayer>(myEvents, id, "Bot_" + std::to_string(id), startMoney, true, 0);
+    auto bot = std::make_shared<BotPlayer>(myEvents, id, "Bot_" + std::to_string(id), startMoney, true,
+                                           ButtonState::Unspecified);
     bot->setStrategy(std::move(strategy));
     return bot;
 }

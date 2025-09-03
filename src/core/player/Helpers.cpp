@@ -3,7 +3,7 @@
 #include "core/engine/BettingActions.h"
 #include "core/engine/CardUtilities.h"
 #include "core/engine/Exception.h"
-#include "core/engine/model/ButtonState.h"
+#include "core/engine/model/PlayerPosition.h"
 #include "core/player/PlayerFsm.h"
 #include "core/player/deprecated/Player.h"
 #include "core/services/GlobalServices.h"
@@ -409,35 +409,38 @@ std::string getPositionLabel(PlayerPosition p)
     switch (p)
     {
 
-    case UTG:
-        return "UTG";
+    case UnderTheGun:
+        return "UnderTheGun";
         break;
-    case UtgPlusOne:
-        return "UtgPlusOne";
+    case UnderTheGunPlusOne:
+        return "UnderTheGun+1";
         break;
-    case UtgPlusTwo:
-        return "UtgPlusTwo";
+    case UnderTheGunPlusTwo:
+        return "UnderTheGun+2";
         break;
-    case MIDDLE:
-        return "MIDDLE";
+    case Middle:
+        return "Middle";
         break;
     case MiddlePlusOne:
-        return "MiddlePlusOne";
+        return "Middle+1";
         break;
-    case LATE:
-        return "LATE";
+    case Late:
+        return "Late";
         break;
-    case CUTOFF:
-        return "CUTOFF";
+    case Cutoff:
+        return "Cutoff";
         break;
-    case BUTTON:
-        return "BUTTON";
+    case Button:
+        return "Button";
         break;
-    case SB:
-        return "SB";
+    case ButtonSmallBlind:
+        return "Button / Small Blind";
         break;
-    case BB:
-        return "BB";
+    case SmallBlind:
+        return "Small Blind";
+        break;
+    case BigBlind:
+        return "Big Blind";
         break;
     default:
         return "unknown";
@@ -563,103 +566,113 @@ PlayerPosition computePositionFromOffset(int offset, int nbPlayers)
     switch (nbPlayers)
     {
     case 2:
-        return offset == 0 ? BUTTON : BB;
+        return offset == 0 ? ButtonSmallBlind : BigBlind;
     case 3:
-        return (offset == 0) ? BUTTON : (offset == 1 ? SB : BB);
+        return (offset == 0) ? Button : (offset == 1 ? SmallBlind : BigBlind);
     case 4:
-        return (offset == 0) ? BUTTON : (offset == 1 ? SB : (offset == 2 ? BB : UTG));
+        return (offset == 0) ? Button : (offset == 1 ? SmallBlind : (offset == 2 ? BigBlind : UnderTheGun));
     case 5:
         if (offset == 0)
-            return BUTTON;
+            return Button;
         if (offset == 1)
-            return SB;
+            return SmallBlind;
         if (offset == 2)
-            return BB;
+            return BigBlind;
         if (offset == 3)
-            return UTG;
-        return CUTOFF;
+            return UnderTheGun;
+        return Cutoff;
     case 6:
         if (offset == 0)
-            return BUTTON;
+            return Button;
         if (offset == 1)
-            return SB;
+            return SmallBlind;
         if (offset == 2)
-            return BB;
+            return BigBlind;
         if (offset == 3)
-            return UTG;
+            return UnderTheGun;
         if (offset == 4)
-            return MIDDLE;
-        return CUTOFF;
+            return Middle;
+        return Cutoff;
     case 7:
         if (offset == 0)
-            return BUTTON;
+            return Button;
         if (offset == 1)
-            return SB;
+            return SmallBlind;
         if (offset == 2)
-            return BB;
+            return BigBlind;
         if (offset == 3)
-            return UTG;
+            return UnderTheGun;
         if (offset == 4)
-            return MIDDLE;
+            return Middle;
         if (offset == 5)
-            return CUTOFF;
-        return LATE;
+            return Cutoff;
+        return Late;
     case 8:
         if (offset == 0)
-            return BUTTON;
+            return Button;
         if (offset == 1)
-            return SB;
+            return SmallBlind;
         if (offset == 2)
-            return BB;
+            return BigBlind;
         if (offset == 3)
-            return UTG;
+            return UnderTheGun;
         if (offset == 4)
-            return UtgPlusOne;
+            return UnderTheGunPlusOne;
         if (offset == 5)
-            return MIDDLE;
+            return Middle;
         if (offset == 6)
-            return CUTOFF;
-        return LATE;
+            return Cutoff;
+        return Late;
     case 9:
         if (offset == 0)
-            return BUTTON;
+            return Button;
         if (offset == 1)
-            return SB;
+            return SmallBlind;
         if (offset == 2)
-            return BB;
+            return BigBlind;
         if (offset == 3)
-            return UTG;
+            return UnderTheGun;
         if (offset == 4)
-            return UtgPlusOne;
+            return UnderTheGunPlusOne;
         if (offset == 5)
-            return MIDDLE;
+            return Middle;
         if (offset == 6)
             return MiddlePlusOne;
         if (offset == 7)
-            return CUTOFF;
-        return LATE;
+            return Cutoff;
+        return Late;
     case 10:
         if (offset == 0)
-            return BUTTON;
+            return Button;
         if (offset == 1)
-            return SB;
+            return SmallBlind;
         if (offset == 2)
-            return BB;
+            return BigBlind;
         if (offset == 3)
-            return UTG;
+            return UnderTheGun;
         if (offset == 4)
-            return UtgPlusOne;
+            return UnderTheGunPlusOne;
         if (offset == 5)
-            return UtgPlusTwo;
+            return UnderTheGunPlusTwo;
         if (offset == 6)
-            return MIDDLE;
+            return Middle;
         if (offset == 7)
             return MiddlePlusOne;
         if (offset == 8)
-            return CUTOFF;
-        return LATE;
+            return Cutoff;
+        return Late;
     default:
-        return UNKNOWN;
+        return Unknown;
     }
+}
+
+bool isDealerPosition(PlayerPosition p)
+{
+    return p == PlayerPosition::Button || p == PlayerPosition::ButtonSmallBlind;
+}
+
+bool isSmallBlindPosition(PlayerPosition p)
+{
+    return p == PlayerPosition::SmallBlind || p == PlayerPosition::ButtonSmallBlind;
 }
 } // namespace pkt::core::player

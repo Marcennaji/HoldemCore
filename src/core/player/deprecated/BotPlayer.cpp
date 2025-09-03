@@ -17,7 +17,7 @@ namespace pkt::core::player
 
 using namespace std;
 
-BotPlayer::BotPlayer(const GameEvents& events, int id, std::string name, int sC, bool aS, int mB)
+BotPlayer::BotPlayer(const GameEvents& events, int id, std::string name, int sC, bool aS, ButtonState mB)
     : Player(events, id, name, sC, aS, mB)
 {
 }

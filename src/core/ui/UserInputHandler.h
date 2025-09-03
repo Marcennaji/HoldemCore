@@ -95,21 +95,6 @@ class UserInputHandler
         }
         return true;
     }
-
-    static std::string positionToString(PlayerPosition pos)
-    {
-        switch (pos)
-        {
-        case PlayerPosition::SB:
-            return "Small Blind";
-        case PlayerPosition::BB:
-            return "Big Blind";
-        case PlayerPosition::UTG:
-            return "Under the Gun";
-        default:
-            return "Unknown";
-        }
-    }
 };
 
 } // namespace pkt::core::ui

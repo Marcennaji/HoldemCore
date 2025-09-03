@@ -83,4 +83,8 @@ bool validatePlayerAction(const PlayerFsm& player, const PlayerAction& action, c
 int circularOffset(int fromId, int toId, const PlayerFsmList& players);
 PlayerPosition computePositionFromOffset(int offset, int nbPlayers);
 
+bool isDealerPosition(PlayerPosition p);
+
+bool isSmallBlindPosition(PlayerPosition p);
+
 } // namespace pkt::core::player

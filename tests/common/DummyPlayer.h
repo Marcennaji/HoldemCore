@@ -5,6 +5,7 @@
 #include <core/player/PlayerFsm.h>
 #include <core/player/deprecated/BotPlayer.h>
 #include <core/player/strategy/LooseAggressiveBotStrategy.h>
+#include "core/engine/deprecated/ButtonState.h"
 
 namespace pkt::test
 {
@@ -18,7 +19,7 @@ class DummyPlayer : public pkt::core::player::BotPlayer
                                        "DummyBot" + std::to_string(id), // Player Name
                                        1000,                            // Starting Cash
                                        true,                            // Active Status
-                                       0)                               // Minimum Bet
+                                       pkt::core::ButtonState::Unspecified)
     {
         setStrategy(std::make_unique<pkt::core::player::LooseAggressiveBotStrategy>());
     }

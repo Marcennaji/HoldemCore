@@ -5,6 +5,7 @@
 #include "PostRiverState.h"
 #include "core/engine/Exception.h"
 #include "core/engine/model/PlayerAction.h"
+#include "core/engine/model/PlayerPosition.h"
 #include "core/player/Helpers.h"
 #include "core/player/PlayerFsm.h"
 #include "core/player/deprecated/Player.h"
@@ -22,7 +23,6 @@ PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsig
 void PreflopState::enter(HandFsm& hand)
 {
     hand.getBettingActions()->updateHighestSet(2 * mySmallBlind);
-    assignButtons(hand);
     setBlinds(hand);
 
     if (myEvents.onBettingRoundStarted)
@@ -94,93 +94,6 @@ void PreflopState::logStateInfo(const HandFsm& /*hand*/) const
 {
     // todo
 }
-void PreflopState::assignButtons(HandFsm& hand)
-{
-
-    size_t i;
-    PlayerFsmListIterator it;
-    PlayerFsmListConstIterator itC;
-
-    // delete all buttons
-    for (it = hand.getSeatsList()->begin(); it != hand.getSeatsList()->end(); ++it)
-    {
-        (*it)->setButton(Button::Unspecified);
-    }
-
-    // assign dealer button
-    it = getPlayerFsmListIteratorById(hand.getSeatsList(), myDealerPlayerId);
-    if (it == hand.getSeatsList()->end())
-    {
-        throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
-    }
-    (*it)->setButton(Dealer);
-
-    // assign Small Blind next to dealer. ATTENTION: in heads up it is big blind
-    // assign big blind next to small blind. ATTENTION: in heads up it is small blind
-    bool nextActivePlayerFound = false;
-    auto dealerPositionIt = getPlayerFsmListIteratorById(hand.getSeatsList(), myDealerPlayerId);
-    if (dealerPositionIt == hand.getSeatsList()->end())
-    {
-        throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
-    }
-
-    for (i = 0; i < hand.getSeatsList()->size(); i++)
-    {
-
-        ++dealerPositionIt;
-        if (dealerPositionIt == hand.getSeatsList()->end())
-        {
-            dealerPositionIt = hand.getSeatsList()->begin();
-        }
-        it = getPlayerFsmListIteratorById(hand.getSeatsList(), (*dealerPositionIt)->getId());
-        if (it != hand.getSeatsList()->end())
-        {
-            nextActivePlayerFound = true;
-            if (hand.getSeatsList()->size() > 2)
-            {
-                // small blind normal
-                (*it)->setButton(SmallBlind);
-                mySmallBlindPlayerId = (*it)->getId();
-            }
-            else
-            {
-                // big blind in heads up
-                (*it)->setButton(BigBlind);
-                myBigBlindPlayerId = (*it)->getId();
-                // lastPlayerAction for showing cards
-            }
-
-            // first player after dealer have to show his cards first (in showdown)
-            // myLastActionPlayerId = (*it)->getId();
-            // myBoard->setLastActionPlayerId(myLastActionPlayerId);
-
-            ++it;
-            if (it == hand.getSeatsList()->end())
-            {
-                it = hand.getSeatsList()->begin();
-            }
-
-            if (hand.getSeatsList()->size() > 2)
-            {
-                // big blind normal
-                (*it)->setButton(BigBlind);
-                myBigBlindPlayerId = (*it)->getId();
-            }
-            else
-            {
-                // small blind in heads up
-                (*it)->setButton(SmallBlind);
-                mySmallBlindPlayerId = (*it)->getId();
-            }
-
-            break;
-        }
-    }
-    if (!nextActivePlayerFound)
-    {
-        throw Exception(__FILE__, __LINE__, EngineError::NextActivePlayerNotFound);
-    }
-}
 
 void PreflopState::setBlinds(HandFsm& hand)
 {
@@ -190,7 +103,8 @@ void PreflopState::setBlinds(HandFsm& hand)
     {
 
         // small blind
-        if ((*itC)->getButton() == SmallBlind)
+        if ((*itC)->getPosition() == PlayerPosition::SmallBlind ||
+            (*itC)->getPosition() == PlayerPosition::ButtonSmallBlind)
         {
 
             // All in ?
@@ -212,7 +126,7 @@ void PreflopState::setBlinds(HandFsm& hand)
     {
 
         // big blind
-        if ((*itC)->getButton() == BigBlind)
+        if ((*itC)->getPosition() == PlayerPosition::BigBlind)
         {
 
             // all in ?

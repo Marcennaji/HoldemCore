@@ -22,7 +22,7 @@ namespace pkt::core::player
 
 using namespace std;
 
-Player::Player(const GameEvents& events, int id, std::string name, int sC, bool aS, int mB)
+Player::Player(const GameEvents& events, int id, std::string name, int sC, bool aS, ButtonState mB)
     : myID(id), myName(name), myCash(sC), myButton(mB), myEvents(events)
 {
     myRangeEstimator = std::make_unique<RangeEstimator>(myID);
@@ -49,7 +49,7 @@ const PlayerPosition Player::getPosition() const
 void Player::setPosition()
 {
 
-    myPosition = UNKNOWN;
+    myPosition = Unknown;
 
     const int dealerPlayerId = currentHand->getDealerPlayerId();
     const int nbPlayers = currentHand->getSeatsList()->size();
@@ -59,23 +59,26 @@ void Player::setPosition()
     const PlayerPosition onDealerPositionPlus[MAX_NUMBER_OF_PLAYERS][MAX_NUMBER_OF_PLAYERS + 1] = {
         // 0 player	1 player	2 players	3 players	4 players		5 players		6 players		7 players 8
         // players		9 players		10 players
-        {UNKNOWN, UNKNOWN, BUTTON, BUTTON, BUTTON, BUTTON, BUTTON, BUTTON, BUTTON, BUTTON,
-         BUTTON},                                                                   // my position = dealer
-        {UNKNOWN, UNKNOWN, BB, SB, SB, SB, SB, SB, SB, SB, SB},                     // my position = dealer + 1
-        {UNKNOWN, UNKNOWN, UNKNOWN, BB, BB, BB, BB, BB, BB, BB, BB},                // my position = dealer + 2
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, CUTOFF, UTG, UTG, UTG, UTG, UTG, UTG}, // my position = dealer + 3
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, CUTOFF, MIDDLE, MIDDLE, UtgPlusOne, UtgPlusOne,
-         UtgPlusOne}, // my position = dealer + 4
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, CUTOFF, LATE, MIDDLE, UtgPlusTwo,
-         UtgPlusTwo}, // my position = dealer + 5
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, CUTOFF, LATE, MIDDLE,
-         MIDDLE}, // my position = dealer + 6
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, CUTOFF, LATE,
+        {Unknown, Unknown, Button, Button, Button, Button, Button, Button, Button, Button,
+         Button}, // my position = dealer
+        {Unknown, Unknown, BigBlind, SmallBlind, SmallBlind, SmallBlind, SmallBlind, SmallBlind, SmallBlind, SmallBlind,
+         SmallBlind}, // my position = dealer + 1
+        {Unknown, Unknown, Unknown, BigBlind, BigBlind, BigBlind, BigBlind, BigBlind, BigBlind, BigBlind,
+         BigBlind}, // my position = dealer + 2
+        {Unknown, Unknown, Unknown, Unknown, Cutoff, UnderTheGun, UnderTheGun, UnderTheGun, UnderTheGun, UnderTheGun,
+         UnderTheGun}, // my position = dealer + 3
+        {Unknown, Unknown, Unknown, Unknown, Unknown, Cutoff, Middle, Middle, UnderTheGunPlusOne, UnderTheGunPlusOne,
+         UnderTheGunPlusOne}, // my position = dealer + 4
+        {Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Cutoff, Late, Middle, UnderTheGunPlusTwo,
+         UnderTheGunPlusTwo}, // my position = dealer + 5
+        {Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Cutoff, Late, Middle,
+         Middle}, // my position = dealer + 6
+        {Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Cutoff, Late,
          MiddlePlusOne}, // my position = dealer + 7
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, CUTOFF,
-         LATE}, // my position = dealer + 8
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN,
-         CUTOFF} // my position = dealer + 9
+        {Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Cutoff,
+         Late}, // my position = dealer + 8
+        {Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown,
+         Cutoff} // my position = dealer + 9
     };
 
     // first dimension is my relative position, BEHIND the dealer.
@@ -83,30 +86,32 @@ void Player::setPosition()
     const PlayerPosition onDealerPositionMinus[10][11] = {
         // 0 player	1 player	2 players	3 players	4 players		5 players		6 players		7 players 8
         // players		9 players		10 players
-        {UNKNOWN, UNKNOWN, BUTTON, BUTTON, BUTTON, BUTTON, BUTTON, BUTTON, BUTTON, BUTTON,
-         BUTTON},                                                                           // my position = dealer
-        {UNKNOWN, UNKNOWN, BB, BB, CUTOFF, CUTOFF, CUTOFF, CUTOFF, CUTOFF, CUTOFF, CUTOFF}, // my position = dealer - 1
-        {UNKNOWN, UNKNOWN, UNKNOWN, SB, BB, UTG, MIDDLE, LATE, LATE, LATE, LATE},           // my position = dealer - 2
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, SB, BB, UTG, MIDDLE, MIDDLE, MiddlePlusOne,
+        {Unknown, Unknown, Button, Button, Button, Button, Button, Button, Button, Button,
+         Button}, // my position = dealer
+        {Unknown, Unknown, BigBlind, BigBlind, Cutoff, Cutoff, Cutoff, Cutoff, Cutoff, Cutoff,
+         Cutoff}, // my position = dealer - 1
+        {Unknown, Unknown, Unknown, SmallBlind, BigBlind, UnderTheGun, Middle, Late, Late, Late,
+         Late}, // my position = dealer - 2
+        {Unknown, Unknown, Unknown, Unknown, SmallBlind, BigBlind, UnderTheGun, Middle, Middle, MiddlePlusOne,
          MiddlePlusOne}, // my position = dealer - 3
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, SB, BB, UTG, UtgPlusOne, UtgPlusTwo,
-         MIDDLE}, // my position = dealer - 4
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, SB, BB, UTG, UtgPlusOne,
-         UtgPlusTwo}, // my position = dealer - 5
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, SB, BB, UTG,
-         UtgPlusOne}, // my position = dealer - 6
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, SB, BB,
-         UTG}, // my position = dealer - 7
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, SB,
-         BB}, // my position = dealer - 8
-        {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN,
-         SB} // my position = dealer - 9
+        {Unknown, Unknown, Unknown, Unknown, Unknown, SmallBlind, BigBlind, UnderTheGun, UnderTheGunPlusOne,
+         UnderTheGunPlusTwo, Middle}, // my position = dealer - 4
+        {Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, SmallBlind, BigBlind, UnderTheGun, UnderTheGunPlusOne,
+         UnderTheGunPlusTwo}, // my position = dealer - 5
+        {Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, SmallBlind, BigBlind, UnderTheGun,
+         UnderTheGunPlusOne}, // my position = dealer - 6
+        {Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, SmallBlind, BigBlind,
+         UnderTheGun}, // my position = dealer - 7
+        {Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, SmallBlind,
+         BigBlind}, // my position = dealer - 8
+        {Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown,
+         SmallBlind} // my position = dealer - 9
 
     };
 
     if (myID == dealerPlayerId)
     {
-        myPosition = BUTTON;
+        myPosition = Button;
     }
     else
     {
@@ -162,7 +167,7 @@ void Player::setPosition()
         }
     }
 
-    assert(myPosition != UNKNOWN);
+    assert(myPosition != Unknown);
 }
 std::string Player::getPositionLabel(PlayerPosition p) const
 {
@@ -170,35 +175,35 @@ std::string Player::getPositionLabel(PlayerPosition p) const
     switch (p)
     {
 
-    case UTG:
-        return "UTG";
+    case UnderTheGun:
+        return "UnderTheGun";
         break;
-    case UtgPlusOne:
-        return "UtgPlusOne";
+    case UnderTheGunPlusOne:
+        return "UnderTheGunPlusOne";
         break;
-    case UtgPlusTwo:
-        return "UtgPlusTwo";
+    case UnderTheGunPlusTwo:
+        return "UnderTheGunPlusTwo";
         break;
-    case MIDDLE:
-        return "MIDDLE";
+    case Middle:
+        return "Middle";
         break;
     case MiddlePlusOne:
         return "MiddlePlusOne";
         break;
-    case LATE:
-        return "LATE";
+    case Late:
+        return "Late";
         break;
-    case CUTOFF:
-        return "CUTOFF";
+    case Cutoff:
+        return "Cutoff";
         break;
-    case BUTTON:
-        return "BUTTON";
+    case Button:
+        return "Button";
         break;
-    case SB:
-        return "SB";
+    case SmallBlind:
+        return "SmallBlind";
         break;
-    case BB:
-        return "BB";
+    case BigBlind:
+        return "BigBlind";
         break;
     default:
         return "unknown";
@@ -268,11 +273,11 @@ ActionType Player::getAction() const
     return myAction;
 }
 
-void Player::setButton(int theValue)
+void Player::setButton(ButtonState theValue)
 {
     myButton = theValue;
 }
-int Player::getButton() const
+ButtonState Player::getButton() const
 {
     return myButton;
 }
@@ -670,7 +675,8 @@ int Player::getPotOdd() const
 float Player::getM() const
 {
 
-    int blinds = currentHand->getSmallBlind() + (currentHand->getSmallBlind() * 2); // assume for now that BB is 2 * SB
+    int blinds = currentHand->getSmallBlind() +
+                 (currentHand->getSmallBlind() * 2); // assume for now that BigBlind is 2 * SmallBlind
     if (blinds > 0 && myCash > 0)
     {
         return (float) myCash / blinds;

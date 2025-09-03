@@ -25,7 +25,7 @@ PlayerAction BotStrategyBase::decidePreflop(const CurrentHandContext& ctx)
 
     // if last to speak, a hand not good enough to raise, and nobody has raised : I check
     if (ctx.commonContext.bettingContext.preflopRaisesNumber == 0 && resultingAction.amount == 0 &&
-        ctx.personalContext.position == BB)
+        ctx.personalContext.position == PlayerPosition::BigBlind)
     {
         resultingAction.type = ActionType::Check;
     }
@@ -296,11 +296,11 @@ void BotStrategyBase::adjustRaiseForPosition(const CurrentHandContext& ctx, int&
 {
     if (ctx.commonContext.playersContext.nbPlayers > 4)
     {
-        if (ctx.personalContext.position < MIDDLE)
+        if (ctx.personalContext.position < Middle)
         {
             raiseAmount += bigBlind;
         }
-        else if (ctx.personalContext.position == BUTTON)
+        else if (ctx.personalContext.position == Button)
         {
             raiseAmount -= ctx.commonContext.smallBlind;
         }

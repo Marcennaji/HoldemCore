@@ -6,8 +6,8 @@
 #include <core/services/GlobalServices.h>
 #include "CardUtilities.h"
 #include "GameEvents.h"
+#include "core/engine/deprecated/ButtonState.h"
 #include "core/player/Helpers.h"
-#include "model/ButtonState.h"
 
 #include "Exception.h"
 #include "model/EngineError.h"
@@ -152,7 +152,7 @@ void Hand::assignButtons()
     // delete all buttons
     for (it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
-        (*it)->setButton(Button::Unspecified);
+        (*it)->setButton(ButtonState::Unspecified);
     }
 
     // assign dealer button
@@ -163,8 +163,7 @@ void Hand::assignButtons()
     }
     (*it)->setButton(Dealer);
 
-    // assign Small Blind next to dealer. ATTENTION: in heads up it is big blind
-    // assign big blind next to small blind. ATTENTION: in heads up it is small blind
+    // NB. in heads-up mode, the Button is also Small Blind
     bool nextActivePlayerFound = false;
     auto dealerPositionIt = getPlayerListIteratorById(mySeatsList, myDealerPlayerId);
     if (dealerPositionIt == mySeatsList->end())
@@ -187,13 +186,13 @@ void Hand::assignButtons()
             if (mySeatsList->size() > 2)
             {
                 // small blind normal
-                (*it)->setButton(2);
+                (*it)->setButton(SB);
                 mySmallBlindPlayerId = (*it)->getId();
             }
             else
             {
                 // big blind in heads up
-                (*it)->setButton(3);
+                (*it)->setButton(BB);
                 myBigBlindPlayerId = (*it)->getId();
                 // lastPlayerAction for showing cards
             }
@@ -211,13 +210,13 @@ void Hand::assignButtons()
             if (mySeatsList->size() > 2)
             {
                 // big blind normal
-                (*it)->setButton(3);
+                (*it)->setButton(BB);
                 myBigBlindPlayerId = (*it)->getId();
             }
             else
             {
                 // small blind in heads up
-                (*it)->setButton(2);
+                (*it)->setButton(SB);
                 mySmallBlindPlayerId = (*it)->getId();
             }
 
@@ -240,7 +239,7 @@ void Hand::setBlinds()
     {
 
         // small blind
-        if ((*itC)->getButton() == SmallBlind)
+        if ((*itC)->getButton() == ButtonState::SB)
         {
 
             // All in ?
@@ -263,7 +262,7 @@ void Hand::setBlinds()
     {
 
         // big blind
-        if ((*itC)->getButton() == BigBlind)
+        if ((*itC)->getButton() == ButtonState::BB)
         {
 
             // all in ?

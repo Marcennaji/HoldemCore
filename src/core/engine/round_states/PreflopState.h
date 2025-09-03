@@ -31,7 +31,6 @@ class PreflopState : public IHandState, public IActionProcessor, public IRoundCo
     void promptPlayerAction(HandFsm&, player::PlayerFsm& player);
 
   private:
-    void assignButtons(HandFsm& hand);
     void setBlinds(HandFsm& hand);
 
     const GameEvents& myEvents;

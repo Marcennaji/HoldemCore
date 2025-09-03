@@ -7,11 +7,11 @@
 namespace pkt::core
 {
 
-enum Button
+enum ButtonState
 {
-    Unspecified,
+    Unspecified = 0,
     Dealer,
-    SmallBlind,
-    BigBlind
+    SB,
+    BB
 };
 } // namespace pkt::core
