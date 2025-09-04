@@ -58,7 +58,7 @@ class PlayerFsm
     void setTotalBetAmount(int theValue);
     int getLastBetAmount() const;
 
-    void setAction(ActionType theValue, bool blind = 0);
+    void setAction(ActionType theValue);
     ActionType getAction() const;
 
     void setCards(int* theValue);

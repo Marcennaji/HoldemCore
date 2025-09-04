@@ -90,7 +90,7 @@ int PlayerFsm::getLastBetAmount() const
     return myLastBetAmount;
 }
 
-void PlayerFsm::setAction(ActionType theValue, bool blind)
+void PlayerFsm::setAction(ActionType theValue)
 {
     myAction = theValue;
 }

@@ -18,6 +18,15 @@ using namespace pkt::core::player;
 PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsigned dealerPlayerId)
     : myEvents(events), mySmallBlind(smallBlind), myDealerPlayerId(dealerPlayerId)
 {
+    if (smallBlind <= 0)
+    {
+        throw std::invalid_argument("PreflopState: smallBlind must be > 0");
+    }
+
+    if (dealerPlayerId == static_cast<unsigned>(-1))
+    {
+        throw std::invalid_argument("PreflopState: dealerPlayerId is invalid");
+    }
 }
 
 void PreflopState::enter(HandFsm& hand)
@@ -62,12 +71,10 @@ std::unique_ptr<IHandState> PreflopState::computeNextState(HandFsm& hand, Player
 {
     if (hand.getRunningPlayersList()->size() == 1)
     {
-        exit(hand);
         return std::make_unique<PostRiverState>(myEvents);
     }
     if (isRoundComplete(hand))
     {
-        exit(hand);
         return std::make_unique<FlopState>(myEvents);
     }
 
@@ -97,49 +104,30 @@ void PreflopState::logStateInfo(const HandFsm& /*hand*/) const
 
 void PreflopState::setBlinds(HandFsm& hand)
 {
-    PlayerFsmListConstIterator itC;
-
-    for (itC = hand.getRunningPlayersList()->begin(); itC != hand.getRunningPlayersList()->end(); ++itC)
+    for (const auto& player : *hand.getRunningPlayersList())
     {
+        int blindAmount = 0;
 
-        // small blind
-        if ((*itC)->getPosition() == PlayerPosition::SmallBlind ||
-            (*itC)->getPosition() == PlayerPosition::ButtonSmallBlind)
+        if (player->getPosition() == PlayerPosition::SmallBlind ||
+            player->getPosition() == PlayerPosition::ButtonSmallBlind)
         {
-
-            // All in ?
-            if ((*itC)->getCash() <= mySmallBlind)
-            {
-
-                (*itC)->addBetAmount((*itC)->getCash());
-                // 1 to do not log this
-                (*itC)->setAction(ActionType::Allin, 1);
-            }
-            else
-            {
-                (*itC)->addBetAmount(mySmallBlind);
-            }
+            blindAmount = mySmallBlind;
         }
-    }
-
-    for (itC = hand.getRunningPlayersList()->begin(); itC != hand.getRunningPlayersList()->end(); ++itC)
-    {
-
-        // big blind
-        if ((*itC)->getPosition() == PlayerPosition::BigBlind)
+        else if (player->getPosition() == PlayerPosition::BigBlind)
         {
+            blindAmount = 2 * mySmallBlind;
+        }
 
-            // all in ?
-            if ((*itC)->getCash() <= 2 * mySmallBlind)
+        if (blindAmount > 0)
+        {
+            if (player->getCash() <= blindAmount)
             {
-
-                (*itC)->addBetAmount((*itC)->getCash());
-                // 1 to do not log this
-                (*itC)->setAction(ActionType::Allin, 1);
+                player->addBetAmount(player->getCash());
+                player->setAction(ActionType::Allin);
             }
             else
             {
-                (*itC)->addBetAmount(2 * mySmallBlind);
+                player->addBetAmount(blindAmount);
             }
         }
     }

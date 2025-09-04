@@ -31,6 +31,19 @@ HandFsm::HandFsm(const GameEvents& events, std::shared_ptr<EngineFactory> factor
     myDealerPlayerId = startData.startDealerPlayerId;
     mySmallBlindPlayerId = startData.startDealerPlayerId;
     myBigBlindPlayerId = startData.startDealerPlayerId;
+
+    if (mySmallBlind <= 0)
+    {
+        throw std::invalid_argument("HandFsm: smallBlind must be > 0");
+    }
+    if (myDealerPlayerId == static_cast<unsigned>(-1))
+    {
+        throw std::invalid_argument("HandFsm: dealerPlayerId is invalid");
+    }
+    if (startData.startDealerPlayerId >= static_cast<unsigned>(startData.numberOfPlayers))
+    {
+        throw std::invalid_argument("HandFsm: startDealerPlayerId is out of range");
+    }
 }
 
 HandFsm::~HandFsm() = default;

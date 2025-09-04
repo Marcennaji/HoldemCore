@@ -20,7 +20,7 @@ void SqlitePlayersStatisticsStoreTest::SetUp()
     EngineTest::SetUp();
     auto db = std::make_unique<pkt::infra::SqliteDb>(":memory:");
     auto& services = pkt::core::GlobalServices::instance();
-    store = std::make_unique<pkt::infra::SqlitePlayersStatisticsStore>(std::move(db));
+    auto store = std::make_unique<pkt::infra::SqlitePlayersStatisticsStore>(std::move(db));
     services.setPlayersStatisticsStore(std::move(store));
 }
 
@@ -31,8 +31,9 @@ void SqlitePlayersStatisticsStoreTest::TearDown()
     services.setPlayersStatisticsStore(std::make_unique<NullPlayersStatisticsStore>());
 }
 
-TEST_F(SqlitePlayersStatisticsStoreTest, DISABLED_SaveAndLoadSinglePlayer)
+TEST_F(SqlitePlayersStatisticsStoreTest, SaveAndLoadSinglePlayer)
 {
+    auto& store = pkt::core::GlobalServices::instance().playersStatisticsStore();
     int nbPlayers = 3;
     initializeHandFsmForTesting(nbPlayers, gameData);
     myHandFsm->start();
@@ -46,18 +47,18 @@ TEST_F(SqlitePlayersStatisticsStoreTest, DISABLED_SaveAndLoadSinglePlayer)
 
     playerSb->updateCurrentHandContext(GameState::Preflop, *myHandFsm);
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Fold});
-    // -> then, the round ends, and the players stats are automatically saved in the database
+    // -> then, the round ends, and the players stats should be automatically saved in the database
 
     // Verify loaded statistics for the number of players (index 1-based)
-    auto dealerStats = store->loadPlayerStatistics(playerDealer->getName());
+    auto dealerStats = store.loadPlayerStatistics(playerDealer->getName());
     EXPECT_EQ(dealerStats[nbPlayers].preflopStatistics.hands, 1);
     EXPECT_EQ(dealerStats[nbPlayers].preflopStatistics.folds, 1);
 
-    auto sbStats = store->loadPlayerStatistics(playerSb->getName());
+    auto sbStats = store.loadPlayerStatistics(playerSb->getName());
     EXPECT_EQ(sbStats[nbPlayers].preflopStatistics.hands, 1);
     EXPECT_EQ(sbStats[nbPlayers].preflopStatistics.folds, 1);
 
-    auto bbStats = store->loadPlayerStatistics(playerBb->getName());
+    auto bbStats = store.loadPlayerStatistics(playerBb->getName());
     EXPECT_EQ(bbStats[nbPlayers].preflopStatistics.hands, 0);
 }
 

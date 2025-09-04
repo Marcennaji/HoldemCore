@@ -19,11 +19,6 @@ void BettingRoundsLegacyTest::SetUp()
 {
     EngineTest::SetUp();
     myEvents.clear();
-
-    gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
-    gameData.startMoney = 1000;
-    gameData.firstSmallBlind = 10;
-    gameData.tableProfile = TableProfile::RandomOpponents;
 }
 
 void BettingRoundsLegacyTest::TearDown()

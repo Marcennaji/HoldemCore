@@ -28,6 +28,11 @@ void EngineTest::SetUp()
     auto randomizer = std::make_unique<FakeRandomizer>();
     randomizer->values = {3, 5, 7};
     services.setRandomizer(std::move(randomizer));
+
+    gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
+    gameData.startMoney = 1000;
+    gameData.firstSmallBlind = 10;
+    gameData.tableProfile = TableProfile::RandomOpponents;
 }
 
 void EngineTest::TearDown()
@@ -37,13 +42,11 @@ void EngineTest::TearDown()
 void EngineTest::initializeHandForTesting(size_t activePlayerCount, GameData gameData)
 {
     myHand.reset();
-    createPlayersLists(activePlayerCount);
     initializeHandWithPlayers(activePlayerCount, gameData);
 }
 void EngineTest::initializeHandFsmForTesting(size_t activePlayerCount, GameData gameData)
 {
     myHandFsm.reset();
-    createPlayersFsmLists(activePlayerCount);
     initializeHandFsmWithPlayers(activePlayerCount, gameData);
 }
 void EngineTest::createPlayersLists(size_t playerCount)

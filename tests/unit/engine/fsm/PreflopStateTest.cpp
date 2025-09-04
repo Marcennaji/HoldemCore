@@ -23,11 +23,6 @@ void PreflopStateTest::SetUp()
 
     myEvents.clear();
     myEvents.onBettingRoundStarted = [&](GameState state) { myLastGameState = state; };
-
-    gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
-    gameData.startMoney = 1000;
-    gameData.firstSmallBlind = 10;
-    gameData.tableProfile = TableProfile::RandomOpponents;
 }
 
 bool PreflopStateTest::isPlayerStillActive(unsigned id) const
