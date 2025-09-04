@@ -5,6 +5,7 @@
 #include <core/player/PlayerFsm.h>
 #include <core/player/deprecated/BotPlayer.h>
 #include <core/player/strategy/LooseAggressiveBotStrategy.h>
+#include "DeterministicStrategy.h"
 #include "core/engine/deprecated/ButtonState.h"
 
 namespace pkt::test
@@ -34,7 +35,7 @@ class DummyPlayerFsm : public pkt::core::player::PlayerFsm
                                        "DummyBotFsm" + std::to_string(id), // Player Name
                                        1000)                               // starting cash
     {
-        setStrategy(std::make_unique<pkt::core::player::LooseAggressiveBotStrategy>());
+        setStrategy(std::make_unique<pkt::test::DeterministicStrategy>());
     }
 };
 

@@ -66,6 +66,7 @@ void EngineTest::createPlayersLists(size_t playerCount)
 }
 void EngineTest::initializeHandWithPlayers(size_t activePlayerCount, GameData gameData)
 {
+    createPlayersLists(activePlayerCount);
     myBoard = myFactory->createBoard(startDealerPlayerId);
     myBoard->setSeatsList(mySeatsList);
     myBoard->setRunningPlayersList(myRunningPlayersList);
