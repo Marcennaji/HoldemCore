@@ -23,7 +23,7 @@ class SqlitePlayersStatisticsStore : public pkt::core::PlayersStatisticsStore
 {
 
   public:
-    SqlitePlayersStatisticsStore(std::shared_ptr<SqliteDb> db);
+    SqlitePlayersStatisticsStore(std::unique_ptr<SqliteDb> db);
 
     ~SqlitePlayersStatisticsStore();
 
@@ -33,7 +33,7 @@ class SqlitePlayersStatisticsStore : public pkt::core::PlayersStatisticsStore
 
   private:
     void initializeStrategyStatistics(const std::string& playerName, const int nbPlayers);
-    std::shared_ptr<SqliteDb> myDb;
+    std::unique_ptr<SqliteDb> myDb;
     std::string mySql;
 };
 } // namespace pkt::infra

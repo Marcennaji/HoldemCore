@@ -37,7 +37,7 @@ HandFsm::~HandFsm() = default;
 
 void HandFsm::start()
 {
-    GlobalServices::instance().logger()->info(
+    GlobalServices::instance().logger().info(
         "\n----------------------  New hand initialization (FSM)  -------------------------------\n");
 
     initAndShuffleDeck();
@@ -57,7 +57,7 @@ void HandFsm::start()
 
 void HandFsm::end()
 {
-    GlobalServices::instance().playersStatisticsStore()->savePlayersStatistics(mySeatsList);
+    GlobalServices::instance().playersStatisticsStore().savePlayersStatistics(mySeatsList);
     myState.reset();
 }
 
@@ -308,8 +308,8 @@ int HandFsm::getPotOdd(const int playerCash, const int playerSet) const
 
     if (pot == 0)
     { // shouldn't happen, but...
-        GlobalServices::instance().logger()->error("Pot = " + std::to_string(myBoard->getPot()) + " + " +
-                                                   std::to_string(myBoard->getSets()) + " = " + std::to_string(pot));
+        GlobalServices::instance().logger().error("Pot = " + std::to_string(myBoard->getPot()) + " + " +
+                                                  std::to_string(myBoard->getSets()) + " = " + std::to_string(pot));
         return 0;
     }
 

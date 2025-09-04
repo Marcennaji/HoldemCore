@@ -13,8 +13,8 @@ class CardsValueTest : public ::testing::Test
     void SetUp() override
     {
         auto& services = pkt::core::GlobalServices::instance();
-        services.setLogger(std::make_shared<pkt::infra::ConsoleLogger>());
-        services.setHandEvaluationEngine(std::make_shared<pkt::infra::PsimHandEvaluationEngine>());
+        services.setLogger(std::make_unique<pkt::infra::ConsoleLogger>());
+        services.setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>());
     }
 
     void TearDown() override {}

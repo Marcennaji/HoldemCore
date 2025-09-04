@@ -21,6 +21,8 @@ class IBoard
     //
     virtual void setSeatsList(pkt::core::player::PlayerList seats) = 0;
     virtual void setRunningPlayersList(pkt::core::player::PlayerList runningPlayers) = 0;
+    virtual void setSeatsListFsm(pkt::core::player::PlayerFsmList seats) = 0;
+    virtual void setRunningPlayersListFsm(pkt::core::player::PlayerFsmList runningPlayers) = 0;
     //
     virtual void setCards(int* theValue) = 0;
     virtual void getCards(int* theValue) = 0;

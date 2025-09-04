@@ -31,8 +31,8 @@ void Pot::distribute()
         int potLevel = static_cast<int>(eligible.size() * level);
         if (potLevel > myTotal)
         {
-            GlobalServices::instance().logger()->info("Pot level " + std::to_string(potLevel) +
-                                                      " exceeds total available chips : " + std::to_string(myTotal));
+            GlobalServices::instance().logger().info("Pot level " + std::to_string(potLevel) +
+                                                     " exceeds total available chips : " + std::to_string(myTotal));
             potLevel = myTotal;
         }
 

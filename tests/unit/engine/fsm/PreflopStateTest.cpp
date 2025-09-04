@@ -14,7 +14,7 @@ namespace pkt::test
 {
 void PreflopStateTest::logTestMessage(const std::string& message) const
 {
-    GlobalServices::instance().logger()->verbose("PreflopState : " + message);
+    GlobalServices::instance().logger().verbose("PreflopState : " + message);
 }
 
 void PreflopStateTest::SetUp()

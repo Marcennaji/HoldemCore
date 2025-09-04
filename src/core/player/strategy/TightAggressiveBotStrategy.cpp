@@ -27,7 +27,7 @@ TightAggressiveBotStrategy::TightAggressiveBotStrategy()
 {
     // initialize utg starting range, in a full table
     int utgFullTableRange = 0;
-    GlobalServices::instance().randomizer()->getRand(2, 3, 1, &utgFullTableRange);
+    GlobalServices::instance().randomizer().getRand(2, 3, 1, &utgFullTableRange);
     initializeRanges(45, utgFullTableRange);
 }
 
@@ -78,7 +78,7 @@ bool TightAggressiveBotStrategy::preflopShouldCall(const CurrentHandContext& ctx
 
         stringCallingRange += HIGH_SUITED_CONNECTORS;
 
-        GlobalServices::instance().logger()->verbose(
+        GlobalServices::instance().logger().verbose(
             "\t\tTAG adding high suited connectors to the initial calling range.");
     }
 
@@ -92,7 +92,7 @@ bool TightAggressiveBotStrategy::preflopShouldCall(const CurrentHandContext& ctx
     {
 
         int rand = 0;
-        GlobalServices::instance().randomizer()->getRand(1, 4, 1, &rand);
+        GlobalServices::instance().randomizer().getRand(1, 4, 1, &rand);
         if (rand == 1)
         {
 
@@ -100,12 +100,12 @@ bool TightAggressiveBotStrategy::preflopShouldCall(const CurrentHandContext& ctx
             stringCallingRange += HIGH_SUITED_ACES;
             stringCallingRange += PAIRS;
 
-            GlobalServices::instance().logger()->verbose(
+            GlobalServices::instance().logger().verbose(
                 "\t\tTAG defending against 3-bet : adding high suited connectors, high suited aces and pairs to "
                 "the initial calling range.");
         }
     }
-    GlobalServices::instance().logger()->verbose("\t\tTAG final calling range : " + stringCallingRange);
+    GlobalServices::instance().logger().verbose("\t\tTAG final calling range : " + stringCallingRange);
 
     return isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, stringCallingRange);
 }
@@ -148,7 +148,7 @@ int TightAggressiveBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx
 
     stringRaisingRange = rangesString[(int) raisingRange];
 
-    GlobalServices::instance().logger()->verbose(stringRaisingRange);
+    GlobalServices::instance().logger().verbose(stringRaisingRange);
 
     // determine when to 3-bet without a real hand
     bool speculativeHandedAdded = false;
@@ -176,11 +176,11 @@ int TightAggressiveBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx
             {
 
                 int rand = 0;
-                GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
+                GlobalServices::instance().randomizer().getRand(1, 2, 1, &rand);
                 if (rand == 2)
                 {
                     speculativeHandedAdded = true;
-                    GlobalServices::instance().logger()->verbose("\t\tTAG trying to steal this bet");
+                    GlobalServices::instance().logger().verbose("\t\tTAG trying to steal this bet");
                 }
             }
             else
@@ -191,7 +191,7 @@ int TightAggressiveBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx
                 {
 
                     speculativeHandedAdded = true;
-                    GlobalServices::instance().logger()->verbose(
+                    GlobalServices::instance().logger().verbose(
                         "\t\tTAG adding this speculative hand to our initial raising range");
                 }
             }
@@ -217,10 +217,10 @@ int TightAggressiveBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx
     {
 
         int rand = 0;
-        GlobalServices::instance().randomizer()->getRand(1, 8, 1, &rand);
+        GlobalServices::instance().randomizer().getRand(1, 8, 1, &rand);
         if (rand == 1)
         {
-            GlobalServices::instance().logger()->verbose("\t\twon't raise, to hide the hand strength");
+            GlobalServices::instance().logger().verbose("\t\twon't raise, to hide the hand strength");
             myShouldCall = true;
             return 0;
         }
@@ -254,7 +254,7 @@ int TightAggressiveBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
             if (getDrawingProbability(ctx.personalContext.postFlopAnalysisFlags) > 25)
             {
                 int rand = 0;
-                GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
+                GlobalServices::instance().randomizer().getRand(1, 2, 1, &rand);
                 if (rand == 1)
                 {
                     return ctx.commonContext.bettingContext.pot * 0.6;
@@ -277,7 +277,7 @@ int TightAggressiveBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
             {
 
                 int rand = 0;
-                GlobalServices::instance().randomizer()->getRand(1, 3, 1, &rand);
+                GlobalServices::instance().randomizer().getRand(1, 3, 1, &rand);
                 if (rand == 1)
                 {
                     return ctx.commonContext.bettingContext.pot * 0.6;
@@ -304,7 +304,7 @@ int TightAggressiveBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
         }
 
         int rand = 0;
-        GlobalServices::instance().randomizer()->getRand(1, 7, 1, &rand);
+        GlobalServices::instance().randomizer().getRand(1, 7, 1, &rand);
         if (rand == 3 && !ctx.personalContext.hasPosition &&
             ctx.commonContext.playersContext.preflopLastRaiser->getId() != ctx.personalContext.id)
         {
@@ -441,7 +441,7 @@ int TightAggressiveBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
     {
 
         int rand = 0;
-        GlobalServices::instance().randomizer()->getRand(1, 4, 1, &rand);
+        GlobalServices::instance().randomizer().getRand(1, 4, 1, &rand);
         if (rand == 2)
         {
             return ctx.commonContext.bettingContext.pot;
@@ -456,7 +456,7 @@ int TightAggressiveBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
         {
 
             int rand = 0;
-            GlobalServices::instance().randomizer()->getRand(1, 6, 1, &rand);
+            GlobalServices::instance().randomizer().getRand(1, 6, 1, &rand);
             if (rand == 2 && ctx.personalContext.myHandSimulation.winRanged > 0.3 &&
                 ctx.personalContext.myHandSimulation.win > 0.3)
             {
@@ -506,7 +506,7 @@ int TightAggressiveBotStrategy::turnShouldBet(const CurrentHandContext& ctx)
         getDrawingProbability(ctx.personalContext.postFlopAnalysisFlags) < 9 && ctx.personalContext.cash > pot * 4)
     {
         int rand = 0;
-        GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
+        GlobalServices::instance().randomizer().getRand(1, 2, 1, &rand);
         if (rand == 1)
         {
             return pot * 0.6;
@@ -534,7 +534,7 @@ int TightAggressiveBotStrategy::turnShouldBet(const CurrentHandContext& ctx)
     if (getDrawingProbability(ctx.personalContext.postFlopAnalysisFlags) > 20 && !ctx.personalContext.hasPosition)
     {
         int rand = 0;
-        GlobalServices::instance().randomizer()->getRand(1, 3, 1, &rand);
+        GlobalServices::instance().randomizer().getRand(1, 3, 1, &rand);
         if (rand == 1)
         {
             return pot * 0.6;
@@ -546,7 +546,7 @@ int TightAggressiveBotStrategy::turnShouldBet(const CurrentHandContext& ctx)
         if (ctx.personalContext.hasPosition && isPossibleToBluff(ctx))
         {
             int rand = 0;
-            GlobalServices::instance().randomizer()->getRand(1, 3, 1, &rand);
+            GlobalServices::instance().randomizer().getRand(1, 3, 1, &rand);
             if (rand == 2)
             {
                 return pot * 0.6;
@@ -662,7 +662,7 @@ int TightAggressiveBotStrategy::turnShouldRaise(const CurrentHandContext& ctx)
         ctx.personalContext.myHandSimulation.winSd > 0.9)
     {
         int rand = 0;
-        GlobalServices::instance().randomizer()->getRand(1, 3, 1, &rand);
+        GlobalServices::instance().randomizer().getRand(1, 3, 1, &rand);
         if (rand == 1)
         {
             return 0; // very strong hand, slow play, just call
@@ -710,7 +710,7 @@ int TightAggressiveBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
         ctx.personalContext.myHandSimulation.winRanged > 0.4 && ctx.personalContext.myHandSimulation.winSd > 0.4)
     {
         int rand = 0;
-        GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
+        GlobalServices::instance().randomizer().getRand(1, 2, 1, &rand);
         if (rand == 1)
         {
             return ctx.commonContext.bettingContext.pot * 0.33;
@@ -727,7 +727,7 @@ int TightAggressiveBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
         {
 
             int rand = 0;
-            GlobalServices::instance().randomizer()->getRand(1, 4, 1, &rand);
+            GlobalServices::instance().randomizer().getRand(1, 4, 1, &rand);
             if (rand == 1)
             {
                 return ctx.commonContext.bettingContext.pot * 0.8;
@@ -742,14 +742,14 @@ int TightAggressiveBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
     }
 
     int rand = 0;
-    GlobalServices::instance().randomizer()->getRand(40, 80, 1, &rand);
+    GlobalServices::instance().randomizer().getRand(40, 80, 1, &rand);
     float coeff = (float) rand / (float) 100;
 
     if (ctx.personalContext.myHandSimulation.winSd > .94 ||
         (ctx.personalContext.hasPosition && ctx.personalContext.myHandSimulation.winSd > .9))
     {
         int rand = 0;
-        GlobalServices::instance().randomizer()->getRand(1, 6, 1, &rand);
+        GlobalServices::instance().randomizer().getRand(1, 6, 1, &rand);
         if (rand != 1 || ctx.personalContext.hasPosition)
         {
             return ctx.commonContext.bettingContext.pot * coeff;
@@ -760,7 +760,7 @@ int TightAggressiveBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
          (ctx.personalContext.hasPosition && ctx.personalContext.myHandSimulation.winRanged > .8)))
     {
         int rand = 0;
-        GlobalServices::instance().randomizer()->getRand(1, 3, 1, &rand);
+        GlobalServices::instance().randomizer().getRand(1, 3, 1, &rand);
         if ((rand == 1 || ctx.personalContext.hasPosition))
         {
             return ctx.commonContext.bettingContext.pot * coeff;
@@ -771,7 +771,7 @@ int TightAggressiveBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
         ctx.commonContext.bettingContext.turnBetsOrRaisesNumber == 0)
     {
         int rand = 0;
-        GlobalServices::instance().randomizer()->getRand(1, 6, 1, &rand);
+        GlobalServices::instance().randomizer().getRand(1, 6, 1, &rand);
         if (rand == 1)
         {
             return ctx.commonContext.bettingContext.pot * coeff;
@@ -782,7 +782,7 @@ int TightAggressiveBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
         ctx.commonContext.bettingContext.turnBetsOrRaisesNumber == 0)
     {
         int rand = 0;
-        GlobalServices::instance().randomizer()->getRand(1, 3, 1, &rand);
+        GlobalServices::instance().randomizer().getRand(1, 3, 1, &rand);
         if (rand != 1)
         {
             return ctx.commonContext.bettingContext.pot * coeff;

@@ -43,8 +43,8 @@ bool PreflopState::isActionAllowed(const HandFsm& hand, const PlayerAction actio
     auto player = getPlayerFsmById(hand.getRunningPlayersList(), action.playerId);
     if (!player)
     {
-        GlobalServices::instance().logger()->error("PreflopState: Player " + std::to_string(action.playerId) +
-                                                   " not found");
+        GlobalServices::instance().logger().error("PreflopState: Player " + std::to_string(action.playerId) +
+                                                  " not found");
         return false;
     }
     return validatePlayerAction(*player, action, *hand.getBettingActions(), mySmallBlind);

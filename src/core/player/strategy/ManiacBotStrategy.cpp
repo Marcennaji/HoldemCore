@@ -27,7 +27,7 @@ ManiacBotStrategy::ManiacBotStrategy()
 {
     // initialize utg starting range, in a full table
     int utgFullTableRange = 0;
-    GlobalServices::instance().randomizer()->getRand(30, 35, 1, &utgFullTableRange);
+    GlobalServices::instance().randomizer().getRand(30, 35, 1, &utgFullTableRange);
     initializeRanges(50, utgFullTableRange);
 }
 
@@ -68,7 +68,7 @@ bool ManiacBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
     if (ctx.commonContext.bettingContext.preflopRaisesNumber < 3)
     {
 
-        GlobalServices::instance().logger()->verbose("\t\tManiac adding high pairs to the initial calling range.");
+        GlobalServices::instance().logger().verbose("\t\tManiac adding high pairs to the initial calling range.");
         stringCallingRange += HIGH_PAIRS;
     }
 
@@ -80,7 +80,7 @@ bool ManiacBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
         !ctx.commonContext.bettingContext.isPreflopBigBet)
     {
 
-        GlobalServices::instance().logger()->verbose(
+        GlobalServices::instance().logger().verbose(
             "\t\tManiac adding high suited connectors, high suited aces and pairs to the initial calling range.");
         stringCallingRange += HIGH_SUITED_CONNECTORS;
         stringCallingRange += HIGH_SUITED_ACES;
@@ -94,7 +94,7 @@ bool ManiacBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
             stringCallingRange += CONNECTORS;
             stringCallingRange += SUITED_ONE_GAPED;
             stringCallingRange += SUITED_TWO_GAPED;
-            GlobalServices::instance().logger()->verbose(
+            GlobalServices::instance().logger().verbose(
                 "\t\tManiac adding suited connectors, suited one-gaped and suited two-gaped to the initial "
                 "calling range.");
         }
@@ -110,7 +110,7 @@ bool ManiacBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
     {
 
         int rand = 0;
-        GlobalServices::instance().randomizer()->getRand(1, 3, 1, &rand);
+        GlobalServices::instance().randomizer().getRand(1, 3, 1, &rand);
         if (rand == 1)
         {
 
@@ -118,12 +118,12 @@ bool ManiacBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
             stringCallingRange += HIGH_SUITED_ACES;
             stringCallingRange += PAIRS;
 
-            GlobalServices::instance().logger()->verbose(
+            GlobalServices::instance().logger().verbose(
                 "\t\tManiac defending against 3-bet : adding high suited connectors, high suited aces and pairs to "
                 "the initial calling range.");
         }
     }
-    GlobalServices::instance().logger()->verbose("\t\tManiac final calling range : " + stringCallingRange);
+    GlobalServices::instance().logger().verbose("\t\tManiac final calling range : " + stringCallingRange);
 
     return isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, stringCallingRange);
 }
@@ -166,7 +166,7 @@ int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
 
     stringRaisingRange = rangesString[(int) raisingRange];
 
-    GlobalServices::instance().logger()->verbose(stringRaisingRange);
+    GlobalServices::instance().logger().verbose(stringRaisingRange);
 
     // determine when to 3-bet without a real hand
     bool speculativeHandedAdded = false;
@@ -194,7 +194,7 @@ int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
             {
 
                 speculativeHandedAdded = true;
-                GlobalServices::instance().logger()->verbose("\t\tManiac trying to steal this bet");
+                GlobalServices::instance().logger().verbose("\t\tManiac trying to steal this bet");
             }
             else
             {
@@ -203,7 +203,7 @@ int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
                 {
 
                     speculativeHandedAdded = true;
-                    GlobalServices::instance().logger()->verbose(
+                    GlobalServices::instance().logger().verbose(
                         "\t\tManiac adding this speculative hand to our initial raising range");
                 }
                 else
@@ -214,11 +214,11 @@ int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
                     {
 
                         int rand = 0;
-                        GlobalServices::instance().randomizer()->getRand(1, 3, 1, &rand);
+                        GlobalServices::instance().randomizer().getRand(1, 3, 1, &rand);
                         if (rand == 1)
                         {
                             speculativeHandedAdded = true;
-                            GlobalServices::instance().logger()->verbose(
+                            GlobalServices::instance().logger().verbose(
                                 "\t\tManiac adding this junk hand to our initial raising range");
                         }
                     }
@@ -248,11 +248,11 @@ int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
             if (isPossibleToBluff(ctx) && ctx.personalContext.position > Late && raiserStats.getPreflop3Bet() > 8)
             {
                 int rand = 0;
-                GlobalServices::instance().randomizer()->getRand(1, 5, 1, &rand);
+                GlobalServices::instance().randomizer().getRand(1, 5, 1, &rand);
                 if (rand == 1)
                 {
                     speculativeHandedAdded = true;
-                    GlobalServices::instance().logger()->verbose(
+                    GlobalServices::instance().logger().verbose(
                         "\t\tManiac adding this speculative hand to our initial raising range");
                 }
             }
@@ -277,10 +277,10 @@ int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
     {
 
         int rand = 0;
-        GlobalServices::instance().randomizer()->getRand(1, 10, 1, &rand);
+        GlobalServices::instance().randomizer().getRand(1, 10, 1, &rand);
         if (rand == 1)
         {
-            GlobalServices::instance().logger()->verbose("\t\twon't raise, to hide the hand strength");
+            GlobalServices::instance().logger().verbose("\t\twon't raise, to hide the hand strength");
             myShouldCall = true;
             return 0;
         }
@@ -313,7 +313,7 @@ int ManiacBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
             if (getDrawingProbability(ctx.personalContext.postFlopAnalysisFlags) > 25)
             {
                 int rand = 0;
-                GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
+                GlobalServices::instance().randomizer().getRand(1, 2, 1, &rand);
                 if (rand == 1)
                 {
                     return ctx.commonContext.bettingContext.pot * 0.6;
@@ -336,7 +336,7 @@ int ManiacBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
             {
 
                 int rand = 0;
-                GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
+                GlobalServices::instance().randomizer().getRand(1, 2, 1, &rand);
                 if (rand == 1)
                 {
                     return ctx.commonContext.bettingContext.pot * 0.6;
@@ -464,7 +464,7 @@ int ManiacBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
     {
 
         int rand = 0;
-        GlobalServices::instance().randomizer()->getRand(1, 3, 1, &rand);
+        GlobalServices::instance().randomizer().getRand(1, 3, 1, &rand);
         if (rand == 2)
         {
             return ctx.commonContext.bettingContext.pot * 2;
@@ -494,7 +494,7 @@ int ManiacBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
     {
 
         int rand = 0;
-        GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
+        GlobalServices::instance().randomizer().getRand(1, 2, 1, &rand);
         if (rand == 2)
         {
             return ctx.commonContext.bettingContext.pot;
@@ -731,7 +731,7 @@ int ManiacBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
         ctx.personalContext.myHandSimulation.winRanged > 0.4 && ctx.personalContext.myHandSimulation.winSd > 0.4)
     {
         int rand = 0;
-        GlobalServices::instance().randomizer()->getRand(1, 2, 1, &rand);
+        GlobalServices::instance().randomizer().getRand(1, 2, 1, &rand);
         if (rand == 1)
         {
             return ctx.commonContext.bettingContext.pot * 0.33;
@@ -748,7 +748,7 @@ int ManiacBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
         {
 
             int rand = 0;
-            GlobalServices::instance().randomizer()->getRand(1, 4, 1, &rand);
+            GlobalServices::instance().randomizer().getRand(1, 4, 1, &rand);
             if (rand == 1)
             {
                 return ctx.commonContext.bettingContext.pot * 0.8;
@@ -757,14 +757,14 @@ int ManiacBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
     }
 
     int rand = 0;
-    GlobalServices::instance().randomizer()->getRand(40, 90, 1, &rand);
+    GlobalServices::instance().randomizer().getRand(40, 90, 1, &rand);
     float coeff = (float) rand / (float) 100;
 
     if (ctx.personalContext.myHandSimulation.winSd > .9 ||
         (ctx.personalContext.hasPosition && ctx.personalContext.myHandSimulation.winSd > .85))
     {
         int rand = 0;
-        GlobalServices::instance().randomizer()->getRand(1, 5, 1, &rand);
+        GlobalServices::instance().randomizer().getRand(1, 5, 1, &rand);
         if (rand != 1 || ctx.personalContext.hasPosition)
         {
             return ctx.commonContext.bettingContext.pot * coeff;
@@ -775,7 +775,7 @@ int ManiacBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
          (ctx.personalContext.hasPosition && ctx.personalContext.myHandSimulation.winRanged > .7)))
     {
         int rand = 0;
-        GlobalServices::instance().randomizer()->getRand(1, 3, 1, &rand);
+        GlobalServices::instance().randomizer().getRand(1, 3, 1, &rand);
         if (rand == 1 || ctx.personalContext.hasPosition)
         {
             return ctx.commonContext.bettingContext.pot * coeff;

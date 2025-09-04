@@ -62,7 +62,7 @@ void StartWindow::startNewGame()
     int tmpDealerPos = 0;
     startData.numberOfPlayers = gameData.maxNumberOfPlayers;
 
-    GlobalServices::instance().randomizer()->getRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
+    GlobalServices::instance().randomizer().getRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
     startData.startDealerPlayerId = static_cast<unsigned>(tmpDealerPos);
 
     // myPokerTableWindow->GameModification();

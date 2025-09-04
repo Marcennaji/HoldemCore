@@ -33,6 +33,14 @@ Board::~Board()
     {
         myRunningPlayersList->clear();
     }
+    if (mySeatsListFsm)
+    {
+        mySeatsListFsm->clear();
+    }
+    if (myRunningPlayersListFsm)
+    {
+        myRunningPlayersListFsm->clear();
+    }
 }
 void Board::setSeatsList(PlayerList seats)
 {
@@ -42,10 +50,16 @@ void Board::setRunningPlayersList(PlayerList runningPlayers)
 {
     myRunningPlayersList = runningPlayers;
 }
-
+void Board::setSeatsListFsm(PlayerFsmList seats)
+{
+    mySeatsListFsm = seats;
+}
+void Board::setRunningPlayersListFsm(PlayerFsmList runningPlayers)
+{
+    myRunningPlayersListFsm = runningPlayers;
+}
 void Board::collectSets()
 {
-
     myTotalBetAmounts = 0;
 
     PlayerListConstIterator itC;

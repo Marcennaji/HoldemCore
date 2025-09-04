@@ -565,7 +565,7 @@ void Player::loadStatistics()
 
     resetPlayerStatistics(); // reset stats to 0
 
-    myStatistics = GlobalServices::instance().playersStatisticsStore()->loadPlayerStatistics(myName);
+    myStatistics = GlobalServices::instance().playersStatisticsStore().loadPlayerStatistics(myName);
     if (myStatistics.empty())
     {
         myStatistics.fill(PlayerStatistics());
@@ -577,7 +577,7 @@ const PostFlopAnalysisFlags Player::getPostFlopAnalysisFlags() const
     std::string stringHand = getCardsValueString();
     std::string stringBoard = getStringBoard();
 
-    return GlobalServices::instance().handEvaluationEngine()->analyzeHand(getCardsValueString(), getStringBoard());
+    return GlobalServices::instance().handEvaluationEngine().analyzeHand(getCardsValueString(), getStringBoard());
 }
 bool Player::checkIfINeedToShowCards() const
 {
@@ -657,9 +657,9 @@ int Player::getPotOdd() const
 
     if (pot == 0)
     { // shouldn't happen, but...
-        GlobalServices::instance().logger()->error("Pot = " + std::to_string(currentHand->getBoard()->getPot()) +
-                                                   " + " + std::to_string(currentHand->getBoard()->getSets()) + " = " +
-                                                   std::to_string(pot));
+        GlobalServices::instance().logger().error("Pot = " + std::to_string(currentHand->getBoard()->getPot()) + " + " +
+                                                  std::to_string(currentHand->getBoard()->getSets()) + " = " +
+                                                  std::to_string(pot));
         return 0;
     }
 
@@ -692,8 +692,8 @@ const HandSimulationStats Player::computeHandSimulation() const
     const int nbOpponents = currentHand->getSeatsList()->size() - 1;
     // evaluate my strength against my opponents's guessed ranges :
     float maxOpponentsStrengths = getMaxOpponentsStrengths();
-    return GlobalServices::instance().handEvaluationEngine()->simulateHandEquity(
-        getCardsValueString(), getStringBoard(), nbOpponents, maxOpponentsStrengths);
+    return GlobalServices::instance().handEvaluationEngine().simulateHandEquity(getCardsValueString(), getStringBoard(),
+                                                                                nbOpponents, maxOpponentsStrengths);
 }
 
 float Player::getMaxOpponentsStrengths() const
@@ -795,7 +795,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 
         if ((*i).size() != 4)
         {
-            GlobalServices::instance().logger()->error("invalid hand : " + (*i));
+            GlobalServices::instance().logger().error("invalid hand : " + (*i));
             continue;
         }
         string s1 = (*i).substr(0, 2);
@@ -826,7 +826,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 
     for (vector<std::string>::const_iterator i = newRanges.begin(); i != newRanges.end(); i++)
     {
-        const int rank = GlobalServices::instance().handEvaluationEngine()->rankHand(((*i) + board).c_str());
+        const int rank = GlobalServices::instance().handEvaluationEngine().rankHand(((*i) + board).c_str());
         if (rank > myHandRanking)
         {
             nbWinningHands++;
@@ -834,7 +834,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
     }
     if (ranges.size() == 0)
     {
-        GlobalServices::instance().logger()->error("no ranges for opponent " + std::to_string(opponentId));
+        GlobalServices::instance().logger().error("no ranges for opponent " + std::to_string(opponentId));
         return 0;
     }
     assert(nbWinningHands / ranges.size() <= 1.0);

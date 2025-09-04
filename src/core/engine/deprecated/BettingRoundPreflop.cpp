@@ -31,8 +31,7 @@ void BettingRoundPreflop::run()
 {
     if (getFirstRun())
     {
-        GlobalServices::instance().logger()->info(
-            "\n\n************************* PREFLOP *************************\n\n");
+        GlobalServices::instance().logger().info("\n\n************************* PREFLOP *************************\n\n");
         handleFirstRun();
     }
 
@@ -48,7 +47,7 @@ void BettingRoundPreflop::run()
 
 void BettingRoundPreflop::handleFirstRun()
 {
-    GlobalServices::instance().logger()->verbose("Handling first run of preflop.");
+    GlobalServices::instance().logger().verbose("Handling first run of preflop.");
 
     auto bigBlindPositionIt = getPlayerListIteratorById(getHand()->getRunningPlayersList(), getBigBlindPlayerId());
 
@@ -64,13 +63,13 @@ void BettingRoundPreflop::handleFirstRun()
     setCurrentPlayerTurnId(getFirstRoundLastPlayersTurnId());
     setFirstRun(false);
 
-    GlobalServices::instance().logger()->verbose("First run of preflop completed. Current player's turn ID: " +
-                                                 std::to_string(getCurrentPlayerTurnId()));
+    GlobalServices::instance().logger().verbose("First run of preflop completed. Current player's turn ID: " +
+                                                std::to_string(getCurrentPlayerTurnId()));
 }
 
 void BettingRoundPreflop::handleMultiPlayerFirstRun(PlayerListIterator bigBlindPositionIt)
 {
-    GlobalServices::instance().logger()->verbose("Handling first run for multi-player preflop.");
+    GlobalServices::instance().logger().verbose("Handling first run for multi-player preflop.");
 
     if (bigBlindPositionIt == getHand()->getRunningPlayersList()->end())
     {
@@ -84,19 +83,19 @@ void BettingRoundPreflop::handleMultiPlayerFirstRun(PlayerListIterator bigBlindP
         else
         {
             setFirstRoundLastPlayersTurnId(getSmallBlindPlayerId());
-            GlobalServices::instance().logger()->verbose("Small blind is the last player before the first action.");
+            GlobalServices::instance().logger().verbose("Small blind is the last player before the first action.");
         }
     }
     else
     {
         setFirstRoundLastPlayersTurnId(getBigBlindPlayerId());
-        GlobalServices::instance().logger()->verbose("Big blind is the last player before the first action.");
+        GlobalServices::instance().logger().verbose("Big blind is the last player before the first action.");
     }
 }
 
 void BettingRoundPreflop::handleHeadsUpFirstRun(PlayerListIterator bigBlindPositionIt)
 {
-    GlobalServices::instance().logger()->verbose("Handling first run for heads-up preflop.");
+    GlobalServices::instance().logger().verbose("Handling first run for heads-up preflop.");
 
     if (bigBlindPositionIt == getHand()->getRunningPlayersList()->end())
     {
@@ -105,24 +104,24 @@ void BettingRoundPreflop::handleHeadsUpFirstRun(PlayerListIterator bigBlindPosit
 
         if (smallBlindPositionIt == getHand()->getRunningPlayersList()->end())
         {
-            GlobalServices::instance().logger()->verbose("No running players found. Heads-up showdown.");
+            GlobalServices::instance().logger().verbose("No running players found. Heads-up showdown.");
         }
         else
         {
             setFirstRoundLastPlayersTurnId(getSmallBlindPlayerId());
-            GlobalServices::instance().logger()->verbose("Small blind is the last player before the first action.");
+            GlobalServices::instance().logger().verbose("Small blind is the last player before the first action.");
         }
     }
     else
     {
         setFirstRoundLastPlayersTurnId(getBigBlindPlayerId());
-        GlobalServices::instance().logger()->verbose("Big blind is the last player before the first action.");
+        GlobalServices::instance().logger().verbose("Big blind is the last player before the first action.");
     }
 }
 
 void BettingRoundPreflop::proceedToFlop()
 {
-    GlobalServices::instance().logger()->verbose("Proceeding to the flop.");
+    GlobalServices::instance().logger().verbose("Proceeding to the flop.");
 
     getHand()->setCurrentRoundState(Flop);
 
@@ -149,7 +148,7 @@ void BettingRoundPreflop::proceedToFlop()
     }
 
     getHand()->resolveHandConditions();
-    GlobalServices::instance().logger()->verbose("Flop setup completed.");
+    GlobalServices::instance().logger().verbose("Flop setup completed.");
 }
 
 void BettingRoundPreflop::handlePlayerTurnEvents(PlayerListIterator it)
@@ -167,13 +166,13 @@ void BettingRoundPreflop::handlePlayerTurnEvents(PlayerListIterator it)
     }
     else
     {
-        GlobalServices::instance().logger()->verbose("Giving action to next bot player: " + it->get()->getName());
+        GlobalServices::instance().logger().verbose("Giving action to next bot player: " + it->get()->getName());
         giveActionToNextBotPlayer();
     }
 }
 void BettingRoundPreflop::handleNextPlayerTurn()
 {
-    GlobalServices::instance().logger()->verbose("Preflop: Determining the next player's turn.");
+    GlobalServices::instance().logger().verbose("Preflop: Determining the next player's turn.");
 
     auto seats = getHand()->getSeatsList();
     auto currentPlayersTurnIt = findPlayerOrThrow(seats, getCurrentPlayerTurnId());
@@ -187,7 +186,7 @@ void BettingRoundPreflop::handleNextPlayerTurn()
     currentPlayersTurnIt = findPlayerOrThrow(seats, getCurrentPlayerTurnId());
     handlePlayerTurnEvents(currentPlayersTurnIt);
 
-    GlobalServices::instance().logger()->verbose("Next player's turn determined. Player ID: " +
-                                                 std::to_string(getCurrentPlayerTurnId()));
+    GlobalServices::instance().logger().verbose("Next player's turn determined. Player ID: " +
+                                                std::to_string(getCurrentPlayerTurnId()));
 }
 } // namespace pkt::core

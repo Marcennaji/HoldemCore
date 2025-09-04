@@ -30,19 +30,15 @@ using namespace pkt::ui::qtwidgets;
 
 int main(int argc, char** argv)
 {
-    auto& services = pkt::core::GlobalServices::instance();
-    services.setLogger(std::make_shared<pkt::infra::ConsoleLogger>());
-    services.setHandEvaluationEngine(std::make_shared<pkt::infra::PsimHandEvaluationEngine>());
-
     pkt::infra::AppDirectories dirs = pkt::infra::AppDirectories::initialize();
-    QString appPath = QString::fromStdString(dirs.appDataDir);
-    QString logPath = QString::fromStdString(dirs.logDir);
 
-    auto db = std::make_shared<pkt::infra::SqliteDb>(dirs.logDir + string("/pokerTraining.db"));
+    auto& services = pkt::core::GlobalServices::instance();
+    services.setLogger(std::make_unique<pkt::infra::ConsoleLogger>());
+    services.setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>());
+    auto db = std::make_unique<pkt::infra::SqliteDb>(dirs.logDir + string("/pokerTraining.db"));
+    services.setPlayersStatisticsStore(std::make_unique<pkt::infra::SqlitePlayersStatisticsStore>(std::move(db)));
 
-    services.setPlayersStatisticsStore(std::make_unique<pkt::infra::SqlitePlayersStatisticsStore>(db));
-
-    GuiAppController controller(appPath);
+    GuiAppController controller(QString::fromStdString(dirs.appDataDir));
     controller.createMainWindow();
 
     return QApplication::exec();

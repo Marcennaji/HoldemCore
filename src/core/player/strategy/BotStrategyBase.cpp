@@ -267,7 +267,7 @@ bool BotStrategyBase::shouldPotControlOnTurn(const CurrentHandContext& ctx, int 
 
 void BotStrategyBase::logPotControl() const
 {
-    GlobalServices::instance().logger()->verbose("\t\tShould control pot");
+    GlobalServices::instance().logger().verbose("\t\tShould control pot");
 }
 
 int BotStrategyBase::computePreflopRaiseAmount(const CurrentHandContext& ctx)
@@ -371,7 +371,7 @@ bool BotStrategyBase::isPossibleToBluff(const CurrentHandContext& ctx) const
 
     if (players == nullptr)
     {
-        GlobalServices::instance().logger()->info(
+        GlobalServices::instance().logger().info(
             "BotStrategyBase::isPossibleToBluff() is not compatible with legacy (non FSM) code");
         return false; // TODO remove this after FSM migration is complete
     }

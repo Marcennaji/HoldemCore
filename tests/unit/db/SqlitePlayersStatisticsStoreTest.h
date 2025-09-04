@@ -15,6 +15,6 @@ class SqlitePlayersStatisticsStoreTest : public EngineTest
     void SetUp() override;
     void TearDown() override;
 
-    std::shared_ptr<infra::SqlitePlayersStatisticsStore> store;
+    std::unique_ptr<infra::SqlitePlayersStatisticsStore> store;
 };
 } // namespace pkt::test

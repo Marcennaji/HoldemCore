@@ -57,17 +57,17 @@ HandSimulationStats PsimHandEvaluationEngine::simulateHandEquity(const std::stri
     SimResults r;
     const string cards = (hand + " " + board).c_str();
 
-    GlobalServices::instance().logger()->verbose("Calling psim for hand equity computing, cards = " + cards +
-                                                 ", nbOpponents = " + to_string(nbOpponents) +
-                                                 ", maxOpponentsStrengths = " + to_string(maxOpponentsStrengths));
+    GlobalServices::instance().logger().verbose("Calling psim for hand equity computing, cards = " + cards +
+                                                ", nbOpponents = " + to_string(nbOpponents) +
+                                                ", maxOpponentsStrengths = " + to_string(maxOpponentsStrengths));
 
-    GlobalServices::instance().logger()->verbose("  --> Calling psim for SimulateHand");
+    GlobalServices::instance().logger().verbose("  --> Calling psim for SimulateHand");
 
     SimulateHand(cards.c_str(), &r, 0, 1, 5000);
 
     float win = r.win; // save the value
 
-    GlobalServices::instance().logger()->verbose("  --> Calling psim for SimulateHandMulti");
+    GlobalServices::instance().logger().verbose("  --> Calling psim for SimulateHandMulti");
     SimulateHandMulti(cards.c_str(), &r, 1000, 300, nbOpponents);
     r.win = win; // because simulateHandMulti doesn't compute 'win'
     r.winRanged = 0;
@@ -81,19 +81,19 @@ HandSimulationStats PsimHandEvaluationEngine::simulateHandEquity(const std::stri
         r.winRanged = r.win / 4;
     }
     HandSimulationStats stats = convertSimResults(r);
-    GlobalServices::instance().logger()->debug("hand equity is computed");
+    GlobalServices::instance().logger().debug("hand equity is computed");
     return stats;
 }
 pkt::core::PostFlopAnalysisFlags PsimHandEvaluationEngine::analyzeHand(const std::string& hand,
                                                                        const std::string& board)
 {
-    GlobalServices::instance().logger()->debug("Calling psim for postflop hand analysis");
+    GlobalServices::instance().logger().debug("Calling psim for postflop hand analysis");
 
     PostFlopState r;
     GetHandState((hand + board).c_str(), &r);
     PostFlopAnalysisFlags flags = convertPostFlopState(r);
 
-    GlobalServices::instance().logger()->debug("postflop hand analysis is done");
+    GlobalServices::instance().logger().debug("postflop hand analysis is done");
 
     return flags;
 }

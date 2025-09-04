@@ -37,7 +37,7 @@ BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int
     }
     if (itC == myHand->getSeatsList()->end())
     {
-        GlobalServices::instance().logger()->error("BB player not found in the seats list");
+        GlobalServices::instance().logger().error("BB player not found in the seats list");
     }
 
     // determine smallBlindPosition
@@ -51,7 +51,7 @@ BettingRound::BettingRound(const GameEvents& events, IHand* hi, unsigned dP, int
     }
     if (itC == myHand->getSeatsList()->end() && myHand->getSeatsList()->size() > 2)
     {
-        GlobalServices::instance().logger()->error("SB player not found in the seats list");
+        GlobalServices::instance().logger().error("SB player not found in the seats list");
     }
 }
 
@@ -73,11 +73,11 @@ void BettingRound::giveActionToNextBotPlayer()
 }
 void BettingRound::run()
 {
-    GlobalServices::instance().logger()->verbose("myHighestSet at start of round: " + std::to_string(myHighestSet));
+    GlobalServices::instance().logger().verbose("myHighestSet at start of round: " + std::to_string(myHighestSet));
     for (auto& player : *myHand->getRunningPlayersList())
     {
-        GlobalServices::instance().logger()->verbose("start of round: Player " + player->getName() +
-                                                     " action: " + playerActionToString(player->getAction()));
+        GlobalServices::instance().logger().verbose("start of round: Player " + player->getName() +
+                                                    " action: " + playerActionToString(player->getAction()));
     }
     if (myFirstRunGui)
     {
@@ -100,12 +100,12 @@ void BettingRound::run()
     logBoardCards();
 
     bool allHighestSet = allBetsAreDone();
-    GlobalServices::instance().logger()->verbose("allBetsAreDone: " + std::to_string(allHighestSet) +
-                                                 ", myFirstRound: " + std::to_string(myFirstRound));
+    GlobalServices::instance().logger().verbose("allBetsAreDone: " + std::to_string(allHighestSet) +
+                                                ", myFirstRound: " + std::to_string(myFirstRound));
 
     if (!myFirstRound && allHighestSet)
     {
-        GlobalServices::instance().logger()->info("all bets are done, proceeding to next betting round");
+        GlobalServices::instance().logger().info("all bets are done, proceeding to next betting round");
         proceedToNextBettingRound();
     }
     else
@@ -135,7 +135,7 @@ void BettingRound::run()
         {
             myEvents.onPlayerActed({myCurrentPlayerTurnId, ActionType::None, 0});
         }
-        GlobalServices::instance().logger()->verbose("BettingRound::run() : Determining next running player");
+        GlobalServices::instance().logger().verbose("BettingRound::run() : Determining next running player");
 
         currentPlayersTurnIt = getPlayerListIteratorById(myHand->getRunningPlayersList(), myCurrentPlayerTurnId);
         if (currentPlayersTurnIt == myHand->getRunningPlayersList()->end())
@@ -143,7 +143,7 @@ void BettingRound::run()
             throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
         }
 
-        GlobalServices::instance().logger()->verbose(
+        GlobalServices::instance().logger().verbose(
             "BettingRound::run() : Next running player is: " + (*currentPlayersTurnIt)->getName() +
             " with ID: " + std::to_string((*currentPlayersTurnIt)->getId()));
 
@@ -161,8 +161,8 @@ void BettingRound::run()
         }
         else
         {
-            GlobalServices::instance().logger()->verbose("Giving action to next bot player: " +
-                                                         (*currentPlayersTurnIt)->getName());
+            GlobalServices::instance().logger().verbose("Giving action to next bot player: " +
+                                                        (*currentPlayersTurnIt)->getName());
             giveActionToNextBotPlayer();
         }
     }
@@ -185,7 +185,7 @@ bool BettingRound::allBetsAreDone() const
 
 unsigned BettingRound::findNextEligiblePlayerFromSmallBlind()
 {
-    GlobalServices::instance().logger()->info("Finding the next eligible player starting from the small blind.");
+    GlobalServices::instance().logger().info("Finding the next eligible player starting from the small blind.");
 
     auto it = getPlayerListIteratorById(myHand->getSeatsList(), mySmallBlindPlayerId);
     if (it == myHand->getSeatsList()->end())
@@ -205,8 +205,8 @@ unsigned BettingRound::findNextEligiblePlayerFromSmallBlind()
         auto runningPlayerIt = getPlayerListIteratorById(myHand->getRunningPlayersList(), (*it)->getId());
         if (runningPlayerIt != myHand->getRunningPlayersList()->end())
         {
-            GlobalServices::instance().logger()->info("Next eligible player found: " + (*it)->getName() +
-                                                      " with ID: " + std::to_string((*it)->getId()));
+            GlobalServices::instance().logger().info("Next eligible player found: " + (*it)->getName() +
+                                                     " with ID: " + std::to_string((*it)->getId()));
             return (*it)->getId();
         }
     }
@@ -224,7 +224,7 @@ void BettingRound::proceedToNextBettingRound()
         (*itC)->setAction(ActionType::None);
     }
 
-    GlobalServices::instance().logger()->info("myCurrentPlayerTurnId: " + std::to_string(myCurrentPlayerTurnId));
+    GlobalServices::instance().logger().info("myCurrentPlayerTurnId: " + std::to_string(myCurrentPlayerTurnId));
 
     myHand->getBoard()->collectSets();
     myHand->getBoard()->collectPot();
@@ -255,13 +255,13 @@ void BettingRound::logBoardCards()
         switch (myBettingRoundId)
         {
         case Flop:
-            GlobalServices::instance().logger()->info(
+            GlobalServices::instance().logger().info(
                 "\n\n************************* FLOP " + CardUtilities::getCardString(tempBoardCardsArray[0]) + " " +
                 CardUtilities::getCardString(tempBoardCardsArray[1]) + " " +
                 CardUtilities::getCardString(tempBoardCardsArray[2]) + "  *************************\n\n");
             break;
         case Turn:
-            GlobalServices::instance().logger()->info(
+            GlobalServices::instance().logger().info(
                 "\n\n************************* TURN " + CardUtilities::getCardString(tempBoardCardsArray[0]) + " " +
                 CardUtilities::getCardString(tempBoardCardsArray[1]) + " " +
                 CardUtilities::getCardString(tempBoardCardsArray[2]) + " " +
@@ -269,7 +269,7 @@ void BettingRound::logBoardCards()
 
             break;
         case River:
-            GlobalServices::instance().logger()->info(
+            GlobalServices::instance().logger().info(
                 "\n\n************************* RIVER " + CardUtilities::getCardString(tempBoardCardsArray[0]) + " " +
                 CardUtilities::getCardString(tempBoardCardsArray[1]) + " " +
                 CardUtilities::getCardString(tempBoardCardsArray[2]) + " " +
@@ -278,7 +278,7 @@ void BettingRound::logBoardCards()
 
             break;
         default:
-            GlobalServices::instance().logger()->error("wrong myBettingRoundId");
+            GlobalServices::instance().logger().error("wrong myBettingRoundId");
         }
         myLogBoardCardsDone = true;
     }
@@ -286,17 +286,17 @@ void BettingRound::logBoardCards()
 
 void BettingRound::handleFirstRun()
 {
-    GlobalServices::instance().logger()->info("handleFirstRun: Starting betting round first run logic.");
+    GlobalServices::instance().logger().info("handleFirstRun: Starting betting round first run logic.");
     myFirstRun = false;
     bool playerFound = false;
 
     if (myHand->getAllInCondition())
     {
-        GlobalServices::instance().logger()->info("All-in condition detected. Skipping first run logic.");
+        GlobalServices::instance().logger().info("All-in condition detected. Skipping first run logic.");
         return;
     }
 
-    GlobalServices::instance().logger()->info("Setting first player to act (clockwise from dealer).");
+    GlobalServices::instance().logger().info("Setting first player to act (clockwise from dealer).");
 
     // Clockwise from dealer to find first active player
     auto dealerIt = getPlayerListIteratorById(myHand->getSeatsList(), myDealerPlayerId);
@@ -315,7 +315,7 @@ void BettingRound::handleFirstRun()
         if (getPlayerListIteratorById(myHand->getRunningPlayersList(), id) != myHand->getRunningPlayersList()->end())
         {
             myFirstRoundLastPlayersTurnId = id;
-            GlobalServices::instance().logger()->info("First player to act: ID " + std::to_string(id));
+            GlobalServices::instance().logger().info("First player to act: ID " + std::to_string(id));
             playerFound = true;
             break;
         }
@@ -459,7 +459,7 @@ int BettingRound::getSmallBlind() const
 }
 void BettingRound::findLastActivePlayerBeforeSmallBlind()
 {
-    GlobalServices::instance().logger()->verbose("Finding the last active player before the small blind.");
+    GlobalServices::instance().logger().verbose("Finding the last active player before the small blind.");
 
     auto it = getPlayerListIteratorById(myHand->getSeatsList(), getSmallBlindPlayerId());
     if (it == getHand()->getSeatsList()->end())
@@ -474,13 +474,13 @@ void BettingRound::findLastActivePlayerBeforeSmallBlind()
     --it;
 
     setFirstRoundLastPlayersTurnId((*it)->getId());
-    GlobalServices::instance().logger()->verbose("Last active player before small blind found. Player ID: " +
-                                                 std::to_string(getFirstRoundLastPlayersTurnId()));
+    GlobalServices::instance().logger().verbose("Last active player before small blind found. Player ID: " +
+                                                std::to_string(getFirstRoundLastPlayersTurnId()));
 }
 
 bool BettingRound::checkAllHighestSet()
 {
-    GlobalServices::instance().logger()->verbose("Checking if all running players have the highest set.");
+    GlobalServices::instance().logger().verbose("Checking if all running players have the highest set.");
 
     bool allHighestSet = true;
     for (PlayerListConstIterator itC = getHand()->getRunningPlayersList()->begin();
@@ -493,7 +493,7 @@ bool BettingRound::checkAllHighestSet()
         }
     }
 
-    GlobalServices::instance().logger()->verbose("All highest set check result: " + std::to_string(allHighestSet));
+    GlobalServices::instance().logger().verbose("All highest set check result: " + std::to_string(allHighestSet));
     return allHighestSet;
 }
 

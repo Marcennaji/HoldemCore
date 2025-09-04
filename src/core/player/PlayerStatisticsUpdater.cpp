@@ -238,7 +238,7 @@ void PlayerStatisticsUpdater::loadStatistics(const std::string& playerName)
 
     resetPlayerStatistics(); // reset stats to 0
 
-    myStatistics = GlobalServices::instance().playersStatisticsStore()->loadPlayerStatistics(playerName);
+    myStatistics = GlobalServices::instance().playersStatisticsStore().loadPlayerStatistics(playerName);
     if (myStatistics.empty())
     {
         myStatistics.fill(PlayerStatistics());

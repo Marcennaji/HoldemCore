@@ -12,7 +12,7 @@ namespace pkt::infra
 using namespace pkt::core;
 using namespace pkt::core::player;
 
-SqlitePlayersStatisticsStore::SqlitePlayersStatisticsStore(std::shared_ptr<SqliteDb> db) : myDb(std::move(db))
+SqlitePlayersStatisticsStore::SqlitePlayersStatisticsStore(std::unique_ptr<SqliteDb> db) : myDb(std::move(db))
 {
     if (!myDb)
     {

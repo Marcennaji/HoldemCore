@@ -29,6 +29,8 @@ class Board : public IBoard
 
     void setSeatsList(pkt::core::player::PlayerList seats);
     void setRunningPlayersList(pkt::core::player::PlayerList runningPlayers);
+    void setSeatsListFsm(pkt::core::player::PlayerFsmList seats);
+    void setRunningPlayersListFsm(pkt::core::player::PlayerFsmList runningPlayers);
 
     void setCards(int* theValue);
     void getCards(int* theValue);
@@ -56,6 +58,8 @@ class Board : public IBoard
   private:
     pkt::core::player::PlayerList mySeatsList;
     pkt::core::player::PlayerList myRunningPlayersList;
+    pkt::core::player::PlayerFsmList mySeatsListFsm;
+    pkt::core::player::PlayerFsmList myRunningPlayersListFsm;
 
     std::list<unsigned> myWinners;
     std::list<unsigned> myPlayerNeedToShowCards;

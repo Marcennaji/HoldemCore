@@ -309,18 +309,18 @@ std::shared_ptr<PlayerFsm> getPlayerFsmById(PlayerFsmList list, unsigned id)
 }
 void updateRunningPlayersList(PlayerList& myRunningPlayersList)
 {
-    GlobalServices::instance().logger()->verbose("Updating myRunningPlayersList...");
+    GlobalServices::instance().logger().verbose("Updating myRunningPlayersList...");
 
     PlayerListIterator it, it1;
 
     for (it = myRunningPlayersList->begin(); it != myRunningPlayersList->end();)
     {
-        GlobalServices::instance().logger()->verbose("Checking player: " + (*it)->getName() +
-                                                     ", action: " + playerActionToString((*it)->getAction()));
+        GlobalServices::instance().logger().verbose("Checking player: " + (*it)->getName() +
+                                                    ", action: " + playerActionToString((*it)->getAction()));
 
         if ((*it)->getAction() == ActionType::Fold || (*it)->getAction() == ActionType::Allin)
         {
-            GlobalServices::instance().logger()->verbose(
+            GlobalServices::instance().logger().verbose(
                 "Removing player: " + (*it)->getName() +
                 " from myRunningPlayersList due to action: " + playerActionToString((*it)->getAction()));
 
@@ -328,13 +328,13 @@ void updateRunningPlayersList(PlayerList& myRunningPlayersList)
 
             if (!myRunningPlayersList->empty())
             {
-                GlobalServices::instance().logger()->verbose(
+                GlobalServices::instance().logger().verbose(
                     "myRunningPlayersList is not empty after removal. Updating current player's turn.");
 
                 it1 = it;
                 if (it1 == myRunningPlayersList->begin())
                 {
-                    GlobalServices::instance().logger()->verbose(
+                    GlobalServices::instance().logger().verbose(
                         "Iterator points to the beginning of the list. Wrapping around to the end.");
                     it1 = myRunningPlayersList->end();
                 }
@@ -342,7 +342,7 @@ void updateRunningPlayersList(PlayerList& myRunningPlayersList)
             }
             else
             {
-                GlobalServices::instance().logger()->verbose("myRunningPlayersList is now empty after removal.");
+                GlobalServices::instance().logger().verbose("myRunningPlayersList is now empty after removal.");
             }
         }
         else
@@ -351,23 +351,23 @@ void updateRunningPlayersList(PlayerList& myRunningPlayersList)
         }
     }
 
-    GlobalServices::instance().logger()->verbose("Finished updating myRunningPlayersList.");
+    GlobalServices::instance().logger().verbose("Finished updating myRunningPlayersList.");
 }
 
 void updateRunningPlayersListFsm(PlayerFsmList& myRunningPlayersListFsm)
 {
-    GlobalServices::instance().logger()->verbose("Updating myRunningPlayersListFsm...");
+    GlobalServices::instance().logger().verbose("Updating myRunningPlayersListFsm...");
 
     PlayerFsmListIterator it, it1;
 
     for (it = myRunningPlayersListFsm->begin(); it != myRunningPlayersListFsm->end();)
     {
-        GlobalServices::instance().logger()->verbose("Checking player: " + (*it)->getName() +
-                                                     ", action: " + playerActionToString((*it)->getAction()));
+        GlobalServices::instance().logger().verbose("Checking player: " + (*it)->getName() +
+                                                    ", action: " + playerActionToString((*it)->getAction()));
 
         if ((*it)->getAction() == ActionType::Fold || (*it)->getAction() == ActionType::Allin)
         {
-            GlobalServices::instance().logger()->verbose(
+            GlobalServices::instance().logger().verbose(
                 "Removing player: " + (*it)->getName() +
                 " from myRunningPlayersListFsm due to action: " + playerActionToString((*it)->getAction()));
 
@@ -375,13 +375,13 @@ void updateRunningPlayersListFsm(PlayerFsmList& myRunningPlayersListFsm)
 
             if (!myRunningPlayersListFsm->empty())
             {
-                GlobalServices::instance().logger()->verbose(
+                GlobalServices::instance().logger().verbose(
                     "myRunningPlayersListFsm is not empty after removal. Updating current player's turn.");
 
                 it1 = it;
                 if (it1 == myRunningPlayersListFsm->begin())
                 {
-                    GlobalServices::instance().logger()->verbose(
+                    GlobalServices::instance().logger().verbose(
                         "Iterator points to the beginning of the list. Wrapping around to the end.");
                     it1 = myRunningPlayersListFsm->end();
                 }
@@ -389,18 +389,18 @@ void updateRunningPlayersListFsm(PlayerFsmList& myRunningPlayersListFsm)
             }
             else
             {
-                GlobalServices::instance().logger()->verbose("myRunningPlayersListFsm is now empty after removal.");
+                GlobalServices::instance().logger().verbose("myRunningPlayersListFsm is now empty after removal.");
             }
         }
         else
         {
-            GlobalServices::instance().logger()->verbose(
+            GlobalServices::instance().logger().verbose(
                 "Player: " + (*it)->getName() + " remains in myRunningPlayersListFsm. Moving to the next player.");
             ++it;
         }
     }
 
-    GlobalServices::instance().logger()->verbose("Finished updating myRunningPlayersListFsm.");
+    GlobalServices::instance().logger().verbose("Finished updating myRunningPlayersListFsm.");
 }
 
 std::string getPositionLabel(PlayerPosition p)
@@ -456,8 +456,8 @@ PlayerListIterator findPlayerOrThrow(PlayerList seats, unsigned id)
         string ids;
         for (auto i = seats->begin(); i != seats->end(); ++i)
             ids += " " + to_string((*i)->getId());
-        GlobalServices::instance().logger()->error("Couldn't find player with id " + to_string(id) +
-                                                   " in the seats list. List contains following ids :" + ids);
+        GlobalServices::instance().logger().error("Couldn't find player with id " + to_string(id) +
+                                                  " in the seats list. List contains following ids :" + ids);
         throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
     }
     return it;

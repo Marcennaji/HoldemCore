@@ -19,31 +19,29 @@ class GlobalServices
         return inst;
     }
 
-    // Getters
-    std::shared_ptr<ILogger> logger() const { return myLogger; }
-    std::shared_ptr<PlayersStatisticsStore> playersStatisticsStore() const { return myPlayersStatisticsStore; }
-    std::shared_ptr<IHandEvaluationEngine> handEvaluationEngine() const { return myHandEvaluationEngine; }
-    std::shared_ptr<IRandomizer> randomizer() const { return myRandomizer; }
+    ILogger& logger() { return *myLogger; }
+    PlayersStatisticsStore& playersStatisticsStore() { return *myPlayersStatisticsStore; }
+    IHandEvaluationEngine& handEvaluationEngine() { return *myHandEvaluationEngine; }
+    IRandomizer& randomizer() { return *myRandomizer; }
 
-    // Setters
-    void setLogger(std::shared_ptr<ILogger> logger) { myLogger = std::move(logger); }
-    void setPlayersStatisticsStore(std::shared_ptr<PlayersStatisticsStore> store)
+    void setLogger(std::unique_ptr<ILogger> logger) { myLogger = std::move(logger); }
+    void setPlayersStatisticsStore(std::unique_ptr<PlayersStatisticsStore> store)
     {
         myPlayersStatisticsStore = std::move(store);
     }
-    void setHandEvaluationEngine(std::shared_ptr<IHandEvaluationEngine> engine)
+    void setHandEvaluationEngine(std::unique_ptr<IHandEvaluationEngine> engine)
     {
         myHandEvaluationEngine = std::move(engine);
     }
-    void setRandomizer(std::shared_ptr<IRandomizer> rand) { myRandomizer = std::move(rand); }
+    void setRandomizer(std::unique_ptr<IRandomizer> rand) { myRandomizer = std::move(rand); }
 
   private:
     GlobalServices();
 
-    std::shared_ptr<ILogger> myLogger;
-    std::shared_ptr<PlayersStatisticsStore> myPlayersStatisticsStore;
-    std::shared_ptr<IHandEvaluationEngine> myHandEvaluationEngine;
-    std::shared_ptr<IRandomizer> myRandomizer;
+    std::unique_ptr<ILogger> myLogger;
+    std::unique_ptr<PlayersStatisticsStore> myPlayersStatisticsStore;
+    std::unique_ptr<IHandEvaluationEngine> myHandEvaluationEngine;
+    std::unique_ptr<IRandomizer> myRandomizer;
 };
 
 } // namespace pkt::core

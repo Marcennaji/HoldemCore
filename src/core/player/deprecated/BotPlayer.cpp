@@ -92,7 +92,7 @@ void BotPlayer::action()
         logMessage << "undefined ?";
     }
 
-    GlobalServices::instance().logger()->info(logMessage.str() + (myAction == ActionType::Fold ? "\n" : ""));
+    GlobalServices::instance().logger().info(logMessage.str() + (myAction == ActionType::Fold ? "\n" : ""));
 
     currentHand->recordPlayerAction(currentHand->getCurrentRoundState(), getId(), myAction);
 
@@ -100,22 +100,22 @@ void BotPlayer::action()
     {
         if (currentHand->getCurrentRoundState() == Preflop)
         {
-            GlobalServices::instance().logger()->info(
+            GlobalServices::instance().logger().info(
                 "--> Preflop estimated range : " + myRangeEstimator->getEstimatedRange() + '\n');
         }
         else if (currentHand->getCurrentRoundState() == Flop)
         {
-            GlobalServices::instance().logger()->verbose(
+            GlobalServices::instance().logger().verbose(
                 "--> Flop estimated range : " + myRangeEstimator->getEstimatedRange() + '\n');
         }
         else if (currentHand->getCurrentRoundState() == Turn)
         {
-            GlobalServices::instance().logger()->verbose(
+            GlobalServices::instance().logger().verbose(
                 "--> Turn estimated range : " + myRangeEstimator->getEstimatedRange() + '\n');
         }
         else if (currentHand->getCurrentRoundState() == River)
         {
-            GlobalServices::instance().logger()->verbose(
+            GlobalServices::instance().logger().verbose(
                 "--> River estimated range : " + myRangeEstimator->getEstimatedRange() + '\n');
         }
     }
@@ -133,7 +133,7 @@ void BotPlayer::doPreflopAction()
                << getCardsValueString() << "\t"
                << "stack = " << myCash << ", stack when starting the betting round = " << myCashAtHandStart
                << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() << std::endl;
-    GlobalServices::instance().logger()->info(logMessage.str());
+    GlobalServices::instance().logger().info(logMessage.str());
 
     PlayerAction action = myStrategy->decideAction(*myCurrentHandContext);
 
@@ -172,7 +172,7 @@ void BotPlayer::doFlopAction()
                << getCardsValueString() << "\t"
                << "stack = " << myCash
                << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() << std::endl;
-    GlobalServices::instance().logger()->verbose(logMessage.str());
+    GlobalServices::instance().logger().verbose(logMessage.str());
 
     // Use the strategy to decide the action
     PlayerAction action = myStrategy->decideAction(*myCurrentHandContext);
@@ -212,7 +212,7 @@ void BotPlayer::doTurnAction()
                << getCardsValueString() << "\t"
                << "stack = " << myCash
                << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() << std::endl;
-    GlobalServices::instance().logger()->verbose(logMessage.str());
+    GlobalServices::instance().logger().verbose(logMessage.str());
 
     // Use the strategy to decide the action
     PlayerAction action = myStrategy->decideAction(*myCurrentHandContext);
@@ -252,7 +252,7 @@ void BotPlayer::doRiverAction()
                << getCardsValueString() << "\t"
                << "stack = " << myCash
                << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() << std::endl;
-    GlobalServices::instance().logger()->verbose(logMessage.str());
+    GlobalServices::instance().logger().verbose(logMessage.str());
 
     // Use the strategy to decide the action
     PlayerAction action = myStrategy->decideAction(*myCurrentHandContext);
