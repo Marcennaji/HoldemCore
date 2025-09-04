@@ -29,7 +29,7 @@ class GuiAppController
   private:
     QString myAppDataPath;
     std::unique_ptr<PokerTableWindow> myPokerTableWindow;
-    std::shared_ptr<pkt::core::Session> mySession;
+    std::unique_ptr<pkt::core::Session> mySession;
     pkt::core::GameEvents myEvents;
     std::unique_ptr<GuiBridgeWidgets> myBridge;
 };

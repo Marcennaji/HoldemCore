@@ -19,6 +19,13 @@ namespace pkt::test
 class EngineTest : public ::testing::Test
 {
   protected:
+    void SetUp() override;
+    void TearDown() override;
+    // Helper function to initialize a Hand object for testing
+    void initializeHandForTesting(size_t activePlayerCount, pkt::core::GameData);
+    void initializeHandFsmForTesting(size_t activePlayerCount, pkt::core::GameData);
+    void checkPostRiverConditions();
+
     pkt::core::GameEvents myEvents;
     std::shared_ptr<pkt::core::EngineFactory> myFactory;
     std::shared_ptr<pkt::core::IHand> myHand;
@@ -30,14 +37,6 @@ class EngineTest : public ::testing::Test
     std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::PlayerFsm>>> mySeatsListFsm;
     std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::PlayerFsm>>> myRunningPlayersListFsm;
     pkt::core::GameState myLastGameState = pkt::core::None;
-
-    void SetUp() override;
-
-    void TearDown() override;
-    // Helper function to initialize a Hand object for testing
-    void initializeHandForTesting(size_t activePlayerCount, pkt::core::GameData);
-    void initializeHandFsmForTesting(size_t activePlayerCount, pkt::core::GameData);
-    void checkPostRiverConditions();
 
     pkt::core::GameData gameData;
 

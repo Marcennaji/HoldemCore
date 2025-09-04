@@ -24,7 +24,7 @@ class PokerTableWindow : public QWidget
     Q_OBJECT
 
   public:
-    explicit PokerTableWindow(std::shared_ptr<pkt::core::Session> session, QWidget* parent = nullptr);
+    explicit PokerTableWindow(pkt::core::Session* session, QWidget* parent = nullptr);
     ~PokerTableWindow() override = default;
 
     void refresh();
@@ -45,7 +45,7 @@ class PokerTableWindow : public QWidget
     void setupUi();
     void connectSignals();
 
-    std::shared_ptr<pkt::core::Session> m_session;
+    pkt::core::Session* m_session;
     QGridLayout* m_layout;
     QLabel* m_potLabel;
     std::array<QLabel*, 9> m_playerLabels;

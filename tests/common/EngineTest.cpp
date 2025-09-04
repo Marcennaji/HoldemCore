@@ -75,7 +75,7 @@ void EngineTest::initializeHandWithPlayers(size_t activePlayerCount, GameData ga
 }
 void EngineTest::createPlayersFsmLists(size_t playerCount)
 {
-    mySeatsListFsm = std::make_unique<std::list<std::shared_ptr<PlayerFsm>>>();
+    mySeatsListFsm = std::make_shared<std::list<std::shared_ptr<PlayerFsm>>>();
     for (size_t i = 0; i < playerCount; ++i)
     {
         auto playerFsm = std::make_shared<DummyPlayerFsm>(i, myEvents);

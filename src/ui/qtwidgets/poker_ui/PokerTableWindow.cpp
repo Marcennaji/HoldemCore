@@ -5,8 +5,7 @@
 namespace pkt::ui::qtwidgets
 {
 
-PokerTableWindow::PokerTableWindow(std::shared_ptr<pkt::core::Session> session, QWidget* parent)
-    : QWidget(parent), m_session(std::move(session))
+PokerTableWindow::PokerTableWindow(pkt::core::Session* session, QWidget* parent) : QWidget(parent), m_session(session)
 {
     setupUi();
     connectSignals();

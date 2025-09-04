@@ -11,9 +11,9 @@ namespace pkt::ui::qtwidgets
 
 GuiAppController::GuiAppController(const QString& app) : myAppDataPath(app)
 {
-    mySession = std::make_shared<pkt::core::Session>(myEvents);
-    myPokerTableWindow = std::make_unique<PokerTableWindow>(mySession);
-    myBridge = std::make_unique<GuiBridgeWidgets>(mySession, myPokerTableWindow.get());
+    mySession = std::make_unique<pkt::core::Session>(myEvents);
+    myPokerTableWindow = std::make_unique<PokerTableWindow>(mySession.get());
+    myBridge = std::make_unique<GuiBridgeWidgets>(mySession.get(), myPokerTableWindow.get());
 
     myBridge->connectEventsToUi(myEvents);
 }

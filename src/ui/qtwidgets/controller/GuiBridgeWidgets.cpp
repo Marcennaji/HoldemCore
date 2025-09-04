@@ -8,8 +8,8 @@ using namespace pkt::core;
 namespace pkt::ui::qtwidgets
 {
 
-GuiBridgeWidgets::GuiBridgeWidgets(std::shared_ptr<Session> session, PokerTableWindow* pokerTableWindow)
-    : m_session(std::move(session)), m_tableWindow(pokerTableWindow)
+GuiBridgeWidgets::GuiBridgeWidgets(pkt::core::Session* session, PokerTableWindow* pokerTableWindow)
+    : m_session(session), m_tableWindow(pokerTableWindow)
 {
 }
 void GuiBridgeWidgets::connectSignalsFromUi()
