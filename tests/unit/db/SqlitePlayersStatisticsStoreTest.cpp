@@ -1,5 +1,7 @@
 #include "SqlitePlayersStatisticsStoreTest.h"
+#include "common/DeterministicStrategy.h"
 #include "common/EngineTest.h"
+#include "core/engine/round_states/PreflopState.h"
 #include "core/interfaces/persistence/NullPlayersStatisticsStore.h"
 #include "core/player/Helpers.h"
 #include "core/services/GlobalServices.h"
@@ -31,7 +33,7 @@ void SqlitePlayersStatisticsStoreTest::TearDown()
     services.setPlayersStatisticsStore(std::make_unique<NullPlayersStatisticsStore>());
 }
 
-TEST_F(SqlitePlayersStatisticsStoreTest, SaveAndLoadSinglePlayer)
+TEST_F(SqlitePlayersStatisticsStoreTest, SaveAndLoadStatistics)
 {
     auto& store = pkt::core::GlobalServices::instance().playersStatisticsStore();
     int nbPlayers = 3;
@@ -42,12 +44,26 @@ TEST_F(SqlitePlayersStatisticsStoreTest, SaveAndLoadSinglePlayer)
     auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
     auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
 
-    playerDealer->updateCurrentHandContext(GameState::Preflop, *myHandFsm);
-    myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
+    // Inject deterministic strategies
+    auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    dealerStrategy->setAction(pkt::core::GameState::Preflop, {playerDealer->getId(), pkt::core::ActionType::Fold, 0});
+    playerDealer->setStrategy(std::move(dealerStrategy));
 
-    playerSb->updateCurrentHandContext(GameState::Preflop, *myHandFsm);
-    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Fold});
-    // -> then, the round ends, and the players stats should be automatically saved in the database
+    auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    sbStrategy->setAction(pkt::core::GameState::Preflop, {playerSb->getId(), pkt::core::ActionType::Fold, 0});
+    playerSb->setStrategy(std::move(sbStrategy));
+
+    auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    // Big blind does nothing here; we don’t configure Preflop action
+    playerBb->setStrategy(std::move(bbStrategy));
+
+    // Simulate preflop actions via state::promptPlayerAction
+    auto* preflop = dynamic_cast<pkt::core::PreflopState*>(&myHandFsm->getState());
+    ASSERT_NE(preflop, nullptr);
+
+    preflop->promptPlayerAction(*myHandFsm, *playerDealer); // Dealer folds
+    preflop->promptPlayerAction(*myHandFsm, *playerSb);     // Small blind folds
+    // -> round ends automatically, stats should be saved
 
     // Verify loaded statistics for the number of players (index 1-based)
     auto dealerStats = store.loadPlayerStatistics(playerDealer->getName());

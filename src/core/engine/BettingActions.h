@@ -14,7 +14,7 @@ class BettingActions
 {
   public:
     BettingActions(pkt::core::player::PlayerFsmList& seats, pkt::core::player::PlayerFsmList& runningPlayers);
-    bool isRoundComplete(const HandFsm& hand) const;
+
     int getHighestSet() const;
     int getMinRaise(int smallBlind) const;
     void updateHighestSet(int amount);
@@ -42,8 +42,6 @@ class BettingActions
     BettingRoundActions myTurn;
     BettingRoundActions myRiver;
 
-    bool haveAllPlayersCalledOrFolded(const HandFsm& hand) const;
-    bool isOnlyOnePlayerRemaining(const HandFsm& hand) const;
     int myHighestSet = 0;
     std::optional<unsigned int> myLastRaiserId = std::nullopt;
     int myLastActionPlayerId;

@@ -81,22 +81,6 @@ std::unique_ptr<IHandState> PreflopState::computeNextState(HandFsm& hand, Player
     return nullptr;
 }
 
-bool PreflopState::isRoundComplete(const HandFsm& hand) const
-{
-    if (hand.getRunningPlayersList()->size() <= 1)
-        return true;
-
-    for (auto itC = hand.getRunningPlayersList()->begin(); itC != hand.getRunningPlayersList()->end(); ++itC)
-    {
-        if ((*itC)->getTotalBetAmount() != hand.getBettingActions()->getHighestSet())
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 void PreflopState::logStateInfo(const HandFsm& /*hand*/) const
 {
     // todo

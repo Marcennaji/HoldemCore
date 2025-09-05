@@ -34,12 +34,6 @@ std::unique_ptr<IHandState> PostRiverState::computeNextState(HandFsm& /*hand*/, 
     return nullptr;
 }
 
-bool PostRiverState::isRoundComplete(const HandFsm& /*hand*/) const
-{
-    // Always true, as this is the end of the hand.
-    return true;
-}
-
 bool PostRiverState::isActionAllowed(const HandFsm& /*hand*/, const PlayerAction /*action*/) const
 {
     // No player actions allowed in PostRiver.

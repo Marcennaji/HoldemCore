@@ -18,6 +18,7 @@ struct PostFlopAnalysisFlags;
 namespace pkt::core
 {
 class BettingActions;
+class HandFsm;
 struct PlayerAction;
 } // namespace pkt::core
 
@@ -86,5 +87,7 @@ PlayerPosition computePositionFromOffset(int offset, int nbPlayers);
 bool isDealerPosition(PlayerPosition p);
 
 bool isSmallBlindPosition(PlayerPosition p);
+
+bool isRoundComplete(const HandFsm& hand);
 
 } // namespace pkt::core::player

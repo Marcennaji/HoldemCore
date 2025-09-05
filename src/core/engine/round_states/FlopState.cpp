@@ -6,6 +6,7 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/player/Helpers.h"
 #include "core/player/PlayerFsm.h"
+#include "core/services/GlobalServices.h"
 
 namespace pkt::core
 {
@@ -32,6 +33,7 @@ void FlopState::exit(HandFsm& hand)
     for (auto& player : *hand.getSeatsList())
     {
         player->getStatisticsUpdater()->updateFlopStatistics(player->getCurrentHandContext());
+        player->getStatisticsUpdater()->updateFlopStatistics(player->getCurrentHandContext());
     }
 }
 
@@ -39,34 +41,12 @@ bool FlopState::isActionAllowed(const HandFsm& hand, const PlayerAction action) 
 {
     auto player = getPlayerFsmById(hand.getRunningPlayersList(), action.playerId);
     if (!player)
-        return false;
-
-    const int cash = player->getCash();
-    const int amountToCall = hand.getBettingActions()->getHighestSet() - player->getTotalBetAmount();
-
-    switch (action.type)
     {
-    case ActionType::Fold:
-        return true;
-
-    case ActionType::Check:
-        return amountToCall == 0 && action.amount == 0;
-
-    case ActionType::Call:
-        return action.amount == amountToCall && cash >= action.amount;
-
-    case ActionType::Bet:
-        return amountToCall == 0 && action.amount > 0 && action.amount <= cash;
-
-    case ActionType::Raise:
-        return amountToCall > 0 && action.amount > amountToCall && action.amount <= cash;
-
-    case ActionType::Allin:
-        return cash > 0;
-
-    default:
+        GlobalServices::instance().logger().error("FlopState: Player " + std::to_string(action.playerId) +
+                                                  " not found");
         return false;
     }
+    return validatePlayerAction(*player, action, *hand.getBettingActions(), 0);
 }
 
 void FlopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
@@ -81,32 +61,14 @@ std::unique_ptr<IHandState> FlopState::computeNextState(HandFsm& hand, PlayerAct
 {
     if (hand.getRunningPlayersList()->size() == 1)
     {
-        exit(hand);
         return std::make_unique<PostRiverState>(myEvents);
     }
     if (isRoundComplete(hand))
     {
-        exit(hand);
         return std::make_unique<TurnState>(myEvents);
     }
 
     return nullptr;
-}
-
-bool FlopState::isRoundComplete(const HandFsm& hand) const
-{
-    if (hand.getRunningPlayersList()->size() <= 1)
-        return true;
-
-    for (auto itC = hand.getRunningPlayersList()->begin(); itC != hand.getRunningPlayersList()->end(); ++itC)
-    {
-        if ((*itC)->getTotalBetAmount() != hand.getBettingActions()->getHighestSet())
-        {
-            return false;
-        }
-    }
-
-    return true;
 }
 
 void FlopState::logStateInfo(const HandFsm& /*hand*/) const

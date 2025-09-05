@@ -39,13 +39,6 @@ int BettingActions::getMinRaise(int smallBlind) const
     return prevRaise;
 }
 
-bool BettingActions::isRoundComplete(const HandFsm& hand) const
-{
-    if (isOnlyOnePlayerRemaining(hand))
-        return true;
-
-    return haveAllPlayersCalledOrFolded(hand);
-}
 int BettingActions::getHighestSet() const
 {
     return myHighestSet;
@@ -55,36 +48,6 @@ void BettingActions::updateHighestSet(int amount)
 {
     if (amount > myHighestSet)
         myHighestSet = amount;
-}
-
-bool BettingActions::haveAllPlayersCalledOrFolded(const HandFsm& hand) const
-{
-
-    const auto& players = hand.getRunningPlayersList();
-    /*const int lastAggressorIndex = hand.getLastAggressorIndex(); // must be stored/set during betting
-    const int currentBet = hand.getHighestSetThisRound();
-
-    for (const auto& player : players)
-    {
-        if (player->hasFolded() || player->isAllIn())
-            continue;
-
-        if (player->getStack() == 0)
-            continue; // Just in case not marked as all-in
-
-        if (player->getCurrentBet() < currentBet)
-            return false; // hasn't called
-
-        // Optionally check if they’ve acted after last aggressor
-        // (can be tracked using hand.hasActedSinceLastRaise(player))
-    }*/
-
-    return true;
-}
-
-bool BettingActions::isOnlyOnePlayerRemaining(const HandFsm& hand) const
-{
-    return hand.getRunningPlayersList()->size() == 1;
 }
 
 void BettingActions::setLastActionPlayerId(int theValue)

@@ -94,22 +94,6 @@ std::unique_ptr<IHandState> TurnState::computeNextState(HandFsm& hand, PlayerAct
     return nullptr;
 }
 
-bool TurnState::isRoundComplete(const HandFsm& hand) const
-{
-    if (hand.getRunningPlayersList()->size() <= 1)
-        return true;
-
-    for (auto itC = hand.getRunningPlayersList()->begin(); itC != hand.getRunningPlayersList()->end(); ++itC)
-    {
-        if ((*itC)->getTotalBetAmount() != hand.getBettingActions()->getHighestSet())
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 void TurnState::logStateInfo(const HandFsm& /*hand*/) const
 {
     // TODO: add logging (e.g. pot size, board cards, etc.)

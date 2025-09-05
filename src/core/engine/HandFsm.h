@@ -28,20 +28,20 @@ class HandFsm : public IHandLifecycle, public IHandPlayerAction, public HandPlay
     ~HandFsm();
 
     IActionProcessor* getActionProcessor() const;
-
+    void handlePlayerAction(const PlayerAction& action) override;
     void start() override;
     void end() override;
     size_t dealBoardCards() override;
     void dealHoleCards(size_t lastArrayIndex) override;
     void initAndShuffleDeck() override;
 
-    void handlePlayerAction(const PlayerAction& action) override;
     pkt::core::player::HandCommonContext updateHandCommonContext(const GameState);
 
     std::string getStringBoard() const;
     int getPotOdd(const int playerCash, const int playerSet) const;
     float getM(int cash) const;
     int getSmallBlind() const;
+    IHandState& getState() { return *myState; }
 
   private:
     void applyActionEffects(const PlayerAction& action);

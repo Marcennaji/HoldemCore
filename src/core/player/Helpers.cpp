@@ -3,6 +3,7 @@
 #include "core/engine/BettingActions.h"
 #include "core/engine/CardUtilities.h"
 #include "core/engine/Exception.h"
+#include "core/engine/HandFsm.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/player/PlayerFsm.h"
 #include "core/player/deprecated/Player.h"
@@ -674,5 +675,21 @@ bool isDealerPosition(PlayerPosition p)
 bool isSmallBlindPosition(PlayerPosition p)
 {
     return p == PlayerPosition::SmallBlind || p == PlayerPosition::ButtonSmallBlind;
+}
+
+bool isRoundComplete(const HandFsm& hand)
+{
+    if (hand.getRunningPlayersList()->size() <= 1)
+        return true;
+
+    for (auto itC = hand.getRunningPlayersList()->begin(); itC != hand.getRunningPlayersList()->end(); ++itC)
+    {
+        if ((*itC)->getTotalBetAmount() != hand.getBettingActions()->getHighestSet())
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 } // namespace pkt::core::player
