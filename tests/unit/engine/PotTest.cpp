@@ -25,7 +25,7 @@ class PotTest : public ::testing::Test
         p->setCashAtHandStart(cashAtHandStart);
         p->setCash(remainingCash);
         p->setHandRanking(handRank);
-        p->setAction(action);
+        p->setAction({id, action});
         return p;
     }
 

@@ -232,50 +232,47 @@ void Hand::assignButtons()
 void Hand::setBlinds()
 {
 
-    PlayerListConstIterator itC;
-
     // do sets --> TODO switch?
-    for (itC = myRunningPlayersList->begin(); itC != myRunningPlayersList->end(); ++itC)
+    for (auto player = myRunningPlayersList->begin(); player != myRunningPlayersList->end(); ++player)
     {
 
         // small blind
-        if ((*itC)->getButton() == ButtonState::SB)
+        if ((*player)->getButton() == ButtonState::SB)
         {
 
             // All in ?
-            if ((*itC)->getCash() <= mySmallBlind)
+            if ((*player)->getCash() <= mySmallBlind)
             {
 
-                (*itC)->addBetAmount((*itC)->getCash());
-                // 1 to do not log this
-                (*itC)->setAction(ActionType::Allin, 1);
+                (*player)->addBetAmount((*player)->getCash());
+                (*player)->setAction({(*player)->getId(), ActionType::Allin, (*player)->getTotalBetAmount()}, 1);
             }
             else
             {
-                (*itC)->addBetAmount(mySmallBlind);
+                (*player)->addBetAmount(mySmallBlind);
             }
         }
     }
 
     // do sets --> TODO switch?
-    for (itC = myRunningPlayersList->begin(); itC != myRunningPlayersList->end(); ++itC)
+    for (auto player = myRunningPlayersList->begin(); player != myRunningPlayersList->end(); ++player)
     {
 
         // big blind
-        if ((*itC)->getButton() == ButtonState::BB)
+        if ((*player)->getButton() == ButtonState::BB)
         {
 
             // all in ?
-            if ((*itC)->getCash() <= 2 * mySmallBlind)
+            if ((*player)->getCash() <= 2 * mySmallBlind)
             {
 
-                (*itC)->addBetAmount((*itC)->getCash());
-                // 1 to do not log this
-                (*itC)->setAction(ActionType::Allin, 1);
+                (*player)->addBetAmount((*player)->getCash());
+
+                (*player)->setAction({(*player)->getId(), ActionType::Allin, (*player)->getTotalBetAmount()}, 1);
             }
             else
             {
-                (*itC)->addBetAmount(2 * mySmallBlind);
+                (*player)->addBetAmount(2 * mySmallBlind);
             }
         }
     }
@@ -294,7 +291,7 @@ void Hand::resolveHandConditions()
     for (auto& player : *myRunningPlayersList)
     {
         GlobalServices::instance().logger().verbose("Player " + player->getName() +
-                                                    " action: " + playerActionToString(player->getAction()) +
+                                                    " action: " + playerActionToString(player->getAction().type) +
                                                     ", set: " + std::to_string(player->getTotalBetAmount()));
     }
 
@@ -304,7 +301,7 @@ void Hand::resolveHandConditions()
     int allInPlayersCounter = 0;
     for (itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
     {
-        if ((*itC)->getAction() == ActionType::Allin)
+        if ((*itC)->getAction().type == ActionType::Allin)
         {
             allInPlayersCounter++;
         }
@@ -315,7 +312,7 @@ void Hand::resolveHandConditions()
     int nonFoldPlayerCounter = 0;
     for (itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
     {
-        if ((*itC)->getAction() != ActionType::Fold)
+        if ((*itC)->getAction().type != ActionType::Fold)
         {
             nonFoldPlayerCounter++;
         }
@@ -419,14 +416,16 @@ int Hand::getPreflopCallsNumber()
 
     int calls = 0;
 
-    for (PlayerListIterator it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
+    for (auto player = mySeatsList->begin(); player != mySeatsList->end(); ++player)
     {
+        auto& actions = (*player)->getCurrentHandActions().getActions(GameState::Preflop);
 
-        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getActions(GameState::Preflop);
-
-        if (find(actions.begin(), actions.end(), ActionType::Call) != actions.end())
+        for (const auto& action : actions)
         {
-            calls++;
+            if (action.type == ActionType::Call)
+            {
+                calls++;
+            }
         }
     }
     return calls;
@@ -436,14 +435,13 @@ int Hand::getPreflopRaisesNumber()
 
     int raises = 0;
 
-    for (PlayerListIterator it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
+    for (auto player = mySeatsList->begin(); player != mySeatsList->end(); ++player)
     {
+        auto& actions = (*player)->getCurrentHandActions().getActions(GameState::Preflop);
 
-        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getActions(GameState::Preflop);
-
-        for (std::vector<ActionType>::const_iterator itAction = actions.begin(); itAction != actions.end(); itAction++)
+        for (const auto& action : actions)
         {
-            if ((*itAction) == ActionType::Raise || (*itAction) == ActionType::Allin)
+            if (action.type == ActionType::Raise || action.type == ActionType::Allin)
             {
                 raises++;
             }
@@ -457,14 +455,13 @@ int Hand::getFlopBetsOrRaisesNumber()
 
     int bets = 0;
 
-    for (PlayerListIterator it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
+    for (auto player = mySeatsList->begin(); player != mySeatsList->end(); ++player)
     {
+        auto& actions = (*player)->getCurrentHandActions().getActions(GameState::Flop);
 
-        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getActions(GameState::Flop);
-
-        for (std::vector<ActionType>::const_iterator itAction = actions.begin(); itAction != actions.end(); itAction++)
+        for (const auto& action : actions)
         {
-            if ((*itAction) == ActionType::Raise || (*itAction) == ActionType::Allin || (*itAction) == ActionType::Bet)
+            if (action.type == ActionType::Call || action.type == ActionType::Allin)
             {
                 bets++;
             }
@@ -478,14 +475,13 @@ int Hand::getTurnBetsOrRaisesNumber()
 
     int bets = 0;
 
-    for (PlayerListIterator it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
+    for (auto player = mySeatsList->begin(); player != mySeatsList->end(); ++player)
     {
+        auto& actions = (*player)->getCurrentHandActions().getActions(GameState::Turn);
 
-        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getActions(GameState::Turn);
-
-        for (std::vector<ActionType>::const_iterator itAction = actions.begin(); itAction != actions.end(); itAction++)
+        for (const auto& action : actions)
         {
-            if ((*itAction) == ActionType::Raise || (*itAction) == ActionType::Allin || (*itAction) == ActionType::Bet)
+            if (action.type == ActionType::Bet || action.type == ActionType::Raise || action.type == ActionType::Allin)
             {
                 bets++;
             }
@@ -499,14 +495,13 @@ int Hand::getRiverBetsOrRaisesNumber()
 
     int bets = 0;
 
-    for (PlayerListIterator it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
+    for (auto player = mySeatsList->begin(); player != mySeatsList->end(); ++player)
     {
+        auto& actions = (*player)->getCurrentHandActions().getActions(GameState::River);
 
-        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getActions(GameState::River);
-
-        for (std::vector<ActionType>::const_iterator itAction = actions.begin(); itAction != actions.end(); itAction++)
+        for (const auto& action : actions)
         {
-            if ((*itAction) == ActionType::Raise || (*itAction) == ActionType::Allin || (*itAction) == ActionType::Bet)
+            if (action.type == ActionType::Bet || action.type == ActionType::Raise || action.type == ActionType::Allin)
             {
                 bets++;
             }
@@ -525,7 +520,7 @@ std::vector<PlayerPosition> Hand::getRaisersPositions()
     for (itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
     { // note that all in players are not "running" any more
 
-        if ((*itC)->getAction() == ActionType::Raise || (*itC)->getAction() == ActionType::Allin)
+        if ((*itC)->getAction().type == ActionType::Raise || (*itC)->getAction().type == ActionType::Allin)
         {
             positions.push_back((*itC)->getPosition());
         }
@@ -543,7 +538,7 @@ std::vector<PlayerPosition> Hand::getCallersPositions()
     for (itC = myRunningPlayersList->begin(); itC != myRunningPlayersList->end(); ++itC)
     {
 
-        if ((*itC)->getAction() == ActionType::Call)
+        if ((*itC)->getAction().type == ActionType::Call)
         {
             positions.push_back((*itC)->getPosition());
         }
@@ -560,7 +555,7 @@ int Hand::getLastRaiserId()
     for (PlayerListIterator it = players->begin(); it != players->end(); ++it)
     {
 
-        if ((*it)->getAction() == ActionType::Raise || (*it)->getAction() == ActionType::Allin)
+        if ((*it)->getAction().type == ActionType::Raise || (*it)->getAction().type == ActionType::Allin)
         {
 
             if (lastRaiser != mySeatsList->end())
@@ -586,7 +581,7 @@ int Hand::getLastRaiserId()
     for (PlayerListIterator it = players->begin(); it != players->end(); ++it)
     {
 
-        if ((*it)->getAction() == ActionType::Bet)
+        if ((*it)->getAction().type == ActionType::Bet)
         {
             lastRaiser = it;
         }

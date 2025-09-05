@@ -29,7 +29,7 @@ float PlayerStatistics::getWentToShowDown() const
     return ((riverStatistics.hands - riverStatistics.folds) * 100) / (flopStatistics.hands);
 }
 
-void PreflopStatistics::addLastAction(ActionType p)
+void PreflopStatistics::addLastAction(PlayerAction p)
 {
     m_lastActions.push_back(p);
     if (m_lastActions.size() > LAST_ACTIONS_STACK_SIZE)
@@ -43,7 +43,7 @@ int PreflopStatistics::getLastActionsNumber(ActionType p) const
     int result = 0;
     for (int i = 0; i < m_lastActions.size(); i++)
     {
-        if (m_lastActions.at(i) == p)
+        if (m_lastActions.at(i).type == p)
         {
             result++;
         }

@@ -59,31 +59,31 @@ void BotPlayer::action()
 
     std::ostringstream logMessage;
 
-    if (myAction == ActionType::Fold)
+    if (myAction.type == ActionType::Fold)
     {
         logMessage << myName + " FOLD";
     }
-    else if (myAction == ActionType::Bet)
+    else if (myAction.type == ActionType::Bet)
     {
         logMessage << myName + " BET " << myBetAmount << endl;
     }
-    else if (myAction == ActionType::Raise)
+    else if (myAction.type == ActionType::Raise)
     {
         logMessage << myName + " RAISE " << myRaiseAmount;
     }
-    else if (myAction == ActionType::Call)
+    else if (myAction.type == ActionType::Call)
     {
         logMessage << myName + " CALL ";
     }
-    else if (myAction == ActionType::Check)
+    else if (myAction.type == ActionType::Check)
     {
         logMessage << myName + " CHECK";
     }
-    else if (myAction == ActionType::Allin)
+    else if (myAction.type == ActionType::Allin)
     {
         logMessage << myName + " ALLIN ";
     }
-    else if (myAction == ActionType::None)
+    else if (myAction.type == ActionType::None)
     {
         logMessage << myName + " NONE";
     }
@@ -92,11 +92,11 @@ void BotPlayer::action()
         logMessage << "undefined ?";
     }
 
-    GlobalServices::instance().logger().info(logMessage.str() + (myAction == ActionType::Fold ? "\n" : ""));
+    GlobalServices::instance().logger().info(logMessage.str() + (myAction.type == ActionType::Fold ? "\n" : ""));
 
-    currentHand->recordPlayerAction(currentHand->getCurrentRoundState(), getId(), myAction);
+    currentHand->recordPlayerAction(currentHand->getCurrentRoundState(), getId(), myAction.type);
 
-    if (myAction != ActionType::Fold)
+    if (myAction.type != ActionType::Fold)
     {
         if (currentHand->getCurrentRoundState() == Preflop)
         {
@@ -135,17 +135,16 @@ void BotPlayer::doPreflopAction()
                << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() << std::endl;
     GlobalServices::instance().logger().info(logMessage.str());
 
-    PlayerAction action = myStrategy->decideAction(*myCurrentHandContext);
+    myAction = myStrategy->decideAction(*myCurrentHandContext);
 
     // Update the player's action and amounts
-    myAction = action.type;
-    if (myAction == ActionType::Bet)
-        myBetAmount = action.amount;
-    if (myAction == ActionType::Raise)
-        myRaiseAmount = action.amount;
+    if (myAction.type == ActionType::Bet)
+        myBetAmount = myAction.amount;
+    if (myAction.type == ActionType::Raise)
+        myRaiseAmount = myAction.amount;
 
     // Handle specific preflop logic
-    if (myAction == ActionType::Raise || myAction == ActionType::Allin)
+    if (myAction.type == ActionType::Raise || myAction.type == ActionType::Allin)
     {
         currentHand->setPreflopLastRaiserId(myID);
     }
@@ -156,7 +155,7 @@ void BotPlayer::doPreflopAction()
     // Update statistics and ranges
     updatePreflopStatistics();
 
-    if (myAction != ActionType::Fold)
+    if (myAction.type != ActionType::Fold)
     {
         updateCurrentHandContext(Preflop);
         myRangeEstimator->updateUnplausibleRangesGivenPreflopActions(*myCurrentHandContext);
@@ -175,17 +174,16 @@ void BotPlayer::doFlopAction()
     GlobalServices::instance().logger().verbose(logMessage.str());
 
     // Use the strategy to decide the action
-    PlayerAction action = myStrategy->decideAction(*myCurrentHandContext);
+    myAction = myStrategy->decideAction(*myCurrentHandContext);
 
     // Update the player's action and amounts
-    myAction = action.type;
-    if (myAction == ActionType::Bet)
-        myBetAmount = action.amount;
-    if (myAction == ActionType::Raise)
-        myRaiseAmount = action.amount;
+    if (myAction.type == ActionType::Bet)
+        myBetAmount = myAction.amount;
+    if (myAction.type == ActionType::Raise)
+        myRaiseAmount = myAction.amount;
 
     // Handle specific flop logic
-    if (myAction == ActionType::Bet || myAction == ActionType::Raise || myAction == ActionType::Allin)
+    if (myAction.type == ActionType::Bet || myAction.type == ActionType::Raise || myAction.type == ActionType::Allin)
     {
         currentHand->setFlopLastRaiserId(myID);
     }
@@ -196,7 +194,7 @@ void BotPlayer::doFlopAction()
     // Update statistics and ranges
     updateFlopStatistics();
 
-    if (myAction != ActionType::Fold)
+    if (myAction.type != ActionType::Fold)
     {
         updateCurrentHandContext(Flop);
         myRangeEstimator->updateUnplausibleRangesGivenFlopActions(*myCurrentHandContext);
@@ -215,17 +213,16 @@ void BotPlayer::doTurnAction()
     GlobalServices::instance().logger().verbose(logMessage.str());
 
     // Use the strategy to decide the action
-    PlayerAction action = myStrategy->decideAction(*myCurrentHandContext);
+    myAction = myStrategy->decideAction(*myCurrentHandContext);
 
     // Update the player's action and amounts
-    myAction = action.type;
-    if (myAction == ActionType::Bet)
-        myBetAmount = action.amount;
-    if (myAction == ActionType::Raise)
-        myRaiseAmount = action.amount;
+    if (myAction.type == ActionType::Bet)
+        myBetAmount = myAction.amount;
+    if (myAction.type == ActionType::Raise)
+        myRaiseAmount = myAction.amount;
 
     // Handle specific turn logic
-    if (myAction == ActionType::Bet || myAction == ActionType::Raise || myAction == ActionType::Allin)
+    if (myAction.type == ActionType::Bet || myAction.type == ActionType::Raise || myAction.type == ActionType::Allin)
     {
         currentHand->setTurnLastRaiserId(myID);
     }
@@ -236,7 +233,7 @@ void BotPlayer::doTurnAction()
     // Update statistics and ranges
     updateTurnStatistics();
 
-    if (myAction != ActionType::Fold)
+    if (myAction.type != ActionType::Fold)
     {
         updateCurrentHandContext(Turn);
         myRangeEstimator->updateUnplausibleRangesGivenTurnActions(*myCurrentHandContext);
@@ -255,16 +252,15 @@ void BotPlayer::doRiverAction()
     GlobalServices::instance().logger().verbose(logMessage.str());
 
     // Use the strategy to decide the action
-    PlayerAction action = myStrategy->decideAction(*myCurrentHandContext);
+    myAction = myStrategy->decideAction(*myCurrentHandContext);
 
     myPreflopPotOdd = getPotOdd();
 
     // Update the player's action and amounts
-    myAction = action.type;
-    if (myAction == ActionType::Bet)
-        myBetAmount = action.amount;
-    if (myAction == ActionType::Raise)
-        myRaiseAmount = action.amount;
+    if (myAction.type == ActionType::Bet)
+        myBetAmount = myAction.amount;
+    if (myAction.type == ActionType::Raise)
+        myRaiseAmount = myAction.amount;
 
     // Record the action
     myCurrentHandActions.getActions(GameState::River).push_back(myAction);
@@ -272,7 +268,7 @@ void BotPlayer::doRiverAction()
     // Update statistics and ranges
     updateRiverStatistics();
 
-    if (myAction != ActionType::Fold)
+    if (myAction.type != ActionType::Fold)
     {
         updateCurrentHandContext(River);
         myRangeEstimator->updateUnplausibleRangesGivenRiverActions(*myCurrentHandContext);
@@ -283,7 +279,7 @@ void BotPlayer::evaluateBetAmount()
 
     int highestBetAmount = currentHand->getCurrentBettingRound()->getHighestSet();
 
-    if (myAction == ActionType::Call)
+    if (myAction.type == ActionType::Call)
     {
 
         // all in
@@ -291,7 +287,7 @@ void BotPlayer::evaluateBetAmount()
         {
             myTotalBetAmount += myCash;
             myCash = 0;
-            myAction = ActionType::Allin;
+            myAction = {myID, ActionType::Allin, myTotalBetAmount};
         }
         else
         {
@@ -300,7 +296,7 @@ void BotPlayer::evaluateBetAmount()
         }
     }
 
-    if (myAction == ActionType::Bet)
+    if (myAction.type == ActionType::Bet)
     {
 
         // if short stack, just go allin
@@ -319,7 +315,7 @@ void BotPlayer::evaluateBetAmount()
             currentHand->getCurrentBettingRound()->setMinimumRaise(myCash);
             myTotalBetAmount = myCash;
             myCash = 0;
-            myAction = ActionType::Allin;
+            myAction = {myID, ActionType::Allin, myTotalBetAmount};
             highestBetAmount = myTotalBetAmount;
         }
         else
@@ -332,7 +328,7 @@ void BotPlayer::evaluateBetAmount()
         currentHand->setLastActionPlayerId(myID);
     }
 
-    if (myAction == ActionType::Raise)
+    if (myAction.type == ActionType::Raise)
     {
 
         // short stack, just go allin
@@ -348,13 +344,13 @@ void BotPlayer::evaluateBetAmount()
             {
                 myTotalBetAmount += myCash;
                 myCash = 0;
-                myAction = ActionType::Allin;
+                myAction = {myID, ActionType::Allin, myTotalBetAmount};
             }
             else
             {
                 myCash = myCash - highestBetAmount + myTotalBetAmount;
                 myTotalBetAmount = highestBetAmount;
-                myAction = ActionType::Call;
+                myAction.type = ActionType::Call;
             }
         }
         else
@@ -375,7 +371,7 @@ void BotPlayer::evaluateBetAmount()
                         // only call all-in
                         myTotalBetAmount += myCash;
                         myCash = 0;
-                        myAction = ActionType::Allin;
+                        myAction = {myID, ActionType::Allin, myTotalBetAmount};
                     }
                     else
                     {
@@ -386,7 +382,7 @@ void BotPlayer::evaluateBetAmount()
                         myTotalBetAmount += myCash;
                         currentHand->getCurrentBettingRound()->setMinimumRaise(myTotalBetAmount - highestBetAmount);
                         myCash = 0;
-                        myAction = ActionType::Allin;
+                        myAction = {myID, ActionType::Allin, myTotalBetAmount};
                         highestBetAmount = myTotalBetAmount;
                     }
                 }
@@ -397,7 +393,7 @@ void BotPlayer::evaluateBetAmount()
                     myTotalBetAmount += myCash;
                     currentHand->getCurrentBettingRound()->setMinimumRaise(myTotalBetAmount - highestBetAmount);
                     myCash = 0;
-                    myAction = ActionType::Allin;
+                    myAction = {myID, ActionType::Allin, myTotalBetAmount};
                     highestBetAmount = myTotalBetAmount;
                 }
             }

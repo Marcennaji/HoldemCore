@@ -63,13 +63,13 @@ TEST_F(BettingRoundsLegacyTest, PlayersDoNotActAfterFolding)
         bool folded = false;
         bool actedAfterFold = false;
 
-        auto checkRound = [&](const std::vector<ActionType>& actions)
+        auto checkRound = [&](const std::vector<PlayerAction>& actions)
         {
             for (const auto& action : actions)
             {
                 if (folded)
                     actedAfterFold = true;
-                if (action == ActionType::Fold)
+                if (action.type == ActionType::Fold)
                     folded = true;
             }
         };
@@ -404,7 +404,7 @@ TEST_F(BettingRoundsLegacyTest, AllInPlayerDoesNotActAgain)
     initializeHandForTesting(3, gameData);
     auto p = *mySeatsList->begin();
     p->setCash(0); // Force all-in
-    p->setAction(ActionType::Allin);
+    p->setAction({p->getId(), ActionType::Allin});
 
     myHand->start();
 
@@ -442,7 +442,8 @@ TEST_F(BettingRoundsLegacyTest, NoExtraActionsAfterFinalCall)
 TEST_F(BettingRoundsLegacyTest, HeadsUpEndsImmediatelyOnFold)
 {
     initializeHandForTesting(2, gameData);
-    (*mySeatsList->begin())->setAction(ActionType::Fold);
+    auto p = *mySeatsList->begin();
+    p->setAction({p->getId(), ActionType::Fold});
     myHand->start();
 
     // If one folds, there should only be preflop actions

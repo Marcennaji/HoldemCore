@@ -90,7 +90,7 @@ void HandFsm::handlePlayerAction(const PlayerAction& action)
 
         applyActionEffects(action);
 
-        player->getCurrentHandActions().getActions(myState->getGameState()).push_back(action.type);
+        player->getCurrentHandActions().getActions(myState->getGameState()).push_back(action);
 
         auto next = processor->computeNextState(*this, action);
         if (next)

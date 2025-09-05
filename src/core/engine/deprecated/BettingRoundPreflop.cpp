@@ -125,10 +125,10 @@ void BettingRoundPreflop::proceedToFlop()
 
     getHand()->setCurrentRoundState(Flop);
 
-    for (PlayerListConstIterator itC = getHand()->getRunningPlayersList()->begin();
-         itC != getHand()->getRunningPlayersList()->end(); ++itC)
+    for (auto player = getHand()->getRunningPlayersList()->begin(); player != getHand()->getRunningPlayersList()->end();
+         ++player)
     {
-        (*itC)->setAction(ActionType::None);
+        (*player)->setAction({(*player)->getId(), ActionType::None});
     }
 
     getHand()->getBoard()->collectSets();

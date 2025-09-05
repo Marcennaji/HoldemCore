@@ -57,8 +57,8 @@ class Player
 
     void setHand(IHand*);
     IHand* getHand() const { return currentHand; }
-    void setAction(ActionType theValue, bool blind = 0);
-    ActionType getAction() const;
+    void setAction(PlayerAction theValue, bool blind = 0);
+    PlayerAction getAction() const;
 
     virtual bool isBot() const = 0;
 
@@ -170,7 +170,7 @@ class Player
      */
     int myLastRelativeSet{0};
 
-    ActionType myAction{ActionType::None};
+    PlayerAction myAction{-1, ActionType::None, 0};
     ButtonState myButton{ButtonState::Unspecified};
 
     bool myCardsFlip{0}; // 0 = cards are not fliped, 1 = cards are already flipped,

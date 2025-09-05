@@ -32,7 +32,7 @@ void PlayerStatisticsUpdater::updatePreflopStatistics(const CurrentHandContext& 
 
     for (const auto& action : actions)
     {
-        switch (action)
+        switch (action.type)
         {
         case ActionType::Allin:
             myStatistics[nbPlayers].preflopStatistics.raises++;
@@ -55,7 +55,7 @@ void PlayerStatisticsUpdater::updatePreflopStatistics(const CurrentHandContext& 
 
         myStatistics[nbPlayers].preflopStatistics.addLastAction(action); // keep track of the last 10 actions
 
-        if (action == ActionType::Call && ctx.commonContext.playersContext.raisersPositions.size() == 0)
+        if (action.type == ActionType::Call && ctx.commonContext.playersContext.raisersPositions.size() == 0)
         { //
             myStatistics[nbPlayers].preflopStatistics.limps++;
         }
@@ -64,13 +64,13 @@ void PlayerStatisticsUpdater::updatePreflopStatistics(const CurrentHandContext& 
         for (auto i = ctx.personalContext.actions.currentHandActions.getActions(GameState::Preflop).begin();
              i != ctx.personalContext.actions.currentHandActions.getActions(GameState::Preflop).end(); i++)
         {
-            if (*i == ActionType::Raise || *i == ActionType::Allin)
+            if (i->type == ActionType::Raise || i->type == ActionType::Allin)
             {
                 playerRaises++;
             }
         }
 
-        if (action == ActionType::Raise || action == ActionType::Allin)
+        if (action.type == ActionType::Raise || action.type == ActionType::Allin)
         {
 
             if (playerRaises == 1 && ctx.commonContext.playersContext.raisersPositions.size() == 2)
@@ -92,7 +92,7 @@ void PlayerStatisticsUpdater::updatePreflopStatistics(const CurrentHandContext& 
 
                 myStatistics[nbPlayers].preflopStatistics.callthreeBetsOpportunities++;
 
-                if (action == ActionType::Call)
+                if (action.type == ActionType::Call)
                 {
                     myStatistics[nbPlayers].preflopStatistics.callthreeBets++;
                 }
@@ -112,7 +112,7 @@ void PlayerStatisticsUpdater::updateFlopStatistics(const CurrentHandContext& ctx
     for (const auto& action : actions)
     {
 
-        switch (action)
+        switch (action.type)
         {
         case ActionType::Allin:
             myStatistics[nbPlayers].flopStatistics.raises++;
@@ -135,7 +135,7 @@ void PlayerStatisticsUpdater::updateFlopStatistics(const CurrentHandContext& ctx
         default:
             break;
         }
-        if (action == ActionType::Raise && ctx.commonContext.playersContext.raisersPositions.size() > 1)
+        if (action.type == ActionType::Raise && ctx.commonContext.playersContext.raisersPositions.size() > 1)
         {
             myStatistics[nbPlayers].flopStatistics.threeBets++;
         }
@@ -145,7 +145,7 @@ void PlayerStatisticsUpdater::updateFlopStatistics(const CurrentHandContext& ctx
             ctx.commonContext.playersContext.preflopLastRaiserFsm->getId() == ctx.personalContext.id)
         {
             myStatistics[nbPlayers].flopStatistics.continuationBetsOpportunities++;
-            if (action == ActionType::Bet)
+            if (action.type == ActionType::Bet)
             {
                 myStatistics[nbPlayers].flopStatistics.continuationBets++;
             }
@@ -163,7 +163,7 @@ void PlayerStatisticsUpdater::updateTurnStatistics(const CurrentHandContext& ctx
 
     for (const auto& action : actions)
     {
-        switch (action)
+        switch (action.type)
         {
         case ActionType::Allin:
             myStatistics[nbPlayers].turnStatistics.raises++;
@@ -186,7 +186,7 @@ void PlayerStatisticsUpdater::updateTurnStatistics(const CurrentHandContext& ctx
         default:
             break;
         }
-        if (action == ActionType::Raise && ctx.commonContext.playersContext.raisersPositions.size() > 1)
+        if (action.type == ActionType::Raise && ctx.commonContext.playersContext.raisersPositions.size() > 1)
         {
             myStatistics[nbPlayers].turnStatistics.threeBets++;
         }
@@ -203,7 +203,7 @@ void PlayerStatisticsUpdater::updateRiverStatistics(const CurrentHandContext& ct
 
     for (const auto& action : actions)
     {
-        switch (action)
+        switch (action.type)
         {
         case ActionType::Allin:
             myStatistics[nbPlayers].riverStatistics.raises++;
@@ -226,7 +226,7 @@ void PlayerStatisticsUpdater::updateRiverStatistics(const CurrentHandContext& ct
         default:
             break;
         }
-        if (action == ActionType::Raise && ctx.commonContext.playersContext.raisersPositions.size() > 1)
+        if (action.type == ActionType::Raise && ctx.commonContext.playersContext.raisersPositions.size() > 1)
         {
             myStatistics[nbPlayers].riverStatistics.threeBets++;
         }

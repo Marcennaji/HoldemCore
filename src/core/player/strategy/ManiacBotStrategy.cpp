@@ -103,7 +103,8 @@ bool ManiacBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
     // defend against 3bet bluffs :
     if (ctx.commonContext.bettingContext.preflopRaisesNumber == 2 &&
         ctx.personalContext.actions.currentHandActions.getActions(GameState::Preflop).size() > 0 &&
-        ctx.personalContext.actions.currentHandActions.getActions(GameState::Preflop).back() == ActionType::Raise &&
+        ctx.personalContext.actions.currentHandActions.getActions(GameState::Preflop).back().type ==
+            ActionType::Raise &&
         ctx.personalContext.cash >= ctx.commonContext.bettingContext.pot * 10 && lastRaiser != nullptr &&
         lastRaiser->getCash() >= ctx.commonContext.bettingContext.pot * 10 &&
         !ctx.commonContext.bettingContext.isPreflopBigBet)

@@ -317,13 +317,13 @@ void updateRunningPlayersList(PlayerList& myRunningPlayersList)
     for (it = myRunningPlayersList->begin(); it != myRunningPlayersList->end();)
     {
         GlobalServices::instance().logger().verbose("Checking player: " + (*it)->getName() +
-                                                    ", action: " + playerActionToString((*it)->getAction()));
+                                                    ", action: " + playerActionToString((*it)->getAction().type));
 
-        if ((*it)->getAction() == ActionType::Fold || (*it)->getAction() == ActionType::Allin)
+        if ((*it)->getAction().type == ActionType::Fold || (*it)->getAction().type == ActionType::Allin)
         {
             GlobalServices::instance().logger().verbose(
                 "Removing player: " + (*it)->getName() +
-                " from myRunningPlayersList due to action: " + playerActionToString((*it)->getAction()));
+                " from myRunningPlayersList due to action: " + playerActionToString((*it)->getAction().type));
 
             it = myRunningPlayersList->erase(it);
 
@@ -469,7 +469,7 @@ PlayerListIterator nextActivePlayer(PlayerList seats, PlayerListIterator it)
     ++it;
     if (it == seats->end())
         it = seats->begin();
-    while ((*it)->getAction() == ActionType::Fold || (*it)->getAction() == ActionType::Allin)
+    while ((*it)->getAction().type == ActionType::Fold || (*it)->getAction().type == ActionType::Allin)
     {
         ++it;
         if (it == seats->end())

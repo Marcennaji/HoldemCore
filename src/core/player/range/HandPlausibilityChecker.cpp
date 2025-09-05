@@ -209,7 +209,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(const PostFlopAnaly
     }
 
     if (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber > 0 &&
-        ctx.personalContext.actions.currentHandActions.getActions(GameState::Flop).back() == ActionType::Call &&
+        ctx.personalContext.actions.currentHandActions.getActions(GameState::Flop).back().type == ActionType::Call &&
         !(ctx.personalContext.statistics.getWentToShowDown() > 35 &&
           ctx.personalContext.statistics.riverStatistics.hands > MIN_HANDS_STATISTICS_ACCURATE))
     {
@@ -507,7 +507,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopAnaly
     // the player called a bet on flop and turn, and he is not loose
     if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber > 0 &&
         ctx.commonContext.bettingContext.flopBetsOrRaisesNumber > 0 &&
-        ctx.personalContext.actions.currentHandActions.getActions(GameState::Turn).back() == ActionType::Call &&
+        ctx.personalContext.actions.currentHandActions.getActions(GameState::Turn).back().type == ActionType::Call &&
         !ctx.personalContext.actions.flopIsAggressor &&
         !(ctx.personalContext.statistics.getWentToShowDown() > 30 &&
           ctx.personalContext.statistics.riverStatistics.hands > MIN_HANDS_STATISTICS_ACCURATE))
@@ -537,7 +537,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopAnaly
     }
     // the player called a raise on turn, and is not loose : he has at least a top pair or a good draw
     if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber > 1 &&
-        ctx.personalContext.actions.currentHandActions.getActions(GameState::Turn).back() == ActionType::Call &&
+        ctx.personalContext.actions.currentHandActions.getActions(GameState::Turn).back().type == ActionType::Call &&
         !(ctx.personalContext.statistics.getWentToShowDown() > 35 &&
           ctx.personalContext.statistics.riverStatistics.hands > MIN_HANDS_STATISTICS_ACCURATE))
     {

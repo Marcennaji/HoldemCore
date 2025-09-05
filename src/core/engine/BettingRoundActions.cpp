@@ -19,12 +19,14 @@ int BettingRoundActions::getCallsNumber()
 
     for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
+        auto& actions = (*it)->getCurrentHandActions().getActions(myGameState);
 
-        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getActions(myGameState);
-
-        if (find(actions.begin(), actions.end(), ActionType::Call) != actions.end())
+        for (auto itAction = actions.begin(); itAction != actions.end(); itAction++)
         {
-            calls++;
+            if (itAction->type == ActionType::Call)
+            {
+                calls++;
+            }
         }
     }
     return calls;
@@ -37,11 +39,11 @@ int BettingRoundActions::getRaisesNumber()
     for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
 
-        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getActions(myGameState);
+        auto& actions = (*it)->getCurrentHandActions().getActions(myGameState);
 
-        for (std::vector<ActionType>::const_iterator itAction = actions.begin(); itAction != actions.end(); itAction++)
+        for (auto itAction = actions.begin(); itAction != actions.end(); itAction++)
         {
-            if ((*itAction) == ActionType::Raise || (*itAction) == ActionType::Allin)
+            if (itAction->type == ActionType::Raise || itAction->type == ActionType::Allin)
             {
                 raises++;
             }
@@ -57,12 +59,12 @@ int BettingRoundActions::getBetsOrRaisesNumber()
 
     for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
+        auto& actions = (*it)->getCurrentHandActions().getActions(myGameState);
 
-        const std::vector<ActionType>& actions = (*it)->getCurrentHandActions().getActions(myGameState);
-
-        for (std::vector<ActionType>::const_iterator itAction = actions.begin(); itAction != actions.end(); itAction++)
+        for (auto itAction = actions.begin(); itAction != actions.end(); itAction++)
         {
-            if ((*itAction) == ActionType::Raise || (*itAction) == ActionType::Allin || (*itAction) == ActionType::Bet)
+            if (itAction->type == ActionType::Raise || itAction->type == ActionType::Allin ||
+                itAction->type == ActionType::Bet)
             {
                 bets++;
             }
