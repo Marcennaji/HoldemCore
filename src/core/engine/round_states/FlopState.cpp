@@ -46,7 +46,14 @@ bool FlopState::isActionAllowed(const HandFsm& hand, const PlayerAction action) 
                                                   " not found");
         return false;
     }
-    return validatePlayerAction(*player, action, *hand.getBettingActions(), 0);
+    if (validatePlayerAction(*player, action, *hand.getBettingActions(), 0))
+    {
+        return true;
+    }
+    GlobalServices::instance().logger().error(
+        "FlopState: Invalid action for player " + std::to_string(action.playerId) + " : " +
+        playerActionToString(action.type) + " with amount = " + std::to_string(action.amount));
+    return false;
 }
 
 void FlopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)

@@ -56,7 +56,14 @@ bool PreflopState::isActionAllowed(const HandFsm& hand, const PlayerAction actio
                                                   " not found");
         return false;
     }
-    return validatePlayerAction(*player, action, *hand.getBettingActions(), mySmallBlind);
+    if (validatePlayerAction(*player, action, *hand.getBettingActions(), mySmallBlind))
+    {
+        return true;
+    }
+    GlobalServices::instance().logger().error(
+        "PreflopState: Invalid action for player " + std::to_string(action.playerId) + " : " +
+        playerActionToString(action.type) + " with amount = " + std::to_string(action.amount));
+    return false;
 }
 
 void PreflopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
