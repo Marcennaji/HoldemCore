@@ -3,7 +3,7 @@
 
 #include "common/common.h"
 
-#include "core/engine/Board.h"
+#include "core/engine/deprecated/Board.h"
 #include "core/engine/deprecated/Hand.h"
 #include "core/engine/model/GameState.h"
 #include "core/interfaces/NullLogger.h"

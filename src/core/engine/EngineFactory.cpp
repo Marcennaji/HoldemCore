@@ -5,10 +5,10 @@
 #include "EngineFactory.h"
 
 #include <core/services/GlobalServices.h>
-#include "Board.h"
 #include "core/engine/deprecated/BettingRoundPostRiver.h"
 #include "core/engine/deprecated/BettingRoundPreflop.h"
 #include "core/engine/deprecated/Hand.h"
+#include "deprecated/Board.h"
 
 #include "core/player/deprecated/HumanPlayer.h"
 #include "strategy/LooseAggressiveBotStrategy.h"

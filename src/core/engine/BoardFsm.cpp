@@ -1,0 +1,271 @@
+// PokerTraining — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+#include "BoardFsm.h"
+
+#include "core/interfaces/IHand.h"
+
+#include <core/services/GlobalServices.h>
+#include "Exception.h"
+#include "Pot.h"
+#include "core/player/PlayerFsm.h"
+#include "model/EngineError.h"
+
+#include <algorithm>
+
+namespace pkt::core
+{
+using namespace pkt::core::player;
+
+BoardFsm::BoardFsm(unsigned dp) : IBoard(), myDealerPlayerId(dp)
+{
+    myCards[0] = myCards[1] = myCards[2] = myCards[3] = myCards[4] = 0;
+}
+
+BoardFsm::~BoardFsm()
+{
+    if (mySeatsList)
+    {
+        mySeatsList->clear();
+    }
+    if (myActingPlayersList)
+    {
+        myActingPlayersList->clear();
+    }
+}
+
+void BoardFsm::setSeatsList(PlayerFsmList seats)
+{
+    mySeatsList = seats;
+}
+void BoardFsm::setActingPlayersList(PlayerFsmList actingPlayers)
+{
+    myActingPlayersList = actingPlayers;
+}
+void BoardFsm::collectSets()
+{
+    myTotalBetAmounts = 0;
+
+    for (auto itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
+    {
+        // myTotalBetAmounts += (*itC)->getTotalBetAmount();
+    }
+}
+
+void BoardFsm::collectPot()
+{
+
+    myPot += myTotalBetAmounts;
+    myTotalBetAmounts = 0;
+
+    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
+    {
+        //(*it)->setSetNull();
+    }
+}
+
+void BoardFsm::distributePot()
+{
+    // Pot pot(myPot, mySeatsList, myDealerPlayerId);
+    // pot.distribute();
+    // myWinners = pot.getWinners();
+}
+
+void BoardFsm::determinePlayerNeedToShowCards()
+{
+
+    myPlayerNeedToShowCards.clear();
+
+    // in All In Condition everybody have to show the cards
+    if (myAllInCondition)
+    {
+        for (auto itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
+        {
+            if ((*itC)->getLastAction().type != ActionType::Fold)
+            {
+                myPlayerNeedToShowCards.push_back((*itC)->getId());
+            }
+        }
+    }
+
+    else
+    {
+
+        // all winners have to show their cards
+
+        std::list<std::pair<int, int>> level;
+
+        PlayerFsmListConstIterator lastActionPlayerIt;
+        PlayerFsmListConstIterator itC;
+
+        // search lastActionPlayer
+        for (itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
+        {
+            if ((*itC)->getId() == myLastActionPlayerId && (*itC)->getLastAction().type != ActionType::Fold)
+            {
+                lastActionPlayerIt = itC;
+                break;
+            }
+        }
+
+        if (itC == mySeatsList->end())
+        {
+            for (itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
+            {
+                if ((*itC)->getLastAction().type != ActionType::Fold)
+                {
+                    lastActionPlayerIt = itC;
+                    break;
+                }
+            }
+        }
+
+        // the player who has done the last action has to show his cards first
+        myPlayerNeedToShowCards.push_back((*lastActionPlayerIt)->getId());
+
+        std::pair<int, int> levelTmp;
+        // get position and cardsValue of the player who show his cards first
+        levelTmp.first = (*lastActionPlayerIt)->getHandRanking();
+        levelTmp.second = (*lastActionPlayerIt)->getCashAtHandStart() - (*lastActionPlayerIt)->getCash();
+
+        level.push_back(levelTmp);
+
+        std::list<std::pair<int, int>>::iterator levelIt;
+        std::list<std::pair<int, int>>::iterator nextLevelIt;
+
+        itC = lastActionPlayerIt;
+        ++itC;
+
+        for (unsigned i = 0; i < mySeatsList->size(); i++)
+        {
+
+            if (itC == mySeatsList->end())
+            {
+                itC = mySeatsList->begin();
+            }
+
+            if ((*itC)->getLastAction().type != ActionType::Fold)
+            {
+
+                for (levelIt = level.begin(); levelIt != level.end(); ++levelIt)
+                {
+                    if ((*itC)->getHandRanking() > (*levelIt).first)
+                    {
+                        nextLevelIt = levelIt;
+                        ++nextLevelIt;
+                        if (nextLevelIt == level.end())
+                        {
+                            myPlayerNeedToShowCards.push_back((*itC)->getId());
+                            levelTmp.first = (*itC)->getHandRanking();
+                            levelTmp.second = (*itC)->getCashAtHandStart() - (*itC)->getCash();
+                            level.push_back(levelTmp);
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        if ((*itC)->getHandRanking() == (*levelIt).first)
+                        {
+                            nextLevelIt = levelIt;
+                            ++nextLevelIt;
+
+                            if (nextLevelIt == level.end() ||
+                                (*itC)->getCashAtHandStart() - (*itC)->getCash() > (*nextLevelIt).second)
+                            {
+                                myPlayerNeedToShowCards.push_back((*itC)->getId());
+                                if ((*itC)->getCashAtHandStart() - (*itC)->getCash() > (*levelIt).second)
+                                {
+                                    (*levelIt).second = (*itC)->getCashAtHandStart() - (*itC)->getCash();
+                                }
+                            }
+                            break;
+                        }
+                        else
+                        {
+                            if ((*itC)->getCashAtHandStart() - (*itC)->getCash() > (*levelIt).second)
+                            {
+                                myPlayerNeedToShowCards.push_back((*itC)->getId());
+                                levelTmp.first = (*itC)->getHandRanking();
+                                levelTmp.second = (*itC)->getCashAtHandStart() - (*itC)->getCash();
+
+                                level.insert(levelIt, levelTmp);
+
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            ++itC;
+        }
+
+        level.clear();
+    }
+
+    // sort and unique the list
+    myPlayerNeedToShowCards.sort();
+    myPlayerNeedToShowCards.unique();
+}
+void BoardFsm::setCards(int* theValue)
+{
+    int i;
+    for (i = 0; i < 5; i++)
+    {
+        myCards[i] = theValue[i];
+    }
+}
+void BoardFsm::getCards(int* theValue)
+{
+    int i;
+    for (i = 0; i < 5; i++)
+    {
+        theValue[i] = myCards[i];
+    }
+}
+
+void BoardFsm::setAllInCondition(bool theValue)
+{
+    myAllInCondition = theValue;
+}
+void BoardFsm::setLastActionPlayerId(unsigned theValue)
+{
+    myLastActionPlayerId = theValue;
+}
+
+int BoardFsm::getPot() const
+{
+    return myPot;
+}
+void BoardFsm::setPot(int theValue)
+{
+    myPot = theValue;
+}
+int BoardFsm::getSets() const
+{
+    return myTotalBetAmounts;
+}
+void BoardFsm::setSets(int theValue)
+{
+    myTotalBetAmounts = theValue;
+}
+
+std::list<unsigned> BoardFsm::getWinners() const
+{
+    return myWinners;
+}
+void BoardFsm::setWinners(const std::list<unsigned>& w)
+{
+    myWinners = w;
+}
+
+std::list<unsigned> BoardFsm::getPlayerNeedToShowCards() const
+{
+    return myPlayerNeedToShowCards;
+}
+void BoardFsm::setPlayerNeedToShowCards(const std::list<unsigned>& p)
+{
+    myPlayerNeedToShowCards = p;
+}
+} // namespace pkt::core
