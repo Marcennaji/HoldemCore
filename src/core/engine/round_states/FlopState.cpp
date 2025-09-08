@@ -20,7 +20,7 @@ void FlopState::enter(HandFsm& hand)
 {
     GlobalServices::instance().logger().info("FlopState: Entering flop");
     // Reset betting amounts for new round
-    hand.getBettingActions()->resetHighestSet();
+    hand.getBettingActions()->resetRoundHighestSet();
 
     for (auto& player : *hand.getRunningPlayersList())
     {
@@ -58,10 +58,19 @@ void FlopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
 
 std::unique_ptr<IHandState> FlopState::computeNextState(HandFsm& hand, PlayerAction action)
 {
-    if (hand.getRunningPlayersList()->size() == 1)
+    // If less than 2 players are still in hand (haven't folded), go directly to showdown
+    if (hand.getPlayersInHandList()->size() < 2)
     {
         return std::make_unique<PostRiverState>(myEvents);
     }
+
+    // If all remaining players are all-in (no one can act further), go directly to showdown
+    if (hand.getRunningPlayersList()->empty() && hand.getPlayersInHandList()->size() >= 1)
+    {
+        return std::make_unique<PostRiverState>(myEvents);
+    }
+
+    // If round is complete and multiple players can still act, continue to Turn
     if (isRoundComplete(hand))
     {
         return std::make_unique<TurnState>(myEvents);

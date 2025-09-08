@@ -507,7 +507,7 @@ bool validatePlayerAction(const PlayerFsmList& runningPlayersList, const PlayerA
                                                   std::to_string(action.playerId) + " not found in runningPlayersList");
         return false;
     }
-    const int currentHighestBet = bettingActions.getHighestSet();
+    const int currentHighestBet = bettingActions.getRoundHighestSet();
     const int playerBet = player->getCurrentHandActions().getRoundTotalBetAmount(gameState);
 
     bool isActionValid = true;
@@ -696,9 +696,6 @@ bool isRoundComplete(HandFsm& hand)
 {
     assert(hand.getState().getGameState() != GameState::None);
 
-    if (hand.getRunningPlayersList()->size() <= 1)
-        return true;
-
     for (auto player = hand.getRunningPlayersList()->begin(); player != hand.getRunningPlayersList()->end(); ++player)
     {
         GlobalServices::instance().logger().verbose("checking if round " +
@@ -715,13 +712,13 @@ bool isRoundComplete(HandFsm& hand)
         }
 
         GlobalServices::instance().logger().verbose(
-            "  round total bet amount: " +
+            "  player round bet amount: " +
             std::to_string((*player)->getCurrentHandActions().getRoundTotalBetAmount(hand.getState().getGameState())) +
             ", hand total bet amount : " + std::to_string((*player)->getCurrentHandActions().getHandTotalBetAmount()) +
-            " vs hand current highest bet: " + std::to_string(hand.getBettingActions()->getHighestSet()));
+            " vs current round highest bet: " + std::to_string(hand.getBettingActions()->getRoundHighestSet()));
 
-        if ((*player)->getCurrentHandActions().getRoundTotalBetAmount(hand.getState().getGameState()) !=
-            hand.getBettingActions()->getHighestSet())
+        if ((*player)->getCurrentHandActions().getRoundTotalBetAmount(hand.getState().getGameState()) <
+            hand.getBettingActions()->getRoundHighestSet())
         {
             GlobalServices::instance().logger().verbose("  ROUND NOT COMPLETE, as player " + (*player)->getName() +
                                                         " has not matched the highest bet yet.");

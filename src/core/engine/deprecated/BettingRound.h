@@ -38,7 +38,7 @@ class BettingRound : public IBettingRound
     int getFirstRoundLastPlayersTurnId() const;
 
     void setHighestSet(int theValue);
-    int getHighestSet() const;
+    int getRoundHighestSet() const;
 
     void setFirstRun(bool theValue);
     bool getFirstRun() const;

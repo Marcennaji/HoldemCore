@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "common/EngineTest.h"
@@ -6,7 +5,7 @@
 namespace pkt::test
 {
 
-class PreflopStateTest : public EngineTest
+class TurnStateTest : public EngineTest
 {
   protected:
     void SetUp() override;

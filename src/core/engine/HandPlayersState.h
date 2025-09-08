@@ -1,6 +1,8 @@
 #pragma once
 
 #include "BettingActions.h"
+#include "core/engine/model/PlayerAction.h"
+#include "core/player/PlayerFsm.h"
 #include "typedefs.h"
 
 namespace pkt::core
@@ -14,6 +16,21 @@ class HandPlayersState
 
     const pkt::core::player::PlayerFsmList getSeatsList() const { return mySeatsList; }
     const pkt::core::player::PlayerFsmList getRunningPlayersList() const { return myRunningPlayersList; }
+    const pkt::core::player::PlayerFsmList getPlayersInHandList() const
+    {
+        // Create a new list with players in hand (not folded, but might include allin players)
+        auto playersInHand = std::make_shared<std::list<std::shared_ptr<pkt::core::player::PlayerFsm>>>();
+
+        for (const auto& player : *mySeatsList)
+        {
+            if (player->getLastAction().type != ActionType::Fold)
+            {
+                playersInHand->push_back(player);
+            }
+        }
+
+        return playersInHand;
+    }
     std::shared_ptr<BettingActions> getBettingActions() const { return myBettingActions; }
     int getDealerPlayerId() const { return myDealerPlayerId; }
     int getSmallBlindPlayerId() const { return mySmallBlindPlayerId; }

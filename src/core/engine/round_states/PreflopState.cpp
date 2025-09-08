@@ -32,7 +32,13 @@ PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsig
 void PreflopState::enter(HandFsm& hand)
 {
     GlobalServices::instance().logger().info("PreflopState: Entering preflop");
-    hand.getBettingActions()->updateHighestSet(2 * mySmallBlind);
+
+    for (auto& player : *hand.getSeatsList())
+    {
+        player->setAction(*this, {player->getId(), ActionType::None});
+    }
+
+    hand.getBettingActions()->updateRoundHighestSet(2 * mySmallBlind);
     setBlinds(hand);
 
     if (myEvents.onBettingRoundStarted)
@@ -65,7 +71,7 @@ void PreflopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
 
 std::unique_ptr<IHandState> PreflopState::computeNextState(HandFsm& hand, PlayerAction action)
 {
-    if (hand.getRunningPlayersList()->size() == 1)
+    if (hand.getRunningPlayersList()->size() < 2)
     {
         return std::make_unique<PostRiverState>(myEvents);
     }

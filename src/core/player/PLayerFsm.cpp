@@ -333,7 +333,7 @@ bool PlayerFsm::isPreflopBigBet() const
         return true;
     }
 
-    const int highestBetAmount = min(myCash, currentHand.getCurrentBettingRound()->getHighestSet());
+    const int highestBetAmount = min(myCash, currentHand.getCurrentBettingRound()->getRoundHighestSet());
 
     if (highestBetAmount > currentHand.getSmallBlind() * 8 &&
         highestBetAmount - myTotalBetAmount > myTotalBetAmount * 6)

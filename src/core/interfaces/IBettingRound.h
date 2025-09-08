@@ -26,7 +26,7 @@ class IBettingRound
     virtual int getBigBlindPlayerId() const = 0;
 
     virtual void setHighestSet(int) = 0;
-    virtual int getHighestSet() const = 0;
+    virtual int getRoundHighestSet() const = 0;
 
     virtual void setMinimumRaise(int) = 0;
     virtual int getMinimumRaise() const = 0;

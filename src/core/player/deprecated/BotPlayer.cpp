@@ -277,7 +277,7 @@ void BotPlayer::doRiverAction()
 void BotPlayer::evaluateBetAmount()
 {
 
-    int highestBetAmount = currentHand->getCurrentBettingRound()->getHighestSet();
+    int highestBetAmount = currentHand->getCurrentBettingRound()->getRoundHighestSet();
 
     if (myAction.type == ActionType::Call)
     {

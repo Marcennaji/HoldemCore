@@ -35,21 +35,21 @@ int BettingActions::getMinRaise(int smallBlind) const
         }
     }
 
-    int prevHighest = myHighestSet;
+    int prevHighest = myRoundHighestSet;
     int prevRaise = prevHighest - lastRaiserTotal;
 
     return prevRaise;
 }
 
-int BettingActions::getHighestSet() const
+int BettingActions::getRoundHighestSet() const
 {
-    return myHighestSet;
+    return myRoundHighestSet;
 }
 
-void BettingActions::updateHighestSet(int amount)
+void BettingActions::updateRoundHighestSet(int amount)
 {
-    if (amount > myHighestSet)
-        myHighestSet = amount;
+    if (amount > myRoundHighestSet)
+        myRoundHighestSet = amount;
 }
 
 void BettingActions::setLastActionPlayerId(int theValue)

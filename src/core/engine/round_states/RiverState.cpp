@@ -18,8 +18,14 @@ RiverState::RiverState(const GameEvents& events) : myEvents(events)
 void RiverState::enter(HandFsm& hand)
 {
     GlobalServices::instance().logger().info("RiverState: Entering river");
+
+    for (auto& player : *hand.getRunningPlayersList())
+    {
+        player->setAction(*this, {player->getId(), ActionType::None});
+    }
+
     // Reset betting amounts for new round
-    hand.getBettingActions()->resetHighestSet();
+    hand.getBettingActions()->resetRoundHighestSet();
 
     // Deal river card
     // hand.getBoard()->dealRiver();
@@ -52,7 +58,10 @@ void RiverState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
 
 std::unique_ptr<IHandState> RiverState::computeNextState(HandFsm& hand, PlayerAction action)
 {
-
+    if (hand.getRunningPlayersList()->size() < 2)
+    {
+        return std::make_unique<PostRiverState>(myEvents);
+    }
     if (isRoundComplete(hand))
     {
         exit(hand);

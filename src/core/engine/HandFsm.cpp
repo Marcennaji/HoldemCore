@@ -103,7 +103,7 @@ void HandFsm::applyActionEffects(const PlayerAction action)
     if (!player)
         return;
 
-    int currentHighest = getBettingActions()->getHighestSet();
+    int currentHighest = getBettingActions()->getRoundHighestSet();
     int playerBet = player->getCurrentHandActions().getRoundTotalBetAmount(myState->getGameState());
 
     // Create a copy for storing in action history with correct increment amounts
@@ -122,6 +122,14 @@ void HandFsm::applyActionEffects(const PlayerAction action)
         {
             amountToCall = player->getCash();
         }
+
+        // If this call uses all remaining cash, treat it as an all-in
+        if (amountToCall == player->getCash())
+        {
+            actionForHistory.type = ActionType::Allin;
+            player->setCash(0);
+        }
+
         actionForHistory.amount = amountToCall; // store the actual call amount
         player->addBetAmount(amountToCall);
         break;
@@ -132,7 +140,7 @@ void HandFsm::applyActionEffects(const PlayerAction action)
         int raiseIncrement = action.amount - playerBet;
         actionForHistory.amount = raiseIncrement; // store only the increment in history
         player->addBetAmount(raiseIncrement);
-        getBettingActions()->updateHighestSet(action.amount);
+        getBettingActions()->updateRoundHighestSet(action.amount);
         getBettingActions()->getPreflop().setLastRaiserId(player->getId());
         break;
     }
@@ -141,7 +149,7 @@ void HandFsm::applyActionEffects(const PlayerAction action)
     {
         // For bet, the amount is already the increment
         player->addBetAmount(action.amount);
-        getBettingActions()->updateHighestSet(action.amount);
+        getBettingActions()->updateRoundHighestSet(action.amount);
         break;
     }
 
@@ -161,7 +169,7 @@ void HandFsm::applyActionEffects(const PlayerAction action)
 
         if (allinIncrement > currentHighest)
         {
-            getBettingActions()->updateHighestSet(allinIncrement);
+            getBettingActions()->updateRoundHighestSet(allinIncrement);
             getBettingActions()->getPreflop().setLastRaiserId(player->getId());
         }
         break;
@@ -255,7 +263,7 @@ HandCommonContext HandFsm::updateHandCommonContext(const GameState state)
     handContext.bettingContext.pot = myBoard->getPot();
     // handContext.bettingContext.potOdd = getPotOdd();
     handContext.bettingContext.sets = myBoard->getSets();
-    handContext.bettingContext.highestBetAmount = getBettingActions()->getHighestSet();
+    handContext.bettingContext.highestBetAmount = getBettingActions()->getRoundHighestSet();
     handContext.bettingContext.preflopRaisesNumber = getBettingActions()->getPreflop().getRaisesNumber();
     handContext.bettingContext.preflopCallsNumber = getBettingActions()->getPreflop().getCallsNumber();
     // handContext.bettingContext.isPreflopBigBet = getBettingActions()->isPreflopBigBet();
@@ -315,7 +323,7 @@ std::string HandFsm::getStringBoard() const
 
 int HandFsm::getPotOdd(const int playerCash, const int playerSet) const
 {
-    const int highestBetAmount = min(playerCash, getBettingActions()->getHighestSet());
+    const int highestBetAmount = min(playerCash, getBettingActions()->getRoundHighestSet());
 
     int pot = myBoard->getPot() + myBoard->getSets();
 

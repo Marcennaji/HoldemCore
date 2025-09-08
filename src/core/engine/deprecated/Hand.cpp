@@ -346,7 +346,7 @@ void Hand::resolveHandConditions()
             GlobalServices::instance().logger().verbose("All players but one are all-in.");
             for (itC = myRunningPlayersList->begin(); itC != myRunningPlayersList->end(); ++itC)
             {
-                if ((*itC)->getTotalBetAmount() >= myBettingRounds[myCurrentRound]->getHighestSet())
+                if ((*itC)->getTotalBetAmount() >= myBettingRounds[myCurrentRound]->getRoundHighestSet())
                 {
                     myAllInCondition = true;
                     myBoard->setAllInCondition(true);

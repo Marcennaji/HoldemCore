@@ -113,4 +113,14 @@ void EngineTest::checkPostRiverConditions()
     EXPECT_EQ(myHand->getBoard()->getPot(), 0); // Pot should be reset to 0
 }
 
+bool EngineTest::isPlayerStillActive(unsigned id) const
+{
+    for (const auto& p : *myHandFsm->getRunningPlayersList())
+    {
+        if (p->getId() == id)
+            return true;
+    }
+    return false;
+}
+
 } // namespace pkt::test

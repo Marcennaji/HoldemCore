@@ -15,10 +15,10 @@ class BettingActions
   public:
     BettingActions(pkt::core::player::PlayerFsmList& seats, pkt::core::player::PlayerFsmList& runningPlayers);
 
-    int getHighestSet() const;
     int getMinRaise(int smallBlind) const;
-    void updateHighestSet(int amount);
-    void resetHighestSet() { myHighestSet = 0; }
+    int getRoundHighestSet() const;
+    void updateRoundHighestSet(int amount);
+    void resetRoundHighestSet() { myRoundHighestSet = 0; }
     void recordRaise(unsigned int id) { myLastRaiserId = id; }
 
     std::optional<unsigned int> getLastRaiserId() const { return myLastRaiserId; }
@@ -42,7 +42,7 @@ class BettingActions
     BettingRoundActions myTurn;
     BettingRoundActions myRiver;
 
-    int myHighestSet = 0;
+    int myRoundHighestSet = 0;
     std::optional<unsigned int> myLastRaiserId = std::nullopt;
     int myLastActionPlayerId;
     int myPreviousPlayerId{-1};

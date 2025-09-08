@@ -17,13 +17,14 @@ PostRiverState::PostRiverState(const GameEvents& events) : myEvents(events)
 void PostRiverState::enter(HandFsm& hand)
 {
     GlobalServices::instance().logger().info("PostRiverState: Entering post-river");
-    // Final state entry logic: typically showdown or hand resolution.
+
+    for (auto& player : *hand.getRunningPlayersList())
+    {
+        player->setAction(*this, {player->getId(), ActionType::None});
+    }
+
     if (myEvents.onBettingRoundStarted)
         myEvents.onBettingRoundStarted(PostRiver);
-
-    // Trigger showdown logic (hand evaluation + pot distribution).
-    // if (myEvents.onShowdown)
-    //    myEvents.onShowdown(hand.getBoard(), hand.getRunningPlayersList());
 }
 
 void PostRiverState::exit(HandFsm& /*hand*/)

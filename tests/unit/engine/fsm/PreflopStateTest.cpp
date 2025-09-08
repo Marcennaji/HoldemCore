@@ -25,15 +25,6 @@ void PreflopStateTest::SetUp()
     myEvents.onBettingRoundStarted = [&](GameState state) { myLastGameState = state; };
 }
 
-bool PreflopStateTest::isPlayerStillActive(unsigned id) const
-{
-    for (const auto& p : *myHandFsm->getRunningPlayersList())
-    {
-        if (p->getId() == id)
-            return true;
-    }
-    return false;
-}
 void PreflopStateTest::TearDown()
 {
     EngineTest::TearDown();
@@ -187,7 +178,7 @@ TEST_F(PreflopStateTest, ReraiseUpdatesHighestBetAndKeepsRoundOpen)
 
     // Verify highest bet and last raiser
     auto bettingActions = myHandFsm->getBettingActions();
-    EXPECT_EQ(bettingActions->getHighestSet(), 0); // reset to 0 on the new round
+    EXPECT_EQ(bettingActions->getRoundHighestSet(), 0); // reset to 0 on the new round
     EXPECT_EQ(bettingActions->getPreflop().getLastRaiserId(), playerBb->getId());
 }
 
@@ -207,7 +198,7 @@ TEST_F(PreflopStateTest, RaiseBelowMinimumShouldBeRejected)
     EXPECT_EQ(myLastGameState, Preflop);
 
     // Step 2: SB attempts an invalid raise (to less than BB + SB)
-    int currentHighest = myHandFsm->getBettingActions()->getHighestSet();
+    int currentHighest = myHandFsm->getBettingActions()->getRoundHighestSet();
     int invalidRaise = currentHighest + (myHandFsm->getSmallBlind() / 2); // too small
 
     auto actionProcessor = myHandFsm->getActionProcessor();
@@ -222,7 +213,7 @@ TEST_F(PreflopStateTest, RaiseBelowMinimumShouldBeRejected)
     EXPECT_EQ(playerSb->getCurrentHandActions().getHandTotalBetAmount(), myHandFsm->getSmallBlind());
 
     // Current highest bet is still the BB
-    EXPECT_EQ(myHandFsm->getBettingActions()->getHighestSet(), myHandFsm->getSmallBlind() * 2);
+    EXPECT_EQ(myHandFsm->getBettingActions()->getRoundHighestSet(), myHandFsm->getSmallBlind() * 2);
 }
 
 TEST_F(PreflopStateTest, AllInInsteadOfRaiseIsAccepted)
@@ -237,7 +228,7 @@ TEST_F(PreflopStateTest, AllInInsteadOfRaiseIsAccepted)
     // dealer goes allin
     myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Allin});
 
-    EXPECT_EQ(myHandFsm->getBettingActions()->getHighestSet(), 1000);
+    EXPECT_EQ(myHandFsm->getBettingActions()->getRoundHighestSet(), 1000);
 
     // dealer must have no chips left
     EXPECT_EQ(playerDealer->getCash(), 0);

@@ -19,8 +19,13 @@ TurnState::TurnState(const GameEvents& events) : myEvents(events)
 void TurnState::enter(HandFsm& hand)
 {
     GlobalServices::instance().logger().info("TurnState: Entering turn");
+
+    for (auto& player : *hand.getRunningPlayersList())
+    {
+        player->setAction(*this, {player->getId(), ActionType::None});
+    }
     // Reset betting amounts for new round
-    hand.getBettingActions()->resetHighestSet();
+    hand.getBettingActions()->resetRoundHighestSet();
 
     // Deal turn card
     // hand.getBoard()->dealTurn();
@@ -53,7 +58,15 @@ void TurnState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
 
 std::unique_ptr<IHandState> TurnState::computeNextState(HandFsm& hand, PlayerAction action)
 {
-    if (hand.getRunningPlayersList()->size() == 1)
+    // If less than 2 players are still in hand (haven't folded), go directly to showdown
+    if (hand.getPlayersInHandList()->size() < 2)
+    {
+        exit(hand);
+        return std::make_unique<PostRiverState>(myEvents);
+    }
+
+    // If all remaining players are all-in (no one can act further), go directly to showdown
+    if (hand.getRunningPlayersList()->empty() && hand.getPlayersInHandList()->size() >= 1)
     {
         exit(hand);
         return std::make_unique<PostRiverState>(myEvents);

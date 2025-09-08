@@ -651,7 +651,7 @@ bool Player::hasPosition(PlayerPosition myPos, PlayerList runningPlayers)
 int Player::getPotOdd() const
 {
 
-    const int highestBetAmount = min(myCash, currentHand->getCurrentBettingRound()->getHighestSet());
+    const int highestBetAmount = min(myCash, currentHand->getCurrentBettingRound()->getRoundHighestSet());
 
     int pot = currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets();
 
@@ -874,7 +874,7 @@ bool Player::isPreflopBigBet() const
         return true;
     }
 
-    const int highestBetAmount = min(myCash, currentHand->getCurrentBettingRound()->getHighestSet());
+    const int highestBetAmount = min(myCash, currentHand->getCurrentBettingRound()->getRoundHighestSet());
 
     if (highestBetAmount > currentHand->getSmallBlind() * 8 &&
         highestBetAmount - myTotalBetAmount > myTotalBetAmount * 6)
@@ -1030,7 +1030,7 @@ void Player::updateCurrentHandContext(const GameState state)
     myCurrentHandContext->commonContext.bettingContext.potOdd = getPotOdd();
     myCurrentHandContext->commonContext.bettingContext.sets = currentHand->getBoard()->getSets();
     myCurrentHandContext->commonContext.bettingContext.highestBetAmount =
-        currentHand->getCurrentBettingRound()->getHighestSet();
+        currentHand->getCurrentBettingRound()->getRoundHighestSet();
 
     // Player-specific, visible from the opponents :
     myCurrentHandContext->personalContext.cash = myCash;

@@ -25,6 +25,7 @@ class EngineTest : public ::testing::Test
     void initializeHandForTesting(size_t activePlayerCount, pkt::core::GameData);
     void initializeHandFsmForTesting(size_t activePlayerCount, pkt::core::GameData);
     void checkPostRiverConditions();
+    bool isPlayerStillActive(unsigned id) const;
 
     pkt::core::GameEvents myEvents;
     std::shared_ptr<pkt::core::EngineFactory> myFactory;

@@ -417,7 +417,7 @@ void BettingRound::setHighestSet(int theValue)
 {
     myHighestSet = theValue;
 }
-int BettingRound::getHighestSet() const
+int BettingRound::getRoundHighestSet() const
 {
     return myHighestSet;
 }
@@ -487,7 +487,7 @@ bool BettingRound::checkAllHighestSet()
     for (PlayerListConstIterator itC = getHand()->getRunningPlayersList()->begin();
          itC != getHand()->getRunningPlayersList()->end(); ++itC)
     {
-        if (getHighestSet() != (*itC)->getTotalBetAmount())
+        if (getRoundHighestSet() != (*itC)->getTotalBetAmount())
         {
             allHighestSet = false;
             break;
