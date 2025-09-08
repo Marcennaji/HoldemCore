@@ -75,7 +75,7 @@ TEST_F(FlopStateTest, OnlyChecksFlopShouldGoToTurn)
     EXPECT_EQ(myLastGameState, Turn);
 }
 
-TEST_F(FlopStateTest, BetOnFlopKeepsRoundOpen)
+TEST_F(FlopStateTest, BetCallScenarioOnFlop)
 {
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
@@ -116,6 +116,189 @@ TEST_F(FlopStateTest, AllInOnFlop)
     // Player goes all-in, so he is not any more "running" (--> we won't find it in running players list)
     myHandFsm->handlePlayerAction({playerDealerSb->getId(), ActionType::Allin});
     EXPECT_EQ(getPlayerFsmById(mySeatsListFsm, playerDealerSb->getId())->getCash(), 0);
+}
+
+TEST_F(FlopStateTest, RaiseOnFlopKeepsRoundOpen)
+{
+    initializeHandFsmForTesting(3, gameData);
+    myHandFsm->start();
+
+    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+
+    // Simulate preflop ending
+    myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
+
+    EXPECT_EQ(myLastGameState, Flop);
+
+    // Flop raise scenario
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Bet, 50});
+    EXPECT_EQ(myLastGameState, Flop); // round still open
+
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Raise, 100});
+    EXPECT_EQ(myLastGameState, Flop); // round still open after raise
+
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    EXPECT_EQ(myLastGameState, Turn); // round closes after call
+}
+
+TEST_F(FlopStateTest, FoldOnFlopWithTwoPlayersEndsHand)
+{
+    initializeHandFsmForTesting(2, gameData);
+    myHandFsm->start();
+
+    auto playerDealerSb = getPlayerFsmById(myRunningPlayersListFsm, 0);
+    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 1);
+
+    // Preflop round finishing
+    myHandFsm->handlePlayerAction({playerDealerSb->getId(), ActionType::Call});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
+
+    EXPECT_EQ(myLastGameState, Flop);
+
+    // One player bets, other folds - should end hand
+    myHandFsm->handlePlayerAction({playerDealerSb->getId(), ActionType::Bet, 50});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Fold});
+
+    // Hand should end with only one player remaining
+    EXPECT_EQ(myLastGameState, PostRiver);
+}
+
+TEST_F(FlopStateTest, MultipleFoldsOnFlop)
+{
+    initializeHandFsmForTesting(4, gameData);
+    myHandFsm->start();
+
+    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+    auto playerUtg = getPlayerFsmById(myRunningPlayersListFsm, 3);
+
+    // Simulate preflop ending with all players calling
+    myHandFsm->handlePlayerAction({playerUtg->getId(), ActionType::Call});
+    myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Call});
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
+
+    EXPECT_EQ(myLastGameState, Flop);
+    EXPECT_EQ(myRunningPlayersListFsm->size(), 4);
+
+    // Multiple folds on flop
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Bet, 50});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Fold});
+    EXPECT_EQ(myRunningPlayersListFsm->size(), 3);
+
+    myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
+    EXPECT_EQ(myRunningPlayersListFsm->size(), 2);
+
+    myHandFsm->handlePlayerAction({playerUtg->getId(), ActionType::Call});
+    EXPECT_EQ(myLastGameState, Turn); // Round should advance to Turn
+}
+
+TEST_F(FlopStateTest, CheckRaiseScenarioOnFlop)
+{
+    initializeHandFsmForTesting(3, gameData);
+    myHandFsm->start();
+
+    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+
+    // Simulate preflop ending
+    myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
+
+    EXPECT_EQ(myLastGameState, Flop);
+
+    // Check-raise scenario
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Bet, 75});
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Raise, 150});
+
+    EXPECT_EQ(myLastGameState, Flop); // round still open after raise
+
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call});
+    EXPECT_EQ(myLastGameState, Turn); // round closes after call
+}
+
+TEST_F(FlopStateTest, AllInCallScenarioOnFlop)
+{
+    initializeHandFsmForTesting(3, gameData);
+    myHandFsm->start();
+
+    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+
+    // Simulate preflop ending
+    myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
+
+    EXPECT_EQ(myLastGameState, Flop);
+
+    // One player goes all-in, other calls
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Allin});
+    EXPECT_EQ(getPlayerFsmById(mySeatsListFsm, playerSb->getId())->getCash(), 0);
+
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call});
+
+    // Both players should be committed, round should advance to PostRiver
+    EXPECT_EQ(myLastGameState, PostRiver);
+}
+
+TEST_F(FlopStateTest, BetFoldScenarioOnFlop)
+{
+    initializeHandFsmForTesting(3, gameData);
+    myHandFsm->start();
+
+    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+
+    // Simulate preflop ending
+    myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
+
+    EXPECT_EQ(myLastGameState, Flop);
+    size_t initialRunningPlayers = myRunningPlayersListFsm->size();
+
+    // Bet and fold scenario
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Bet, 100});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Fold});
+
+    // One player should have folded
+    EXPECT_EQ(myRunningPlayersListFsm->size(), initialRunningPlayers - 1);
+}
+
+TEST_F(FlopStateTest, LargeBetOnFlopRequiresResponse)
+{
+    initializeHandFsmForTesting(3, gameData);
+    myHandFsm->start();
+
+    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+
+    // Simulate preflop ending
+    myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
+
+    EXPECT_EQ(myLastGameState, Flop);
+
+    // Large bet on flop
+    int initialCash = playerSb->getCash();
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Bet, 200});
+
+    // Verify bet was applied
+    EXPECT_LT(playerSb->getCash(), initialCash);
+    EXPECT_EQ(myLastGameState, Flop); // round still open, awaiting response
 }
 
 } // namespace pkt::test
