@@ -39,36 +39,7 @@ void RiverState::exit(HandFsm& hand)
 
 bool RiverState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const
 {
-    auto player = getPlayerFsmById(hand.getRunningPlayersList(), action.playerId);
-    if (!player)
-        return false;
-
-    const int cash = player->getCash();
-    const int amountToCall = hand.getBettingActions()->getHighestSet() - player->getTotalBetAmount();
-
-    switch (action.type)
-    {
-    case ActionType::Fold:
-        return true;
-
-    case ActionType::Check:
-        return amountToCall == 0 && action.amount == 0;
-
-    case ActionType::Call:
-        return action.amount == amountToCall && cash >= action.amount;
-
-    case ActionType::Bet:
-        return amountToCall == 0 && action.amount > 0 && action.amount <= cash;
-
-    case ActionType::Raise:
-        return amountToCall > 0 && action.amount > amountToCall && action.amount <= cash;
-
-    case ActionType::Allin:
-        return cash > 0;
-
-    default:
-        return false;
-    }
+    return (validatePlayerAction(hand.getRunningPlayersList(), action, *hand.getBettingActions(), 0, River));
 }
 
 void RiverState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)

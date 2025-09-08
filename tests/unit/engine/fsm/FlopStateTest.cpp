@@ -113,7 +113,7 @@ TEST_F(FlopStateTest, AllInOnFlop)
 
     EXPECT_EQ(myLastGameState, Flop);
 
-    // Player goes all-in, so he is not any more "running"
+    // Player goes all-in, so he is not any more "running" (--> we won't find it in running players list)
     myHandFsm->handlePlayerAction({playerDealerSb->getId(), ActionType::Allin});
     EXPECT_EQ(getPlayerFsmById(mySeatsListFsm, playerDealerSb->getId())->getCash(), 0);
 }

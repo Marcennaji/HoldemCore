@@ -28,7 +28,9 @@ int BettingActions::getMinRaise(int smallBlind) const
     {
         if ((*player)->getId() == myLastRaiserId.value())
         {
-            lastRaiserTotal = (*player)->getTotalBetAmount();
+            PlayerAction lastAction = (*player)->getCurrentHandActions().getLastAction();
+            assert(lastAction.type == ActionType::Raise || lastAction.type == ActionType::Allin);
+            lastRaiserTotal = lastAction.amount;
             break;
         }
     }

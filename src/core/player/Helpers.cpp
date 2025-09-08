@@ -497,50 +497,66 @@ bool hasPosition(PlayerPosition position, PlayerFsmList runningPlayers)
     return hasPosition;
 }
 
-bool validatePlayerAction(const PlayerFsm& player, const PlayerAction& action, const BettingActions& bettingActions,
-                          int smallBlind, const GameState gameState)
+bool validatePlayerAction(const PlayerFsmList& runningPlayersList, const PlayerAction& action,
+                          const BettingActions& bettingActions, int smallBlind, const GameState gameState)
 {
+    auto player = getPlayerFsmById(runningPlayersList, action.playerId);
+    if (!player)
+    {
+        GlobalServices::instance().logger().error(gameStateToString(gameState) + ": player with id " +
+                                                  std::to_string(action.playerId) + " not found in runningPlayersList");
+        return false;
+    }
     const int currentHighestBet = bettingActions.getHighestSet();
-    const int playerBet = player.getCurrentHandActions().getRoundTotalBetAmount(gameState);
+    const int playerBet = player->getCurrentHandActions().getRoundTotalBetAmount(gameState);
+
+    bool isActionValid = true;
 
     switch (action.type)
     {
     case ActionType::Fold:
-        return true;
+        break;
 
     case ActionType::Check:
-        return playerBet == currentHighestBet && action.amount == 0;
+        isActionValid = (playerBet == currentHighestBet && action.amount == 0);
+        break;
 
     case ActionType::Call:
     {
         // take into account a call which would also be an allin, with a stack < to the amount to call
-        return player.getCash() > 0;
+        isActionValid = (player->getCash() > 0);
+        break;
     }
 
     case ActionType::Bet:
-        return currentHighestBet == 0 && action.amount > 0 && action.amount <= player.getCash();
+        isActionValid = (currentHighestBet == 0 && action.amount > 0 && action.amount <= player->getCash());
+        break;
 
     case ActionType::Raise:
     {
-        if (action.amount <= currentHighestBet)
-            return false;
+        isActionValid = (action.amount > currentHighestBet);
 
         int minRaise = bettingActions.getMinRaise(smallBlind);
-        if (action.amount < currentHighestBet + minRaise)
-            return false;
+        isActionValid = (isActionValid && action.amount >= currentHighestBet + minRaise);
 
         const int extraChipsRequired = action.amount - playerBet;
-        if (extraChipsRequired > player.getCash())
-            return false;
-
-        return true;
+        isActionValid = (isActionValid && extraChipsRequired <= player->getCash());
+        break;
     }
     case ActionType::Allin:
-        return player.getCash() > 0;
+        isActionValid = (player->getCash() > 0);
+        break;
 
     default:
-        return false;
+        isActionValid = false;
     }
+    if (!isActionValid)
+    {
+        GlobalServices::instance().logger().error(
+            gameStateToString(gameState) + ": Invalid action for player " + std::to_string(action.playerId) + " : " +
+            playerActionToString(action.type) + " with amount = " + std::to_string(action.amount));
+    }
+    return isActionValid;
 }
 
 // Helper to compute the relative offset in the circular table

@@ -219,7 +219,7 @@ TEST_F(PreflopStateTest, RaiseBelowMinimumShouldBeRejected)
     EXPECT_FALSE(actionAllowed);
 
     // SB’s total bet must remain unchanged
-    EXPECT_EQ(playerSb->getTotalBetAmount(), myHandFsm->getSmallBlind());
+    EXPECT_EQ(playerSb->getCurrentHandActions().getHandTotalBetAmount(), myHandFsm->getSmallBlind());
 
     // Current highest bet is still the BB
     EXPECT_EQ(myHandFsm->getBettingActions()->getHighestSet(), myHandFsm->getSmallBlind() * 2);

@@ -79,8 +79,8 @@ std::string getPositionLabel(pkt::core::PlayerPosition);
 
 bool hasPosition(PlayerPosition myPos, PlayerFsmList);
 
-bool validatePlayerAction(const PlayerFsm& player, const PlayerAction& action, const BettingActions& bettingActions,
-                          int smallBlind, const GameState gameState);
+bool validatePlayerAction(const PlayerFsmList& runningPlayersList, const PlayerAction& action,
+                          const BettingActions& bettingActions, int smallBlind, const GameState gameState);
 
 int circularOffset(int fromId, int toId, const PlayerFsmList& players);
 PlayerPosition computePositionFromOffset(int offset, int nbPlayers);

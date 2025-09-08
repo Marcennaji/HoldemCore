@@ -22,6 +22,10 @@ void FlopState::enter(HandFsm& hand)
     // Reset betting amounts for new round
     hand.getBettingActions()->resetHighestSet();
 
+    for (auto& player : *hand.getRunningPlayersList())
+    {
+        player->setAction(*this, {player->getId(), ActionType::None});
+    }
     // Deal flop cards
     // hand.getBoard()->dealFlop();
 
@@ -41,21 +45,7 @@ void FlopState::exit(HandFsm& hand)
 
 bool FlopState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const
 {
-    auto player = getPlayerFsmById(hand.getRunningPlayersList(), action.playerId);
-    if (!player)
-    {
-        GlobalServices::instance().logger().error("FlopState: Player " + std::to_string(action.playerId) +
-                                                  " not found");
-        return false;
-    }
-    if (validatePlayerAction(*player, action, *hand.getBettingActions(), 0, Flop))
-    {
-        return true;
-    }
-    GlobalServices::instance().logger().error(
-        "FlopState: Invalid action for player " + std::to_string(action.playerId) + " : " +
-        playerActionToString(action.type) + " with amount = " + std::to_string(action.amount));
-    return false;
+    return (validatePlayerAction(hand.getRunningPlayersList(), action, *hand.getBettingActions(), 0, Flop));
 }
 
 void FlopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)

@@ -54,10 +54,6 @@ class PlayerFsm
     void setCash(int theValue);
     int getCash() const;
     void addBetAmount(int theValue);
-    void resetBetAmount();
-    int getTotalBetAmount() const;
-    void setTotalBetAmount(int theValue);
-    int getLastBetAmount() const;
 
     void setAction(IHandState& state, const PlayerAction& action);
     PlayerAction getLastAction() const;
@@ -125,23 +121,6 @@ class PlayerFsm
     int myCash{0};
     int myCashAtHandStart{0};
 
-    /**
-     * Purpose: Represents the total amount of chips the player has committed to the pot during the hand.
-     * Usage:
-     * Tracks the cumulative amount the player has bet across all rounds.
-     * Used in pot distribution calculations to determine the player's share of the pot.
-     * Example:
-     * If a player bets 200 in the preflop and 300 on the flop, myTotalBetAmount would be 500.
-     */
-    int myTotalBetAmount{0};
-
-    /**
-     * Purpose: Represents the amount of chips the player has committed to the pot during the most recent betting
-     * action. Usage: Tracks the player's contribution during the current betting action (e.g., a call, raise, or
-     * all-in). Helps calculate the player's odds and contributions for the current pot level. Example: If a player
-     * raises by 300 chips, myLastBetAmount would be set to 300
-     */
-    int myLastBetAmount{0};
     bool myCardsFlip{false}; // 0 = cards are not fliped, 1 = cards are already flipped,
     int lastMoneyWon{0};
     int myPreflopPotOdd{0};

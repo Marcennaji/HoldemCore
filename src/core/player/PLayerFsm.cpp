@@ -67,27 +67,7 @@ int PlayerFsm::getCash() const
 
 void PlayerFsm::addBetAmount(int theValue)
 {
-    myLastBetAmount = theValue;
-    myTotalBetAmount += theValue;
     myCash -= theValue;
-}
-
-void PlayerFsm::resetBetAmount()
-{
-    myTotalBetAmount = 0;
-    myLastBetAmount = 0;
-}
-int PlayerFsm::getTotalBetAmount() const
-{
-    return myTotalBetAmount;
-}
-void PlayerFsm::setTotalBetAmount(int theValue)
-{
-    myTotalBetAmount = theValue;
-}
-int PlayerFsm::getLastBetAmount() const
-{
-    return myLastBetAmount;
 }
 
 PlayerAction PlayerFsm::getLastAction() const
@@ -425,7 +405,7 @@ void PlayerFsm::updateCurrentHandContext(const GameState state, HandFsm& current
 
     // Player-specific, visible from the opponents :
     myCurrentHandContext->personalContext.cash = myCash;
-    myCurrentHandContext->personalContext.totalBetAmount = myTotalBetAmount;
+    myCurrentHandContext->personalContext.totalBetAmount = myCurrentHandActions.getHandTotalBetAmount();
     myCurrentHandContext->personalContext.m = static_cast<int>(currentHand.getM(myCash));
     myCurrentHandContext->personalContext.actions.currentHandActions = myCurrentHandActions;
     myCurrentHandContext->personalContext.hasPosition = hasPosition(myPosition, currentHand.getRunningPlayersList());
