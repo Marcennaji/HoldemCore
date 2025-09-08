@@ -30,7 +30,7 @@ To keep the project maintainable and high-quality, please respect the following 
 ### ✅ Prefer clean, small commits
 
 * Keep your pull requests focused.
-* Include test cases if you touch logic.
+* Always include test cases for new code. Ideally, follow a TDD approach.
 
 ### ✅ Maintain naming and style consistency
 
