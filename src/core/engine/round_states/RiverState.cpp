@@ -19,7 +19,7 @@ void RiverState::enter(HandFsm& hand)
 {
     GlobalServices::instance().logger().info("RiverState: Entering river");
 
-    for (auto& player : *hand.getRunningPlayersList())
+    for (auto& player : *hand.getActingPlayersList())
     {
         player->setAction(*this, {player->getId(), ActionType::None});
     }
@@ -45,7 +45,7 @@ void RiverState::exit(HandFsm& hand)
 
 bool RiverState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const
 {
-    return (validatePlayerAction(hand.getRunningPlayersList(), action, *hand.getBettingActions(), 0, River));
+    return (validatePlayerAction(hand.getActingPlayersList(), action, *hand.getBettingActions(), 0, River));
 }
 
 void RiverState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
@@ -58,7 +58,7 @@ void RiverState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
 
 std::unique_ptr<IHandState> RiverState::computeNextState(HandFsm& hand, PlayerAction action)
 {
-    if (hand.getRunningPlayersList()->size() < 2)
+    if (hand.getActingPlayersList()->size() < 2)
     {
         return std::make_unique<PostRiverState>(myEvents);
     }

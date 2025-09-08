@@ -29,34 +29,34 @@ Board::~Board()
     {
         mySeatsList->clear();
     }
-    if (myRunningPlayersList)
+    if (myActingPlayersList)
     {
-        myRunningPlayersList->clear();
+        myActingPlayersList->clear();
     }
     if (mySeatsListFsm)
     {
         mySeatsListFsm->clear();
     }
-    if (myRunningPlayersListFsm)
+    if (myActingPlayersListFsm)
     {
-        myRunningPlayersListFsm->clear();
+        myActingPlayersListFsm->clear();
     }
 }
 void Board::setSeatsList(PlayerList seats)
 {
     mySeatsList = seats;
 }
-void Board::setRunningPlayersList(PlayerList runningPlayers)
+void Board::setActingPlayersList(PlayerList actingPlayers)
 {
-    myRunningPlayersList = runningPlayers;
+    myActingPlayersList = actingPlayers;
 }
 void Board::setSeatsListFsm(PlayerFsmList seats)
 {
     mySeatsListFsm = seats;
 }
-void Board::setRunningPlayersListFsm(PlayerFsmList runningPlayers)
+void Board::setActingPlayersListFsm(PlayerFsmList actingPlayers)
 {
-    myRunningPlayersListFsm = runningPlayers;
+    myActingPlayersListFsm = actingPlayers;
 }
 void Board::collectSets()
 {

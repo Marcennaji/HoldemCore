@@ -35,9 +35,9 @@ TEST_F(FlopStateTest, StartFlopInitializesPlayersCorrectly)
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
 
-    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
 
     // Force preflop actions to move FSM to Flop
     myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
@@ -57,9 +57,9 @@ TEST_F(FlopStateTest, OnlyChecksFlopShouldGoToTurn)
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
 
-    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
 
     // Simulate preflop ending
     myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
@@ -80,9 +80,9 @@ TEST_F(FlopStateTest, BetCallScenarioOnFlop)
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
 
-    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
 
     // Simulate preflop ending
     myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
@@ -104,8 +104,8 @@ TEST_F(FlopStateTest, AllInOnFlop)
     initializeHandFsmForTesting(2, gameData);
     myHandFsm->start();
 
-    auto playerDealerSb = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 1);
+    auto playerDealerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
 
     // Preflop round finishing
     myHandFsm->handlePlayerAction({playerDealerSb->getId(), ActionType::Call});
@@ -113,7 +113,7 @@ TEST_F(FlopStateTest, AllInOnFlop)
 
     EXPECT_EQ(myLastGameState, Flop);
 
-    // Player goes all-in, so he is not any more "running" (--> we won't find it in running players list)
+    // Player goes all-in, so he is not any more "running" (--> we won't find it in acting players list)
     myHandFsm->handlePlayerAction({playerDealerSb->getId(), ActionType::Allin});
     EXPECT_EQ(getPlayerFsmById(mySeatsListFsm, playerDealerSb->getId())->getCash(), 0);
 }
@@ -123,9 +123,9 @@ TEST_F(FlopStateTest, RaiseOnFlopKeepsRoundOpen)
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
 
-    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
 
     // Simulate preflop ending
     myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
@@ -150,8 +150,8 @@ TEST_F(FlopStateTest, FoldOnFlopWithTwoPlayersEndsHand)
     initializeHandFsmForTesting(2, gameData);
     myHandFsm->start();
 
-    auto playerDealerSb = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 1);
+    auto playerDealerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
 
     // Preflop round finishing
     myHandFsm->handlePlayerAction({playerDealerSb->getId(), ActionType::Call});
@@ -172,10 +172,10 @@ TEST_F(FlopStateTest, MultipleFoldsOnFlop)
     initializeHandFsmForTesting(4, gameData);
     myHandFsm->start();
 
-    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
-    auto playerUtg = getPlayerFsmById(myRunningPlayersListFsm, 3);
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
+    auto playerUtg = getPlayerFsmById(myActingPlayersListFsm, 3);
 
     // Simulate preflop ending with all players calling
     myHandFsm->handlePlayerAction({playerUtg->getId(), ActionType::Call});
@@ -184,15 +184,15 @@ TEST_F(FlopStateTest, MultipleFoldsOnFlop)
     myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
     EXPECT_EQ(myLastGameState, Flop);
-    EXPECT_EQ(myRunningPlayersListFsm->size(), 4);
+    EXPECT_EQ(myActingPlayersListFsm->size(), 4);
 
     // Multiple folds on flop
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Bet, 50});
     myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Fold});
-    EXPECT_EQ(myRunningPlayersListFsm->size(), 3);
+    EXPECT_EQ(myActingPlayersListFsm->size(), 3);
 
     myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
-    EXPECT_EQ(myRunningPlayersListFsm->size(), 2);
+    EXPECT_EQ(myActingPlayersListFsm->size(), 2);
 
     myHandFsm->handlePlayerAction({playerUtg->getId(), ActionType::Call});
     EXPECT_EQ(myLastGameState, Turn); // Round should advance to Turn
@@ -203,9 +203,9 @@ TEST_F(FlopStateTest, CheckRaiseScenarioOnFlop)
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
 
-    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
 
     // Simulate preflop ending
     myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
@@ -230,9 +230,9 @@ TEST_F(FlopStateTest, AllInCallScenarioOnFlop)
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
 
-    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
 
     // Simulate preflop ending
     myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
@@ -256,9 +256,9 @@ TEST_F(FlopStateTest, BetFoldScenarioOnFlop)
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
 
-    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
 
     // Simulate preflop ending
     myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
@@ -266,14 +266,14 @@ TEST_F(FlopStateTest, BetFoldScenarioOnFlop)
     myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
     EXPECT_EQ(myLastGameState, Flop);
-    size_t initialRunningPlayers = myRunningPlayersListFsm->size();
+    size_t initialActingPlayers = myActingPlayersListFsm->size();
 
     // Bet and fold scenario
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Bet, 100});
     myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Fold});
 
     // One player should have folded
-    EXPECT_EQ(myRunningPlayersListFsm->size(), initialRunningPlayers - 1);
+    EXPECT_EQ(myActingPlayersListFsm->size(), initialActingPlayers - 1);
 }
 
 TEST_F(FlopStateTest, LargeBetOnFlopRequiresResponse)
@@ -281,9 +281,9 @@ TEST_F(FlopStateTest, LargeBetOnFlopRequiresResponse)
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
 
-    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
 
     // Simulate preflop ending
     myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});

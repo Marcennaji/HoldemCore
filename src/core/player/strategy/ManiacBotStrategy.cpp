@@ -86,7 +86,7 @@ bool ManiacBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
         stringCallingRange += HIGH_SUITED_ACES;
         stringCallingRange += PAIRS;
 
-        if (ctx.commonContext.playersContext.runningPlayersList->size() > 2 &&
+        if (ctx.commonContext.playersContext.actingPlayersList->size() > 2 &&
             ctx.commonContext.bettingContext.preflopRaisesNumber + ctx.commonContext.bettingContext.preflopCallsNumber >
                 1 &&
             ctx.personalContext.position >= Middle)
@@ -364,10 +364,10 @@ int ManiacBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
 
         // if no raise preflop, or if more than 1 opponent
         if (ctx.commonContext.bettingContext.preflopRaisesNumber == 0 ||
-            ctx.commonContext.playersContext.runningPlayersList->size() > 2)
+            ctx.commonContext.playersContext.actingPlayersList->size() > 2)
         {
 
-            if (ctx.commonContext.playersContext.runningPlayersList->size() < 4)
+            if (ctx.commonContext.playersContext.actingPlayersList->size() < 4)
             {
                 return ctx.commonContext.bettingContext.pot * 0.8;
             }
@@ -399,7 +399,7 @@ int ManiacBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
         // if I was the last raiser preflop, I may bet with not much
         if (ctx.commonContext.bettingContext.preflopRaisesNumber > 0 &&
             ctx.commonContext.playersContext.preflopLastRaiser->getId() == ctx.personalContext.id &&
-            ctx.commonContext.playersContext.runningPlayersList->size() < 4 &&
+            ctx.commonContext.playersContext.actingPlayersList->size() < 4 &&
             ctx.personalContext.cash > ctx.commonContext.bettingContext.pot * 4 && isPossibleToBluff(ctx))
         {
             if (ctx.personalContext.myHandSimulation.winRanged > 0.15 && ctx.personalContext.myHandSimulation.win > 0.3)
@@ -458,7 +458,7 @@ int ManiacBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
         return 0;
     }
 
-    if (nbRaises < 2 && ctx.commonContext.playersContext.runningPlayersList->size() < 4 && isPossibleToBluff(ctx) &&
+    if (nbRaises < 2 && ctx.commonContext.playersContext.actingPlayersList->size() < 4 && isPossibleToBluff(ctx) &&
         ctx.personalContext.myHandSimulation.winRanged < 0.3 &&
         getBoardCardsHigherThan(ctx.commonContext.stringBoard, "Jh") < 2 &&
         getBoardCardsHigherThan(ctx.commonContext.stringBoard, "Kh") == 0)
@@ -489,7 +489,7 @@ int ManiacBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
 
     if ((isDrawingProbOk(ctx.personalContext.postFlopAnalysisFlags, ctx.commonContext.bettingContext.potOdd) ||
          ctx.personalContext.hasPosition) &&
-        ctx.commonContext.playersContext.runningPlayersList->size() == 2 &&
+        ctx.commonContext.playersContext.actingPlayersList->size() == 2 &&
         !(ctx.personalContext.myHandSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd) &&
         isPossibleToBluff(ctx) && nbRaises < 2)
     {
@@ -705,7 +705,7 @@ int ManiacBotStrategy::turnShouldRaise(const CurrentHandContext& ctx)
     if (ctx.personalContext.myHandSimulation.winRanged > 0.6 && ctx.personalContext.myHandSimulation.win > 0.6 &&
         ctx.commonContext.bettingContext.turnBetsOrRaisesNumber == 1 &&
         ctx.commonContext.bettingContext.flopBetsOrRaisesNumber < 2 &&
-        ctx.commonContext.playersContext.runningPlayersList->size() < 3)
+        ctx.commonContext.playersContext.actingPlayersList->size() < 3)
     {
         return ctx.commonContext.bettingContext.pot * 0.6;
     }
@@ -744,7 +744,7 @@ int ManiacBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
     {
 
         if (ctx.personalContext.myHandSimulation.winRanged < .2 && ctx.personalContext.myHandSimulation.winSd > 0.3 &&
-            ctx.commonContext.playersContext.runningPlayersList->size() < 4 &&
+            ctx.commonContext.playersContext.actingPlayersList->size() < 4 &&
             ctx.personalContext.cash >= ctx.commonContext.bettingContext.pot && isPossibleToBluff(ctx))
         {
 

@@ -73,7 +73,7 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
     // Board is fully prepared here
     auto board = engineFactory->createBoard(startData.startDealerPlayerId);
     board->setSeatsList(playersList);
-    board->setRunningPlayersList(playersList);
+    board->setActingPlayersList(playersList);
 
     myCurrentGame = std::make_unique<Game>(myEvents, engineFactory, board, playersList, startData.startDealerPlayerId,
                                            gameData, startData);

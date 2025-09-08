@@ -18,7 +18,7 @@ class StrategyTest : public EngineTest
 
         initializeHandForTesting(6, gameData);
         ctx.commonContext.playersContext.nbPlayers = 6;
-        ctx.commonContext.playersContext.runningPlayersList = myRunningPlayersList;
+        ctx.commonContext.playersContext.actingPlayersList = myActingPlayersList;
         ctx.commonContext.bettingContext.pot = 100;
         ctx.commonContext.bettingContext.highestBetAmount = 20;
         ctx.personalContext.cash = 1000;

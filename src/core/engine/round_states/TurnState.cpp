@@ -20,7 +20,7 @@ void TurnState::enter(HandFsm& hand)
 {
     GlobalServices::instance().logger().info("TurnState: Entering turn");
 
-    for (auto& player : *hand.getRunningPlayersList())
+    for (auto& player : *hand.getActingPlayersList())
     {
         player->setAction(*this, {player->getId(), ActionType::None});
     }
@@ -45,7 +45,7 @@ void TurnState::exit(HandFsm& hand)
 
 bool TurnState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const
 {
-    return (validatePlayerAction(hand.getRunningPlayersList(), action, *hand.getBettingActions(), 0, Turn));
+    return (validatePlayerAction(hand.getActingPlayersList(), action, *hand.getBettingActions(), 0, Turn));
 }
 
 void TurnState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
@@ -66,7 +66,7 @@ std::unique_ptr<IHandState> TurnState::computeNextState(HandFsm& hand, PlayerAct
     }
 
     // If all remaining players are all-in (no one can act further), go directly to showdown
-    if (hand.getRunningPlayersList()->empty() && hand.getPlayersInHandList()->size() >= 1)
+    if (hand.getActingPlayersList()->empty() && hand.getPlayersInHandList()->size() >= 1)
     {
         exit(hand);
         return std::make_unique<PostRiverState>(myEvents);

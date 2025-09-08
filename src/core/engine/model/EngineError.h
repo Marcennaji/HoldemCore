@@ -11,12 +11,12 @@ enum class EngineError
 {
     SeatNotFound = 10001,
     ActivePlayerNotFound = 10002,
-    RunningPlayerNotFound = 10003,
+    ActingPlayerNotFound = 10003,
     DealerNotFound = 10004,
     CurrentPlayerNotFound = 10005,
     NextDealerNotFound = 10010,
     NextActivePlayerNotFound = 10011,
-    FormerRunningPlayerNotFound = 10012,
+    FormerActingPlayerNotFound = 10012,
     PlayerActionError = 10030
 };
 } // namespace pkt::core

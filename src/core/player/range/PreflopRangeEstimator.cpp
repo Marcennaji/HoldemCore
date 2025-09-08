@@ -400,7 +400,7 @@ float PreflopRangeEstimator::handleLimpRange(const CurrentHandContext& ctx, cons
 {
     float range = currentRange;
 
-    if (ctx.commonContext.playersContext.runningPlayersList->size() > 3)
+    if (ctx.commonContext.playersContext.actingPlayersList->size() > 3)
     {
         range = currentRange - ctx.personalContext.statistics.preflopStatistics.getPreflopRaise();
         GlobalServices::instance().logger().verbose("Limp range adjusted for deception: " + std::to_string(range));

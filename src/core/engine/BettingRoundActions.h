@@ -14,7 +14,7 @@ class BettingRoundActions
 {
   public:
     BettingRoundActions(GameState gameState, pkt::core::player::PlayerFsmList& seats,
-                        pkt::core::player::PlayerFsmList& runningPlayers);
+                        pkt::core::player::PlayerFsmList& actingPlayers);
 
     int getCallsNumber();
     int getRaisesNumber();
@@ -31,7 +31,7 @@ class BettingRoundActions
     int myLastRaiserId = -1;
 
     const pkt::core::player::PlayerFsmList& mySeatsList;
-    const pkt::core::player::PlayerFsmList& myRunningPlayersList;
+    const pkt::core::player::PlayerFsmList& myActingPlayersList;
 };
 
 } // namespace pkt::core

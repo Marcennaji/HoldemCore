@@ -58,7 +58,7 @@ void PreflopState::exit(HandFsm& hand)
 bool PreflopState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const
 {
     return (
-        validatePlayerAction(hand.getRunningPlayersList(), action, *hand.getBettingActions(), mySmallBlind, Preflop));
+        validatePlayerAction(hand.getActingPlayersList(), action, *hand.getBettingActions(), mySmallBlind, Preflop));
 }
 
 void PreflopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
@@ -71,7 +71,7 @@ void PreflopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
 
 std::unique_ptr<IHandState> PreflopState::computeNextState(HandFsm& hand, PlayerAction action)
 {
-    if (hand.getRunningPlayersList()->size() < 2)
+    if (hand.getActingPlayersList()->size() < 2)
     {
         return std::make_unique<PostRiverState>(myEvents);
     }
@@ -90,7 +90,7 @@ void PreflopState::logStateInfo(const HandFsm& /*hand*/) const
 
 void PreflopState::setBlinds(HandFsm& hand)
 {
-    for (const auto& player : *hand.getRunningPlayersList())
+    for (const auto& player : *hand.getActingPlayersList())
     {
         int blindAmount = 0;
         ActionType actionType = ActionType::None;

@@ -408,7 +408,7 @@ void PlayerFsm::updateCurrentHandContext(const GameState state, HandFsm& current
     myCurrentHandContext->personalContext.totalBetAmount = myCurrentHandActions.getHandTotalBetAmount();
     myCurrentHandContext->personalContext.m = static_cast<int>(currentHand.getM(myCash));
     myCurrentHandContext->personalContext.actions.currentHandActions = myCurrentHandActions;
-    myCurrentHandContext->personalContext.hasPosition = hasPosition(myPosition, currentHand.getRunningPlayersList());
+    myCurrentHandContext->personalContext.hasPosition = hasPosition(myPosition, currentHand.getActingPlayersList());
     myCurrentHandContext->personalContext.actions.preflopIsAggressor = isAgressor(Preflop);
     myCurrentHandContext->personalContext.actions.flopIsAggressor = isAgressor(Flop);
     myCurrentHandContext->personalContext.actions.turnIsAggressor = isAgressor(Turn);
@@ -431,7 +431,7 @@ void PlayerFsm::updateCurrentHandContext(const GameState state, HandFsm& current
 
 float PlayerFsm::calculatePreflopCallingRange(const CurrentHandContext& ctx) const
 {
-    return myRangeEstimator->getStandardCallingRange(ctx.commonContext.playersContext.runningPlayersListFsm->size());
+    return myRangeEstimator->getStandardCallingRange(ctx.commonContext.playersContext.actingPlayersListFsm->size());
 }
 
 void PlayerFsm::resetForNewHand(const HandFsm& hand)

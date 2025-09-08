@@ -8,11 +8,11 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-HandPlayersState::HandPlayersState(PlayerFsmList seats, PlayerFsmList runningPlayers)
-    : mySeatsList(seats), myRunningPlayersList(runningPlayers)
+HandPlayersState::HandPlayersState(PlayerFsmList seats, PlayerFsmList actingPlayers)
+    : mySeatsList(seats), myActingPlayersList(actingPlayers)
 
 {
-    myBettingActions = make_shared<BettingActions>(mySeatsList, myRunningPlayersList);
+    myBettingActions = make_shared<BettingActions>(mySeatsList, myActingPlayersList);
 }
 
 } // namespace pkt::core

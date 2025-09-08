@@ -25,7 +25,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(const PostFlopAnal
         // woudn't slow play a medium hand on a dangerous board
         if (!testedHand.isFullHousePossible &&
             ((testedHand.isMiddlePair && !testedHand.isFullHousePossible &&
-              ctx.commonContext.playersContext.runningPlayersList->size() < 4) ||
+              ctx.commonContext.playersContext.actingPlayersList->size() < 4) ||
              testedHand.isTopPair || testedHand.isOverPair ||
              (testedHand.isTwoPair && !testedHand.isFullHousePossible)) &&
             testedHand.isFlushDrawPossible && testedHand.isStraightDrawPossible)
@@ -43,7 +43,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(const PostFlopAnal
         // wouldn't be passive with a decent hand, on position, if more than 1 opponent
         if (!testedHand.isFullHousePossible &&
             (testedHand.isTopPair || testedHand.isOverPair || testedHand.isTwoPair || testedHand.isTrips) &&
-            ctx.commonContext.playersContext.runningPlayersList->size() > 2)
+            ctx.commonContext.playersContext.actingPlayersList->size() > 2)
         {
             return true;
         }
@@ -88,7 +88,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopAnalys
 
         if (testedHand.isOverCards || testedHand.straightOuts >= 8 || testedHand.flushOuts >= 8)
         {
-            return (ctx.commonContext.playersContext.runningPlayersList->size() > 2 ? true : false);
+            return (ctx.commonContext.playersContext.actingPlayersList->size() > 2 ? true : false);
         }
 
         if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight ||
@@ -118,7 +118,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopAnalys
     }
 
     // on a 3 or more players pot : if the player bets in position, he should have at least a middle pair
-    if (bHavePosition && ctx.commonContext.playersContext.runningPlayersList->size() > 2)
+    if (bHavePosition && ctx.commonContext.playersContext.actingPlayersList->size() > 2)
     {
 
         if (testedHand.isOverCards || testedHand.straightOuts >= 8 || testedHand.flushOuts >= 8)
@@ -154,7 +154,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopAnalys
 
     // on a 3 or more players pot : if the player is first to act, and bets, he should have at least a top pair
     if (ctx.personalContext.actions.currentHandActions.getActionsNumber(GameState::Flop, ActionType::Check) == 0 &&
-        ctx.commonContext.playersContext.runningPlayersList->size() > 2)
+        ctx.commonContext.playersContext.actingPlayersList->size() > 2)
     {
 
         if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight ||
@@ -237,7 +237,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(const PostFlopAnaly
                 return true;
             }
 
-            if (ctx.commonContext.playersContext.runningPlayersList->size() > 2 && testedHand.isOnePair &&
+            if (ctx.commonContext.playersContext.actingPlayersList->size() > 2 && testedHand.isOnePair &&
                 !testedHand.isTopPair && !testedHand.isOverPair)
             {
                 return true;
@@ -275,7 +275,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopAnal
     if (ctx.personalContext.actions.currentHandActions.getActionsNumber(GameState::Flop, ActionType::Check) == 1)
     {
         if ((testedHand.isOverCards || testedHand.flushOuts >= 8 || testedHand.straightOuts >= 8) &&
-            ctx.commonContext.playersContext.runningPlayersList->size() > 2)
+            ctx.commonContext.playersContext.actingPlayersList->size() > 2)
         {
             return true;
         }
@@ -418,7 +418,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCheck(const PostFlopAnal
         // wouldn't be passive with a decent hand, on position, if more than 1 opponent
         if (((testedHand.usesFirst || testedHand.usesSecond) &&
              ((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isTrips)) &&
-            ctx.commonContext.playersContext.runningPlayersList->size() > 2)
+            ctx.commonContext.playersContext.actingPlayersList->size() > 2)
         {
             return true;
         }
@@ -456,7 +456,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnBet(const PostFlopAnalys
     {
 
         if ((testedHand.isOverCards || testedHand.flushOuts >= 8 || testedHand.straightOuts >= 8) &&
-            ctx.commonContext.playersContext.runningPlayersList->size() > 2)
+            ctx.commonContext.playersContext.actingPlayersList->size() > 2)
         {
             return true;
         }
@@ -737,7 +737,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(const PostFlopAnaly
 
     // the player has bet the river, is out of position on a multi-players pot, in a hand with some action, and is
     // not a maniac player : he should have at least 2 pairs
-    if (!bHavePosition && ctx.commonContext.playersContext.runningPlayersList->size() > 2 &&
+    if (!bHavePosition && ctx.commonContext.playersContext.actingPlayersList->size() > 2 &&
         ((ctx.commonContext.bettingContext.flopBetsOrRaisesNumber > 1 &&
           !ctx.personalContext.actions.flopIsAggressor) ||
          (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber > 1 && !ctx.personalContext.actions.turnIsAggressor)))
@@ -786,7 +786,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(const PostFlopAnal
 
     // the player has called the river on a multi-players pot, and is not a loose player : he should have at least a
     // top pair
-    if (ctx.commonContext.playersContext.runningPlayersList->size() > 2)
+    if (ctx.commonContext.playersContext.actingPlayersList->size() > 2)
     {
 
         if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight ||
@@ -845,7 +845,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(const PostFlopAna
 
     // the player has raised the river, is out of position on a multi-players pot, in a hand with some action, and
     // is not a maniac player : he should have at least a set
-    if (!bHavePosition && ctx.commonContext.playersContext.runningPlayersList->size() > 2 &&
+    if (!bHavePosition && ctx.commonContext.playersContext.actingPlayersList->size() > 2 &&
         ((ctx.commonContext.bettingContext.flopBetsOrRaisesNumber > 1 &&
           !ctx.personalContext.actions.flopIsAggressor) ||
          (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber > 1 && !ctx.personalContext.actions.turnIsAggressor)))

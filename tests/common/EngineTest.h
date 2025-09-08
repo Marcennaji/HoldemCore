@@ -33,10 +33,10 @@ class EngineTest : public ::testing::Test
     std::shared_ptr<pkt::core::HandFsm> myHandFsm;
     std::shared_ptr<pkt::core::IBoard> myBoard;
     std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::Player>>> mySeatsList;
-    std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::Player>>> myRunningPlayersList;
+    std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::Player>>> myActingPlayersList;
 
     std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::PlayerFsm>>> mySeatsListFsm;
-    std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::PlayerFsm>>> myRunningPlayersListFsm;
+    std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::PlayerFsm>>> myActingPlayersListFsm;
     pkt::core::GameState myLastGameState = pkt::core::None;
 
     pkt::core::GameData gameData;

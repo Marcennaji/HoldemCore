@@ -13,7 +13,7 @@ namespace pkt::core
 class BettingActions
 {
   public:
-    BettingActions(pkt::core::player::PlayerFsmList& seats, pkt::core::player::PlayerFsmList& runningPlayers);
+    BettingActions(pkt::core::player::PlayerFsmList& seats, pkt::core::player::PlayerFsmList& actingPlayers);
 
     int getMinRaise(int smallBlind) const;
     int getRoundHighestSet() const;
@@ -48,7 +48,7 @@ class BettingActions
     int myPreviousPlayerId{-1};
 
     const pkt::core::player::PlayerFsmList& mySeatsList;
-    const pkt::core::player::PlayerFsmList& myRunningPlayersList;
+    const pkt::core::player::PlayerFsmList& myActingPlayersList;
 };
 
 } // namespace pkt::core

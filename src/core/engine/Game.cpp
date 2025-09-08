@@ -24,8 +24,8 @@ Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
     : myEngineFactory(factory), myEvents(events), myCurrentBoard(board), mySeatsList(seatsList),
       myDealerPlayerId(dealerId), myGameData(gameData), myStartData(startData)
 {
-    // Running players list starts identical to seats list
-    myRunningPlayersList = std::make_shared<std::list<std::shared_ptr<Player>>>(*mySeatsList);
+    // Acting players list starts identical to seats list
+    myActingPlayersList = std::make_shared<std::list<std::shared_ptr<Player>>>(*mySeatsList);
 
     // Validate dealer exists
     auto it = getPlayerListIteratorById(mySeatsList, dealerId);
@@ -35,14 +35,14 @@ Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
 
 Game::~Game()
 {
-    myRunningPlayersList->clear();
+    myActingPlayersList->clear();
     mySeatsList->clear();
 }
 
 void Game::startNewHand()
 {
     resetPlayerActions();
-    resetRunningPlayers();
+    resetActingPlayers();
     createNewHand();
     findNextDealer();
     myCurrentHand->start();
@@ -54,15 +54,15 @@ void Game::resetPlayerActions()
         player->setLastAction({player->getId(), ActionType::None, 0});
 }
 
-void Game::resetRunningPlayers()
+void Game::resetActingPlayers()
 {
-    myRunningPlayersList->clear();
-    *myRunningPlayersList = *mySeatsList;
+    myActingPlayersList->clear();
+    *myActingPlayersList = *mySeatsList;
 }
 
 void Game::createNewHand()
 {
-    myCurrentHand = myEngineFactory->createHand(myEngineFactory, myCurrentBoard, mySeatsList, myRunningPlayersList,
+    myCurrentHand = myEngineFactory->createHand(myEngineFactory, myCurrentBoard, mySeatsList, myActingPlayersList,
                                                 myGameData, myStartData);
 }
 

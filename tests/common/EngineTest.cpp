@@ -22,7 +22,7 @@ void EngineTest::SetUp()
     myFactory = std::make_unique<EngineFactory>(myEvents);
     auto& services = pkt::core::GlobalServices::instance();
     auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
-    logger->setLogLevel(pkt::core::LogLevel::Verbose);
+    logger->setLogLevel(pkt::core::LogLevel::Info);
     services.setLogger(std::move(logger));
     services.setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>());
     auto randomizer = std::make_unique<FakeRandomizer>();
@@ -57,11 +57,11 @@ void EngineTest::createPlayersLists(size_t playerCount)
         auto player = std::make_shared<DummyPlayer>(i, myEvents);
         mySeatsList->push_back(player);
     }
-    // Create a deep copy of mySeatsList for RunningPlayersList
-    myRunningPlayersList = std::make_shared<std::list<std::shared_ptr<Player>>>();
+    // Create a deep copy of mySeatsList for ActingPlayersList
+    myActingPlayersList = std::make_shared<std::list<std::shared_ptr<Player>>>();
     for (const auto& player : *mySeatsList)
     {
-        myRunningPlayersList->push_back(player);
+        myActingPlayersList->push_back(player);
     }
 }
 void EngineTest::initializeHandWithPlayers(size_t activePlayerCount, GameData gameData)
@@ -69,13 +69,13 @@ void EngineTest::initializeHandWithPlayers(size_t activePlayerCount, GameData ga
     createPlayersLists(activePlayerCount);
     myBoard = myFactory->createBoard(startDealerPlayerId);
     myBoard->setSeatsList(mySeatsList);
-    myBoard->setRunningPlayersList(myRunningPlayersList);
+    myBoard->setActingPlayersList(myActingPlayersList);
 
     StartData startData;
     startData.startDealerPlayerId = startDealerPlayerId;
     startData.numberOfPlayers = static_cast<int>(activePlayerCount);
 
-    myHand = myFactory->createHand(myFactory, myBoard, mySeatsList, myRunningPlayersList, gameData, startData);
+    myHand = myFactory->createHand(myFactory, myBoard, mySeatsList, myActingPlayersList, gameData, startData);
 }
 void EngineTest::createPlayersFsmLists(size_t playerCount)
 {
@@ -86,10 +86,10 @@ void EngineTest::createPlayersFsmLists(size_t playerCount)
         mySeatsListFsm->push_back(playerFsm);
     }
 
-    myRunningPlayersListFsm = std::make_shared<std::list<std::shared_ptr<PlayerFsm>>>();
+    myActingPlayersListFsm = std::make_shared<std::list<std::shared_ptr<PlayerFsm>>>();
     for (const auto& player : *mySeatsListFsm)
     {
-        myRunningPlayersListFsm->push_back(player);
+        myActingPlayersListFsm->push_back(player);
     }
 }
 void EngineTest::initializeHandFsmWithPlayers(size_t activePlayerCount, GameData gameData)
@@ -97,14 +97,14 @@ void EngineTest::initializeHandFsmWithPlayers(size_t activePlayerCount, GameData
     createPlayersFsmLists(activePlayerCount);
     myBoard = myFactory->createBoard(startDealerPlayerId);
     myBoard->setSeatsListFsm(mySeatsListFsm);
-    myBoard->setRunningPlayersListFsm(myRunningPlayersListFsm);
+    myBoard->setActingPlayersListFsm(myActingPlayersListFsm);
 
     StartData startData;
     startData.startDealerPlayerId = startDealerPlayerId;
     startData.numberOfPlayers = static_cast<int>(activePlayerCount);
 
     myHandFsm =
-        myFactory->createHandFsm(myFactory, myBoard, mySeatsListFsm, myRunningPlayersListFsm, gameData, startData);
+        myFactory->createHandFsm(myFactory, myBoard, mySeatsListFsm, myActingPlayersListFsm, gameData, startData);
 }
 void EngineTest::checkPostRiverConditions()
 {
@@ -115,7 +115,7 @@ void EngineTest::checkPostRiverConditions()
 
 bool EngineTest::isPlayerStillActive(unsigned id) const
 {
-    for (const auto& p : *myHandFsm->getRunningPlayersList())
+    for (const auto& p : *myHandFsm->getActingPlayersList())
     {
         if (p->getId() == id)
             return true;

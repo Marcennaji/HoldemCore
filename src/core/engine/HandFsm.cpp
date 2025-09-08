@@ -20,14 +20,14 @@ using namespace std;
 using namespace pkt::core::player;
 
 HandFsm::HandFsm(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
-                 PlayerFsmList seats, PlayerFsmList runningPlayers, GameData gameData, StartData startData)
-    : HandPlayersState(seats, runningPlayers), myEvents(events), myFactory(factory), myBoard(board),
+                 PlayerFsmList seats, PlayerFsmList actingPlayers, GameData gameData, StartData startData)
+    : HandPlayersState(seats, actingPlayers), myEvents(events), myFactory(factory), myBoard(board),
       myStartQuantityPlayers(startData.numberOfPlayers), mySmallBlind(gameData.firstSmallBlind),
       myStartCash(gameData.startMoney)
 
 {
     mySeatsList = seats;
-    myRunningPlayersList = runningPlayers;
+    myActingPlayersList = actingPlayers;
     myDealerPlayerId = startData.startDealerPlayerId;
     mySmallBlindPlayerId = startData.startDealerPlayerId;
     myBigBlindPlayerId = startData.startDealerPlayerId;
@@ -99,7 +99,7 @@ void HandFsm::handlePlayerAction(PlayerAction action)
 }
 void HandFsm::applyActionEffects(const PlayerAction action)
 {
-    auto player = getPlayerFsmById(myRunningPlayersList, action.playerId);
+    auto player = getPlayerFsmById(myActingPlayersList, action.playerId);
     if (!player)
         return;
 
@@ -181,7 +181,7 @@ void HandFsm::applyActionEffects(const PlayerAction action)
     }
 
     player->setAction(*myState, actionForHistory);
-    updateRunningPlayersListFsm(myRunningPlayersList);
+    updateActingPlayersListFsm(myActingPlayersList);
 }
 
 void HandFsm::initAndShuffleDeck()
@@ -248,7 +248,7 @@ HandCommonContext HandFsm::updateHandCommonContext(const GameState state)
     handContext.stringBoard = getStringBoard();
     handContext.smallBlind = mySmallBlind;
 
-    handContext.playersContext.runningPlayersListFsm = getRunningPlayersList();
+    handContext.playersContext.actingPlayersListFsm = getActingPlayersList();
     handContext.playersContext.lastVPIPPlayerFsm =
         getPlayerFsmById(getSeatsList(), getBettingActions()->getLastRaiserId());
     handContext.playersContext.callersPositions = myBettingActions->getCallersPositions();

@@ -29,11 +29,10 @@ class EngineFactory
 
     virtual std::shared_ptr<IHand> createHand(std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
                                               pkt::core::player::PlayerList seats,
-                                              pkt::core::player::PlayerList runningPlayers, GameData, StartData);
+                                              pkt::core::player::PlayerList actingPlayers, GameData, StartData);
     virtual std::shared_ptr<HandFsm> createHandFsm(std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
                                                    pkt::core::player::PlayerFsmList seats,
-                                                   pkt::core::player::PlayerFsmList runningPlayers, GameData,
-                                                   StartData);
+                                                   pkt::core::player::PlayerFsmList actingPlayers, GameData, StartData);
 
     virtual std::shared_ptr<IBoard> createBoard(unsigned dealerPosition);
     virtual std::vector<std::shared_ptr<IBettingRound>> createAllBettingRounds(IHand* hi, unsigned dealerPosition,

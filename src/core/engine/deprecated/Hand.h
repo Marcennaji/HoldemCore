@@ -22,7 +22,7 @@ class Hand : public IHand
 {
   public:
     Hand(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard>,
-         pkt::core::player::PlayerList seats, pkt::core::player::PlayerList runningPlayers, GameData gameData,
+         pkt::core::player::PlayerList seats, pkt::core::player::PlayerList actingPlayers, GameData gameData,
          StartData startData);
     ~Hand();
 
@@ -33,7 +33,7 @@ class Hand : public IHand
     void initAndShuffleDeck();
 
     pkt::core::player::PlayerList getSeatsList() const { return mySeatsList; }
-    pkt::core::player::PlayerList getRunningPlayersList() const { return myRunningPlayersList; }
+    pkt::core::player::PlayerList getActingPlayersList() const { return myActingPlayersList; }
 
     std::shared_ptr<IBoard> getBoard() const { return myBoard; }
     std::shared_ptr<IBettingRound> getPreflop() const { return myBettingRounds[Preflop]; }
@@ -98,8 +98,8 @@ class Hand : public IHand
     const GameEvents& myEvents;
     std::shared_ptr<IBoard> myBoard;
 
-    pkt::core::player::PlayerList mySeatsList;          // all players
-    pkt::core::player::PlayerList myRunningPlayersList; // all players who have not folded and are not all in
+    pkt::core::player::PlayerList mySeatsList;         // all players
+    pkt::core::player::PlayerList myActingPlayersList; // all players who have not folded and are not all in
 
     std::vector<std::shared_ptr<IBettingRound>> myBettingRounds;
 

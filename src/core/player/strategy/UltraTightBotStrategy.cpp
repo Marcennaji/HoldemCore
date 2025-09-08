@@ -67,7 +67,7 @@ bool UltraTightBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
 
     std::shared_ptr<Player> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
 
-    if (ctx.commonContext.playersContext.runningPlayersList->size() > 2 &&
+    if (ctx.commonContext.playersContext.actingPlayersList->size() > 2 &&
         ctx.commonContext.bettingContext.preflopRaisesNumber + ctx.commonContext.bettingContext.preflopCallsNumber >
             1 &&
         ctx.commonContext.bettingContext.preflopRaisesNumber == 1 && ctx.personalContext.position >= Cutoff &&
@@ -313,10 +313,10 @@ int UltraTightBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
 
         // if no raise preflop, or if more than 1 opponent
         if (ctx.commonContext.bettingContext.preflopRaisesNumber == 0 ||
-            ctx.commonContext.playersContext.runningPlayersList->size() > 2)
+            ctx.commonContext.playersContext.actingPlayersList->size() > 2)
         {
 
-            if (ctx.commonContext.playersContext.runningPlayersList->size() < 4)
+            if (ctx.commonContext.playersContext.actingPlayersList->size() < 4)
             {
                 return ctx.commonContext.bettingContext.pot * 0.6;
             }
@@ -330,7 +330,7 @@ int UltraTightBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
         if (ctx.commonContext.bettingContext.preflopRaisesNumber > 0 &&
             ctx.commonContext.playersContext.preflopLastRaiser->getId() == ctx.personalContext.id)
         {
-            if (ctx.commonContext.playersContext.runningPlayersList->size() < 4)
+            if (ctx.commonContext.playersContext.actingPlayersList->size() < 4)
             {
                 return ctx.commonContext.bettingContext.pot * 0.6;
             }
@@ -358,7 +358,7 @@ int UltraTightBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
             // if I was the last raiser preflop, bet if i have a big enough stack
             if (ctx.commonContext.bettingContext.preflopRaisesNumber > 0 &&
                 ctx.commonContext.playersContext.preflopLastRaiser->getId() == ctx.personalContext.id &&
-                ctx.commonContext.playersContext.runningPlayersList->size() < 4 &&
+                ctx.commonContext.playersContext.actingPlayersList->size() < 4 &&
                 ctx.personalContext.cash > ctx.commonContext.bettingContext.pot * 5 && isPossibleToBluff(ctx))
             {
                 return ctx.commonContext.bettingContext.pot * 0.6;
@@ -437,7 +437,7 @@ int UltraTightBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
 
     if ((isDrawingProbOk(ctx.personalContext.postFlopAnalysisFlags, ctx.commonContext.bettingContext.potOdd) ||
          ctx.personalContext.hasPosition) &&
-        ctx.commonContext.playersContext.runningPlayersList->size() == 2 &&
+        ctx.commonContext.playersContext.actingPlayersList->size() == 2 &&
         !(ctx.personalContext.myHandSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd) &&
         isPossibleToBluff(ctx) && nbRaises < 2)
     {
@@ -454,7 +454,7 @@ int UltraTightBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
     {
 
         if (ctx.commonContext.bettingContext.potOdd < 30 &&
-            ctx.commonContext.playersContext.runningPlayersList->size() < 4)
+            ctx.commonContext.playersContext.actingPlayersList->size() < 4)
         {
 
             int rand = 0;
@@ -504,7 +504,7 @@ int UltraTightBotStrategy::turnShouldBet(const CurrentHandContext& ctx)
     }
 
     if (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber == 0 && ctx.personalContext.hasPosition &&
-        ctx.commonContext.playersContext.runningPlayersList->size() < 4 &&
+        ctx.commonContext.playersContext.actingPlayersList->size() < 4 &&
         getDrawingProbability(ctx.personalContext.postFlopAnalysisFlags) < 9 && ctx.personalContext.cash > pot * 4)
     {
         int rand = 0;
@@ -725,7 +725,7 @@ int UltraTightBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
 
         if (ctx.personalContext.hasPosition && ctx.personalContext.myHandSimulation.winRanged < .4 &&
             ctx.personalContext.myHandSimulation.winSd > 0.3 &&
-            ctx.commonContext.playersContext.runningPlayersList->size() < 3 &&
+            ctx.commonContext.playersContext.actingPlayersList->size() < 3 &&
             (ctx.personalContext.cash >= ctx.commonContext.bettingContext.pot * 3 || ctx.personalContext.m < 4) &&
             isPossibleToBluff(ctx))
         {
@@ -862,7 +862,7 @@ bool UltraTightBotStrategy::riverShouldCall(const CurrentHandContext& ctx)
     // assume that if there was more than 1 player to play after the raiser and he is not a maniac, he shouldn't
     // bluff
     // TODO
-    /*if (ctx.commonContext.playersContext.runningPlayersList->size() > 2 &&
+    /*if (ctx.commonContext.playersContext.actingPlayersList->size() > 2 &&
     ctx.personalContext.myHandSimulation.winRanged < .6 && ctx.personalContext.myHandSimulation.winSd < 0.95 &&
         (raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getAgressionFactor() < 4 &&
          raiserStats.getAgressionFrequency() < 50))
@@ -871,8 +871,8 @@ bool UltraTightBotStrategy::riverShouldCall(const CurrentHandContext& ctx)
         PlayerListConstIterator it_c;
         int playersAfterRaiser = 0;
 
-        for (it_c = currentHand->getRunningPlayersList()->begin(); it_c !=
-    currentHand->getRunningPlayersList()->end();
+        for (it_c = currentHand->getActingPlayersList()->begin(); it_c !=
+    currentHand->getActingPlayersList()->end();
              ++it_c)
         {
             if ((*it_c)->getPosition() > ctx.commonContext.playersContext.lastVPIPPlayer->getPosition())

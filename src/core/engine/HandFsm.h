@@ -23,7 +23,7 @@ class HandFsm : public IHandLifecycle, public IHandPlayerAction, public HandPlay
 {
   public:
     HandFsm(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard>,
-            pkt::core::player::PlayerFsmList seats, pkt::core::player::PlayerFsmList runningPlayers, GameData gameData,
+            pkt::core::player::PlayerFsmList seats, pkt::core::player::PlayerFsmList actingPlayers, GameData gameData,
             StartData startData);
     ~HandFsm();
 

@@ -308,13 +308,13 @@ std::shared_ptr<PlayerFsm> getPlayerFsmById(PlayerFsmList list, unsigned id)
     }
     return nullptr;
 }
-void updateRunningPlayersList(PlayerList& myRunningPlayersList)
+void updateActingPlayersList(PlayerList& myActingPlayersList)
 {
-    GlobalServices::instance().logger().verbose("Updating myRunningPlayersList...");
+    GlobalServices::instance().logger().verbose("Updating myActingPlayersList...");
 
     PlayerListIterator it, it1;
 
-    for (it = myRunningPlayersList->begin(); it != myRunningPlayersList->end();)
+    for (it = myActingPlayersList->begin(); it != myActingPlayersList->end();)
     {
         GlobalServices::instance().logger().verbose("Checking player: " + (*it)->getName() +
                                                     ", action: " + playerActionToString((*it)->getLastAction().type));
@@ -323,27 +323,27 @@ void updateRunningPlayersList(PlayerList& myRunningPlayersList)
         {
             GlobalServices::instance().logger().verbose(
                 "Removing player: " + (*it)->getName() +
-                " from myRunningPlayersList due to action: " + playerActionToString((*it)->getLastAction().type));
+                " from myActingPlayersList due to action: " + playerActionToString((*it)->getLastAction().type));
 
-            it = myRunningPlayersList->erase(it);
+            it = myActingPlayersList->erase(it);
 
-            if (!myRunningPlayersList->empty())
+            if (!myActingPlayersList->empty())
             {
                 GlobalServices::instance().logger().verbose(
-                    "myRunningPlayersList is not empty after removal. Updating current player's turn.");
+                    "myActingPlayersList is not empty after removal. Updating current player's turn.");
 
                 it1 = it;
-                if (it1 == myRunningPlayersList->begin())
+                if (it1 == myActingPlayersList->begin())
                 {
                     GlobalServices::instance().logger().verbose(
                         "Iterator points to the beginning of the list. Wrapping around to the end.");
-                    it1 = myRunningPlayersList->end();
+                    it1 = myActingPlayersList->end();
                 }
                 --it1;
             }
             else
             {
-                GlobalServices::instance().logger().verbose("myRunningPlayersList is now empty after removal.");
+                GlobalServices::instance().logger().verbose("myActingPlayersList is now empty after removal.");
             }
         }
         else
@@ -352,16 +352,16 @@ void updateRunningPlayersList(PlayerList& myRunningPlayersList)
         }
     }
 
-    GlobalServices::instance().logger().verbose("Finished updating myRunningPlayersList.");
+    GlobalServices::instance().logger().verbose("Finished updating myActingPlayersList.");
 }
 
-void updateRunningPlayersListFsm(PlayerFsmList& myRunningPlayersListFsm)
+void updateActingPlayersListFsm(PlayerFsmList& myActingPlayersListFsm)
 {
-    GlobalServices::instance().logger().verbose("Updating myRunningPlayersListFsm...");
+    GlobalServices::instance().logger().verbose("Updating myActingPlayersListFsm...");
 
     PlayerFsmListIterator it, it1;
 
-    for (it = myRunningPlayersListFsm->begin(); it != myRunningPlayersListFsm->end();)
+    for (it = myActingPlayersListFsm->begin(); it != myActingPlayersListFsm->end();)
     {
         GlobalServices::instance().logger().verbose("Checking player: " + (*it)->getName() +
                                                     ", action: " + playerActionToString((*it)->getLastAction().type));
@@ -370,38 +370,38 @@ void updateRunningPlayersListFsm(PlayerFsmList& myRunningPlayersListFsm)
         {
             GlobalServices::instance().logger().verbose(
                 "Removing player: " + (*it)->getName() +
-                " from myRunningPlayersListFsm due to action: " + playerActionToString((*it)->getLastAction().type));
+                " from myActingPlayersListFsm due to action: " + playerActionToString((*it)->getLastAction().type));
 
-            it = myRunningPlayersListFsm->erase(it);
+            it = myActingPlayersListFsm->erase(it);
 
-            if (!myRunningPlayersListFsm->empty())
+            if (!myActingPlayersListFsm->empty())
             {
                 GlobalServices::instance().logger().verbose(
-                    "myRunningPlayersListFsm is not empty after removal. Updating current player's turn.");
+                    "myActingPlayersListFsm is not empty after removal. Updating current player's turn.");
 
                 it1 = it;
-                if (it1 == myRunningPlayersListFsm->begin())
+                if (it1 == myActingPlayersListFsm->begin())
                 {
                     GlobalServices::instance().logger().verbose(
                         "Iterator points to the beginning of the list. Wrapping around to the end.");
-                    it1 = myRunningPlayersListFsm->end();
+                    it1 = myActingPlayersListFsm->end();
                 }
                 --it1;
             }
             else
             {
-                GlobalServices::instance().logger().verbose("myRunningPlayersListFsm is now empty after removal.");
+                GlobalServices::instance().logger().verbose("myActingPlayersListFsm is now empty after removal.");
             }
         }
         else
         {
             GlobalServices::instance().logger().verbose(
-                "Player: " + (*it)->getName() + " remains in myRunningPlayersListFsm. Moving to the next player.");
+                "Player: " + (*it)->getName() + " remains in myActingPlayersListFsm. Moving to the next player.");
             ++it;
         }
     }
 
-    GlobalServices::instance().logger().verbose("Finished updating myRunningPlayersListFsm.");
+    GlobalServices::instance().logger().verbose("Finished updating myActingPlayersListFsm.");
 }
 
 std::string getPositionLabel(PlayerPosition p)
@@ -459,7 +459,7 @@ PlayerListIterator findPlayerOrThrow(PlayerList seats, unsigned id)
             ids += " " + to_string((*i)->getId());
         GlobalServices::instance().logger().error("Couldn't find player with id " + to_string(id) +
                                                   " in the seats list. List contains following ids :" + ids);
-        throw Exception(__FILE__, __LINE__, EngineError::RunningPlayerNotFound);
+        throw Exception(__FILE__, __LINE__, EngineError::ActingPlayerNotFound);
     }
     return it;
 }
@@ -477,7 +477,7 @@ PlayerListIterator nextActivePlayer(PlayerList seats, PlayerListIterator it)
     }
     return it;
 }
-bool hasPosition(PlayerPosition position, PlayerFsmList runningPlayers)
+bool hasPosition(PlayerPosition position, PlayerFsmList actingPlayers)
 {
     // return true if position is last to play, false if not
 
@@ -485,7 +485,7 @@ bool hasPosition(PlayerPosition position, PlayerFsmList runningPlayers)
 
     PlayerFsmListConstIterator itC;
 
-    for (itC = runningPlayers->begin(); itC != runningPlayers->end(); ++itC)
+    for (itC = actingPlayers->begin(); itC != actingPlayers->end(); ++itC)
     {
 
         if ((*itC)->getPosition() > position)
@@ -497,14 +497,14 @@ bool hasPosition(PlayerPosition position, PlayerFsmList runningPlayers)
     return hasPosition;
 }
 
-bool validatePlayerAction(const PlayerFsmList& runningPlayersList, const PlayerAction& action,
+bool validatePlayerAction(const PlayerFsmList& actingPlayersList, const PlayerAction& action,
                           const BettingActions& bettingActions, int smallBlind, const GameState gameState)
 {
-    auto player = getPlayerFsmById(runningPlayersList, action.playerId);
+    auto player = getPlayerFsmById(actingPlayersList, action.playerId);
     if (!player)
     {
         GlobalServices::instance().logger().error(gameStateToString(gameState) + ": player with id " +
-                                                  std::to_string(action.playerId) + " not found in runningPlayersList");
+                                                  std::to_string(action.playerId) + " not found in actingPlayersList");
         return false;
     }
     const int currentHighestBet = bettingActions.getRoundHighestSet();
@@ -696,7 +696,7 @@ bool isRoundComplete(HandFsm& hand)
 {
     assert(hand.getState().getGameState() != GameState::None);
 
-    for (auto player = hand.getRunningPlayersList()->begin(); player != hand.getRunningPlayersList()->end(); ++player)
+    for (auto player = hand.getActingPlayersList()->begin(); player != hand.getActingPlayersList()->end(); ++player)
     {
         GlobalServices::instance().logger().verbose("checking if round " +
                                                     gameStateToString(hand.getState().getGameState()) +

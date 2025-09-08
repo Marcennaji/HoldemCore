@@ -628,7 +628,7 @@ std::string Player::getStringBoard() const
     return stringBoard;
 }
 
-bool Player::hasPosition(PlayerPosition myPos, PlayerList runningPlayers)
+bool Player::hasPosition(PlayerPosition myPos, PlayerList actingPlayers)
 {
     // return true if myPos is last to play, false if not
 
@@ -636,7 +636,7 @@ bool Player::hasPosition(PlayerPosition myPos, PlayerList runningPlayers)
 
     PlayerListConstIterator itC;
 
-    for (itC = runningPlayers->begin(); itC != runningPlayers->end(); ++itC)
+    for (itC = actingPlayers->begin(); itC != actingPlayers->end(); ++itC)
     {
 
         if ((*itC)->getPosition() > myPos)
@@ -919,7 +919,7 @@ bool Player::canBluff(const GameState gameState) const
     const int nbPlayers = currentHand->getSeatsList()->size();
     const int nbRaises = currentHand->getPreflopRaisesNumber();
 
-    PlayerList players = currentHand->getRunningPlayersList();
+    PlayerList players = currentHand->getActingPlayersList();
 
     if (players->size() == 1)
     {
@@ -1007,7 +1007,7 @@ void Player::updateCurrentHandContext(const GameState state)
 
     myCurrentHandContext->commonContext.playersContext.flopLastRaiser =
         getPlayerById(currentHand->getSeatsList(), currentHand->getFlopLastRaiserId());
-    myCurrentHandContext->commonContext.playersContext.runningPlayersList = currentHand->getRunningPlayersList();
+    myCurrentHandContext->commonContext.playersContext.actingPlayersList = currentHand->getActingPlayersList();
     myCurrentHandContext->commonContext.playersContext.lastVPIPPlayer =
         getPlayerById(currentHand->getSeatsList(), currentHand->getLastRaiserId());
     myCurrentHandContext->commonContext.playersContext.callersPositions = currentHand->getCallersPositions();
@@ -1038,7 +1038,7 @@ void Player::updateCurrentHandContext(const GameState state)
     myCurrentHandContext->personalContext.m = static_cast<int>(getM());
     myCurrentHandContext->personalContext.actions.currentHandActions = myCurrentHandActions;
     myCurrentHandContext->personalContext.hasPosition =
-        Player::hasPosition(myPosition, currentHand->getRunningPlayersList());
+        Player::hasPosition(myPosition, currentHand->getActingPlayersList());
     myCurrentHandContext->personalContext.actions.preflopIsAggressor = isAgressor(Preflop);
     myCurrentHandContext->personalContext.actions.flopIsAggressor = isAgressor(Flop);
     myCurrentHandContext->personalContext.actions.turnIsAggressor = isAgressor(Turn);

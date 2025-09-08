@@ -72,14 +72,14 @@ PlayerFsmListIterator getPlayerFsmListIteratorById(PlayerFsmList list, unsigned 
 PlayerListIterator findPlayerOrThrow(PlayerList seats, unsigned id);
 PlayerListIterator nextActivePlayer(PlayerList seats, PlayerListIterator it);
 
-void updateRunningPlayersList(PlayerList&);
-void updateRunningPlayersListFsm(PlayerFsmList&);
+void updateActingPlayersList(PlayerList&);
+void updateActingPlayersListFsm(PlayerFsmList&);
 
 std::string getPositionLabel(pkt::core::PlayerPosition);
 
 bool hasPosition(PlayerPosition myPos, PlayerFsmList);
 
-bool validatePlayerAction(const PlayerFsmList& runningPlayersList, const PlayerAction& action,
+bool validatePlayerAction(const PlayerFsmList& actingPlayersList, const PlayerAction& action,
                           const BettingActions& bettingActions, int smallBlind, const GameState gameState);
 
 int circularOffset(int fromId, int toId, const PlayerFsmList& players);

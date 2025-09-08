@@ -8,10 +8,10 @@ namespace pkt::core
 {
 using namespace pkt::core::player;
 
-BettingActions::BettingActions(PlayerFsmList& seats, PlayerFsmList& runningPlayers)
-    : mySeatsList(seats), myRunningPlayersList(runningPlayers), myPreflop(GameState::Preflop, seats, runningPlayers),
-      myFlop(GameState::Flop, seats, runningPlayers), myTurn(GameState::Turn, seats, runningPlayers),
-      myRiver(GameState::River, seats, runningPlayers)
+BettingActions::BettingActions(PlayerFsmList& seats, PlayerFsmList& actingPlayers)
+    : mySeatsList(seats), myActingPlayersList(actingPlayers), myPreflop(GameState::Preflop, seats, actingPlayers),
+      myFlop(GameState::Flop, seats, actingPlayers), myTurn(GameState::Turn, seats, actingPlayers),
+      myRiver(GameState::River, seats, actingPlayers)
 {
 }
 int BettingActions::getMinRaise(int smallBlind) const
@@ -24,7 +24,7 @@ int BettingActions::getMinRaise(int smallBlind) const
 
     // Compute previous raise amount
     int lastRaiserTotal = 0;
-    for (auto player = myRunningPlayersList->begin(); player != myRunningPlayersList->end(); ++player)
+    for (auto player = myActingPlayersList->begin(); player != myActingPlayersList->end(); ++player)
     {
         if ((*player)->getId() == myLastRaiserId.value())
         {
@@ -79,7 +79,7 @@ std::vector<PlayerPosition> BettingActions::getCallersPositions()
 
     std::vector<PlayerPosition> positions;
 
-    for (auto itC = myRunningPlayersList->begin(); itC != myRunningPlayersList->end(); ++itC)
+    for (auto itC = myActingPlayersList->begin(); itC != myActingPlayersList->end(); ++itC)
     {
 
         if ((*itC)->getLastAction().type == ActionType::Call)

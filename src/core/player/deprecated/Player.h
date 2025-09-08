@@ -86,7 +86,7 @@ class Player
     void setPosition();
     std::string getPositionLabel(PlayerPosition p) const;
 
-    static bool hasPosition(PlayerPosition myPos, PlayerList runningPlayers);
+    static bool hasPosition(PlayerPosition myPos, PlayerList actingPlayers);
 
     bool checkIfINeedToShowCards() const;
 

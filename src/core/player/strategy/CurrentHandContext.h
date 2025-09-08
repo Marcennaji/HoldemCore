@@ -14,13 +14,13 @@ namespace pkt::core::player
 struct PlayersInHandContext
 {
     int nbPlayers = 0; // total number of players in the current hand, including the ones who folded
-    PlayerList runningPlayersList;
+    PlayerList actingPlayersList;
     std::shared_ptr<Player> preflopLastRaiser = nullptr;
     std::shared_ptr<Player> flopLastRaiser = nullptr;
     std::shared_ptr<Player> turnLastRaiser = nullptr;
     std::shared_ptr<Player> lastVPIPPlayer = nullptr; // last player who voluntarily put money in the
 
-    PlayerFsmList runningPlayersListFsm; // list of players still acting in the hand (not folded and not allin)
+    PlayerFsmList actingPlayersListFsm; // list of players still acting in the hand (not folded and not allin)
     std::shared_ptr<PlayerFsm> preflopLastRaiserFsm = nullptr;
     std::shared_ptr<PlayerFsm> flopLastRaiserFsm = nullptr;
     std::shared_ptr<PlayerFsm> turnLastRaiserFsm = nullptr;

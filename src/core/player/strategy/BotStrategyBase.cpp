@@ -367,7 +367,7 @@ bool BotStrategyBase::isPossibleToBluff(const CurrentHandContext& ctx) const
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
     const int nbRaises = ctx.commonContext.bettingContext.preflopRaisesNumber;
 
-    PlayerFsmList players = ctx.commonContext.playersContext.runningPlayersListFsm;
+    PlayerFsmList players = ctx.commonContext.playersContext.actingPlayersListFsm;
 
     if (players == nullptr)
     {

@@ -18,7 +18,7 @@ void PostRiverState::enter(HandFsm& hand)
 {
     GlobalServices::instance().logger().info("PostRiverState: Entering post-river");
 
-    for (auto& player : *hand.getRunningPlayersList())
+    for (auto& player : *hand.getActingPlayersList())
     {
         player->setAction(*this, {player->getId(), ActionType::None});
     }

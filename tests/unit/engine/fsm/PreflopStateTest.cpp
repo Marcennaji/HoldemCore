@@ -35,9 +35,9 @@ TEST_F(PreflopStateTest, StartHandHeadsUpInitializePlayersCorrectly)
     initializeHandFsmForTesting(2, gameData);
     myHandFsm->start();
 
-    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     EXPECT_EQ(playerSb->getPosition(), PlayerPosition::ButtonSmallBlind);
-    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
     EXPECT_EQ(playerBb->getPosition(), PlayerPosition::BigBlind);
 
     EXPECT_EQ(playerSb->getCash(), playerBb->getCash() + gameData.firstSmallBlind);
@@ -47,11 +47,11 @@ TEST_F(PreflopStateTest, StartHand3BotsInitializePlayersCorrectly)
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
 
-    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     EXPECT_EQ(playerDealer->getPosition(), PlayerPosition::Button);
-    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
     EXPECT_EQ(playerSb->getPosition(), PlayerPosition::SmallBlind);
-    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
     EXPECT_EQ(playerBb->getPosition(), PlayerPosition::BigBlind);
 
     EXPECT_EQ(playerDealer->getCash(), playerBb->getCash() + gameData.firstSmallBlind * 2);
@@ -62,17 +62,17 @@ TEST_F(PreflopStateTest, StartHand6BotsInitializePlayersCorrectly)
     initializeHandFsmForTesting(6, gameData);
     myHandFsm->start();
 
-    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     EXPECT_EQ(playerDealer->getPosition(), PlayerPosition::Button);
-    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
     EXPECT_EQ(playerSb->getPosition(), PlayerPosition::SmallBlind);
-    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
     EXPECT_EQ(playerBb->getPosition(), PlayerPosition::BigBlind);
-    auto playerUtg = getPlayerFsmById(myRunningPlayersListFsm, 3);
+    auto playerUtg = getPlayerFsmById(myActingPlayersListFsm, 3);
     EXPECT_EQ(playerUtg->getPosition(), PlayerPosition::UnderTheGun);
-    auto playerMiddle = getPlayerFsmById(myRunningPlayersListFsm, 4);
+    auto playerMiddle = getPlayerFsmById(myActingPlayersListFsm, 4);
     EXPECT_EQ(playerMiddle->getPosition(), PlayerPosition::Middle);
-    auto playerCutoff = getPlayerFsmById(myRunningPlayersListFsm, 5);
+    auto playerCutoff = getPlayerFsmById(myActingPlayersListFsm, 5);
     EXPECT_EQ(playerCutoff->getPosition(), PlayerPosition::Cutoff);
 
     EXPECT_EQ(playerDealer->getCash(), playerBb->getCash() + gameData.firstSmallBlind * 2);
@@ -93,11 +93,11 @@ TEST_F(PreflopStateTest, OnlyCallsPreflopShouldGoToFlop)
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
 
-    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     EXPECT_EQ(playerDealer->getPosition(), PlayerPosition::Button);
-    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
     EXPECT_EQ(playerSb->getPosition(), PlayerPosition::SmallBlind);
-    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
     EXPECT_EQ(playerBb->getPosition(), PlayerPosition::BigBlind);
 
     myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Call});
@@ -111,9 +111,9 @@ TEST_F(PreflopStateTest, EverybodyFoldPreflopShouldGoToPostRiver)
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
 
-    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
 
     myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Fold});
@@ -126,9 +126,9 @@ TEST_F(PreflopStateTest, OneRaiseKeepsBettingRoundOpen)
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
 
-    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
 
     // step 1 : dealer fold
     myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
@@ -152,9 +152,9 @@ TEST_F(PreflopStateTest, ReraiseUpdatesHighestBetAndKeepsRoundOpen)
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
 
-    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
 
     // Step 1: dealer folds
     myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
@@ -187,9 +187,9 @@ TEST_F(PreflopStateTest, RaiseBelowMinimumShouldBeRejected)
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
 
-    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
 
     // Step 1: dealer folds
     myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
@@ -221,9 +221,9 @@ TEST_F(PreflopStateTest, AllInInsteadOfRaiseIsAccepted)
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
 
-    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
 
     // dealer goes allin
     myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Allin});

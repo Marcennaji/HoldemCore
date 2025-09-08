@@ -23,8 +23,8 @@ using namespace std;
 using namespace pkt::core::player;
 
 Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
-           PlayerList seats, PlayerList runningPlayers, GameData gameData, StartData startData)
-    : myEvents(events), myFactory(factory), myBoard(board), mySeatsList(seats), myRunningPlayersList(runningPlayers),
+           PlayerList seats, PlayerList actingPlayers, GameData gameData, StartData startData)
+    : myEvents(events), myFactory(factory), myBoard(board), mySeatsList(seats), myActingPlayersList(actingPlayers),
       myStartQuantityPlayers(startData.numberOfPlayers), myDealerPlayerId(startData.startDealerPlayerId),
       mySmallBlindPlayerId(startData.startDealerPlayerId), myBigBlindPlayerId(startData.startDealerPlayerId),
       mySmallBlind(gameData.firstSmallBlind), myStartCash(gameData.startMoney)
@@ -233,7 +233,7 @@ void Hand::setBlinds()
 {
 
     // do sets --> TODO switch?
-    for (auto player = myRunningPlayersList->begin(); player != myRunningPlayersList->end(); ++player)
+    for (auto player = myActingPlayersList->begin(); player != myActingPlayersList->end(); ++player)
     {
 
         // small blind
@@ -255,7 +255,7 @@ void Hand::setBlinds()
     }
 
     // do sets --> TODO switch?
-    for (auto player = myRunningPlayersList->begin(); player != myRunningPlayersList->end(); ++player)
+    for (auto player = myActingPlayersList->begin(); player != myActingPlayersList->end(); ++player)
     {
 
         // big blind
@@ -286,16 +286,16 @@ void Hand::resolveHandConditions()
     PlayerListIterator it, it1;
     PlayerListConstIterator itC;
 
-    // Log the current state of the running player list
-    GlobalServices::instance().logger().verbose("Current running players:");
-    for (auto& player : *myRunningPlayersList)
+    // Log the current state of the acting player list
+    GlobalServices::instance().logger().verbose("Current acting players:");
+    for (auto& player : *myActingPlayersList)
     {
         GlobalServices::instance().logger().verbose("Player " + player->getName() +
                                                     " action: " + playerActionToString(player->getLastAction().type) +
                                                     ", set: " + std::to_string(player->getTotalBetAmount()));
     }
 
-    updateRunningPlayersList(myRunningPlayersList);
+    updateActingPlayersList(myActingPlayersList);
 
     // Determine number of all-in players
     int allInPlayersCounter = 0;
@@ -344,7 +344,7 @@ void Hand::resolveHandConditions()
         else if (allInPlayersCounter + 1 == nonFoldPlayerCounter)
         {
             GlobalServices::instance().logger().verbose("All players but one are all-in.");
-            for (itC = myRunningPlayersList->begin(); itC != myRunningPlayersList->end(); ++itC)
+            for (itC = myActingPlayersList->begin(); itC != myActingPlayersList->end(); ++itC)
             {
                 if ((*itC)->getTotalBetAmount() >= myBettingRounds[myCurrentRound]->getRoundHighestSet())
                 {
@@ -535,7 +535,7 @@ std::vector<PlayerPosition> Hand::getCallersPositions()
 
     PlayerListIterator itC;
 
-    for (itC = myRunningPlayersList->begin(); itC != myRunningPlayersList->end(); ++itC)
+    for (itC = myActingPlayersList->begin(); itC != myActingPlayersList->end(); ++itC)
     {
 
         if ((*itC)->getLastAction().type == ActionType::Call)

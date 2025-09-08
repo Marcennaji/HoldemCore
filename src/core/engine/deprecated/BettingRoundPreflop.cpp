@@ -49,7 +49,7 @@ void BettingRoundPreflop::handleFirstRun()
 {
     GlobalServices::instance().logger().verbose("Handling first run of preflop.");
 
-    auto bigBlindPositionIt = getPlayerListIteratorById(getHand()->getRunningPlayersList(), getBigBlindPlayerId());
+    auto bigBlindPositionIt = getPlayerListIteratorById(getHand()->getActingPlayersList(), getBigBlindPlayerId());
 
     if (getHand()->getSeatsList()->size() > 2)
     {
@@ -71,12 +71,12 @@ void BettingRoundPreflop::handleMultiPlayerFirstRun(PlayerListIterator bigBlindP
 {
     GlobalServices::instance().logger().verbose("Handling first run for multi-player preflop.");
 
-    if (bigBlindPositionIt == getHand()->getRunningPlayersList()->end())
+    if (bigBlindPositionIt == getHand()->getActingPlayersList()->end())
     {
         auto smallBlindPositionIt =
-            getPlayerListIteratorById(getHand()->getRunningPlayersList(), getSmallBlindPlayerId());
+            getPlayerListIteratorById(getHand()->getActingPlayersList(), getSmallBlindPlayerId());
 
-        if (smallBlindPositionIt == getHand()->getRunningPlayersList()->end())
+        if (smallBlindPositionIt == getHand()->getActingPlayersList()->end())
         {
             findLastActivePlayerBeforeSmallBlind();
         }
@@ -97,14 +97,14 @@ void BettingRoundPreflop::handleHeadsUpFirstRun(PlayerListIterator bigBlindPosit
 {
     GlobalServices::instance().logger().verbose("Handling first run for heads-up preflop.");
 
-    if (bigBlindPositionIt == getHand()->getRunningPlayersList()->end())
+    if (bigBlindPositionIt == getHand()->getActingPlayersList()->end())
     {
         auto smallBlindPositionIt =
-            getPlayerListIteratorById(getHand()->getRunningPlayersList(), getSmallBlindPlayerId());
+            getPlayerListIteratorById(getHand()->getActingPlayersList(), getSmallBlindPlayerId());
 
-        if (smallBlindPositionIt == getHand()->getRunningPlayersList()->end())
+        if (smallBlindPositionIt == getHand()->getActingPlayersList()->end())
         {
-            GlobalServices::instance().logger().verbose("No running players found. Heads-up showdown.");
+            GlobalServices::instance().logger().verbose("No acting players found. Heads-up showdown.");
         }
         else
         {
@@ -125,7 +125,7 @@ void BettingRoundPreflop::proceedToFlop()
 
     getHand()->setCurrentRoundState(Flop);
 
-    for (auto player = getHand()->getRunningPlayersList()->begin(); player != getHand()->getRunningPlayersList()->end();
+    for (auto player = getHand()->getActingPlayersList()->begin(); player != getHand()->getActingPlayersList()->end();
          ++player)
     {
         (*player)->setLastAction({(*player)->getId(), ActionType::None});

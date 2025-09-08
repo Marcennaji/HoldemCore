@@ -183,7 +183,7 @@ float PreflopRangeCalculator::adjustCallForRaises(const CurrentHandContext& ctx,
     const int nbRaises = ctx.commonContext.bettingContext.preflopRaisesNumber;
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
     const PlayerPosition myPosition = ctx.personalContext.position;
-    const int nbRunningPlayers = ctx.commonContext.playersContext.runningPlayersList->size();
+    const int nbActingPlayers = ctx.commonContext.playersContext.actingPlayersList->size();
     std::shared_ptr<Player> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
     if (!lastRaiser)
     {
@@ -202,7 +202,7 @@ float PreflopRangeCalculator::adjustCallForRaises(const CurrentHandContext& ctx,
     if (raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getPreflopRaise() != 0)
     {
         callingRange =
-            adjustCallForRaiserStats(callingRange, raiserStats, nbRaises, nbPlayers, myPosition, nbRunningPlayers);
+            adjustCallForRaiserStats(callingRange, raiserStats, nbRaises, nbPlayers, myPosition, nbActingPlayers);
     }
     else
     {
@@ -214,9 +214,9 @@ float PreflopRangeCalculator::adjustCallForRaises(const CurrentHandContext& ctx,
 
 float PreflopRangeCalculator::adjustCallForRaiserStats(float callingRange, const PreflopStatistics& raiserStats,
                                                        int nbRaises, int nbPlayers, PlayerPosition myPosition,
-                                                       int nbRunningPlayers) const
+                                                       int nbActingPlayers) const
 {
-    if ((myPosition == Button || myPosition == Cutoff) && nbRunningPlayers > 5)
+    if ((myPosition == Button || myPosition == Cutoff) && nbActingPlayers > 5)
     {
         callingRange = raiserStats.getPreflopRaise() * (nbPlayers > 3 ? 0.7f : 0.9f);
     }

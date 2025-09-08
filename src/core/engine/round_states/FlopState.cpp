@@ -22,7 +22,7 @@ void FlopState::enter(HandFsm& hand)
     // Reset betting amounts for new round
     hand.getBettingActions()->resetRoundHighestSet();
 
-    for (auto& player : *hand.getRunningPlayersList())
+    for (auto& player : *hand.getActingPlayersList())
     {
         player->setAction(*this, {player->getId(), ActionType::None});
     }
@@ -45,7 +45,7 @@ void FlopState::exit(HandFsm& hand)
 
 bool FlopState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const
 {
-    return (validatePlayerAction(hand.getRunningPlayersList(), action, *hand.getBettingActions(), 0, Flop));
+    return (validatePlayerAction(hand.getActingPlayersList(), action, *hand.getBettingActions(), 0, Flop));
 }
 
 void FlopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
@@ -65,7 +65,7 @@ std::unique_ptr<IHandState> FlopState::computeNextState(HandFsm& hand, PlayerAct
     }
 
     // If all remaining players are all-in (no one can act further), go directly to showdown
-    if (hand.getRunningPlayersList()->empty() && hand.getPlayersInHandList()->size() >= 1)
+    if (hand.getActingPlayersList()->empty() && hand.getPlayersInHandList()->size() >= 1)
     {
         return std::make_unique<PostRiverState>(myEvents);
     }

@@ -28,7 +28,7 @@ void BettingRoundsLegacyTest::TearDown()
 
 bool BettingRoundsLegacyTest::isPlayerStillActive(unsigned id) const
 {
-    for (const auto& p : *myHand->getRunningPlayersList())
+    for (const auto& p : *myHand->getActingPlayersList())
     {
         if (p->getId() == id)
             return true;

@@ -37,7 +37,7 @@ class PreflopRangeCalculator
     float clampCallingRange(float callingRange) const;
     float adjustCallForRaises(const CurrentHandContext& ctx, float callingRange) const;
     float adjustCallForRaiserStats(float callingRange, const PreflopStatistics& raiserStats, int nbRaises,
-                                   int nbPlayers, PlayerPosition myPosition, int nbRunningPlayers) const;
+                                   int nbPlayers, PlayerPosition myPosition, int nbActingPlayers) const;
     float adjustCallForNoStats(float callingRange, int nbRaises) const;
     float adjustCallForBigBet(float callingRange, int potOdd, int myCash, int highestBetAmount, int myTotalBetAmount,
                               int smallBlind) const;

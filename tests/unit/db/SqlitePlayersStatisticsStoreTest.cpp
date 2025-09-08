@@ -40,9 +40,9 @@ TEST_F(SqlitePlayersStatisticsStoreTest, SaveAndLoadStatistics)
     initializeHandFsmForTesting(nbPlayers, gameData);
     myHandFsm->start();
 
-    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
 
     // Inject deterministic strategies
     auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();

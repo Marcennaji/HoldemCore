@@ -8,8 +8,8 @@ namespace pkt::core
 {
 using namespace pkt::core::player;
 
-BettingRoundActions::BettingRoundActions(GameState gameState, PlayerFsmList& seats, PlayerFsmList& runningPlayers)
-    : myGameState(gameState), mySeatsList(seats), myRunningPlayersList(runningPlayers)
+BettingRoundActions::BettingRoundActions(GameState gameState, PlayerFsmList& seats, PlayerFsmList& actingPlayers)
+    : myGameState(gameState), mySeatsList(seats), myActingPlayersList(actingPlayers)
 {
 }
 

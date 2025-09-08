@@ -34,7 +34,7 @@ class Game
 
   private:
     void resetPlayerActions();
-    void resetRunningPlayers();
+    void resetActingPlayers();
     void createNewHand();
     void findNextDealer();
 
@@ -45,7 +45,7 @@ class Game
     std::shared_ptr<IBoard> myCurrentBoard;
 
     pkt::core::player::PlayerList mySeatsList;
-    pkt::core::player::PlayerList myRunningPlayersList;
+    pkt::core::player::PlayerList myActingPlayersList;
 
     unsigned myDealerPlayerId{0};
     GameData myGameData;
