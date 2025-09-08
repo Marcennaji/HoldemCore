@@ -32,7 +32,7 @@ void BettingRoundPostRiver::run()
     for (itC = getHand()->getSeatsList()->begin(); itC != getHand()->getSeatsList()->end(); ++itC)
     {
 
-        if ((*itC)->getAction().type != ActionType::Fold && (*itC)->getHandRanking() > myHighestCardsValue)
+        if ((*itC)->getLastAction().type != ActionType::Fold && (*itC)->getHandRanking() > myHighestCardsValue)
         {
             myHighestCardsValue = (*itC)->getHandRanking();
         }
@@ -42,7 +42,7 @@ void BettingRoundPostRiver::run()
 
     for (itC = getHand()->getSeatsList()->begin(); itC != getHand()->getSeatsList()->end(); ++itC)
     {
-        if ((*itC)->getAction().type != ActionType::Fold)
+        if ((*itC)->getLastAction().type != ActionType::Fold)
         {
             potPlayers++;
         }
@@ -58,7 +58,7 @@ void BettingRoundPostRiver::run()
     int nonfoldPlayersCounter = 0;
     for (itC = getHand()->getSeatsList()->begin(); itC != getHand()->getSeatsList()->end(); ++itC)
     {
-        if ((*itC)->getAction().type != ActionType::Fold)
+        if ((*itC)->getLastAction().type != ActionType::Fold)
         {
             nonfoldPlayersCounter++;
             if (!(*itC)->isBot())

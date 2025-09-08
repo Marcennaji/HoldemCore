@@ -57,8 +57,8 @@ class Player
 
     void setHand(IHand*);
     IHand* getHand() const { return currentHand; }
-    void setAction(PlayerAction theValue, bool blind = 0);
-    PlayerAction getAction() const;
+    void setLastAction(PlayerAction theValue, bool blind = 0);
+    PlayerAction getLastAction() const;
 
     virtual bool isBot() const = 0;
 

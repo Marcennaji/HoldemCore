@@ -18,6 +18,7 @@ FlopState::FlopState(const GameEvents& events) : myEvents(events)
 
 void FlopState::enter(HandFsm& hand)
 {
+    GlobalServices::instance().logger().info("FlopState: Entering flop");
     // Reset betting amounts for new round
     hand.getBettingActions()->resetHighestSet();
 
@@ -35,6 +36,7 @@ void FlopState::exit(HandFsm& hand)
         player->getStatisticsUpdater()->updateFlopStatistics(player->getCurrentHandContext());
         player->getStatisticsUpdater()->updateFlopStatistics(player->getCurrentHandContext());
     }
+    GlobalServices::instance().logger().info("FlopState: Exiting flop");
 }
 
 bool FlopState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const
@@ -46,7 +48,7 @@ bool FlopState::isActionAllowed(const HandFsm& hand, const PlayerAction action) 
                                                   " not found");
         return false;
     }
-    if (validatePlayerAction(*player, action, *hand.getBettingActions(), 0))
+    if (validatePlayerAction(*player, action, *hand.getBettingActions(), 0, Flop))
     {
         return true;
     }
@@ -59,7 +61,7 @@ bool FlopState::isActionAllowed(const HandFsm& hand, const PlayerAction action) 
 void FlopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
 {
     player.updateCurrentHandContext(Flop, hand);
-    const PlayerAction action = player.decideAction(player.getCurrentHandContext());
+    PlayerAction action = player.decideAction(player.getCurrentHandContext());
 
     hand.handlePlayerAction(action);
 }

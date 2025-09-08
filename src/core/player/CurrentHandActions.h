@@ -18,7 +18,7 @@ class CurrentHandActions
 
     void reset();
 
-    std::vector<PlayerAction>& getActions(const GameState& state) { return myActionsByState[state]; }
+    void addAction(const GameState& state, const PlayerAction& action);
     const std::vector<PlayerAction>& getActions(const GameState& state) const { return myActionsByState.at(state); }
 
     int getActionsNumber(const GameState& state, const ActionType& actionType) const;
@@ -27,8 +27,13 @@ class CurrentHandActions
     int getRoundTotalBetAmount(const GameState& state) const;
     int getHandTotalBetAmount() const;
 
+    PlayerAction getLastAction() const { return myLastAction; }
+
+    void writeActionsToLog() const;
+
   private:
     std::map<GameState, std::vector<PlayerAction>> myActionsByState;
+    PlayerAction myLastAction{-1, ActionType::None, 0};
 };
 
 } // namespace pkt::core::player

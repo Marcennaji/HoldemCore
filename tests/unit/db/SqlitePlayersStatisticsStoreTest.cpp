@@ -46,11 +46,12 @@ TEST_F(SqlitePlayersStatisticsStoreTest, SaveAndLoadStatistics)
 
     // Inject deterministic strategies
     auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
-    dealerStrategy->setAction(pkt::core::GameState::Preflop, {playerDealer->getId(), pkt::core::ActionType::Fold, 0});
+    dealerStrategy->setLastAction(pkt::core::GameState::Preflop,
+                                  {playerDealer->getId(), pkt::core::ActionType::Fold, 0});
     playerDealer->setStrategy(std::move(dealerStrategy));
 
     auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
-    sbStrategy->setAction(pkt::core::GameState::Preflop, {playerSb->getId(), pkt::core::ActionType::Fold, 0});
+    sbStrategy->setLastAction(pkt::core::GameState::Preflop, {playerSb->getId(), pkt::core::ActionType::Fold, 0});
     playerSb->setStrategy(std::move(sbStrategy));
 
     auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
@@ -75,7 +76,7 @@ TEST_F(SqlitePlayersStatisticsStoreTest, SaveAndLoadStatistics)
     EXPECT_EQ(sbStats[nbPlayers].preflopStatistics.folds, 1);
 
     auto bbStats = store.loadPlayerStatistics(playerBb->getName());
-    EXPECT_EQ(bbStats[nbPlayers].preflopStatistics.hands, 0);
+    EXPECT_EQ(bbStats[nbPlayers].preflopStatistics.hands, 1);
 }
 
 } // namespace pkt::test

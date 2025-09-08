@@ -128,7 +128,7 @@ void BettingRoundPreflop::proceedToFlop()
     for (auto player = getHand()->getRunningPlayersList()->begin(); player != getHand()->getRunningPlayersList()->end();
          ++player)
     {
-        (*player)->setAction({(*player)->getId(), ActionType::None});
+        (*player)->setLastAction({(*player)->getId(), ActionType::None});
     }
 
     getHand()->getBoard()->collectSets();

@@ -16,7 +16,9 @@ enum class ActionType
     Call,
     Bet,
     Raise,
-    Allin
+    Allin,
+    PostBigBlind,
+    PostSmallBlind
 };
 
 struct PlayerAction
@@ -44,6 +46,10 @@ inline const char* playerActionToString(ActionType action)
         return "Raise";
     case ActionType::Allin:
         return "All-in";
+    case ActionType::PostBigBlind:
+        return "Post Big Blind";
+    case ActionType::PostSmallBlind:
+        return "Post Small Blind";
     default:
         return "Unknown Action";
     }

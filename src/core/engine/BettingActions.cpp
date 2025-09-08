@@ -64,7 +64,7 @@ std::vector<PlayerPosition> BettingActions::getRaisersPositions()
     for (auto itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
     { // note that all in players are not "running" any more
 
-        if ((*itC)->getAction() == ActionType::Raise || (*itC)->getAction() == ActionType::Allin)
+        if ((*itC)->getLastAction().type == ActionType::Raise || (*itC)->getLastAction().type == ActionType::Allin)
         {
             positions.push_back((*itC)->getPosition());
         }
@@ -80,7 +80,7 @@ std::vector<PlayerPosition> BettingActions::getCallersPositions()
     for (auto itC = myRunningPlayersList->begin(); itC != myRunningPlayersList->end(); ++itC)
     {
 
-        if ((*itC)->getAction() == ActionType::Call)
+        if ((*itC)->getLastAction().type == ActionType::Call)
         {
             positions.push_back((*itC)->getPosition());
         }
@@ -97,7 +97,7 @@ int BettingActions::getLastRaiserId()
     for (auto it = players->begin(); it != players->end(); ++it)
     {
 
-        if ((*it)->getAction() == ActionType::Raise || (*it)->getAction() == ActionType::Allin)
+        if ((*it)->getLastAction().type == ActionType::Raise || (*it)->getLastAction().type == ActionType::Allin)
         {
 
             if (lastRaiser != mySeatsList->end())
@@ -123,7 +123,7 @@ int BettingActions::getLastRaiserId()
     for (auto it = players->begin(); it != players->end(); ++it)
     {
 
-        if ((*it)->getAction() == ActionType::Bet)
+        if ((*it)->getLastAction().type == ActionType::Bet)
         {
             lastRaiser = it;
         }

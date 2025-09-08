@@ -74,13 +74,9 @@ void HandFsm::end()
     myState.reset();
 }
 
-void HandFsm::handlePlayerAction(const PlayerAction& action)
+void HandFsm::handlePlayerAction(PlayerAction action)
 {
     if (!myState)
-        return;
-
-    auto player = getPlayerFsmById(myRunningPlayersList, action.playerId);
-    if (!player)
         return;
 
     if (auto* processor = dynamic_cast<IActionProcessor*>(myState.get()))
@@ -89,8 +85,6 @@ void HandFsm::handlePlayerAction(const PlayerAction& action)
             return;
 
         applyActionEffects(action);
-
-        player->getCurrentHandActions().getActions(myState->getGameState()).push_back(action);
 
         auto next = processor->computeNextState(*this, action);
         if (next)
@@ -103,30 +97,32 @@ void HandFsm::handlePlayerAction(const PlayerAction& action)
         }
     }
 }
-void HandFsm::applyActionEffects(const PlayerAction& action)
+void HandFsm::applyActionEffects(const PlayerAction action)
 {
     auto player = getPlayerFsmById(myRunningPlayersList, action.playerId);
     if (!player)
         return;
 
-    player->setAction(action.type);
-
     int currentHighest = getBettingActions()->getHighestSet();
-    int playerBet = player->getTotalBetAmount();
-    int amountToCall = currentHighest - playerBet;
-    if (player->getCash() < amountToCall)
-    {
-        amountToCall = player->getCash();
-    }
+    int playerBet = player->getCurrentHandActions().getRoundTotalBetAmount(myState->getGameState());
+
+    // Create a copy for storing in action history with correct increment amounts
+    PlayerAction actionForHistory = action;
 
     switch (action.type)
     {
     case ActionType::Fold:
-        updateRunningPlayersListFsm(myRunningPlayersList);
+        // No amount change needed
         break;
 
     case ActionType::Call:
     {
+        int amountToCall = currentHighest - playerBet;
+        if (player->getCash() < amountToCall)
+        {
+            amountToCall = player->getCash();
+        }
+        actionForHistory.amount = amountToCall; // store the actual call amount
         player->addBetAmount(amountToCall);
         break;
     }
@@ -134,38 +130,39 @@ void HandFsm::applyActionEffects(const PlayerAction& action)
     case ActionType::Raise:
     {
         int raiseIncrement = action.amount - playerBet;
+        actionForHistory.amount = raiseIncrement; // store only the increment in history
         player->addBetAmount(raiseIncrement);
         getBettingActions()->updateHighestSet(action.amount);
-        getBettingActions()->getPreflop().setLastRaiserId(
-            player->getId()); // TODO: Implement proper last raiser tracking based on the real game state
+        getBettingActions()->getPreflop().setLastRaiserId(player->getId());
         break;
     }
 
     case ActionType::Bet:
     {
-        int betIncrement = action.amount - playerBet;
-        player->addBetAmount(betIncrement);
+        // For bet, the amount is already the increment
+        player->addBetAmount(action.amount);
         getBettingActions()->updateHighestSet(action.amount);
         break;
     }
 
     case ActionType::Check:
     {
+        // No amount change needed
         break;
     }
 
     case ActionType::Allin:
     {
-        int newTotalBet = player->getTotalBetAmount() + player->getCash();
+        int allinIncrement = player->getCash();   // The increment is all remaining cash
+        actionForHistory.amount = allinIncrement; // store only the increment in history
 
-        player->setTotalBetAmount(newTotalBet);
+        player->addBetAmount(allinIncrement);
         player->setCash(0);
 
-        if (newTotalBet > getBettingActions()->getHighestSet())
+        if (allinIncrement > currentHighest)
         {
-            getBettingActions()->updateHighestSet(newTotalBet);
-            getBettingActions()->getPreflop().setLastRaiserId(
-                player->getId()); // TODO: Implement proper last raiser tracking based on the real game state
+            getBettingActions()->updateHighestSet(allinIncrement);
+            getBettingActions()->getPreflop().setLastRaiserId(player->getId());
         }
         break;
     }
@@ -174,6 +171,9 @@ void HandFsm::applyActionEffects(const PlayerAction& action)
     default:
         break;
     }
+
+    player->setAction(*myState, actionForHistory);
+    updateRunningPlayersListFsm(myRunningPlayersList);
 }
 
 void HandFsm::initAndShuffleDeck()

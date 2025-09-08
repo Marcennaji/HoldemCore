@@ -51,7 +51,7 @@ void Game::startNewHand()
 void Game::resetPlayerActions()
 {
     for (auto& player : *mySeatsList)
-        player->setAction({player->getId(), ActionType::None, 0});
+        player->setLastAction({player->getId(), ActionType::None, 0});
 }
 
 void Game::resetRunningPlayers()

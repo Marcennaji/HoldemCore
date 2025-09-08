@@ -109,9 +109,9 @@ TEST_F(PreflopStateTest, OnlyCallsPreflopShouldGoToFlop)
     auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
     EXPECT_EQ(playerBb->getPosition(), PlayerPosition::BigBlind);
 
-    myHandFsm->handlePlayerAction({0, ActionType::Call, 20});
-    myHandFsm->handlePlayerAction({1, ActionType::Call, 10});
-    myHandFsm->handlePlayerAction({2, ActionType::Check});
+    myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Call});
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
     EXPECT_EQ(myLastGameState, Flop);
 }
@@ -119,8 +119,13 @@ TEST_F(PreflopStateTest, EverybodyFoldPreflopShouldGoToPostRiver)
 {
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
-    myHandFsm->handlePlayerAction({0, ActionType::Fold});
-    myHandFsm->handlePlayerAction({1, ActionType::Fold});
+
+    auto playerDealer = getPlayerFsmById(myRunningPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myRunningPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myRunningPlayersListFsm, 2);
+
+    myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Fold});
 
     EXPECT_EQ(myLastGameState, PostRiver);
 }
@@ -145,7 +150,7 @@ TEST_F(PreflopStateTest, OneRaiseKeepsBettingRoundOpen)
     EXPECT_EQ(myLastGameState, Preflop); // round not finished yet
 
     // step 3 : big blind calls 20
-    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call, 20});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call});
 
     // now, the bets are equal → transition to Flop
     EXPECT_EQ(myLastGameState, Flop);
@@ -175,7 +180,7 @@ TEST_F(PreflopStateTest, ReraiseUpdatesHighestBetAndKeepsRoundOpen)
     EXPECT_EQ(myLastGameState, Preflop); // still in preflop after re-raise
 
     // Step 4: small blind calls the difference (40)
-    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call, 40});
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
 
     // now, the bets are equal → transition to Flop
     EXPECT_EQ(myLastGameState, Flop);

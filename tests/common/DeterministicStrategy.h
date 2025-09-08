@@ -11,7 +11,7 @@ using CurrentHandContext = pkt::core::player::CurrentHandContext;
 class DeterministicStrategy : public pkt::core::player::BotStrategy
 {
   public:
-    void setAction(pkt::core::GameState state, pkt::core::PlayerAction action) { myActions[state] = action; }
+    void setLastAction(pkt::core::GameState state, pkt::core::PlayerAction action) { myActions[state] = action; }
 
     void clear() { myActions.clear(); }
 

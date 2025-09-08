@@ -46,7 +46,7 @@ int PlayerFsm::getId() const
 {
     return myID;
 }
-CurrentHandActions& PlayerFsm::getCurrentHandActions()
+const CurrentHandActions& PlayerFsm::getCurrentHandActions() const
 {
     return myCurrentHandActions;
 }
@@ -90,19 +90,14 @@ int PlayerFsm::getLastBetAmount() const
     return myLastBetAmount;
 }
 
-void PlayerFsm::setAction(ActionType theValue)
+PlayerAction PlayerFsm::getLastAction() const
 {
-    myAction = theValue;
-}
-ActionType PlayerFsm::getAction() const
-{
-    return myAction;
+    return getCurrentHandActions().getLastAction();
 }
 
-// will contain human-readable string, i.e "Qc" or "Ts"
+// will set myCard1 and myCard1, which are human-readable strings, i.e "Qc" or "Ts"
 void PlayerFsm::setCards(int* theValue)
 {
-
     for (int i = 0; i < 2; i++)
     {
         myCards[i] = theValue[i];
@@ -334,7 +329,8 @@ std::map<int, float> PlayerFsm::evaluateOpponentsStrengths() const
     for (PlayerFsmListIterator it = players->begin(); it != players->end(); ++it)
     {
 
-        if ((*it)->getId() == myID || (*it)->getAction() == ActionType::Fold || (*it)->getAction() == ActionType::None)
+        if ((*it)->getId() == myID || (*it)->getLastAction().type == ActionType::Fold ||
+            (*it)->getLastAction().type == ActionType::None)
         {
             continue;
         }
@@ -461,7 +457,7 @@ float PlayerFsm::calculatePreflopCallingRange(const CurrentHandContext& ctx) con
 void PlayerFsm::resetForNewHand(const HandFsm& hand)
 {
     setCardsFlip(0);
-    getCurrentHandActions().reset();
+    myCurrentHandActions.reset();
     setCashAtHandStart(getCash());
     setPosition(hand);
     getRangeEstimator()->setEstimatedRange("");
@@ -502,6 +498,11 @@ void PlayerFsm::setPosition(const HandFsm& hand)
     myPosition = computePositionFromOffset(offset, nbPlayers);
 
     assert(myPosition != Unknown);
+}
+
+void PlayerFsm::setAction(IHandState& state, const PlayerAction& action)
+{
+    myCurrentHandActions.addAction(state.getGameState(), action);
 }
 
 } // namespace pkt::core::player

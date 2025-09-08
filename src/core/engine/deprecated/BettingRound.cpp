@@ -77,7 +77,7 @@ void BettingRound::run()
     for (auto& player : *myHand->getRunningPlayersList())
     {
         GlobalServices::instance().logger().verbose("start of round: Player " + player->getName() +
-                                                    " action: " + playerActionToString(player->getAction().type));
+                                                    " action: " + playerActionToString(player->getLastAction().type));
     }
     if (myFirstRunGui)
     {
@@ -222,7 +222,7 @@ void BettingRound::proceedToNextBettingRound()
     for (auto player = myHand->getRunningPlayersList()->begin(); player != myHand->getRunningPlayersList()->end();
          ++player)
     {
-        (*player)->setAction({(*player)->getId(), ActionType::None});
+        (*player)->setLastAction({(*player)->getId(), ActionType::None});
     }
 
     GlobalServices::instance().logger().info("myCurrentPlayerTurnId: " + std::to_string(myCurrentPlayerTurnId));

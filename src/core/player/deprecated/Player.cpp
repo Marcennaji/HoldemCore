@@ -264,11 +264,11 @@ int Player::getLastRelativeSet() const
     return myLastRelativeSet;
 }
 
-void Player::setAction(PlayerAction theValue, bool blind)
+void Player::setLastAction(PlayerAction theValue, bool blind)
 {
     myAction = theValue;
 }
-PlayerAction Player::getAction() const
+PlayerAction Player::getLastAction() const
 {
     return myAction;
 }
@@ -851,8 +851,8 @@ std::map<int, float> Player::evaluateOpponentsStrengths() const
     for (PlayerListIterator it = players->begin(); it != players->end(); ++it)
     {
 
-        if ((*it)->getId() == myID || (*it)->getAction().type == ActionType::Fold ||
-            (*it)->getAction().type == ActionType::None)
+        if ((*it)->getId() == myID || (*it)->getLastAction().type == ActionType::Fold ||
+            (*it)->getLastAction().type == ActionType::None)
         {
             continue;
         }

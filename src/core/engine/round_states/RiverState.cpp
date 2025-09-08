@@ -5,6 +5,7 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/player/Helpers.h"
 #include "core/player/PlayerFsm.h"
+#include "core/services/GlobalServices.h"
 
 namespace pkt::core
 {
@@ -16,6 +17,7 @@ RiverState::RiverState(const GameEvents& events) : myEvents(events)
 
 void RiverState::enter(HandFsm& hand)
 {
+    GlobalServices::instance().logger().info("RiverState: Entering river");
     // Reset betting amounts for new round
     hand.getBettingActions()->resetHighestSet();
 
@@ -32,6 +34,7 @@ void RiverState::exit(HandFsm& hand)
     {
         player->getStatisticsUpdater()->updateRiverStatistics(player->getCurrentHandContext());
     }
+    GlobalServices::instance().logger().info("RiverState: Exiting river");
 }
 
 bool RiverState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const
@@ -71,7 +74,7 @@ bool RiverState::isActionAllowed(const HandFsm& hand, const PlayerAction action)
 void RiverState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
 {
     player.updateCurrentHandContext(River, hand);
-    const PlayerAction action = player.decideAction(player.getCurrentHandContext());
+    PlayerAction action = player.decideAction(player.getCurrentHandContext());
 
     hand.handlePlayerAction(action);
 }

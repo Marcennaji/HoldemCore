@@ -22,7 +22,7 @@ void EngineTest::SetUp()
     myFactory = std::make_unique<EngineFactory>(myEvents);
     auto& services = pkt::core::GlobalServices::instance();
     auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
-    logger->setLogLevel(pkt::core::LogLevel::Quiet);
+    logger->setLogLevel(pkt::core::LogLevel::Info);
     services.setLogger(std::move(logger));
     services.setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>());
     auto randomizer = std::make_unique<FakeRandomizer>();

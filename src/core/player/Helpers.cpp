@@ -317,13 +317,13 @@ void updateRunningPlayersList(PlayerList& myRunningPlayersList)
     for (it = myRunningPlayersList->begin(); it != myRunningPlayersList->end();)
     {
         GlobalServices::instance().logger().verbose("Checking player: " + (*it)->getName() +
-                                                    ", action: " + playerActionToString((*it)->getAction().type));
+                                                    ", action: " + playerActionToString((*it)->getLastAction().type));
 
-        if ((*it)->getAction().type == ActionType::Fold || (*it)->getAction().type == ActionType::Allin)
+        if ((*it)->getLastAction().type == ActionType::Fold || (*it)->getLastAction().type == ActionType::Allin)
         {
             GlobalServices::instance().logger().verbose(
                 "Removing player: " + (*it)->getName() +
-                " from myRunningPlayersList due to action: " + playerActionToString((*it)->getAction().type));
+                " from myRunningPlayersList due to action: " + playerActionToString((*it)->getLastAction().type));
 
             it = myRunningPlayersList->erase(it);
 
@@ -364,13 +364,13 @@ void updateRunningPlayersListFsm(PlayerFsmList& myRunningPlayersListFsm)
     for (it = myRunningPlayersListFsm->begin(); it != myRunningPlayersListFsm->end();)
     {
         GlobalServices::instance().logger().verbose("Checking player: " + (*it)->getName() +
-                                                    ", action: " + playerActionToString((*it)->getAction()));
+                                                    ", action: " + playerActionToString((*it)->getLastAction().type));
 
-        if ((*it)->getAction() == ActionType::Fold || (*it)->getAction() == ActionType::Allin)
+        if ((*it)->getLastAction().type == ActionType::Fold || (*it)->getLastAction().type == ActionType::Allin)
         {
             GlobalServices::instance().logger().verbose(
                 "Removing player: " + (*it)->getName() +
-                " from myRunningPlayersListFsm due to action: " + playerActionToString((*it)->getAction()));
+                " from myRunningPlayersListFsm due to action: " + playerActionToString((*it)->getLastAction().type));
 
             it = myRunningPlayersListFsm->erase(it);
 
@@ -469,7 +469,7 @@ PlayerListIterator nextActivePlayer(PlayerList seats, PlayerListIterator it)
     ++it;
     if (it == seats->end())
         it = seats->begin();
-    while ((*it)->getAction().type == ActionType::Fold || (*it)->getAction().type == ActionType::Allin)
+    while ((*it)->getLastAction().type == ActionType::Fold || (*it)->getLastAction().type == ActionType::Allin)
     {
         ++it;
         if (it == seats->end())
@@ -498,10 +498,10 @@ bool hasPosition(PlayerPosition position, PlayerFsmList runningPlayers)
 }
 
 bool validatePlayerAction(const PlayerFsm& player, const PlayerAction& action, const BettingActions& bettingActions,
-                          int smallBlind)
+                          int smallBlind, const GameState gameState)
 {
     const int currentHighestBet = bettingActions.getHighestSet();
-    const int playerBet = player.getTotalBetAmount();
+    const int playerBet = player.getCurrentHandActions().getRoundTotalBetAmount(gameState);
 
     switch (action.type)
     {
@@ -535,7 +535,6 @@ bool validatePlayerAction(const PlayerFsm& player, const PlayerAction& action, c
 
         return true;
     }
-
     case ActionType::Allin:
         return player.getCash() > 0;
 
@@ -677,19 +676,44 @@ bool isSmallBlindPosition(PlayerPosition p)
     return p == PlayerPosition::SmallBlind || p == PlayerPosition::ButtonSmallBlind;
 }
 
-bool isRoundComplete(const HandFsm& hand)
+bool isRoundComplete(HandFsm& hand)
 {
+    assert(hand.getState().getGameState() != GameState::None);
+
     if (hand.getRunningPlayersList()->size() <= 1)
         return true;
 
-    for (auto itC = hand.getRunningPlayersList()->begin(); itC != hand.getRunningPlayersList()->end(); ++itC)
+    for (auto player = hand.getRunningPlayersList()->begin(); player != hand.getRunningPlayersList()->end(); ++player)
     {
-        if ((*itC)->getTotalBetAmount() != hand.getBettingActions()->getHighestSet())
+        GlobalServices::instance().logger().verbose("checking if round " +
+                                                    gameStateToString(hand.getState().getGameState()) +
+                                                    " is complete : Checking player: " + (*player)->getName());
+
+        if ((*player)->getLastAction().type == ActionType::None ||
+            (*player)->getLastAction().type == ActionType::PostBigBlind ||
+            (*player)->getLastAction().type == ActionType::PostSmallBlind)
         {
+            GlobalServices::instance().logger().verbose("  ROUND NOT COMPLETE, as player " + (*player)->getName() +
+                                                        " did not act.");
+            return false;
+        }
+
+        GlobalServices::instance().logger().verbose(
+            "  round total bet amount: " +
+            std::to_string((*player)->getCurrentHandActions().getRoundTotalBetAmount(hand.getState().getGameState())) +
+            ", hand total bet amount : " + std::to_string((*player)->getCurrentHandActions().getHandTotalBetAmount()) +
+            " vs hand current highest bet: " + std::to_string(hand.getBettingActions()->getHighestSet()));
+
+        if ((*player)->getCurrentHandActions().getRoundTotalBetAmount(hand.getState().getGameState()) !=
+            hand.getBettingActions()->getHighestSet())
+        {
+            GlobalServices::instance().logger().verbose("  ROUND NOT COMPLETE, as player " + (*player)->getName() +
+                                                        " has not matched the highest bet yet.");
             return false;
         }
     }
-
+    GlobalServices::instance().logger().verbose("  ROUND " + gameStateToString(hand.getState().getGameState()) +
+                                                " COMPLETE");
     return true;
 }
 } // namespace pkt::core::player

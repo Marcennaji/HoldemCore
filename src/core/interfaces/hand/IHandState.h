@@ -18,6 +18,6 @@ class IHandState
     virtual void exit(HandFsm& hand) = 0;
     virtual bool isTerminal() const { return false; }
 
-    virtual GameState getGameState() const = 0;
+    virtual const GameState getGameState() const = 0;
 };
 } // namespace pkt::core

@@ -26,6 +26,7 @@
 namespace pkt::core
 {
 class HandFsm;
+class IHandState;
 
 } // namespace pkt::core
 
@@ -58,8 +59,8 @@ class PlayerFsm
     void setTotalBetAmount(int theValue);
     int getLastBetAmount() const;
 
-    void setAction(ActionType theValue);
-    ActionType getAction() const;
+    void setAction(IHandState& state, const PlayerAction& action);
+    PlayerAction getLastAction() const;
 
     void setCards(int* theValue);
     void getCards(int* theValue) const;
@@ -88,7 +89,7 @@ class PlayerFsm
     virtual float calculatePreflopCallingRange(const CurrentHandContext& ctx) const;
 
     const PostFlopAnalysisFlags getPostFlopAnalysisFlags() const;
-    CurrentHandActions& getCurrentHandActions();
+    const CurrentHandActions& getCurrentHandActions() const;
 
     void setPreflopPotOdd(const int potOdd);
 
@@ -141,8 +142,6 @@ class PlayerFsm
      * raises by 300 chips, myLastBetAmount would be set to 300
      */
     int myLastBetAmount{0};
-
-    ActionType myAction{ActionType::None};
     bool myCardsFlip{false}; // 0 = cards are not fliped, 1 = cards are already flipped,
     int lastMoneyWon{0};
     int myPreflopPotOdd{0};

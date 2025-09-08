@@ -404,7 +404,7 @@ TEST_F(BettingRoundsLegacyTest, AllInPlayerDoesNotActAgain)
     initializeHandForTesting(3, gameData);
     auto p = *mySeatsList->begin();
     p->setCash(0); // Force all-in
-    p->setAction({p->getId(), ActionType::Allin});
+    p->setLastAction({p->getId(), ActionType::Allin});
 
     myHand->start();
 
@@ -443,7 +443,7 @@ TEST_F(BettingRoundsLegacyTest, HeadsUpEndsImmediatelyOnFold)
 {
     initializeHandForTesting(2, gameData);
     auto p = *mySeatsList->begin();
-    p->setAction({p->getId(), ActionType::Fold});
+    p->setLastAction({p->getId(), ActionType::Fold});
     myHand->start();
 
     // If one folds, there should only be preflop actions

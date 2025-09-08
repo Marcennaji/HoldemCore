@@ -4,6 +4,7 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/player/Helpers.h"
 #include "core/player/PlayerFsm.h"
+#include "core/services/GlobalServices.h"
 
 namespace pkt::core
 {
@@ -15,6 +16,7 @@ PostRiverState::PostRiverState(const GameEvents& events) : myEvents(events)
 
 void PostRiverState::enter(HandFsm& hand)
 {
+    GlobalServices::instance().logger().info("PostRiverState: Entering post-river");
     // Final state entry logic: typically showdown or hand resolution.
     if (myEvents.onBettingRoundStarted)
         myEvents.onBettingRoundStarted(PostRiver);
@@ -26,6 +28,7 @@ void PostRiverState::enter(HandFsm& hand)
 
 void PostRiverState::exit(HandFsm& /*hand*/)
 {
+    GlobalServices::instance().logger().info("PostRiverState: Exiting post-river");
 }
 
 std::unique_ptr<IHandState> PostRiverState::computeNextState(HandFsm& /*hand*/, const PlayerAction /*action*/)

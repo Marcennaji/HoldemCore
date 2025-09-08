@@ -102,7 +102,7 @@ void Board::determinePlayerNeedToShowCards()
 
         for (itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
         {
-            if ((*itC)->getAction().type != ActionType::Fold)
+            if ((*itC)->getLastAction().type != ActionType::Fold)
             {
                 myPlayerNeedToShowCards.push_back((*itC)->getId());
             }
@@ -122,7 +122,7 @@ void Board::determinePlayerNeedToShowCards()
         // search lastActionPlayer
         for (itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
         {
-            if ((*itC)->getId() == myLastActionPlayerId && (*itC)->getAction().type != ActionType::Fold)
+            if ((*itC)->getId() == myLastActionPlayerId && (*itC)->getLastAction().type != ActionType::Fold)
             {
                 lastActionPlayerIt = itC;
                 break;
@@ -133,7 +133,7 @@ void Board::determinePlayerNeedToShowCards()
         {
             for (itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
             {
-                if ((*itC)->getAction().type != ActionType::Fold)
+                if ((*itC)->getLastAction().type != ActionType::Fold)
                 {
                     lastActionPlayerIt = itC;
                     break;
@@ -165,7 +165,7 @@ void Board::determinePlayerNeedToShowCards()
                 itC = mySeatsList->begin();
             }
 
-            if ((*itC)->getAction().type != ActionType::Fold)
+            if ((*itC)->getLastAction().type != ActionType::Fold)
             {
 
                 for (levelIt = level.begin(); levelIt != level.end(); ++levelIt)

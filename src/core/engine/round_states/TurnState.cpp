@@ -6,6 +6,7 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/player/Helpers.h"
 #include "core/player/PlayerFsm.h"
+#include "core/services/GlobalServices.h"
 
 namespace pkt::core
 {
@@ -17,6 +18,7 @@ TurnState::TurnState(const GameEvents& events) : myEvents(events)
 
 void TurnState::enter(HandFsm& hand)
 {
+    GlobalServices::instance().logger().info("TurnState: Entering turn");
     // Reset betting amounts for new round
     hand.getBettingActions()->resetHighestSet();
 
@@ -33,6 +35,7 @@ void TurnState::exit(HandFsm& hand)
     {
         player->getStatisticsUpdater()->updateTurnStatistics(player->getCurrentHandContext());
     }
+    GlobalServices::instance().logger().info("TurnState: Exiting turn");
 }
 
 bool TurnState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const
@@ -72,7 +75,7 @@ bool TurnState::isActionAllowed(const HandFsm& hand, const PlayerAction action) 
 void TurnState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
 {
     player.updateCurrentHandContext(Turn, hand);
-    const PlayerAction action = player.decideAction(player.getCurrentHandContext());
+    PlayerAction action = player.decideAction(player.getCurrentHandContext());
 
     hand.handlePlayerAction(action);
 }

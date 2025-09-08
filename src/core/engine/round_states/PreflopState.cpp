@@ -31,6 +31,7 @@ PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsig
 
 void PreflopState::enter(HandFsm& hand)
 {
+    GlobalServices::instance().logger().info("PreflopState: Entering preflop");
     hand.getBettingActions()->updateHighestSet(2 * mySmallBlind);
     setBlinds(hand);
 
@@ -45,6 +46,7 @@ void PreflopState::exit(HandFsm& hand)
         player->updateCurrentHandContext(GameState::Preflop, hand);
         player->getStatisticsUpdater()->updatePreflopStatistics(player->getCurrentHandContext());
     }
+    GlobalServices::instance().logger().info("PreflopState: Exiting preflop");
 }
 
 bool PreflopState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const
@@ -56,7 +58,7 @@ bool PreflopState::isActionAllowed(const HandFsm& hand, const PlayerAction actio
                                                   " not found");
         return false;
     }
-    if (validatePlayerAction(*player, action, *hand.getBettingActions(), mySmallBlind))
+    if (validatePlayerAction(*player, action, *hand.getBettingActions(), mySmallBlind, Preflop))
     {
         return true;
     }
@@ -69,7 +71,7 @@ bool PreflopState::isActionAllowed(const HandFsm& hand, const PlayerAction actio
 void PreflopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
 {
     player.updateCurrentHandContext(Preflop, hand);
-    const PlayerAction action = player.decideAction(player.getCurrentHandContext());
+    PlayerAction action = player.decideAction(player.getCurrentHandContext());
 
     hand.handlePlayerAction(action);
 }
@@ -98,27 +100,33 @@ void PreflopState::setBlinds(HandFsm& hand)
     for (const auto& player : *hand.getRunningPlayersList())
     {
         int blindAmount = 0;
+        ActionType actionType = ActionType::None;
 
         if (player->getPosition() == PlayerPosition::SmallBlind ||
             player->getPosition() == PlayerPosition::ButtonSmallBlind)
         {
             blindAmount = mySmallBlind;
+            actionType = ActionType::PostSmallBlind;
         }
         else if (player->getPosition() == PlayerPosition::BigBlind)
         {
             blindAmount = 2 * mySmallBlind;
+            actionType = ActionType::PostBigBlind;
         }
 
         if (blindAmount > 0)
         {
-            if (player->getCash() <= blindAmount)
+            if (player->getCash() < blindAmount)
             {
+                // Player doesn't have enough cash to post the blind, goes all-in
                 player->addBetAmount(player->getCash());
-                player->setAction(ActionType::Allin);
+                player->setAction(*this, {player->getId(), ActionType::Allin, player->getCash()});
             }
             else
             {
+                // Player can afford the blind
                 player->addBetAmount(blindAmount);
+                player->setAction(*this, {player->getId(), actionType, blindAmount});
             }
         }
     }

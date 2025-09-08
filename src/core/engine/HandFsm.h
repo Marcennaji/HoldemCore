@@ -28,7 +28,7 @@ class HandFsm : public IHandLifecycle, public IHandPlayerAction, public HandPlay
     ~HandFsm();
 
     IActionProcessor* getActionProcessor() const;
-    void handlePlayerAction(const PlayerAction& action) override;
+    void handlePlayerAction(PlayerAction action) override;
     void start() override;
     void end() override;
     size_t dealBoardCards() override;
@@ -44,7 +44,7 @@ class HandFsm : public IHandLifecycle, public IHandPlayerAction, public HandPlay
     IHandState& getState() { return *myState; }
 
   private:
-    void applyActionEffects(const PlayerAction& action);
+    void applyActionEffects(const PlayerAction action);
 
     std::shared_ptr<EngineFactory> myFactory;
     const GameEvents& myEvents;

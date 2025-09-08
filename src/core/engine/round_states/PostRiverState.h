@@ -25,7 +25,7 @@ class PostRiverState : public IHandState, public IActionProcessor, public IDebug
     bool isTerminal() const override { return true; }
 
     void logStateInfo(const HandFsm&) const override;
-    GameState getGameState() const override { return GameState::PostRiver; }
+    const GameState getGameState() const override { return GameState::PostRiver; }
     void promptPlayerAction(HandFsm&, player::PlayerFsm& player) override;
 
   private:

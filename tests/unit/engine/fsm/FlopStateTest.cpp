@@ -52,7 +52,7 @@ TEST_F(FlopStateTest, StartFlopInitializesPlayersCorrectly)
     EXPECT_GE(playerBb->getCash(), 0);
 }
 
-TEST_F(FlopStateTest, DISABLED_OnlyChecksFlopShouldGoToTurn)
+TEST_F(FlopStateTest, OnlyChecksFlopShouldGoToTurn)
 {
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
@@ -75,7 +75,7 @@ TEST_F(FlopStateTest, DISABLED_OnlyChecksFlopShouldGoToTurn)
     EXPECT_EQ(myLastGameState, Turn);
 }
 
-TEST_F(FlopStateTest, RaiseOnFlopKeepsRoundOpen)
+TEST_F(FlopStateTest, BetOnFlopKeepsRoundOpen)
 {
     initializeHandFsmForTesting(3, gameData);
     myHandFsm->start();
@@ -91,11 +91,11 @@ TEST_F(FlopStateTest, RaiseOnFlopKeepsRoundOpen)
 
     EXPECT_EQ(myLastGameState, Flop);
 
-    // Flop raise scenario
-    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Raise, 50});
+    // Flop bet scenario
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Bet, 50});
     EXPECT_EQ(myLastGameState, Flop); // round still open
 
-    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call, 50});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call});
     EXPECT_EQ(myLastGameState, Turn); // round closes after call
 }
 
@@ -113,9 +113,9 @@ TEST_F(FlopStateTest, AllInOnFlop)
 
     EXPECT_EQ(myLastGameState, Flop);
 
-    // Player goes all-in
+    // Player goes all-in, so he is not any more "running"
     myHandFsm->handlePlayerAction({playerDealerSb->getId(), ActionType::Allin});
-    EXPECT_EQ(getPlayerFsmById(myRunningPlayersListFsm, playerDealerSb->getId())->getCash(), 0);
+    EXPECT_EQ(getPlayerFsmById(mySeatsListFsm, playerDealerSb->getId())->getCash(), 0);
 }
 
 } // namespace pkt::test

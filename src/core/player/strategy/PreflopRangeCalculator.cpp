@@ -322,7 +322,7 @@ bool PreflopRangeCalculator::shouldCallForAllIn(const CurrentHandContext& ctx, i
     const PlayerPosition myPosition = ctx.personalContext.position;
 
     return ctx.personalContext.m > 10 && potOdd <= 20 && nbRaises < 2 &&
-           lastRaiser->getAction().type == ActionType::Allin &&
+           lastRaiser->getLastAction().type == ActionType::Allin &&
            (myPosition >= Late || myPosition == SmallBlind || myPosition == BigBlind);
 }
 
