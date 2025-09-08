@@ -16,15 +16,26 @@ PostRiverState::PostRiverState(const GameEvents& events) : myEvents(events)
 
 void PostRiverState::enter(HandFsm& hand)
 {
-    GlobalServices::instance().logger().info("PostRiverState: Entering post-river");
+    GlobalServices::instance().logger().info("PostRiverState: Entering showdown");
 
     for (auto& player : *hand.getActingPlayersList())
     {
         player->setAction(*this, {player->getId(), ActionType::None});
     }
 
+    // hand.getBoard().collectPot();
+    // hand.getBoard().distributePot();
+
+    // hand.getBoard().determinePlayerNeedToShowCards();
+
     if (myEvents.onBettingRoundStarted)
         myEvents.onBettingRoundStarted(PostRiver);
+
+    if (myEvents.onShowdownStarted)
+        myEvents.onShowdownStarted();
+
+    if (myEvents.onPauseHand)
+        myEvents.onPauseHand();
 }
 
 void PostRiverState::exit(HandFsm& /*hand*/)

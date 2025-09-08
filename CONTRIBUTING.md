@@ -13,6 +13,7 @@ To keep the project maintainable and high-quality, please respect the following 
 
 ### ✅ Decoupling is sacred
 
+* Follow the [SOLID design principles](https://en.wikipedia.org/wiki/SOLID)
 * The **core engine** must remain **UI-agnostic** (no Qt, no Flutter, no I/O inside `src/core/`).
 * All UI updates are driven by `GameEvents`.
 
@@ -38,15 +39,11 @@ To keep the project maintainable and high-quality, please respect the following 
 
 ---
 
-## 📂 Where to Contribute
+## 📂 Help needed for...
 
-| Area             | Location           | Notes                                        |
-| ---------------- | ------------------ | -------------------------------------------- |
-| Engine Logic     | `src/core/engine/` | Hand management, board logic, betting rounds |
-| Player/Bots      | `src/core/player/` | `BotPlayer`, `BotStrategy`, `PlayerFactory` |
-| Events           | `src/core/events/` | Add new `GameEvents` if needed               |
-| WebSocket Server | `src/server/`      | Handles protocol and message routing         |
-| Unit Tests       | `tests/core/...`   | All logic should be testable                 |
+* developing new UIs, or improving the existing ones (Flutter, Qt Widgets, Qt QML...)
+* adding new bot strategies
+* ...or any new feature that would be nice to have !
 
 ---
 
