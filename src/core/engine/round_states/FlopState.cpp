@@ -69,9 +69,16 @@ std::unique_ptr<IHandState> FlopState::computeNextState(HandFsm& hand, PlayerAct
         return std::make_unique<PostRiverState>(myEvents);
     }
 
-    // If round is complete and multiple players can still act, continue to Turn
+    // If round is complete, check if we can continue betting
     if (isRoundComplete(hand))
     {
+        // If only one or no players can still act, go directly to showdown
+        if (hand.getActingPlayersList()->size() <= 1)
+        {
+            return std::make_unique<PostRiverState>(myEvents);
+        }
+
+        // Multiple players can still act, continue to Turn
         return std::make_unique<TurnState>(myEvents);
     }
 

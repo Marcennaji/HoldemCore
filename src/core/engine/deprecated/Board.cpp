@@ -251,10 +251,6 @@ int Board::getSets() const
 {
     return myTotalBetAmounts;
 }
-void Board::setSets(int theValue)
-{
-    myTotalBetAmounts = theValue;
-}
 
 std::list<unsigned> Board::getWinners() const
 {

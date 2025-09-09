@@ -42,6 +42,7 @@ class HandFsm : public IHandLifecycle, public IHandPlayerAction, public HandPlay
     float getM(int cash) const;
     int getSmallBlind() const;
     IHandState& getState() { return *myState; }
+    GameState getGameState() const { return myState->getGameState(); }
     IBoard& getBoard() { return *myBoard; }
 
   private:

@@ -694,12 +694,11 @@ bool isSmallBlindPosition(PlayerPosition p)
 
 bool isRoundComplete(HandFsm& hand)
 {
-    assert(hand.getState().getGameState() != GameState::None);
+    assert(hand.getGameState() != GameState::None);
 
     for (auto player = hand.getActingPlayersList()->begin(); player != hand.getActingPlayersList()->end(); ++player)
     {
-        GlobalServices::instance().logger().verbose("checking if round " +
-                                                    gameStateToString(hand.getState().getGameState()) +
+        GlobalServices::instance().logger().verbose("checking if round " + gameStateToString(hand.getGameState()) +
                                                     " is complete : Checking player: " + (*player)->getName());
 
         if ((*player)->getLastAction().type == ActionType::None ||
@@ -713,11 +712,11 @@ bool isRoundComplete(HandFsm& hand)
 
         GlobalServices::instance().logger().verbose(
             "  player round bet amount: " +
-            std::to_string((*player)->getCurrentHandActions().getRoundTotalBetAmount(hand.getState().getGameState())) +
+            std::to_string((*player)->getCurrentHandActions().getRoundTotalBetAmount(hand.getGameState())) +
             ", hand total bet amount : " + std::to_string((*player)->getCurrentHandActions().getHandTotalBetAmount()) +
             " vs current round highest bet: " + std::to_string(hand.getBettingActions()->getRoundHighestSet()));
 
-        if ((*player)->getCurrentHandActions().getRoundTotalBetAmount(hand.getState().getGameState()) <
+        if ((*player)->getCurrentHandActions().getRoundTotalBetAmount(hand.getGameState()) <
             hand.getBettingActions()->getRoundHighestSet())
         {
             GlobalServices::instance().logger().verbose("  ROUND NOT COMPLETE, as player " + (*player)->getName() +
@@ -725,8 +724,7 @@ bool isRoundComplete(HandFsm& hand)
             return false;
         }
     }
-    GlobalServices::instance().logger().verbose("  ROUND " + gameStateToString(hand.getState().getGameState()) +
-                                                " COMPLETE");
+    GlobalServices::instance().logger().verbose("  ROUND " + gameStateToString(hand.getGameState()) + " COMPLETE");
     return true;
 }
 } // namespace pkt::core::player

@@ -3,13 +3,12 @@
 // Licensed under the MIT License — see LICENSE file for details.
 #pragma once
 
+#include "core/interfaces/IBoard.h"
+#include "core/player/typedefs.h"
+
 #include <iostream>
 #include <memory>
 #include <vector>
-
-#include "core/interfaces/IBoard.h"
-
-#include "core/player/typedefs.h"
 
 namespace pkt::core::player
 {
@@ -19,7 +18,7 @@ class Player;
 namespace pkt::core
 {
 
-class IHand;
+class HandFsm;
 
 class BoardFsm : public IBoard
 {
@@ -41,15 +40,18 @@ class BoardFsm : public IBoard
     void setAllInCondition(bool theValue);
     void setLastActionPlayerId(unsigned theValue);
 
-    int getPot() const;
-    void setPot(int theValue);
-    int getSets() const;
-    void setSets(int theValue);
+    int getPot() const { throw std::runtime_error("getPot is deprecated"); }
+    int getPot(const HandFsm& hand) const;
+    void setPot(int theValue) { throw std::runtime_error("setPot is deprecated"); }
+    int getSets() const { throw std::runtime_error("getSets is deprecated"); }
+    int getSets(const HandFsm& hand) const;
 
-    void collectSets();
-    void collectPot();
+    void collectSets() { throw std::runtime_error("collectSets is deprecated"); }
+    void collectPot() { throw std::runtime_error("collectPot is deprecated"); }
 
-    void distributePot();
+    void distributePot() { throw std::runtime_error("distributePot is deprecated"); }
+
+    void distributePot(HandFsm& hand);
     void determinePlayerNeedToShowCards();
 
     std::list<unsigned> getWinners() const;
@@ -67,7 +69,7 @@ class BoardFsm : public IBoard
 
     int myCards[5];
     int myPot{0};
-    int myTotalBetAmounts{0};
+    int myCurrentRoundTotalBets{0};
     unsigned myDealerPlayerId;
     bool myAllInCondition{false};
     unsigned myLastActionPlayerId{0};

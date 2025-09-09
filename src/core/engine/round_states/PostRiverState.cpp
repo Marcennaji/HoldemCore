@@ -23,8 +23,7 @@ void PostRiverState::enter(HandFsm& hand)
         player->setAction(*this, {player->getId(), ActionType::None});
     }
 
-    hand.getBoard().collectPot();
-    hand.getBoard().distributePot();
+    hand.getBoard().distributePot(hand);
 
     hand.getBoard().determinePlayerNeedToShowCards();
 

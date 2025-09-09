@@ -74,6 +74,13 @@ std::unique_ptr<IHandState> TurnState::computeNextState(HandFsm& hand, PlayerAct
     if (isRoundComplete(hand))
     {
         exit(hand);
+        // If only one or no players can still act, go directly to showdown
+        if (hand.getActingPlayersList()->size() <= 1)
+        {
+            return std::make_unique<PostRiverState>(myEvents);
+        }
+
+        // Multiple players can still act, continue to River
         return std::make_unique<RiverState>(myEvents);
     }
 

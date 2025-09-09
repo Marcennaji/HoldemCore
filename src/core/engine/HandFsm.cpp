@@ -259,9 +259,9 @@ HandCommonContext HandFsm::updateHandCommonContext(const GameState state)
     handContext.playersContext.flopLastRaiserFsm =
         getPlayerFsmById(getSeatsList(), getBettingActions()->getFlop().getLastRaiserId());
 
-    handContext.bettingContext.pot = myBoard->getPot();
+    handContext.bettingContext.pot = myBoard->getPot(*this);
     // handContext.bettingContext.potOdd = getPotOdd();
-    handContext.bettingContext.sets = myBoard->getSets();
+    handContext.bettingContext.sets = myBoard->getSets(*this);
     handContext.bettingContext.highestBetAmount = getBettingActions()->getRoundHighestSet();
     handContext.bettingContext.preflopRaisesNumber = getBettingActions()->getPreflop().getRaisesNumber();
     handContext.bettingContext.preflopCallsNumber = getBettingActions()->getPreflop().getCallsNumber();
@@ -324,12 +324,13 @@ int HandFsm::getPotOdd(const int playerCash, const int playerSet) const
 {
     const int highestBetAmount = min(playerCash, getBettingActions()->getRoundHighestSet());
 
-    int pot = myBoard->getPot() + myBoard->getSets();
+    int pot = myBoard->getPot(*this) + myBoard->getSets(*this);
 
     if (pot == 0)
     { // shouldn't happen, but...
-        GlobalServices::instance().logger().error("Pot = " + std::to_string(myBoard->getPot()) + " + " +
-                                                  std::to_string(myBoard->getSets()) + " = " + std::to_string(pot));
+        GlobalServices::instance().logger().error("Pot = " + std::to_string(myBoard->getPot(*this)) + " + " +
+                                                  std::to_string(myBoard->getSets(*this)) + " = " +
+                                                  std::to_string(pot));
         return 0;
     }
 

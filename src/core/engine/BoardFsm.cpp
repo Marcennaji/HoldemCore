@@ -9,6 +9,7 @@
 #include <core/services/GlobalServices.h>
 #include "Exception.h"
 #include "PotFsm.h"
+#include "core/engine/HandFsm.h"
 #include "core/player/PlayerFsm.h"
 #include "model/EngineError.h"
 
@@ -35,25 +36,16 @@ void BoardFsm::setActingPlayersListFsm(PlayerFsmList actingPlayers)
 {
     myActingPlayersList = actingPlayers;
 }
-void BoardFsm::collectSets()
-{
-    myTotalBetAmounts = 0;
 
-    for (auto player = mySeatsList->begin(); player != mySeatsList->end(); ++player)
+void BoardFsm::distributePot(HandFsm& hand)
+{
+    int totalPot = 0;
+
+    for (auto& player : *hand.getSeatsList())
     {
-        myTotalBetAmounts += (*player)->getCurrentHandActions().getHandTotalBetAmount();
+        totalPot += player->getCurrentHandActions().getHandTotalBetAmount();
     }
-}
-
-void BoardFsm::collectPot()
-{
-    myPot += myTotalBetAmounts;
-    myTotalBetAmounts = 0;
-}
-
-void BoardFsm::distributePot()
-{
-    PotFsm pot(myPot, mySeatsList, myDealerPlayerId);
+    PotFsm pot(totalPot, mySeatsList, myDealerPlayerId);
     pot.distribute();
     myWinners = pot.getWinners();
 }
@@ -220,23 +212,6 @@ void BoardFsm::setLastActionPlayerId(unsigned theValue)
     myLastActionPlayerId = theValue;
 }
 
-int BoardFsm::getPot() const
-{
-    return myPot;
-}
-void BoardFsm::setPot(int theValue)
-{
-    myPot = theValue;
-}
-int BoardFsm::getSets() const
-{
-    return myTotalBetAmounts;
-}
-void BoardFsm::setSets(int theValue)
-{
-    myTotalBetAmounts = theValue;
-}
-
 std::list<unsigned> BoardFsm::getWinners() const
 {
     return myWinners;
@@ -253,5 +228,26 @@ std::list<unsigned> BoardFsm::getPlayerNeedToShowCards() const
 void BoardFsm::setPlayerNeedToShowCards(const std::list<unsigned>& p)
 {
     myPlayerNeedToShowCards = p;
+}
+int BoardFsm::getPot(const HandFsm& hand) const
+{
+    int totalPot = 0;
+
+    for (auto& player : *hand.getSeatsList())
+    {
+        totalPot += player->getCurrentHandActions().getHandTotalBetAmount();
+    }
+    return totalPot;
+}
+int BoardFsm::getSets(const HandFsm& hand) const
+{
+    int total = 0;
+    GameState currentRound = hand.getGameState();
+
+    for (auto& player : *hand.getSeatsList())
+    {
+        total += player->getCurrentHandActions().getRoundTotalBetAmount(currentRound);
+    }
+    return total;
 }
 } // namespace pkt::core

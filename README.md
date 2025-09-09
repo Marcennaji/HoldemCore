@@ -187,14 +187,14 @@ See [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## 📝 License
 
-This project, **PokerTraining**, is released under the **MIT License** —  
+This project, PokerTraining, is released under the MIT License —  
 you are free to use, learn from, and contribute to it.
 
-⚖️ **Note on legacy code:**  
-- The very first version of PokerTraining (2011, SourceForge) was based on and built upon portions of the open-source **PokerTH** engine, which is licensed under **GPLv2**.  
-- That early codebase focused mainly on adding **poker bot strategies and AI logic**.  
-- Since 2025, the engine has been undergoing a **progressive rewrite**:  
-  nearly all of the original PokerTH-derived code has been replaced with a **fully original, modular, MIT-licensed codebase**.  
+⚖️ Note on legacy code:
+The initial version of PokerTraining (2011, SourceForge) reused portions of the open-source [PokerTH](https://github.com/pokerth/pokerth) engine,  
+which at that time was distributed under **GPLv2**. That early codebase focused mainly on adding poker bot strategies and AI logic.  
 
-🙏 Acknowledgment to the **PokerTH project** for providing the foundation that helped inspire the early stages of PokerTraining.
+Since 2025, the engine has been undergoing a **progressive rewrite**: nearly all PokerTH-derived code has been replaced with a  
+**fully original, modular codebase under MIT**.  
 
+🙏 Acknowledgment to the PokerTH project for inspiring the early stages of PokerTraining.

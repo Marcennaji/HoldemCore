@@ -39,9 +39,10 @@ class Board : public IBoard
     void setLastActionPlayerId(unsigned theValue);
 
     int getPot() const;
+    int getPot(const HandFsm& hand) const { throw std::runtime_error("getPot Not implemented"); }
     void setPot(int theValue);
     int getSets() const;
-    void setSets(int theValue);
+    int getSets(const HandFsm& hand) const { throw std::runtime_error("getSets Not implemented"); }
 
     void collectSets();
     void collectPot();

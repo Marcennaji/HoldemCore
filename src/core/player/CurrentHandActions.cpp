@@ -115,11 +115,16 @@ void CurrentHandActions::writeActionsToLog() const
 
 void CurrentHandActions::addAction(const GameState& state, const PlayerAction& action)
 {
-    GlobalServices::instance().logger().verbose(
-        "CurrentHandActions::addAction: adding action " + std::string(playerActionToString(action.type)) +
-        " with amount = " + std::to_string(action.amount) + " for player " + std::to_string(action.playerId) +
-        " in state " + gameStateToString(state));
-    myActionsByState[state].push_back(action);
+    if (action.type != ActionType::None)
+    {
+        GlobalServices::instance().logger().verbose(
+            "CurrentHandActions::addAction: adding action " + std::string(playerActionToString(action.type)) +
+            " with amount = " + std::to_string(action.amount) + " for player " + std::to_string(action.playerId) +
+            " in state " + gameStateToString(state));
+
+        myActionsByState[state].push_back(action);
+    }
+
     myLastAction = action;
 }
 

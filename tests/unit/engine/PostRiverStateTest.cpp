@@ -125,7 +125,7 @@ TEST_F(PostRiverStateTest, ShowdownTiedHands)
     EXPECT_TRUE(std::find(winners.begin(), winners.end(), playerBb->getId()) != winners.end());
 }
 
-TEST_F(PostRiverStateTest, DISABLED_PotDistributionSingleWinner)
+TEST_F(PostRiverStateTest, PotDistributionSingleWinner)
 {
     logTestMessage("Testing pot distribution to single winner");
 
@@ -139,9 +139,9 @@ TEST_F(PostRiverStateTest, DISABLED_PotDistributionSingleWinner)
     playerSb->setHandRanking(1000); // Loser
     playerBb->setHandRanking(2000); // Winner
 
-    // Record initial cash
-    int initialCashSb = playerSb->getCash();
-    int initialCashBb = playerBb->getCash();
+    // Record initial cash BEFORE any actions (to capture the true initial state)
+    int trueCashSb = 1000; // From gameData.startMoney
+    int trueCashBb = 1000; // From gameData.startMoney
 
     // Both players bet and call to showdown
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
@@ -155,12 +155,17 @@ TEST_F(PostRiverStateTest, DISABLED_PotDistributionSingleWinner)
 
     EXPECT_EQ(myLastGameState, PostRiver);
 
-    // Verify winner gets the pot (should get back their bet plus opponent's bet)
-    EXPECT_EQ(playerBb->getCash(), initialCashBb + 200); // Gets opponent's bet
-    EXPECT_EQ(playerSb->getCash(), initialCashSb - 200); // Loses their bet
+    // Verify winner gets the pot (should get back their bet plus opponent's bet plus blinds)
+    // Total pot calculation from actual contributions:
+    // - Preflop: SB posts 10, BB posts 20, SB calls additional 10 to match BB = 20 each total
+    // - Flop: SB bets 200, BB calls 200 = 200 each
+    // - Total contributions: SB = 220, BB = 220, Total pot = 440
+    // Winner (BB) should get entire pot, net change from true initial: +220
+    EXPECT_EQ(playerBb->getCash(), trueCashBb + 220); // Net gain from winning entire pot
+    EXPECT_EQ(playerSb->getCash(), trueCashSb - 220); // Total loss of their contribution
 }
 
-TEST_F(PostRiverStateTest, DISABLED_SplitPotDistribution)
+TEST_F(PostRiverStateTest, SplitPotDistribution)
 {
     logTestMessage("Testing split pot distribution for tied hands");
 
@@ -174,9 +179,9 @@ TEST_F(PostRiverStateTest, DISABLED_SplitPotDistribution)
     playerSb->setHandRanking(1500);
     playerBb->setHandRanking(1500); // Same ranking
 
-    // Record initial cash
-    int initialCashSb = playerSb->getCash();
-    int initialCashBb = playerBb->getCash();
+    // Record initial cash BEFORE any actions (to capture the true initial state)
+    int trueCashSb = 1000; // From gameData.startMoney
+    int trueCashBb = 1000; // From gameData.startMoney
 
     // Both players bet equally to showdown
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
@@ -191,11 +196,11 @@ TEST_F(PostRiverStateTest, DISABLED_SplitPotDistribution)
     EXPECT_EQ(myLastGameState, PostRiver);
 
     // Verify pot is split equally (both get their money back)
-    EXPECT_EQ(playerSb->getCash(), initialCashSb);
-    EXPECT_EQ(playerBb->getCash(), initialCashBb);
+    EXPECT_EQ(playerSb->getCash(), trueCashSb);
+    EXPECT_EQ(playerBb->getCash(), trueCashBb);
 }
 
-TEST_F(PostRiverStateTest, DISABLED_AllInPlayerWinsEntirePot)
+TEST_F(PostRiverStateTest, AllInPlayerWinsEntirePot)
 {
     logTestMessage("Testing all-in player wins entire pot");
 
@@ -205,28 +210,34 @@ TEST_F(PostRiverStateTest, DISABLED_AllInPlayerWinsEntirePot)
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
 
-    // Set up all-in scenario - reduce one player's cash
-    playerSb->setCash(300); // Limited cash for all-in
+    // Set up all-in scenario - reduce one player's cash AFTER blinds are posted
+    // SB has already posted 10, so they have 990 remaining
+    playerSb->setCash(270); // This gives them 280 total (10 already posted + 270 remaining)
 
     // All-in player has better hand
     playerSb->setHandRanking(2000); // Winner (all-in)
     playerBb->setHandRanking(1000); // Loser
 
-    // Record initial cash
-    int initialCashBb = playerBb->getCash();
+    // Record cash after hand start but before all-in
+    int cashSbBeforeAllin = playerSb->getCash(); // Should be 270
+    int cashBbBeforeAllin = playerBb->getCash(); // Should be 980 (after posting BB)
 
     // SB goes all-in, BB calls
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
     myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Allin, 250}); // All remaining cash
-    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call, 250});
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Allin, 260}); // All remaining cash after preflop call
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call, 260});
 
-    // No more actions possible due to all-in, should go to PostRiver
     EXPECT_EQ(myLastGameState, PostRiver);
 
-    // Verify all-in player wins the pot
-    EXPECT_EQ(playerSb->getCash(), 300 + 250);           // Gets back chips plus opponent's call
-    EXPECT_EQ(playerBb->getCash(), initialCashBb - 250); // Loses the call amount
+    // Calculate expected results:
+    // SB contributed: 10 (small blind) + 10 (call preflop) + 260 (all-in on flop) = 280 total
+    // BB contributed: 20 (big blind) + 0 (check preflop) + 260 (call on flop) = 280 total
+    // Total pot = 560, Winner (SB) gets all
+    // SB final: 0 (all-in) + 560 (pot) = 560
+    // BB final: 1000 - 280 = 720
+    EXPECT_EQ(playerSb->getCash(), 560); // All-in amount (0) + winnings (560)
+    EXPECT_EQ(playerBb->getCash(), 720); // Initial cash (1000) minus total contribution (280)
 }
 
 TEST_F(PostRiverStateTest, DISABLED_FoldedPlayerExcludedFromPot)
@@ -245,10 +256,10 @@ TEST_F(PostRiverStateTest, DISABLED_FoldedPlayerExcludedFromPot)
     playerSb->setHandRanking(1000);     // Worse hand
     playerBb->setHandRanking(2000);     // Better of remaining players
 
-    // Record initial cash
-    int initialCashDealer = playerDealer->getCash();
-    int initialCashSb = playerSb->getCash();
-    int initialCashBb = playerBb->getCash();
+    // Record initial cash BEFORE any actions (to capture true initial state)
+    int trueCashDealer = 1000; // From gameData.startMoney
+    int trueCashSb = 1000;     // From gameData.startMoney
+    int trueCashBb = 1000;     // From gameData.startMoney
 
     // Dealer folds, SB and BB go to showdown
     myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
@@ -268,10 +279,14 @@ TEST_F(PostRiverStateTest, DISABLED_FoldedPlayerExcludedFromPot)
     EXPECT_TRUE(std::find(winners.begin(), winners.end(), playerBb->getId()) != winners.end());
     EXPECT_TRUE(std::find(winners.begin(), winners.end(), playerDealer->getId()) == winners.end());
 
-    // Verify pot distribution
-    EXPECT_EQ(playerDealer->getCash(), initialCashDealer); // Folded player unchanged
-    EXPECT_EQ(playerBb->getCash(), initialCashBb + 200);   // Winner gets pot
-    EXPECT_EQ(playerSb->getCash(), initialCashSb - 200);   // Loser loses bet
+    // Verify pot distribution with proper blind accounting:
+    // - Dealer: folded immediately, no contribution except any ante (none in this case)
+    // - SB: 10 (blind) + 200 (bet) = 210 total contribution
+    // - BB: 20 (blind) + 200 (call) = 220 total contribution
+    // Total pot: 430, Winner (BB) gets all
+    EXPECT_EQ(playerDealer->getCash(), trueCashDealer); // Folded player unchanged
+    EXPECT_EQ(playerBb->getCash(), trueCashBb + 210);   // Winner gets 430 - 220 = +210 net
+    EXPECT_EQ(playerSb->getCash(), trueCashSb - 210);   // Loser loses their 210 contribution
 }
 
 TEST_F(PostRiverStateTest, MultiplePlayersComplexShowdown)
@@ -357,8 +372,8 @@ TEST_F(PostRiverStateTest, DISABLED_PotCollectionBeforeDistribution)
     myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call, 100});
 
     // Check current pot and sets before reaching PostRiver
-    int potBeforeRiver = myHandFsm->getBoard().getPot();
-    int setsBeforeRiver = myHandFsm->getBoard().getSets();
+    int potBeforeRiver = myHandFsm->getBoard().getPot(*myHandFsm);
+    int setsBeforeRiver = myHandFsm->getBoard().getSets(*myHandFsm);
 
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Check});
     myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
@@ -368,8 +383,8 @@ TEST_F(PostRiverStateTest, DISABLED_PotCollectionBeforeDistribution)
     EXPECT_EQ(myLastGameState, PostRiver);
 
     // Verify pot was collected (sets added to pot, sets cleared)
-    EXPECT_GT(myHandFsm->getBoard().getPot(), potBeforeRiver);
-    EXPECT_EQ(myHandFsm->getBoard().getSets(), 0);
+    EXPECT_GT(myHandFsm->getBoard().getPot(*myHandFsm), potBeforeRiver);
+    EXPECT_EQ(myHandFsm->getBoard().getSets(*myHandFsm), 0);
 }
 
 TEST_F(PostRiverStateTest, PlayersSetToNoneInPostRiver)
@@ -399,7 +414,7 @@ TEST_F(PostRiverStateTest, PlayersSetToNoneInPostRiver)
     EXPECT_EQ(playerBb->getLastAction().type, ActionType::None);
 }
 
-TEST_F(PostRiverStateTest, DISABLED_EmptyPotShowdown)
+TEST_F(PostRiverStateTest, EmptyPotShowdown)
 {
     logTestMessage("Testing showdown with empty pot");
 
@@ -414,8 +429,8 @@ TEST_F(PostRiverStateTest, DISABLED_EmptyPotShowdown)
     playerBb->setHandRanking(2000); // Winner
 
     // Record initial cash
-    int initialCashSb = playerSb->getCash();
-    int initialCashBb = playerBb->getCash();
+    int initialCashSb = gameData.startMoney; // 1000
+    int initialCashBb = gameData.startMoney; // 1000
 
     // Both players check through all streets (no betting)
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
@@ -433,9 +448,9 @@ TEST_F(PostRiverStateTest, DISABLED_EmptyPotShowdown)
     auto winners = myHandFsm->getBoard().getWinners();
     EXPECT_TRUE(std::find(winners.begin(), winners.end(), playerBb->getId()) != winners.end());
 
-    // Verify no money changes hands (only blinds were collected)
-    EXPECT_EQ(playerSb->getCash(), initialCashSb - 50); // Only lost small blind
-    EXPECT_EQ(playerBb->getCash(), initialCashBb + 50); // Only won small blind
+    // Verify no money changes hands except blinds - SB lost 20, BB won 20 (net effect)
+    EXPECT_EQ(playerSb->getCash(), initialCashSb - 20); // Lost 20 total (small blind lost, no compensation)
+    EXPECT_EQ(playerBb->getCash(), initialCashBb + 20); // Won 20 total (net after losing big blind and winning pot)
 }
 
 } // namespace pkt::test
