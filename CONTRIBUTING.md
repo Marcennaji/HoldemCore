@@ -42,8 +42,8 @@ To keep the project maintainable and high-quality, please respect the following 
 ## 📂 Help needed for...
 
 * developing new UIs, or improving the existing ones (Flutter, Qt Widgets, Qt QML...)
-* adding new bot strategies
-* ...or any new feature that would be nice to have !
+* adding new bot strategies / improving existing ones
+* ...or any new feature you can think of, that would be nice to have !
 
 ---
 

@@ -98,25 +98,22 @@ player.setStrategy(std::make_unique<MyCustomBotStrategy>());
 - **SQLite3**
 
 ---
-## 🕰 Project history and current Status — *Ongoing refactoring with FSM-based core redesign*
+## 🕰 Project History and Current Status — *Ongoing refactoring with FSM-based core redesign*
 
 - **2011** — Initial version published on SourceForge (5⭐ project, >11,000 downloads).  
-  At that time, the project built upon portions of the open-source **PokerTH** codebase (GPLv2),  
-  but focused mainly on adding **poker bot strategies and AI logic**.  
+  The original version reused portions of the open-source **PokerTH** (GPLv2) engine, with a focus on adding **poker bot strategies and AI logic**.  
 
 - **2025 (today)** — Migrated to GitHub and undergoing a **major architectural rewrite**.  
-  The legacy PokerTH engine code is being **progressively refactored and replaced** with  
-  a new **FSM-driven, modular architecture**, designed for **testability** and to support  
-  multiple UIs (Qt Widgets, QML, and web frontends).  
+  The legacy PokerTH code is being **progressively refactored and replaced** with a new **FSM-driven, modular architecture**, designed for **testability** and to support multiple UIs (Qt Widgets, QML, and web frontends).  
 
-Soon, the engine will be **fully original**.  
-
-
+The ongoing refactor is replacing all legacy code — the engine is evolving into a **fully original, modern architecture**.  
+Since it is still under heavy development, no public release or announcement has been made yet.  
 
 ✅ Core engine is now headless  
 ✅ `GameEvents` decouples UI from logic  
-✅ Minimalistic `BotStrategy` API with overridable defaults   
+✅ Minimalistic `BotStrategy` API with overridable defaults  
 ✅ FSM-based street handling in progress  
+
 
 ---
 

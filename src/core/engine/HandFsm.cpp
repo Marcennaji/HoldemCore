@@ -71,7 +71,6 @@ void HandFsm::start()
 void HandFsm::end()
 {
     GlobalServices::instance().playersStatisticsStore().savePlayersStatistics(mySeatsList);
-    myState.reset();
 }
 
 void HandFsm::handlePlayerAction(PlayerAction action)

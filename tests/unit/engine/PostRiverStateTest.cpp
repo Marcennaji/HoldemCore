@@ -28,7 +28,7 @@ void PostRiverStateTest::logTestMessage(const std::string& message)
     GlobalServices::instance().logger().info("PostRiverStateTest: " + message);
 }
 
-TEST_F(PostRiverStateTest, DISABLED_TerminalStateNoActionsAllowed)
+TEST_F(PostRiverStateTest, TerminalStateNoActionsAllowed)
 {
     logTestMessage("Testing terminal state - no actions allowed");
 
@@ -60,7 +60,7 @@ TEST_F(PostRiverStateTest, DISABLED_TerminalStateNoActionsAllowed)
         myHandFsm->getActionProcessor()->isActionAllowed(*myHandFsm, {playerBb->getId(), ActionType::Raise, 200}));
 }
 
-TEST_F(PostRiverStateTest, DISABLED_ShowdownSingleWinner)
+TEST_F(PostRiverStateTest, ShowdownSingleWinner)
 {
     logTestMessage("Testing showdown with single winner");
 
@@ -92,7 +92,7 @@ TEST_F(PostRiverStateTest, DISABLED_ShowdownSingleWinner)
     EXPECT_TRUE(std::find(winners.begin(), winners.end(), playerBb->getId()) != winners.end());
 }
 
-TEST_F(PostRiverStateTest, DISABLED_ShowdownTiedHands)
+TEST_F(PostRiverStateTest, ShowdownTiedHands)
 {
     logTestMessage("Testing showdown with tied hands");
 
@@ -274,7 +274,7 @@ TEST_F(PostRiverStateTest, DISABLED_FoldedPlayerExcludedFromPot)
     EXPECT_EQ(playerSb->getCash(), initialCashSb - 200);   // Loser loses bet
 }
 
-TEST_F(PostRiverStateTest, DISABLED_MultiplePlayersComplexShowdown)
+TEST_F(PostRiverStateTest, MultiplePlayersComplexShowdown)
 {
     logTestMessage("Testing multiple players complex showdown scenario");
 
@@ -312,7 +312,7 @@ TEST_F(PostRiverStateTest, DISABLED_MultiplePlayersComplexShowdown)
     EXPECT_TRUE(std::find(winners.begin(), winners.end(), playerBb->getId()) != winners.end());
 }
 
-TEST_F(PostRiverStateTest, DISABLED_NoNextStateFromPostRiver)
+TEST_F(PostRiverStateTest, NoNextStateFromPostRiver)
 {
     logTestMessage("Testing no next state transition from PostRiver");
 
@@ -372,7 +372,7 @@ TEST_F(PostRiverStateTest, DISABLED_PotCollectionBeforeDistribution)
     EXPECT_EQ(myHandFsm->getBoard().getSets(), 0);
 }
 
-TEST_F(PostRiverStateTest, DISABLED_PlayersSetToNoneInPostRiver)
+TEST_F(PostRiverStateTest, PlayersSetToNoneInPostRiver)
 {
     logTestMessage("Testing all players set to ActionType::None in PostRiver");
 
