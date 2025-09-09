@@ -27,8 +27,10 @@ class BoardFsm : public IBoard
     BoardFsm(unsigned dealerPosition);
     ~BoardFsm();
 
-    void setSeatsList(pkt::core::player::PlayerFsmList seats);
-    void setActingPlayersList(pkt::core::player::PlayerFsmList actingPlayers);
+    void setSeatsList(pkt::core::player::PlayerFsmList seats) {};
+    void setActingPlayersList(pkt::core::player::PlayerFsmList actingPlayers) {};
+    void setSeatsListFsm(pkt::core::player::PlayerFsmList seats);
+    void setActingPlayersListFsm(pkt::core::player::PlayerFsmList actingPlayers);
 
     void setCards(int* theValue);
     void getCards(int* theValue);

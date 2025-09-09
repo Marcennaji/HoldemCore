@@ -54,15 +54,3 @@ To keep the project maintainable and high-quality, please respect the following 
 3. **Write clean, self-contained commits**
 4. **Push and create a pull request**
 
----
-
-## 🙏 Final Note
-
-This project aims to be a showcase of modern, maintainable C++ code in a domain (poker) that’s fun and challenging.
-
-We’re glad you’re here — but we care a lot about code quality.
-**Please avoid hacks, shortcuts, or quick wins that add technical debt.**
-
-If you're unsure about a design, open a discussion first — we're friendly, but picky 😄
-
-Happy hacking, and may the odds be ever in your favor! ♠️♥️♣️♦️

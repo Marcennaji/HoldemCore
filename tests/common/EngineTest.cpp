@@ -95,16 +95,16 @@ void EngineTest::createPlayersFsmLists(size_t playerCount)
 void EngineTest::initializeHandFsmWithPlayers(size_t activePlayerCount, GameData gameData)
 {
     createPlayersFsmLists(activePlayerCount);
-    myBoard = myFactory->createBoard(startDealerPlayerId);
-    myBoard->setSeatsListFsm(mySeatsListFsm);
-    myBoard->setActingPlayersListFsm(myActingPlayersListFsm);
+    myBoardFsm = myFactory->createBoard(startDealerPlayerId);
+    myBoardFsm->setSeatsListFsm(mySeatsListFsm);
+    myBoardFsm->setActingPlayersListFsm(myActingPlayersListFsm);
 
     StartData startData;
     startData.startDealerPlayerId = startDealerPlayerId;
     startData.numberOfPlayers = static_cast<int>(activePlayerCount);
 
     myHandFsm =
-        myFactory->createHandFsm(myFactory, myBoard, mySeatsListFsm, myActingPlayersListFsm, gameData, startData);
+        myFactory->createHandFsm(myFactory, myBoardFsm, mySeatsListFsm, myActingPlayersListFsm, gameData, startData);
 }
 void EngineTest::checkPostRiverConditions()
 {

@@ -18,7 +18,7 @@ TurnState::TurnState(const GameEvents& events) : myEvents(events)
 
 void TurnState::enter(HandFsm& hand)
 {
-    GlobalServices::instance().logger().info("TurnState: Entering turn");
+    GlobalServices::instance().logger().info("Turn");
 
     for (auto& player : *hand.getActingPlayersList())
     {
@@ -40,7 +40,6 @@ void TurnState::exit(HandFsm& hand)
     {
         player->getStatisticsUpdater()->updateTurnStatistics(player->getCurrentHandContext());
     }
-    GlobalServices::instance().logger().info("TurnState: Exiting turn");
 }
 
 bool TurnState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const

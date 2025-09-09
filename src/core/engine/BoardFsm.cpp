@@ -8,7 +8,7 @@
 
 #include <core/services/GlobalServices.h>
 #include "Exception.h"
-#include "Pot.h"
+#include "PotFsm.h"
 #include "core/player/PlayerFsm.h"
 #include "model/EngineError.h"
 
@@ -35,11 +35,11 @@ BoardFsm::~BoardFsm()
     }
 }
 
-void BoardFsm::setSeatsList(PlayerFsmList seats)
+void BoardFsm::setSeatsListFsm(PlayerFsmList seats)
 {
     mySeatsList = seats;
 }
-void BoardFsm::setActingPlayersList(PlayerFsmList actingPlayers)
+void BoardFsm::setActingPlayersListFsm(PlayerFsmList actingPlayers)
 {
     myActingPlayersList = actingPlayers;
 }

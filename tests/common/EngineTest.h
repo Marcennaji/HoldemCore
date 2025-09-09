@@ -3,6 +3,7 @@
 
 #include "common/common.h"
 
+#include "core/engine/BoardFsm.h"
 #include "core/engine/deprecated/Board.h"
 #include "core/engine/deprecated/Hand.h"
 #include "core/engine/model/GameState.h"
@@ -32,6 +33,7 @@ class EngineTest : public ::testing::Test
     std::shared_ptr<pkt::core::IHand> myHand;
     std::shared_ptr<pkt::core::HandFsm> myHandFsm;
     std::shared_ptr<pkt::core::IBoard> myBoard;
+    std::shared_ptr<pkt::core::IBoard> myBoardFsm;
     std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::Player>>> mySeatsList;
     std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::Player>>> myActingPlayersList;
 

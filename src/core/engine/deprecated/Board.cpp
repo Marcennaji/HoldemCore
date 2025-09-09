@@ -33,14 +33,6 @@ Board::~Board()
     {
         myActingPlayersList->clear();
     }
-    if (mySeatsListFsm)
-    {
-        mySeatsListFsm->clear();
-    }
-    if (myActingPlayersListFsm)
-    {
-        myActingPlayersListFsm->clear();
-    }
 }
 void Board::setSeatsList(PlayerList seats)
 {
@@ -50,14 +42,7 @@ void Board::setActingPlayersList(PlayerList actingPlayers)
 {
     myActingPlayersList = actingPlayers;
 }
-void Board::setSeatsListFsm(PlayerFsmList seats)
-{
-    mySeatsListFsm = seats;
-}
-void Board::setActingPlayersListFsm(PlayerFsmList actingPlayers)
-{
-    myActingPlayersListFsm = actingPlayers;
-}
+
 void Board::collectSets()
 {
     myTotalBetAmounts = 0;

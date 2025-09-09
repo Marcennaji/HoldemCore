@@ -31,7 +31,7 @@ PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsig
 
 void PreflopState::enter(HandFsm& hand)
 {
-    GlobalServices::instance().logger().info("PreflopState: Entering preflop");
+    GlobalServices::instance().logger().info("Preflop");
 
     for (auto& player : *hand.getSeatsList())
     {
@@ -52,7 +52,6 @@ void PreflopState::exit(HandFsm& hand)
         player->updateCurrentHandContext(GameState::Preflop, hand);
         player->getStatisticsUpdater()->updatePreflopStatistics(player->getCurrentHandContext());
     }
-    GlobalServices::instance().logger().info("PreflopState: Exiting preflop");
 }
 
 bool PreflopState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const

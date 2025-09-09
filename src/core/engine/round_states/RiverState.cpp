@@ -17,7 +17,7 @@ RiverState::RiverState(const GameEvents& events) : myEvents(events)
 
 void RiverState::enter(HandFsm& hand)
 {
-    GlobalServices::instance().logger().info("RiverState: Entering river");
+    GlobalServices::instance().logger().info("River");
 
     for (auto& player : *hand.getActingPlayersList())
     {
@@ -40,7 +40,6 @@ void RiverState::exit(HandFsm& hand)
     {
         player->getStatisticsUpdater()->updateRiverStatistics(player->getCurrentHandContext());
     }
-    GlobalServices::instance().logger().info("RiverState: Exiting river");
 }
 
 bool RiverState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const

@@ -1,7 +1,7 @@
 #include "common/common.h"
 
 #include "common/DummyPlayer.h"
-#include "core/engine/Pot.h"
+#include "core/engine/deprecated/Pot.h"
 #include "core/player/typedefs.h"
 
 using namespace pkt::core;

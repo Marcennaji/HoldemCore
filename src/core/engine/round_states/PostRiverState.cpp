@@ -16,7 +16,7 @@ PostRiverState::PostRiverState(const GameEvents& events) : myEvents(events)
 
 void PostRiverState::enter(HandFsm& hand)
 {
-    GlobalServices::instance().logger().info("PostRiverState: Entering showdown");
+    GlobalServices::instance().logger().info("Post-River");
 
     for (auto& player : *hand.getActingPlayersList())
     {
@@ -40,7 +40,6 @@ void PostRiverState::enter(HandFsm& hand)
 
 void PostRiverState::exit(HandFsm& /*hand*/)
 {
-    GlobalServices::instance().logger().info("PostRiverState: Exiting post-river");
 }
 
 std::unique_ptr<IHandState> PostRiverState::computeNextState(HandFsm& /*hand*/, const PlayerAction /*action*/)
