@@ -58,6 +58,24 @@ void PostRiverState::promptPlayerAction(HandFsm& /*hand*/, player::PlayerFsm& /*
     // No actions to prompt in PostRiver.
 }
 
+std::shared_ptr<player::PlayerFsm> PostRiverState::getNextPlayerToAct(const HandFsm& /*hand*/) const
+{
+    // No player actions in terminal state
+    return nullptr;
+}
+
+std::shared_ptr<player::PlayerFsm> PostRiverState::getFirstPlayerToActInRound(const HandFsm& /*hand*/) const
+{
+    // No player actions in terminal state
+    return nullptr;
+}
+
+bool PostRiverState::isRoundComplete(const HandFsm& /*hand*/) const
+{
+    // Terminal state is always "complete"
+    return true;
+}
+
 void PostRiverState::logStateInfo(const HandFsm& /*hand*/) const
 {
     // Could log showdown info, winners, etc.

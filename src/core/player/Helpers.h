@@ -71,6 +71,9 @@ PlayerFsmListIterator getPlayerFsmListIteratorById(PlayerFsmList list, unsigned 
 
 PlayerListIterator findPlayerOrThrow(PlayerList seats, unsigned id);
 PlayerListIterator nextActivePlayer(PlayerList seats, PlayerListIterator it);
+PlayerFsmListIterator nextActivePlayerFsm(PlayerFsmList seats, PlayerFsmListIterator it);
+
+std::shared_ptr<player::PlayerFsm> getFirstPlayerToActPostFlop(const HandFsm& hand);
 
 void updateActingPlayersList(PlayerList&);
 void updateActingPlayersListFsm(PlayerFsmList&);

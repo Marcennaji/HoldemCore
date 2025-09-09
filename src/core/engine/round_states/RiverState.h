@@ -23,6 +23,10 @@ class RiverState : public IHandState, public IActionProcessor, public IDebuggabl
 
     bool isActionAllowed(const HandFsm&, const PlayerAction) const override;
 
+    std::shared_ptr<player::PlayerFsm> getNextPlayerToAct(const HandFsm& hand) const override;
+    std::shared_ptr<player::PlayerFsm> getFirstPlayerToActInRound(const HandFsm& hand) const override;
+    bool isRoundComplete(const HandFsm& hand) const override;
+
     void logStateInfo(const HandFsm&) const override;
     const GameState getGameState() const override { return GameState::River; }
     void promptPlayerAction(HandFsm&, player::PlayerFsm& player) override;

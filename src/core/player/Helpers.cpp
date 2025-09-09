@@ -477,6 +477,43 @@ PlayerListIterator nextActivePlayer(PlayerList seats, PlayerListIterator it)
     }
     return it;
 }
+
+PlayerFsmListIterator nextActivePlayerFsm(PlayerFsmList seats, PlayerFsmListIterator it)
+{
+    ++it;
+    if (it == seats->end())
+        it = seats->begin();
+    while ((*it)->getLastAction().type == ActionType::Fold || (*it)->getLastAction().type == ActionType::Allin)
+    {
+        ++it;
+        if (it == seats->end())
+            it = seats->begin();
+    }
+    return it;
+}
+
+std::shared_ptr<player::PlayerFsm> getFirstPlayerToActPostFlop(const HandFsm& hand)
+{
+    auto actingPlayers = hand.getActingPlayersList();
+
+    if (actingPlayers->empty())
+        return nullptr;
+
+    for (auto it = actingPlayers->begin(); it != actingPlayers->end(); ++it)
+    {
+        if ((*it)->getPosition() == PlayerPosition::Button || (*it)->getPosition() == PlayerPosition::ButtonSmallBlind)
+        {
+            auto nextIt = std::next(it);
+            if (nextIt == actingPlayers->end())
+                nextIt = actingPlayers->begin();
+
+            return *nextIt;
+        }
+    }
+
+    return actingPlayers->front();
+}
+
 bool hasPosition(PlayerPosition position, PlayerFsmList actingPlayers)
 {
     // return true if position is last to play, false if not

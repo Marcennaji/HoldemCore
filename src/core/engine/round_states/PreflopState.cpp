@@ -87,6 +87,45 @@ void PreflopState::logStateInfo(const HandFsm& /*hand*/) const
     // todo
 }
 
+std::shared_ptr<player::PlayerFsm> PreflopState::getNextPlayerToAct(const HandFsm& hand) const
+{
+    // In preflop, the first to act is left of the big blind (UTG in multi-player, SB in heads-up)
+    auto actingPlayers = hand.getActingPlayersList();
+
+    if (actingPlayers->empty())
+        return nullptr;
+
+    // Find the big blind player in the acting players list
+    for (auto it = actingPlayers->begin(); it != actingPlayers->end(); ++it)
+    {
+        if ((*it)->getPosition() == PlayerPosition::BigBlind)
+        {
+            // Found the big blind, get the next player in the list
+            auto nextIt = std::next(it);
+            if (nextIt == actingPlayers->end())
+                nextIt = actingPlayers->begin(); // Wrap around
+
+            return *nextIt;
+        }
+    }
+
+    // No big blind found (shouldn't happen), return first player
+    return actingPlayers->front();
+}
+
+std::shared_ptr<player::PlayerFsm> PreflopState::getFirstPlayerToActInRound(const HandFsm& hand) const
+{
+    // In preflop, the first player to act is left of the big blind
+    // This handles both heads-up (SB acts first) and multi-player (UTG acts first)
+    return getNextPlayerToAct(hand);
+}
+
+bool PreflopState::isRoundComplete(const HandFsm& hand) const
+{
+    // Use the existing helper function from Helpers.cpp
+    return pkt::core::player::isRoundComplete(const_cast<HandFsm&>(hand));
+}
+
 void PreflopState::setBlinds(HandFsm& hand)
 {
     for (const auto& player : *hand.getActingPlayersList())

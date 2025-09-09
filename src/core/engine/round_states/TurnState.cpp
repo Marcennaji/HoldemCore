@@ -87,6 +87,23 @@ std::unique_ptr<IHandState> TurnState::computeNextState(HandFsm& hand, PlayerAct
     return nullptr;
 }
 
+std::shared_ptr<player::PlayerFsm> TurnState::getNextPlayerToAct(const HandFsm& hand) const
+{
+
+    return getFirstPlayerToActPostFlop(hand);
+}
+
+std::shared_ptr<player::PlayerFsm> TurnState::getFirstPlayerToActInRound(const HandFsm& hand) const
+{
+    // In post-flop rounds, the first player to act is left of the dealer
+    return getNextPlayerToAct(hand);
+}
+bool TurnState::isRoundComplete(const HandFsm& hand) const
+{
+    // Use the existing helper function from Helpers.cpp
+    return pkt::core::player::isRoundComplete(const_cast<HandFsm&>(hand));
+}
+
 void TurnState::logStateInfo(const HandFsm& /*hand*/) const
 {
     // TODO: add logging (e.g. pot size, board cards, etc.)
