@@ -73,6 +73,49 @@ void HandFsm::end()
     GlobalServices::instance().playersStatisticsStore().savePlayersStatistics(mySeatsList);
 }
 
+void HandFsm::runGameLoop()
+{
+    // Automatic game loop
+    // This method drives the game forward by prompting players for actions
+
+    while (!myState->isTerminal())
+    {
+        if (auto* processor = dynamic_cast<IActionProcessor*>(myState.get()))
+        {
+            auto nextPlayer = processor->getNextPlayerToAct(*this);
+            if (nextPlayer)
+            {
+                processor->promptPlayerAction(*this, *nextPlayer);
+            }
+            else
+            {
+                // No next player to act, round should be complete
+                // Transition to next state (e.g., flop -> turn)
+                auto next = processor->computeNextState(*this, {-1, ActionType::None});
+                if (next)
+                {
+                    myState->exit(*this);
+                    myState = std::move(next);
+                    myState->enter(*this);
+                }
+                else
+                {
+                    break; // No next state, hand should end
+                }
+            }
+        }
+        else
+        {
+            break; // State doesn't support action processing
+        }
+    }
+
+    if (myState->isTerminal())
+    {
+        end();
+    }
+}
+
 void HandFsm::handlePlayerAction(PlayerAction action)
 {
     if (!myState)

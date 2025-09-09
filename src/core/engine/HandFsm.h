@@ -31,6 +31,7 @@ class HandFsm : public IHandLifecycle, public IHandPlayerAction, public HandPlay
     void handlePlayerAction(PlayerAction action) override;
     void start() override;
     void end() override;
+    void runGameLoop();
     size_t dealBoardCards() override;
     void dealHoleCards(size_t lastArrayIndex) override;
     void initAndShuffleDeck() override;
