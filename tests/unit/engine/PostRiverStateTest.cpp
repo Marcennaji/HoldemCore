@@ -240,7 +240,7 @@ TEST_F(PostRiverStateTest, AllInPlayerWinsEntirePot)
     EXPECT_EQ(playerBb->getCash(), 720); // Initial cash (1000) minus total contribution (280)
 }
 
-TEST_F(PostRiverStateTest, DISABLED_FoldedPlayerExcludedFromPot)
+TEST_F(PostRiverStateTest, FoldedPlayerExcludedFromPot)
 {
     logTestMessage("Testing folded player excluded from pot distribution");
 
@@ -281,12 +281,12 @@ TEST_F(PostRiverStateTest, DISABLED_FoldedPlayerExcludedFromPot)
 
     // Verify pot distribution with proper blind accounting:
     // - Dealer: folded immediately, no contribution except any ante (none in this case)
-    // - SB: 10 (blind) + 200 (bet) = 210 total contribution
+    // - SB: 10 (blind) + 10 (call to complete BB) + 200 (bet) = 220 total contribution
     // - BB: 20 (blind) + 200 (call) = 220 total contribution
-    // Total pot: 430, Winner (BB) gets all
+    // Total pot: 440, Winner (BB) gets all
     EXPECT_EQ(playerDealer->getCash(), trueCashDealer); // Folded player unchanged
-    EXPECT_EQ(playerBb->getCash(), trueCashBb + 210);   // Winner gets 430 - 220 = +210 net
-    EXPECT_EQ(playerSb->getCash(), trueCashSb - 210);   // Loser loses their 210 contribution
+    EXPECT_EQ(playerBb->getCash(), trueCashBb + 220);   // Winner gets 440 - 220 = +220 net
+    EXPECT_EQ(playerSb->getCash(), trueCashSb - 220);   // Loser loses their 220 contribution
 }
 
 TEST_F(PostRiverStateTest, MultiplePlayersComplexShowdown)
@@ -355,7 +355,7 @@ TEST_F(PostRiverStateTest, NoNextStateFromPostRiver)
     EXPECT_EQ(nextState, nullptr);
 }
 
-TEST_F(PostRiverStateTest, DISABLED_PotCollectionBeforeDistribution)
+TEST_F(PostRiverStateTest, PotCollectionBeforeDistribution)
 {
     logTestMessage("Testing pot collection before distribution");
 
@@ -382,8 +382,17 @@ TEST_F(PostRiverStateTest, DISABLED_PotCollectionBeforeDistribution)
 
     EXPECT_EQ(myLastGameState, PostRiver);
 
-    // Verify pot was collected (sets added to pot, sets cleared)
-    EXPECT_GT(myHandFsm->getBoard().getPot(*myHandFsm), potBeforeRiver);
+    // Verify pot collection logic:
+    // If there were sets before PostRiver, they should be added to pot and sets cleared
+    // If there were no sets, pot should remain the same and sets should still be 0
+    if (setsBeforeRiver > 0)
+    {
+        EXPECT_EQ(myHandFsm->getBoard().getPot(*myHandFsm), potBeforeRiver + setsBeforeRiver);
+    }
+    else
+    {
+        EXPECT_EQ(myHandFsm->getBoard().getPot(*myHandFsm), potBeforeRiver);
+    }
     EXPECT_EQ(myHandFsm->getBoard().getSets(*myHandFsm), 0);
 }
 
