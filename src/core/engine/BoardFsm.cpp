@@ -25,14 +25,6 @@ BoardFsm::BoardFsm(unsigned dp) : IBoard(), myDealerPlayerId(dp)
 
 BoardFsm::~BoardFsm()
 {
-    if (mySeatsList)
-    {
-        mySeatsList->clear();
-    }
-    if (myActingPlayersList)
-    {
-        myActingPlayersList->clear();
-    }
 }
 
 void BoardFsm::setSeatsListFsm(PlayerFsmList seats)
@@ -47,29 +39,23 @@ void BoardFsm::collectSets()
 {
     myTotalBetAmounts = 0;
 
-    for (auto itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
+    for (auto player = mySeatsList->begin(); player != mySeatsList->end(); ++player)
     {
-        // myTotalBetAmounts += (*itC)->getTotalBetAmount();
+        myTotalBetAmounts += (*player)->getCurrentHandActions().getHandTotalBetAmount();
     }
 }
 
 void BoardFsm::collectPot()
 {
-
     myPot += myTotalBetAmounts;
     myTotalBetAmounts = 0;
-
-    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
-    {
-        //(*it)->setSetNull();
-    }
 }
 
 void BoardFsm::distributePot()
 {
-    // Pot pot(myPot, mySeatsList, myDealerPlayerId);
-    // pot.distribute();
-    // myWinners = pot.getWinners();
+    PotFsm pot(myPot, mySeatsList, myDealerPlayerId);
+    pot.distribute();
+    myWinners = pot.getWinners();
 }
 
 void BoardFsm::determinePlayerNeedToShowCards()

@@ -95,7 +95,7 @@ void EngineTest::createPlayersFsmLists(size_t playerCount)
 void EngineTest::initializeHandFsmWithPlayers(size_t activePlayerCount, GameData gameData)
 {
     createPlayersFsmLists(activePlayerCount);
-    myBoardFsm = myFactory->createBoard(startDealerPlayerId);
+    myBoardFsm = myFactory->createBoardFsm(startDealerPlayerId);
     myBoardFsm->setSeatsListFsm(mySeatsListFsm);
     myBoardFsm->setActingPlayersListFsm(myActingPlayersListFsm);
 

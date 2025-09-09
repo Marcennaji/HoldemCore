@@ -27,8 +27,11 @@ class BoardFsm : public IBoard
     BoardFsm(unsigned dealerPosition);
     ~BoardFsm();
 
-    void setSeatsList(pkt::core::player::PlayerFsmList seats) {};
-    void setActingPlayersList(pkt::core::player::PlayerFsmList actingPlayers) {};
+    void setSeatsList(pkt::core::player::PlayerList seats) { throw std::runtime_error("Use setSeatsListFsm instead"); };
+    void setActingPlayersList(pkt::core::player::PlayerList actingPlayers)
+    {
+        throw std::runtime_error("Use setActingPlayersListFsm instead");
+    };
     void setSeatsListFsm(pkt::core::player::PlayerFsmList seats);
     void setActingPlayersListFsm(pkt::core::player::PlayerFsmList actingPlayers);
 

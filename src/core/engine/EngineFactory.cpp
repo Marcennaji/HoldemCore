@@ -5,6 +5,7 @@
 #include "EngineFactory.h"
 
 #include <core/services/GlobalServices.h>
+#include "core/engine/BoardFsm.h"
 #include "core/engine/deprecated/BettingRoundPostRiver.h"
 #include "core/engine/deprecated/BettingRoundPreflop.h"
 #include "core/engine/deprecated/Hand.h"
@@ -42,7 +43,10 @@ std::shared_ptr<IBoard> EngineFactory::createBoard(unsigned dealerPosition)
 {
     return std::shared_ptr<IBoard>(new Board(dealerPosition));
 }
-
+std::shared_ptr<IBoard> EngineFactory::createBoardFsm(unsigned dealerPosition)
+{
+    return std::shared_ptr<IBoard>(new BoardFsm(dealerPosition));
+}
 std::vector<std::shared_ptr<IBettingRound>> EngineFactory::createAllBettingRounds(IHand* hand, unsigned dealerPosition,
                                                                                   int smallBlind)
 {

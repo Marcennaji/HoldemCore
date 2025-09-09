@@ -35,6 +35,7 @@ class EngineFactory
                                                    pkt::core::player::PlayerFsmList actingPlayers, GameData, StartData);
 
     virtual std::shared_ptr<IBoard> createBoard(unsigned dealerPosition);
+    virtual std::shared_ptr<IBoard> createBoardFsm(unsigned dealerPosition);
     virtual std::vector<std::shared_ptr<IBettingRound>> createAllBettingRounds(IHand* hi, unsigned dealerPosition,
                                                                                int smallBlind);
 
