@@ -46,7 +46,7 @@ TEST_F(BettingRoundsFsmTest, DISABLED_StartShouldGoFromPreflopToPostRiverHeadsUp
     logTestMessage("Testing heads-up hand completion");
 
     initializeHandFsmForTesting(2, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     // NOTE: For true E2E tests with AI or interactive players, we would use:
     // myHandFsm->runGameLoop();  // This automatically prompts players and drives the game
@@ -66,7 +66,7 @@ TEST_F(BettingRoundsFsmTest, StartShouldGoFromPreflopToPostRiver3Players)
     logTestMessage("Testing 3-player hand completion");
 
     initializeHandFsmForTesting(3, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -97,7 +97,7 @@ TEST_F(BettingRoundsFsmTest, DISABLED_StartShouldGoFromPreflopToPostRiver6Player
     logTestMessage("Testing 6-player hand completion");
 
     initializeHandFsmForTesting(6, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     // Verify we reached PostRiver state
     EXPECT_EQ(myLastGameState, PostRiver) << "6-player hand should complete and reach PostRiver state";
@@ -120,7 +120,7 @@ TEST_F(BettingRoundsFsmTest, DISABLED_FsmStateTransitionsFollowCorrectSequence)
         myLastGameState = state;
     };
 
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     // Verify we have a valid sequence
     EXPECT_FALSE(stateSequence.empty()) << "Should have recorded state transitions";
@@ -166,7 +166,7 @@ TEST_F(BettingRoundsFsmTest, DISABLED_AllInPlayersTransitionToPostRiverCorrectly
         myLastGameState = state;
     };
 
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     // In an all-in scenario, we should transition directly to PostRiver
     // without going through all betting rounds
@@ -198,7 +198,7 @@ TEST_F(BettingRoundsFsmTest, DISABLED_PlayersDoNotActAfterFolding)
     // We'll need to manually step through the hand to observe folding behavior
     // This is a more complex test that would require hand action tracking
     // For now, let's just verify the hand completes successfully
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     EXPECT_EQ(myLastGameState, PostRiver) << "Hand with potential folds should complete";
 

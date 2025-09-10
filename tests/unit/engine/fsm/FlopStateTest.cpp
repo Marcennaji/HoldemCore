@@ -33,7 +33,7 @@ void FlopStateTest::TearDown()
 TEST_F(FlopStateTest, StartFlopInitializesPlayersCorrectly)
 {
     initializeHandFsmForTesting(3, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -55,7 +55,7 @@ TEST_F(FlopStateTest, StartFlopInitializesPlayersCorrectly)
 TEST_F(FlopStateTest, OnlyChecksFlopShouldGoToTurn)
 {
     initializeHandFsmForTesting(3, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -78,7 +78,7 @@ TEST_F(FlopStateTest, OnlyChecksFlopShouldGoToTurn)
 TEST_F(FlopStateTest, BetCallScenarioOnFlop)
 {
     initializeHandFsmForTesting(3, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -102,7 +102,7 @@ TEST_F(FlopStateTest, BetCallScenarioOnFlop)
 TEST_F(FlopStateTest, AllInOnFlop)
 {
     initializeHandFsmForTesting(2, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -121,7 +121,7 @@ TEST_F(FlopStateTest, AllInOnFlop)
 TEST_F(FlopStateTest, RaiseOnFlopKeepsRoundOpen)
 {
     initializeHandFsmForTesting(3, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -148,7 +148,7 @@ TEST_F(FlopStateTest, RaiseOnFlopKeepsRoundOpen)
 TEST_F(FlopStateTest, FoldOnFlopWithTwoPlayersEndsHand)
 {
     initializeHandFsmForTesting(2, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -170,7 +170,7 @@ TEST_F(FlopStateTest, FoldOnFlopWithTwoPlayersEndsHand)
 TEST_F(FlopStateTest, MultipleFoldsOnFlop)
 {
     initializeHandFsmForTesting(4, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -201,7 +201,7 @@ TEST_F(FlopStateTest, MultipleFoldsOnFlop)
 TEST_F(FlopStateTest, CheckRaiseScenarioOnFlop)
 {
     initializeHandFsmForTesting(3, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -228,7 +228,7 @@ TEST_F(FlopStateTest, CheckRaiseScenarioOnFlop)
 TEST_F(FlopStateTest, AllInCallScenarioOnFlop)
 {
     initializeHandFsmForTesting(3, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -254,7 +254,7 @@ TEST_F(FlopStateTest, AllInCallScenarioOnFlop)
 TEST_F(FlopStateTest, BetFoldScenarioOnFlop)
 {
     initializeHandFsmForTesting(3, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -279,7 +279,7 @@ TEST_F(FlopStateTest, BetFoldScenarioOnFlop)
 TEST_F(FlopStateTest, LargeBetOnFlopRequiresResponse)
 {
     initializeHandFsmForTesting(3, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);

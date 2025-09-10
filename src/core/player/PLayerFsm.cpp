@@ -482,6 +482,11 @@ void PlayerFsm::setPosition(const HandFsm& hand)
 
 void PlayerFsm::setAction(IHandState& state, const PlayerAction& action)
 {
+    if (action.type != ActionType::None)
+    {
+        GlobalServices::instance().logger().info(myName + " " + std::string(playerActionToString(action.type)) +
+                                                 (action.amount ? " " + std::to_string(action.amount) : ""));
+    }
     myCurrentHandActions.addAction(state.getGameState(), action);
 }
 

@@ -37,8 +37,13 @@ void PostRiverState::enter(HandFsm& hand)
         myEvents.onPauseHand();
 }
 
-void PostRiverState::exit(HandFsm& /*hand*/)
+void PostRiverState::exit(HandFsm& hand)
 {
+    // Clear betting data after pot distribution is complete
+    for (auto& player : *hand.getSeatsList())
+    {
+        player->resetCurrentHandActions();
+    }
 }
 
 std::unique_ptr<IHandState> PostRiverState::computeNextState(HandFsm& /*hand*/)
@@ -55,30 +60,27 @@ bool PostRiverState::isActionAllowed(const HandFsm& /*hand*/, const PlayerAction
 
 void PostRiverState::promptPlayerAction(HandFsm& /*hand*/, player::PlayerFsm& /*player*/)
 {
-    // No actions to prompt in PostRiver.
+    // No player actions in PostRiver.
 }
 
 std::shared_ptr<player::PlayerFsm> PostRiverState::getNextPlayerToAct(const HandFsm& /*hand*/) const
 {
-    // No player actions in terminal state
     return nullptr;
 }
 
 std::shared_ptr<player::PlayerFsm> PostRiverState::getFirstPlayerToActInRound(const HandFsm& /*hand*/) const
 {
-    // No player actions in terminal state
     return nullptr;
 }
 
 bool PostRiverState::isRoundComplete(const HandFsm& /*hand*/) const
 {
-    // Terminal state is always "complete"
     return true;
 }
 
 void PostRiverState::logStateInfo(const HandFsm& /*hand*/) const
 {
-    // Could log showdown info, winners, etc.
+    // todo
 }
 
 } // namespace pkt::core

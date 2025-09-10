@@ -33,7 +33,7 @@ void RiverStateTest::TearDown()
 TEST_F(RiverStateTest, StartRiverInitializesPlayersCorrectly)
 {
     initializeHandFsmForTesting(3, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -68,7 +68,7 @@ TEST_F(RiverStateTest, StartRiverInitializesPlayersCorrectly)
 TEST_F(RiverStateTest, OnlyChecksOnRiverShouldGoToPostRiver)
 {
     initializeHandFsmForTesting(3, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -95,7 +95,7 @@ TEST_F(RiverStateTest, OnlyChecksOnRiverShouldGoToPostRiver)
 TEST_F(RiverStateTest, BetCallScenarioOnRiver)
 {
     initializeHandFsmForTesting(3, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -122,7 +122,7 @@ TEST_F(RiverStateTest, BetCallScenarioOnRiver)
 TEST_F(RiverStateTest, AllInFoldScenarioOnRiver)
 {
     initializeHandFsmForTesting(2, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -147,7 +147,7 @@ TEST_F(RiverStateTest, AllInFoldScenarioOnRiver)
 TEST_F(RiverStateTest, RaiseOnRiverKeepsRoundOpen)
 {
     initializeHandFsmForTesting(3, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -175,7 +175,7 @@ TEST_F(RiverStateTest, RaiseOnRiverKeepsRoundOpen)
 TEST_F(RiverStateTest, FoldOnRiverWithTwoPlayersEndsHand)
 {
     initializeHandFsmForTesting(2, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -200,7 +200,7 @@ TEST_F(RiverStateTest, FoldOnRiverWithTwoPlayersEndsHand)
 TEST_F(RiverStateTest, MultipleFoldsOnRiver)
 {
     initializeHandFsmForTesting(4, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -239,7 +239,7 @@ TEST_F(RiverStateTest, MultipleFoldsOnRiver)
 TEST_F(RiverStateTest, CheckRaiseScenarioOnRiver)
 {
     initializeHandFsmForTesting(3, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -268,7 +268,7 @@ TEST_F(RiverStateTest, CheckRaiseScenarioOnRiver)
 TEST_F(RiverStateTest, AllInCallScenarioOnRiver)
 {
     initializeHandFsmForTesting(3, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -295,7 +295,7 @@ TEST_F(RiverStateTest, AllInCallScenarioOnRiver)
 TEST_F(RiverStateTest, BetFoldScenarioOnRiver)
 {
     initializeHandFsmForTesting(3, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -322,7 +322,7 @@ TEST_F(RiverStateTest, BetFoldScenarioOnRiver)
 TEST_F(RiverStateTest, LargeBetOnRiverRequiresResponse)
 {
     initializeHandFsmForTesting(3, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -349,7 +349,7 @@ TEST_F(RiverStateTest, LargeBetOnRiverRequiresResponse)
 TEST_F(RiverStateTest, MultipleRaisesOnRiver)
 {
     initializeHandFsmForTesting(3, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -378,7 +378,7 @@ TEST_F(RiverStateTest, MultipleRaisesOnRiver)
 TEST_F(RiverStateTest, HeadsUpRiverAction)
 {
     initializeHandFsmForTesting(2, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -405,7 +405,7 @@ TEST_F(RiverStateTest, HeadsUpRiverAction)
 TEST_F(RiverStateTest, CallRaiseSequenceOnRiver)
 {
     initializeHandFsmForTesting(4, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);

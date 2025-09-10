@@ -37,7 +37,7 @@ void FlopState::exit(HandFsm& hand)
 {
     for (auto& player : *hand.getSeatsList())
     {
-        player->getStatisticsUpdater()->updateFlopStatistics(player->getCurrentHandContext());
+        player->updateCurrentHandContext(GameState::Flop, hand);
         player->getStatisticsUpdater()->updateFlopStatistics(player->getCurrentHandContext());
     }
 }
@@ -67,13 +67,11 @@ std::shared_ptr<player::PlayerFsm> FlopState::getNextPlayerToAct(const HandFsm& 
 
 std::shared_ptr<player::PlayerFsm> FlopState::getFirstPlayerToActInRound(const HandFsm& hand) const
 {
-    // In post-flop rounds, the first player to act is left of the dealer
     return getNextPlayerToAct(hand);
 }
 
 bool FlopState::isRoundComplete(const HandFsm& hand) const
 {
-    // Use the existing helper function from Helpers.cpp
     return pkt::core::player::isRoundComplete(const_cast<HandFsm&>(hand));
 }
 

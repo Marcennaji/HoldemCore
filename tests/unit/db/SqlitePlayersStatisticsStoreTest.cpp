@@ -38,7 +38,7 @@ TEST_F(SqlitePlayersStatisticsStoreTest, SaveAndLoadStatistics)
     auto& store = pkt::core::GlobalServices::instance().playersStatisticsStore();
     int nbPlayers = 3;
     initializeHandFsmForTesting(nbPlayers, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);

@@ -48,7 +48,7 @@ HandFsm::HandFsm(const GameEvents& events, std::shared_ptr<EngineFactory> factor
 
 HandFsm::~HandFsm() = default;
 
-void HandFsm::start()
+void HandFsm::initialize()
 {
     GlobalServices::instance().logger().info(
         "\n----------------------  New hand initialization (FSM)  -------------------------------\n");
@@ -125,7 +125,10 @@ void HandFsm::handlePlayerAction(PlayerAction action)
             myState = std::move(next);
             myState->enter(*this);
             if (myState->isTerminal())
+            {
+                myState->exit(*this);
                 end();
+            }
         }
     }
 }

@@ -33,7 +33,7 @@ TEST_F(PostRiverStateTest, TerminalStateNoActionsAllowed)
     logTestMessage("Testing terminal state - no actions allowed");
 
     initializeHandFsmForTesting(2, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -65,7 +65,7 @@ TEST_F(PostRiverStateTest, ShowdownSingleWinner)
     logTestMessage("Testing showdown with single winner");
 
     initializeHandFsmForTesting(2, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -97,7 +97,7 @@ TEST_F(PostRiverStateTest, ShowdownTiedHands)
     logTestMessage("Testing showdown with tied hands");
 
     initializeHandFsmForTesting(2, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -130,7 +130,7 @@ TEST_F(PostRiverStateTest, PotDistributionSingleWinner)
     logTestMessage("Testing pot distribution to single winner");
 
     initializeHandFsmForTesting(2, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -170,7 +170,7 @@ TEST_F(PostRiverStateTest, SplitPotDistribution)
     logTestMessage("Testing split pot distribution for tied hands");
 
     initializeHandFsmForTesting(2, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -205,7 +205,7 @@ TEST_F(PostRiverStateTest, AllInPlayerWinsEntirePot)
     logTestMessage("Testing all-in player wins entire pot");
 
     initializeHandFsmForTesting(2, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -245,7 +245,7 @@ TEST_F(PostRiverStateTest, FoldedPlayerExcludedFromPot)
     logTestMessage("Testing folded player excluded from pot distribution");
 
     initializeHandFsmForTesting(3, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -294,7 +294,7 @@ TEST_F(PostRiverStateTest, MultiplePlayersComplexShowdown)
     logTestMessage("Testing multiple players complex showdown scenario");
 
     initializeHandFsmForTesting(3, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -332,7 +332,7 @@ TEST_F(PostRiverStateTest, NoNextStateFromPostRiver)
     logTestMessage("Testing no next state transition from PostRiver");
 
     initializeHandFsmForTesting(2, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -358,7 +358,7 @@ TEST_F(PostRiverStateTest, PotCollectionBeforeDistribution)
     logTestMessage("Testing pot collection before distribution");
 
     initializeHandFsmForTesting(2, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -380,18 +380,19 @@ TEST_F(PostRiverStateTest, PotCollectionBeforeDistribution)
 
     EXPECT_EQ(myLastGameState, PostRiver);
 
-    // Verify pot collection logic:
-    // If there were sets before PostRiver, they should be added to pot and sets cleared
-    // If there were no sets, pot should remain the same and sets should still be 0
-    if (setsBeforeRiver > 0)
-    {
-        EXPECT_EQ(myHandFsm->getBoard().getPot(*myHandFsm), potBeforeRiver + setsBeforeRiver);
-    }
-    else
-    {
-        EXPECT_EQ(myHandFsm->getBoard().getPot(*myHandFsm), potBeforeRiver);
-    }
-    EXPECT_EQ(myHandFsm->getBoard().getSets(*myHandFsm), 0);
+    // After pot distribution in PostRiver state:
+    // 1. The pot should be 0 (money has been distributed to winners)
+    // 2. Sets should be 0 (any remaining sets were added to pot before distribution)
+    EXPECT_EQ(myHandFsm->getBoard().getPot(*myHandFsm), 0) << "Pot should be 0 after distribution";
+    EXPECT_EQ(myHandFsm->getBoard().getSets(*myHandFsm), 0) << "Sets should be 0 after collection";
+
+    // Verify that money was actually distributed (pot wasn't just lost)
+    // Total pot before distribution should have been: potBeforeRiver + setsBeforeRiver
+    int expectedTotalPot = potBeforeRiver + setsBeforeRiver;
+    EXPECT_GT(expectedTotalPot, 0) << "There should have been a pot to distribute";
+
+    // The money should now be in the players' cash (can't easily verify exact amounts
+    // without knowing the winner, but we can verify pot clearing worked correctly)
 }
 
 TEST_F(PostRiverStateTest, PlayersSetToNoneInPostRiver)
@@ -399,7 +400,7 @@ TEST_F(PostRiverStateTest, PlayersSetToNoneInPostRiver)
     logTestMessage("Testing all players set to ActionType::None in PostRiver");
 
     initializeHandFsmForTesting(2, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -421,12 +422,67 @@ TEST_F(PostRiverStateTest, PlayersSetToNoneInPostRiver)
     EXPECT_EQ(playerBb->getLastAction().type, ActionType::None);
 }
 
+TEST_F(PostRiverStateTest, PotClearedAfterDistribution)
+{
+    logTestMessage("Testing pot is properly cleared after distribution");
+
+    initializeHandFsmForTesting(2, gameData);
+    myHandFsm->initialize();
+
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+
+    // Set hand rankings to ensure deterministic winner
+    playerSb->setHandRanking(1000); // Loser
+    playerBb->setHandRanking(2000); // Winner
+
+    // Record initial cash at hand start (before any betting)
+    int initialCashSb = playerSb->getCashAtHandStart();
+    int initialCashBb = playerBb->getCashAtHandStart();
+
+    // Create a substantial pot
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Bet, 300});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call, 300});
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
+
+    EXPECT_EQ(myLastGameState, PostRiver);
+
+    // After PostRiver state is complete:
+    // 1. Pot should be 0 (cleared after distribution)
+    EXPECT_EQ(myHandFsm->getBoard().getPot(*myHandFsm), 0);
+
+    // 2. Sets should be 0 (cleared after collection)
+    EXPECT_EQ(myHandFsm->getBoard().getSets(*myHandFsm), 0);
+
+    // 3. Money should have been properly distributed to winner
+    // Let's calculate the net change for each player (more robust than absolute values)
+    int netChangeBb = playerBb->getCash() - initialCashBb;
+    int netChangeSb = playerSb->getCash() - initialCashSb;
+
+    // The net changes should sum to 0 (conservation of money)
+    EXPECT_EQ(netChangeBb + netChangeSb, 0) << "Money should be conserved (total change = 0)";
+
+    // Winner (BB) should have gained money, loser (SB) should have lost the same amount
+    EXPECT_GT(netChangeBb, 0) << "Winner should have gained money";
+    EXPECT_LT(netChangeSb, 0) << "Loser should have lost money";
+    EXPECT_EQ(netChangeBb, -netChangeSb) << "Winner's gain should equal loser's loss";
+
+    // 4. Player betting actions should be cleared (this is what enables pot = 0)
+    EXPECT_EQ(playerSb->getCurrentHandActions().getHandTotalBetAmount(), 0);
+    EXPECT_EQ(playerBb->getCurrentHandActions().getHandTotalBetAmount(), 0);
+}
+
 TEST_F(PostRiverStateTest, EmptyPotShowdown)
 {
     logTestMessage("Testing showdown with empty pot");
 
     initializeHandFsmForTesting(2, gameData);
-    myHandFsm->start();
+    myHandFsm->initialize();
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);

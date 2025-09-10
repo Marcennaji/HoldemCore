@@ -38,6 +38,7 @@ void TurnState::exit(HandFsm& hand)
 {
     for (auto& player : *hand.getSeatsList())
     {
+        player->updateCurrentHandContext(GameState::Turn, hand);
         player->getStatisticsUpdater()->updateTurnStatistics(player->getCurrentHandContext());
     }
 }
@@ -62,7 +63,6 @@ std::unique_ptr<IHandState> TurnState::computeNextState(HandFsm& hand)
 
 std::shared_ptr<player::PlayerFsm> TurnState::getNextPlayerToAct(const HandFsm& hand) const
 {
-
     return getFirstPlayerToActPostFlop(hand);
 }
 
@@ -73,7 +73,6 @@ std::shared_ptr<player::PlayerFsm> TurnState::getFirstPlayerToActInRound(const H
 }
 bool TurnState::isRoundComplete(const HandFsm& hand) const
 {
-    // Use the existing helper function from Helpers.cpp
     return pkt::core::player::isRoundComplete(const_cast<HandFsm&>(hand));
 }
 

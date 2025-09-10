@@ -29,9 +29,9 @@ class HandFsm : public IHandLifecycle, public IHandPlayerAction, public HandPlay
 
     IActionProcessor* getActionProcessor() const;
     void handlePlayerAction(PlayerAction action) override;
-    void start() override;
+    void initialize() override;
+    void runGameLoop() override;
     void end() override;
-    void runGameLoop();
     size_t dealBoardCards() override;
     void dealHoleCards(size_t lastArrayIndex) override;
     void initAndShuffleDeck() override;

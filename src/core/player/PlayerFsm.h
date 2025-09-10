@@ -86,6 +86,7 @@ class PlayerFsm
 
     const PostFlopAnalysisFlags getPostFlopAnalysisFlags() const;
     const CurrentHandActions& getCurrentHandActions() const;
+    void resetCurrentHandActions() { myCurrentHandActions.reset(); }
 
     void setPreflopPotOdd(const int potOdd);
 
