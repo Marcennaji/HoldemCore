@@ -16,7 +16,7 @@ class StrategyTest : public EngineTest
     {
         EngineTest::SetUp();
 
-        initializeHandForTesting(6, gameData);
+        initializeHandWithPlayers(6, gameData);
         ctx.commonContext.playersContext.nbPlayers = 6;
         ctx.commonContext.playersContext.actingPlayersList = myActingPlayersList;
         ctx.commonContext.bettingContext.pot = 100;

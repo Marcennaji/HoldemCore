@@ -32,8 +32,7 @@ void PreflopStateTest::TearDown()
 
 TEST_F(PreflopStateTest, StartHandHeadsUpInitializePlayersCorrectly)
 {
-    initializeHandFsmForTesting(2, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(2, gameData);
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     EXPECT_EQ(playerSb->getPosition(), PlayerPosition::ButtonSmallBlind);
@@ -44,8 +43,7 @@ TEST_F(PreflopStateTest, StartHandHeadsUpInitializePlayersCorrectly)
 }
 TEST_F(PreflopStateTest, StartHand3BotsInitializePlayersCorrectly)
 {
-    initializeHandFsmForTesting(3, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(3, gameData);
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     EXPECT_EQ(playerDealer->getPosition(), PlayerPosition::Button);
@@ -59,8 +57,7 @@ TEST_F(PreflopStateTest, StartHand3BotsInitializePlayersCorrectly)
 }
 TEST_F(PreflopStateTest, StartHand6BotsInitializePlayersCorrectly)
 {
-    initializeHandFsmForTesting(6, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(6, gameData);
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     EXPECT_EQ(playerDealer->getPosition(), PlayerPosition::Button);
@@ -83,15 +80,13 @@ TEST_F(PreflopStateTest, StartHand6BotsInitializePlayersCorrectly)
 }
 TEST_F(PreflopStateTest, StartHandShouldGoToPreflop)
 {
-    initializeHandFsmForTesting(2, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(2, gameData);
 
     EXPECT_EQ(myLastGameState, Preflop);
 }
 TEST_F(PreflopStateTest, OnlyCallsPreflopShouldGoToFlop)
 {
-    initializeHandFsmForTesting(3, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(3, gameData);
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     EXPECT_EQ(playerDealer->getPosition(), PlayerPosition::Button);
@@ -108,8 +103,7 @@ TEST_F(PreflopStateTest, OnlyCallsPreflopShouldGoToFlop)
 }
 TEST_F(PreflopStateTest, EverybodyFoldPreflopShouldGoToPostRiver)
 {
-    initializeHandFsmForTesting(3, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(3, gameData);
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -123,8 +117,7 @@ TEST_F(PreflopStateTest, EverybodyFoldPreflopShouldGoToPostRiver)
 
 TEST_F(PreflopStateTest, OneRaiseKeepsBettingRoundOpen)
 {
-    initializeHandFsmForTesting(3, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(3, gameData);
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -149,8 +142,7 @@ TEST_F(PreflopStateTest, OneRaiseKeepsBettingRoundOpen)
 
 TEST_F(PreflopStateTest, ReraiseUpdatesHighestBetAndKeepsRoundOpen)
 {
-    initializeHandFsmForTesting(3, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(3, gameData);
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -184,8 +176,7 @@ TEST_F(PreflopStateTest, ReraiseUpdatesHighestBetAndKeepsRoundOpen)
 
 TEST_F(PreflopStateTest, RaiseBelowMinimumShouldBeRejected)
 {
-    initializeHandFsmForTesting(3, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(3, gameData);
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -218,8 +209,7 @@ TEST_F(PreflopStateTest, RaiseBelowMinimumShouldBeRejected)
 
 TEST_F(PreflopStateTest, AllInInsteadOfRaiseIsAccepted)
 {
-    initializeHandFsmForTesting(3, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(3, gameData);
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);

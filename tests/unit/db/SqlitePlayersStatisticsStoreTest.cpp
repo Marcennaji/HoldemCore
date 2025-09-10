@@ -37,8 +37,7 @@ TEST_F(SqlitePlayersStatisticsStoreTest, SaveAndLoadStatistics)
 {
     auto& store = pkt::core::GlobalServices::instance().playersStatisticsStore();
     int nbPlayers = 3;
-    initializeHandFsmForTesting(nbPlayers, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(nbPlayers, gameData);
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -46,12 +45,11 @@ TEST_F(SqlitePlayersStatisticsStoreTest, SaveAndLoadStatistics)
 
     // Inject deterministic strategies
     auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
-    dealerStrategy->setLastAction(pkt::core::GameState::Preflop,
-                                  {playerDealer->getId(), pkt::core::ActionType::Fold, 0});
+    dealerStrategy->setLastAction(pkt::core::GameState::Preflop, {playerDealer->getId(), pkt::core::ActionType::Fold});
     playerDealer->setStrategy(std::move(dealerStrategy));
 
     auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
-    sbStrategy->setLastAction(pkt::core::GameState::Preflop, {playerSb->getId(), pkt::core::ActionType::Fold, 0});
+    sbStrategy->setLastAction(pkt::core::GameState::Preflop, {playerSb->getId(), pkt::core::ActionType::Fold});
     playerSb->setStrategy(std::move(sbStrategy));
 
     auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();

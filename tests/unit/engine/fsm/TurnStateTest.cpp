@@ -32,8 +32,7 @@ void TurnStateTest::TearDown()
 
 TEST_F(TurnStateTest, StartTurnInitializesPlayersCorrectly)
 {
-    initializeHandFsmForTesting(3, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(3, gameData);
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -61,8 +60,7 @@ TEST_F(TurnStateTest, StartTurnInitializesPlayersCorrectly)
 
 TEST_F(TurnStateTest, OnlyChecksOnTurnShouldGoToRiver)
 {
-    initializeHandFsmForTesting(3, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(3, gameData);
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -86,8 +84,7 @@ TEST_F(TurnStateTest, OnlyChecksOnTurnShouldGoToRiver)
 
 TEST_F(TurnStateTest, BetOnTurnKeepsRoundOpen)
 {
-    initializeHandFsmForTesting(3, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(3, gameData);
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -112,8 +109,7 @@ TEST_F(TurnStateTest, BetOnTurnKeepsRoundOpen)
 
 TEST_F(TurnStateTest, RaiseOnTurnKeepsRoundOpen)
 {
-    initializeHandFsmForTesting(3, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(3, gameData);
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -141,8 +137,7 @@ TEST_F(TurnStateTest, RaiseOnTurnKeepsRoundOpen)
 
 TEST_F(TurnStateTest, FoldOnTurnWithTwoPlayersEndsHand)
 {
-    initializeHandFsmForTesting(2, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(2, gameData);
 
     auto playerDealerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -166,8 +161,7 @@ TEST_F(TurnStateTest, FoldOnTurnWithTwoPlayersEndsHand)
 
 TEST_F(TurnStateTest, AllInOnTurn)
 {
-    initializeHandFsmForTesting(2, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(2, gameData);
 
     auto playerDealerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -188,8 +182,7 @@ TEST_F(TurnStateTest, AllInOnTurn)
 
 TEST_F(TurnStateTest, MultipleFoldsOnTurn)
 {
-    initializeHandFsmForTesting(4, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(4, gameData);
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -225,8 +218,7 @@ TEST_F(TurnStateTest, MultipleFoldsOnTurn)
 
 TEST_F(TurnStateTest, CheckRaiseScenarioOnTurn)
 {
-    initializeHandFsmForTesting(3, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(3, gameData);
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -254,8 +246,7 @@ TEST_F(TurnStateTest, CheckRaiseScenarioOnTurn)
 
 TEST_F(TurnStateTest, AllInCallScenarioOnTurn)
 {
-    initializeHandFsmForTesting(3, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(3, gameData);
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -282,8 +273,7 @@ TEST_F(TurnStateTest, AllInCallScenarioOnTurn)
 
 TEST_F(TurnStateTest, BetFoldScenarioOnTurn)
 {
-    initializeHandFsmForTesting(3, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(3, gameData);
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -310,8 +300,7 @@ TEST_F(TurnStateTest, BetFoldScenarioOnTurn)
 
 TEST_F(TurnStateTest, LargeBetOnTurnRequiresResponse)
 {
-    initializeHandFsmForTesting(3, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(3, gameData);
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -337,8 +326,7 @@ TEST_F(TurnStateTest, LargeBetOnTurnRequiresResponse)
 
 TEST_F(TurnStateTest, MultipleRaisesOnTurn)
 {
-    initializeHandFsmForTesting(3, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(3, gameData);
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -369,8 +357,7 @@ TEST_F(TurnStateTest, MultipleRaisesOnTurn)
 
 TEST_F(TurnStateTest, HeadsUpTurnAction)
 {
-    initializeHandFsmForTesting(2, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(2, gameData);
 
     auto playerDealerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);

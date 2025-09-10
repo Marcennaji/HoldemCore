@@ -38,17 +38,7 @@ void EngineTest::SetUp()
 void EngineTest::TearDown()
 {
 }
-// Helper function to initialize a Hand object for testing
-void EngineTest::initializeHandForTesting(size_t activePlayerCount, GameData gameData)
-{
-    myHand.reset();
-    initializeHandWithPlayers(activePlayerCount, gameData);
-}
-void EngineTest::initializeHandFsmForTesting(size_t activePlayerCount, GameData gameData)
-{
-    myHandFsm.reset();
-    initializeHandFsmWithPlayers(activePlayerCount, gameData);
-}
+
 void EngineTest::createPlayersLists(size_t playerCount)
 {
     mySeatsList = std::make_shared<std::list<std::shared_ptr<Player>>>();
@@ -66,6 +56,7 @@ void EngineTest::createPlayersLists(size_t playerCount)
 }
 void EngineTest::initializeHandWithPlayers(size_t activePlayerCount, GameData gameData)
 {
+    myHand.reset();
     createPlayersLists(activePlayerCount);
     myBoard = myFactory->createBoard(startDealerPlayerId);
     myBoard->setSeatsList(mySeatsList);
@@ -94,6 +85,7 @@ void EngineTest::createPlayersFsmLists(size_t playerCount)
 }
 void EngineTest::initializeHandFsmWithPlayers(size_t activePlayerCount, GameData gameData)
 {
+    myHandFsm.reset();
     createPlayersFsmLists(activePlayerCount);
     myBoardFsm = myFactory->createBoardFsm(startDealerPlayerId);
     myBoardFsm->setSeatsListFsm(mySeatsListFsm);
@@ -105,6 +97,8 @@ void EngineTest::initializeHandFsmWithPlayers(size_t activePlayerCount, GameData
 
     myHandFsm =
         myFactory->createHandFsm(myFactory, myBoardFsm, mySeatsListFsm, myActingPlayersListFsm, gameData, startData);
+
+    myHandFsm->initialize();
 }
 void EngineTest::checkPostRiverConditions()
 {

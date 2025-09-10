@@ -32,8 +32,7 @@ TEST_F(PostRiverStateTest, TerminalStateNoActionsAllowed)
 {
     logTestMessage("Testing terminal state - no actions allowed");
 
-    initializeHandFsmForTesting(2, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(2, gameData);
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -54,8 +53,7 @@ TEST_F(PostRiverStateTest, TerminalStateNoActionsAllowed)
     EXPECT_TRUE(myHandFsm->getState().isTerminal());
 
     // Verify no further actions are allowed
-    EXPECT_FALSE(
-        myHandFsm->getActionProcessor()->isActionAllowed(*myHandFsm, {playerSb->getId(), ActionType::Call, 100}));
+    EXPECT_FALSE(myHandFsm->getActionProcessor()->isActionAllowed(*myHandFsm, {playerSb->getId(), ActionType::Call}));
     EXPECT_FALSE(
         myHandFsm->getActionProcessor()->isActionAllowed(*myHandFsm, {playerBb->getId(), ActionType::Raise, 200}));
 }
@@ -64,8 +62,7 @@ TEST_F(PostRiverStateTest, ShowdownSingleWinner)
 {
     logTestMessage("Testing showdown with single winner");
 
-    initializeHandFsmForTesting(2, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(2, gameData);
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -96,8 +93,7 @@ TEST_F(PostRiverStateTest, ShowdownTiedHands)
 {
     logTestMessage("Testing showdown with tied hands");
 
-    initializeHandFsmForTesting(2, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(2, gameData);
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -129,8 +125,7 @@ TEST_F(PostRiverStateTest, PotDistributionSingleWinner)
 {
     logTestMessage("Testing pot distribution to single winner");
 
-    initializeHandFsmForTesting(2, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(2, gameData);
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -147,7 +142,7 @@ TEST_F(PostRiverStateTest, PotDistributionSingleWinner)
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
     myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Bet, 200});
-    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call, 200});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call});
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Check});
     myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Check});
@@ -169,8 +164,7 @@ TEST_F(PostRiverStateTest, SplitPotDistribution)
 {
     logTestMessage("Testing split pot distribution for tied hands");
 
-    initializeHandFsmForTesting(2, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(2, gameData);
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -187,7 +181,7 @@ TEST_F(PostRiverStateTest, SplitPotDistribution)
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
     myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Bet, 200});
-    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call, 200});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call});
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Check});
     myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Check});
@@ -204,8 +198,7 @@ TEST_F(PostRiverStateTest, AllInPlayerWinsEntirePot)
 {
     logTestMessage("Testing all-in player wins entire pot");
 
-    initializeHandFsmForTesting(2, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(2, gameData);
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -226,7 +219,7 @@ TEST_F(PostRiverStateTest, AllInPlayerWinsEntirePot)
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
     myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Allin, 260}); // All remaining cash after preflop call
-    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call, 260});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call});
 
     EXPECT_EQ(myLastGameState, PostRiver);
 
@@ -244,8 +237,7 @@ TEST_F(PostRiverStateTest, FoldedPlayerExcludedFromPot)
 {
     logTestMessage("Testing folded player excluded from pot distribution");
 
-    initializeHandFsmForTesting(3, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(3, gameData);
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -266,7 +258,7 @@ TEST_F(PostRiverStateTest, FoldedPlayerExcludedFromPot)
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
     myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Bet, 200});
-    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call, 200});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call});
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Check});
     myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Check});
@@ -293,8 +285,7 @@ TEST_F(PostRiverStateTest, MultiplePlayersComplexShowdown)
 {
     logTestMessage("Testing multiple players complex showdown scenario");
 
-    initializeHandFsmForTesting(3, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(3, gameData);
 
     auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -331,8 +322,7 @@ TEST_F(PostRiverStateTest, NoNextStateFromPostRiver)
 {
     logTestMessage("Testing no next state transition from PostRiver");
 
-    initializeHandFsmForTesting(2, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(2, gameData);
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -357,8 +347,7 @@ TEST_F(PostRiverStateTest, PotCollectionBeforeDistribution)
 {
     logTestMessage("Testing pot collection before distribution");
 
-    initializeHandFsmForTesting(2, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(2, gameData);
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -367,7 +356,7 @@ TEST_F(PostRiverStateTest, PotCollectionBeforeDistribution)
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
     myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Bet, 100});
-    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call, 100});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call});
 
     // Check current pot and sets before reaching PostRiver
     int potBeforeRiver = myHandFsm->getBoard().getPot(*myHandFsm);
@@ -399,8 +388,7 @@ TEST_F(PostRiverStateTest, PlayersSetToNoneInPostRiver)
 {
     logTestMessage("Testing all players set to ActionType::None in PostRiver");
 
-    initializeHandFsmForTesting(2, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(2, gameData);
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -409,7 +397,7 @@ TEST_F(PostRiverStateTest, PlayersSetToNoneInPostRiver)
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
     myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Bet, 100});
-    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call, 100});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call});
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Check});
     myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Check});
@@ -426,8 +414,7 @@ TEST_F(PostRiverStateTest, PotClearedAfterDistribution)
 {
     logTestMessage("Testing pot is properly cleared after distribution");
 
-    initializeHandFsmForTesting(2, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(2, gameData);
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
@@ -444,7 +431,7 @@ TEST_F(PostRiverStateTest, PotClearedAfterDistribution)
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
     myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Bet, 300});
-    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call, 300});
+    myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Call});
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Check});
     myHandFsm->handlePlayerAction({playerBb->getId(), ActionType::Check});
     myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Check});
@@ -481,8 +468,7 @@ TEST_F(PostRiverStateTest, EmptyPotShowdown)
 {
     logTestMessage("Testing showdown with empty pot");
 
-    initializeHandFsmForTesting(2, gameData);
-    myHandFsm->initialize();
+    initializeHandFsmWithPlayers(2, gameData);
 
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
