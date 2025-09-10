@@ -13,6 +13,8 @@
 #include "core/engine/round_states/FlopState.h"
 #include "core/engine/round_states/PostRiverState.h"
 #include "core/engine/round_states/RiverState.h"
+
+#include <algorithm>
 #include "core/engine/round_states/TurnState.h"
 
 #include <algorithm>
@@ -540,6 +542,78 @@ bool hasPosition(PlayerPosition position, PlayerFsmList actingPlayers)
     return hasPosition;
 }
 
+std::vector<ActionType> getValidActionsForPlayer(const HandFsm& hand, int playerId)
+{
+    int smallBlind = hand.getSmallBlind();
+
+    return getValidActionsForPlayer(hand.getActingPlayersList(), playerId, *hand.getBettingActions(), smallBlind,
+                                    hand.getGameState());
+}
+
+std::vector<ActionType> getValidActionsForPlayer(const PlayerFsmList& actingPlayersList, int playerId,
+                                                 const BettingActions& bettingActions, int smallBlind,
+                                                 const GameState gameState)
+{
+    std::vector<ActionType> validActions;
+
+    // Find the player in the acting players list
+    auto player = getPlayerFsmById(actingPlayersList, playerId);
+    if (!player)
+    {
+        return validActions; // Return empty list if player not found
+    }
+
+    const int currentHighestBet = bettingActions.getRoundHighestSet();
+    const int playerBet = player->getCurrentHandActions().getRoundTotalBetAmount(gameState);
+    const int playerCash = player->getCash();
+
+    // Fold is almost always available (except in some edge cases like being all-in)
+    if (playerCash > 0 || playerBet < currentHighestBet)
+    {
+        validActions.push_back(ActionType::Fold);
+    }
+
+    // Check if player can check (when no bet to call)
+    if (playerBet == currentHighestBet)
+    {
+        validActions.push_back(ActionType::Check);
+    }
+
+    // Check if player can call (when there's a bet to call and player has chips)
+    if (playerBet < currentHighestBet && playerCash > 0)
+    {
+        validActions.push_back(ActionType::Call);
+    }
+
+    // Check if player can bet (when no current bet and player has chips)
+    if (currentHighestBet == 0 && playerCash > 0)
+    {
+        validActions.push_back(ActionType::Bet);
+    }
+
+    // Check if player can raise (when there's a current bet and player has enough chips)
+    if (currentHighestBet > 0 && playerCash > 0)
+    {
+        // Get minimum raise amount based on game rules
+        int minRaise = bettingActions.getMinRaise(smallBlind);
+        int minRaiseAmount = currentHighestBet + minRaise;
+        int extraChipsRequired = minRaiseAmount - playerBet;
+
+        if (extraChipsRequired <= playerCash)
+        {
+            validActions.push_back(ActionType::Raise);
+        }
+    }
+
+    // All-in is available if player has chips
+    if (playerCash > 0)
+    {
+        validActions.push_back(ActionType::Allin);
+    }
+
+    return validActions;
+}
+
 bool validatePlayerAction(const PlayerFsmList& actingPlayersList, const PlayerAction& action,
                           const BettingActions& bettingActions, int smallBlind, const GameState gameState)
 {
@@ -550,6 +624,22 @@ bool validatePlayerAction(const PlayerFsmList& actingPlayersList, const PlayerAc
                                                   std::to_string(action.playerId) + " not found in actingPlayersList");
         return false;
     }
+
+    // Get valid actions for the player
+    std::vector<ActionType> validActions =
+        getValidActionsForPlayer(actingPlayersList, action.playerId, bettingActions, smallBlind, gameState);
+
+    // Check if the action type is in the list of valid actions
+    bool isActionTypeValid = std::find(validActions.begin(), validActions.end(), action.type) != validActions.end();
+
+    if (!isActionTypeValid)
+    {
+        GlobalServices::instance().logger().error(gameStateToString(gameState) + ": Invalid action type for player " +
+                                                  player->getName() + " : " + playerActionToString(action.type));
+        return false;
+    }
+
+    // Additional validation for actions that require specific amounts
     const int currentHighestBet = bettingActions.getRoundHighestSet();
     const int playerBet = player->getCurrentHandActions().getRoundTotalBetAmount(gameState);
 
@@ -558,21 +648,19 @@ bool validatePlayerAction(const PlayerFsmList& actingPlayersList, const PlayerAc
     switch (action.type)
     {
     case ActionType::Fold:
+        // Fold doesn't require amount validation
         break;
 
     case ActionType::Check:
-        isActionValid = (playerBet == currentHighestBet && action.amount == 0);
+        isActionValid = (action.amount == 0);
         break;
 
     case ActionType::Call:
-    {
-        // take into account a call which would also be an allin, with a stack < to the amount to call
-        isActionValid = (player->getCash() > 0);
+        // Amount will be calculated by the system
         break;
-    }
 
     case ActionType::Bet:
-        isActionValid = (currentHighestBet == 0 && action.amount > 0 && action.amount <= player->getCash());
+        isActionValid = (action.amount > 0 && action.amount <= player->getCash());
         break;
 
     case ActionType::Raise:
@@ -587,18 +675,20 @@ bool validatePlayerAction(const PlayerFsmList& actingPlayersList, const PlayerAc
         break;
     }
     case ActionType::Allin:
-        isActionValid = (player->getCash() > 0);
+        // All-in doesn't require specific amount validation
         break;
 
     default:
         isActionValid = false;
     }
+
     if (!isActionValid)
     {
         GlobalServices::instance().logger().error(
-            gameStateToString(gameState) + ": Invalid action for player " + std::to_string(action.playerId) + " : " +
-            playerActionToString(action.type) + " with amount = " + std::to_string(action.amount));
+            gameStateToString(gameState) + ": Invalid action amount for player " + std::to_string(action.playerId) +
+            " : " + playerActionToString(action.type) + " with amount = " + std::to_string(action.amount));
     }
+
     return isActionValid;
 }
 

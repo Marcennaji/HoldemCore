@@ -6,6 +6,7 @@
 #pragma once
 
 #include "core/engine/model/GameState.h"
+#include "core/engine/model/PlayerAction.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "typedefs.h"
 
@@ -13,6 +14,7 @@
 #include <list>
 #include <memory>
 #include <string>
+#include <vector>
 
 struct PostFlopAnalysisFlags;
 
@@ -83,6 +85,12 @@ void updateActingPlayersListFsm(PlayerFsmList&);
 std::string getPositionLabel(pkt::core::PlayerPosition);
 
 bool hasPosition(PlayerPosition myPos, PlayerFsmList);
+
+std::vector<ActionType> getValidActionsForPlayer(const HandFsm& hand, int playerId);
+
+std::vector<ActionType> getValidActionsForPlayer(const PlayerFsmList& actingPlayersList, int playerId,
+                                                 const BettingActions& bettingActions, int smallBlind,
+                                                 const GameState gameState);
 
 bool validatePlayerAction(const PlayerFsmList& actingPlayersList, const PlayerAction& action,
                           const BettingActions& bettingActions, int smallBlind, const GameState gameState);
