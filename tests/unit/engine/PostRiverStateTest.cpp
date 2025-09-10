@@ -349,9 +349,7 @@ TEST_F(PostRiverStateTest, NoNextStateFromPostRiver)
 
     EXPECT_EQ(myLastGameState, PostRiver);
 
-    // Try any action - should return nullptr for next state
-    auto nextState =
-        myHandFsm->getActionProcessor()->computeNextState(*myHandFsm, {playerSb->getId(), ActionType::Call, 100});
+    auto nextState = myHandFsm->getActionProcessor()->computeNextState(*myHandFsm);
     EXPECT_EQ(nextState, nullptr);
 }
 

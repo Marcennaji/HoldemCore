@@ -19,7 +19,7 @@ class RiverState : public IHandState, public IActionProcessor, public IDebuggabl
 
     void enter(HandFsm&) override;
     void exit(HandFsm&) override;
-    std::unique_ptr<IHandState> computeNextState(HandFsm& hand, const PlayerAction action) override;
+    std::unique_ptr<IHandState> computeNextState(HandFsm& hand) override;
 
     bool isActionAllowed(const HandFsm&, const PlayerAction) const override;
 

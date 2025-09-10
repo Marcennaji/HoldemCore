@@ -68,18 +68,9 @@ void PreflopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
     hand.handlePlayerAction(action);
 }
 
-std::unique_ptr<IHandState> PreflopState::computeNextState(HandFsm& hand, PlayerAction action)
+std::unique_ptr<IHandState> PreflopState::computeNextState(HandFsm& hand)
 {
-    if (hand.getActingPlayersList()->size() < 2)
-    {
-        return std::make_unique<PostRiverState>(myEvents);
-    }
-    if (isRoundComplete(hand))
-    {
-        return std::make_unique<FlopState>(myEvents);
-    }
-
-    return nullptr;
+    return computeBettingRoundNextState(hand, myEvents, Preflop);
 }
 
 void PreflopState::logStateInfo(const HandFsm& /*hand*/) const

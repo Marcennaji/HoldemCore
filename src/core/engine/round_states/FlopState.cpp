@@ -55,34 +55,9 @@ void FlopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
     hand.handlePlayerAction(action);
 }
 
-std::unique_ptr<IHandState> FlopState::computeNextState(HandFsm& hand, PlayerAction action)
+std::unique_ptr<IHandState> FlopState::computeNextState(HandFsm& hand)
 {
-    // If less than 2 players are still in hand (haven't folded), go directly to showdown
-    if (hand.getPlayersInHandList()->size() < 2)
-    {
-        return std::make_unique<PostRiverState>(myEvents);
-    }
-
-    // If all remaining players are all-in (no one can act further), go directly to showdown
-    if (hand.getActingPlayersList()->empty() && hand.getPlayersInHandList()->size() >= 1)
-    {
-        return std::make_unique<PostRiverState>(myEvents);
-    }
-
-    // If round is complete, check if we can continue betting
-    if (isRoundComplete(hand))
-    {
-        // If only one or no players can still act, go directly to showdown
-        if (hand.getActingPlayersList()->size() <= 1)
-        {
-            return std::make_unique<PostRiverState>(myEvents);
-        }
-
-        // Multiple players can still act, continue to Turn
-        return std::make_unique<TurnState>(myEvents);
-    }
-
-    return nullptr;
+    return computeBettingRoundNextState(hand, myEvents, Flop);
 }
 
 std::shared_ptr<player::PlayerFsm> FlopState::getNextPlayerToAct(const HandFsm& hand) const

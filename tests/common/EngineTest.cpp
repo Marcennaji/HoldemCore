@@ -108,7 +108,6 @@ void EngineTest::initializeHandFsmWithPlayers(size_t activePlayerCount, GameData
 }
 void EngineTest::checkPostRiverConditions()
 {
-    // Check if the hand has been resolved correctly after the river
     if (myHand)
     {
         EXPECT_EQ(myHand->getCurrentRoundState(), PostRiver);
@@ -117,7 +116,7 @@ void EngineTest::checkPostRiverConditions()
     if (myHandFsm)
     {
         EXPECT_EQ(myHandFsm->getGameState(), PostRiver);
-        // EXPECT_EQ(myHandFsm->getBoard().getPot(*myHandFsm), 0); // Pot should be reset to 0
+        EXPECT_EQ(myHandFsm->getBoard().getPot(*myHandFsm), 0); // Pot should be reset to 0
     }
 }
 

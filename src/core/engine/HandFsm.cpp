@@ -91,22 +91,12 @@ void HandFsm::runGameLoop()
             {
                 // No next player to act, round should be complete
                 // Transition to next state (e.g., flop -> turn)
-                auto next = processor->computeNextState(*this, {-1, ActionType::None});
-                if (next)
-                {
-                    myState->exit(*this);
-                    myState = std::move(next);
-                    myState->enter(*this);
-                }
-                else
-                {
-                    break; // No next state, hand should end
-                }
+                auto next = processor->computeNextState(*this);
+                assert(next);
+                myState->exit(*this);
+                myState = std::move(next);
+                myState->enter(*this);
             }
-        }
-        else
-        {
-            break; // State doesn't support action processing
         }
     }
 
@@ -128,7 +118,7 @@ void HandFsm::handlePlayerAction(PlayerAction action)
 
         applyActionEffects(action);
 
-        auto next = processor->computeNextState(*this, action);
+        auto next = processor->computeNextState(*this);
         if (next)
         {
             myState->exit(*this);

@@ -55,19 +55,9 @@ void RiverState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
     hand.handlePlayerAction(action);
 }
 
-std::unique_ptr<IHandState> RiverState::computeNextState(HandFsm& hand, PlayerAction action)
+std::unique_ptr<IHandState> RiverState::computeNextState(HandFsm& hand)
 {
-    if (hand.getActingPlayersList()->size() < 2)
-    {
-        return std::make_unique<PostRiverState>(myEvents);
-    }
-    if (isRoundComplete(hand))
-    {
-        exit(hand);
-        return std::make_unique<PostRiverState>(myEvents);
-    }
-
-    return nullptr;
+    return computeBettingRoundNextState(hand, myEvents, River);
 }
 
 std::shared_ptr<player::PlayerFsm> RiverState::getNextPlayerToAct(const HandFsm& hand) const

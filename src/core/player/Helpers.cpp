@@ -9,6 +9,12 @@
 #include "core/player/deprecated/Player.h"
 #include "core/services/GlobalServices.h"
 
+// Include FSM states for the helper function
+#include "core/engine/round_states/FlopState.h"
+#include "core/engine/round_states/PostRiverState.h"
+#include "core/engine/round_states/RiverState.h"
+#include "core/engine/round_states/TurnState.h"
+
 #include <algorithm>
 #include <cmath>
 #include <fstream>
@@ -764,4 +770,50 @@ bool isRoundComplete(HandFsm& hand)
     GlobalServices::instance().logger().verbose("  ROUND " + gameStateToString(hand.getGameState()) + " COMPLETE");
     return true;
 }
+
+std::unique_ptr<pkt::core::IHandState> computeBettingRoundNextState(pkt::core::HandFsm& hand,
+                                                                    const pkt::core::GameEvents& events,
+                                                                    pkt::core::GameState currentState)
+{
+    // If less than 2 players are still in hand (haven't folded), go directly to showdown
+    if (hand.getPlayersInHandList()->size() < 2)
+    {
+        return std::make_unique<pkt::core::PostRiverState>(events);
+    }
+
+    // If all remaining players are all-in (no one can act further), go directly to showdown
+    if (hand.getActingPlayersList()->empty() && hand.getPlayersInHandList()->size() >= 1)
+    {
+        return std::make_unique<pkt::core::PostRiverState>(events);
+    }
+
+    // If round is complete, check if we can continue betting
+    if (isRoundComplete(hand))
+    {
+        // If only one or no players can still act, go directly to showdown
+        if (hand.getActingPlayersList()->size() <= 1)
+        {
+            return std::make_unique<pkt::core::PostRiverState>(events);
+        }
+
+        // Multiple players can still act, determine next state based on current state
+        switch (currentState)
+        {
+        case pkt::core::GameState::Preflop:
+            return std::make_unique<pkt::core::FlopState>(events);
+        case pkt::core::GameState::Flop:
+            return std::make_unique<pkt::core::TurnState>(events);
+        case pkt::core::GameState::Turn:
+            return std::make_unique<pkt::core::RiverState>(events);
+        case pkt::core::GameState::River:
+            return std::make_unique<pkt::core::PostRiverState>(events);
+        default:
+            // Shouldn't happen for betting rounds
+            return std::make_unique<pkt::core::PostRiverState>(events);
+        }
+    }
+
+    return nullptr; // Stay in current state - more betting needed
+}
+
 } // namespace pkt::core::player

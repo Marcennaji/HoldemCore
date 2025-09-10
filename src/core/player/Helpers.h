@@ -20,6 +20,8 @@ namespace pkt::core
 {
 class BettingActions;
 class HandFsm;
+class IHandState;
+struct GameEvents;
 struct PlayerAction;
 } // namespace pkt::core
 
@@ -93,5 +95,8 @@ bool isDealerPosition(PlayerPosition p);
 bool isSmallBlindPosition(PlayerPosition p);
 
 bool isRoundComplete(HandFsm& hand);
+
+std::unique_ptr<pkt::core::IHandState> computeBettingRoundNextState(HandFsm& hand, const GameEvents& events,
+                                                                    GameState currentState);
 
 } // namespace pkt::core::player

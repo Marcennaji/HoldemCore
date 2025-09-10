@@ -41,7 +41,7 @@ void PostRiverState::exit(HandFsm& /*hand*/)
 {
 }
 
-std::unique_ptr<IHandState> PostRiverState::computeNextState(HandFsm& /*hand*/, const PlayerAction /*action*/)
+std::unique_ptr<IHandState> PostRiverState::computeNextState(HandFsm& /*hand*/)
 {
     // PostRiver is terminal — no next state.
     return nullptr;
