@@ -21,12 +21,19 @@ void BettingRoundsFsmTest::SetUp()
 {
     EngineTest::SetUp();
     myEvents.clear();
-    myEvents.onBettingRoundStarted = [&](GameState state) { myLastGameState = state; };
+    stateSequence.clear();
+
+    myEvents.onBettingRoundStarted = [&](GameState state)
+    {
+        myLastGameState = state;
+        stateSequence.push_back(state);
+    };
 }
 
 void BettingRoundsFsmTest::TearDown()
 {
     checkPostRiverConditions();
+    checkStateTransitions();
 }
 
 bool BettingRoundsFsmTest::isPlayerStillActive(unsigned id) const
@@ -37,6 +44,31 @@ bool BettingRoundsFsmTest::isPlayerStillActive(unsigned id) const
             return true;
     }
     return false;
+}
+void BettingRoundsFsmTest::checkStateTransitions()
+{
+    // Verify we have a valid sequence
+    EXPECT_FALSE(stateSequence.empty()) << "Should have recorded state transitions";
+
+    // Verify PostRiver is the final state
+    EXPECT_EQ(stateSequence.back(), PostRiver)
+        << "Final state should be PostRiver, found " + gameStateToString(stateSequence.back());
+
+    // Verify no invalid state transitions
+    for (size_t i = 1; i < stateSequence.size(); ++i)
+    {
+        GameState prev = stateSequence[i - 1];
+        GameState curr = stateSequence[i];
+
+        // Check for valid transitions
+        bool validTransition = (prev == Preflop && (curr == Flop || curr == PostRiver)) ||
+                               (prev == Flop && (curr == Turn || curr == PostRiver)) ||
+                               (prev == Turn && (curr == River || curr == PostRiver)) ||
+                               (prev == River && curr == PostRiver);
+
+        EXPECT_TRUE(validTransition) << "Invalid transition from " << gameStateToString(prev) << " to "
+                                     << gameStateToString(curr);
+    }
 }
 
 // Tests for FSM betting rounds and transitions
@@ -144,63 +176,7 @@ TEST_F(BettingRoundsFsmTest, StartShouldGoFromPreflopToPostRiver6Players)
     EXPECT_TRUE(myHandFsm->getState().isTerminal()) << "Final state should be terminal";
 }
 
-TEST_F(BettingRoundsFsmTest, FsmStateTransitionsFollowCorrectSequence)
-{
-    logTestMessage("Testing FSM state transition sequence");
-
-    initializeHandFsmWithPlayers(3, gameData);
-
-    // Track state transitions
-    std::vector<GameState> stateSequence;
-    myEvents.onBettingRoundStarted = [&](GameState state)
-    {
-        stateSequence.push_back(state);
-        myLastGameState = state;
-    };
-
-    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
-
-    // Inject deterministic strategies - simple fold sequence to avoid infinite loops
-    auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
-    dealerStrategy->setLastAction(pkt::core::GameState::Preflop, {playerDealer->getId(), pkt::core::ActionType::Fold});
-    playerDealer->setStrategy(std::move(dealerStrategy));
-
-    auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
-    sbStrategy->setLastAction(pkt::core::GameState::Preflop, {playerSb->getId(), pkt::core::ActionType::Fold});
-    playerSb->setStrategy(std::move(sbStrategy));
-
-    auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
-    // Big blind doesn't need to act in this scenario - wins by default
-    playerBb->setStrategy(std::move(bbStrategy));
-
-    myHandFsm->runGameLoop(); // Automatically prompts players and drives game to completion
-
-    // Verify we have a valid sequence
-    EXPECT_FALSE(stateSequence.empty()) << "Should have recorded state transitions";
-
-    // Verify PostRiver is the final state
-    EXPECT_EQ(stateSequence.back(), PostRiver) << "Final state should be PostRiver";
-
-    // Verify no invalid state transitions
-    for (size_t i = 1; i < stateSequence.size(); ++i)
-    {
-        GameState prev = stateSequence[i - 1];
-        GameState curr = stateSequence[i];
-
-        // Check for valid transitions
-        bool validTransition = (prev == Preflop && (curr == Flop || curr == PostRiver)) ||
-                               (prev == Flop && (curr == Turn || curr == PostRiver)) ||
-                               (prev == Turn && (curr == River || curr == PostRiver)) ||
-                               (prev == River && curr == PostRiver);
-
-        EXPECT_TRUE(validTransition) << "Invalid transition from " << static_cast<int>(prev) << " to "
-                                     << static_cast<int>(curr);
-    }
-}
-
-TEST_F(BettingRoundsFsmTest, DISABLED_AllInPlayersTransitionToPostRiverCorrectly)
+TEST_F(BettingRoundsFsmTest, AllInPlayersTransitionToPostRiverCorrectly)
 {
     logTestMessage("Testing all-in scenario transitions to PostRiver");
 
@@ -213,14 +189,6 @@ TEST_F(BettingRoundsFsmTest, DISABLED_AllInPlayersTransitionToPostRiverCorrectly
     // Reduce SB player's cash to force all-in scenario
     playerSb->setCash(50); // After posting SB (10), they'll have 40 left
 
-    // Track state transitions
-    std::vector<GameState> stateSequence;
-    myEvents.onBettingRoundStarted = [&](GameState state)
-    {
-        stateSequence.push_back(state);
-        myLastGameState = state;
-    };
-
     // Inject deterministic strategies - SB goes all-in, BB calls
     auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
     sbStrategy->setLastAction(pkt::core::GameState::Preflop, {playerSb->getId(), pkt::core::ActionType::Allin});
@@ -232,22 +200,10 @@ TEST_F(BettingRoundsFsmTest, DISABLED_AllInPlayersTransitionToPostRiverCorrectly
 
     myHandFsm->runGameLoop(); // Automatically prompts players and drives game to completion
 
-    // In an all-in scenario, we should transition directly to PostRiver
-    // without going through all betting rounds
-    EXPECT_EQ(myLastGameState, PostRiver) << "All-in scenario should end in PostRiver";
-
-    // The state sequence should not include Turn and River if all-in happened early
-    bool hasAllInTransition = false;
-    for (size_t i = 1; i < stateSequence.size(); ++i)
-    {
-        if (stateSequence[i - 1] != PostRiver && stateSequence[i] == PostRiver)
-        {
-            hasAllInTransition = true;
-            break;
-        }
-    }
-
-    EXPECT_TRUE(hasAllInTransition) << "Should have direct transition to PostRiver in all-in scenario";
+    EXPECT_EQ(stateSequence.size(), 2)
+        << "This preflop All-in scenario should have only 2 states: Preflop and PostRiver";
+    EXPECT_EQ(stateSequence[0], Preflop) << "First state should be Preflop";
+    EXPECT_EQ(stateSequence[1], PostRiver) << "Second state should be PostRiver";
 }
 
 TEST_F(BettingRoundsFsmTest, PlayersDoNotActAfterFolding)
@@ -294,7 +250,98 @@ TEST_F(BettingRoundsFsmTest, PlayersDoNotActAfterFolding)
 }
 
 // TODO: Add more tests following the BettingRoundsLegacyTest pattern:
-// - ShouldRecordAllActionsInHandHistoryChronologically (when FSM hand history is available)
+TEST_F(BettingRoundsFsmTest, ShouldRecordAllActionsInHandHistoryChronologically)
+{
+    logTestMessage("Testing that all player actions are recorded chronologically in hand history");
+
+    initializeHandFsmWithPlayers(3, gameData);
+
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
+
+    // Set up strategies - dealer folds, SB and BB don't need to act much
+    auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    dealerStrategy->setLastAction(pkt::core::GameState::Preflop, {playerDealer->getId(), pkt::core::ActionType::Fold});
+    playerDealer->setStrategy(std::move(dealerStrategy));
+
+    auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    sbStrategy->setLastAction(pkt::core::GameState::Preflop, {playerSb->getId(), pkt::core::ActionType::Fold});
+    playerSb->setStrategy(std::move(sbStrategy));
+
+    auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    // BB wins when others fold
+    playerBb->setStrategy(std::move(bbStrategy));
+
+    myHandFsm->runGameLoop();
+
+    // Now we can use the hand-level action history for true chronological verification
+    const auto& handHistory = myHandFsm->getHandActionHistory();
+    EXPECT_FALSE(handHistory.empty()) << "Hand action history should not be empty";
+
+    // Verify each round has recorded actions
+    for (const auto& roundHistory : handHistory)
+    {
+        SCOPED_TRACE("Round: " + gameStateToString(roundHistory.round));
+        EXPECT_FALSE(roundHistory.actions.empty())
+            << "No actions recorded for round " + gameStateToString(roundHistory.round);
+
+        // Verify all actions in this round are valid
+        for (const auto& [playerId, action] : roundHistory.actions)
+        {
+            EXPECT_GE(playerId, 0u) << "Player ID should be valid";
+            EXPECT_NE(action, ActionType::None) << "Action type should not be None";
+        }
+    }
+
+    // Verify we have at least preflop actions
+    auto preflopRound = std::find_if(handHistory.begin(), handHistory.end(),
+                                     [](const auto& round) { return round.round == GameState::Preflop; });
+    EXPECT_NE(preflopRound, handHistory.end()) << "Should have preflop round recorded";
+
+    if (preflopRound != handHistory.end())
+    {
+        // In preflop, we should see blind posts first, then player decisions
+        const auto& preflopActions = preflopRound->actions;
+        EXPECT_GE(preflopActions.size(), 2u) << "Should have at least blind posts in preflop";
+
+        // Verify chronological order: small blind post should come before big blind post
+        bool foundSB = false, foundBB = false;
+        size_t sbIndex = 0, bbIndex = 0;
+
+        for (size_t i = 0; i < preflopActions.size(); ++i)
+        {
+            if (preflopActions[i].second == ActionType::PostSmallBlind)
+            {
+                foundSB = true;
+                sbIndex = i;
+            }
+            else if (preflopActions[i].second == ActionType::PostBigBlind)
+            {
+                foundBB = true;
+                bbIndex = i;
+            }
+        }
+
+        if (foundSB && foundBB)
+        {
+            EXPECT_LT(sbIndex, bbIndex) << "Small blind should be posted before big blind in chronological order";
+        }
+    }
+
+    // If we reached flop, verify flop actions are recorded after preflop
+    auto flopRound = std::find_if(handHistory.begin(), handHistory.end(),
+                                  [](const auto& round) { return round.round == GameState::Flop; });
+    if (flopRound != handHistory.end())
+    {
+        // Flop round should come after preflop round in the history
+        EXPECT_GT(std::distance(handHistory.begin(), flopRound), std::distance(handHistory.begin(), preflopRound))
+            << "Flop round should come after preflop round in hand history";
+
+        EXPECT_FALSE(flopRound->actions.empty()) << "Flop round should have actions recorded";
+    }
+}
+
 // - ActionOrderStartsCorrectlyInHeadsUpPreflop
 // - FirstToActPostflopIsLeftOfDealer
 // - AllActionsAreFromActivePlayersOnly

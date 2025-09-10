@@ -138,18 +138,24 @@ void PreflopState::setBlinds(HandFsm& hand)
 
         if (blindAmount > 0)
         {
+            PlayerAction blindAction;
             if (player->getCash() < blindAmount)
             {
                 // Player doesn't have enough cash to post the blind, goes all-in
                 player->addBetAmount(player->getCash());
-                player->setAction(*this, {player->getId(), ActionType::Allin, player->getCash()});
+                blindAction = {player->getId(), ActionType::Allin, player->getCash()};
+                player->setAction(*this, blindAction);
             }
             else
             {
                 // Player can afford the blind
                 player->addBetAmount(blindAmount);
-                player->setAction(*this, {player->getId(), actionType, blindAmount});
+                blindAction = {player->getId(), actionType, blindAmount};
+                player->setAction(*this, blindAction);
             }
+
+            // Record blind post in hand-level chronological history
+            hand.getBettingActions()->recordPlayerAction(getGameState(), blindAction);
         }
     }
 }

@@ -12,6 +12,7 @@
 #include "core/engine/round_states/PreflopState.h"
 #include "core/player/typedefs.h"
 
+#include <algorithm>
 #include <random>
 
 namespace pkt::core
@@ -216,6 +217,10 @@ void HandFsm::applyActionEffects(const PlayerAction action)
     }
 
     player->setAction(*myState, actionForHistory);
+
+    // Record action in hand-level chronological history
+    getBettingActions()->recordPlayerAction(myState->getGameState(), actionForHistory);
+
     updateActingPlayersListFsm(myActingPlayersList);
 }
 

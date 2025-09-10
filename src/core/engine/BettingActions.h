@@ -2,6 +2,7 @@
 
 #include "core/engine/BettingRoundActions.h"
 #include "core/engine/model/PlayerPosition.h"
+#include "core/interfaces/IHand.h"
 #include "core/interfaces/hand/IHandState.h"
 #include "core/player/typedefs.h"
 
@@ -36,6 +37,10 @@ class BettingActions
     void setLastActionPlayerId(int theValue);
     int getLastActionPlayerId() const { return myLastActionPlayerId; }
 
+    // Hand action history methods
+    void recordPlayerAction(GameState round, const pkt::core::PlayerAction& action);
+    const std::vector<pkt::core::BettingRoundHistory>& getHandActionHistory() const { return myHandActionHistory; }
+
   private:
     BettingRoundActions myPreflop;
     BettingRoundActions myFlop;
@@ -49,6 +54,9 @@ class BettingActions
 
     const pkt::core::player::PlayerFsmList& mySeatsList;
     const pkt::core::player::PlayerFsmList& myActingPlayersList;
+
+    // Hand-level action history for chronological tracking
+    std::vector<pkt::core::BettingRoundHistory> myHandActionHistory;
 };
 
 } // namespace pkt::core

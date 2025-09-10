@@ -46,6 +46,12 @@ class HandFsm : public IHandLifecycle, public IHandPlayerAction, public HandPlay
     GameState getGameState() const { return myState->getGameState(); }
     IBoard& getBoard() { return *myBoard; }
 
+    // Hand action history methods (delegates to BettingActions)
+    const std::vector<pkt::core::BettingRoundHistory>& getHandActionHistory() const
+    {
+        return getBettingActions()->getHandActionHistory();
+    }
+
   private:
     void applyActionEffects(const PlayerAction action);
 

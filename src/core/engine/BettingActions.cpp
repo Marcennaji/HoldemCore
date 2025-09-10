@@ -4,6 +4,8 @@
 #include "core/player/PlayerFsm.h"
 #include "core/player/typedefs.h"
 
+#include <algorithm>
+
 namespace pkt::core
 {
 using namespace pkt::core::player;
@@ -139,4 +141,21 @@ int BettingActions::getLastRaiserId()
         return -1;
     }
 }
+
+void BettingActions::recordPlayerAction(GameState round, const pkt::core::PlayerAction& action)
+{
+    // Find or create entry for this round
+    auto it = std::find_if(myHandActionHistory.begin(), myHandActionHistory.end(),
+                           [round](const pkt::core::BettingRoundHistory& h) { return h.round == round; });
+
+    if (it == myHandActionHistory.end())
+    {
+        myHandActionHistory.push_back({round, {{action.playerId, action.type}}});
+    }
+    else
+    {
+        it->actions.emplace_back(action.playerId, action.type);
+    }
+}
+
 } // namespace pkt::core
