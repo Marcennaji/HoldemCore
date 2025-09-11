@@ -6,15 +6,13 @@
 
 #include <core/engine/EngineDefs.h>
 #include <core/engine/HandEvaluator.h>
+#include <core/engine/deprecated/ButtonState.h>
 #include <core/interfaces/IHand.h>
+#include <core/interfaces/IHandEvaluationEngine.h>
+#include <core/player/CurrentHandActions.h>
 #include <core/player/PlayerStatistics.h>
-#include "core/engine/deprecated/ButtonState.h"
-
-#include "CurrentHandActions.h"
-#include "range/RangeEstimator.h"
-#include "strategy/CurrentHandContext.h"
-
-#include "core/interfaces/IHandEvaluationEngine.h"
+#include <core/player/range/RangeEstimator.h>
+#include <core/player/strategy/CurrentHandContext.h>
 
 #include <array>
 #include <assert.h>
