@@ -336,4 +336,94 @@ bool validatePlayerAction(const PlayerFsmList& actingPlayersList, const PlayerAc
     return true;
 }
 
+std::shared_ptr<player::PlayerFsm> getNextPlayerToActInRound(const HandFsm& hand, GameState currentRound)
+{
+    auto actingPlayers = hand.getActingPlayersList();
+    if (actingPlayers->empty())
+        return nullptr;
+
+    // Get the hand action history to see what actions have happened
+    const auto& handHistory = hand.getBettingActions()->getHandActionHistory();
+
+    // Find the current round and check if there are any actions
+    for (const auto& roundHistory : handHistory)
+    {
+        if (roundHistory.round == currentRound && !roundHistory.actions.empty())
+        {
+            // For Preflop, skip blind actions to find the last non-blind action
+            if (currentRound == GameState::Preflop)
+            {
+                // Look for the last non-blind action
+                for (auto it = roundHistory.actions.rbegin(); it != roundHistory.actions.rend(); ++it)
+                {
+                    const auto& [playerId, action] = *it;
+
+                    // Skip blind actions
+                    if (action != ActionType::PostSmallBlind && action != ActionType::PostBigBlind)
+                    {
+                        // Found the last non-blind action, find the next player
+                        for (auto playerIt = actingPlayers->begin(); playerIt != actingPlayers->end(); ++playerIt)
+                        {
+                            if ((*playerIt)->getId() == playerId)
+                            {
+                                // Found the player who just acted, return the next player in sequence
+                                auto nextIt = std::next(playerIt);
+                                if (nextIt == actingPlayers->end())
+                                    nextIt = actingPlayers->begin(); // Wrap around
+
+                                return *nextIt;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // For postflop rounds, use the last action directly
+                const auto& [playerId, action] = roundHistory.actions.back();
+
+                // Found the last action, find the next player
+                for (auto playerIt = actingPlayers->begin(); playerIt != actingPlayers->end(); ++playerIt)
+                {
+                    if ((*playerIt)->getId() == playerId)
+                    {
+                        // Found the player who just acted, return the next player in sequence
+                        auto nextIt = std::next(playerIt);
+                        if (nextIt == actingPlayers->end())
+                            nextIt = actingPlayers->begin(); // Wrap around
+
+                        return *nextIt;
+                    }
+                }
+            }
+        }
+    }
+
+    // No actions found for this round, this is the start of the round
+    if (currentRound == GameState::Preflop)
+    {
+        // Preflop: start from left of big blind (first non-blind action)
+        for (auto it = actingPlayers->begin(); it != actingPlayers->end(); ++it)
+        {
+            if ((*it)->getPosition() == PlayerPosition::BigBlind)
+            {
+                // Found the big blind, get the next player in the list
+                auto nextIt = std::next(it);
+                if (nextIt == actingPlayers->end())
+                    nextIt = actingPlayers->begin(); // Wrap around
+
+                return *nextIt;
+            }
+        }
+
+        // No big blind found (shouldn't happen), return first player
+        return actingPlayers->front();
+    }
+    else
+    {
+        // Postflop: start from first player to act postflop (left of dealer)
+        return getFirstPlayerToActPostFlop(hand);
+    }
+}
+
 } // namespace pkt::core

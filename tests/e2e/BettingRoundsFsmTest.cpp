@@ -405,7 +405,126 @@ TEST_F(BettingRoundsFsmTest, ValidActionsAreCorrectlyDetermined)
     myHandFsm->runGameLoop();
 }
 
-// - FirstToActPostflopIsLeftOfDealer
+TEST_F(BettingRoundsFsmTest, HeadsUpPositionAssignmentIsCorrect)
+{
+    logTestMessage("Testing that position assignment is correct in heads-up");
+
+    initializeHandFsmWithPlayers(2, gameData);
+
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+
+    // Setup simple scenario: SB folds preflop to keep it simple
+    auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    sbStrategy->setLastAction(pkt::core::GameState::Preflop, {playerSb->getId(), pkt::core::ActionType::Fold});
+    playerSb->setStrategy(std::move(sbStrategy));
+
+    auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    // BB wins when SB folds - no action needed
+    playerBb->setStrategy(std::move(bbStrategy));
+
+    myHandFsm->runGameLoop();
+
+    // Verify the position assignment is correct
+    EXPECT_EQ(playerSb->getPosition(), PlayerPosition::ButtonSmallBlind)
+        << "Player 0 should be Button+Small Blind in heads-up";
+    EXPECT_EQ(playerBb->getPosition(), PlayerPosition::BigBlind) << "Player 1 should be Big Blind in heads-up";
+}
+
+TEST_F(BettingRoundsFsmTest, SmallBlindActsFirstPostflopInHeadsUp)
+{
+    logTestMessage("Testing that Small Blind acts first postflop in heads-up");
+
+    initializeHandFsmWithPlayers(2, gameData);
+
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+
+    // In heads-up, SB is also button, so after SB calls, BB should have option to check
+    auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    sbStrategy->setLastAction(pkt::core::GameState::Preflop, {playerSb->getId(), pkt::core::ActionType::Call});
+    sbStrategy->setLastAction(pkt::core::GameState::Flop, {playerSb->getId(), pkt::core::ActionType::Check});
+    sbStrategy->setLastAction(pkt::core::GameState::Turn, {playerSb->getId(), pkt::core::ActionType::Check});
+    sbStrategy->setLastAction(pkt::core::GameState::River, {playerSb->getId(), pkt::core::ActionType::Check});
+    playerSb->setStrategy(std::move(sbStrategy));
+
+    auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    // Now that turn logic works correctly, BB needs to respond to SB's call
+    bbStrategy->setLastAction(pkt::core::GameState::Preflop, {playerBb->getId(), pkt::core::ActionType::Check});
+    bbStrategy->setLastAction(pkt::core::GameState::Flop, {playerBb->getId(), pkt::core::ActionType::Check});
+    bbStrategy->setLastAction(pkt::core::GameState::Turn, {playerBb->getId(), pkt::core::ActionType::Check});
+    bbStrategy->setLastAction(pkt::core::GameState::River, {playerBb->getId(), pkt::core::ActionType::Check});
+    playerBb->setStrategy(std::move(bbStrategy));
+
+    myHandFsm->runGameLoop();
+
+    const auto& handHistory = myHandFsm->getHandActionHistory();
+    // Verify we reached flop
+    auto flopRound = std::find_if(handHistory.begin(), handHistory.end(),
+                                  [](const auto& round) { return round.round == GameState::Flop; });
+
+    if (flopRound != handHistory.end())
+    {
+        EXPECT_FALSE(flopRound->actions.empty()) << "Flop round should have actions";
+
+        // Verify Big Blind acts first on flop in heads-up
+        unsigned firstActorId = flopRound->actions.front().first;
+        EXPECT_EQ(firstActorId, playerBb->getId()) << "Big Blind should act first postflop in heads-up";
+        EXPECT_EQ(playerSb->getPosition(), PlayerPosition::ButtonSmallBlind)
+            << "Small Blind should be ButtonSmallBlind in heads-up";
+    }
+    else
+    {
+        FAIL() << "Should have reached flop round but didn't find it in action history";
+    }
+}
+
+TEST_F(BettingRoundsFsmTest, FirstToActPostflopIsSmallBlindInThreePlayers)
+{
+    logTestMessage("Testing that Small Blind acts first postflop with 3 players");
+
+    initializeHandFsmWithPlayers(3, gameData);
+
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
+
+    // Setup strategies to reach flop with all players
+    auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    dealerStrategy->setLastAction(pkt::core::GameState::Preflop, {playerDealer->getId(), pkt::core::ActionType::Call});
+    dealerStrategy->setLastAction(pkt::core::GameState::Flop, {playerDealer->getId(), pkt::core::ActionType::Fold});
+    playerDealer->setStrategy(std::move(dealerStrategy));
+
+    auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    sbStrategy->setLastAction(pkt::core::GameState::Preflop, {playerSb->getId(), pkt::core::ActionType::Call});
+    sbStrategy->setLastAction(pkt::core::GameState::Flop, {playerSb->getId(), pkt::core::ActionType::Check});
+    sbStrategy->setLastAction(pkt::core::GameState::Turn, {playerSb->getId(), pkt::core::ActionType::Check});
+    sbStrategy->setLastAction(pkt::core::GameState::River, {playerSb->getId(), pkt::core::ActionType::Check});
+    playerSb->setStrategy(std::move(sbStrategy));
+
+    auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    bbStrategy->setLastAction(pkt::core::GameState::Preflop, {playerBb->getId(), pkt::core::ActionType::Check});
+    bbStrategy->setLastAction(pkt::core::GameState::Flop, {playerBb->getId(), pkt::core::ActionType::Check});
+    bbStrategy->setLastAction(pkt::core::GameState::Turn, {playerBb->getId(), pkt::core::ActionType::Check});
+    bbStrategy->setLastAction(pkt::core::GameState::River, {playerBb->getId(), pkt::core::ActionType::Check});
+    playerBb->setStrategy(std::move(bbStrategy));
+
+    myHandFsm->runGameLoop();
+
+    // Verify we reached flop
+    const auto& handHistory = myHandFsm->getHandActionHistory();
+    auto flopRound = std::find_if(handHistory.begin(), handHistory.end(),
+                                  [](const auto& round) { return round.round == GameState::Flop; });
+
+    ASSERT_NE(flopRound, handHistory.end()) << "Should have reached flop round";
+    EXPECT_FALSE(flopRound->actions.empty()) << "Flop round should have actions";
+
+    // Verify Small Blind acts first on flop
+    unsigned firstActorId = flopRound->actions.front().first;
+    EXPECT_EQ(firstActorId, playerSb->getId()) << "Small Blind should act first postflop with 3 players";
+    EXPECT_EQ(playerSb->getPosition(), PlayerPosition::SmallBlind) << "Player should be Small Blind";
+}
+
 // - AllActionsAreFromActivePlayersOnly
 // - NoPlayerStartsPostFlopRoundWithRaise
 // - NoPlayerBetsAfterRaise

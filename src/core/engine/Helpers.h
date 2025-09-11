@@ -31,6 +31,7 @@ struct GameEvents;
 struct PlayerAction;
 
 std::shared_ptr<player::PlayerFsm> getFirstPlayerToActPostFlop(const HandFsm& hand);
+std::shared_ptr<player::PlayerFsm> getNextPlayerToActInRound(const HandFsm& hand, GameState currentRound);
 std::unique_ptr<pkt::core::IHandState> computeBettingRoundNextState(HandFsm& hand, const GameEvents& events,
                                                                     GameState currentState);
 bool isRoundComplete(HandFsm& hand);

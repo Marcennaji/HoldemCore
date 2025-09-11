@@ -63,7 +63,7 @@ std::unique_ptr<IHandState> TurnState::computeNextState(HandFsm& hand)
 
 std::shared_ptr<player::PlayerFsm> TurnState::getNextPlayerToAct(const HandFsm& hand) const
 {
-    return getFirstPlayerToActPostFlop(hand);
+    return getNextPlayerToActInRound(hand, GameState::Turn);
 }
 
 std::shared_ptr<player::PlayerFsm> TurnState::getFirstPlayerToActInRound(const HandFsm& hand) const

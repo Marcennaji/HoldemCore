@@ -79,28 +79,7 @@ void PreflopState::logStateInfo(const HandFsm& /*hand*/) const
 
 std::shared_ptr<player::PlayerFsm> PreflopState::getNextPlayerToAct(const HandFsm& hand) const
 {
-    // In preflop, the first to act is left of the big blind (UTG in multi-player, SB in heads-up)
-    auto actingPlayers = hand.getActingPlayersList();
-
-    if (actingPlayers->empty())
-        return nullptr;
-
-    // Find the big blind player in the acting players list
-    for (auto it = actingPlayers->begin(); it != actingPlayers->end(); ++it)
-    {
-        if ((*it)->getPosition() == PlayerPosition::BigBlind)
-        {
-            // Found the big blind, get the next player in the list
-            auto nextIt = std::next(it);
-            if (nextIt == actingPlayers->end())
-                nextIt = actingPlayers->begin(); // Wrap around
-
-            return *nextIt;
-        }
-    }
-
-    // No big blind found (shouldn't happen), return first player
-    return actingPlayers->front();
+    return getNextPlayerToActInRound(hand, GameState::Preflop);
 }
 
 std::shared_ptr<player::PlayerFsm> PreflopState::getFirstPlayerToActInRound(const HandFsm& hand) const
