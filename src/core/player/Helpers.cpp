@@ -18,6 +18,9 @@
 #include "core/engine/round_states/TurnState.h"
 
 #include <algorithm>
+
+using namespace pkt::core;
+using namespace pkt::core::player;
 #include <cmath>
 #include <fstream>
 #include <random>
@@ -42,8 +45,10 @@ static bool isOffsuitedAndAbove(const string& card1, const string& card2, const 
 static bool isSuitedAndAbove(const string& card1, const string& card2, const char* c1, const char* c2,
                              const char* range);
 static bool isExactHand(const string& card1, const string& card2, const char* range);
-static bool isDealerPosition(PlayerPosition p);
-static bool isSmallBlindPosition(PlayerPosition p);
+std::vector<ActionType> getValidActionsForPlayer(const PlayerFsmList& actingPlayersList, int playerId,
+                                                 const BettingActions& bettingActions, int smallBlind,
+                                                 const GameState gameState);
+const int getImplicitOdd(const PostFlopAnalysisFlags& state);
 
 // values are odd %, according to the outs number. Array index is the number of outs
 static int outsOddsOneCard[] = {
@@ -59,21 +64,6 @@ static int outsOddsTwoCard[] = {
     42, 45, 48, 51, 54,     /* 11 to 15 outs */
     57, 60, 62, 65, 68      /* 16 to 20 outs */
 };
-
-void shufflePlayers(std::list<std::shared_ptr<Player>>& players, unsigned humanId)
-{
-    std::vector<std::shared_ptr<Player>> v(players.begin(), players.end());
-    auto it = std::find_if(v.begin(), v.end(), [=](auto& p) { return p->getId() == humanId; });
-    if (it != v.end())
-    {
-        std::swap(v.front(), *it);
-    }
-
-    std::mt19937 rng(std::time(nullptr));
-    std::shuffle(v.begin() + 1, v.end(), rng);
-
-    players.assign(v.begin(), v.end());
-}
 
 static string getFakeCard(char c)
 {
@@ -306,20 +296,6 @@ bool isDrawingProbOk(const PostFlopAnalysisFlags& postFlopState, const int potOd
     return false;
 }
 
-PlayerListIterator getPlayerListIteratorById(PlayerList list, unsigned id)
-{
-    return std::find_if(list->begin(), list->end(),
-                        [id](const std::shared_ptr<Player>& p) { return p->getId() == id; });
-}
-std::shared_ptr<Player> getPlayerById(PlayerList list, unsigned id)
-{
-    for (auto i = list->begin(); i != list->end(); ++i)
-    {
-        if ((*i)->getId() == id)
-            return *i;
-    }
-    return nullptr;
-}
 PlayerFsmListIterator getPlayerFsmListIteratorById(PlayerFsmList list, unsigned id)
 {
     return std::find_if(list->begin(), list->end(),
@@ -333,52 +309,6 @@ std::shared_ptr<PlayerFsm> getPlayerFsmById(PlayerFsmList list, unsigned id)
             return *i;
     }
     return nullptr;
-}
-void updateActingPlayersList(PlayerList& myActingPlayersList)
-{
-    GlobalServices::instance().logger().verbose("Updating myActingPlayersList...");
-
-    PlayerListIterator it, it1;
-
-    for (it = myActingPlayersList->begin(); it != myActingPlayersList->end();)
-    {
-        GlobalServices::instance().logger().verbose("Checking player: " + (*it)->getName() +
-                                                    ", action: " + playerActionToString((*it)->getLastAction().type));
-
-        if ((*it)->getLastAction().type == ActionType::Fold || (*it)->getLastAction().type == ActionType::Allin)
-        {
-            GlobalServices::instance().logger().verbose(
-                "Removing player: " + (*it)->getName() +
-                " from myActingPlayersList due to action: " + playerActionToString((*it)->getLastAction().type));
-
-            it = myActingPlayersList->erase(it);
-
-            if (!myActingPlayersList->empty())
-            {
-                GlobalServices::instance().logger().verbose(
-                    "myActingPlayersList is not empty after removal. Updating current player's turn.");
-
-                it1 = it;
-                if (it1 == myActingPlayersList->begin())
-                {
-                    GlobalServices::instance().logger().verbose(
-                        "Iterator points to the beginning of the list. Wrapping around to the end.");
-                    it1 = myActingPlayersList->end();
-                }
-                --it1;
-            }
-            else
-            {
-                GlobalServices::instance().logger().verbose("myActingPlayersList is now empty after removal.");
-            }
-        }
-        else
-        {
-            ++it;
-        }
-    }
-
-    GlobalServices::instance().logger().verbose("Finished updating myActingPlayersList.");
 }
 
 void updateActingPlayersListFsm(PlayerFsmList& myActingPlayersListFsm)
@@ -428,94 +358,6 @@ void updateActingPlayersListFsm(PlayerFsmList& myActingPlayersListFsm)
     }
 
     GlobalServices::instance().logger().verbose("Finished updating myActingPlayersListFsm.");
-}
-
-std::string getPositionLabel(PlayerPosition p)
-{
-
-    switch (p)
-    {
-
-    case UnderTheGun:
-        return "UnderTheGun";
-        break;
-    case UnderTheGunPlusOne:
-        return "UnderTheGun+1";
-        break;
-    case UnderTheGunPlusTwo:
-        return "UnderTheGun+2";
-        break;
-    case Middle:
-        return "Middle";
-        break;
-    case MiddlePlusOne:
-        return "Middle+1";
-        break;
-    case Late:
-        return "Late";
-        break;
-    case Cutoff:
-        return "Cutoff";
-        break;
-    case Button:
-        return "Button";
-        break;
-    case ButtonSmallBlind:
-        return "Button / Small Blind";
-        break;
-    case SmallBlind:
-        return "Small Blind";
-        break;
-    case BigBlind:
-        return "Big Blind";
-        break;
-    default:
-        return "unknown";
-        break;
-    }
-}
-
-PlayerListIterator findPlayerOrThrow(PlayerList seats, unsigned id)
-{
-    auto it = getPlayerListIteratorById(seats, id);
-    if (it == seats->end())
-    {
-        string ids;
-        for (auto i = seats->begin(); i != seats->end(); ++i)
-            ids += " " + to_string((*i)->getId());
-        GlobalServices::instance().logger().error("Couldn't find player with id " + to_string(id) +
-                                                  " in the seats list. List contains following ids :" + ids);
-        throw Exception(__FILE__, __LINE__, EngineError::ActingPlayerNotFound);
-    }
-    return it;
-}
-
-PlayerListIterator nextActivePlayer(PlayerList seats, PlayerListIterator it)
-{
-    ++it;
-    if (it == seats->end())
-        it = seats->begin();
-    while ((*it)->getLastAction().type == ActionType::Fold || (*it)->getLastAction().type == ActionType::Allin)
-    {
-        ++it;
-        if (it == seats->end())
-            it = seats->begin();
-    }
-    return it;
-}
-
-PlayerFsmListIterator nextActivePlayerFsm(PlayerFsmList seats, PlayerFsmListIterator it)
-{
-    ++it;
-    if (it == seats->end())
-        it = seats->begin();
-    while ((*it)->getLastAction().type == ActionType::Fold || (*it)->getLastAction().type == ActionType::Allin)
-    {
-        ++it;
-        if (it == seats->end())
-            it = seats->begin();
-    }
-    return it;
 }
 
 std::shared_ptr<player::PlayerFsm> getFirstPlayerToActPostFlop(const HandFsm& hand)
@@ -630,137 +472,6 @@ std::vector<ActionType> getValidActionsForPlayer(const PlayerFsmList& actingPlay
     }
 
     return validActions;
-}
-
-// Helper function to check for consecutive actions by the same player
-bool isConsecutiveActionAllowed(const BettingActions& bettingActions, const PlayerAction& action,
-                                const GameState gameState)
-{
-    const auto& handHistory = bettingActions.getHandActionHistory();
-    for (const auto& round : handHistory)
-    {
-        if (round.round == gameState && !round.actions.empty())
-        {
-            // Get the last action in this round
-            const auto& lastAction = round.actions.back();
-            if (lastAction.first == action.playerId)
-            {
-                GlobalServices::instance().logger().error(gameStateToString(gameState) + ": Player " +
-                                                          std::to_string(action.playerId) +
-                                                          " cannot act twice consecutively in the same round");
-                return false;
-            }
-            break;
-        }
-    }
-    return true;
-}
-
-// Helper function to check if action type is valid for the player
-bool isActionTypeValid(const PlayerFsmList& actingPlayersList, const PlayerAction& action,
-                       const BettingActions& bettingActions, int smallBlind, const GameState gameState,
-                       const std::shared_ptr<PlayerFsm>& player)
-{
-    std::vector<ActionType> validActions =
-        getValidActionsForPlayer(actingPlayersList, action.playerId, bettingActions, smallBlind, gameState);
-
-    bool isValid = std::find(validActions.begin(), validActions.end(), action.type) != validActions.end();
-
-    if (!isValid)
-    {
-        GlobalServices::instance().logger().error(gameStateToString(gameState) + ": Invalid action type for player " +
-                                                  player->getName() + " : " + playerActionToString(action.type));
-    }
-
-    return isValid;
-}
-
-// Helper function to validate action amounts
-bool isActionAmountValid(const PlayerAction& action, const BettingActions& bettingActions, int smallBlind,
-                         const GameState gameState, const std::shared_ptr<PlayerFsm>& player)
-{
-    const int currentHighestBet = bettingActions.getRoundHighestSet();
-    const int playerBet = player->getCurrentHandActions().getRoundTotalBetAmount(gameState);
-
-    bool isValid = true;
-
-    switch (action.type)
-    {
-    case ActionType::Fold:
-        // Fold doesn't require amount validation
-        break;
-
-    case ActionType::Check:
-        isValid = (action.amount == 0);
-        break;
-
-    case ActionType::Call:
-        // Amount will be calculated by the system
-        break;
-
-    case ActionType::Bet:
-        isValid = (action.amount > 0 && action.amount <= player->getCash());
-        break;
-
-    case ActionType::Raise:
-    {
-        isValid = (action.amount > currentHighestBet);
-
-        int minRaise = bettingActions.getMinRaise(smallBlind);
-        isValid = (isValid && action.amount >= currentHighestBet + minRaise);
-
-        const int extraChipsRequired = action.amount - playerBet;
-        isValid = (isValid && extraChipsRequired <= player->getCash());
-        break;
-    }
-    case ActionType::Allin:
-        // All-in doesn't require specific amount validation
-        break;
-
-    default:
-        isValid = false;
-    }
-
-    if (!isValid)
-    {
-        GlobalServices::instance().logger().error(
-            gameStateToString(gameState) + ": Invalid action amount for player " + std::to_string(action.playerId) +
-            " : " + playerActionToString(action.type) + " with amount = " + std::to_string(action.amount));
-    }
-
-    return isValid;
-}
-
-bool validatePlayerAction(const PlayerFsmList& actingPlayersList, const PlayerAction& action,
-                          const BettingActions& bettingActions, int smallBlind, const GameState gameState)
-{
-    auto player = getPlayerFsmById(actingPlayersList, action.playerId);
-    if (!player)
-    {
-        GlobalServices::instance().logger().error(gameStateToString(gameState) + ": player with id " +
-                                                  std::to_string(action.playerId) + " not found in actingPlayersList");
-        return false;
-    }
-
-    // Validate consecutive actions
-    if (!isConsecutiveActionAllowed(bettingActions, action, gameState))
-    {
-        return false;
-    }
-
-    // Validate action type
-    if (!isActionTypeValid(actingPlayersList, action, bettingActions, smallBlind, gameState, player))
-    {
-        return false;
-    }
-
-    // Validate action amount
-    if (!isActionAmountValid(action, bettingActions, smallBlind, gameState, player))
-    {
-        return false;
-    }
-
-    return true;
 }
 
 // Helper to compute the relative offset in the circular table
@@ -884,16 +595,6 @@ PlayerPosition computePositionFromOffset(int offset, int nbPlayers)
     default:
         return Unknown;
     }
-}
-
-static bool isDealerPosition(PlayerPosition p)
-{
-    return p == PlayerPosition::Button || p == PlayerPosition::ButtonSmallBlind;
-}
-
-static bool isSmallBlindPosition(PlayerPosition p)
-{
-    return p == PlayerPosition::SmallBlind || p == PlayerPosition::ButtonSmallBlind;
 }
 
 bool isRoundComplete(HandFsm& hand)

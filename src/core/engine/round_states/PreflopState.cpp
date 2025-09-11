@@ -4,11 +4,10 @@
 #include "HandFsm.h"
 #include "PostRiverState.h"
 #include "core/engine/Exception.h"
+#include "core/engine/Helpers.h"
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/model/PlayerPosition.h"
-#include "core/player/Helpers.h"
 #include "core/player/PlayerFsm.h"
-#include "core/player/deprecated/Player.h"
 #include "core/services/GlobalServices.h"
 
 namespace pkt::core
@@ -114,7 +113,7 @@ std::shared_ptr<player::PlayerFsm> PreflopState::getFirstPlayerToActInRound(cons
 bool PreflopState::isRoundComplete(const HandFsm& hand) const
 {
 
-    return pkt::core::player::isRoundComplete(const_cast<HandFsm&>(hand));
+    return pkt::core::isRoundComplete(const_cast<HandFsm&>(hand));
 }
 
 void PreflopState::setBlinds(HandFsm& hand)

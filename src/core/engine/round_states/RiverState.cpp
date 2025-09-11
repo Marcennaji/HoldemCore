@@ -2,8 +2,8 @@
 #include "GameEvents.h"
 #include "HandFsm.h"
 #include "PostRiverState.h"
+#include "core/engine/Helpers.h"
 #include "core/engine/model/PlayerAction.h"
-#include "core/player/Helpers.h"
 #include "core/player/PlayerFsm.h"
 #include "core/services/GlobalServices.h"
 
@@ -72,7 +72,7 @@ std::shared_ptr<player::PlayerFsm> RiverState::getFirstPlayerToActInRound(const 
 }
 bool RiverState::isRoundComplete(const HandFsm& hand) const
 {
-    return pkt::core::player::isRoundComplete(const_cast<HandFsm&>(hand));
+    return pkt::core::isRoundComplete(const_cast<HandFsm&>(hand));
 }
 
 void RiverState::logStateInfo(const HandFsm& /*hand*/) const

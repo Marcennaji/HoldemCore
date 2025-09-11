@@ -1,8 +1,8 @@
 // tests/BettingRoundsLegacyTest.cpp
 
 #include "BettingRoundsLegacyTest.h"
+#include "core/engine/deprecated/Helpers.h"
 #include "core/engine/model/PlayerAction.h"
-#include "core/player/Helpers.h"
 #include "core/services/GlobalServices.h"
 
 using namespace pkt::core;

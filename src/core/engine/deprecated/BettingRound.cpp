@@ -11,7 +11,7 @@
 #include <core/engine/CardUtilities.h>
 #include <core/player/deprecated/BotPlayer.h>
 #include <core/services/GlobalServices.h>
-#include "core/player/Helpers.h"
+#include "core/engine/deprecated/Helpers.h"
 
 namespace pkt::core
 {

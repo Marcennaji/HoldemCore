@@ -2,6 +2,7 @@
 
 #include "BettingRoundsFsmTest.h"
 #include "common/DeterministicStrategy.h"
+#include "core/engine/Helpers.h"
 #include "core/engine/model/PlayerAction.h"
 #include "core/player/Helpers.h"
 #include "core/services/GlobalServices.h"
@@ -373,7 +374,7 @@ TEST_F(BettingRoundsFsmTest, ValidActionsAreCorrectlyDetermined)
     auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
 
     // Check valid actions for SB after blinds are posted (after initialization)
-    auto validActionsSb = pkt::core::player::getValidActionsForPlayer(*myHandFsm, playerSb->getId());
+    auto validActionsSb = getValidActionsForPlayer(*myHandFsm, playerSb->getId());
     EXPECT_FALSE(validActionsSb.empty()) << "SB should have valid actions available";
 
     // SB should be able to fold, call (to match BB), or raise

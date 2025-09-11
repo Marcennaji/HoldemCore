@@ -13,7 +13,7 @@
 #include <core/player/range/RangeParser.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include <core/services/GlobalServices.h>
-#include "Helpers.h"
+#include "core/engine/deprecated/Helpers.h"
 
 #include <sstream>
 

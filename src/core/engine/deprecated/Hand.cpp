@@ -7,7 +7,7 @@
 #include "CardUtilities.h"
 #include "GameEvents.h"
 #include "core/engine/deprecated/ButtonState.h"
-#include "core/player/Helpers.h"
+#include "core/engine/deprecated/Helpers.h"
 
 #include "Exception.h"
 #include "model/EngineError.h"

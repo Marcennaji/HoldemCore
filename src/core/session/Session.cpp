@@ -14,8 +14,8 @@
 #include <core/player/strategy/TightAggressiveBotStrategy.h>
 #include <core/player/strategy/UltraTightBotStrategy.h>
 #include <core/services/GlobalServices.h>
+#include "core/engine/deprecated/Helpers.h"
 #include "core/player/DefaultPlayerFactory.h"
-#include "core/player/Helpers.h"
 #include "core/player/deprecated/HumanPlayer.h"
 #include "core/player/strategy/StrategyAssigner.h"
 
