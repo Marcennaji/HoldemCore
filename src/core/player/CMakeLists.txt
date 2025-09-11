@@ -1,5 +1,8 @@
 # Player logic
 
+# Add subdirectory for position management
+add_subdirectory(position)
+
 # Automatically collect all .cpp and .h files in the current directory
 file(GLOB_RECURSE PLAYER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
@@ -13,5 +16,5 @@ add_library(player ${PLAYER_SOURCES})
 target_include_directories(player PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src)
 
-# Link player to core
-target_link_libraries(player PUBLIC core)
+# Link player to core and new modules
+target_link_libraries(player PUBLIC core cards probability position)

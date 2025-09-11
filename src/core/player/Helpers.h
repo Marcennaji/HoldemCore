@@ -5,6 +5,12 @@
 
 #pragma once
 
+// Include the new focused modules
+#include "core/cards/CardRangeAnalyzer.h"
+#include "core/player/PlayerListUtils.h"
+#include "core/player/position/PositionManager.h"
+#include "core/probability/DrawProbabilityCalculator.h"
+
 #include "core/engine/model/GameState.h"
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/model/PlayerPosition.h"
@@ -20,17 +26,56 @@ struct PostFlopAnalysisFlags;
 
 namespace pkt::core::player
 {
-class Player;
 
-std::shared_ptr<PlayerFsm> getPlayerFsmById(PlayerFsmList list, unsigned id);
-PlayerFsmListIterator getPlayerFsmListIteratorById(PlayerFsmList list, unsigned id);
-void updateActingPlayersListFsm(PlayerFsmList&);
-bool isCardsInRange(std::string card1, std::string card2, std::string range);
-const int getDrawingProbability(const PostFlopAnalysisFlags& state);
-bool isDrawingProbOk(const PostFlopAnalysisFlags&, const int potOdd);
-int getBoardCardsHigherThan(std::string stringBoard, std::string card);
-bool hasPosition(PlayerPosition myPos, PlayerFsmList);
-int circularOffset(int fromId, int toId, const PlayerFsmList& players);
-PlayerPosition computePositionFromOffset(int offset, int nbPlayers);
+// Backward compatibility layer - delegates to the new modules
+inline std::shared_ptr<PlayerFsm> getPlayerFsmById(PlayerFsmList list, unsigned id)
+{
+    return PlayerListUtils::getPlayerFsmById(list, id);
+}
+
+inline PlayerFsmListIterator getPlayerFsmListIteratorById(PlayerFsmList list, unsigned id)
+{
+    return PlayerListUtils::getPlayerFsmListIteratorById(list, id);
+}
+
+inline void updateActingPlayersListFsm(PlayerFsmList& list)
+{
+    PlayerListUtils::updateActingPlayersListFsm(list);
+}
+
+inline bool isCardsInRange(const std::string& card1, const std::string& card2, const std::string& range)
+{
+    return pkt::core::cards::CardRangeAnalyzer::isCardsInRange(card1, card2, range);
+}
+
+inline int getDrawingProbability(const PostFlopAnalysisFlags& state)
+{
+    return pkt::core::probability::DrawProbabilityCalculator::getDrawingProbability(state);
+}
+
+inline bool isDrawingProbOk(const PostFlopAnalysisFlags& state, int potOdd)
+{
+    return pkt::core::probability::DrawProbabilityCalculator::isDrawingProbOk(state, potOdd);
+}
+
+inline int getBoardCardsHigherThan(const std::string& stringBoard, const std::string& card)
+{
+    return pkt::core::cards::CardRangeAnalyzer::getBoardCardsHigherThan(stringBoard, card);
+}
+
+inline bool hasPosition(PlayerPosition myPos, PlayerFsmList actingPlayers)
+{
+    return pkt::core::player::position::PositionManager::hasPosition(myPos, actingPlayers);
+}
+
+inline int playerDistanceCircularOffset(int fromId, int toId, const PlayerFsmList& players)
+{
+    return pkt::core::player::position::PositionManager::playerDistanceCircularOffset(fromId, toId, players);
+}
+
+inline PlayerPosition computePlayerPositionFromOffset(int offset, int nbPlayers)
+{
+    return pkt::core::player::position::PositionManager::computePlayerPositionFromOffset(offset, nbPlayers);
+}
 
 } // namespace pkt::core::player

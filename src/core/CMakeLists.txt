@@ -1,8 +1,10 @@
 # Core game logic
 
 # Add subdirectories
+add_subdirectory(cards)
 add_subdirectory(engine)
 add_subdirectory(player)
+add_subdirectory(probability)
 add_subdirectory(session)
 add_subdirectory(services)
 
@@ -11,8 +13,10 @@ add_library(core INTERFACE)
 
 # Include directories for core
 target_include_directories(core INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/cards
     ${CMAKE_CURRENT_SOURCE_DIR}/engine
     ${CMAKE_CURRENT_SOURCE_DIR}/player
+    ${CMAKE_CURRENT_SOURCE_DIR}/probability
     ${CMAKE_CURRENT_SOURCE_DIR}/services
     ${CMAKE_SOURCE_DIR}/src
 )

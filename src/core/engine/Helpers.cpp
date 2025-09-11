@@ -8,7 +8,6 @@
 #include "core/player/Helpers.h"
 #include "core/player/PlayerFsm.h"
 #include "core/services/GlobalServices.h"
-
 // Include FSM states for the helper function
 #include "core/engine/round_states/FlopState.h"
 #include "core/engine/round_states/PostRiverState.h"
@@ -18,9 +17,6 @@
 #include <algorithm>
 #include <cmath>
 #include <fstream>
-
-using namespace pkt::core;
-using namespace pkt::core::player;
 #include <random>
 #include <sstream>
 #include <string>

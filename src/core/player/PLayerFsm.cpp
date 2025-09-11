@@ -474,8 +474,8 @@ void PlayerFsm::setPosition(const HandFsm& hand)
     const int nbPlayers = players->size();
 
     // Compute relative offset clockwise from dealer
-    int offset = circularOffset(dealerId, myID, players);
-    myPosition = computePositionFromOffset(offset, nbPlayers);
+    int offset = playerDistanceCircularOffset(dealerId, myID, players);
+    myPosition = computePlayerPositionFromOffset(offset, nbPlayers);
 
     assert(myPosition != Unknown);
 }
