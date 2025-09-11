@@ -406,7 +406,6 @@ TEST_F(BettingRoundsFsmTest, ValidActionsAreCorrectlyDetermined)
 
 // - FirstToActPostflopIsLeftOfDealer
 // - AllActionsAreFromActivePlayersOnly
-// - NoTwoConsecutiveActionsBySamePlayerInRound
 // - NoPlayerStartsPostFlopRoundWithRaise
 // - NoPlayerBetsAfterRaise
 // - NoPlayerChecksAfterBetOrRaise

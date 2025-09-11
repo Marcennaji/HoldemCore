@@ -29,6 +29,22 @@ namespace pkt::core::player
 {
 using namespace std;
 
+// Forward declarations for internal helper functions
+static string getFakeCard(char c);
+static void ensureHighestCard(string& card1, string& card2);
+static bool isValidRange(const std::string& token);
+static bool isExactPair(const char* c1, const char* c2, const char* range);
+static bool isExactSuitedHand(const char* c1, const char* c2, const char* range);
+static bool isExactOffsuitedHand(const char* c1, const char* c2, const char* range);
+static bool isPairAndAbove(const string& card1, const string& card2, const char* range);
+static bool isOffsuitedAndAbove(const string& card1, const string& card2, const char* c1, const char* c2,
+                                const char* range);
+static bool isSuitedAndAbove(const string& card1, const string& card2, const char* c1, const char* c2,
+                             const char* range);
+static bool isExactHand(const string& card1, const string& card2, const char* range);
+static bool isDealerPosition(PlayerPosition p);
+static bool isSmallBlindPosition(PlayerPosition p);
+
 // values are odd %, according to the outs number. Array index is the number of outs
 static int outsOddsOneCard[] = {
     0,  2,  4,  6,  8,  11, /* 0 to 5 outs */
@@ -59,7 +75,7 @@ void shufflePlayers(std::list<std::shared_ptr<Player>>& players, unsigned humanI
     players.assign(v.begin(), v.end());
 }
 
-string getFakeCard(char c)
+static string getFakeCard(char c)
 {
 
     char tmp[3];
@@ -151,52 +167,54 @@ bool isCardsInRange(string card1, string card2, string ranges)
 
     return false;
 }
-void ensureHighestCard(string& card1, string& card2)
+static void ensureHighestCard(string& card1, string& card2)
 {
     if (CardUtilities::getCardValue(card1) < CardUtilities::getCardValue(card2))
     {
         std::swap(card1, card2);
     }
 }
-bool isValidRange(const std::string& token)
+static bool isValidRange(const std::string& token)
 {
     return !(token.size() == 1 || token.size() > 4);
 }
-bool isExactPair(const char* c1, const char* c2, const char* range)
+static bool isExactPair(const char* c1, const char* c2, const char* range)
 {
     return (strlen(range) == 2 && c1[0] == range[0] && c2[0] == range[1]);
 }
-bool isExactSuitedHand(const char* c1, const char* c2, const char* range)
+static bool isExactSuitedHand(const char* c1, const char* c2, const char* range)
 {
     return (strlen(range) == 3 && range[2] == 's' &&
             ((c1[0] == range[0] && c2[0] == range[1]) || (c1[0] == range[1] && c2[0] == range[0])) && (c1[1] == c2[1]));
 }
-bool isExactOffsuitedHand(const char* c1, const char* c2, const char* range)
+static bool isExactOffsuitedHand(const char* c1, const char* c2, const char* range)
 {
     return (strlen(range) == 3 && range[2] == 'o' &&
             ((c1[0] == range[0] && c2[0] == range[1]) || (c1[0] == range[1] && c2[0] == range[0])) && (c1[1] != c2[1]));
 }
-bool isPairAndAbove(const string& card1, const string& card2, const char* range)
+static bool isPairAndAbove(const string& card1, const string& card2, const char* range)
 {
     return (strlen(range) == 3 && range[0] == range[1] && range[2] == '+' &&
             CardUtilities::getCardValue(card1) == CardUtilities::getCardValue(card2) &&
             CardUtilities::getCardValue(card1) >= CardUtilities::getCardValue(getFakeCard(range[0])));
 }
-bool isOffsuitedAndAbove(const string& card1, const string& card2, const char* c1, const char* c2, const char* range)
+static bool isOffsuitedAndAbove(const string& card1, const string& card2, const char* c1, const char* c2,
+                                const char* range)
 {
     return (strlen(range) == 4 && range[2] == 'o' && range[3] == '+' &&
             CardUtilities::getCardValue(card1) == CardUtilities::getCardValue(getFakeCard(range[0])) &&
             CardUtilities::getCardValue(card2) >= CardUtilities::getCardValue(getFakeCard(range[1])) &&
             CardUtilities::getCardValue(card2) < CardUtilities::getCardValue(card1) && c1[1] != c2[1]);
 }
-bool isSuitedAndAbove(const string& card1, const string& card2, const char* c1, const char* c2, const char* range)
+static bool isSuitedAndAbove(const string& card1, const string& card2, const char* c1, const char* c2,
+                             const char* range)
 {
     return (strlen(range) == 4 && range[2] == 's' && range[3] == '+' &&
             CardUtilities::getCardValue(card1) == CardUtilities::getCardValue(getFakeCard(range[0])) &&
             CardUtilities::getCardValue(card2) >= CardUtilities::getCardValue(getFakeCard(range[1])) &&
             CardUtilities::getCardValue(card2) < CardUtilities::getCardValue(card1) && c1[1] == c2[1]);
 }
-bool isExactHand(const string& card1, const string& card2, const char* range)
+static bool isExactHand(const string& card1, const string& card2, const char* range)
 {
     if (strlen(range) == 4 && range[2] != 's' && range[2] != 'o')
     {
@@ -614,6 +632,105 @@ std::vector<ActionType> getValidActionsForPlayer(const PlayerFsmList& actingPlay
     return validActions;
 }
 
+// Helper function to check for consecutive actions by the same player
+bool isConsecutiveActionAllowed(const BettingActions& bettingActions, const PlayerAction& action,
+                                const GameState gameState)
+{
+    const auto& handHistory = bettingActions.getHandActionHistory();
+    for (const auto& round : handHistory)
+    {
+        if (round.round == gameState && !round.actions.empty())
+        {
+            // Get the last action in this round
+            const auto& lastAction = round.actions.back();
+            if (lastAction.first == action.playerId)
+            {
+                GlobalServices::instance().logger().error(gameStateToString(gameState) + ": Player " +
+                                                          std::to_string(action.playerId) +
+                                                          " cannot act twice consecutively in the same round");
+                return false;
+            }
+            break;
+        }
+    }
+    return true;
+}
+
+// Helper function to check if action type is valid for the player
+bool isActionTypeValid(const PlayerFsmList& actingPlayersList, const PlayerAction& action,
+                       const BettingActions& bettingActions, int smallBlind, const GameState gameState,
+                       const std::shared_ptr<PlayerFsm>& player)
+{
+    std::vector<ActionType> validActions =
+        getValidActionsForPlayer(actingPlayersList, action.playerId, bettingActions, smallBlind, gameState);
+
+    bool isValid = std::find(validActions.begin(), validActions.end(), action.type) != validActions.end();
+
+    if (!isValid)
+    {
+        GlobalServices::instance().logger().error(gameStateToString(gameState) + ": Invalid action type for player " +
+                                                  player->getName() + " : " + playerActionToString(action.type));
+    }
+
+    return isValid;
+}
+
+// Helper function to validate action amounts
+bool isActionAmountValid(const PlayerAction& action, const BettingActions& bettingActions, int smallBlind,
+                         const GameState gameState, const std::shared_ptr<PlayerFsm>& player)
+{
+    const int currentHighestBet = bettingActions.getRoundHighestSet();
+    const int playerBet = player->getCurrentHandActions().getRoundTotalBetAmount(gameState);
+
+    bool isValid = true;
+
+    switch (action.type)
+    {
+    case ActionType::Fold:
+        // Fold doesn't require amount validation
+        break;
+
+    case ActionType::Check:
+        isValid = (action.amount == 0);
+        break;
+
+    case ActionType::Call:
+        // Amount will be calculated by the system
+        break;
+
+    case ActionType::Bet:
+        isValid = (action.amount > 0 && action.amount <= player->getCash());
+        break;
+
+    case ActionType::Raise:
+    {
+        isValid = (action.amount > currentHighestBet);
+
+        int minRaise = bettingActions.getMinRaise(smallBlind);
+        isValid = (isValid && action.amount >= currentHighestBet + minRaise);
+
+        const int extraChipsRequired = action.amount - playerBet;
+        isValid = (isValid && extraChipsRequired <= player->getCash());
+        break;
+    }
+    case ActionType::Allin:
+        // All-in doesn't require specific amount validation
+        break;
+
+    default:
+        isValid = false;
+    }
+
+    if (!isValid)
+    {
+        GlobalServices::instance().logger().error(
+            gameStateToString(gameState) + ": Invalid action amount for player " + std::to_string(action.playerId) +
+            " : " + playerActionToString(action.type) + " with amount = " + std::to_string(action.amount));
+    }
+
+    return isValid;
+}
+
 bool validatePlayerAction(const PlayerFsmList& actingPlayersList, const PlayerAction& action,
                           const BettingActions& bettingActions, int smallBlind, const GameState gameState)
 {
@@ -625,71 +742,25 @@ bool validatePlayerAction(const PlayerFsmList& actingPlayersList, const PlayerAc
         return false;
     }
 
-    // Get valid actions for the player
-    std::vector<ActionType> validActions =
-        getValidActionsForPlayer(actingPlayersList, action.playerId, bettingActions, smallBlind, gameState);
-
-    // Check if the action type is in the list of valid actions
-    bool isActionTypeValid = std::find(validActions.begin(), validActions.end(), action.type) != validActions.end();
-
-    if (!isActionTypeValid)
+    // Validate consecutive actions
+    if (!isConsecutiveActionAllowed(bettingActions, action, gameState))
     {
-        GlobalServices::instance().logger().error(gameStateToString(gameState) + ": Invalid action type for player " +
-                                                  player->getName() + " : " + playerActionToString(action.type));
         return false;
     }
 
-    // Additional validation for actions that require specific amounts
-    const int currentHighestBet = bettingActions.getRoundHighestSet();
-    const int playerBet = player->getCurrentHandActions().getRoundTotalBetAmount(gameState);
-
-    bool isActionValid = true;
-
-    switch (action.type)
+    // Validate action type
+    if (!isActionTypeValid(actingPlayersList, action, bettingActions, smallBlind, gameState, player))
     {
-    case ActionType::Fold:
-        // Fold doesn't require amount validation
-        break;
-
-    case ActionType::Check:
-        isActionValid = (action.amount == 0);
-        break;
-
-    case ActionType::Call:
-        // Amount will be calculated by the system
-        break;
-
-    case ActionType::Bet:
-        isActionValid = (action.amount > 0 && action.amount <= player->getCash());
-        break;
-
-    case ActionType::Raise:
-    {
-        isActionValid = (action.amount > currentHighestBet);
-
-        int minRaise = bettingActions.getMinRaise(smallBlind);
-        isActionValid = (isActionValid && action.amount >= currentHighestBet + minRaise);
-
-        const int extraChipsRequired = action.amount - playerBet;
-        isActionValid = (isActionValid && extraChipsRequired <= player->getCash());
-        break;
-    }
-    case ActionType::Allin:
-        // All-in doesn't require specific amount validation
-        break;
-
-    default:
-        isActionValid = false;
+        return false;
     }
 
-    if (!isActionValid)
+    // Validate action amount
+    if (!isActionAmountValid(action, bettingActions, smallBlind, gameState, player))
     {
-        GlobalServices::instance().logger().error(
-            gameStateToString(gameState) + ": Invalid action amount for player " + std::to_string(action.playerId) +
-            " : " + playerActionToString(action.type) + " with amount = " + std::to_string(action.amount));
+        return false;
     }
 
-    return isActionValid;
+    return true;
 }
 
 // Helper to compute the relative offset in the circular table
@@ -815,12 +886,12 @@ PlayerPosition computePositionFromOffset(int offset, int nbPlayers)
     }
 }
 
-bool isDealerPosition(PlayerPosition p)
+static bool isDealerPosition(PlayerPosition p)
 {
     return p == PlayerPosition::Button || p == PlayerPosition::ButtonSmallBlind;
 }
 
-bool isSmallBlindPosition(PlayerPosition p)
+static bool isSmallBlindPosition(PlayerPosition p)
 {
     return p == PlayerPosition::SmallBlind || p == PlayerPosition::ButtonSmallBlind;
 }

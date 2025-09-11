@@ -22,6 +22,7 @@ void ActionsPreflopTest::SetUp()
 {
     EngineTest::SetUp();
     myEvents.clear();
+    myEvents.onBettingRoundStarted = [&](GameState state) { myLastGameState = state; };
 }
 
 void ActionsPreflopTest::TearDown()
@@ -349,6 +350,49 @@ TEST_F(ActionsPreflopTest, ValidatePlayerActionInvalidPlayerId)
 
     EXPECT_FALSE(isValid) << "Action should be invalid for non-existent player";
 }
+TEST_F(ActionsPreflopTest, NoTwoConsecutiveActionsBySamePlayerInRound)
+{
+    logTestMessage("Testing that engine prevents consecutive actions by same player");
+
+    setupThreePlayerScenario();
+
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
+
+    // This should succeed (dealer acts first in 3-player scenario)
+    myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Call});
+
+    // this should be ignored as duplicate (dealer acting again consecutively)
+    myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Call});
+
+    // this should succeed
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
+
+    // this should be ignored as duplicate (SB acting again consecutively)
+    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Raise, 50});
+
+    EXPECT_EQ(myLastGameState, Preflop);
+
+    const auto& history = myHandFsm->getHandActionHistory();
+
+    // Verify no consecutive actions exist in the history
+    int nbActions = 0;
+    for (const auto& round : history)
+    {
+        unsigned lastPlayerId = std::numeric_limits<unsigned>::max();
+
+        for (const auto& [playerId, action] : round.actions)
+        {
+            EXPECT_NE(playerId, lastPlayerId) << "No consecutive actions should exist in history - found player "
+                                              << playerId << " acting after player " << lastPlayerId;
+            lastPlayerId = playerId;
+            nbActions++;
+        }
+    }
+    EXPECT_EQ(4, nbActions) << "There should be only 4 valid actions in history (BB post, SB post, dealer call, SB "
+                               "call), invalid actions ignored";
+}
 
 // ==================== Integration Tests ====================
 
@@ -434,6 +478,7 @@ void ActionsPostflopTest::SetUp()
 {
     EngineTest::SetUp();
     myEvents.clear();
+    myEvents.onBettingRoundStarted = [&](GameState state) { myLastGameState = state; };
 }
 
 void ActionsPostflopTest::TearDown()
@@ -477,7 +522,8 @@ void ActionsPostflopTest::advanceToPostflop(GameState targetState)
     // Now we should be at Flop
     EXPECT_EQ(myHandFsm->getGameState(), GameState::Flop);
 
-    if (targetState == GameState::Flop) {
+    if (targetState == GameState::Flop)
+    {
         return; // We're done
     }
 
@@ -486,7 +532,8 @@ void ActionsPostflopTest::advanceToPostflop(GameState targetState)
     simulatePlayerAction(playerBb->getId(), ActionType::Check);
     EXPECT_EQ(myHandFsm->getGameState(), GameState::Turn);
 
-    if (targetState == GameState::Turn) {
+    if (targetState == GameState::Turn)
+    {
         return; // We're done
     }
 
@@ -555,8 +602,10 @@ TEST_F(ActionsPostflopTest, GetValidActionsForPlayerAfterBet)
     EXPECT_TRUE(containsAction(validActions, ActionType::Allin)) << "Player should be able to go all-in";
 
     // Player facing bet should NOT be able to check or bet
-    EXPECT_TRUE(doesNotContainAction(validActions, ActionType::Check)) << "Player should NOT be able to check when facing bet";
-    EXPECT_TRUE(doesNotContainAction(validActions, ActionType::Bet)) << "Player should NOT be able to bet when facing bet";
+    EXPECT_TRUE(doesNotContainAction(validActions, ActionType::Check))
+        << "Player should NOT be able to check when facing bet";
+    EXPECT_TRUE(doesNotContainAction(validActions, ActionType::Bet))
+        << "Player should NOT be able to bet when facing bet";
 }
 
 TEST_F(ActionsPostflopTest, GetValidActionsForPlayerAfterCheck)
@@ -583,8 +632,10 @@ TEST_F(ActionsPostflopTest, GetValidActionsForPlayerAfterCheck)
     EXPECT_TRUE(containsAction(validActions, ActionType::Fold)) << "Player should be able to fold";
 
     // Player after check should NOT be able to call or raise
-    EXPECT_TRUE(doesNotContainAction(validActions, ActionType::Call)) << "Player should NOT be able to call after check";
-    EXPECT_TRUE(doesNotContainAction(validActions, ActionType::Raise)) << "Player should NOT be able to raise after check";
+    EXPECT_TRUE(doesNotContainAction(validActions, ActionType::Call))
+        << "Player should NOT be able to call after check";
+    EXPECT_TRUE(doesNotContainAction(validActions, ActionType::Raise))
+        << "Player should NOT be able to raise after check";
 }
 
 TEST_F(ActionsPostflopTest, GetValidActionsForPlayerWithLimitedCashPostflop)
@@ -609,10 +660,15 @@ TEST_F(ActionsPostflopTest, GetValidActionsForPlayerWithLimitedCashPostflop)
     EXPECT_TRUE(containsAction(validActions, ActionType::Allin)) << "Player should be able to go all-in";
 
     // Player might be able to bet if they have enough chips
-    if (playerSb->getCash() >= myHandFsm->getSmallBlind()) {
-        EXPECT_TRUE(containsAction(validActions, ActionType::Bet)) << "Player with sufficient cash should be able to bet";
-    } else {
-        EXPECT_TRUE(doesNotContainAction(validActions, ActionType::Bet)) << "Player with insufficient cash should NOT be able to bet";
+    if (playerSb->getCash() >= myHandFsm->getSmallBlind())
+    {
+        EXPECT_TRUE(containsAction(validActions, ActionType::Bet))
+            << "Player with sufficient cash should be able to bet";
+    }
+    else
+    {
+        EXPECT_TRUE(doesNotContainAction(validActions, ActionType::Bet))
+            << "Player with insufficient cash should NOT be able to bet";
     }
 }
 
@@ -707,7 +763,8 @@ TEST_F(ActionsPostflopTest, IntegrationPostflopValidActionsMatchValidation)
         }
         else if (actionType == ActionType::Raise)
         {
-            amount = myHandFsm->getSmallBlind() * 4; // Valid raise amount (though this shouldn't happen for first to act)
+            amount =
+                myHandFsm->getSmallBlind() * 4; // Valid raise amount (though this shouldn't happen for first to act)
         }
         else if (actionType == ActionType::Allin)
         {
