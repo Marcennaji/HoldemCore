@@ -32,7 +32,7 @@ Maintained by **Marc Ennaji**, freelance **senior software engineer**
 ## 🧱 Architecture Highlights
 
 ### 1. **Decoupled C++ Engine** (`src/core/`)
-- **Fully UI-independent** 
+- **Fully UI-independent**, thanks to an hexagonal architecture (ports & adapters)
 - Manages game state, hand resolution, betting rounds, player actions
 - Event-driven via plain `GameEvents` callback struct
 
@@ -104,10 +104,9 @@ player.setStrategy(std::make_unique<MyCustomBotStrategy>());
   The original version reused portions of the open-source **PokerTH** (GPLv2) engine, with a focus on adding **poker bot strategies and AI logic**.  
 
 - **2025 (today)** — Migrated to GitHub and undergoing a **major architectural rewrite**.  
-  The legacy PokerTH code is being **progressively refactored and replaced** with a new **FSM-driven, modular architecture**, designed for **testability** and to support multiple UIs (Qt Widgets, QML, and web frontends).  
+  The legacy PokerTH code (layered architecture, boost library-dependent) has been **progressively refactored and replaced** with a new **FSM-driven, modular architecture** (hexagonal architecture, pure C++), designed for **testability** and to support multiple UIs (Qt Widgets, QML, and web frontends).  
 
-The ongoing refactor is replacing all legacy code — the engine is evolving into a **fully original, modern architecture**.  
-Since it is still under heavy development, no public release or announcement has been made yet.  
+The ongoing refactor has replaced almost all legacy code. Since it is still under refactoring for the core engine, and since UI development is still on progress, no public release or announcement has been made yet.  
 
 ✅ Core engine is now headless  
 ✅ `GameEvents` decouples UI from logic  
@@ -120,51 +119,12 @@ Since it is still under heavy development, no public release or announcement has
 ## 📋 Roadmap 
 
 **Short-term**
-- Finalize FSM-based hand street transitions
+- Enhance testing on the new FSM-based hand street transitions, and remove the remaining legacy code
 - Redesign Qt Widgets table UI with a modern layout
-- Expand unit test coverage to the entire core engine
-- Continue major refactoring, or removal, of remaining legacy components
-
 
 **Medium-term**
 - Implement WebSocket server & JSON protocol
 - Build Flutter UIs for Android and Web
-
----
-
-## 📁 Project Structure (Simplified)
-```
-src/
-├── core/             # Engine logic
-│   ├── engine/       # Hand, board, betting, evaluator
-│   ├── events/       # GameEvents definition
-│   ├── player/       # Player, BotStrategy
-│   ├── session/      # Session & game management
-├── ui/
-│   └── qtwidgets/    # Qt Widgets UI
-├── server/           # WebSocket server (planned)
-├── tests/            # Unit tests and end-to-end tests
-└── third_party/      # External dependencies
-```
-
----
-
-## 💻 Building & Running
-
-### Requirements
-- CMake 3.15+
-- C++17 compiler
-- Qt6 (only if building the qt UI)
-- (Optional) GoogleTest for running tests
-
-### Build Instructions
-```bash
-git clone https://github.com/Marcennaji/PokerTraining.git
-cd PokerTraining
-mkdir build && cd build
-cmake ..
-make
-```
 
 ---
 
