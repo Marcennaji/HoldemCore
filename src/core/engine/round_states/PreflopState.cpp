@@ -134,6 +134,11 @@ void PreflopState::setBlinds(HandFsm& hand)
 
             // Record blind post in hand-level chronological history
             hand.getBettingActions()->recordPlayerAction(getGameState(), blindAction);
+
+            if (myEvents.onPlayerActed)
+            {
+                myEvents.onPlayerActed(blindAction);
+            }
         }
     }
 }

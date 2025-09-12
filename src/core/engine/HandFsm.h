@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <memory>
 #include "PlayerFsm.h"
 #include "core/engine/HandPlayersState.h"
@@ -54,6 +55,18 @@ class HandFsm : public IHandLifecycle, public IHandPlayerAction, public HandPlay
 
   private:
     void applyActionEffects(const PlayerAction action);
+    void fireOnPotUpdated() const;
+    std::string getActionValidationError(const PlayerAction& action) const;
+    PlayerAction getDefaultActionForPlayer(unsigned playerId) const;
+    void resetInvalidActionCount(unsigned playerId);
+    bool shouldAutoFoldPlayer(unsigned playerId) const;
+
+    // New focused methods for handlePlayerAction refactoring
+    void validateGameState() const;
+    IActionProcessor* getActionProcessorOrThrow() const;
+    void handleInvalidAction(const PlayerAction& action);
+    void handleAutoFold(unsigned playerId);
+    void processValidAction(const PlayerAction& action);
 
     std::shared_ptr<EngineFactory> myFactory;
     const GameEvents& myEvents;
@@ -63,6 +76,11 @@ class HandFsm : public IHandLifecycle, public IHandPlayerAction, public HandPlay
     int myStartQuantityPlayers;
     int myStartCash;
     int mySmallBlind;
+
+    // Error handling state
+    std::map<unsigned, int> myInvalidActionCounts;    // Track invalid actions per player
+    static const int MAX_INVALID_ACTIONS = 3;         // Max invalid actions before auto-fold
+    static const int MAX_GAME_LOOP_ITERATIONS = 1000; // Emergency brake for infinite loops
 
     bool myAllInCondition{false};
     bool myCardsShown{false};

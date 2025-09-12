@@ -56,7 +56,6 @@ void EngineTest::createPlayersLists(size_t playerCount)
 }
 void EngineTest::initializeHandWithPlayers(size_t activePlayerCount, GameData gameData)
 {
-    myHand.reset();
     createPlayersLists(activePlayerCount);
     myBoard = myFactory->createBoard(startDealerPlayerId);
     myBoard->setSeatsList(mySeatsList);
@@ -85,7 +84,6 @@ void EngineTest::createPlayersFsmLists(size_t playerCount)
 }
 void EngineTest::initializeHandFsmWithPlayers(size_t activePlayerCount, GameData gameData)
 {
-    myHandFsm.reset();
     createPlayersFsmLists(activePlayerCount);
     myBoardFsm = myFactory->createBoardFsm(startDealerPlayerId);
     myBoardFsm->setSeatsListFsm(mySeatsListFsm);

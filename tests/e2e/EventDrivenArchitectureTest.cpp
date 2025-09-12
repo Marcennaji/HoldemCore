@@ -21,6 +21,8 @@ void MockUI::clear()
     gameStates.clear();
     chipUpdates.clear();
     potUpdates.clear();
+    invalidActions.clear();
+    engineErrors.clear();
     awaitingHumanInput = false;
     gameInitialized = false;
     gameSpeed = 0;
@@ -61,7 +63,10 @@ void EventDrivenArchitectureTest::SetUp()
 {
     EngineTest::SetUp();
     mockUI = std::make_unique<MockUI>();
-
+    createGameEvents();
+}
+void EventDrivenArchitectureTest::createGameEvents()
+{
     // Clear existing events and set up our mock UI events
     // This follows the pattern from BettingRoundsFsmTest
     myEvents.clear();
@@ -72,36 +77,19 @@ void EventDrivenArchitectureTest::SetUp()
         mockUI->gameSpeed = speed;
     };
 
-    // Store events in local variables to avoid potential reference issues
-    std::vector<GameState> capturedStates;
-    std::vector<PlayerAction> capturedActions;
-    std::vector<int> capturedPots;
-    std::vector<std::pair<unsigned, int>> capturedChips;
+    myEvents.onBettingRoundStarted = [this](GameState state) { mockUI->bettingRoundsStarted.push_back(state); };
 
-    myEvents.onBettingRoundStarted = [&capturedStates](GameState state)
-    {
-        std::cout << "[DEBUG] onBettingRoundStarted fired: " << static_cast<int>(state) << std::endl;
-        capturedStates.push_back(state);
-    };
+    myEvents.onPlayerActed = [this](PlayerAction action) { mockUI->playerActions.push_back(action); };
 
-    myEvents.onPlayerActed = [&capturedActions](PlayerAction action)
-    {
-        std::cout << "[DEBUG] onPlayerActed fired: player=" << action.playerId
-                  << " action=" << static_cast<int>(action.type) << " amount=" << action.amount << std::endl;
-        capturedActions.push_back(action);
-    };
+    myEvents.onPotUpdated = [this](int newPot) { mockUI->potUpdates.push_back(newPot); };
 
-    myEvents.onPotUpdated = [&capturedPots](int newPot)
-    {
-        std::cout << "[DEBUG] onPotUpdated fired: " << newPot << std::endl;
-        capturedPots.push_back(newPot);
-    };
+    myEvents.onPlayerChipsUpdated = [this](unsigned playerId, int newChips)
+    { mockUI->chipUpdates.push_back({playerId, newChips}); };
 
-    myEvents.onPlayerChipsUpdated = [&capturedChips](unsigned playerId, int newChips)
-    {
-        std::cout << "[DEBUG] onPlayerChipsUpdated fired: player=" << playerId << " chips=" << newChips << std::endl;
-        capturedChips.push_back({playerId, newChips});
-    };
+    myEvents.onInvalidPlayerAction = [this](unsigned playerId, PlayerAction invalidAction, std::string reason)
+    { mockUI->invalidActions.push_back({playerId, invalidAction, reason}); };
+
+    myEvents.onEngineError = [this](std::string errorMessage) { mockUI->engineErrors.push_back(errorMessage); };
 
     myEvents.onAwaitingHumanInput = [this]() { mockUI->awaitingHumanInput = true; };
 }
@@ -110,7 +98,7 @@ void EventDrivenArchitectureTest::SetUp()
  * Test that engine fires events when betting rounds start
  * UI should know game state transitions without calling engine
  */
-TEST_F(EventDrivenArchitectureTest, DISABLED_EngineFiresBettingRoundEvents)
+TEST_F(EventDrivenArchitectureTest, EngineFiresBettingRoundEvents)
 {
     initializeHandFsmWithPlayers(2, gameData);
 
@@ -119,9 +107,6 @@ TEST_F(EventDrivenArchitectureTest, DISABLED_EngineFiresBettingRoundEvents)
     auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
     sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Fold});
     playerSb->setStrategy(std::move(sbStrategy));
-
-    // Clear events before running
-    mockUI->clear();
 
     // Run the hand
     myHandFsm->runGameLoop();
@@ -150,7 +135,7 @@ TEST_F(EventDrivenArchitectureTest, DISABLED_EngineFiresBettingRoundEvents)
  * Test that engine fires events when players act
  * UI should track all actions without polling engine
  */
-TEST_F(EventDrivenArchitectureTest, DISABLED_EngineFiresPlayerActionEvents)
+TEST_F(EventDrivenArchitectureTest, EngineFiresPlayerActionEvents)
 {
     initializeHandFsmWithPlayers(2, gameData);
 
@@ -171,9 +156,6 @@ TEST_F(EventDrivenArchitectureTest, DISABLED_EngineFiresPlayerActionEvents)
     bbStrategy->setLastAction(GameState::Turn, {playerBb->getId(), ActionType::Check});
     bbStrategy->setLastAction(GameState::River, {playerBb->getId(), ActionType::Check});
     playerBb->setStrategy(std::move(bbStrategy));
-
-    // Clear events before running
-    mockUI->clear();
 
     // Run the hand
     myHandFsm->runGameLoop();
@@ -207,12 +189,14 @@ TEST_F(EventDrivenArchitectureTest, DISABLED_EngineFiresPlayerActionEvents)
  */
 TEST_F(EventDrivenArchitectureTest, DISABLED_UICannotDetermineValidActions)
 {
+    // Clear events before initializing the game
+    mockUI->clear();
+
     // This test is disabled because it highlights the current limitation
     // In proper hexagonal architecture, the UI should know valid actions
     // for the current player through events, not by calling the engine directly
 
     initializeHandFsmWithPlayers(2, gameData);
-    mockUI->clear();
 
     // What's missing for true hexagonal architecture:
     // 1. onPlayerTurnStarted(playerId, validActions, gameContext) event
@@ -227,22 +211,22 @@ TEST_F(EventDrivenArchitectureTest, DISABLED_UICannotDetermineValidActions)
 /**
  * Test that UI can track pot changes through events
  */
-TEST_F(EventDrivenArchitectureTest, DISABLED_UIReceivesPotUpdates)
+TEST_F(EventDrivenArchitectureTest, UIReceivesPotUpdates)
 {
     initializeHandFsmWithPlayers(2, gameData);
 
-    // Configure strategies for quick hand
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+
     auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
-    sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Fold});
+    sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Call});
     playerSb->setStrategy(std::move(sbStrategy));
 
-    mockUI->clear();
+    auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    bbStrategy->setLastAction(GameState::Preflop, {playerBb->getId(), ActionType::Check});
 
-    // Run hand to generate pot updates
     myHandFsm->runGameLoop();
 
-    // UI should receive pot updates
     EXPECT_FALSE(mockUI->potUpdates.empty()) << "UI should receive pot updates through events";
 }
 
@@ -253,15 +237,11 @@ TEST_F(EventDrivenArchitectureTest, DISABLED_UIReceivesChipUpdates)
 {
     initializeHandFsmWithPlayers(2, gameData);
 
-    // Configure strategies for quick hand
     auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
     auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
     sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Fold});
     playerSb->setStrategy(std::move(sbStrategy));
 
-    mockUI->clear();
-
-    // Run hand to generate chip updates
     myHandFsm->runGameLoop();
 
     // UI should receive chip updates for affected players
@@ -278,97 +258,84 @@ TEST_F(EventDrivenArchitectureTest, DISABLED_UIReceivesChipUpdates)
 }
 
 /**
- * SUMMARY TEST: Documents current state of event-driven architecture
- * This test validates what events work vs what's missing for proper hexagonal architecture
+ * Test error handling - invalid player actions should fire error events
  */
-TEST_F(EventDrivenArchitectureTest, ArchitecturalComplianceSummary)
+TEST_F(EventDrivenArchitectureTest, EngineFiresErrorEvents)
 {
-    // Store events in local variables to avoid potential reference issues
-    std::vector<GameState> capturedStates;
-    std::vector<PlayerAction> capturedActions;
-    std::vector<int> capturedPots;
-    std::vector<std::pair<unsigned, int>> capturedChips;
-
-    // Override event handlers to capture directly
-    myEvents.onBettingRoundStarted = [&capturedStates](GameState state)
-    {
-        std::cout << "[DEBUG] onBettingRoundStarted fired: " << static_cast<int>(state) << std::endl;
-        capturedStates.push_back(state);
-    };
-
-    myEvents.onPlayerActed = [&capturedActions](PlayerAction action)
-    {
-        std::cout << "[DEBUG] onPlayerActed fired: player=" << action.playerId
-                  << " action=" << static_cast<int>(action.type) << " amount=" << action.amount << std::endl;
-        capturedActions.push_back(action);
-    };
-
-    myEvents.onPotUpdated = [&capturedPots](int newPot)
-    {
-        std::cout << "[DEBUG] onPotUpdated fired: " << newPot << std::endl;
-        capturedPots.push_back(newPot);
-    };
-
-    myEvents.onPlayerChipsUpdated = [&capturedChips](unsigned playerId, int newChips)
-    {
-        std::cout << "[DEBUG] onPlayerChipsUpdated fired: player=" << playerId << " chips=" << newChips << std::endl;
-        capturedChips.push_back({playerId, newChips});
-    };
+    // Clear events before initializing the game
+    mockUI->clear();
 
     initializeHandFsmWithPlayers(2, gameData);
 
-    // Configure simple fold scenario to test all event types
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
-    sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Fold});
-    playerSb->setStrategy(std::move(sbStrategy));
+    // Try to make an invalid action (player not in turn)
+    PlayerAction invalidAction;
+    invalidAction.playerId = 99; // Non-existent player
+    invalidAction.type = ActionType::Fold;
+    invalidAction.amount = 0;
 
-    // Run hand to trigger all possible events
-    myHandFsm->runGameLoop();
+    // This should trigger an error event
+    myHandFsm->handlePlayerAction(invalidAction);
 
-    // === WORKING EVENTS (Architectural compliance) ===
-    EXPECT_FALSE(capturedStates.empty()) << "✅ onBettingRoundStarted works - UI can track game state transitions";
+    // Check that error was captured
+    EXPECT_FALSE(mockUI->invalidActions.empty()) << "UI should receive invalid action events";
 
-    // Debug: print all received states
-    std::cout << "[DEBUG] Received " << capturedStates.size() << " betting round events:" << std::endl;
-    for (size_t i = 0; i < capturedStates.size(); ++i)
+    if (!mockUI->invalidActions.empty())
     {
-        std::cout << "  [" << i << "] = " << static_cast<int>(capturedStates[i]) << std::endl;
+        const auto& errorData = mockUI->invalidActions[0];
+        EXPECT_EQ(errorData.playerId, 99u) << "Error should contain the invalid player ID";
+        EXPECT_FALSE(errorData.reason.empty()) << "Error should contain a descriptive reason";
+    }
+}
+
+/**
+ * Test infinite loop prevention - repeated invalid actions should trigger auto-fold
+ */
+TEST_F(EventDrivenArchitectureTest, EngineAutoFoldsAfterRepeatedInvalidActions)
+{
+    // Clear events before initializing the game
+    mockUI->clear();
+
+    initializeHandFsmWithPlayers(2, gameData);
+
+    // Get the first player who should act (small blind)
+    auto processor = myHandFsm->getActionProcessor();
+    ASSERT_NE(processor, nullptr) << "Should have action processor in preflop";
+
+    auto currentPlayer = processor->getNextPlayerToAct(*myHandFsm);
+    ASSERT_NE(currentPlayer, nullptr) << "Should have a player to act";
+
+    unsigned playerToAct = currentPlayer->getId();
+
+    // Create an invalid action (trying to check when there's a bet to call)
+    PlayerAction invalidAction;
+    invalidAction.playerId = playerToAct;
+    invalidAction.type = ActionType::Check; // Invalid because big blind was posted
+    invalidAction.amount = 0;
+
+    // Submit the same invalid action multiple times
+    for (int i = 0; i < 3; ++i) // Exactly MAX_INVALID_ACTIONS (3)
+    {
+        myHandFsm->handlePlayerAction(invalidAction);
     }
 
-    EXPECT_GE(capturedStates.size(), 2u) << "Should have at least Preflop and PostRiver";
+    // One more should trigger auto-fold
+    myHandFsm->handlePlayerAction(invalidAction);
 
-    // Check if we have Preflop and PostRiver (order might vary)
-    bool hasPreflop = false;
-    bool hasPostRiver = false;
-    for (auto state : capturedStates)
+    // Check that we received error events
+    EXPECT_GE(mockUI->invalidActions.size(), 3u) << "Should receive multiple invalid action events";
+
+    // Check that an engine error was fired (auto-fold notification)
+    EXPECT_FALSE(mockUI->engineErrors.empty()) << "Should receive engine error about auto-fold";
+
+    // Check that a player action was eventually fired (the auto-fold)
+    EXPECT_FALSE(mockUI->playerActions.empty()) << "Should receive the auto-fold action event";
+
+    if (!mockUI->playerActions.empty())
     {
-        if (state == GameState::Preflop)
-            hasPreflop = true;
-        if (state == GameState::PostRiver)
-            hasPostRiver = true;
+        const auto& autoFoldAction = mockUI->playerActions.back();
+        EXPECT_EQ(autoFoldAction.playerId, playerToAct) << "Auto-fold should be for the problematic player";
+        EXPECT_EQ(autoFoldAction.type, ActionType::Fold) << "Auto-action should be a fold";
     }
-    EXPECT_TRUE(hasPreflop) << "✅ UI receives Preflop start event";
-    EXPECT_TRUE(hasPostRiver) << "✅ UI receives PostRiver end event";
-
-    // === MISSING EVENTS (Architectural violations) ===
-    EXPECT_TRUE(capturedActions.empty())
-        << "❌ onPlayerActed never fires - UI cannot track player actions without polling engine!";
-
-    EXPECT_TRUE(capturedPots.empty()) << "❌ onPotUpdated never fires - UI cannot track pot without polling engine!";
-
-    EXPECT_TRUE(capturedChips.empty())
-        << "❌ onPlayerChipsUpdated never fires - UI cannot track chip stacks without polling engine!";
-
-    // === CONCLUSION FOR HEXAGONAL ARCHITECTURE ===
-    // The current engine provides PARTIAL event support:
-    // ✅ Game state transitions (betting rounds)
-    // ❌ Player actions (blinds, bets, calls, folds, etc.)
-    // ❌ Financial state (pot, chip stacks)
-    // ❌ Player turn information (who acts next, valid actions)
-    //
-    // For true hexagonal architecture, the UI needs ALL game information through events,
-    // not just state transitions. Current gaps force UI to poll engine directly.
 }
 
 } // namespace pkt::test

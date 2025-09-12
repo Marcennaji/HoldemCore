@@ -104,7 +104,7 @@ player.setStrategy(std::make_unique<MyCustomBotStrategy>());
   The original version reused portions of the open-source **PokerTH** (GPLv2) engine, with a focus on adding **poker bot strategies and AI logic**.  
 
 - **2025 (today)** — Migrated to GitHub and undergoing a **major architectural rewrite**.  
-  The legacy PokerTH code (layered architecture, boost library-dependent) has been **progressively refactored and replaced** with a new **FSM-driven, modular architecture** (hexagonal architecture, pure C++), designed for **testability** and to support multiple UIs (Qt Widgets, QML, and web frontends).  
+  The legacy PokerTH code (layered architecture, using Boost C++ library) has been **progressively refactored and replaced** with a new **FSM-driven, modular architecture** (hexagonal architecture, pure standard C++), designed for **testability** and to support multiple UIs (Qt Widgets, QML, and web frontends).  
 
 The ongoing refactor has replaced almost all legacy code. Since it is still under refactoring for the core engine, and since UI development is still on progress, no public release or announcement has been made yet.  
 

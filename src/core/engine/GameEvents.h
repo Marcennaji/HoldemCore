@@ -25,6 +25,10 @@ struct GameEvents
     std::function<void(PlayerAction)> onPlayerActed;
     std::function<void(int playerId, bool isActive)> onPlayerStatusChanged;
 
+    // Error handling events
+    std::function<void(unsigned playerId, PlayerAction invalidAction, std::string reason)> onInvalidPlayerAction;
+    std::function<void(std::string errorMessage)> onEngineError;
+
     std::function<void()> onAwaitingHumanInput;
 
     std::function<void()> onShowdownStarted;

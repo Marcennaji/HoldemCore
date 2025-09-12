@@ -79,8 +79,12 @@ void HandFsm::runGameLoop()
     // Automatic game loop
     // This method drives the game forward by prompting players for actions
 
-    while (!myState->isTerminal())
+    int iterationCount = 0; // Emergency brake for infinite loops
+
+    while (!myState->isTerminal() && iterationCount < MAX_GAME_LOOP_ITERATIONS)
     {
+        iterationCount++;
+
         if (auto* processor = dynamic_cast<IActionProcessor*>(myState.get()))
         {
             auto nextPlayer = processor->getNextPlayerToAct(*this);
@@ -101,6 +105,22 @@ void HandFsm::runGameLoop()
         }
     }
 
+    // Check if we hit the emergency brake
+    if (iterationCount >= MAX_GAME_LOOP_ITERATIONS)
+    {
+        GlobalServices::instance().logger().error("Game loop hit maximum iterations (" +
+                                                  std::to_string(MAX_GAME_LOOP_ITERATIONS) +
+                                                  "), terminating to prevent infinite loop");
+
+        if (myEvents.onEngineError)
+        {
+            myEvents.onEngineError("Game loop terminated due to possible infinite loop");
+        }
+
+        // Force terminate the game
+        return;
+    }
+
     if (myState->isTerminal())
     {
         end();
@@ -109,29 +129,16 @@ void HandFsm::runGameLoop()
 
 void HandFsm::handlePlayerAction(PlayerAction action)
 {
-    if (!myState)
-        return;
+    validateGameState();
+    auto* processor = getActionProcessorOrThrow();
 
-    if (auto* processor = dynamic_cast<IActionProcessor*>(myState.get()))
+    if (!processor->isActionAllowed(*this, action))
     {
-        if (!processor->isActionAllowed(*this, action))
-            return;
-
-        applyActionEffects(action);
-
-        auto next = processor->computeNextState(*this);
-        if (next)
-        {
-            myState->exit(*this);
-            myState = std::move(next);
-            myState->enter(*this);
-            if (myState->isTerminal())
-            {
-                myState->exit(*this);
-                end();
-            }
-        }
+        handleInvalidAction(action);
+        return;
     }
+
+    processValidAction(action);
 }
 void HandFsm::applyActionEffects(const PlayerAction action)
 {
@@ -168,6 +175,7 @@ void HandFsm::applyActionEffects(const PlayerAction action)
 
         actionForHistory.amount = amountToCall; // store the actual call amount
         player->addBetAmount(amountToCall);
+        fireOnPotUpdated();
         break;
     }
 
@@ -176,6 +184,7 @@ void HandFsm::applyActionEffects(const PlayerAction action)
         int raiseIncrement = action.amount - playerBet;
         actionForHistory.amount = raiseIncrement; // store only the increment in history
         player->addBetAmount(raiseIncrement);
+        fireOnPotUpdated();
         getBettingActions()->updateRoundHighestSet(action.amount);
         getBettingActions()->getPreflop().setLastRaiserId(player->getId());
         break;
@@ -185,6 +194,7 @@ void HandFsm::applyActionEffects(const PlayerAction action)
     {
         // For bet, the amount is already the increment
         player->addBetAmount(action.amount);
+        fireOnPotUpdated();
         getBettingActions()->updateRoundHighestSet(action.amount);
         break;
     }
@@ -201,6 +211,7 @@ void HandFsm::applyActionEffects(const PlayerAction action)
         actionForHistory.amount = allinIncrement; // store only the increment in history
 
         player->addBetAmount(allinIncrement);
+        fireOnPotUpdated();
         player->setCash(0);
 
         if (allinIncrement > currentHighest)
@@ -222,6 +233,11 @@ void HandFsm::applyActionEffects(const PlayerAction action)
     getBettingActions()->recordPlayerAction(myState->getGameState(), actionForHistory);
 
     updateActingPlayersListFsm(myActingPlayersList);
+
+    if (myEvents.onPlayerActed)
+    {
+        myEvents.onPlayerActed(action);
+    }
 }
 
 void HandFsm::initAndShuffleDeck()
@@ -392,6 +408,218 @@ IActionProcessor* HandFsm::getActionProcessor() const
 int HandFsm::getSmallBlind() const
 {
     return mySmallBlind;
+}
+void HandFsm::fireOnPotUpdated() const
+{
+    if (myEvents.onPotUpdated)
+    {
+        myEvents.onPotUpdated(myBoard->getPot(*this));
+    }
+}
+
+std::string HandFsm::getActionValidationError(const PlayerAction& action) const
+{
+    if (!myState)
+    {
+        return "Game state is invalid";
+    }
+
+    auto* processor = dynamic_cast<IActionProcessor*>(myState.get());
+    if (!processor)
+    {
+        return "Current game state does not accept player actions";
+    }
+
+    auto player = getPlayerFsmById(myActingPlayersList, action.playerId);
+    if (!player)
+    {
+        return "Player not found in active players list";
+    }
+
+    // Check if it's the player's turn
+    auto currentPlayer = processor->getNextPlayerToAct(*this);
+    if (!currentPlayer || currentPlayer->getId() != action.playerId)
+    {
+        return "It's not this player's turn to act";
+    }
+
+    // Check specific action validation based on type
+    switch (action.type)
+    {
+    case ActionType::Fold:
+        return "Fold action is always valid"; // This shouldn't be called for valid folds
+
+    case ActionType::Check:
+        if (getBettingActions()->getRoundHighestSet() >
+            player->getCurrentHandActions().getRoundTotalBetAmount(myState->getGameState()))
+        {
+            return "Cannot check when there is a bet to call";
+        }
+        break;
+
+    case ActionType::Call:
+        if (getBettingActions()->getRoundHighestSet() <=
+            player->getCurrentHandActions().getRoundTotalBetAmount(myState->getGameState()))
+        {
+            return "Cannot call when no bet needs to be called";
+        }
+        break;
+
+    case ActionType::Raise:
+        if (action.amount <= getBettingActions()->getRoundHighestSet())
+        {
+            return "Raise amount must be higher than current highest bet";
+        }
+        if (action.amount >
+            player->getCash() + player->getCurrentHandActions().getRoundTotalBetAmount(myState->getGameState()))
+        {
+            return "Raise amount exceeds available chips";
+        }
+        break;
+
+    case ActionType::Bet:
+        if (getBettingActions()->getRoundHighestSet() > 0)
+        {
+            return "Cannot bet when there is already a bet in this round";
+        }
+        if (action.amount > player->getCash())
+        {
+            return "Bet amount exceeds available chips";
+        }
+        break;
+
+    case ActionType::Allin:
+        // All-in is generally valid if player has chips
+        if (player->getCash() <= 0)
+        {
+            return "Cannot go all-in with no chips";
+        }
+        break;
+
+    default:
+        return "Unknown or unsupported action type";
+    }
+
+    return "Action validation failed for unknown reason";
+}
+
+PlayerAction HandFsm::getDefaultActionForPlayer(unsigned playerId) const
+{
+    PlayerAction defaultAction;
+    defaultAction.playerId = playerId;
+    defaultAction.type = ActionType::Fold; // Default to fold for safety
+    defaultAction.amount = 0;
+    return defaultAction;
+}
+
+void HandFsm::resetInvalidActionCount(unsigned playerId)
+{
+    myInvalidActionCounts[playerId] = 0;
+}
+
+bool HandFsm::shouldAutoFoldPlayer(unsigned playerId) const
+{
+    auto it = myInvalidActionCounts.find(playerId);
+    return (it != myInvalidActionCounts.end() && it->second >= MAX_INVALID_ACTIONS);
+}
+
+void HandFsm::validateGameState() const
+{
+    if (!myState)
+    {
+        throw Exception(__FILE__, __LINE__, EngineError::PlayerActionError);
+    }
+}
+
+IActionProcessor* HandFsm::getActionProcessorOrThrow() const
+{
+    auto* processor = dynamic_cast<IActionProcessor*>(myState.get());
+    if (!processor)
+    {
+        // Current state doesn't support actions - this is a programming error
+        throw Exception(__FILE__, __LINE__, EngineError::PlayerActionError);
+    }
+    return processor;
+}
+
+void HandFsm::handleInvalidAction(const PlayerAction& action)
+{
+    // Track invalid action attempts
+    myInvalidActionCounts[action.playerId]++;
+
+    // Fire event to notify UI of invalid action
+    if (myEvents.onInvalidPlayerAction)
+    {
+        std::string reason = getActionValidationError(action);
+        myEvents.onInvalidPlayerAction(action.playerId, action, reason);
+    }
+
+    GlobalServices::instance().logger().error("Invalid action from player " + std::to_string(action.playerId) +
+                                              " (attempt " + std::to_string(myInvalidActionCounts[action.playerId]) +
+                                              "): " + getActionValidationError(action));
+
+    // Check if player should be auto-folded due to repeated invalid actions
+    if (shouldAutoFoldPlayer(action.playerId))
+    {
+        handleAutoFold(action.playerId);
+    }
+}
+
+void HandFsm::handleAutoFold(unsigned playerId)
+{
+    GlobalServices::instance().logger().error("Player " + std::to_string(playerId) +
+                                              " exceeded maximum invalid actions, auto-folding");
+
+    // Create a fold action as default
+    PlayerAction autoFoldAction = getDefaultActionForPlayer(playerId);
+
+    if (myEvents.onEngineError)
+    {
+        myEvents.onEngineError("Player " + std::to_string(playerId) + " auto-folded due to repeated invalid actions");
+    }
+
+    // Reset counter and process the auto-fold
+    resetInvalidActionCount(playerId);
+
+    // Recursively call with the auto-fold action
+    handlePlayerAction(autoFoldAction);
+}
+
+void HandFsm::processValidAction(const PlayerAction& action)
+{
+    try
+    {
+        // Reset invalid action count on successful action
+        resetInvalidActionCount(action.playerId);
+
+        applyActionEffects(action);
+
+        auto* processor = getActionProcessorOrThrow();
+        auto next = processor->computeNextState(*this);
+        if (next)
+        {
+            myState->exit(*this);
+            myState = std::move(next);
+            myState->enter(*this);
+            if (myState->isTerminal())
+            {
+                myState->exit(*this);
+                end();
+            }
+        }
+    }
+    catch (const std::exception& e)
+    {
+        if (myEvents.onEngineError)
+        {
+            myEvents.onEngineError("Error processing player action: " + std::string(e.what()));
+        }
+
+        GlobalServices::instance().logger().error("Error in handlePlayerAction: " + std::string(e.what()));
+
+        // Re-throw critical errors
+        throw;
+    }
 }
 
 } // namespace pkt::core

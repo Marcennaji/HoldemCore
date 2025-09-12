@@ -49,12 +49,21 @@ class MockUI
     std::vector<std::pair<unsigned, int>> chipUpdates;
     std::vector<int> potUpdates;
 
+    // Error event tracking
+    struct InvalidActionData
+    {
+        unsigned playerId;
+        core::PlayerAction action;
+        std::string reason;
+    };
+    std::vector<InvalidActionData> invalidActions;
+    std::vector<std::string> engineErrors;
+
     bool awaitingHumanInput = false;
     bool gameInitialized = false;
     int gameSpeed = 0;
 
     void clear();
-    core::GameEvents createGameEvents();
 
     // Analysis methods - what a real UI would need to know
     bool canDetermineCurrentPlayer() const;
@@ -67,6 +76,7 @@ class EventDrivenArchitectureTest : public EngineTest
 {
   protected:
     void SetUp() override;
+    void createGameEvents();
 
     std::unique_ptr<MockUI> mockUI;
 };
