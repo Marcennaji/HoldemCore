@@ -7,9 +7,8 @@ namespace pkt::core::player
 
 PlayerAction HumanStrategy::decideAction(const CurrentHandContext& ctx)
 {
-    // TODO: We need a way to get the HandFsm reference to calculate valid actions
-    // For now, fire the event with empty valid actions
-    std::vector<ActionType> validActions = {}; // Placeholder
+    // Get valid actions from the context (calculated during updateCurrentHandContext)
+    const std::vector<ActionType>& validActions = ctx.commonContext.validActions;
 
     // Fire event to notify UI with player ID and valid actions
     if (myEvents.onAwaitingHumanInput)

@@ -6,8 +6,8 @@
 
 #include <core/engine/CardUtilities.h>
 #include <core/engine/HandEvaluator.h>
-
 #include <core/engine/HandFsm.h>
+#include <core/engine/Helpers.h>
 #include <core/engine/model/Ranges.h>
 #include <core/interfaces/persistence/PlayersStatisticsStore.h>
 #include <core/player/range/RangeParser.h>
@@ -410,6 +410,9 @@ void PlayerFsm::updateCurrentHandContext(const GameState state, HandFsm& current
 {
     // common context
     myCurrentHandContext->commonContext = currentHand.updateHandCommonContext(state);
+
+    // Calculate valid actions for this specific player
+    myCurrentHandContext->commonContext.validActions = pkt::core::getValidActionsForPlayer(currentHand, myID);
 
     // Player-specific, visible from the opponents :
     myCurrentHandContext->personalContext.cash = myCash;

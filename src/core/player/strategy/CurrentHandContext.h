@@ -6,6 +6,7 @@
 #pragma once
 
 #include <core/player/deprecated/Player.h>
+#include "core/engine/model/PlayerAction.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/interfaces/IHandEvaluationEngine.h"
 
@@ -94,6 +95,7 @@ struct HandCommonContext
     std::string stringBoard; // string representation of the board's cards, for example "As Ks Qs"
     PlayersInHandContext playersContext;
     HandBettingContext bettingContext;
+    std::vector<ActionType> validActions; // valid actions for the current acting player
 };
 
 struct CurrentHandContext

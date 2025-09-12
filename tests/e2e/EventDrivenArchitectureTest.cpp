@@ -5,6 +5,7 @@
 #include "core/engine/HandFsm.h"
 #include "core/player/Helpers.h"
 #include "core/player/PlayerFsm.h"
+#include "core/player/strategy/HumanStrategy.h"
 #include "core/services/GlobalServices.h"
 
 using namespace pkt::core;
@@ -30,30 +31,23 @@ void MockUI::clear()
 
 bool MockUI::canDetermineCurrentPlayer() const
 {
-    // Can the UI determine who should act next based on events?
     return !playerActions.empty() || !bettingRoundsStarted.empty();
 }
 
 bool MockUI::hasValidActionsForCurrentPlayer() const
 {
-    // Does the UI know what actions are valid for current player?
-    // Now we can determine this from human input requests!
     return !humanInputRequests.empty();
 }
 
 bool MockUI::canDisplayGameState() const
 {
-    // Can the UI display current game state without calling engine?
     return !gameStates.empty() || gameInitialized;
 }
 
 unsigned MockUI::getCurrentPlayerFromEvents() const
 {
-    // Try to determine current player from events alone
     if (!playerActions.empty())
     {
-        // Would need next player logic, but that requires engine knowledge
-        // This shows the architectural problem!
         return playerActions.back().playerId;
     }
     return 0;
@@ -67,8 +61,6 @@ void EventDrivenArchitectureTest::SetUp()
 }
 void EventDrivenArchitectureTest::createGameEvents()
 {
-    // Clear existing events and set up our mock UI events
-    // This follows the pattern from BettingRoundsFsmTest
     myEvents.clear();
 
     myEvents.onGameInitialized = [this](int speed)
@@ -185,37 +177,49 @@ TEST_F(EventDrivenArchitectureTest, EngineFiresPlayerActionEvents)
 }
 
 /**
- * Test that UI can determine valid actions through human input events
- * This validates proper hexagonal architecture for human player interaction
+ * Test that UI receives real human input events with calculated valid actions
+ * This validates that the engine fires onAwaitingHumanInput with actual valid actions
+ * calculated from the current game state when a human player needs to act
  */
 TEST_F(EventDrivenArchitectureTest, UIReceivesHumanInputEvents)
 {
     initializeHandFsmWithPlayers(2, gameData);
 
-    // Verify the event infrastructure is ready for human input
-    EXPECT_TRUE(myEvents.onAwaitingHumanInput != nullptr) << "onAwaitingHumanInput event should be properly configured";
+    // Get the first player who should act (small blind)
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
 
-    // Test that we can simulate the event firing
-    std::vector<ActionType> testValidActions = {ActionType::Call, ActionType::Fold, ActionType::Raise};
-    if (myEvents.onAwaitingHumanInput)
-    {
-        myEvents.onAwaitingHumanInput(0, testValidActions);
-    }
+    // Set up the test strategy for small blind
+    auto testStrategy = std::make_unique<TestHumanEventStrategy>(myEvents);
+    playerSb->setStrategy(std::move(testStrategy));
 
-    // Verify the UI received the human input request
+    myHandFsm->runGameLoop();
+
+    // Verify the UI received the human input request with real valid actions
     EXPECT_EQ(mockUI->humanInputRequests.size(), 1u) << "UI should receive human input request";
-    EXPECT_EQ(mockUI->humanInputRequests[0].playerId, 0u) << "Player ID should match";
-    EXPECT_EQ(mockUI->humanInputRequests[0].validActions.size(), 3u) << "Should receive all valid actions";
+    EXPECT_EQ(mockUI->humanInputRequests[0].playerId, playerSb->getId()) << "Player ID should match the small blind";
 
-    // Verify specific actions are included
     const auto& receivedActions = mockUI->humanInputRequests[0].validActions;
-    EXPECT_TRUE(std::find(receivedActions.begin(), receivedActions.end(), ActionType::Call) != receivedActions.end());
-    EXPECT_TRUE(std::find(receivedActions.begin(), receivedActions.end(), ActionType::Fold) != receivedActions.end());
-    EXPECT_TRUE(std::find(receivedActions.begin(), receivedActions.end(), ActionType::Raise) != receivedActions.end());
+    EXPECT_FALSE(receivedActions.empty()) << "Should receive actual calculated valid actions";
 
-    // Now the UI can determine valid actions
-    EXPECT_TRUE(mockUI->hasValidActionsForCurrentPlayer())
-        << "UI should be able to determine valid actions through events";
+    // In preflop with big blind posted, small blind should be able to:
+    // - Fold (always available)
+    // - Call (to match big blind)
+    // - Raise (if has enough chips)
+    // - Allin (if has chips)
+    EXPECT_EQ(receivedActions.size(), 4u) << "Should receive 4 valid actions preflop for small blind";
+
+    EXPECT_TRUE(std::find(receivedActions.begin(), receivedActions.end(), ActionType::Fold) != receivedActions.end())
+        << "Fold should always be available";
+
+    EXPECT_TRUE(std::find(receivedActions.begin(), receivedActions.end(), ActionType::Call) != receivedActions.end())
+        << "Call should be available to match big blind";
+
+    EXPECT_TRUE(std::find(receivedActions.begin(), receivedActions.end(), ActionType::Allin) != receivedActions.end())
+        << "Allin should be available if player has chips";
+
+    EXPECT_TRUE(std::find(receivedActions.begin(), receivedActions.end(), ActionType::Raise) != receivedActions.end())
+        << "Raise should be available if player has enough chips";
 }
 
 /**

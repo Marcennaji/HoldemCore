@@ -45,4 +45,27 @@ class DeterministicStrategy : public pkt::core::player::BotStrategy
 
     std::unordered_map<pkt::core::GameState, pkt::core::PlayerAction> myActions;
 };
+
+// test strategy that will fire the human input event when asked to decide,
+// and then provide a deterministic action so the test can continue
+class TestHumanEventStrategy : public pkt::test::DeterministicStrategy
+{
+  private:
+    const pkt::core::GameEvents& myEvents;
+
+  public:
+    TestHumanEventStrategy(const pkt::core::GameEvents& events) : myEvents(events) {}
+
+    pkt::core::PlayerAction decideAction(const CurrentHandContext& ctx) override
+    {
+        // Fire the human input event with real valid actions from context
+        if (myEvents.onAwaitingHumanInput)
+        {
+            myEvents.onAwaitingHumanInput(ctx.personalContext.id, ctx.commonContext.validActions);
+        }
+
+        // Then return a deterministic action to let the test continue
+        return {ctx.personalContext.id, pkt::core::ActionType::Fold};
+    }
+};
 } // namespace pkt::test
