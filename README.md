@@ -22,13 +22,16 @@ It is also designed for **bot developers** to easily implement and test custom p
 - C++20 compatible compiler
 - Qt 6.x (optional, only for GUI)
 
-### Build & Run
+### Build & Test
 ```bash
 git clone https://github.com/Marcennaji/PokerTraining.git
 cd PokerTraining
 cmake --preset debug-widgets
 cmake --build build/debug-widgets
-./build/debug-widgets/bin/PokerTraining
+
+# Run tests to verify the build
+.\build\debug-widgets\tests\unit_tests.exe
+.\build\debug-widgets\tests\e2e_tests.exe
 ```
 
 ---
