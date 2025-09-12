@@ -15,6 +15,23 @@ It is also designed for **bot developers** to easily implement and test custom p
 - Run entirely offline (desktop, mobile, or CLI)
 
 ---
+## 🚀 Quick Start
+
+### Prerequisites
+- CMake 3.20+
+- C++20 compatible compiler
+- Qt 6.x (optional, only for GUI)
+
+### Build & Run
+```bash
+git clone https://github.com/Marcennaji/PokerTraining.git
+cd PokerTraining
+cmake --preset debug-widgets
+cmake --build build/debug-widgets
+./build/debug-widgets/bin/PokerTraining
+```
+
+---
 
 ## 👨‍💻 About the Author
 
@@ -32,7 +49,7 @@ Maintained by **Marc Ennaji**, freelance **senior software engineer**
 ## 🧱 Architecture Highlights
 
 ### 1. **Decoupled C++ Engine** (`src/core/`)
-- **Fully UI-independent**, thanks to an hexagonal architecture (ports & adapters)
+- **Fully UI-independent**, thanks to a hexagonal architecture (ports & adapters)
 - Manages game state, hand resolution, betting rounds, player actions
 - Event-driven via plain `GameEvents` callback struct
 
@@ -80,7 +97,7 @@ player.setStrategy(std::make_unique<MyCustomBotStrategy>());
 - Flexible preflop/streets decision logic
 
 ### 5. **Finite State Machine for Streets**
-- Ongoing refactor to model hand progress:
+- FSM model hand progress:
   - Preflop → Flop → Turn → River → PostRiver
 - Ensures predictable and maintainable game flow
 
@@ -90,7 +107,7 @@ player.setStrategy(std::make_unique<MyCustomBotStrategy>());
 ---
 
 ## 🔧 Technologies Used
-- **C++17**
+- **C++20**
 - **Qt Widgets** (current UI)
 - **GoogleTest**
 - **uWebSockets** (planned WebSocket server)
@@ -101,17 +118,19 @@ player.setStrategy(std::make_unique<MyCustomBotStrategy>());
 ## 🕰 Project History and Current Status — *Ongoing refactoring with FSM-based core redesign*
 
 - **2011** — Initial version published on SourceForge (5⭐ project, >11,000 downloads).  
-  The original version reused portions of the open-source **PokerTH** (GPLv2) engine, with a focus on adding **poker bot strategies and AI logic**.  
+  The original version reused portions of the open-source **PokerTH** (GPLv2) engine, with a focus on creating **poker bot strategies and AI logic** (the existing PokerTH builtin bot AI was not reused at all).  
 
 - **2025 (today)** — Migrated to GitHub and undergoing a **major architectural rewrite**.  
   The legacy PokerTH code (layered architecture, using Boost C++ library) has been **progressively refactored and replaced** with a new **FSM-driven, modular architecture** (hexagonal architecture, pure standard C++), designed for **testability** and to support multiple UIs (Qt Widgets, QML, and web frontends).  
 
-The ongoing refactor has replaced almost all legacy code. Since it is still under refactoring for the core engine, and since UI development is still on progress, no public release or announcement has been made yet.  
+The ongoing refactor has replaced almost all legacy code. 
+
+🚧 Since it is still under refactoring for the core engine, and since UI development is still on progress, no public release or announcement has been made yet.  
 
 ✅ Core engine is now headless  
 ✅ `GameEvents` decouples UI from logic  
 ✅ Minimalistic `BotStrategy` API with overridable defaults  
-✅ FSM-based street handling in progress  
+✅ FSM-based street handling has been achieved  
 
 
 ---
