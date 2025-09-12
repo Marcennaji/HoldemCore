@@ -169,7 +169,7 @@ void Player::setPosition()
 
     assert(myPosition != Unknown);
 }
-std::string Player::getPositionLabel(PlayerPosition p) const
+std::string Player::positionToString(PlayerPosition p) const
 {
 
     switch (p)

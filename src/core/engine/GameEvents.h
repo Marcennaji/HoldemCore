@@ -29,7 +29,7 @@ struct GameEvents
     std::function<void(unsigned playerId, PlayerAction invalidAction, std::string reason)> onInvalidPlayerAction;
     std::function<void(std::string errorMessage)> onEngineError;
 
-    std::function<void()> onAwaitingHumanInput;
+    std::function<void(unsigned playerId, std::vector<ActionType> validActions)> onAwaitingHumanInput;
 
     std::function<void()> onShowdownStarted;
     std::function<void()> onPauseHand;

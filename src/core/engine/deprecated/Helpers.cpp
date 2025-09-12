@@ -96,7 +96,7 @@ void updateActingPlayersList(PlayerList& myActingPlayersList)
     GlobalServices::instance().logger().verbose("Finished updating myActingPlayersList.");
 }
 
-std::string getPositionLabel(PlayerPosition p)
+std::string positionToString(PlayerPosition p)
 {
 
     switch (p)

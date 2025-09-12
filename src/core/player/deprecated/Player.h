@@ -82,7 +82,7 @@ class Player
 
     const PlayerPosition getPosition() const;
     void setPosition();
-    std::string getPositionLabel(PlayerPosition p) const;
+    std::string positionToString(PlayerPosition p) const;
 
     static bool hasPosition(PlayerPosition myPos, PlayerList actingPlayers);
 

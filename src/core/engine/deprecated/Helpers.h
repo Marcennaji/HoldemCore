@@ -21,7 +21,7 @@ pkt::core::player::PlayerListIterator findPlayerOrThrow(pkt::core::player::Playe
 pkt::core::player::PlayerListIterator nextActivePlayer(pkt::core::player::PlayerList seats,
                                                        pkt::core::player::PlayerListIterator it);
 void updateActingPlayersList(pkt::core::player::PlayerList&);
-std::string getPositionLabel(pkt::core::PlayerPosition);
+std::string positionToString(pkt::core::PlayerPosition);
 std::shared_ptr<pkt::core::player::Player> getPlayerById(pkt::core::player::PlayerList list, unsigned id);
 pkt::core::player::PlayerListIterator getPlayerListIteratorById(pkt::core::player::PlayerList list, unsigned id);
 void shufflePlayers(std::list<std::shared_ptr<pkt::core::player::Player>>& players, unsigned humanId);

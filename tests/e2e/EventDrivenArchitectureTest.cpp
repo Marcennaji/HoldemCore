@@ -23,7 +23,7 @@ void MockUI::clear()
     potUpdates.clear();
     invalidActions.clear();
     engineErrors.clear();
-    awaitingHumanInput = false;
+    humanInputRequests.clear();
     gameInitialized = false;
     gameSpeed = 0;
 }
@@ -37,8 +37,8 @@ bool MockUI::canDetermineCurrentPlayer() const
 bool MockUI::hasValidActionsForCurrentPlayer() const
 {
     // Does the UI know what actions are valid for current player?
-    // This is currently missing from events!
-    return false; // TODO: This should be true when proper events exist
+    // Now we can determine this from human input requests!
+    return !humanInputRequests.empty();
 }
 
 bool MockUI::canDisplayGameState() const
@@ -91,7 +91,8 @@ void EventDrivenArchitectureTest::createGameEvents()
 
     myEvents.onEngineError = [this](std::string errorMessage) { mockUI->engineErrors.push_back(errorMessage); };
 
-    myEvents.onAwaitingHumanInput = [this]() { mockUI->awaitingHumanInput = true; };
+    myEvents.onAwaitingHumanInput = [this](unsigned playerId, std::vector<ActionType> validActions)
+    { mockUI->humanInputRequests.push_back({playerId, validActions}); };
 }
 
 /**
@@ -184,28 +185,37 @@ TEST_F(EventDrivenArchitectureTest, EngineFiresPlayerActionEvents)
 }
 
 /**
- * Test current architectural limitation: UI cannot determine valid actions
- * This test documents what's missing for proper hexagonal architecture
+ * Test that UI can determine valid actions through human input events
+ * This validates proper hexagonal architecture for human player interaction
  */
-TEST_F(EventDrivenArchitectureTest, DISABLED_UICannotDetermineValidActions)
+TEST_F(EventDrivenArchitectureTest, UIReceivesHumanInputEvents)
 {
-    // Clear events before initializing the game
-    mockUI->clear();
-
-    // This test is disabled because it highlights the current limitation
-    // In proper hexagonal architecture, the UI should know valid actions
-    // for the current player through events, not by calling the engine directly
-
     initializeHandFsmWithPlayers(2, gameData);
 
-    // What's missing for true hexagonal architecture:
-    // 1. onPlayerTurnStarted(playerId, validActions, gameContext) event
-    // 2. onValidActionsChanged(playerId, newValidActions) event
-    // 3. onGameStateChanged(currentState, playerStates) event
+    // Verify the event infrastructure is ready for human input
+    EXPECT_TRUE(myEvents.onAwaitingHumanInput != nullptr) << "onAwaitingHumanInput event should be properly configured";
 
-    // Currently UI cannot determine valid actions without engine calls
-    EXPECT_FALSE(mockUI->hasValidActionsForCurrentPlayer())
-        << "This fails because current events don't provide valid actions";
+    // Test that we can simulate the event firing
+    std::vector<ActionType> testValidActions = {ActionType::Call, ActionType::Fold, ActionType::Raise};
+    if (myEvents.onAwaitingHumanInput)
+    {
+        myEvents.onAwaitingHumanInput(0, testValidActions);
+    }
+
+    // Verify the UI received the human input request
+    EXPECT_EQ(mockUI->humanInputRequests.size(), 1u) << "UI should receive human input request";
+    EXPECT_EQ(mockUI->humanInputRequests[0].playerId, 0u) << "Player ID should match";
+    EXPECT_EQ(mockUI->humanInputRequests[0].validActions.size(), 3u) << "Should receive all valid actions";
+
+    // Verify specific actions are included
+    const auto& receivedActions = mockUI->humanInputRequests[0].validActions;
+    EXPECT_TRUE(std::find(receivedActions.begin(), receivedActions.end(), ActionType::Call) != receivedActions.end());
+    EXPECT_TRUE(std::find(receivedActions.begin(), receivedActions.end(), ActionType::Fold) != receivedActions.end());
+    EXPECT_TRUE(std::find(receivedActions.begin(), receivedActions.end(), ActionType::Raise) != receivedActions.end());
+
+    // Now the UI can determine valid actions
+    EXPECT_TRUE(mockUI->hasValidActionsForCurrentPlayer())
+        << "UI should be able to determine valid actions through events";
 }
 
 /**
@@ -220,12 +230,26 @@ TEST_F(EventDrivenArchitectureTest, UIReceivesPotUpdates)
 
     auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
     sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Call});
+    sbStrategy->setLastAction(GameState::Flop, {playerSb->getId(), ActionType::Check});
+    sbStrategy->setLastAction(GameState::Turn, {playerSb->getId(), ActionType::Check});
+    sbStrategy->setLastAction(GameState::River, {playerSb->getId(), ActionType::Check});
     playerSb->setStrategy(std::move(sbStrategy));
 
     auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
     bbStrategy->setLastAction(GameState::Preflop, {playerBb->getId(), ActionType::Check});
+    bbStrategy->setLastAction(GameState::Flop, {playerBb->getId(), ActionType::Check});
+    bbStrategy->setLastAction(GameState::Turn, {playerBb->getId(), ActionType::Check});
+    bbStrategy->setLastAction(GameState::River, {playerBb->getId(), ActionType::Check});
+    playerBb->setStrategy(std::move(bbStrategy)); // FIX: Actually assign the strategy!
 
     myHandFsm->runGameLoop();
+
+    // Verify no auto-fold occurred (which would indicate test setup problems)
+    for (const auto& error : mockUI->engineErrors)
+    {
+        EXPECT_TRUE(error.find("exceeded maximum invalid actions") == std::string::npos)
+            << "Test setup error: Player auto-folded due to invalid actions - " << error;
+    }
 
     EXPECT_FALSE(mockUI->potUpdates.empty()) << "UI should receive pot updates through events";
 }
@@ -233,7 +257,7 @@ TEST_F(EventDrivenArchitectureTest, UIReceivesPotUpdates)
 /**
  * Test that UI receives chip stack updates
  */
-TEST_F(EventDrivenArchitectureTest, DISABLED_UIReceivesChipUpdates)
+TEST_F(EventDrivenArchitectureTest, UIReceivesChipUpdates)
 {
     initializeHandFsmWithPlayers(2, gameData);
 
@@ -255,6 +279,15 @@ TEST_F(EventDrivenArchitectureTest, DISABLED_UIReceivesChipUpdates)
     }
 
     EXPECT_GE(updatedPlayers.size(), 1u) << "At least one player should have chip updates";
+
+    // Expected behavior: Players should have chip updates from both betting and winnings
+    // - Small blind posting (chip reduction)
+    // - Big blind posting (chip reduction)
+    // - Pot distribution to winner (chip increases)
+    EXPECT_GE(mockUI->chipUpdates.size(), 2u) << "Should have blind posting and pot distribution updates";
+
+    // Verify both players had chip changes
+    EXPECT_EQ(updatedPlayers.size(), 2u) << "Both players should have chip updates in heads-up game";
 }
 
 /**

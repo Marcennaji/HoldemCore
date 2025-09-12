@@ -120,8 +120,10 @@ void GuiBridgeWidgets::connectEventsToUi(pkt::core::GameEvents& events)
        QMetaObject::invokeMethod(
            myPokerTableWindow, [this]() { myPokerTableWindow->activePlayerActionDone(); }, Qt::DirectConnection);
    };
-   events.onAwaitingHumanInput = [this]()
+   events.onAwaitingHumanInput = [this](unsigned playerId, const std::vector<ActionType>& validActions)
    {
+       // Store valid actions for UI to use when enabling/disabling buttons
+       // Note: This could be expanded to pass validActions to the UI method
        QMetaObject::invokeMethod(
            myPokerTableWindow, [this]() { myPokerTableWindow->doHumanAction(); }, Qt::DirectConnection);
    };

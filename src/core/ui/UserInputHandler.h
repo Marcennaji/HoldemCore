@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/engine/EngineDefs.h>
+#include <core/engine/deprecated/Helpers.h>
 #include <core/player/strategy/CurrentHandContext.h>
 
 #include <iostream>
@@ -28,7 +29,7 @@ class UserInputHandler
         while (!valid)
         {
             std::cout << "\n=== Your Turn ===\n";
-            std::cout << "Position: " << positionToString(ctx.personalContext.position) << "\n";
+            std::cout << "Position: " << pkt::core::positionToString(ctx.personalContext.position) << "\n";
             std::cout << "Pot size: " << ctx.commonContext.bettingContext.pot << "\n";
             std::cout << "Choose action: (c)all, (r)aise, (f)old, chec(k): ";
 

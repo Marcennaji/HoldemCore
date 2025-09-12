@@ -59,7 +59,14 @@ class MockUI
     std::vector<InvalidActionData> invalidActions;
     std::vector<std::string> engineErrors;
 
-    bool awaitingHumanInput = false;
+    // Human input events
+    struct HumanInputRequest
+    {
+        unsigned playerId;
+        std::vector<core::ActionType> validActions;
+    };
+    std::vector<HumanInputRequest> humanInputRequests;
+
     bool gameInitialized = false;
     int gameSpeed = 0;
 

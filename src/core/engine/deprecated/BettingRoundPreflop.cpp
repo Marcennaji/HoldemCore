@@ -162,7 +162,11 @@ void BettingRoundPreflop::handlePlayerTurnEvents(PlayerListIterator it)
     if (!it->get()->isBot())
     {
         if (myEvents.onAwaitingHumanInput)
-            myEvents.onAwaitingHumanInput();
+        {
+            // Legacy code: provide empty valid actions since deprecated system doesn't calculate them
+            std::vector<ActionType> legacyValidActions = {};
+            myEvents.onAwaitingHumanInput(getCurrentPlayerTurnId(), legacyValidActions);
+        }
     }
     else
     {

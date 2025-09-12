@@ -1,6 +1,7 @@
 // PokerTraining — Texas Hold'em simulator
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
+#include <core/engine/deprecated/Helpers.h>
 #include <core/player/deprecated/BotPlayer.h>
 #include <core/player/strategy/BotStrategy.h>
 #include <core/player/strategy/CurrentHandContext.h>
@@ -129,7 +130,7 @@ void BotPlayer::doPreflopAction()
 
     // Log the current state
     std::ostringstream logMessage;
-    logMessage << "\tdoPreflopAction for " << getPositionLabel(myPosition) << "\t" << myName << "\t"
+    logMessage << "\tdoPreflopAction for " << pkt::core::positionToString(myPosition) << "\t" << myName << "\t"
                << getCardsValueString() << "\t"
                << "stack = " << myCash << ", stack when starting the betting round = " << myCashAtHandStart
                << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() << std::endl;
@@ -167,7 +168,7 @@ void BotPlayer::doFlopAction()
 
     // Log the current state
     std::ostringstream logMessage;
-    logMessage << "\tdoFlopAction for " << getPositionLabel(myPosition) << "\t" << myName << "\t"
+    logMessage << "\tdoFlopAction for " << pkt::core::positionToString(myPosition) << "\t" << myName << "\t"
                << getCardsValueString() << "\t"
                << "stack = " << myCash
                << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() << std::endl;
@@ -206,7 +207,7 @@ void BotPlayer::doTurnAction()
 
     // Log the current state
     std::ostringstream logMessage;
-    logMessage << "\tdoTurnAction for " << getPositionLabel(myPosition) << "\t" << myName << "\t"
+    logMessage << "\tdoTurnAction for " << pkt::core::positionToString(myPosition) << "\t" << myName << "\t"
                << getCardsValueString() << "\t"
                << "stack = " << myCash
                << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() << std::endl;
@@ -245,7 +246,7 @@ void BotPlayer::doRiverAction()
 
     // Log the current state
     std::ostringstream logMessage;
-    logMessage << "\tdoRiverAction for " << getPositionLabel(myPosition) << "\t" << myName << "\t"
+    logMessage << "\tdoRiverAction for " << pkt::core::positionToString(myPosition) << "\t" << myName << "\t"
                << getCardsValueString() << "\t"
                << "stack = " << myCash
                << ", pot = " << currentHand->getBoard()->getPot() + currentHand->getBoard()->getSets() << std::endl;

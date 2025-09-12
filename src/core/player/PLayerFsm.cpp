@@ -59,6 +59,10 @@ std::string PlayerFsm::getName() const
 void PlayerFsm::setCash(int theValue)
 {
     myCash = theValue;
+    if (myEvents.onPlayerChipsUpdated)
+    {
+        myEvents.onPlayerChipsUpdated(myID, myCash);
+    }
 }
 int PlayerFsm::getCash() const
 {
@@ -68,6 +72,10 @@ int PlayerFsm::getCash() const
 void PlayerFsm::addBetAmount(int theValue)
 {
     myCash -= theValue;
+    if (myEvents.onPlayerChipsUpdated)
+    {
+        myEvents.onPlayerChipsUpdated(myID, myCash);
+    }
 }
 
 PlayerAction PlayerFsm::getLastAction() const

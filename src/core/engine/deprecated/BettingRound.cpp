@@ -156,7 +156,9 @@ void BettingRound::run()
         {
             if (myEvents.onAwaitingHumanInput)
             {
-                myEvents.onAwaitingHumanInput();
+                // Legacy code: provide empty valid actions since deprecated system doesn't calculate them
+                std::vector<ActionType> legacyValidActions = {};
+                myEvents.onAwaitingHumanInput((*currentPlayersTurnIt)->getId(), legacyValidActions);
             }
         }
         else
