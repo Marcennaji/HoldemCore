@@ -24,6 +24,9 @@ GameFsm::GameFsm(const GameEvents& events, std::shared_ptr<EngineFactory> factor
     : myEngineFactory(factory), myEvents(events), myCurrentBoard(board), mySeatsList(seatsList),
       myDealerPlayerId(dealerId), myGameData(gameData), myStartData(startData)
 {
+    if (!factory || !board || !seatsList || seatsList->empty())
+        throw Exception(__FILE__, __LINE__, EngineError::MissingParameter);
+
     // Acting players list starts identical to seats list
     myActingPlayersList = std::make_shared<std::list<std::shared_ptr<PlayerFsm>>>(*mySeatsList);
 
@@ -47,17 +50,18 @@ void GameFsm::findNextDealer()
     bool nextDealerFound = false;
     auto dealerPos = getPlayerFsmListIteratorById(myCurrentHand->getSeatsList(), myDealerPlayerId);
 
-    if (dealerPos == mySeatsList->end())
-        throw Exception(__FILE__, __LINE__, EngineError::SeatNotFound);
+    // Current dealer must exist in the seats list
+    if (dealerPos == myCurrentHand->getSeatsList()->end())
+        throw Exception(__FILE__, __LINE__, EngineError::DealerNotFound);
 
     for (size_t i = 0; i < mySeatsList->size(); ++i)
     {
         ++dealerPos;
-        if (dealerPos == mySeatsList->end())
-            dealerPos = mySeatsList->begin();
+        if (dealerPos == myCurrentHand->getSeatsList()->end())
+            dealerPos = myCurrentHand->getSeatsList()->begin();
 
         auto playerIt = getPlayerFsmListIteratorById(myCurrentHand->getSeatsList(), (*dealerPos)->getId());
-        if (playerIt != mySeatsList->end())
+        if (playerIt != myCurrentHand->getSeatsList()->end())
         {
             myDealerPlayerId = (*playerIt)->getId();
             nextDealerFound = true;

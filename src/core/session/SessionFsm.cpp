@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <random>
 #include <sstream>
+#include <stdexcept>
 
 namespace pkt::core
 {
@@ -29,7 +30,12 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-SessionFsm::SessionFsm(const GameEvents& events) : myEvents(events)
+SessionFsm::SessionFsm(const GameEvents& events) : myEvents(events), myEngineFactory(nullptr)
+{
+}
+
+SessionFsm::SessionFsm(const GameEvents& events, std::shared_ptr<EngineFactory> engineFactory)
+    : myEvents(events), myEngineFactory(engineFactory)
 {
 }
 
@@ -46,6 +52,27 @@ pkt::core::player::PlayerFsmList SessionFsm::createPlayersList(DefaultPlayerFact
     return playersList;
 }
 
+std::unique_ptr<player::StrategyAssigner> SessionFsm::createStrategyAssigner(const TableProfile& tableProfile,
+                                                                             int numberOfBots)
+{
+    return std::make_unique<player::StrategyAssigner>(tableProfile, numberOfBots);
+}
+
+std::unique_ptr<player::DefaultPlayerFactory>
+SessionFsm::createPlayerFactory(const GameEvents& events, player::StrategyAssigner* strategyAssigner)
+{
+    return std::make_unique<player::DefaultPlayerFactory>(events, strategyAssigner);
+}
+
+std::shared_ptr<IBoard> SessionFsm::createBoard(const StartData& startData)
+{
+    if (!myEngineFactory)
+        throw std::runtime_error("EngineFactory not initialized");
+
+    auto board = myEngineFactory->createBoardFsm(startData.startDealerPlayerId);
+    return board;
+}
+
 void SessionFsm::startGame(const GameData& gameData, const StartData& startData)
 {
     myCurrentGame.reset();
@@ -53,19 +80,23 @@ void SessionFsm::startGame(const GameData& gameData, const StartData& startData)
     if (myEvents.onGameInitialized)
         myEvents.onGameInitialized(gameData.guiSpeed);
 
-    auto engineFactory = std::make_shared<EngineFactory>(myEvents);
-    auto strategyAssigner = std::make_unique<StrategyAssigner>(gameData.tableProfile, startData.numberOfPlayers - 1);
-    auto playerFactory = std::make_unique<DefaultPlayerFactory>(myEvents, strategyAssigner.get());
+    // Create or use injected engine factory
+    if (!myEngineFactory)
+        myEngineFactory = std::make_shared<EngineFactory>(myEvents);
+
+    // Create dependencies using virtual factory methods (testable)
+    auto strategyAssigner = createStrategyAssigner(gameData.tableProfile, startData.numberOfPlayers - 1);
+    auto playerFactory = createPlayerFactory(myEvents, strategyAssigner.get());
 
     auto playersList =
         createPlayersList(*playerFactory, startData.numberOfPlayers, gameData.startMoney, gameData.tableProfile);
 
-    // Board is fully prepared here
-    auto board = engineFactory->createBoardFsm(startData.startDealerPlayerId);
+    // Create board using factory method (testable)
+    auto board = createBoard(startData);
     board->setSeatsListFsm(playersList);
     board->setActingPlayersListFsm(playersList);
 
-    myCurrentGame = std::make_unique<GameFsm>(myEvents, engineFactory, board, playersList,
+    myCurrentGame = std::make_unique<GameFsm>(myEvents, myEngineFactory, board, playersList,
                                               startData.startDealerPlayerId, gameData, startData);
 
     myCurrentGame->startNewHand();
