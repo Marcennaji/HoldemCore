@@ -42,7 +42,7 @@ Maintained by **Marc Ennaji**, freelance **senior software engineer**
 [LinkedIn profile](https://www.linkedin.com/in/marcennaji/)
 
 - Expertise in **cross-platform development** (C++, Python)  
-- Passionate about **refactoring legacy code** into **modern, testable architectures**  
+- Specialized in **refactoring legacy code** into **modern, testable architectures**  
 - Focused on **clean, modular design** and maintainability  
 
 📫 Available for freelance collaborations — feel free to reach out!
