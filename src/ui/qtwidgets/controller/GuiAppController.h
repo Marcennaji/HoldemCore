@@ -3,14 +3,14 @@
 
 #include <core/engine/GameEvents.h>
 
-#include <core/session/Session.h>
+#include <core/session/SessionFsm.h>
 
 #include <QString>
 #include <memory>
 
 namespace pkt::core
 {
-class Session;
+class SessionFsm;
 } // namespace pkt::core
 
 namespace pkt::ui::qtwidgets
@@ -29,7 +29,7 @@ class GuiAppController
   private:
     QString myAppDataPath;
     std::unique_ptr<PokerTableWindow> myPokerTableWindow;
-    std::unique_ptr<pkt::core::Session> mySession;
+    std::unique_ptr<pkt::core::SessionFsm> mySession;
     pkt::core::GameEvents myEvents;
     std::unique_ptr<GuiBridgeWidgets> myBridge;
 };

@@ -118,7 +118,7 @@ player.setStrategy(std::make_unique<MyCustomBotStrategy>());
 - **SQLite3**
 
 ---
-## 🕰 Project History and Current Status — *Ongoing refactoring with FSM-based core redesign*
+## 🕰 Project History and Current Status
 
 - **2011** — Initial version published on SourceForge (5⭐ project, >11,000 downloads).  
   The original version reused portions of the open-source **PokerTH** (GPLv2) engine, with a focus on creating **poker bot strategies and AI logic** (the existing PokerTH builtin bot AI was not reused at all).  
@@ -169,12 +169,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## 📝 License
 
-This project, PokerTraining, is released under the MIT License —  
-you are free to use, learn from, and contribute to it.
+This project, PokerTraining, is released under the MIT License — you are free to use, learn from, and contribute to it.
 
 ⚖️ Note on legacy code:
 The initial version of PokerTraining (2011, SourceForge) reused portions of the open-source [PokerTH](https://github.com/pokerth/pokerth) engine, which at that time was distributed under **GPLv2**. That early codebase focused mainly on adding poker bot strategies and AI logic.  
 
 Since 2025, the engine has been undergoing a **progressive rewrite**: nearly all PokerTH-derived code has been replaced with a **fully original, modular codebase under MIT**.  
 
-🙏 Acknowledgment to the PokerTH project for inspiring the early stages of PokerTraining.
+🙏 Acknowledgment to the PokerTH project for providing the initial foundation that enabled focusing on bot AI development.

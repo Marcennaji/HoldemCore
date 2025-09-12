@@ -2,9 +2,9 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
-#include "Session.h"
-#include <core/engine/Game.h>
+#include "SessionFsm.h"
 #include <core/engine/GameEvents.h>
+#include <core/engine/GameFsm.h>
 
 #include <core/engine/EngineFactory.h>
 
@@ -29,34 +29,24 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-Session::Session(const GameEvents& events) : myEvents(events)
+SessionFsm::SessionFsm(const GameEvents& events) : myEvents(events)
 {
 }
 
-Session::~Session() = default;
+SessionFsm::~SessionFsm() = default;
 
-pkt::core::player::PlayerList Session::createPlayersList(DefaultPlayerFactory& playerFactory, int numberOfPlayers,
-                                                         unsigned startMoney, const TableProfile& tableProfile)
+pkt::core::player::PlayerFsmList SessionFsm::createPlayersList(DefaultPlayerFactory& playerFactory, int numberOfPlayers,
+                                                               unsigned startMoney, const TableProfile& tableProfile)
 {
-    auto playersList = std::make_shared<std::list<std::shared_ptr<Player>>>();
+    auto playersList = std::make_shared<std::list<std::shared_ptr<PlayerFsm>>>();
 
-    playersList->push_back(playerFactory.createHumanPlayer(0, startMoney));
-
-    for (int i = 1; i < numberOfPlayers; ++i)
-        playersList->push_back(playerFactory.createBotPlayer(i, tableProfile, startMoney));
-
-    // Shuffle bots but keep human first
-    shufflePlayers(*playersList, 0);
-
-    // Reassign IDs after shuffle
-    int id = 0;
-    for (auto& p : *playersList)
-        p->setId(id++);
+    for (int i = 0; i < numberOfPlayers; ++i)
+        playersList->push_back(playerFactory.createPlayerFsm(i, tableProfile, startMoney));
 
     return playersList;
 }
 
-void Session::startGame(const GameData& gameData, const StartData& startData)
+void SessionFsm::startGame(const GameData& gameData, const StartData& startData)
 {
     myCurrentGame.reset();
 
@@ -71,12 +61,12 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
         createPlayersList(*playerFactory, startData.numberOfPlayers, gameData.startMoney, gameData.tableProfile);
 
     // Board is fully prepared here
-    auto board = engineFactory->createBoard(startData.startDealerPlayerId);
-    board->setSeatsList(playersList);
-    board->setActingPlayersList(playersList);
+    auto board = engineFactory->createBoardFsm(startData.startDealerPlayerId);
+    board->setSeatsListFsm(playersList);
+    board->setActingPlayersListFsm(playersList);
 
-    myCurrentGame = std::make_unique<Game>(myEvents, engineFactory, board, playersList, startData.startDealerPlayerId,
-                                           gameData, startData);
+    myCurrentGame = std::make_unique<GameFsm>(myEvents, engineFactory, board, playersList,
+                                              startData.startDealerPlayerId, gameData, startData);
 
     myCurrentGame->startNewHand();
 }

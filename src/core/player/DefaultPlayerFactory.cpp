@@ -26,4 +26,12 @@ std::shared_ptr<Player> DefaultPlayerFactory::createBotPlayer(int id, TableProfi
     return bot;
 }
 
+std::shared_ptr<PlayerFsm> DefaultPlayerFactory::createPlayerFsm(int id, TableProfile profile, int startMoney)
+{
+    auto strategy = myStrategyAssigner->chooseStrategyFor(id);
+
+    auto player = std::make_shared<PlayerFsm>(myEvents, id, "Bot_" + std::to_string(id), startMoney);
+    player->setStrategy(std::move(strategy));
+    return player;
+}
 } // namespace pkt::core::player

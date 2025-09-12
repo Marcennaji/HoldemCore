@@ -7,7 +7,7 @@
 #include <memory>
 
 #include <core/engine/EngineDefs.h>
-#include <core/session/Session.h>
+#include <core/session/SessionFsm.h>
 #include "ui_StartWindow.h"
 
 #include <QtWidgets/QMainWindow>
@@ -19,12 +19,12 @@ class StartWindow : public QMainWindow, public Ui::StartWindow
 {
     Q_OBJECT
   public:
-    StartWindow(const QString& appDataPath, PokerTableWindow* tableWindow, pkt::core::Session* session,
+    StartWindow(const QString& appDataPath, PokerTableWindow* tableWindow, pkt::core::SessionFsm* session,
                 QWidget* parent);
     ~StartWindow();
 
-    void setSession(pkt::core::Session* session) { mySession = session; }
-    pkt::core::Session* getSession()
+    void setSession(pkt::core::SessionFsm* session) { mySession = session; }
+    pkt::core::SessionFsm* getSession()
     {
         assert(mySession != nullptr);
         return mySession;
@@ -43,7 +43,7 @@ class StartWindow : public QMainWindow, public Ui::StartWindow
     QString myAppDataPath;
 
     std::shared_ptr<PokerTableWindow> myPokerTableWindow;
-    pkt::core::Session* mySession;
+    pkt::core::SessionFsm* mySession;
 };
 
 } // namespace pkt::ui::qtwidgets

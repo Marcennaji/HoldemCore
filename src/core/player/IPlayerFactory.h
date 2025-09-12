@@ -6,6 +6,7 @@
 #include <memory>
 #include "core/engine/model/TableProfile.h"
 #include "core/interfaces/ILogger.h"
+#include "core/player/PlayerFsm.h"
 #include "core/player/deprecated/Player.h"
 
 namespace pkt::core::player
@@ -18,6 +19,7 @@ class IPlayerFactory
 
     virtual std::shared_ptr<Player> createHumanPlayer(int id, int startMoney) = 0;
     virtual std::shared_ptr<Player> createBotPlayer(int id, TableProfile profile, int startMoney) = 0;
+    virtual std::shared_ptr<PlayerFsm> createPlayerFsm(int id, TableProfile profile, int startMoney) = 0;
 
   protected:
 };

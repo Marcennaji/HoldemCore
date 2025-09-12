@@ -6,7 +6,7 @@
 #include <ui/qtwidgets/poker_ui/PokerTableWindow.h>
 
 #include <core/engine/EngineDefs.h>
-#include <core/engine/Game.h>
+#include <core/engine/GameFsm.h>
 #include "core/services/GlobalServices.h"
 
 #include <core/engine/model/GameData.h>
@@ -18,7 +18,8 @@ using namespace pkt::core;
 namespace pkt::ui::qtwidgets
 {
 
-StartWindow::StartWindow(const QString& appDataPath, PokerTableWindow* tableWindow, Session* session, QWidget* parent)
+StartWindow::StartWindow(const QString& appDataPath, PokerTableWindow* tableWindow, SessionFsm* session,
+                         QWidget* parent)
     : QMainWindow(parent), myAppDataPath(appDataPath), myPokerTableWindow(tableWindow), mySession(session)
 {
     setupUi(this);
@@ -65,8 +66,6 @@ void StartWindow::startNewGame()
     GlobalServices::instance().randomizer().getRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
     startData.startDealerPlayerId = static_cast<unsigned>(tmpDealerPos);
 
-    // myPokerTableWindow->GameModification();
-
     mySession->startGame(gameData, startData);
 }
 
@@ -75,7 +74,7 @@ bool StartWindow::eventFilter(QObject* obj, QEvent* event)
     if (event->type() == QEvent::Close)
     {
         event->ignore();
-        //        mySession->getLog()->closeLogDbAtExit();
+
         return QMainWindow::eventFilter(obj, event);
     }
     else

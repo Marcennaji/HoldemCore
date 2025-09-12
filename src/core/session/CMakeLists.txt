@@ -1,7 +1,12 @@
 # src/core/session/CMakeLists.txt
 
+file(GLOB_RECURSE SESSION_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.h
+)
+
 add_library(core_session STATIC
-    Session.cpp
+    ${SESSION_SOURCES}
 )
 
 target_include_directories(core_session

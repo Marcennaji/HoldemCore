@@ -7,7 +7,7 @@ class PokerTableWindow;
 
 namespace pkt::core
 {
-class Session;
+class SessionFsm;
 }
 namespace pkt::ui::qtwidgets
 {
@@ -16,14 +16,14 @@ class PokerTableWindow;
 class GuiBridgeWidgets
 {
   public:
-    GuiBridgeWidgets(pkt::core::Session* session, PokerTableWindow* pokerTableWindow);
+    GuiBridgeWidgets(pkt::core::SessionFsm* session, PokerTableWindow* pokerTableWindow);
     void connectEventsToUi(pkt::core::GameEvents& events);
 
   private:
     void connectSignalsFromUi();
 
     PokerTableWindow* m_tableWindow = nullptr;
-    pkt::core::Session* m_session = nullptr;
+    pkt::core::SessionFsm* m_session = nullptr;
 };
 
 } // namespace pkt::ui::qtwidgets
