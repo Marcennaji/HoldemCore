@@ -72,19 +72,9 @@ std::shared_ptr<IBoard> SessionFsm::createBoard(const StartData& startData)
 
 void SessionFsm::startGame(const GameData& gameData, const StartData& startData)
 {
-    // Validate input parameters
     validateGameParameters(gameData, startData);
-
-    // Fire initialization event
-    fireGameInitializedEvent(gameData.guiSpeed);
-
-    // Ensure engine factory is available
     ensureEngineFactoryInitialized();
-
-    // Create game components
     auto gameComponents = createGameComponents(gameData, startData);
-
-    // Initialize and start the game
     initializeGame(std::move(gameComponents), gameData, startData);
 }
 
@@ -147,7 +137,7 @@ void SessionFsm::initializeGame(GameComponents&& components, const GameData& gam
 {
     myCurrentGame = std::make_unique<GameFsm>(myEvents, myEngineFactory, components.board, components.playersList,
                                               startData.startDealerPlayerId, gameData, startData);
-
+    fireGameInitializedEvent(gameData.guiSpeed);
     myCurrentGame->startNewHand();
 }
 

@@ -12,27 +12,16 @@ namespace pkt::core
 struct GameEvents
 {
     std::function<void(int gameSpeed)> onGameInitialized;
-
-    std::function<void(int)> onPotUpdated;
+    std::function<void(std::vector<unsigned> winnerIds, int totalPot)> onHandCompleted;
     std::function<void(unsigned playerId, int newChips)> onPlayerChipsUpdated;
-
-    std::function<void()> onDealHoleCards;
-    std::function<void(unsigned playerId)> onShowHoleCards;
-    std::function<void(int bettingRoundId)> onDealCommunityCards;
-    std::function<void()> onFlipHoleCardsAllIn;
-
     std::function<void(GameState)> onBettingRoundStarted;
+    std::function<void(int)> onPotUpdated;
     std::function<void(PlayerAction)> onPlayerActed;
-    std::function<void(int playerId, bool isActive)> onPlayerStatusChanged;
+    std::function<void(unsigned playerId, std::vector<ActionType> validActions)> onAwaitingHumanInput;
 
     // Error handling events
     std::function<void(unsigned playerId, PlayerAction invalidAction, std::string reason)> onInvalidPlayerAction;
     std::function<void(std::string errorMessage)> onEngineError;
-
-    std::function<void(unsigned playerId, std::vector<ActionType> validActions)> onAwaitingHumanInput;
-
-    std::function<void()> onShowdownStarted;
-    std::function<void()> onPauseHand;
 
     void clear()
     {

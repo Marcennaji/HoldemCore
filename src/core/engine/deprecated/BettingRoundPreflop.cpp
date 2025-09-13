@@ -153,8 +153,8 @@ void BettingRoundPreflop::proceedToFlop()
 
 void BettingRoundPreflop::handlePlayerTurnEvents(PlayerListIterator it)
 {
-    if (myEvents.onPlayerStatusChanged)
-        myEvents.onPlayerStatusChanged(getCurrentPlayerTurnId(), true);
+    /*if (myEvents.onPlayerStatusChanged)
+        myEvents.onPlayerStatusChanged(getCurrentPlayerTurnId(), true);*/
 
     if (myEvents.onPlayerActed)
         myEvents.onPlayerActed({getCurrentPlayerTurnId(), ActionType::None, 0});

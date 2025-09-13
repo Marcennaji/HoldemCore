@@ -126,10 +126,10 @@ void BettingRound::run()
 
         myCurrentPlayerTurnId = (*currentPlayersTurnIt)->getId();
 
-        if (myEvents.onPlayerStatusChanged)
+        /*if (myEvents.onPlayerStatusChanged)
         {
             myEvents.onPlayerStatusChanged(myCurrentPlayerTurnId, true);
-        }
+        }*/
 
         if (myEvents.onPlayerActed)
         {

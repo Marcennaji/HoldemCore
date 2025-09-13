@@ -70,10 +70,10 @@ void BettingRoundPostRiver::run()
     // commented out, as not compatible any more with FSM player
     // GlobalServices::instance().playersStatisticsStore().savePlayersStatistics(getHand()->getSeatsList());
 
-    if (myEvents.onShowdownStarted)
+    /*if (myEvents.onShowdownStarted)
     {
         myEvents.onShowdownStarted();
-    }
+    }*/
 
     if (getHand()->getCardsShown())
     {
@@ -85,19 +85,19 @@ void BettingRoundPostRiver::run()
                 (*itC)->getCurrentHandActions().getActions(GameState::Preflop).at(0).type != ActionType::Fold)
             {
 
-                if (myEvents.onShowHoleCards)
+                /*if (myEvents.onShowHoleCards)
                 {
                     myEvents.onShowHoleCards((*itC)->getId());
-                }
+                }*/
             }
         }
     }
     // if the human player went at showdown with at least one opponent, enable pausing the hand so he can see the
     // results
-    if (pauseHand && nonfoldPlayersCounter > 1 && myEvents.onPauseHand)
+    /*if (pauseHand && nonfoldPlayersCounter > 1 && myEvents.onPauseHand)
     {
         myEvents.onPauseHand();
-    }
+    }*/
 }
 
 } // namespace pkt::core

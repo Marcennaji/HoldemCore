@@ -29,12 +29,6 @@ void PostRiverState::enter(HandFsm& hand)
 
     if (myEvents.onBettingRoundStarted)
         myEvents.onBettingRoundStarted(PostRiver);
-
-    if (myEvents.onShowdownStarted)
-        myEvents.onShowdownStarted();
-
-    if (myEvents.onPauseHand)
-        myEvents.onPauseHand();
 }
 
 void PostRiverState::exit(HandFsm& hand)

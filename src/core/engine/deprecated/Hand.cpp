@@ -127,10 +127,10 @@ void Hand::start()
     {
         myEvents.onBettingRoundStarted(getCurrentBettingRound()->getBettingRoundId());
     }
-    if (myEvents.onDealHoleCards)
+    /*if (myEvents.onDealHoleCards)
     {
         myEvents.onDealHoleCards();
-    }
+    }*/
 
     getBoard()->collectSets();
 
@@ -368,10 +368,10 @@ void Hand::resolveHandConditions()
             myEvents.onPotUpdated(myBoard->getPot());
         }
 
-        if (myEvents.onFlipHoleCardsAllIn)
+        /*if (myEvents.onFlipHoleCardsAllIn)
         {
             myEvents.onFlipHoleCardsAllIn();
-        }
+        }*/
 
         if (myCurrentRound < PostRiver)
         {
@@ -389,12 +389,12 @@ void Hand::resolveHandConditions()
     itC = getPlayerListIteratorById(mySeatsList, myPreviousPlayerId);
     if (itC != mySeatsList->end())
     {
-        if (myEvents.onPlayerStatusChanged)
+        /*if (myEvents.onPlayerStatusChanged)
         {
             myEvents.onPlayerStatusChanged(myPreviousPlayerId, false);
             GlobalServices::instance().logger().verbose("Unhighlighted previous player's groupbox: " +
                                                         std::to_string(myPreviousPlayerId));
-        }
+        }*/
     }
 
     if (myCurrentRound < PostRiver)
