@@ -40,7 +40,9 @@ target_link_libraries(unit_tests
     engine
     service
     infra
+    core_session
     gtest_main
+    gmock_main
 )
 
 # --- E2E tests executable ---
@@ -63,6 +65,7 @@ target_link_libraries(e2e_tests
     engine
     service
     infra
+    core_session
     gtest_main
 )
 

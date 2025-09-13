@@ -72,28 +72,80 @@ std::shared_ptr<IBoard> SessionFsm::createBoard(const StartData& startData)
 
 void SessionFsm::startGame(const GameData& gameData, const StartData& startData)
 {
-    myCurrentGame.reset();
+    // Validate input parameters
+    validateGameParameters(gameData, startData);
 
+    // Fire initialization event
+    fireGameInitializedEvent(gameData.guiSpeed);
+
+    // Ensure engine factory is available
+    ensureEngineFactoryInitialized();
+
+    // Create game components
+    auto gameComponents = createGameComponents(gameData, startData);
+
+    // Initialize and start the game
+    initializeGame(std::move(gameComponents), gameData, startData);
+}
+
+void SessionFsm::validateGameParameters(const GameData& gameData, const StartData& startData)
+{
+    if (startData.numberOfPlayers < 2)
+    {
+        throw std::invalid_argument("Game requires at least 2 players");
+    }
+    if (startData.numberOfPlayers > 10)
+    {
+        throw std::invalid_argument("Game supports maximum 10 players");
+    }
+    if (gameData.startMoney == 0)
+    {
+        throw std::invalid_argument("Start money must be greater than 0");
+    }
+    if (startData.startDealerPlayerId >= startData.numberOfPlayers)
+    {
+        throw std::invalid_argument("Dealer player ID must be valid player index");
+    }
+}
+
+void SessionFsm::fireGameInitializedEvent(int guiSpeed)
+{
     if (myEvents.onGameInitialized)
-        myEvents.onGameInitialized(gameData.guiSpeed);
+    {
+        myEvents.onGameInitialized(guiSpeed);
+    }
+}
 
-    // Create or use injected engine factory
+void SessionFsm::ensureEngineFactoryInitialized()
+{
     if (!myEngineFactory)
+    {
         myEngineFactory = std::make_shared<EngineFactory>(myEvents);
+    }
+}
+
+SessionFsm::GameComponents SessionFsm::createGameComponents(const GameData& gameData, const StartData& startData)
+{
+    GameComponents components;
 
     // Create dependencies using virtual factory methods (testable)
-    auto strategyAssigner = createStrategyAssigner(gameData.tableProfile, startData.numberOfPlayers - 1);
-    auto playerFactory = createPlayerFactory(myEvents, strategyAssigner.get());
+    components.strategyAssigner = createStrategyAssigner(gameData.tableProfile, startData.numberOfPlayers - 1);
+    components.playerFactory = createPlayerFactory(myEvents, components.strategyAssigner.get());
 
-    auto playersList =
-        createPlayersList(*playerFactory, startData.numberOfPlayers, gameData.startMoney, gameData.tableProfile);
+    components.playersList = createPlayersList(*components.playerFactory, startData.numberOfPlayers,
+                                               gameData.startMoney, gameData.tableProfile);
 
     // Create board using factory method (testable)
-    auto board = createBoard(startData);
-    board->setSeatsListFsm(playersList);
-    board->setActingPlayersListFsm(playersList);
+    components.board = createBoard(startData);
+    components.board->setSeatsListFsm(components.playersList);
+    components.board->setActingPlayersListFsm(components.playersList);
 
-    myCurrentGame = std::make_unique<GameFsm>(myEvents, myEngineFactory, board, playersList,
+    return components;
+}
+
+void SessionFsm::initializeGame(GameComponents&& components, const GameData& gameData, const StartData& startData)
+{
+    myCurrentGame = std::make_unique<GameFsm>(myEvents, myEngineFactory, components.board, components.playersList,
                                               startData.startDealerPlayerId, gameData, startData);
 
     myCurrentGame->startNewHand();
