@@ -1,7 +1,6 @@
 #pragma once
 
 #include <core/engine/EngineDefs.h>
-#include <core/engine/deprecated/Helpers.h>
 #include <core/player/strategy/CurrentHandContext.h>
 
 #include <iostream>

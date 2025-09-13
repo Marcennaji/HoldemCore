@@ -10,7 +10,6 @@
 #include "core/services/GlobalServices.h"
 
 #include <core/engine/model/GameData.h>
-#include <core/player/deprecated/Player.h>
 
 using namespace std;
 using namespace pkt::core;

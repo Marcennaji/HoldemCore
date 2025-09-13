@@ -1,6 +1,5 @@
 #include "HandPlayersState.h"
 #include "core/player/PlayerFsm.h"
-#include "core/player/deprecated/Player.h"
 #include "core/services/GlobalServices.h"
 
 namespace pkt::core

@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <core/player/deprecated/Player.h>
-#include <core/player/strategy/PreflopRangeCalculator.h>
 #include "PlayerStrategy.h"
+#include "core/player/strategy/CurrentHandContext.h"
+#include "core/player/strategy/PreflopRangeCalculator.h"
 
 namespace pkt::core::player
 {

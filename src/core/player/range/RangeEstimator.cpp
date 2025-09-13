@@ -5,7 +5,6 @@
 #include <core/interfaces/persistence/PlayersStatisticsStore.h>
 #include <core/player/Helpers.h>
 #include <core/player/PlayerStatistics.h>
-#include <core/player/deprecated/Player.h>
 #include <core/player/range/HandPlausibilityChecker.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include <core/services/GlobalServices.h>

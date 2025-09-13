@@ -3,6 +3,8 @@
 // Licensed under the MIT License — see LICENSE file for details.
 
 #pragma once
+
+#include <string>
 namespace pkt::core
 {
 
@@ -21,5 +23,50 @@ enum PlayerPosition
     Button = 10,
     ButtonSmallBlind = 11
 };
+
+static std::string positionToString(PlayerPosition p)
+{
+
+    switch (p)
+    {
+
+    case UnderTheGun:
+        return "UnderTheGun";
+        break;
+    case UnderTheGunPlusOne:
+        return "UnderTheGun+1";
+        break;
+    case UnderTheGunPlusTwo:
+        return "UnderTheGun+2";
+        break;
+    case Middle:
+        return "Middle";
+        break;
+    case MiddlePlusOne:
+        return "Middle+1";
+        break;
+    case Late:
+        return "Late";
+        break;
+    case Cutoff:
+        return "Cutoff";
+        break;
+    case Button:
+        return "Button";
+        break;
+    case ButtonSmallBlind:
+        return "Button / Small Blind";
+        break;
+    case SmallBlind:
+        return "Small Blind";
+        break;
+    case BigBlind:
+        return "Big Blind";
+        break;
+    default:
+        return "unknown";
+        break;
+    }
+}
 
 } // namespace pkt::core
