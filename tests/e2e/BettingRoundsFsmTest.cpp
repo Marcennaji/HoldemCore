@@ -589,13 +589,588 @@ TEST_F(BettingRoundsFsmTest, NoPlayerStartsPostFlopRoundWithRaise)
         << gameStateToString(myLastGameState);
 }
 
-// - NoPlayerBetsAfterRaise
-// - NoPlayerChecksAfterBetOrRaise
-// - OnlyOneBetAllowedPerRoundUnlessRaised
-// - FoldedPlayerDoesNotReappearInLaterRounds
-// - NoBettingInPostRiverRound
-// - AllInPlayerDoesNotActAgain
-// - NoExtraActionsAfterFinalCall
-// - HeadsUpEndsImmediatelyOnFold
+TEST_F(BettingRoundsFsmTest, NoPlayerBetsAfterRaise)
+{
+    logTestMessage("Testing that engine rejects bet actions after a raise has been made");
+
+    initializeHandFsmWithPlayers(4, gameData);
+
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
+    auto playerUtg = getPlayerFsmById(myActingPlayersListFsm, 3);
+
+    // Setup strategies to create a scenario where one player raises, then another tries to bet
+    auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    dealerStrategy->setLastAction(GameState::Preflop, {playerDealer->getId(), ActionType::Call});
+    dealerStrategy->setLastAction(GameState::Flop, {playerDealer->getId(), ActionType::Check});
+    playerDealer->setStrategy(std::move(dealerStrategy));
+
+    auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Call});
+    // Small blind will bet first on flop
+    sbStrategy->setLastAction(GameState::Flop, {playerSb->getId(), ActionType::Bet, 30});
+    playerSb->setStrategy(std::move(sbStrategy));
+
+    auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    bbStrategy->setLastAction(GameState::Preflop, {playerBb->getId(), ActionType::Check});
+    // Big blind will raise the bet
+    bbStrategy->setLastAction(GameState::Flop, {playerBb->getId(), ActionType::Raise, 60});
+    playerBb->setStrategy(std::move(bbStrategy));
+
+    auto utgStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    utgStrategy->setLastAction(GameState::Preflop, {playerUtg->getId(), ActionType::Call});
+    // UTG will try to make an INVALID bet action after the raise
+    utgStrategy->setLastAction(GameState::Flop, {playerUtg->getId(), ActionType::Bet, 40});
+    playerUtg->setStrategy(std::move(utgStrategy));
+
+    // Track invalid actions from engine
+    std::vector<std::tuple<unsigned, PlayerAction, std::string>> invalidActions;
+    myEvents.onInvalidPlayerAction = [&invalidActions](unsigned playerId, PlayerAction action, std::string reason)
+    { invalidActions.push_back(std::make_tuple(playerId, action, reason)); };
+
+    // Run the hand - this should trigger the invalid bet after raise
+    myHandFsm->runGameLoop();
+
+    // Verify the engine rejected the invalid bet action after raise
+    EXPECT_FALSE(invalidActions.empty()) << "Engine should reject bet action after a raise has been made";
+
+    if (!invalidActions.empty())
+    {
+        bool foundInvalidBet = false;
+        for (const auto& [playerId, rejectedAction, reason] : invalidActions)
+        {
+            if (rejectedAction.type == ActionType::Bet && playerId == playerUtg->getId())
+            {
+                foundInvalidBet = true;
+                logTestMessage("Engine correctly rejected invalid bet after raise with reason: " + reason);
+
+                // The reason should indicate why betting after raise is not allowed
+                EXPECT_FALSE(reason.empty()) << "Engine should provide a reason for rejecting the bet";
+
+                // Verify this happened on flop round where we expected it
+                EXPECT_TRUE(myLastGameState >= GameState::Flop)
+                    << "Invalid bet should have been attempted during or after flop";
+
+                break;
+            }
+        }
+
+        EXPECT_TRUE(foundInvalidBet) << "Should have found rejection of invalid bet action from UTG after BB raised";
+    }
+
+    // Verify we progressed properly through the hand despite invalid action
+    EXPECT_TRUE(myLastGameState == GameState::Flop || myLastGameState == GameState::Turn ||
+                myLastGameState == GameState::River || myLastGameState == GameState::PostRiver)
+        << "Should have progressed to at least flop despite invalid action. Last state: "
+        << gameStateToString(myLastGameState);
+}
+
+TEST_F(BettingRoundsFsmTest, NoPlayerChecksAfterBetOrRaise)
+{
+    logTestMessage("Testing that engine rejects check actions after a bet or raise has been made");
+
+    initializeHandFsmWithPlayers(4, gameData);
+
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
+    auto playerUtg = getPlayerFsmById(myActingPlayersListFsm, 3);
+
+    // Setup strategies to create a scenario where one player bets, then another tries to check
+    auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    dealerStrategy->setLastAction(GameState::Preflop, {playerDealer->getId(), ActionType::Call});
+    dealerStrategy->setLastAction(GameState::Flop, {playerDealer->getId(), ActionType::Check});
+    playerDealer->setStrategy(std::move(dealerStrategy));
+
+    auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Call});
+    // Small blind will bet on flop
+    sbStrategy->setLastAction(GameState::Flop, {playerSb->getId(), ActionType::Bet, 40});
+    playerSb->setStrategy(std::move(sbStrategy));
+
+    auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    bbStrategy->setLastAction(GameState::Preflop, {playerBb->getId(), ActionType::Check});
+    // Big blind will try to make an INVALID check action after the bet
+    bbStrategy->setLastAction(GameState::Flop, {playerBb->getId(), ActionType::Check});
+    playerBb->setStrategy(std::move(bbStrategy));
+
+    auto utgStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    utgStrategy->setLastAction(GameState::Preflop, {playerUtg->getId(), ActionType::Call});
+    // UTG will also try to make an INVALID check action after the bet
+    utgStrategy->setLastAction(GameState::Flop, {playerUtg->getId(), ActionType::Check});
+    playerUtg->setStrategy(std::move(utgStrategy));
+
+    // Track invalid actions from engine
+    std::vector<std::tuple<unsigned, PlayerAction, std::string>> invalidActions;
+    myEvents.onInvalidPlayerAction = [&invalidActions](unsigned playerId, PlayerAction action, std::string reason)
+    { invalidActions.push_back(std::make_tuple(playerId, action, reason)); };
+
+    // Run the hand - this should trigger invalid check actions after bet
+    myHandFsm->runGameLoop();
+
+    // Verify the engine rejected the invalid check actions after bet
+    EXPECT_FALSE(invalidActions.empty()) << "Engine should reject check actions after a bet has been made";
+
+    if (!invalidActions.empty())
+    {
+        bool foundInvalidCheck = false;
+        for (const auto& [playerId, rejectedAction, reason] : invalidActions)
+        {
+            if (rejectedAction.type == ActionType::Check &&
+                (playerId == playerBb->getId() || playerId == playerUtg->getId()))
+            {
+                foundInvalidCheck = true;
+                logTestMessage("Engine correctly rejected invalid check after bet with reason: " + reason);
+
+                // The reason should indicate why checking after bet is not allowed
+                EXPECT_FALSE(reason.empty()) << "Engine should provide a reason for rejecting the check";
+
+                // Should contain message about not being able to check when there's a bet
+                EXPECT_TRUE(reason.find("check") != std::string::npos || reason.find("bet") != std::string::npos ||
+                            reason.find("call") != std::string::npos)
+                    << "Error message should mention check/bet/call conflict: " + reason;
+
+                break;
+            }
+        }
+
+        EXPECT_TRUE(foundInvalidCheck) << "Should have found rejection of invalid check action after bet was made";
+    }
+
+    // Verify we progressed properly through the hand despite invalid actions
+    EXPECT_TRUE(myLastGameState == GameState::Flop || myLastGameState == GameState::Turn ||
+                myLastGameState == GameState::River || myLastGameState == GameState::PostRiver)
+        << "Should have progressed to at least flop despite invalid actions. Last state: "
+        << gameStateToString(myLastGameState);
+}
+
+TEST_F(BettingRoundsFsmTest, FoldedPlayerDoesNotReappearInLaterRounds)
+{
+    logTestMessage("Testing that engine rejects actions from players who have already folded");
+
+    initializeHandFsmWithPlayers(4, gameData);
+
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
+    auto playerUtg = getPlayerFsmById(myActingPlayersListFsm, 3);
+
+    // Setup strategies: Only 2 players continue to flop
+    auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    dealerStrategy->setLastAction(GameState::Preflop, {playerDealer->getId(), ActionType::Fold});
+    playerDealer->setStrategy(std::move(dealerStrategy));
+
+    auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Call});
+    sbStrategy->setLastAction(GameState::Flop, {playerSb->getId(), ActionType::Check});
+    playerSb->setStrategy(std::move(sbStrategy));
+
+    auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    bbStrategy->setLastAction(GameState::Preflop, {playerBb->getId(), ActionType::Check});
+    bbStrategy->setLastAction(GameState::Flop, {playerBb->getId(), ActionType::Check});
+    playerBb->setStrategy(std::move(bbStrategy));
+
+    auto utgStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    utgStrategy->setLastAction(GameState::Preflop, {playerUtg->getId(), ActionType::Fold});
+    playerUtg->setStrategy(std::move(utgStrategy));
+
+    // Track invalid actions from engine
+    std::vector<std::tuple<unsigned, PlayerAction, std::string>> invalidActions;
+    myEvents.onInvalidPlayerAction = [&invalidActions](unsigned playerId, PlayerAction action, std::string reason)
+    { invalidActions.push_back(std::make_tuple(playerId, action, reason)); };
+
+    // Run the complete hand until it reaches a later round or ends
+    myHandFsm->runGameLoop();
+
+    // Now manually try to submit an action from a folded player
+    // This should happen after the players have folded in preflop
+    PlayerAction invalidActionFromFoldedPlayer{playerDealer->getId(), ActionType::Check, 0};
+
+    logTestMessage("Attempting to submit action from folded player (Dealer)");
+    myHandFsm->handlePlayerAction(invalidActionFromFoldedPlayer);
+
+    // Try another action from another folded player
+    PlayerAction anotherInvalidAction{playerUtg->getId(), ActionType::Bet, 50};
+
+    logTestMessage("Attempting to submit action from folded player (UTG)");
+    myHandFsm->handlePlayerAction(anotherInvalidAction);
+
+    // Verify the engine rejected actions from folded players
+    EXPECT_FALSE(invalidActions.empty()) << "Engine should reject actions from players who have already folded";
+
+    if (!invalidActions.empty())
+    {
+        bool foundFoldedPlayerAction = false;
+        for (const auto& [playerId, rejectedAction, reason] : invalidActions)
+        {
+            // Look for actions from players who folded (Dealer=0 or UTG=3)
+            if (playerId == playerDealer->getId() || playerId == playerUtg->getId())
+            {
+                foundFoldedPlayerAction = true;
+                logTestMessage("Engine correctly rejected action from folded player " + std::to_string(playerId) +
+                               " (" + playerActionToString(rejectedAction.type) + ") with reason: " + reason);
+
+                // The reason should indicate the player is not active/folded
+                EXPECT_FALSE(reason.empty()) << "Engine should provide a reason for rejecting folded player action";
+
+                break;
+            }
+        }
+
+        EXPECT_TRUE(foundFoldedPlayerAction) << "Should have found rejection of action from a folded player";
+    }
+
+    // Verify folded players are not in active list after folding
+    EXPECT_FALSE(isPlayerStillActive(playerDealer->getId())) << "Dealer should not be active after folding";
+    EXPECT_FALSE(isPlayerStillActive(playerUtg->getId())) << "UTG should not be active after folding";
+}
+
+TEST_F(BettingRoundsFsmTest, NoExtraActionsAfterFinalCall)
+{
+    logTestMessage("Testing that engine rejects extra actions after final call completes betting round");
+
+    initializeHandFsmWithPlayers(3, gameData);
+
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerUtg = getPlayerFsmById(myActingPlayersListFsm, 2);
+
+    // Setup strategies: Create scenario where betting round ends with final call
+    // In 3-player preflop: SB=0, BB=1, UTG=2 (positions might rotate, but SB posts first)
+    auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Call}); // SB calls to complete BB
+    sbStrategy->setLastAction(GameState::Flop, {playerSb->getId(), ActionType::Check});   // SB checks
+    playerSb->setStrategy(std::move(sbStrategy));
+
+    auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    bbStrategy->setLastAction(GameState::Preflop,
+                              {playerBb->getId(), ActionType::Check}); // BB checks after all players call
+    bbStrategy->setLastAction(GameState::Flop, {playerBb->getId(), ActionType::Bet, 30}); // BB bets on flop
+    playerBb->setStrategy(std::move(bbStrategy));
+
+    auto utgStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    utgStrategy->setLastAction(GameState::Preflop, {playerUtg->getId(), ActionType::Call}); // UTG calls BB
+    utgStrategy->setLastAction(GameState::Flop,
+                               {playerUtg->getId(), ActionType::Call}); // UTG calls BB's bet (final call)
+    playerUtg->setStrategy(std::move(utgStrategy));
+
+    // Track invalid actions from engine
+    std::vector<std::tuple<unsigned, PlayerAction, std::string>> invalidActions;
+    myEvents.onInvalidPlayerAction = [&invalidActions](unsigned playerId, PlayerAction action, std::string reason)
+    { invalidActions.push_back(std::make_tuple(playerId, action, reason)); };
+
+    // Run the hand until flop betting is complete
+    myHandFsm->runGameLoop();
+
+    // At this point, the flop betting should be complete:
+    // SB checked, BB bet 30, UTG called 30 (final call)
+    // Now try to submit extra actions that should be rejected
+
+    // Try to make SB act again after the round is complete
+    PlayerAction extraActionFromSb{playerSb->getId(), ActionType::Raise, 60};
+    logTestMessage("Attempting extra action from SB after final call");
+    myHandFsm->handlePlayerAction(extraActionFromSb);
+
+    // Try to make BB act again after the round is complete
+    PlayerAction extraActionFromBb{playerBb->getId(), ActionType::Bet, 50};
+    logTestMessage("Attempting extra action from BB after final call");
+    myHandFsm->handlePlayerAction(extraActionFromBb);
+
+    // Try to make UTG act again after the round is complete
+    PlayerAction extraActionFromUtg{playerUtg->getId(), ActionType::Check, 0};
+    logTestMessage("Attempting extra action from UTG after final call");
+    myHandFsm->handlePlayerAction(extraActionFromUtg);
+
+    // Verify the engine rejected extra actions after final call
+    EXPECT_FALSE(invalidActions.empty()) << "Engine should reject extra actions after betting round is complete";
+
+    if (!invalidActions.empty())
+    {
+        bool foundExtraActionRejection = false;
+        for (const auto& [playerId, rejectedAction, reason] : invalidActions)
+        {
+            // Look for actions that were rejected because the round is complete
+            logTestMessage("Engine rejected action from player " + std::to_string(playerId) + " (" +
+                           playerActionToString(rejectedAction.type) + ") with reason: " + reason);
+
+            // The reason should indicate that no more actions are needed or the round is complete
+            EXPECT_FALSE(reason.empty()) << "Engine should provide a reason for rejecting extra actions";
+
+            foundExtraActionRejection = true;
+        }
+
+        EXPECT_TRUE(foundExtraActionRejection) << "Should have found rejection of extra actions after final call";
+    }
+
+    // Verify the hand has progressed beyond flop (indicating the round properly ended)
+    EXPECT_NE(myHandFsm->getGameState(), GameState::Flop)
+        << "Hand should have progressed beyond flop after all players acted";
+}
+
+TEST_F(BettingRoundsFsmTest, NoBettingInPostRiverRound)
+{
+    logTestMessage("Testing that engine rejects betting actions in PostRiver state");
+
+    initializeHandFsmWithPlayers(2, gameData);
+
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+
+    // Setup strategies to quickly reach PostRiver state
+    // SB folds immediately, BB wins, hand goes directly to PostRiver
+    auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Fold});
+    playerSb->setStrategy(std::move(sbStrategy));
+
+    auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    // BB doesn't need to act since SB folds
+    playerBb->setStrategy(std::move(bbStrategy));
+
+    // Track invalid actions from engine
+    std::vector<std::tuple<unsigned, PlayerAction, std::string>> invalidActions;
+    myEvents.onInvalidPlayerAction = [&invalidActions](unsigned playerId, PlayerAction action, std::string reason)
+    { invalidActions.push_back(std::make_tuple(playerId, action, reason)); };
+
+    // Run the hand to completion (should reach PostRiver)
+    myHandFsm->runGameLoop();
+
+    // Verify we've reached PostRiver state
+    EXPECT_EQ(myHandFsm->getGameState(), GameState::PostRiver) << "Hand should have reached PostRiver state after fold";
+
+    // Now try to submit various betting actions in PostRiver state
+    // These should all be rejected by the engine
+
+    PlayerAction invalidBet{playerSb->getId(), ActionType::Bet, 50};
+    logTestMessage("Attempting to bet in PostRiver state");
+    myHandFsm->handlePlayerAction(invalidBet);
+
+    PlayerAction invalidRaise{playerBb->getId(), ActionType::Raise, 100};
+    logTestMessage("Attempting to raise in PostRiver state");
+    myHandFsm->handlePlayerAction(invalidRaise);
+
+    PlayerAction invalidCall{playerSb->getId(), ActionType::Call, 0};
+    logTestMessage("Attempting to call in PostRiver state");
+    myHandFsm->handlePlayerAction(invalidCall);
+
+    PlayerAction invalidCheck{playerBb->getId(), ActionType::Check, 0};
+    logTestMessage("Attempting to check in PostRiver state");
+    myHandFsm->handlePlayerAction(invalidCheck);
+
+    PlayerAction invalidAllIn{playerSb->getId(), ActionType::Allin, 0};
+    logTestMessage("Attempting to go all-in in PostRiver state");
+    myHandFsm->handlePlayerAction(invalidAllIn);
+
+    // Verify the engine rejected all betting actions in PostRiver
+    EXPECT_FALSE(invalidActions.empty()) << "Engine should reject all betting actions in PostRiver state";
+
+    if (!invalidActions.empty())
+    {
+        bool foundPostRiverRejection = false;
+        for (const auto& [playerId, rejectedAction, reason] : invalidActions)
+        {
+            logTestMessage("Engine rejected PostRiver action from player " + std::to_string(playerId) + " (" +
+                           playerActionToString(rejectedAction.type) + ") with reason: " + reason);
+
+            // The reason should indicate that no betting is allowed in PostRiver
+            EXPECT_FALSE(reason.empty()) << "Engine should provide a reason for rejecting PostRiver betting actions";
+
+            foundPostRiverRejection = true;
+        }
+
+        EXPECT_TRUE(foundPostRiverRejection) << "Should have found rejection of betting actions in PostRiver state";
+    }
+
+    // Verify the game state remains PostRiver (no state changes from invalid actions)
+    EXPECT_EQ(myHandFsm->getGameState(), GameState::PostRiver)
+        << "Game state should remain PostRiver after rejected actions";
+}
+
+TEST_F(BettingRoundsFsmTest, AllInPlayerDoesNotActAgain)
+{
+    logTestMessage("Testing that all-in players cannot act again in subsequent rounds");
+
+    initializeHandFsmWithPlayers(3, gameData);
+
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerUtg = getPlayerFsmById(myActingPlayersListFsm, 2);
+
+    // Reduce SB player's cash to create all-in scenario
+    playerSb->setCash(50); // After posting SB (10), they'll have 40 left for all-in
+
+    // Setup strategies: SB goes all-in preflop, others call to continue to flop
+    auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Allin}); // SB goes all-in
+    playerSb->setStrategy(std::move(sbStrategy));
+
+    auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    bbStrategy->setLastAction(GameState::Preflop, {playerBb->getId(), ActionType::Call}); // BB calls all-in
+    bbStrategy->setLastAction(GameState::Flop, {playerBb->getId(), ActionType::Check});   // BB checks on flop
+    playerBb->setStrategy(std::move(bbStrategy));
+
+    auto utgStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    utgStrategy->setLastAction(GameState::Preflop, {playerUtg->getId(), ActionType::Call}); // UTG calls all-in
+    utgStrategy->setLastAction(GameState::Flop, {playerUtg->getId(), ActionType::Check});   // UTG checks on flop
+    playerUtg->setStrategy(std::move(utgStrategy));
+
+    // Track invalid actions from engine
+    std::vector<std::tuple<unsigned, PlayerAction, std::string>> invalidActions;
+    myEvents.onInvalidPlayerAction = [&invalidActions](unsigned playerId, PlayerAction action, std::string reason)
+    { invalidActions.push_back(std::make_tuple(playerId, action, reason)); };
+
+    // Run the hand until we reach flop (SB should be all-in from preflop)
+    myHandFsm->runGameLoop();
+
+    // Verify the hand progressed beyond preflop
+    EXPECT_NE(myHandFsm->getGameState(), GameState::Preflop)
+        << "Hand should have progressed beyond preflop after all-in";
+
+    // Now try to make the all-in player (SB) act again in later rounds
+    // This should be rejected since they're already all-in
+
+    PlayerAction invalidBetFromAllIn{playerSb->getId(), ActionType::Bet, 20};
+    logTestMessage("Attempting bet from all-in player");
+    myHandFsm->handlePlayerAction(invalidBetFromAllIn);
+
+    PlayerAction invalidRaiseFromAllIn{playerSb->getId(), ActionType::Raise, 50};
+    logTestMessage("Attempting raise from all-in player");
+    myHandFsm->handlePlayerAction(invalidRaiseFromAllIn);
+
+    PlayerAction invalidCallFromAllIn{playerSb->getId(), ActionType::Call, 0};
+    logTestMessage("Attempting call from all-in player");
+    myHandFsm->handlePlayerAction(invalidCallFromAllIn);
+
+    PlayerAction invalidCheckFromAllIn{playerSb->getId(), ActionType::Check, 0};
+    logTestMessage("Attempting check from all-in player");
+    myHandFsm->handlePlayerAction(invalidCheckFromAllIn);
+
+    PlayerAction invalidFoldFromAllIn{playerSb->getId(), ActionType::Fold, 0};
+    logTestMessage("Attempting fold from all-in player");
+    myHandFsm->handlePlayerAction(invalidFoldFromAllIn);
+
+    // Verify the engine rejected actions from the all-in player
+    EXPECT_FALSE(invalidActions.empty()) << "Engine should reject actions from players who are already all-in";
+
+    if (!invalidActions.empty())
+    {
+        bool foundAllInPlayerRejection = false;
+        for (const auto& [playerId, rejectedAction, reason] : invalidActions)
+        {
+            // Look for actions from the all-in player (SB)
+            if (playerId == playerSb->getId())
+            {
+                foundAllInPlayerRejection = true;
+                logTestMessage("Engine correctly rejected action from all-in player " + std::to_string(playerId) +
+                               " (" + playerActionToString(rejectedAction.type) + ") with reason: " + reason);
+
+                // The reason should indicate the player is all-in or cannot act
+                EXPECT_FALSE(reason.empty()) << "Engine should provide a reason for rejecting all-in player actions";
+            }
+        }
+
+        EXPECT_TRUE(foundAllInPlayerRejection) << "Should have found rejection of actions from all-in player";
+    }
+}
+
+TEST_F(BettingRoundsFsmTest, HeadsUpEndsImmediatelyOnFold)
+{
+    logTestMessage("Testing that heads-up hands end immediately when one player folds");
+
+    initializeHandFsmWithPlayers(2, gameData);
+
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+
+    // Test scenario 1: SB folds preflop - hand should end immediately
+    logTestMessage("Testing SB fold in preflop");
+
+    // Setup strategies: SB folds immediately, BB should win without acting
+    auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Fold});
+    playerSb->setStrategy(std::move(sbStrategy));
+
+    auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    // BB doesn't need any actions since SB folds immediately
+    playerBb->setStrategy(std::move(bbStrategy));
+
+    // Track invalid actions to ensure no extra actions are attempted
+    std::vector<std::tuple<unsigned, PlayerAction, std::string>> invalidActions;
+    myEvents.onInvalidPlayerAction = [&invalidActions](unsigned playerId, PlayerAction action, std::string reason)
+    { invalidActions.push_back(std::make_tuple(playerId, action, reason)); };
+
+    // Run the hand
+    myHandFsm->runGameLoop();
+
+    // Verify the hand went directly to PostRiver after the fold
+    EXPECT_EQ(myHandFsm->getGameState(), GameState::PostRiver)
+        << "Heads-up hand should end immediately and reach PostRiver when one player folds";
+
+    // Verify the state sequence shows immediate transition
+    EXPECT_GE(stateSequence.size(), 2u) << "Should have at least Preflop and PostRiver states";
+    EXPECT_EQ(stateSequence[0], GameState::Preflop) << "Should start in Preflop";
+    EXPECT_EQ(stateSequence.back(), GameState::PostRiver) << "Should end in PostRiver";
+
+    // In heads-up, a fold should transition directly to PostRiver (no flop/turn/river)
+    // The sequence should be short: Preflop -> PostRiver
+    EXPECT_LE(stateSequence.size(), 2u)
+        << "Heads-up fold should transition directly from Preflop to PostRiver without intermediate states";
+
+    // Verify the folded player is no longer active
+    EXPECT_FALSE(isPlayerStillActive(playerSb->getId())) << "Folded player should not be active after folding";
+
+    // Verify winner (BB) is still active or properly determined
+    EXPECT_TRUE(isPlayerStillActive(playerBb->getId()) || myHandFsm->getGameState() == GameState::PostRiver)
+        << "Winning player should be active or hand should be in PostRiver";
+
+    // Test that attempting actions after the fold is rejected
+    PlayerAction invalidActionAfterFold{playerSb->getId(), ActionType::Bet, 20};
+    logTestMessage("Attempting action from folded player after heads-up fold");
+    myHandFsm->handlePlayerAction(invalidActionAfterFold);
+
+    PlayerAction invalidActionFromWinner{playerBb->getId(), ActionType::Check, 0};
+    logTestMessage("Attempting action from winner after heads-up fold");
+    myHandFsm->handlePlayerAction(invalidActionFromWinner);
+
+    // Verify these actions were rejected
+    EXPECT_FALSE(invalidActions.empty()) << "Engine should reject actions after heads-up hand has ended";
+
+    if (!invalidActions.empty())
+    {
+        bool foundPostFoldRejection = false;
+        for (const auto& [playerId, rejectedAction, reason] : invalidActions)
+        {
+            logTestMessage("Engine rejected post-fold action from player " + std::to_string(playerId) + " (" +
+                           playerActionToString(rejectedAction.type) + ") with reason: " + reason);
+
+            // Should reject actions because hand is over or player is inactive
+            EXPECT_FALSE(reason.empty()) << "Engine should provide reason for rejecting actions after heads-up fold";
+
+            foundPostFoldRejection = true;
+        }
+
+        EXPECT_TRUE(foundPostFoldRejection) << "Should have found rejection of actions after heads-up fold";
+    }
+
+    // Verify hand action history shows the immediate fold
+    const auto& handHistory = myHandFsm->getHandActionHistory();
+    EXPECT_FALSE(handHistory.empty()) << "Hand action history should not be empty";
+
+    // Should have preflop round with SB fold
+    auto preflopRound = std::find_if(handHistory.begin(), handHistory.end(),
+                                     [](const auto& round) { return round.round == GameState::Preflop; });
+    ASSERT_NE(preflopRound, handHistory.end()) << "Should have preflop round in history";
+
+    // Count fold actions - should have exactly one (the SB fold)
+    int foldCount = 0;
+    for (const auto& [playerId, action] : preflopRound->actions)
+    {
+        if (action == ActionType::Fold && playerId == playerSb->getId())
+        {
+            foldCount++;
+        }
+    }
+    EXPECT_EQ(foldCount, 1) << "Should have exactly one fold action (SB) in heads-up scenario";
+}
 
 } // namespace pkt::test

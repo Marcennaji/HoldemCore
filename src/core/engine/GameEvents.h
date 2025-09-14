@@ -16,8 +16,8 @@ struct GameEvents
     std::function<void(std::list<unsigned> winnerIds, int totalPot)> onHandCompleted;
     std::function<void(unsigned playerId, int newChips)> onPlayerChipsUpdated;
     std::function<void(GameState)> onBettingRoundStarted;
-    std::function<void(int)> onPotUpdated;
-    std::function<void(PlayerAction)> onPlayerActed;
+    std::function<void(int newPotAmount)> onPotUpdated;
+    std::function<void(PlayerAction action)> onPlayerActed;
     std::function<void(unsigned playerId, std::vector<ActionType> validActions)> onAwaitingHumanInput;
 
     // Error handling events
