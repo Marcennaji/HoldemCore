@@ -3,6 +3,7 @@
 // Licensed under the MIT License — see LICENSE file for details.
 #pragma once
 
+#include "core/engine/GameEvents.h"
 #include "core/interfaces/IBoard.h"
 #include "core/player/typedefs.h"
 
@@ -23,7 +24,7 @@ class HandFsm;
 class BoardFsm : public IBoard
 {
   public:
-    BoardFsm(unsigned dealerPosition);
+    BoardFsm(unsigned dealerPosition, const GameEvents& events);
     ~BoardFsm();
 
     void setSeatsList(pkt::core::player::PlayerList seats) { throw std::runtime_error("Use setSeatsListFsm instead"); };
@@ -61,6 +62,8 @@ class BoardFsm : public IBoard
     void setPlayerNeedToShowCards(const std::list<unsigned>& p);
 
   private:
+  private:
+    const GameEvents& myEvents;
     pkt::core::player::PlayerFsmList mySeatsList;
     pkt::core::player::PlayerFsmList myActingPlayersList;
 

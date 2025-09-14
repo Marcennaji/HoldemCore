@@ -25,6 +25,7 @@ void MockUI::clear()
     invalidActions.clear();
     engineErrors.clear();
     humanInputRequests.clear();
+    handCompletions.clear();
     gameInitialized = false;
     gameSpeed = 0;
 }
@@ -85,6 +86,9 @@ void EventDrivenArchitectureTest::createGameEvents()
 
     myEvents.onAwaitingHumanInput = [this](unsigned playerId, std::vector<ActionType> validActions)
     { mockUI->humanInputRequests.push_back({playerId, validActions}); };
+
+    myEvents.onHandCompleted = [this](std::list<unsigned> winnerIds, int totalPot)
+    { mockUI->handCompletions.push_back({winnerIds, totalPot}); };
 }
 
 /**
@@ -373,6 +377,64 @@ TEST_F(EventDrivenArchitectureTest, EngineAutoFoldsAfterRepeatedInvalidActions)
         EXPECT_EQ(autoFoldAction.playerId, playerToAct) << "Auto-fold should be for the problematic player";
         EXPECT_EQ(autoFoldAction.type, ActionType::Fold) << "Auto-action should be a fold";
     }
+}
+
+/**
+ * Test that engine fires onHandCompleted event when a hand finishes
+ * UI should know when hands complete and who won without calling engine
+ */
+TEST_F(EventDrivenArchitectureTest, EngineFiresHandCompletedEvent)
+{
+    initializeHandFsmWithPlayers(3, gameData);
+
+    // Configure strategies so we have a clear winner scenario
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);     // Small blind folds
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);     // Big blind folds
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 2); // Dealer wins by default
+
+    auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Fold});
+    playerSb->setStrategy(std::move(sbStrategy));
+
+    auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    bbStrategy->setLastAction(GameState::Preflop, {playerBb->getId(), ActionType::Fold});
+    playerBb->setStrategy(std::move(bbStrategy));
+
+    // Dealer doesn't need strategy since others fold
+    auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    dealerStrategy->setLastAction(GameState::Preflop, {playerDealer->getId(), ActionType::Check});
+    playerDealer->setStrategy(std::move(dealerStrategy));
+
+    // Clear any existing events and run the hand
+    mockUI->clear();
+    myHandFsm->runGameLoop();
+
+    // UI should have received exactly one hand completion event
+    ASSERT_FALSE(mockUI->handCompletions.empty()) << "UI should receive onHandCompleted event when hand finishes";
+
+    EXPECT_EQ(mockUI->handCompletions.size(), 1) << "Should receive exactly one hand completion event per hand";
+
+    const auto& handCompletion = mockUI->handCompletions[0];
+
+    // Should have exactly one winner (the dealer who didn't fold)
+    EXPECT_FALSE(handCompletion.winnerIds.empty()) << "Hand completion should include winner IDs";
+
+    EXPECT_EQ(handCompletion.winnerIds.size(), 1) << "Should have exactly one winner when others fold";
+
+    if (!handCompletion.winnerIds.empty())
+    {
+        EXPECT_EQ(handCompletion.winnerIds.front(), playerDealer->getId())
+            << "Winner should be the dealer (player who didn't fold)";
+    }
+
+    // Should have a reasonable pot size (at least the blinds)
+    EXPECT_GT(handCompletion.totalPot, 0) << "Total pot should be greater than 0";
+
+    // Pot should include at least the small and big blinds
+    int expectedMinPot = gameData.firstSmallBlind + (gameData.firstSmallBlind * 2); // SB + BB
+    EXPECT_GE(handCompletion.totalPot, expectedMinPot)
+        << "Pot should at least contain the blinds. Expected >= " << expectedMinPot << ", got "
+        << handCompletion.totalPot;
 }
 
 } // namespace pkt::test

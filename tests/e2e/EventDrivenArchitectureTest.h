@@ -67,6 +67,14 @@ class MockUI
     };
     std::vector<HumanInputRequest> humanInputRequests;
 
+    // Hand completion events
+    struct HandCompletedData
+    {
+        std::list<unsigned> winnerIds;
+        int totalPot;
+    };
+    std::vector<HandCompletedData> handCompletions;
+
     bool gameInitialized = false;
     int gameSpeed = 0;
 

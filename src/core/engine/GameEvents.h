@@ -12,7 +12,7 @@ namespace pkt::core
 struct GameEvents
 {
     std::function<void(int gameSpeed)> onGameInitialized;
-    std::function<void(std::vector<unsigned> winnerIds, int totalPot)> onHandCompleted;
+    std::function<void(std::list<unsigned> winnerIds, int totalPot)> onHandCompleted;
     std::function<void(unsigned playerId, int newChips)> onPlayerChipsUpdated;
     std::function<void(GameState)> onBettingRoundStarted;
     std::function<void(int)> onPotUpdated;

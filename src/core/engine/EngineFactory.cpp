@@ -45,7 +45,7 @@ std::shared_ptr<IBoard> EngineFactory::createBoard(unsigned dealerPosition)
 }
 std::shared_ptr<IBoard> EngineFactory::createBoardFsm(unsigned dealerPosition)
 {
-    return std::shared_ptr<IBoard>(new BoardFsm(dealerPosition));
+    return std::shared_ptr<IBoard>(new BoardFsm(dealerPosition, myEvents));
 }
 std::vector<std::shared_ptr<IBettingRound>> EngineFactory::createAllBettingRounds(IHand* hand, unsigned dealerPosition,
                                                                                   int smallBlind)

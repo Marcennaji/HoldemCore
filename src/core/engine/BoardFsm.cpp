@@ -19,7 +19,7 @@ namespace pkt::core
 {
 using namespace pkt::core::player;
 
-BoardFsm::BoardFsm(unsigned dp) : IBoard(), myDealerPlayerId(dp)
+BoardFsm::BoardFsm(unsigned dp, const GameEvents& events) : myDealerPlayerId(dp), myEvents(events)
 {
     myCards[0] = myCards[1] = myCards[2] = myCards[3] = myCards[4] = 0;
 }
@@ -48,6 +48,9 @@ void BoardFsm::distributePot(HandFsm& hand)
     PotFsm pot(totalPot, mySeatsList, myDealerPlayerId);
     pot.distribute();
     myWinners = pot.getWinners();
+
+    if (myEvents.onHandCompleted)
+        myEvents.onHandCompleted(myWinners, totalPot);
 }
 
 void BoardFsm::determinePlayerNeedToShowCards()
