@@ -525,8 +525,70 @@ TEST_F(BettingRoundsFsmTest, FirstToActPostflopIsSmallBlindInThreePlayers)
     EXPECT_EQ(playerSb->getPosition(), PlayerPosition::SmallBlind) << "Player should be Small Blind";
 }
 
-// - AllActionsAreFromActivePlayersOnly
-// - NoPlayerStartsPostFlopRoundWithRaise
+TEST_F(BettingRoundsFsmTest, NoPlayerStartsPostFlopRoundWithRaise)
+{
+    logTestMessage("Testing that engine rejects raise actions when starting post-flop rounds");
+
+    initializeHandFsmWithPlayers(3, gameData);
+
+    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
+
+    // Setup strategies to reach flop
+    auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    dealerStrategy->setLastAction(GameState::Preflop, {playerDealer->getId(), ActionType::Call});
+    playerDealer->setStrategy(std::move(dealerStrategy));
+
+    auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Call});
+    // Small blind will attempt an INVALID raise as first action on flop
+    sbStrategy->setLastAction(GameState::Flop, {playerSb->getId(), ActionType::Raise, 50});
+    playerSb->setStrategy(std::move(sbStrategy));
+
+    auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    bbStrategy->setLastAction(GameState::Preflop, {playerBb->getId(), ActionType::Check});
+    playerBb->setStrategy(std::move(bbStrategy));
+
+    // Track invalid actions from engine
+    std::vector<std::tuple<unsigned, PlayerAction, std::string>> invalidActions;
+    myEvents.onInvalidPlayerAction = [&invalidActions](unsigned playerId, PlayerAction action, std::string reason)
+    { invalidActions.push_back(std::make_tuple(playerId, action, reason)); };
+
+    // Run the hand - this should trigger the invalid raise on flop
+    myHandFsm->runGameLoop();
+
+    // Verify the engine rejected the invalid raise action
+    EXPECT_FALSE(invalidActions.empty()) << "Engine should reject raise action at start of post-flop round";
+
+    if (!invalidActions.empty())
+    {
+        bool foundInvalidRaise = false;
+        for (const auto& [playerId, rejectedAction, reason] : invalidActions)
+        {
+            if (rejectedAction.type == ActionType::Raise && playerId == playerSb->getId())
+            {
+                foundInvalidRaise = true;
+                logTestMessage("Engine correctly rejected invalid raise with reason: " + reason);
+
+                // The reason should indicate why raising is not allowed
+                EXPECT_FALSE(reason.empty()) << "Engine should provide a reason for rejecting the raise";
+
+                break;
+            }
+        }
+
+        EXPECT_TRUE(foundInvalidRaise)
+            << "Should have found rejection of invalid raise action from small blind on flop";
+    }
+
+    // Verify we should have reached at least flop (even if invalid action occurred)
+    EXPECT_TRUE(myLastGameState == GameState::Flop || myLastGameState == GameState::Turn ||
+                myLastGameState == GameState::River || myLastGameState == GameState::PostRiver)
+        << "Should have progressed beyond preflop despite invalid action. Last state: "
+        << gameStateToString(myLastGameState);
+}
+
 // - NoPlayerBetsAfterRaise
 // - NoPlayerChecksAfterBetOrRaise
 // - OnlyOneBetAllowedPerRoundUnlessRaised
