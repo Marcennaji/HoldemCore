@@ -3,6 +3,7 @@
 #include "core/engine/model/PlayerAction.h"
 
 #include <functional>
+#include <list>
 #include <string>
 #include <vector>
 
