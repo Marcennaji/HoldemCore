@@ -1,10 +1,12 @@
 #pragma once
 
+#include "core/engine/CardUtilities.h"
+
 #include <algorithm>
 #include <random>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include "core/engine/CardUtilities.h"
 
 namespace pkt::core
 {

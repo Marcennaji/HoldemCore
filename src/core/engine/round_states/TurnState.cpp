@@ -27,11 +27,29 @@ void TurnState::enter(HandFsm& hand)
     // Reset betting amounts for new round
     hand.getBettingActions()->resetRoundHighestSet();
 
-    // Deal turn card
-    // hand.getBoard()->dealTurn();
-
     if (myEvents.onBettingRoundStarted)
         myEvents.onBettingRoundStarted(Turn);
+
+    // Deal turn card and fire event with turn-specific BoardCards
+    BoardCards currentBoard = hand.getBoard().getBoardCards();
+    if (currentBoard.getNumCards() == 3) // Only deal turn if we have exactly 3 cards (flop)
+    {
+        // Get next card from deck for turn
+        std::vector<Card> turnCards = hand.dealCardsFromDeck(1);
+
+        // Create turn-specific BoardCards (4 cards)
+        BoardCards turnBoard = currentBoard; // Copy current flop
+        turnBoard.dealTurn(turnCards[0]);    // Add turn card
+
+        // Update board with turn card
+        hand.getBoard().setBoardCards(turnBoard);
+
+        // Fire event with turn-specific board (4 cards)
+        if (myEvents.onBoardCardsDealt)
+        {
+            myEvents.onBoardCardsDealt(turnBoard);
+        }
+    }
 }
 
 void TurnState::exit(HandFsm& hand)

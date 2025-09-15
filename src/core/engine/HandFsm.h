@@ -38,6 +38,9 @@ class HandFsm : public IHandLifecycle, public IHandPlayerAction, public HandPlay
     void dealHoleCards(size_t lastArrayIndex) override;
     void initAndShuffleDeck() override;
 
+    // Method for round states to deal cards progressively
+    std::vector<Card> dealCardsFromDeck(int numCards);
+
     pkt::core::player::HandCommonContext updateHandCommonContext(const GameState);
 
     std::string getStringBoard() const;

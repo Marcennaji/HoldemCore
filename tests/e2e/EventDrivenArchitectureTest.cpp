@@ -437,4 +437,82 @@ TEST_F(EventDrivenArchitectureTest, EngineFiresHandCompletedEvent)
         << handCompletion.totalPot;
 }
 
+/**
+ * Test that engine fires card dealing events (onHoleCardsDealt and onBoardCardsDealt)
+ * UI should receive events when cards are dealt without polling engine
+ */
+TEST_F(EventDrivenArchitectureTest, EngineFiresCardDealingEvents)
+{
+    // Track card dealing events
+    std::vector<std::pair<unsigned, HoleCards>> holeCardsDealt;
+    std::vector<BoardCards> boardCardsDealt;
+
+    // Add event handlers for card dealing BEFORE initialization so we capture hole cards events
+    myEvents.onHoleCardsDealt = [&holeCardsDealt](unsigned playerId, HoleCards holeCards)
+    { holeCardsDealt.push_back({playerId, holeCards}); };
+
+    myEvents.onBoardCardsDealt = [&boardCardsDealt](BoardCards boardCards) { boardCardsDealt.push_back(boardCards); };
+
+    // Initialize AFTER setting up event handlers so we capture hole cards events
+    initializeHandFsmWithPlayers(2, gameData);
+
+    // Configure strategies to play through all rounds so we see all board card events
+    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+
+    auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Call});
+    sbStrategy->setLastAction(GameState::Flop, {playerSb->getId(), ActionType::Check});
+    sbStrategy->setLastAction(GameState::Turn, {playerSb->getId(), ActionType::Check});
+    sbStrategy->setLastAction(GameState::River, {playerSb->getId(), ActionType::Check});
+    playerSb->setStrategy(std::move(sbStrategy));
+
+    auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    bbStrategy->setLastAction(GameState::Preflop, {playerBb->getId(), ActionType::Check});
+    bbStrategy->setLastAction(GameState::Flop, {playerBb->getId(), ActionType::Check});
+    bbStrategy->setLastAction(GameState::Turn, {playerBb->getId(), ActionType::Check});
+    bbStrategy->setLastAction(GameState::River, {playerBb->getId(), ActionType::Check});
+    playerBb->setStrategy(std::move(bbStrategy));
+
+    // Run the hand
+    myHandFsm->runGameLoop();
+
+    // Verify hole cards events
+    ASSERT_EQ(holeCardsDealt.size(), 2) << "Should receive hole cards events for both players";
+
+    // Check that both players received hole cards
+    std::set<unsigned> playersWithHoleCards;
+    for (const auto& [playerId, holeCards] : holeCardsDealt)
+    {
+        playersWithHoleCards.insert(playerId);
+        // Each player should receive valid hole cards
+        EXPECT_TRUE(holeCards.isValid()) << "Each player should receive valid hole cards";
+    }
+    EXPECT_EQ(playersWithHoleCards.size(), 2) << "Both players should receive hole cards";
+
+    // Verify board cards events
+    ASSERT_EQ(boardCardsDealt.size(), 3) << "Should receive board cards events for Flop, Turn, and River";
+
+    // Check Flop event (3 cards)
+    auto flopEvent = std::find_if(boardCardsDealt.begin(), boardCardsDealt.end(),
+                                  [](const BoardCards& boardCards) { return boardCards.isFlop(); });
+    ASSERT_NE(flopEvent, boardCardsDealt.end()) << "Should receive Flop board cards event";
+    EXPECT_EQ(flopEvent->getNumCards(), 3) << "Flop should have exactly 3 cards";
+    EXPECT_TRUE(flopEvent->isFlop()) << "Board should be in flop state";
+
+    // Check Turn event (4 cards total)
+    auto turnEvent = std::find_if(boardCardsDealt.begin(), boardCardsDealt.end(),
+                                  [](const BoardCards& boardCards) { return boardCards.isTurn(); });
+    ASSERT_NE(turnEvent, boardCardsDealt.end()) << "Should receive Turn board cards event";
+    EXPECT_EQ(turnEvent->getNumCards(), 4) << "Turn should have exactly 4 cards total";
+    EXPECT_TRUE(turnEvent->isTurn()) << "Board should be in turn state";
+
+    // Check River event (5 cards total)
+    auto riverEvent = std::find_if(boardCardsDealt.begin(), boardCardsDealt.end(),
+                                   [](const BoardCards& boardCards) { return boardCards.isRiver(); });
+    ASSERT_NE(riverEvent, boardCardsDealt.end()) << "Should receive River board cards event";
+    EXPECT_EQ(riverEvent->getNumCards(), 5) << "River should have exactly 5 cards total";
+    EXPECT_TRUE(riverEvent->isRiver()) << "Board should be in river state";
+}
+
 } // namespace pkt::test

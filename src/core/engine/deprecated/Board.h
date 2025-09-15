@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <memory>
+#include <stdexcept>
 #include <vector>
 
 #include "core/cards/Card.h"
@@ -28,13 +29,13 @@ class Board : public IBoard
     Board(unsigned dealerPosition);
     ~Board();
 
-    void setSeatsList(pkt::core::player::PlayerList seats);
-    void setActingPlayersList(pkt::core::player::PlayerList actingPlayers);
-    void setSeatsListFsm(pkt::core::player::PlayerFsmList seats) {};
-    void setActingPlayersListFsm(pkt::core::player::PlayerFsmList actingPlayers) {};
+    void setSeatsList(pkt::core::player::PlayerList seats) override;
+    void setActingPlayersList(pkt::core::player::PlayerList actingPlayers) override;
+    void setSeatsListFsm(pkt::core::player::PlayerFsmList seats) override {};
+    void setActingPlayersListFsm(pkt::core::player::PlayerFsmList actingPlayers) override {};
 
-    void setCards(int* theValue);
-    void getCards(int* theValue);
+    void setCards(int* theValue) override;
+    void getCards(int* theValue) override;
 
     // Modern BoardCards interface (not implemented in deprecated class)
     void setBoardCards(const BoardCards& boardCards) override
@@ -46,26 +47,26 @@ class Board : public IBoard
         throw std::runtime_error("getBoardCards not implemented in deprecated Board class");
     }
 
-    void setAllInCondition(bool theValue);
-    void setLastActionPlayerId(unsigned theValue);
+    void setAllInCondition(bool theValue) override;
+    void setLastActionPlayerId(unsigned theValue) override;
 
-    int getPot() const;
-    int getPot(const HandFsm& hand) const { throw std::runtime_error("getPot Not implemented"); }
-    void setPot(int theValue);
-    int getSets() const;
-    int getSets(const HandFsm& hand) const { throw std::runtime_error("getSets Not implemented"); }
+    int getPot() const override;
+    int getPot(const HandFsm& hand) const override { throw std::runtime_error("getPot Not implemented"); }
+    void setPot(int theValue) override;
+    int getSets() const override;
+    int getSets(const HandFsm& hand) const override { throw std::runtime_error("getSets Not implemented"); }
 
-    void collectSets();
-    void collectPot();
+    void collectSets() override;
+    void collectPot() override;
 
-    void distributePot();
-    void determinePlayerNeedToShowCards();
+    void distributePot() override;
+    void determinePlayerNeedToShowCards() override;
 
-    std::list<unsigned> getWinners() const;
-    void setWinners(const std::list<unsigned>& w);
+    std::list<unsigned> getWinners() const override;
+    void setWinners(const std::list<unsigned>& w) override;
 
-    std::list<unsigned> getPlayerNeedToShowCards() const;
-    void setPlayerNeedToShowCards(const std::list<unsigned>& p);
+    std::list<unsigned> getPlayerNeedToShowCards() const override;
+    void setPlayerNeedToShowCards(const std::list<unsigned>& p) override;
 
   private:
     pkt::core::player::PlayerList mySeatsList;

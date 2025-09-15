@@ -55,8 +55,7 @@ void HandFsm::initialize()
         "\n----------------------  New hand initialization (FSM)  -------------------------------\n");
 
     initAndShuffleDeck();
-    size_t cardsArrayIndex = dealBoardCards();
-    dealHoleCards(cardsArrayIndex);
+    dealHoleCards(0); // Pass 0 as index, since no board cards dealt yet
 
     for (auto player = mySeatsList->begin(); player != mySeatsList->end(); ++player)
     {
@@ -265,6 +264,12 @@ void HandFsm::dealHoleCards(size_t cardsArrayIndex)
         // Set using modern interface
         (*it)->setHoleCards(holeCards);
 
+        // Fire event for UI to know hole cards were dealt
+        if (myEvents.onHoleCardsDealt)
+        {
+            myEvents.onHoleCardsDealt((*it)->getId(), holeCards);
+        }
+
         // Create 7-card array for hand evaluation (2 hole + 5 board)
         int tempPlayerAndBoardArray[7];
 
@@ -306,6 +311,11 @@ size_t HandFsm::dealBoardCards()
     myBoard->setBoardCards(boardCards);
 
     return 5; // Number of cards dealt
+}
+
+std::vector<Card> HandFsm::dealCardsFromDeck(int numCards)
+{
+    return myDeck.dealCards(numCards);
 }
 
 HandCommonContext HandFsm::updateHandCommonContext(const GameState state)

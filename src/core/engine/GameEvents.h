@@ -1,4 +1,5 @@
 #pragma once
+#include "core/cards/Card.h"
 #include "core/engine/model/GameState.h"
 #include "core/engine/model/PlayerAction.h"
 
@@ -19,6 +20,10 @@ struct GameEvents
     std::function<void(int newPotAmount)> onPotUpdated;
     std::function<void(PlayerAction action)> onPlayerActed;
     std::function<void(unsigned playerId, std::vector<ActionType> validActions)> onAwaitingHumanInput;
+
+    // Card dealing events
+    std::function<void(unsigned playerId, HoleCards holeCards)> onHoleCardsDealt;
+    std::function<void(BoardCards boardCards)> onBoardCardsDealt;
 
     // Error handling events
     std::function<void(unsigned playerId, PlayerAction invalidAction, std::string reason)> onInvalidPlayerAction;

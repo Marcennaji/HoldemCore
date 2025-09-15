@@ -54,6 +54,11 @@ std::string CardUtilities::getCardStringValue(const int* cardValues, int size)
 
 const std::string& CardUtilities::getCardString(int cardIndex)
 {
+    if (cardIndex == -1)
+    {
+        static const std::string invalidCard = "Invalid";
+        return invalidCard;
+    }
     if (cardIndex < 0 || cardIndex >= 52)
     {
         throw std::out_of_range("Card index out of range: " + std::to_string(cardIndex));

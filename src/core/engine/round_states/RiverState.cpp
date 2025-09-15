@@ -27,11 +27,29 @@ void RiverState::enter(HandFsm& hand)
     // Reset betting amounts for new round
     hand.getBettingActions()->resetRoundHighestSet();
 
-    // Deal river card
-    // hand.getBoard()->dealRiver();
-
     if (myEvents.onBettingRoundStarted)
         myEvents.onBettingRoundStarted(River);
+
+    // Deal river card and fire event with river-specific BoardCards
+    BoardCards currentBoard = hand.getBoard().getBoardCards();
+    if (currentBoard.getNumCards() == 4) // Only deal river if we have exactly 4 cards (turn)
+    {
+        // Get next card from deck for river
+        std::vector<Card> riverCards = hand.dealCardsFromDeck(1);
+
+        // Create river-specific BoardCards (5 cards)
+        BoardCards riverBoard = currentBoard; // Copy current turn board
+        riverBoard.dealRiver(riverCards[0]);  // Add river card
+
+        // Update board with river card
+        hand.getBoard().setBoardCards(riverBoard);
+
+        // Fire event with river-specific board (5 cards)
+        if (myEvents.onBoardCardsDealt)
+        {
+            myEvents.onBoardCardsDealt(riverBoard);
+        }
+    }
 }
 
 void RiverState::exit(HandFsm& hand)

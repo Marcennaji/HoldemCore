@@ -28,43 +28,46 @@ class BoardFsm : public IBoard
     BoardFsm(unsigned dealerPosition, const GameEvents& events);
     ~BoardFsm();
 
-    void setSeatsList(pkt::core::player::PlayerList seats) { throw std::runtime_error("Use setSeatsListFsm instead"); };
-    void setActingPlayersList(pkt::core::player::PlayerList actingPlayers)
+    void setSeatsList(pkt::core::player::PlayerList seats) override
+    {
+        throw std::runtime_error("Use setSeatsListFsm instead");
+    };
+    void setActingPlayersList(pkt::core::player::PlayerList actingPlayers) override
     {
         throw std::runtime_error("Use setActingPlayersListFsm instead");
     };
-    void setSeatsListFsm(pkt::core::player::PlayerFsmList seats);
-    void setActingPlayersListFsm(pkt::core::player::PlayerFsmList actingPlayers);
+    void setSeatsListFsm(pkt::core::player::PlayerFsmList seats) override;
+    void setActingPlayersListFsm(pkt::core::player::PlayerFsmList actingPlayers) override;
 
-    void setCards(int* theValue);
-    void getCards(int* theValue);
+    void setCards(int* theValue) override;
+    void getCards(int* theValue) override;
 
     // Modern BoardCards interface (preferred for new code)
     void setBoardCards(const BoardCards& boardCards) override;
     const BoardCards& getBoardCards() const override;
 
-    void setAllInCondition(bool theValue);
-    void setLastActionPlayerId(unsigned theValue);
+    void setAllInCondition(bool theValue) override;
+    void setLastActionPlayerId(unsigned theValue) override;
 
-    int getPot() const { throw std::runtime_error("getPot is deprecated"); }
-    int getPot(const HandFsm& hand) const;
-    void setPot(int theValue) { throw std::runtime_error("setPot is deprecated"); }
-    int getSets() const { throw std::runtime_error("getSets is deprecated"); }
-    int getSets(const HandFsm& hand) const;
+    int getPot() const override { throw std::runtime_error("getPot is deprecated"); }
+    int getPot(const HandFsm& hand) const override;
+    void setPot(int theValue) override { throw std::runtime_error("setPot is deprecated"); }
+    int getSets() const override { throw std::runtime_error("getSets is deprecated"); }
+    int getSets(const HandFsm& hand) const override;
 
-    void collectSets() { throw std::runtime_error("collectSets is deprecated"); }
-    void collectPot() { throw std::runtime_error("collectPot is deprecated"); }
+    void collectSets() override { throw std::runtime_error("collectSets is deprecated"); }
+    void collectPot() override { throw std::runtime_error("collectPot is deprecated"); }
 
-    void distributePot() { throw std::runtime_error("distributePot is deprecated"); }
+    void distributePot() override { throw std::runtime_error("distributePot is deprecated"); }
 
-    void distributePot(HandFsm& hand);
-    void determinePlayerNeedToShowCards();
+    void distributePot(HandFsm& hand) override;
+    void determinePlayerNeedToShowCards() override;
 
-    std::list<unsigned> getWinners() const;
-    void setWinners(const std::list<unsigned>& w);
+    std::list<unsigned> getWinners() const override;
+    void setWinners(const std::list<unsigned>& w) override;
 
-    std::list<unsigned> getPlayerNeedToShowCards() const;
-    void setPlayerNeedToShowCards(const std::list<unsigned>& p);
+    std::list<unsigned> getPlayerNeedToShowCards() const override;
+    void setPlayerNeedToShowCards(const std::list<unsigned>& p) override;
 
   private:
   private:
