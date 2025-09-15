@@ -2,10 +2,12 @@
 
 set(cards_SOURCES
     CardRangeAnalyzer.cpp
+    Card.cpp
 )
 
 set(cards_HEADERS
     CardRangeAnalyzer.h
+    Card.h
 )
 
 add_library(cards STATIC ${cards_SOURCES} ${cards_HEADERS})

@@ -1,6 +1,5 @@
+#include "common/EngineTest.h"
 #include "common/common.h"
-
-#include "CardsTest.h"
 
 #include <memory>
 
@@ -10,9 +9,18 @@ using namespace pkt::core::player;
 namespace pkt::test
 {
 
-bool CardsTest::cardsAreUniqueAndValid(const std::shared_ptr<pkt::core::IHand>& hand,
-                                       const std::shared_ptr<pkt::core::IBoard>& board,
-                                       const pkt::core::player::PlayerList& players)
+class BoardCardTest : public EngineTest
+{
+
+  public:
+    bool cardsAreUniqueAndValid(const std::shared_ptr<pkt::core::IHand>& hand,
+                                const std::shared_ptr<pkt::core::IBoard>& board,
+                                const pkt::core::player::PlayerList& players);
+};
+
+bool BoardCardTest::cardsAreUniqueAndValid(const std::shared_ptr<pkt::core::IHand>& hand,
+                                           const std::shared_ptr<pkt::core::IBoard>& board,
+                                           const pkt::core::player::PlayerList& players)
 {
     std::vector<int> allCards;
 
@@ -42,7 +50,7 @@ bool CardsTest::cardsAreUniqueAndValid(const std::shared_ptr<pkt::core::IHand>& 
     return cardSet.size() == allCards.size();
 }
 
-TEST_F(CardsTest, DealBoardCardsAndHoleCards_NoOverlap_2Players)
+TEST_F(BoardCardTest, DealBoardCardsAndHoleCards_NoOverlap_2Players)
 {
     initializeHandWithPlayers(2, gameData);
 
@@ -54,28 +62,28 @@ TEST_F(CardsTest, DealBoardCardsAndHoleCards_NoOverlap_2Players)
     ASSERT_EQ(sizeof(boardCards) / sizeof(boardCards[0]), 5);
 }
 
-TEST_F(CardsTest, DealBoardCardsAndHoleCards_NoOverlap_2Players_FullTest)
+TEST_F(BoardCardTest, DealBoardCardsAndHoleCards_NoOverlap_2Players_FullTest)
 {
     initializeHandWithPlayers(2, gameData);
     myHand->dealHoleCards(myHand->dealBoardCards());
     ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
 }
 
-TEST_F(CardsTest, DealBoardCardsAndHoleCards_NoOverlap_3Players)
+TEST_F(BoardCardTest, DealBoardCardsAndHoleCards_NoOverlap_3Players)
 {
     initializeHandWithPlayers(3, gameData);
     myHand->dealHoleCards(myHand->dealBoardCards());
     ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
 }
 
-TEST_F(CardsTest, DealBoardCardsAndHoleCards_NoOverlap_MaxPlayers)
+TEST_F(BoardCardTest, DealBoardCardsAndHoleCards_NoOverlap_MaxPlayers)
 {
     initializeHandWithPlayers(MAX_NUMBER_OF_PLAYERS, gameData);
     myHand->dealHoleCards(myHand->dealBoardCards());
     ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
 }
 
-TEST_F(CardsTest, AllDealtCards_AreWithinValidRange_4Players)
+TEST_F(BoardCardTest, AllDealtCards_AreWithinValidRange_4Players)
 {
     initializeHandWithPlayers(4, gameData);
     myHand->dealHoleCards(myHand->dealBoardCards());
@@ -98,7 +106,7 @@ TEST_F(CardsTest, AllDealtCards_AreWithinValidRange_4Players)
     }
 }
 
-TEST_F(CardsTest, DealCards_NoOverlap_OverMultipleRounds)
+TEST_F(BoardCardTest, DealCards_NoOverlap_OverMultipleRounds)
 {
     for (int i = 0; i < 500; ++i)
     {
