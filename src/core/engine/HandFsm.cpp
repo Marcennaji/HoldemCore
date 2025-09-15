@@ -54,8 +54,8 @@ void HandFsm::initialize()
     GlobalServices::instance().logger().info(
         "\n----------------------  New hand initialization (FSM)  -------------------------------\n");
 
+    // Initialize deck but don't deal cards yet - wait until runGameLoop() to match legacy timing
     initAndShuffleDeck();
-    dealHoleCards(0); // Pass 0 as index, since no board cards dealt yet
 
     for (auto player = mySeatsList->begin(); player != mySeatsList->end(); ++player)
     {
@@ -75,6 +75,9 @@ void HandFsm::end()
 
 void HandFsm::runGameLoop()
 {
+    // Deal cards at the start of game loop to match legacy timing
+    dealHoleCards(0); // Pass 0 as index, since no board cards dealt yet
+
     // Automatic game loop
     // This method drives the game forward by prompting players for actions
 
@@ -261,7 +264,6 @@ void HandFsm::dealHoleCards(size_t cardsArrayIndex)
         // Create HoleCards from the dealt cards
         HoleCards holeCards(holeCardList[0], holeCardList[1]);
 
-        // Set using modern interface
         (*it)->setHoleCards(holeCards);
 
         // Fire event for UI to know hole cards were dealt
@@ -307,7 +309,6 @@ size_t HandFsm::dealBoardCards()
     // Deal river (5th card)
     boardCards.dealRiver(boardCardList[4]);
 
-    // Set the board using modern interface
     myBoard->setBoardCards(boardCards);
 
     return 5; // Number of cards dealt
@@ -326,16 +327,16 @@ HandCommonContext HandFsm::updateHandCommonContext(const GameState state)
     handContext.stringBoard = getStringBoard();
     handContext.smallBlind = mySmallBlind;
 
-    handContext.playersContext.actingPlayersListFsm = getActingPlayersList();
-    handContext.playersContext.lastVPIPPlayerFsm =
+    handContext.playersContext.actingPlayersList = getActingPlayersList();
+    handContext.playersContext.lastVPIPPlayer =
         getPlayerFsmById(getSeatsList(), getBettingActions()->getLastRaiserId());
     handContext.playersContext.callersPositions = myBettingActions->getCallersPositions();
     handContext.playersContext.raisersPositions = myBettingActions->getRaisersPositions();
-    handContext.playersContext.preflopLastRaiserFsm =
+    handContext.playersContext.preflopLastRaiser =
         getPlayerFsmById(getSeatsList(), getBettingActions()->getPreflop().getLastRaiserId());
-    handContext.playersContext.turnLastRaiserFsm =
+    handContext.playersContext.turnLastRaiser =
         getPlayerFsmById(getSeatsList(), getBettingActions()->getTurn().getLastRaiserId());
-    handContext.playersContext.flopLastRaiserFsm =
+    handContext.playersContext.flopLastRaiser =
         getPlayerFsmById(getSeatsList(), getBettingActions()->getFlop().getLastRaiserId());
 
     handContext.bettingContext.pot = myBoard->getPot(*this);
@@ -371,7 +372,7 @@ std::string HandFsm::getStringBoard() const
     // Use modern BoardCards toString but adjust for legacy format compatibility
     std::string boardString = boardCards.toString();
 
-    if (boardString == "Preflop" || boardString == "Invalid Board State")
+    if (boardString == "<no cards>" || boardString == "Invalid Board State")
     {
         return ""; // Legacy behavior for preflop/invalid states
     }

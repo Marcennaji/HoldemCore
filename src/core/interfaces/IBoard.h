@@ -22,8 +22,6 @@ class IBoard
   public:
     virtual ~IBoard() = default;
     //
-    virtual void setSeatsList(pkt::core::player::PlayerList seats) = 0;
-    virtual void setActingPlayersList(pkt::core::player::PlayerList actingPlayers) = 0;
     virtual void setSeatsListFsm(pkt::core::player::PlayerFsmList seats) = 0;
     virtual void setActingPlayersListFsm(pkt::core::player::PlayerFsmList actingPlayers) = 0;
     //

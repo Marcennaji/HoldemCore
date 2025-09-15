@@ -14,14 +14,14 @@ class BoardCardTest : public EngineTest
 {
 
   public:
-    bool cardsAreUniqueAndValid(const std::shared_ptr<pkt::core::IHand>& hand,
+    bool cardsAreUniqueAndValid(const std::shared_ptr<pkt::core::HandFsm>& hand,
                                 const std::shared_ptr<pkt::core::IBoard>& board,
-                                const pkt::core::player::PlayerList& players);
+                                const pkt::core::player::PlayerFsmList& players);
 };
 
-bool BoardCardTest::cardsAreUniqueAndValid(const std::shared_ptr<pkt::core::IHand>& hand,
+bool BoardCardTest::cardsAreUniqueAndValid(const std::shared_ptr<pkt::core::HandFsm>& hand,
                                            const std::shared_ptr<pkt::core::IBoard>& board,
-                                           const pkt::core::player::PlayerList& players)
+                                           const pkt::core::player::PlayerFsmList& players)
 {
     std::vector<int> allCards;
 
@@ -53,51 +53,51 @@ bool BoardCardTest::cardsAreUniqueAndValid(const std::shared_ptr<pkt::core::IHan
 
 TEST_F(BoardCardTest, DealBoardCardsAndHoleCards_NoOverlap_2Players)
 {
-    initializeHandWithPlayers(2, gameData);
+    initializeHandFsmWithPlayers(2, gameData);
 
-    myHand->dealHoleCards(myHand->dealBoardCards());
+    myHandFsm->dealHoleCards(myHandFsm->dealBoardCards());
 
     // Verify board cards
     int boardCards[5];
-    myHand->getBoard()->getCards(boardCards);
+    myHandFsm->getBoard().getCards(boardCards);
     ASSERT_EQ(sizeof(boardCards) / sizeof(boardCards[0]), 5);
 }
 
 TEST_F(BoardCardTest, DealBoardCardsAndHoleCards_NoOverlap_2Players_FullTest)
 {
-    initializeHandWithPlayers(2, gameData);
-    myHand->dealHoleCards(myHand->dealBoardCards());
-    ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
+    initializeHandFsmWithPlayers(2, gameData);
+    myHandFsm->dealHoleCards(myHandFsm->dealBoardCards());
+    ASSERT_TRUE(cardsAreUniqueAndValid(myHandFsm, myBoardFsm, mySeatsListFsm));
 }
 
 TEST_F(BoardCardTest, DealBoardCardsAndHoleCards_NoOverlap_3Players)
 {
-    initializeHandWithPlayers(3, gameData);
-    myHand->dealHoleCards(myHand->dealBoardCards());
-    ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
+    initializeHandFsmWithPlayers(3, gameData);
+    myHandFsm->dealHoleCards(myHandFsm->dealBoardCards());
+    ASSERT_TRUE(cardsAreUniqueAndValid(myHandFsm, myBoardFsm, mySeatsListFsm));
 }
 
 TEST_F(BoardCardTest, DealBoardCardsAndHoleCards_NoOverlap_MaxPlayers)
 {
-    initializeHandWithPlayers(MAX_NUMBER_OF_PLAYERS, gameData);
-    myHand->dealHoleCards(myHand->dealBoardCards());
-    ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
+    initializeHandFsmWithPlayers(MAX_NUMBER_OF_PLAYERS, gameData);
+    myHandFsm->dealHoleCards(myHandFsm->dealBoardCards());
+    ASSERT_TRUE(cardsAreUniqueAndValid(myHandFsm, myBoardFsm, mySeatsListFsm));
 }
 
 TEST_F(BoardCardTest, AllDealtCards_AreWithinValidRange_4Players)
 {
-    initializeHandWithPlayers(4, gameData);
-    myHand->dealHoleCards(myHand->dealBoardCards());
+    initializeHandFsmWithPlayers(4, gameData);
+    myHandFsm->dealHoleCards(myHandFsm->dealBoardCards());
 
     int boardCards[5];
-    myBoard->getCards(boardCards);
+    myBoardFsm->getCards(boardCards);
     for (int card : boardCards)
     {
         ASSERT_GE(card, 0);
         ASSERT_LT(card, 52);
     }
     int cards[2];
-    for (const auto& player : *mySeatsList)
+    for (const auto& player : *mySeatsListFsm)
     {
         player->getCards(cards);
         ASSERT_GE(cards[0], 0);
@@ -111,9 +111,9 @@ TEST_F(BoardCardTest, DealCards_NoOverlap_OverMultipleRounds)
 {
     for (int i = 0; i < 500; ++i)
     {
-        initializeHandWithPlayers(6, gameData);
-        myHand->dealHoleCards(myHand->dealBoardCards());
-        ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
+        initializeHandFsmWithPlayers(6, gameData);
+        myHandFsm->dealHoleCards(myHandFsm->dealBoardCards());
+        ASSERT_TRUE(cardsAreUniqueAndValid(myHandFsm, myBoardFsm, mySeatsListFsm));
     }
 }
 
@@ -123,7 +123,7 @@ TEST_F(BoardCardTest, ModernBoardCards_GamePhases_WorkCorrectly)
     BoardCards preflop;
     EXPECT_TRUE(preflop.isPreflop());
     EXPECT_EQ(preflop.getNumCards(), 0);
-    EXPECT_EQ(preflop.toString(), "Preflop");
+    EXPECT_EQ(preflop.toString(), "<no cards>");
 
     // Test flop state (3 cards)
     BoardCards flop("Ah", "Ks", "Qd");

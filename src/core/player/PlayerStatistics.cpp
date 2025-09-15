@@ -11,7 +11,7 @@ const int PreflopStatistics::LAST_ACTIONS_STACK_SIZE = 10;
 
 void PlayerStatistics::reset()
 {
-
+    totalHands = 0;
     preflopStatistics.reset();
     flopStatistics.reset();
     turnStatistics.reset();

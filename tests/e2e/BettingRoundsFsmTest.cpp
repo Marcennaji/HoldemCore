@@ -809,7 +809,7 @@ TEST_F(BettingRoundsFsmTest, FoldedPlayerDoesNotReappearInLaterRounds)
             {
                 foundFoldedPlayerAction = true;
                 logTestMessage("Engine correctly rejected action from folded player " + std::to_string(playerId) +
-                               " (" + playerActionToString(rejectedAction.type) + ") with reason: " + reason);
+                               " (" + actionTypeToString(rejectedAction.type) + ") with reason: " + reason);
 
                 // The reason should indicate the player is not active/folded
                 EXPECT_FALSE(reason.empty()) << "Engine should provide a reason for rejecting folded player action";
@@ -892,7 +892,7 @@ TEST_F(BettingRoundsFsmTest, NoExtraActionsAfterFinalCall)
         {
             // Look for actions that were rejected because the round is complete
             logTestMessage("Engine rejected action from player " + std::to_string(playerId) + " (" +
-                           playerActionToString(rejectedAction.type) + ") with reason: " + reason);
+                           actionTypeToString(rejectedAction.type) + ") with reason: " + reason);
 
             // The reason should indicate that no more actions are needed or the round is complete
             EXPECT_FALSE(reason.empty()) << "Engine should provide a reason for rejecting extra actions";
@@ -970,7 +970,7 @@ TEST_F(BettingRoundsFsmTest, NoBettingInPostRiverRound)
         for (const auto& [playerId, rejectedAction, reason] : invalidActions)
         {
             logTestMessage("Engine rejected PostRiver action from player " + std::to_string(playerId) + " (" +
-                           playerActionToString(rejectedAction.type) + ") with reason: " + reason);
+                           actionTypeToString(rejectedAction.type) + ") with reason: " + reason);
 
             // The reason should indicate that no betting is allowed in PostRiver
             EXPECT_FALSE(reason.empty()) << "Engine should provide a reason for rejecting PostRiver betting actions";
@@ -1062,7 +1062,7 @@ TEST_F(BettingRoundsFsmTest, AllInPlayerDoesNotActAgain)
             {
                 foundAllInPlayerRejection = true;
                 logTestMessage("Engine correctly rejected action from all-in player " + std::to_string(playerId) +
-                               " (" + playerActionToString(rejectedAction.type) + ") with reason: " + reason);
+                               " (" + actionTypeToString(rejectedAction.type) + ") with reason: " + reason);
 
                 // The reason should indicate the player is all-in or cannot act
                 EXPECT_FALSE(reason.empty()) << "Engine should provide a reason for rejecting all-in player actions";
@@ -1141,7 +1141,7 @@ TEST_F(BettingRoundsFsmTest, HeadsUpEndsImmediatelyOnFold)
         for (const auto& [playerId, rejectedAction, reason] : invalidActions)
         {
             logTestMessage("Engine rejected post-fold action from player " + std::to_string(playerId) + " (" +
-                           playerActionToString(rejectedAction.type) + ") with reason: " + reason);
+                           actionTypeToString(rejectedAction.type) + ") with reason: " + reason);
 
             // Should reject actions because hand is over or player is inactive
             EXPECT_FALSE(reason.empty()) << "Engine should provide reason for rejecting actions after heads-up fold";

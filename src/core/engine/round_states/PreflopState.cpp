@@ -30,8 +30,6 @@ PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsig
 
 void PreflopState::enter(HandFsm& hand)
 {
-    GlobalServices::instance().logger().info("Preflop");
-
     for (auto& player : *hand.getSeatsList())
     {
         player->setAction(*this, {player->getId(), ActionType::None});
@@ -42,6 +40,8 @@ void PreflopState::enter(HandFsm& hand)
 
     if (myEvents.onBettingRoundStarted)
         myEvents.onBettingRoundStarted(Preflop);
+
+    logStateInfo(hand);
 }
 
 void PreflopState::exit(HandFsm& hand)
@@ -72,9 +72,30 @@ std::unique_ptr<IHandState> PreflopState::computeNextState(HandFsm& hand)
     return computeBettingRoundNextState(hand, myEvents, Preflop);
 }
 
-void PreflopState::logStateInfo(const HandFsm& /*hand*/) const
+void PreflopState::logStateInfo(HandFsm& hand)
 {
-    // todo
+    IDebuggableState::logStateInfo(hand);
+    GlobalServices::instance().logger().info("Blinds: SB=" + std::to_string(mySmallBlind) +
+                                             ", BB=" + std::to_string(2 * mySmallBlind));
+    logHoleCards(hand);
+}
+
+void PreflopState::logHoleCards(HandFsm& hand)
+{
+    for (const auto& player : *hand.getSeatsList())
+    {
+        const HoleCards& holeCards = player->getHoleCards();
+        if (holeCards.isValid())
+        {
+            GlobalServices::instance().logger().info("Player " + std::to_string(player->getId()) + " (" +
+                                                     player->getName() + "): " + holeCards.toString());
+        }
+        else
+        {
+            GlobalServices::instance().logger().info("Player " + std::to_string(player->getId()) + " (" +
+                                                     player->getName() + "): No hole cards");
+        }
+    }
 }
 
 std::shared_ptr<player::PlayerFsm> PreflopState::getNextPlayerToAct(const HandFsm& hand) const

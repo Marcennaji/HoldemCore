@@ -242,7 +242,7 @@ bool isActionTypeValid(const PlayerFsmList& actingPlayersList, const PlayerActio
     if (!isValid)
     {
         GlobalServices::instance().logger().error(gameStateToString(gameState) + ": Invalid action type for player " +
-                                                  player->getName() + " : " + playerActionToString(action.type));
+                                                  player->getName() + " : " + actionTypeToString(action.type));
     }
 
     return isValid;
@@ -298,7 +298,7 @@ bool isActionAmountValid(const PlayerAction& action, const BettingActions& betti
     {
         GlobalServices::instance().logger().error(
             gameStateToString(gameState) + ": Invalid action amount for player " + std::to_string(action.playerId) +
-            " : " + playerActionToString(action.type) + " with amount = " + std::to_string(action.amount));
+            " : " + actionTypeToString(action.type) + " with amount = " + std::to_string(action.amount));
     }
 
     return isValid;

@@ -4,8 +4,6 @@
 
 #include "BoardFsm.h"
 
-#include "core/interfaces/IHand.h"
-
 #include <core/services/GlobalServices.h>
 #include "Exception.h"
 #include "PotFsm.h"

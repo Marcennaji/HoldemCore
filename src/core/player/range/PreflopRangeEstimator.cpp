@@ -5,7 +5,6 @@
 #include "PreflopRangeEstimator.h"
 #include <cmath>
 #include <core/engine/model/Ranges.h>
-#include <core/interfaces/IHand.h>
 #include <core/player/range/RangeRefiner.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include <core/services/GlobalServices.h>
@@ -75,8 +74,9 @@ std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(co
     float range = 0;
 
     GlobalServices::instance().logger().verbose(" [ player is last raiser ] ");
-    PreflopStatistics preflopOpponent =
-        ctx.commonContext.playersContext.preflopLastRaiser->getStatistics(nbPlayers).preflopStatistics;
+    PreflopStatistics preflopOpponent = ctx.commonContext.playersContext.preflopLastRaiser->getStatisticsUpdater()
+                                            ->getStatistics(nbPlayers)
+                                            .preflopStatistics;
 
     if (ctx.personalContext.statistics.preflopStatistics.hands >= MIN_HANDS_STATISTICS_ACCURATE)
     {
@@ -461,9 +461,10 @@ float PreflopRangeEstimator::handleThreeBetRange(const CurrentHandContext& ctx, 
             range = ctx.personalContext.statistics.preflopStatistics.getPreflopRaise() *
                     ctx.personalContext.statistics.preflopStatistics.getPreflopCallthreeBetsFrequency() / 100;
 
-            PreflopStatistics lastRaiserStats = ctx.commonContext.playersContext.preflopLastRaiser
-                                                    ->getStatistics(ctx.commonContext.playersContext.nbPlayers)
-                                                    .preflopStatistics;
+            PreflopStatistics lastRaiserStats =
+                ctx.commonContext.playersContext.preflopLastRaiser->getStatisticsUpdater()
+                    ->getStatistics(ctx.commonContext.playersContext.nbPlayers)
+                    .preflopStatistics;
 
             if (range < lastRaiserStats.getPreflop3Bet() * 0.8)
             {

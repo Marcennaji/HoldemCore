@@ -10,9 +10,7 @@
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
 #include "core/interfaces/IBoard.h"
-#include "core/interfaces/IHand.h"
-
-#include <core/player/deprecated/Player.h>
+#include "core/player/PlayerFsm.h"
 
 #include <memory>
 #include <vector>
@@ -27,17 +25,11 @@ class EngineFactory
     EngineFactory(const GameEvents&);
     ~EngineFactory();
 
-    virtual std::shared_ptr<IHand> createHand(std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
-                                              pkt::core::player::PlayerList seats,
-                                              pkt::core::player::PlayerList actingPlayers, GameData, StartData);
     virtual std::shared_ptr<HandFsm> createHandFsm(std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
                                                    pkt::core::player::PlayerFsmList seats,
                                                    pkt::core::player::PlayerFsmList actingPlayers, GameData, StartData);
 
-    virtual std::shared_ptr<IBoard> createBoard(unsigned dealerPosition);
     virtual std::shared_ptr<IBoard> createBoardFsm(unsigned dealerPosition);
-    virtual std::vector<std::shared_ptr<IBettingRound>> createAllBettingRounds(IHand* hi, unsigned dealerPosition,
-                                                                               int smallBlind);
 
   private:
     const GameEvents& myEvents;

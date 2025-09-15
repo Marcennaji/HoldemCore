@@ -7,7 +7,6 @@
 
 #include <core/engine/model/EngineError.h>
 #include <core/engine/model/Ranges.h>
-#include <core/interfaces/IHand.h>
 #include <core/player/Helpers.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include <core/services/GlobalServices.h>
@@ -64,7 +63,7 @@ bool UltraTightBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
 
     stringCallingRange = rangesString[(int) callingRange];
 
-    std::shared_ptr<Player> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
+    std::shared_ptr<PlayerFsm> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
 
     if (ctx.commonContext.playersContext.actingPlayersList->size() > 2 &&
         ctx.commonContext.bettingContext.preflopRaisesNumber + ctx.commonContext.bettingContext.preflopCallsNumber >
@@ -154,7 +153,7 @@ int UltraTightBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
 
     if (ctx.commonContext.bettingContext.preflopRaisesNumber == 1)
     {
-        PreflopStatistics raiserStats = ctx.commonContext.playersContext.preflopLastRaiser
+        PreflopStatistics raiserStats = ctx.commonContext.playersContext.preflopLastRaiser->getStatisticsUpdater()
                                             ->getStatistics(ctx.commonContext.playersContext.nbPlayers)
                                             .preflopStatistics;
 
@@ -566,17 +565,18 @@ bool UltraTightBotStrategy::turnShouldCall(const CurrentHandContext& ctx)
         return true;
     }
 
-    TurnStatistics raiserStats =
-        ctx.commonContext.playersContext.turnLastRaiser->getStatistics(ctx.commonContext.playersContext.nbPlayers)
-            .turnStatistics;
+    TurnStatistics raiserStats = ctx.commonContext.playersContext.turnLastRaiser->getStatisticsUpdater()
+                                     ->getStatistics(ctx.commonContext.playersContext.nbPlayers)
+                                     .turnStatistics;
 
     // if not enough hands, then try to use the statistics collected for (nbPlayers + 1), they should be more accurate
     if (raiserStats.hands < MIN_HANDS_STATISTICS_ACCURATE && ctx.commonContext.playersContext.nbPlayers < 10 &&
-        ctx.commonContext.playersContext.turnLastRaiser->getStatistics(ctx.commonContext.playersContext.nbPlayers + 1)
+        ctx.commonContext.playersContext.turnLastRaiser->getStatisticsUpdater()
+                ->getStatistics(ctx.commonContext.playersContext.nbPlayers + 1)
                 .turnStatistics.hands > MIN_HANDS_STATISTICS_ACCURATE)
     {
 
-        raiserStats = ctx.commonContext.playersContext.turnLastRaiser
+        raiserStats = ctx.commonContext.playersContext.turnLastRaiser->getStatisticsUpdater()
                           ->getStatistics(ctx.commonContext.playersContext.nbPlayers + 1)
                           .turnStatistics;
     }
@@ -791,16 +791,17 @@ bool UltraTightBotStrategy::riverShouldCall(const CurrentHandContext& ctx)
         return false;
     }
 
-    RiverStatistics raiserStats =
-        ctx.commonContext.playersContext.lastVPIPPlayer->getStatistics(ctx.commonContext.playersContext.nbPlayers)
-            .riverStatistics;
+    RiverStatistics raiserStats = ctx.commonContext.playersContext.lastVPIPPlayer->getStatisticsUpdater()
+                                      ->getStatistics(ctx.commonContext.playersContext.nbPlayers)
+                                      .riverStatistics;
 
     // if not enough hands, then try to use the statistics collected for (nbPlayers + 1), they should be more accurate
     if (raiserStats.hands < MIN_HANDS_STATISTICS_ACCURATE && ctx.commonContext.playersContext.nbPlayers < 10 &&
-        ctx.commonContext.playersContext.lastVPIPPlayer->getStatistics(ctx.commonContext.playersContext.nbPlayers + 1)
+        ctx.commonContext.playersContext.lastVPIPPlayer->getStatisticsUpdater()
+                ->getStatistics(ctx.commonContext.playersContext.nbPlayers + 1)
                 .turnStatistics.hands > MIN_HANDS_STATISTICS_ACCURATE)
     {
-        raiserStats = ctx.commonContext.playersContext.lastVPIPPlayer
+        raiserStats = ctx.commonContext.playersContext.lastVPIPPlayer->getStatisticsUpdater()
                           ->getStatistics(ctx.commonContext.playersContext.nbPlayers + 1)
                           .riverStatistics;
     }
@@ -819,7 +820,8 @@ bool UltraTightBotStrategy::riverShouldCall(const CurrentHandContext& ctx)
     {
 
         if (raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE &&
-            ctx.commonContext.playersContext.lastVPIPPlayer->getStatistics(ctx.commonContext.playersContext.nbPlayers)
+            ctx.commonContext.playersContext.lastVPIPPlayer->getStatisticsUpdater()
+                    ->getStatistics(ctx.commonContext.playersContext.nbPlayers)
                     .getWentToShowDown() < 40)
         {
             return false;
@@ -831,7 +833,8 @@ bool UltraTightBotStrategy::riverShouldCall(const CurrentHandContext& ctx)
     {
 
         if (raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE &&
-            ctx.commonContext.playersContext.lastVPIPPlayer->getStatistics(ctx.commonContext.playersContext.nbPlayers)
+            ctx.commonContext.playersContext.lastVPIPPlayer->getStatisticsUpdater()
+                    ->getStatistics(ctx.commonContext.playersContext.nbPlayers)
                     .getWentToShowDown() < 40)
         {
             return false;
@@ -847,7 +850,8 @@ bool UltraTightBotStrategy::riverShouldCall(const CurrentHandContext& ctx)
     {
 
         if (raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE &&
-            ctx.commonContext.playersContext.lastVPIPPlayer->getStatistics(ctx.commonContext.playersContext.nbPlayers)
+            ctx.commonContext.playersContext.lastVPIPPlayer->getStatisticsUpdater()
+                    ->getStatistics(ctx.commonContext.playersContext.nbPlayers)
                     .getWentToShowDown() < 50)
         {
             return false;

@@ -50,6 +50,7 @@ void RiverState::enter(HandFsm& hand)
             myEvents.onBoardCardsDealt(riverBoard);
         }
     }
+    logStateInfo(hand);
 }
 
 void RiverState::exit(HandFsm& hand)
@@ -91,11 +92,6 @@ std::shared_ptr<player::PlayerFsm> RiverState::getFirstPlayerToActInRound(const 
 bool RiverState::isRoundComplete(const HandFsm& hand) const
 {
     return pkt::core::isRoundComplete(const_cast<HandFsm&>(hand));
-}
-
-void RiverState::logStateInfo(const HandFsm& /*hand*/) const
-{
-    // TODO: add logging (e.g. pot size, board cards, etc.)
 }
 
 } // namespace pkt::core

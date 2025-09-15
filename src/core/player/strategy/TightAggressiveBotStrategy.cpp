@@ -7,7 +7,6 @@
 
 #include <core/engine/model/EngineError.h>
 #include <core/engine/model/Ranges.h>
-#include <core/interfaces/IHand.h>
 #include <core/player/Helpers.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include <core/services/GlobalServices.h>
@@ -28,6 +27,12 @@ TightAggressiveBotStrategy::TightAggressiveBotStrategy()
     // initialize utg starting range, in a full table
     int utgFullTableRange = 0;
     GlobalServices::instance().randomizer().getRand(2, 3, 1, &utgFullTableRange);
+
+    // Debug logging to see what values we're getting
+    GlobalServices::instance().logger().verbose(
+        "TightAggressiveBotStrategy constructor: utgHeadsUpRange=45, utgFullTableRange=" +
+        std::to_string(utgFullTableRange));
+
     initializeRanges(45, utgFullTableRange);
 }
 
@@ -64,7 +69,7 @@ bool TightAggressiveBotStrategy::preflopShouldCall(const CurrentHandContext& ctx
 
     stringCallingRange = rangesString[(int) callingRange];
 
-    std::shared_ptr<Player> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
+    std::shared_ptr<PlayerFsm> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
 
     if (ctx.commonContext.playersContext.actingPlayersList->size() > 2 &&
         ctx.commonContext.bettingContext.preflopRaisesNumber + ctx.commonContext.bettingContext.preflopCallsNumber >

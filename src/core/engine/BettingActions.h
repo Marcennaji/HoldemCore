@@ -1,8 +1,8 @@
 #pragma once
 
 #include "core/engine/BettingRoundActions.h"
+#include "core/engine/model/PlayerAction.h"
 #include "core/engine/model/PlayerPosition.h"
-#include "core/interfaces/IHand.h"
 #include "core/interfaces/hand/IHandState.h"
 #include "core/player/typedefs.h"
 
@@ -11,6 +11,13 @@
 
 namespace pkt::core
 {
+
+struct BettingRoundHistory
+{
+    GameState round;
+    std::vector<std::pair<unsigned, pkt::core::ActionType>> actions; // playerId, action
+};
+
 class BettingActions
 {
   public:

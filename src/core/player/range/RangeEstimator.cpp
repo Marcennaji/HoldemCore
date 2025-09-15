@@ -1,7 +1,6 @@
 #include "RangeEstimator.h"
 
 #include <core/engine/model/Ranges.h>
-#include <core/interfaces/IHand.h>
 #include <core/interfaces/persistence/PlayersStatisticsStore.h>
 #include <core/player/Helpers.h>
 #include <core/player/PlayerStatistics.h>

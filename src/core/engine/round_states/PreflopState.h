@@ -28,12 +28,13 @@ class PreflopState : public IHandState, public IActionProcessor, public IDebugga
     std::shared_ptr<player::PlayerFsm> getFirstPlayerToActInRound(const HandFsm& hand) const override;
     bool isRoundComplete(const HandFsm& hand) const override;
 
-    void logStateInfo(const HandFsm&) const override;
+    void logStateInfo(HandFsm& hand) override;
     const GameState getGameState() const override { return GameState::Preflop; }
     void promptPlayerAction(HandFsm&, player::PlayerFsm& player) override;
 
   private:
     void setBlinds(HandFsm& hand);
+    void logHoleCards(HandFsm& hand);
 
     const GameEvents& myEvents;
     const int mySmallBlind;

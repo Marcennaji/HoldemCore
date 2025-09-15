@@ -28,7 +28,6 @@ class PostRiverState : public IHandState, public IActionProcessor, public IDebug
     std::shared_ptr<player::PlayerFsm> getFirstPlayerToActInRound(const HandFsm& hand) const override;
     bool isRoundComplete(const HandFsm& hand) const override;
 
-    void logStateInfo(const HandFsm&) const override;
     const GameState getGameState() const override { return GameState::PostRiver; }
     void promptPlayerAction(HandFsm&, player::PlayerFsm& player) override;
 

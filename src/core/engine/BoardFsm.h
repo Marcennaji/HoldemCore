@@ -28,14 +28,6 @@ class BoardFsm : public IBoard
     BoardFsm(unsigned dealerPosition, const GameEvents& events);
     ~BoardFsm();
 
-    void setSeatsList(pkt::core::player::PlayerList seats) override
-    {
-        throw std::runtime_error("Use setSeatsListFsm instead");
-    };
-    void setActingPlayersList(pkt::core::player::PlayerList actingPlayers) override
-    {
-        throw std::runtime_error("Use setActingPlayersListFsm instead");
-    };
     void setSeatsListFsm(pkt::core::player::PlayerFsmList seats) override;
     void setActingPlayersListFsm(pkt::core::player::PlayerFsmList actingPlayers) override;
 

@@ -184,19 +184,20 @@ float PreflopRangeCalculator::adjustCallForRaises(const CurrentHandContext& ctx,
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
     const PlayerPosition myPosition = ctx.personalContext.position;
     const int nbActingPlayers = ctx.commonContext.playersContext.actingPlayersList->size();
-    std::shared_ptr<Player> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
+    std::shared_ptr<PlayerFsm> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
     if (!lastRaiser)
     {
         return callingRange;
     }
 
-    PreflopStatistics raiserStats = lastRaiser->getStatistics(nbPlayers).preflopStatistics;
+    PreflopStatistics raiserStats = lastRaiser->getStatisticsUpdater()->getStatistics(nbPlayers).preflopStatistics;
 
     // Use fallback statistics if necessary
     if (raiserStats.hands < MIN_HANDS_STATISTICS_ACCURATE && nbPlayers < 10 &&
-        lastRaiser->getStatistics(nbPlayers + 1).preflopStatistics.hands > MIN_HANDS_STATISTICS_ACCURATE)
+        lastRaiser->getStatisticsUpdater()->getStatistics(nbPlayers + 1).preflopStatistics.hands >
+            MIN_HANDS_STATISTICS_ACCURATE)
     {
-        raiserStats = lastRaiser->getStatistics(nbPlayers + 1).preflopStatistics;
+        raiserStats = lastRaiser->getStatisticsUpdater()->getStatistics(nbPlayers + 1).preflopStatistics;
     }
 
     if (raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getPreflopRaise() != 0)
@@ -304,7 +305,7 @@ float PreflopRangeCalculator::adjustCallForBigBet(float callingRange, int potOdd
 bool PreflopRangeCalculator::shouldAdjustCallForLooseRaiser(const CurrentHandContext& ctx, int nbCalls,
                                                             int nbRaises) const
 {
-    std::shared_ptr<Player> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
+    std::shared_ptr<PlayerFsm> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
     const PlayerPosition myPosition = ctx.personalContext.position;
 
     return lastRaiser->isInVeryLooseMode(ctx.commonContext.playersContext.nbPlayers) &&
@@ -318,7 +319,7 @@ bool PreflopRangeCalculator::shouldCallForGoodOdds(int potOdd, int myM, PlayerPo
 
 bool PreflopRangeCalculator::shouldCallForAllIn(const CurrentHandContext& ctx, int potOdd, int nbRaises) const
 {
-    std::shared_ptr<Player> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
+    std::shared_ptr<PlayerFsm> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
     const PlayerPosition myPosition = ctx.personalContext.position;
 
     return ctx.personalContext.m > 10 && potOdd <= 20 && nbRaises < 2 &&
@@ -373,14 +374,15 @@ float PreflopRangeCalculator::adjustRaiseForRaiser(const CurrentHandContext& ctx
     const int myTotalBetAmount = ctx.personalContext.totalBetAmount;
     const int smallBlind = ctx.commonContext.smallBlind;
     const bool isPreflopBigBet = ctx.commonContext.bettingContext.isPreflopBigBet;
-    std::shared_ptr<Player> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
+    std::shared_ptr<PlayerFsm> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
 
-    PreflopStatistics raiserStats = lastRaiser->getStatistics(nbPlayers).preflopStatistics;
+    PreflopStatistics raiserStats = lastRaiser->getStatisticsUpdater()->getStatistics(nbPlayers).preflopStatistics;
 
     if (raiserStats.hands < MIN_HANDS_STATISTICS_ACCURATE && nbPlayers < 10 &&
-        lastRaiser->getStatistics(nbPlayers + 1).preflopStatistics.hands > MIN_HANDS_STATISTICS_ACCURATE)
+        lastRaiser->getStatisticsUpdater()->getStatistics(nbPlayers + 1).preflopStatistics.hands >
+            MIN_HANDS_STATISTICS_ACCURATE)
     {
-        raiserStats = lastRaiser->getStatistics(nbPlayers + 1).preflopStatistics;
+        raiserStats = lastRaiser->getStatisticsUpdater()->getStatistics(nbPlayers + 1).preflopStatistics;
     }
 
     if (raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getPreflopRaise() != 0)

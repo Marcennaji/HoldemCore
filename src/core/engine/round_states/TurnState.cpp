@@ -50,6 +50,7 @@ void TurnState::enter(HandFsm& hand)
             myEvents.onBoardCardsDealt(turnBoard);
         }
     }
+    logStateInfo(hand);
 }
 
 void TurnState::exit(HandFsm& hand)
@@ -92,11 +93,6 @@ std::shared_ptr<player::PlayerFsm> TurnState::getFirstPlayerToActInRound(const H
 bool TurnState::isRoundComplete(const HandFsm& hand) const
 {
     return pkt::core::isRoundComplete(const_cast<HandFsm&>(hand));
-}
-
-void TurnState::logStateInfo(const HandFsm& /*hand*/) const
-{
-    // TODO: add logging (e.g. pot size, board cards, etc.)
 }
 
 } // namespace pkt::core

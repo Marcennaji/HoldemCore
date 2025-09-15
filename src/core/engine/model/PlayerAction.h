@@ -28,7 +28,7 @@ struct PlayerAction
     int amount = 0;
 };
 
-inline const char* playerActionToString(ActionType action)
+inline const char* actionTypeToString(ActionType action)
 {
     switch (action)
     {

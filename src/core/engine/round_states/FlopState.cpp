@@ -18,7 +18,6 @@ FlopState::FlopState(const GameEvents& events) : myEvents(events)
 
 void FlopState::enter(HandFsm& hand)
 {
-    GlobalServices::instance().logger().info("Flop");
     // Reset betting amounts for new round
     hand.getBettingActions()->resetRoundHighestSet();
 
@@ -49,6 +48,7 @@ void FlopState::enter(HandFsm& hand)
             myEvents.onBoardCardsDealt(flopBoard);
         }
     }
+    logStateInfo(hand);
 }
 
 void FlopState::exit(HandFsm& hand)
@@ -91,11 +91,6 @@ std::shared_ptr<player::PlayerFsm> FlopState::getFirstPlayerToActInRound(const H
 bool FlopState::isRoundComplete(const HandFsm& hand) const
 {
     return pkt::core::isRoundComplete(const_cast<HandFsm&>(hand));
-}
-
-void FlopState::logStateInfo(const HandFsm& /*hand*/) const
-{
-    // TODO: add logging (e.g. pot size, board cards, etc.)
 }
 
 } // namespace pkt::core

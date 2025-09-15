@@ -29,6 +29,8 @@ void PostRiverState::enter(HandFsm& hand)
 
     if (myEvents.onBettingRoundStarted)
         myEvents.onBettingRoundStarted(PostRiver);
+
+    logStateInfo(hand);
 }
 
 void PostRiverState::exit(HandFsm& hand)
@@ -70,11 +72,6 @@ std::shared_ptr<player::PlayerFsm> PostRiverState::getFirstPlayerToActInRound(co
 bool PostRiverState::isRoundComplete(const HandFsm& /*hand*/) const
 {
     return true;
-}
-
-void PostRiverState::logStateInfo(const HandFsm& /*hand*/) const
-{
-    // todo
 }
 
 } // namespace pkt::core

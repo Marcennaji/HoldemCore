@@ -3,28 +3,11 @@
 #include <core/engine/GameEvents.h>
 #include <core/interfaces/NullLogger.h>
 #include <core/player/PlayerFsm.h>
-#include <core/player/deprecated/BotPlayer.h>
 #include <core/player/strategy/LooseAggressiveBotStrategy.h>
 #include "DeterministicStrategy.h"
-#include "core/engine/deprecated/ButtonState.h"
 
 namespace pkt::test
 {
-
-class DummyPlayer : public pkt::core::player::BotPlayer
-{
-  public:
-    DummyPlayer(int id, const pkt::core::GameEvents& events)
-        : pkt::core::player::BotPlayer(events,                          // const GameEvents&
-                                       id,                              // Player ID
-                                       "DummyBot" + std::to_string(id), // Player Name
-                                       1000,                            // Starting Cash
-                                       true,                            // Active Status
-                                       pkt::core::ButtonState::Unspecified)
-    {
-        setStrategy(std::make_unique<pkt::core::player::LooseAggressiveBotStrategy>());
-    }
-};
 
 class DummyPlayerFsm : public pkt::core::player::PlayerFsm
 {

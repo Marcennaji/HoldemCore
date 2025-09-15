@@ -5,28 +5,22 @@
 
 #pragma once
 
-#include <core/player/deprecated/Player.h>
 #include "core/cards/Card.h" // For HoleCards
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/interfaces/IHandEvaluationEngine.h"
+#include "core/player/PlayerFsm.h"
 
 namespace pkt::core::player
 {
 struct PlayersInHandContext
 {
-    int nbPlayers = 0; // total number of players in the current hand, including the ones who folded
-    PlayerList actingPlayersList;
-    std::shared_ptr<Player> preflopLastRaiser = nullptr;
-    std::shared_ptr<Player> flopLastRaiser = nullptr;
-    std::shared_ptr<Player> turnLastRaiser = nullptr;
-    std::shared_ptr<Player> lastVPIPPlayer = nullptr; // last player who voluntarily put money in the
-
-    PlayerFsmList actingPlayersListFsm; // list of players still acting in the hand (not folded and not allin)
-    std::shared_ptr<PlayerFsm> preflopLastRaiserFsm = nullptr;
-    std::shared_ptr<PlayerFsm> flopLastRaiserFsm = nullptr;
-    std::shared_ptr<PlayerFsm> turnLastRaiserFsm = nullptr;
-    std::shared_ptr<PlayerFsm> lastVPIPPlayerFsm = nullptr; // last player who voluntarily put money in the pot
+    int nbPlayers = 0;               // total number of players in the current hand, including the ones who folded
+    PlayerFsmList actingPlayersList; // list of players still acting in the hand (not folded and not allin)
+    std::shared_ptr<PlayerFsm> preflopLastRaiser = nullptr;
+    std::shared_ptr<PlayerFsm> flopLastRaiser = nullptr;
+    std::shared_ptr<PlayerFsm> turnLastRaiser = nullptr;
+    std::shared_ptr<PlayerFsm> lastVPIPPlayer = nullptr; // last player who voluntarily put money in the pot
 
     std::vector<pkt::core::PlayerPosition> callersPositions;
     std::vector<pkt::core::PlayerPosition> raisersPositions;
@@ -67,7 +61,7 @@ struct PerPlayerHandContext
     int totalBetAmount = 0;
     int m = 0;
     int id = 0;
-    pkt::core::HoleCards holeCards; // Modern Card-based representation
+    pkt::core::HoleCards holeCards;
     pkt::core::PlayerPosition position = PlayerPosition::Unknown;
 
     PlayerStatistics statistics{};

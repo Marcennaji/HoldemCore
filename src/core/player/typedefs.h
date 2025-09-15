@@ -9,12 +9,8 @@
 
 namespace pkt::core::player
 {
-class Player;
-class PlayerFsm;
 
-typedef std::shared_ptr<std::list<std::shared_ptr<Player>>> PlayerList;
-typedef std::list<std::shared_ptr<Player>>::iterator PlayerListIterator;
-typedef std::list<std::shared_ptr<Player>>::const_iterator PlayerListConstIterator;
+class PlayerFsm;
 
 typedef std::shared_ptr<std::list<std::shared_ptr<PlayerFsm>>> PlayerFsmList;
 typedef std::list<std::shared_ptr<PlayerFsm>>::iterator PlayerFsmListIterator;

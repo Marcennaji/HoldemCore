@@ -27,7 +27,6 @@ class TurnState : public IHandState, public IActionProcessor, public IDebuggable
     std::shared_ptr<player::PlayerFsm> getFirstPlayerToActInRound(const HandFsm& hand) const override;
     bool isRoundComplete(const HandFsm& hand) const override;
 
-    void logStateInfo(const HandFsm&) const override;
     const GameState getGameState() const override { return GameState::Turn; }
     void promptPlayerAction(HandFsm&, player::PlayerFsm& player) override;
 

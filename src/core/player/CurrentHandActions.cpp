@@ -18,7 +18,7 @@ void checkActionAmount(const PlayerAction& action)
         if (action.amount == 0)
         {
             GlobalServices::instance().logger().error("Action amount missing for action type " +
-                                                      std::string(playerActionToString(action.type)));
+                                                      std::string(actionTypeToString(action.type)));
             assert(false);
         }
     }
@@ -107,7 +107,7 @@ void CurrentHandActions::writeActionsToLog() const
         for (const auto& action : actions)
         {
             GlobalServices::instance().logger().error("Player " + std::to_string(action.playerId) + " performed " +
-                                                      playerActionToString(action.type) +
+                                                      actionTypeToString(action.type) +
                                                       " with amount = " + std::to_string(action.amount));
         }
     }

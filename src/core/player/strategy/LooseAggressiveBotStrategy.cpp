@@ -7,7 +7,6 @@
 
 #include <core/engine/model/EngineError.h>
 #include <core/engine/model/Ranges.h>
-#include <core/interfaces/IHand.h>
 #include <core/player/Helpers.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include <core/services/GlobalServices.h>
@@ -72,7 +71,7 @@ bool LooseAggressiveBotStrategy::preflopShouldCall(const CurrentHandContext& ctx
         stringCallingRange += HIGH_PAIRS;
     }
 
-    std::shared_ptr<Player> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
+    std::shared_ptr<PlayerFsm> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
 
     if (ctx.commonContext.bettingContext.preflopRaisesNumber < 2 &&
         ctx.personalContext.cash >= ctx.commonContext.bettingContext.pot * 10 && lastRaiser != nullptr &&

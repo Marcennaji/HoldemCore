@@ -167,7 +167,7 @@ float PlayerFsm::getMaxOpponentsStrengths() const
 
     //	// if we are facing a single opponent in very loose mode, don't adjust the strength
     //	if (strenghts.size() == 1){
-    //		std::shared_ptr<Player> opponent = getPlayerByUniqueId(opponentID);
+    //		std::shared_ptr<PlayerFsm> opponent = getPlayerByUniqueId(opponentID);
     //
     //		if (opponent->isInVeryLooseMode(nbPlayers))
     //			return maxOpponentsStrengths;
@@ -430,7 +430,7 @@ void PlayerFsm::updateCurrentHandContext(const GameState state, HandFsm& current
 
 float PlayerFsm::calculatePreflopCallingRange(const CurrentHandContext& ctx) const
 {
-    return myRangeEstimator->getStandardCallingRange(ctx.commonContext.playersContext.actingPlayersListFsm->size());
+    return myRangeEstimator->getStandardCallingRange(ctx.commonContext.playersContext.actingPlayersList->size());
 }
 
 void PlayerFsm::resetForNewHand(const HandFsm& hand)
@@ -483,10 +483,14 @@ void PlayerFsm::setAction(IHandState& state, const PlayerAction& action)
 {
     if (action.type != ActionType::None)
     {
-        GlobalServices::instance().logger().info(myName + " " + std::string(playerActionToString(action.type)) +
+        GlobalServices::instance().logger().info(myName + " " + std::string(actionTypeToString(action.type)) +
                                                  (action.amount ? " " + std::to_string(action.amount) : ""));
     }
     myCurrentHandActions.addAction(state.getGameState(), action);
 }
 
+const PlayerStatistics& PlayerFsm::getStatistics(const int nbPlayers) const
+{
+    return myStatisticsUpdater->getStatistics(nbPlayers);
+}
 } // namespace pkt::core::player

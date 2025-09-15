@@ -1,5 +1,10 @@
 #pragma once
 
+#include "core/engine/HandFsm.h"
+#include "core/engine/model/GameState.h"
+#include "core/interfaces/IBoard.h"
+#include "core/services/GlobalServices.h"
+
 namespace pkt::core
 {
 
@@ -10,9 +15,13 @@ class IDebuggableState
   public:
     virtual ~IDebuggableState() = default;
 
-    virtual void logStateInfo(const HandFsm& hand) const
+    virtual void logStateInfo(HandFsm& hand)
     {
-        // Optional default: do nothing
+        // Default implementation: log basic info
+        std::string boardStr = hand.getStringBoard();
+        int pot = hand.getBoard().getPot(hand);
+        GlobalServices::instance().logger().info("Current State: " + gameStateToString(hand.getGameState()) +
+                                                 ", Board: " + boardStr + ", Pot: " + std::to_string(pot));
     }
 };
 

@@ -17,7 +17,12 @@ class FakeRandomizer : public pkt::core::IRandomizer
         for (unsigned i = 0; i < count; ++i)
         {
             if (index < values.size())
-                *out++ = values[index++];
+            {
+                // Constrain the fake value to the requested range
+                int rawValue = values[index++];
+                int range = maxValue - minValue + 1;
+                *out++ = minValue + (rawValue % range);
+            }
             else
                 *out++ = minValue; // fallback
         }

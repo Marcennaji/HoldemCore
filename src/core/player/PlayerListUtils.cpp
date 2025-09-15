@@ -39,13 +39,13 @@ void PlayerListUtils::updateActingPlayersListFsm(PlayerFsmList& myActingPlayersL
     for (it = myActingPlayersListFsm->begin(); it != myActingPlayersListFsm->end();)
     {
         GlobalServices::instance().logger().verbose("Checking player: " + (*it)->getName() +
-                                                    ", action: " + playerActionToString((*it)->getLastAction().type));
+                                                    ", action: " + actionTypeToString((*it)->getLastAction().type));
 
         if ((*it)->getLastAction().type == ActionType::Fold || (*it)->getLastAction().type == ActionType::Allin)
         {
             GlobalServices::instance().logger().verbose(
                 "Removing player: " + (*it)->getName() +
-                " from myActingPlayersListFsm due to action: " + playerActionToString((*it)->getLastAction().type));
+                " from myActingPlayersListFsm due to action: " + actionTypeToString((*it)->getLastAction().type));
 
             it = myActingPlayersListFsm->erase(it);
 

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <core/engine/HandEvaluator.h>
+#include "core/engine/GameEvents.h"
 
 #include "core/cards/Card.h"
 #include "core/engine/model/PlayerPosition.h"
@@ -107,6 +108,7 @@ class PlayerFsm
 
     void resetForNewHand(const HandFsm& hand);
 
+    const PlayerStatistics& getStatistics(const int nbPlayers) const;
     const std::unique_ptr<PlayerStatisticsUpdater>& getStatisticsUpdater() const { return myStatisticsUpdater; }
 
   protected:

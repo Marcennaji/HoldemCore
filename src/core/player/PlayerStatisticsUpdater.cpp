@@ -141,8 +141,8 @@ void PlayerStatisticsUpdater::updateFlopStatistics(const CurrentHandContext& ctx
         }
 
         // continuation bets
-        if (ctx.commonContext.playersContext.preflopLastRaiserFsm &&
-            ctx.commonContext.playersContext.preflopLastRaiserFsm->getId() == ctx.personalContext.id)
+        if (ctx.commonContext.playersContext.preflopLastRaiser &&
+            ctx.commonContext.playersContext.preflopLastRaiser->getId() == ctx.personalContext.id)
         {
             myStatistics[nbPlayers].flopStatistics.continuationBetsOpportunities++;
             if (action.type == ActionType::Bet)

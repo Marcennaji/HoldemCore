@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/engine/CardUtilities.h"
+#include "core/services/GlobalServices.h"
 
 #include <algorithm>
 #include <random>
@@ -186,7 +187,6 @@ struct HoleCards
 };
 
 /// BoardCards represents the 5 community cards on the board (flop, turn, river)
-/// Modern replacement for int array representation
 /// Valid states: 0 cards (preflop), 3 cards (flop), 4 cards (turn), 5 cards (river)
 struct BoardCards
 {
@@ -273,7 +273,7 @@ struct BoardCards
     std::string toString() const
     {
         if (numCards == 0)
-            return "Preflop";
+            return "<no cards>";
         if (numCards == 3)
             return flop1.toString() + " " + flop2.toString() + " " + flop3.toString();
         if (numCards == 4)
@@ -376,7 +376,6 @@ struct BoardCards
 };
 
 /// Deck represents a standard 52-card poker deck with shuffling and dealing capabilities
-/// Modern replacement for std::vector<int> myCardsArray
 class Deck
 {
   private:
@@ -409,9 +408,17 @@ class Deck
     /// Shuffle the deck using random number generator
     void shuffle()
     {
-        std::random_device rd;
-        std::mt19937 rng(rd());
-        std::shuffle(cards.begin(), cards.end(), rng);
+        // Use the global randomizer service for consistency with the rest of the system
+        auto& randomizer = GlobalServices::instance().randomizer();
+
+        // Use a simple shuffle algorithm that uses our randomizer
+        for (size_t i = cards.size() - 1; i > 0; --i)
+        {
+            int randomValues[1];
+            randomizer.getRand(0, static_cast<int>(i), 1, randomValues);
+            size_t j = static_cast<size_t>(randomValues[0]);
+            std::swap(cards[i], cards[j]);
+        }
         nextCardIndex = 0; // Reset deal position after shuffle
     }
 

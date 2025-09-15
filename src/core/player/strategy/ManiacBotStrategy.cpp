@@ -7,7 +7,6 @@
 
 #include <core/engine/model/EngineError.h>
 #include <core/engine/model/Ranges.h>
-#include <core/interfaces/IHand.h>
 #include <core/player/Helpers.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include <core/services/GlobalServices.h>
@@ -71,7 +70,7 @@ bool ManiacBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
         stringCallingRange += HIGH_PAIRS;
     }
 
-    std::shared_ptr<Player> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
+    std::shared_ptr<PlayerFsm> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
 
     if (ctx.commonContext.bettingContext.preflopRaisesNumber < 2 &&
         ctx.personalContext.cash >= ctx.commonContext.bettingContext.pot * 10 && lastRaiser != nullptr &&
@@ -172,7 +171,7 @@ int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
 
     if (ctx.commonContext.bettingContext.preflopRaisesNumber == 1)
     {
-        PreflopStatistics raiserStats = ctx.commonContext.playersContext.preflopLastRaiser
+        PreflopStatistics raiserStats = ctx.commonContext.playersContext.preflopLastRaiser->getStatisticsUpdater()
                                             ->getStatistics(ctx.commonContext.playersContext.nbPlayers)
                                             .preflopStatistics;
 
@@ -226,7 +225,7 @@ int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
     // determine when to 4-bet without a real hand
     if (!speculativeHandedAdded && ctx.commonContext.bettingContext.preflopRaisesNumber == 2)
     {
-        PreflopStatistics raiserStats = ctx.commonContext.playersContext.preflopLastRaiser
+        PreflopStatistics raiserStats = ctx.commonContext.playersContext.preflopLastRaiser->getStatisticsUpdater()
                                             ->getStatistics(ctx.commonContext.playersContext.nbPlayers)
                                             .preflopStatistics;
 
@@ -577,18 +576,19 @@ bool ManiacBotStrategy::turnShouldCall(const CurrentHandContext& ctx)
         return true;
     }
 
-    TurnStatistics raiserStats =
-        ctx.commonContext.playersContext.turnLastRaiser->getStatistics(ctx.commonContext.playersContext.nbPlayers)
-            .turnStatistics;
+    TurnStatistics raiserStats = ctx.commonContext.playersContext.turnLastRaiser->getStatisticsUpdater()
+                                     ->getStatistics(ctx.commonContext.playersContext.nbPlayers)
+                                     .turnStatistics;
 
     // if not enough hands, then try to use the statistics collected for (nbPlayers + 1), they should be more
     // accurate
     if (raiserStats.hands < MIN_HANDS_STATISTICS_ACCURATE && ctx.commonContext.playersContext.nbPlayers < 10 &&
-        ctx.commonContext.playersContext.turnLastRaiser->getStatistics(ctx.commonContext.playersContext.nbPlayers + 1)
+        ctx.commonContext.playersContext.turnLastRaiser->getStatisticsUpdater()
+                ->getStatistics(ctx.commonContext.playersContext.nbPlayers + 1)
                 .turnStatistics.hands > MIN_HANDS_STATISTICS_ACCURATE)
     {
 
-        raiserStats = ctx.commonContext.playersContext.turnLastRaiser
+        raiserStats = ctx.commonContext.playersContext.turnLastRaiser->getStatisticsUpdater()
                           ->getStatistics(ctx.commonContext.playersContext.nbPlayers + 1)
                           .turnStatistics;
     }
