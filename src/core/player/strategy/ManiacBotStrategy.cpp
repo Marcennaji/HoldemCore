@@ -35,7 +35,6 @@ ManiacBotStrategy::~ManiacBotStrategy() = default;
 
 bool ManiacBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
 {
-
     float callingRange = getPreflopRangeCalculator()->calculatePreflopCallingRange(ctx);
     if (callingRange == -1)
     {
@@ -126,12 +125,11 @@ bool ManiacBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
     }
     GlobalServices::instance().logger().verbose("\t\tManiac final calling range : " + stringCallingRange);
 
-    return isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, stringCallingRange);
+    return isCardsInRange(ctx.personalContext.holeCards, stringCallingRange);
 }
 
 int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
 {
-
     float raisingRange = getPreflopRangeCalculator()->calculatePreflopRaisingRange(ctx);
 
     if (raisingRange == -1)
@@ -178,8 +176,7 @@ int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
                                             ->getStatistics(ctx.commonContext.playersContext.nbPlayers)
                                             .preflopStatistics;
 
-        if (!isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, stringRaisingRange) &&
-            ctx.personalContext.m > 20 &&
+        if (!isCardsInRange(ctx.personalContext.holeCards, stringRaisingRange) && ctx.personalContext.m > 20 &&
             ctx.personalContext.cash > ctx.commonContext.bettingContext.highestBetAmount * 20 &&
             ctx.personalContext.position > UnderTheGunPlusTwo && raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE &&
             ctx.personalContext.position > ctx.commonContext.playersContext.preflopLastRaiser->getPosition() &&
@@ -190,7 +187,7 @@ int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
         {
             if (isPossibleToBluff(ctx) && ctx.personalContext.position > Late &&
                 ctx.commonContext.bettingContext.preflopRaisesNumber == 1 &&
-                !isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, ACES + BROADWAYS) &&
+                !isCardsInRange(ctx.personalContext.holeCards, ACES + BROADWAYS) &&
                 raiserStats.getPreflopCallthreeBetsFrequency() < 30)
             {
 
@@ -199,7 +196,7 @@ int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
             }
             else
             {
-                if (isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2,
+                if (isCardsInRange(ctx.personalContext.holeCards,
                                    LOW_PAIRS + SUITED_CONNECTORS + SUITED_ONE_GAPED + SUITED_TWO_GAPED))
                 {
 
@@ -209,8 +206,7 @@ int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
                 }
                 else
                 {
-                    if (!isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2,
-                                        PAIRS + ACES + BROADWAYS) &&
+                    if (!isCardsInRange(ctx.personalContext.holeCards, PAIRS + ACES + BROADWAYS) &&
                         raiserStats.getPreflopCallthreeBetsFrequency() < 30)
                     {
 
@@ -234,9 +230,8 @@ int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
                                             ->getStatistics(ctx.commonContext.playersContext.nbPlayers)
                                             .preflopStatistics;
 
-        if (!isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, stringRaisingRange) &&
-            !isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, OFFSUITED_BROADWAYS) &&
-            ctx.personalContext.m > 20 &&
+        if (!isCardsInRange(ctx.personalContext.holeCards, stringRaisingRange) &&
+            !isCardsInRange(ctx.personalContext.holeCards, OFFSUITED_BROADWAYS) && ctx.personalContext.m > 20 &&
             ctx.personalContext.cash > ctx.commonContext.bettingContext.highestBetAmount * 60 &&
             ctx.personalContext.position > MiddlePlusOne && raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE &&
             ctx.personalContext.position > ctx.commonContext.playersContext.preflopLastRaiser->getPosition() &&
@@ -259,8 +254,7 @@ int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
             }
         }
     }
-    if (!speculativeHandedAdded &&
-        !isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, stringRaisingRange))
+    if (!speculativeHandedAdded && !isCardsInRange(ctx.personalContext.holeCards, stringRaisingRange))
     {
         return 0;
     }
@@ -269,11 +263,11 @@ int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
     // nb. raising range 100 means that I want to steal a bet or BB
     if (!speculativeHandedAdded && ctx.commonContext.bettingContext.preflopCallsNumber == 0 &&
         ctx.commonContext.bettingContext.preflopRaisesNumber == 1 && raisingRange < 100 &&
-        !(isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, LOW_PAIRS + MEDIUM_PAIRS) &&
+        !(isCardsInRange(ctx.personalContext.holeCards, LOW_PAIRS + MEDIUM_PAIRS) &&
           ctx.commonContext.playersContext.nbPlayers < 4) &&
-        !(isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, HIGH_PAIRS) &&
+        !(isCardsInRange(ctx.personalContext.holeCards, HIGH_PAIRS) &&
           ctx.commonContext.bettingContext.preflopCallsNumber > 0) &&
-        isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2,
+        isCardsInRange(ctx.personalContext.holeCards,
                        RangeEstimator::getStringRange(ctx.commonContext.playersContext.nbPlayers, 4)))
     {
 

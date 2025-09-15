@@ -447,10 +447,8 @@ float PreflopRangeCalculator::adjustRaiseForNoRaiser(const CurrentHandContext& c
 {
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
     const PlayerPosition myPosition = ctx.personalContext.position;
-    const std::string myCard1 = ctx.personalContext.card1;
-    const std::string myCard2 = ctx.personalContext.card2;
 
-    if (!isCardsInRange(myCard1, myCard2, RangeEstimator::getStringRange(nbPlayers, raisingRange)) &&
+    if (!isCardsInRange(ctx.personalContext.holeCards, RangeEstimator::getStringRange(nbPlayers, raisingRange)) &&
         (myPosition == SmallBlind || myPosition == Button || myPosition == Cutoff) && canBluff)
     {
         int rand = 0;

@@ -35,7 +35,6 @@ UltraTightBotStrategy::~UltraTightBotStrategy() = default;
 
 bool UltraTightBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
 {
-
     float callingRange = getPreflopRangeCalculator()->calculatePreflopCallingRange(ctx);
     if (callingRange == -1)
     {
@@ -108,12 +107,11 @@ bool UltraTightBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
     }
     GlobalServices::instance().logger().verbose("\t\tLAG final calling range : " + stringCallingRange);
 
-    return isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, stringCallingRange);
+    return isCardsInRange(ctx.personalContext.holeCards, stringCallingRange);
 }
 
 int UltraTightBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
 {
-
     float raisingRange = getPreflopRangeCalculator()->calculatePreflopRaisingRange(ctx);
 
     if (raisingRange == -1)
@@ -160,8 +158,7 @@ int UltraTightBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
                                             ->getStatistics(ctx.commonContext.playersContext.nbPlayers)
                                             .preflopStatistics;
 
-        if (!isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, stringRaisingRange) &&
-            ctx.personalContext.m > 20 &&
+        if (!isCardsInRange(ctx.personalContext.holeCards, stringRaisingRange) && ctx.personalContext.m > 20 &&
             ctx.personalContext.cash > ctx.commonContext.bettingContext.highestBetAmount * 20 &&
             ctx.personalContext.position > MiddlePlusOne && raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE &&
             ctx.personalContext.position > ctx.commonContext.playersContext.preflopLastRaiser->getPosition() &&
@@ -172,7 +169,7 @@ int UltraTightBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
         {
 
             if (isPossibleToBluff(ctx) && ctx.personalContext.position > Late &&
-                !isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, LOW_PAIRS) &&
+                !isCardsInRange(ctx.personalContext.holeCards, LOW_PAIRS) &&
                 raiserStats.getPreflopCallthreeBetsFrequency() < 20)
             {
 
@@ -186,8 +183,7 @@ int UltraTightBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
             }
             else
             {
-                if (isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2,
-                                   SUITED_CONNECTORS + SUITED_ONE_GAPED) &&
+                if (isCardsInRange(ctx.personalContext.holeCards, SUITED_CONNECTORS + SUITED_ONE_GAPED) &&
                     raiserStats.getPreflopCallthreeBetsFrequency() < 30)
                 {
 
@@ -199,8 +195,7 @@ int UltraTightBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
         }
     }
 
-    if (!speculativeHandedAdded &&
-        !isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, stringRaisingRange))
+    if (!speculativeHandedAdded && !isCardsInRange(ctx.personalContext.holeCards, stringRaisingRange))
     {
         return 0;
     }
@@ -209,11 +204,11 @@ int UltraTightBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
     // nb. raising range 100 means that I want to steal a bet or BB
     if (!speculativeHandedAdded && ctx.commonContext.bettingContext.preflopCallsNumber == 0 &&
         ctx.commonContext.bettingContext.preflopRaisesNumber == 1 && raisingRange < 100 &&
-        !(isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, LOW_PAIRS + MEDIUM_PAIRS) &&
+        !(isCardsInRange(ctx.personalContext.holeCards, LOW_PAIRS + MEDIUM_PAIRS) &&
           ctx.commonContext.playersContext.nbPlayers < 4) &&
-        !(isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2, HIGH_PAIRS) &&
+        !(isCardsInRange(ctx.personalContext.holeCards, HIGH_PAIRS) &&
           ctx.commonContext.bettingContext.preflopCallsNumber > 0) &&
-        isCardsInRange(ctx.personalContext.card1, ctx.personalContext.card2,
+        isCardsInRange(ctx.personalContext.holeCards,
                        RangeEstimator::getStringRange(ctx.commonContext.playersContext.nbPlayers, 4)))
     {
 

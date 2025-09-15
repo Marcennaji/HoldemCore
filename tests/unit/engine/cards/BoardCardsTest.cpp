@@ -1,5 +1,6 @@
 #include "common/EngineTest.h"
 #include "common/common.h"
+#include "core/cards/Card.h"
 
 #include <memory>
 
@@ -114,6 +115,70 @@ TEST_F(BoardCardTest, DealCards_NoOverlap_OverMultipleRounds)
         myHand->dealHoleCards(myHand->dealBoardCards());
         ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
     }
+}
+
+TEST_F(BoardCardTest, ModernBoardCards_GamePhases_WorkCorrectly)
+{
+    // Test preflop state (no cards)
+    BoardCards preflop;
+    EXPECT_TRUE(preflop.isPreflop());
+    EXPECT_EQ(preflop.getNumCards(), 0);
+    EXPECT_EQ(preflop.toString(), "Preflop");
+
+    // Test flop state (3 cards)
+    BoardCards flop("Ah", "Ks", "Qd");
+    EXPECT_TRUE(flop.isFlop());
+    EXPECT_EQ(flop.getNumCards(), 3);
+    EXPECT_EQ(flop.toString(), "Ah Ks Qd");
+
+    // Test turn state (4 cards)
+    BoardCards turn("Ah", "Ks", "Qd", "Jh");
+    EXPECT_TRUE(turn.isTurn());
+    EXPECT_EQ(turn.getNumCards(), 4);
+    EXPECT_EQ(turn.toString(), "Ah Ks Qd Jh");
+
+    // Test river state (5 cards)
+    BoardCards river("Ah", "Ks", "Qd", "Jh", "Tc");
+    EXPECT_TRUE(river.isRiver());
+    EXPECT_EQ(river.getNumCards(), 5);
+    EXPECT_EQ(river.toString(), "Ah Ks Qd Jh Tc");
+
+    // Test progressive dealing
+    BoardCards progressive;
+    progressive.dealFlop(Card("As"), Card("Kh"), Card("Qs"));
+    EXPECT_TRUE(progressive.isFlop());
+    EXPECT_EQ(progressive.toString(), "As Kh Qs");
+
+    progressive.dealTurn(Card("Jd"));
+    EXPECT_TRUE(progressive.isTurn());
+    EXPECT_EQ(progressive.toString(), "As Kh Qs Jd");
+
+    progressive.dealRiver(Card("Tc"));
+    EXPECT_TRUE(progressive.isRiver());
+    EXPECT_EQ(progressive.toString(), "As Kh Qs Jd Tc");
+}
+
+TEST_F(BoardCardTest, ModernBoardCards_LegacyCompatibility_Works)
+{
+    // Create modern BoardCards and test legacy conversion
+    BoardCards modern("Ah", "Ks", "Qd", "Jh", "Tc");
+
+    // Convert to legacy int array
+    int legacyArray[5];
+    modern.toIntArray(legacyArray);
+
+    // Verify the conversion matches expected card indices
+    EXPECT_EQ(legacyArray[0], Card("Ah").getIndex());
+    EXPECT_EQ(legacyArray[1], Card("Ks").getIndex());
+    EXPECT_EQ(legacyArray[2], Card("Qd").getIndex());
+    EXPECT_EQ(legacyArray[3], Card("Jh").getIndex());
+    EXPECT_EQ(legacyArray[4], Card("Tc").getIndex());
+
+    // Create from legacy array and verify it matches
+    BoardCards fromLegacy(legacyArray);
+    EXPECT_EQ(fromLegacy.toString(), modern.toString());
+    EXPECT_TRUE(fromLegacy.isRiver());
+    EXPECT_EQ(fromLegacy.getNumCards(), 5);
 }
 
 } // namespace pkt::test

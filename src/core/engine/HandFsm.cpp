@@ -242,58 +242,70 @@ void HandFsm::applyActionEffects(const PlayerAction action)
 
 void HandFsm::initAndShuffleDeck()
 {
-    myCardsArray = {0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17,
-                    18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
-                    36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51};
-
-    std::random_device rd;  // Non-deterministic random number generator
-    std::mt19937 rng(rd()); // Seed the Mersenne Twister random number generator
-    std::shuffle(myCardsArray.begin(), myCardsArray.end(), rng);
+    myDeck.initializeFullDeck();
+    myDeck.shuffle();
 }
 
 void HandFsm::dealHoleCards(size_t cardsArrayIndex)
 {
-    int boardCardIndex, holeCardIndex, playerIndex = 0;
-    int tempPlayerArray[2];
-    int tempPlayerAndBoardArray[7];
-
     // Validate that there are enough cards in the deck
-    if (myCardsArray.size() < 5 + 2 * mySeatsList->size())
+    if (!myDeck.hasEnoughCards(0, mySeatsList->size())) // 0 board cards here since already dealt
     {
-        throw std::runtime_error("Not enough cards in the deck to deal hole cards and board cards.");
+        throw std::runtime_error("Not enough cards in the deck to deal hole cards to all players.");
     }
 
-    // Initialize the first 5 cards of the board
-    for (boardCardIndex = 0; boardCardIndex < 5; boardCardIndex++)
+    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
-        tempPlayerAndBoardArray[boardCardIndex] = myCardsArray[boardCardIndex];
-    }
+        // Deal 2 hole cards for this player
+        std::vector<Card> holeCardList = myDeck.dealCards(2);
 
-    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it, playerIndex++)
-    {
-        for (holeCardIndex = 0; holeCardIndex < 2; holeCardIndex++)
+        // Create HoleCards from the dealt cards
+        HoleCards holeCards(holeCardList[0], holeCardList[1]);
+
+        // Set using modern interface
+        (*it)->setHoleCards(holeCards);
+
+        // Create 7-card array for hand evaluation (2 hole + 5 board)
+        int tempPlayerAndBoardArray[7];
+
+        // Get board cards for evaluation
+        BoardCards boardCards = myBoard->getBoardCards();
+        for (int boardIndex = 0; boardIndex < 5; boardIndex++)
         {
-            tempPlayerArray[holeCardIndex] = myCardsArray[2 * playerIndex + holeCardIndex + 5];
-            tempPlayerAndBoardArray[5 + holeCardIndex] = myCardsArray[2 * playerIndex + holeCardIndex + 5];
+            tempPlayerAndBoardArray[boardIndex] = boardCards.getCard(boardIndex).getIndex();
         }
+
+        // Add hole cards
+        tempPlayerAndBoardArray[5] = holeCardList[0].getIndex();
+        tempPlayerAndBoardArray[6] = holeCardList[1].getIndex();
+
+        // Evaluate hand using legacy string-based system
         string humanReadableHand = CardUtilities::getCardStringValue(tempPlayerAndBoardArray, 7);
-        (*it)->setCards(tempPlayerArray);
         (*it)->setHandRanking(HandEvaluator::evaluateHand(humanReadableHand.c_str()));
     }
 }
 
 size_t HandFsm::dealBoardCards()
 {
-    int tempBoardArray[5];
-    size_t cardsArrayIndex = 0;
+    // Deal 5 cards for the board (flop, turn, river)
+    std::vector<Card> boardCardList = myDeck.dealCards(5);
 
-    for (size_t i = 0; i < 5; ++i) // The board consists of 5 cards (Flop, Turn, River)
-    {
-        tempBoardArray[i] = myCardsArray[cardsArrayIndex++];
-    }
+    // Create BoardCards and progressively deal them
+    BoardCards boardCards;
 
-    myBoard->setCards(tempBoardArray);
-    return cardsArrayIndex;
+    // Deal flop first (3 cards)
+    boardCards.dealFlop(boardCardList[0], boardCardList[1], boardCardList[2]);
+
+    // Deal turn (4th card)
+    boardCards.dealTurn(boardCardList[3]);
+
+    // Deal river (5th card)
+    boardCards.dealRiver(boardCardList[4]);
+
+    // Set the board using modern interface
+    myBoard->setBoardCards(boardCards);
+
+    return 5; // Number of cards dealt
 }
 
 HandCommonContext HandFsm::updateHandCommonContext(const GameState state)
@@ -344,37 +356,18 @@ float HandFsm::getM(int cash) const
 }
 std::string HandFsm::getStringBoard() const
 {
+    const BoardCards& boardCards = myBoard->getBoardCards();
 
-    int cardsOnBoard;
+    // Use modern BoardCards toString but adjust for legacy format compatibility
+    std::string boardString = boardCards.toString();
 
-    if (myState->getGameState() == GameState::Flop)
+    if (boardString == "Preflop" || boardString == "Invalid Board State")
     {
-        cardsOnBoard = 3;
-    }
-    else if (myState->getGameState() == GameState::Turn)
-    {
-        cardsOnBoard = 4;
-    }
-    else if (myState->getGameState() == GameState::River)
-    {
-        cardsOnBoard = 5;
-    }
-    else
-    {
-        cardsOnBoard = 0;
+        return ""; // Legacy behavior for preflop/invalid states
     }
 
-    std::string stringBoard;
-    int board[5];
-    myBoard->getCards(board);
-
-    for (int i = 0; i < cardsOnBoard; i++)
-    {
-        stringBoard += " ";
-        stringBoard += CardUtilities::getCardString(board[i]);
-    }
-
-    return stringBoard;
+    // Add leading space to match legacy format (cards have spaces between them in toString())
+    return " " + boardString;
 }
 
 int HandFsm::getPotOdd(const int playerCash, const int playerSet) const

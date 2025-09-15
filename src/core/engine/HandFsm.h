@@ -3,6 +3,7 @@
 #include <map>
 #include <memory>
 #include "PlayerFsm.h"
+#include "core/cards/Card.h"
 #include "core/engine/HandPlayersState.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
@@ -72,7 +73,7 @@ class HandFsm : public IHandLifecycle, public IHandPlayerAction, public HandPlay
     const GameEvents& myEvents;
     std::shared_ptr<IBoard> myBoard;
     std::unique_ptr<IHandState> myState;
-    std::vector<int> myCardsArray;
+    Deck myDeck;
     int myStartQuantityPlayers;
     int myStartCash;
     int mySmallBlind;

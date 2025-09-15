@@ -21,7 +21,7 @@ using namespace pkt::core::player;
 
 BoardFsm::BoardFsm(unsigned dp, const GameEvents& events) : myDealerPlayerId(dp), myEvents(events)
 {
-    myCards[0] = myCards[1] = myCards[2] = myCards[3] = myCards[4] = 0;
+    myBoardCards.reset(); // Initialize with invalid cards
 }
 
 BoardFsm::~BoardFsm()
@@ -191,19 +191,21 @@ void BoardFsm::determinePlayerNeedToShowCards()
 }
 void BoardFsm::setCards(int* theValue)
 {
-    int i;
-    for (i = 0; i < 5; i++)
-    {
-        myCards[i] = theValue[i];
-    }
+    myBoardCards.fromIntArray(theValue);
 }
 void BoardFsm::getCards(int* theValue)
 {
-    int i;
-    for (i = 0; i < 5; i++)
-    {
-        theValue[i] = myCards[i];
-    }
+    myBoardCards.toIntArray(theValue);
+}
+
+void BoardFsm::setBoardCards(const BoardCards& boardCards)
+{
+    myBoardCards = boardCards;
+}
+
+const BoardCards& BoardFsm::getBoardCards() const
+{
+    return myBoardCards;
 }
 
 void BoardFsm::setAllInCondition(bool theValue)

@@ -25,8 +25,7 @@ class TightAggressiveStrategyTest : public StrategyTest
 TEST_F(TightAggressiveStrategyTest, Preflop_StrongPair_Raises)
 {
     ctx.commonContext.gameState = Preflop;
-    ctx.personalContext.card1 = "Ah";
-    ctx.personalContext.card2 = "Ad";
+    ctx.personalContext.holeCards = pkt::core::HoleCards("Ah", "Ad");
 
     PlayerAction action = strategy.decideAction(ctx);
 
@@ -37,8 +36,7 @@ TEST_F(TightAggressiveStrategyTest, Preflop_StrongPair_Raises)
 TEST_F(TightAggressiveStrategyTest, Preflop_SuitedBroadway_Raises)
 {
     ctx.commonContext.gameState = Preflop;
-    ctx.personalContext.card1 = "Ks";
-    ctx.personalContext.card2 = "Qs";
+    ctx.personalContext.holeCards = pkt::core::HoleCards("Ks", "Qs");
 
     PlayerAction action = strategy.decideAction(ctx);
 
@@ -49,8 +47,7 @@ TEST_F(TightAggressiveStrategyTest, Preflop_SuitedBroadway_Raises)
 TEST_F(TightAggressiveStrategyTest, Preflop_Trash_DoesNotRaise)
 {
     ctx.commonContext.gameState = Preflop;
-    ctx.personalContext.card1 = "7d";
-    ctx.personalContext.card2 = "2c";
+    ctx.personalContext.holeCards = pkt::core::HoleCards("7d", "2c");
 
     PlayerAction action = strategy.decideAction(ctx);
 
@@ -61,8 +58,7 @@ TEST_F(TightAggressiveStrategyTest, Preflop_Trash_DoesNotRaise)
 TEST_F(TightAggressiveStrategyTest, Preflop_InPosition_CallsWithOdds)
 {
     ctx.commonContext.gameState = Preflop;
-    ctx.personalContext.card1 = "8h";
-    ctx.personalContext.card2 = "9h";
+    ctx.personalContext.holeCards = pkt::core::HoleCards("8h", "9h");
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.personalContext.myHandSimulation.winSd = 0.6f;
     ctx.commonContext.bettingContext.preflopRaisesNumber = 1;
@@ -80,8 +76,7 @@ TEST_F(TightAggressiveStrategyTest, Preflop_InPosition_CallsWithOdds)
 TEST_F(TightAggressiveStrategyTest, Flop_HighEquity_Raises)
 {
     ctx.commonContext.gameState = Flop;
-    ctx.personalContext.card1 = "Jh";
-    ctx.personalContext.card2 = "Js";
+    ctx.personalContext.holeCards = pkt::core::HoleCards("Jh", "Js");
     ctx.commonContext.stringBoard = "2h 3d 7c";
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.commonContext.bettingContext.flopBetsOrRaisesNumber = 1;
@@ -198,8 +193,7 @@ TEST_F(TightAggressiveStrategyTest, ZeroCash_CannotRaise)
     ctx.commonContext.gameState = Preflop;
     ctx.personalContext.myHandSimulation.winSd = 0.5f;
     ctx.personalContext.cash = 0;
-    ctx.personalContext.card1 = "8h";
-    ctx.personalContext.card2 = "9h";
+    ctx.personalContext.holeCards = pkt::core::HoleCards("8h", "9h");
 
     PlayerAction action = strategy.decideAction(ctx);
 

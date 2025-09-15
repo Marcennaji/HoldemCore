@@ -1050,8 +1050,7 @@ void Player::updateCurrentHandContext(const GameState state)
     myCurrentHandContext->personalContext.position = myPosition;
 
     // player specific, hidden from the opponents :
-    myCurrentHandContext->personalContext.card1 = myCard1;
-    myCurrentHandContext->personalContext.card2 = myCard2;
+    myCurrentHandContext->personalContext.holeCards = HoleCards(myCard1, myCard2);
     myCurrentHandContext->personalContext.preflopCallingRange = calculatePreflopCallingRange(*myCurrentHandContext);
     // guess what the opponents might have and evaluate our strength, given our hole cards and the board cards (if any)
     myCurrentHandContext->personalContext.myHandSimulation = computeHandSimulation();

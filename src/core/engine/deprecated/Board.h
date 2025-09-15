@@ -7,6 +7,7 @@
 #include <memory>
 #include <vector>
 
+#include "core/cards/Card.h"
 #include "core/interfaces/IBoard.h"
 
 #include "core/player/typedefs.h"
@@ -34,6 +35,16 @@ class Board : public IBoard
 
     void setCards(int* theValue);
     void getCards(int* theValue);
+
+    // Modern BoardCards interface (not implemented in deprecated class)
+    void setBoardCards(const BoardCards& boardCards) override
+    {
+        throw std::runtime_error("setBoardCards not implemented in deprecated Board class");
+    }
+    const BoardCards& getBoardCards() const override
+    {
+        throw std::runtime_error("getBoardCards not implemented in deprecated Board class");
+    }
 
     void setAllInCondition(bool theValue);
     void setLastActionPlayerId(unsigned theValue);

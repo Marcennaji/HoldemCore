@@ -30,11 +30,8 @@ PlayerFsm::PlayerFsm(const GameEvents& events, int id, std::string name, int cas
     myStatisticsUpdater = std::make_unique<PlayerStatisticsUpdater>();
     myStatisticsUpdater->loadStatistics(name);
 
-    int i;
-    for (i = 0; i < 2; i++)
-    {
-        myCards[i] = -1;
-    }
+    // Initialize with invalid cards
+    myHoleCards.reset();
 }
 
 const PlayerPosition PlayerFsm::getPosition() const
@@ -83,24 +80,15 @@ PlayerAction PlayerFsm::getLastAction() const
     return getCurrentHandActions().getLastAction();
 }
 
-// will set myCard1 and myCard1, which are human-readable strings, i.e "Qc" or "Ts"
+// will set hole cards from int array, maintaining backward compatibility
 void PlayerFsm::setCards(int* theValue)
 {
-    for (int i = 0; i < 2; i++)
-    {
-        myCards[i] = theValue[i];
-    }
-
-    myCard1 = CardUtilities::getCardString(myCards[0]);
-    myCard2 = CardUtilities::getCardString(myCards[1]);
+    myHoleCards.fromIntArray(theValue);
 }
+
 void PlayerFsm::getCards(int* theValue) const
 {
-    int i;
-    for (i = 0; i < 2; i++)
-    {
-        theValue[i] = myCards[i];
-    }
+    myHoleCards.toIntArray(theValue);
 }
 
 void PlayerFsm::setCardsFlip(bool theValue)
@@ -141,8 +129,7 @@ int PlayerFsm::getLastMoneyWon() const
 
 std::string PlayerFsm::getCardsValueString() const
 {
-    std::string s = myCard1 + " " + myCard2;
-    return s;
+    return myHoleCards.toString();
 }
 
 const HandSimulationStats PlayerFsm::computeHandSimulation() const
@@ -272,8 +259,10 @@ float PlayerFsm::getOpponentWinningHandsPercentage(const int opponentId, std::st
         // delete hands that can't exist, given the player's cards (if they are supposed to be known)
         if (opponentId != myID)
         {
-            if (myCard1.find(s1) != string::npos || myCard2.find(s1) != string::npos ||
-                myCard1.find(s2) != string::npos || myCard2.find(s2) != string::npos)
+            const std::string card1Str = myHoleCards.card1.toString();
+            const std::string card2Str = myHoleCards.card2.toString();
+            if (card1Str.find(s1) != string::npos || card2Str.find(s1) != string::npos ||
+                card1Str.find(s2) != string::npos || card2Str.find(s2) != string::npos)
             {
                 continue;
             }
@@ -432,8 +421,7 @@ void PlayerFsm::updateCurrentHandContext(const GameState state, HandFsm& current
     myCurrentHandContext->personalContext.position = myPosition;
 
     // player specific, hidden from the opponents :
-    myCurrentHandContext->personalContext.card1 = myCard1;
-    myCurrentHandContext->personalContext.card2 = myCard2;
+    myCurrentHandContext->personalContext.holeCards = myHoleCards;
     myCurrentHandContext->personalContext.preflopCallingRange = calculatePreflopCallingRange(*myCurrentHandContext);
     // guess what the opponents might have and evaluate our strength, given our hole cards and the board cards (if any)
     myCurrentHandContext->personalContext.myHandSimulation = computeHandSimulation();

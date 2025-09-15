@@ -5,6 +5,7 @@
 #pragma once
 
 #include <core/player/typedefs.h>
+#include "core/cards/Card.h"
 #include "core/engine/EngineDefs.h"
 
 #include <list>
@@ -28,6 +29,10 @@ class IBoard
     //
     virtual void setCards(int* theValue) = 0;
     virtual void getCards(int* theValue) = 0;
+
+    // Modern BoardCards interface (preferred for new code)
+    virtual void setBoardCards(const BoardCards& boardCards) = 0;
+    virtual const BoardCards& getBoardCards() const = 0;
     //
     virtual int getPot() const = 0;
     virtual int getPot(const HandFsm& hand) const = 0;

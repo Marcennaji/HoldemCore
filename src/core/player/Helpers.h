@@ -6,6 +6,7 @@
 #pragma once
 
 // Include the new focused modules
+#include "core/cards/Card.h"
 #include "core/cards/CardRangeAnalyzer.h"
 #include "core/player/PlayerListUtils.h"
 #include "core/player/position/PositionManager.h"
@@ -46,6 +47,12 @@ inline void updateActingPlayersListFsm(PlayerFsmList& list)
 inline bool isCardsInRange(const std::string& card1, const std::string& card2, const std::string& range)
 {
     return pkt::core::cards::CardRangeAnalyzer::isCardsInRange(card1, card2, range);
+}
+
+inline bool isCardsInRange(const pkt::core::HoleCards& holeCards, const std::string& range)
+{
+    return pkt::core::cards::CardRangeAnalyzer::isCardsInRange(holeCards.card1.toString(), holeCards.card2.toString(),
+                                                               range);
 }
 
 inline int getDrawingProbability(const PostFlopAnalysisFlags& state)

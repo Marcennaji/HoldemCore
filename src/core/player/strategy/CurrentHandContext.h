@@ -6,6 +6,7 @@
 #pragma once
 
 #include <core/player/deprecated/Player.h>
+#include "core/cards/Card.h" // For HoleCards
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/interfaces/IHandEvaluationEngine.h"
@@ -66,8 +67,7 @@ struct PerPlayerHandContext
     int totalBetAmount = 0;
     int m = 0;
     int id = 0;
-    std::string card1 = "";
-    std::string card2 = "";
+    pkt::core::HoleCards holeCards; // Modern Card-based representation
     pkt::core::PlayerPosition position = PlayerPosition::Unknown;
 
     PlayerStatistics statistics{};

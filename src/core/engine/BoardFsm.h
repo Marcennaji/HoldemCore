@@ -3,6 +3,7 @@
 // Licensed under the MIT License — see LICENSE file for details.
 #pragma once
 
+#include "core/cards/Card.h"
 #include "core/engine/GameEvents.h"
 #include "core/interfaces/IBoard.h"
 #include "core/player/typedefs.h"
@@ -38,6 +39,10 @@ class BoardFsm : public IBoard
     void setCards(int* theValue);
     void getCards(int* theValue);
 
+    // Modern BoardCards interface (preferred for new code)
+    void setBoardCards(const BoardCards& boardCards) override;
+    const BoardCards& getBoardCards() const override;
+
     void setAllInCondition(bool theValue);
     void setLastActionPlayerId(unsigned theValue);
 
@@ -70,7 +75,7 @@ class BoardFsm : public IBoard
     std::list<unsigned> myWinners;
     std::list<unsigned> myPlayerNeedToShowCards;
 
-    int myCards[5];
+    BoardCards myBoardCards;
     int myPot{0};
     int myCurrentRoundTotalBets{0};
     unsigned myDealerPlayerId;
