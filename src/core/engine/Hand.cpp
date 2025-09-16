@@ -1,7 +1,7 @@
+#include "Hand.h"
 #include <core/services/GlobalServices.h>
 #include "CardUtilities.h"
 #include "GameEvents.h"
-#include "Hand.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/player/Helpers.h"
 
@@ -51,8 +51,7 @@ Hand::~Hand() = default;
 
 void Hand::initialize()
 {
-    GlobalServices::instance().logger().info(
-        "\n----------------------  New hand initialization (FSM)  -------------------------------\n");
+    GlobalServices::instance().logger().info("\n----------------------  New hand ----------------------------\n");
 
     // Initialize deck but don't deal cards yet - wait until runGameLoop() to match legacy timing
     initAndShuffleDeck();
@@ -188,7 +187,25 @@ void Hand::applyActionEffects(const PlayerAction action)
         player->addBetAmount(raiseIncrement);
         fireOnPotUpdated();
         getBettingActions()->updateRoundHighestSet(action.amount);
-        getBettingActions()->getPreflop().setLastRaiserId(player->getId());
+
+        // Record last raiser for the current betting round
+        switch (myState->getGameState())
+        {
+        case GameState::Preflop:
+            getBettingActions()->getPreflop().setLastRaiserId(player->getId());
+            break;
+        case GameState::Flop:
+            getBettingActions()->getFlop().setLastRaiserId(player->getId());
+            break;
+        case GameState::Turn:
+            getBettingActions()->getTurn().setLastRaiserId(player->getId());
+            break;
+        case GameState::River:
+            getBettingActions()->getRiver().setLastRaiserId(player->getId());
+            break;
+        default:
+            break;
+        }
         break;
     }
 
@@ -198,6 +215,25 @@ void Hand::applyActionEffects(const PlayerAction action)
         player->addBetAmount(action.amount);
         fireOnPotUpdated();
         getBettingActions()->updateRoundHighestSet(action.amount);
+
+        // Record last raiser (bettor) for the current betting round
+        switch (myState->getGameState())
+        {
+        case GameState::Preflop:
+            getBettingActions()->getPreflop().setLastRaiserId(player->getId());
+            break;
+        case GameState::Flop:
+            getBettingActions()->getFlop().setLastRaiserId(player->getId());
+            break;
+        case GameState::Turn:
+            getBettingActions()->getTurn().setLastRaiserId(player->getId());
+            break;
+        case GameState::River:
+            getBettingActions()->getRiver().setLastRaiserId(player->getId());
+            break;
+        default:
+            break;
+        }
         break;
     }
 
@@ -219,7 +255,25 @@ void Hand::applyActionEffects(const PlayerAction action)
         if (allinIncrement > currentHighest)
         {
             getBettingActions()->updateRoundHighestSet(allinIncrement);
-            getBettingActions()->getPreflop().setLastRaiserId(player->getId());
+
+            // Record last raiser (all-in as raise) for the current betting round
+            switch (myState->getGameState())
+            {
+            case GameState::Preflop:
+                getBettingActions()->getPreflop().setLastRaiserId(player->getId());
+                break;
+            case GameState::Flop:
+                getBettingActions()->getFlop().setLastRaiserId(player->getId());
+                break;
+            case GameState::Turn:
+                getBettingActions()->getTurn().setLastRaiserId(player->getId());
+                break;
+            case GameState::River:
+                getBettingActions()->getRiver().setLastRaiserId(player->getId());
+                break;
+            default:
+                break;
+            }
         }
         break;
     }

@@ -1,7 +1,7 @@
 // tests/BettingRoundsTest.cpp
 
-#include "BettingRoundsTest.h"
 #include "common/DeterministicStrategy.h"
+#include "common/EngineTest.h"
 #include "core/engine/Helpers.h"
 #include "core/engine/model/PlayerAction.h"
 #include "core/player/Helpers.h"
@@ -12,6 +12,18 @@ using namespace pkt::core::player;
 
 namespace pkt::test
 {
+
+class BettingRoundsTest : public EngineTest
+{
+  protected:
+    void SetUp() override;
+    void TearDown() override;
+    void logTestMessage(const std::string& message) const;
+    bool isPlayerStillActive(unsigned id) const;
+    void checkStateTransitions();
+
+    std::vector<core::GameState> stateSequence;
+};
 
 void BettingRoundsTest::logTestMessage(const std::string& message) const
 {

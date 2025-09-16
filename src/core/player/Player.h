@@ -12,6 +12,8 @@
 #include "core/player/PlayerStatisticsUpdater.h"
 #include "core/player/strategy/PlayerStrategy.h"
 
+#include <string>
+#include <typeinfo>
 #include "CurrentHandActions.h"
 #include "range/RangeEstimator.h"
 #include "strategy/CurrentHandContext.h"
@@ -51,6 +53,28 @@ class Player
     {
         assert(myStrategy && "PlayerStrategy must be set before deciding action");
         return myStrategy->decideAction(ctx);
+    }
+
+    // For testing purposes: get strategy type information
+    std::string getStrategyTypeName() const
+    {
+        if (!myStrategy)
+        {
+            return "None";
+        }
+        // Store in variable to avoid warning about potentially-evaluated-expression
+        const auto& strategy = *myStrategy;
+        return typeid(strategy).name();
+    }
+
+    // For testing purposes: check if strategy is of specific type
+    template <typename StrategyType> bool hasStrategyType() const
+    {
+        if (!myStrategy)
+        {
+            return false;
+        }
+        return dynamic_cast<const StrategyType*>(myStrategy.get()) != nullptr;
     }
 
     void setCash(int theValue);
