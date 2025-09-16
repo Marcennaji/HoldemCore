@@ -131,7 +131,7 @@ player.setStrategy(std::make_unique<MyCustomBotStrategy>());
   
   As of September 2025, the architectural rewrite is **complete** — the codebase is now fully original and MIT-licensed. 
 
-🚧🚧🚧 Since UI development is still on progress, **no public release or announcement has been made yet**. 🚧🚧🚧  
+🚧 Since UI development is still on progress, **no public release or announcement has been made yet**. 🚧  
 
 
 ---
@@ -168,8 +168,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md)
 
 This project, PokerTraining, is released under the MIT License — you are free to use, learn from, and contribute to it.
 
-⚖️ Note on legacy code:
-The initial version of PokerTraining (2011, SourceForge) reused portions of the open-source [PokerTH](https://github.com/pokerth/pokerth) engine, which at that time was distributed under **GPLv2**. That early codebase focused mainly on adding poker bot strategies and AI logic.  
+⚖️ Note : the initial version of PokerTraining (2011, SourceForge) reused portions of the open-source [PokerTH](https://github.com/pokerth/pokerth) engine, which at that time was distributed under **GPLv2**. That early codebase focused mainly on adding poker bot strategies and AI logic.  
 
 Since 2025, the engine has undergone a **complete rewrite**: all PokerTH-derived code has been replaced with a **fully original, modular codebase under MIT**.  
 
