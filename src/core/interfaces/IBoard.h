@@ -24,11 +24,7 @@ class IBoard
     //
     virtual void setSeatsList(pkt::core::player::PlayerList seats) = 0;
     virtual void setActingPlayersList(pkt::core::player::PlayerList actingPlayers) = 0;
-    //
-    virtual void setCards(int* theValue) = 0;
-    virtual void getCards(int* theValue) = 0;
 
-    // Modern BoardCards interface (preferred for new code)
     virtual void setBoardCards(const BoardCards& boardCards) = 0;
     virtual const BoardCards& getBoardCards() const = 0;
     //

@@ -80,17 +80,6 @@ PlayerAction Player::getLastAction() const
     return getCurrentHandActions().getLastAction();
 }
 
-// will set hole cards from int array, maintaining backward compatibility
-void Player::setCards(int* theValue)
-{
-    myHoleCards.fromIntArray(theValue);
-}
-
-void Player::getCards(int* theValue) const
-{
-    myHoleCards.toIntArray(theValue);
-}
-
 void Player::setCardsFlip(bool theValue)
 {
     myCardsFlip = theValue;

@@ -86,29 +86,6 @@ TEST_F(HoleCardsTest, ResetToInvalidCards)
     EXPECT_FALSE(holeCards.isValid());
 }
 
-TEST_F(HoleCardsTest, PlayerBackwardCompatibility)
-{
-    GameEvents events;
-    Player player(events, 1, "TestPlayer", 1000);
-
-    // Test setting cards using old int array method
-    int cardIndices[2] = {25, 37}; // Ah, Ks
-    player.setCards(cardIndices);
-
-    // Test getting cards using old int array method
-    int retrievedCards[2];
-    player.getCards(retrievedCards);
-
-    EXPECT_EQ(retrievedCards[0], 25);
-    EXPECT_EQ(retrievedCards[1], 37);
-
-    // Test that the Card-first approach works
-    const HoleCards& holeCards = player.getHoleCards();
-    EXPECT_EQ(holeCards.card1.toString(), "Ah");
-    EXPECT_EQ(holeCards.card2.toString(), "Ks");
-    EXPECT_EQ(player.getCardsValueString(), "Ah Ks");
-}
-
 TEST_F(HoleCardsTest, PlayerModernInterface)
 {
     GameEvents events;
@@ -124,12 +101,6 @@ TEST_F(HoleCardsTest, PlayerModernInterface)
     EXPECT_EQ(retrievedCards.card1.toString(), "Qd");
     EXPECT_EQ(retrievedCards.card2.toString(), "Jc");
     EXPECT_EQ(retrievedCards.toString(), "Qd Jc");
-
-    // Test that legacy interface still works for existing engine integration
-    int cardIndices[2];
-    player.getCards(cardIndices);
-    EXPECT_EQ(cardIndices[0], 10); // Qd
-    EXPECT_EQ(cardIndices[1], 48); // Jc
 }
 
 TEST_F(HoleCardsTest, PlayerStringConstructorInterface)
@@ -166,4 +137,53 @@ TEST_F(HoleCardsTest, RoundTripConversion)
     EXPECT_EQ(original.card1.toString(), converted.card1.toString());
     EXPECT_EQ(original.card2.toString(), converted.card2.toString());
     EXPECT_EQ(original.toString(), converted.toString());
+}
+
+TEST_F(HoleCardsTest, ApiTest)
+{
+    GameEvents events;
+    Player player(events, 1, "ModernPlayer", 1000);
+
+    // NEW APPROACH: Work directly with Card objects
+    Card aceOfSpades("As");
+    Card kingOfHearts("Kh");
+
+    // Set cards using modern interface - preferred for new FSM code
+    player.setHoleCards(aceOfSpades, kingOfHearts);
+
+    // Access cards as Card objects - type-safe and expressive
+    const HoleCards& holeCards = player.getHoleCards();
+
+    // Rich Card API available
+    EXPECT_EQ(holeCards.card1.getSuit(), Card::Suit::Spades);
+    EXPECT_EQ(holeCards.card1.getRank(), Card::Rank::Ace);
+    EXPECT_EQ(holeCards.card2.getSuit(), Card::Suit::Hearts);
+    EXPECT_EQ(holeCards.card2.getRank(), Card::Rank::King);
+
+    // String representation for logging/display
+    EXPECT_EQ(holeCards.toString(), "As Kh");
+
+    // Values for game logic
+    EXPECT_EQ(holeCards.card1.getValue(), 14); // Ace high
+    EXPECT_EQ(holeCards.card2.getValue(), 13); // King
+}
+
+TEST_F(HoleCardsTest, ConvenientStringConstructor)
+{
+    GameEvents events;
+    Player player(events, 2, "ConvenientPlayer", 1000);
+
+    // CONVENIENT: Create from strings directly
+    HoleCards pocket("Qd", "Jc");
+    player.setHoleCards(pocket);
+
+    const HoleCards& retrieved = player.getHoleCards();
+    EXPECT_EQ(retrieved.card1.toString(), "Qd");
+    EXPECT_EQ(retrieved.card2.toString(), "Jc");
+
+    // Access suit/rank information easily
+    EXPECT_EQ(retrieved.card1.getSuit(), Card::Suit::Diamonds);
+    EXPECT_EQ(retrieved.card2.getSuit(), Card::Suit::Clubs);
+    EXPECT_EQ(retrieved.card1.getRank(), Card::Rank::Queen);
+    EXPECT_EQ(retrieved.card2.getRank(), Card::Rank::Jack);
 }

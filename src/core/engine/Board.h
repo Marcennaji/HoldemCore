@@ -31,9 +31,6 @@ class Board : public IBoard
     void setSeatsList(pkt::core::player::PlayerList seats) override;
     void setActingPlayersList(pkt::core::player::PlayerList actingPlayers) override;
 
-    void setCards(int* theValue) override;
-    void getCards(int* theValue) override;
-
     // Modern BoardCards interface (preferred for new code)
     void setBoardCards(const BoardCards& boardCards) override;
     const BoardCards& getBoardCards() const override;

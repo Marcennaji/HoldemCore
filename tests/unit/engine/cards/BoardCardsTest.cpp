@@ -26,17 +26,18 @@ bool BoardCardTest::cardsAreUniqueAndValid(const std::shared_ptr<pkt::core::Hand
     std::vector<int> allCards;
 
     // Collect board cards
-    int boardCards[5];
-    board->getCards(boardCards);
-    allCards.insert(allCards.end(), boardCards, boardCards + 5);
+    const BoardCards& boardCards = board->getBoardCards();
+    int boardCardsArray[5];
+    boardCards.toIntArray(boardCardsArray);
+    allCards.insert(allCards.end(), boardCardsArray, boardCardsArray + 5);
 
     int cards[2];
     // Collect players' hole cards
     for (const auto& player : *players)
     {
-        player->getCards(cards);
-        allCards.push_back(cards[0]);
-        allCards.push_back(cards[1]);
+        HoleCards holeCards = player->getHoleCards();
+        allCards.push_back(holeCards.card1.getIndex());
+        allCards.push_back(holeCards.card2.getIndex());
     }
 
     // Check range and uniqueness
@@ -58,9 +59,10 @@ TEST_F(BoardCardTest, DealBoardCardsAndHoleCards_NoOverlap_2Players)
     myHand->dealHoleCards(myHand->dealBoardCards());
 
     // Verify board cards
-    int boardCards[5];
-    myHand->getBoard().getCards(boardCards);
-    ASSERT_EQ(sizeof(boardCards) / sizeof(boardCards[0]), 5);
+    const BoardCards& boardCards = myHand->getBoard().getBoardCards();
+    int boardCardsArray[5];
+    boardCards.toIntArray(boardCardsArray);
+    ASSERT_EQ(sizeof(boardCardsArray) / sizeof(boardCardsArray[0]), 5);
 }
 
 TEST_F(BoardCardTest, DealBoardCardsAndHoleCards_NoOverlap_2Players_FullTest)
@@ -89,9 +91,10 @@ TEST_F(BoardCardTest, AllDealtCards_AreWithinValidRange_4Players)
     initializeHandWithPlayers(4, gameData);
     myHand->dealHoleCards(myHand->dealBoardCards());
 
-    int boardCards[5];
-    myBoard->getCards(boardCards);
-    for (int card : boardCards)
+    const BoardCards& boardCards = myBoard->getBoardCards();
+    int boardCardsArray[5];
+    boardCards.toIntArray(boardCardsArray);
+    for (int card : boardCardsArray)
     {
         ASSERT_GE(card, 0);
         ASSERT_LT(card, 52);
@@ -99,11 +102,11 @@ TEST_F(BoardCardTest, AllDealtCards_AreWithinValidRange_4Players)
     int cards[2];
     for (const auto& player : *mySeatsList)
     {
-        player->getCards(cards);
-        ASSERT_GE(cards[0], 0);
-        ASSERT_LT(cards[0], 52);
-        ASSERT_GE(cards[1], 0);
-        ASSERT_LT(cards[1], 52);
+        HoleCards holeCards = player->getHoleCards();
+        ASSERT_GE(holeCards.card1.getIndex(), 0);
+        ASSERT_LT(holeCards.card1.getIndex(), 52);
+        ASSERT_GE(holeCards.card2.getIndex(), 0);
+        ASSERT_LT(holeCards.card2.getIndex(), 52);
     }
 }
 

@@ -60,14 +60,11 @@ class Player
     void setAction(IHandState& state, const PlayerAction& action);
     PlayerAction getLastAction() const;
 
-    // Legacy interface for compatibility with existing engine code that uses int arrays
-    void setCards(int* theValue);
-    void getCards(int* theValue) const;
-
     // Modern Card-based interface - preferred for new code
     const HoleCards& getHoleCards() const { return myHoleCards; }
     void setHoleCards(const HoleCards& cards) { myHoleCards = cards; }
     void setHoleCards(const Card& card1, const Card& card2) { myHoleCards = HoleCards(card1, card2); }
+
     void setCardsFlip(bool theValue);
     bool getCardsFlip() const;
 

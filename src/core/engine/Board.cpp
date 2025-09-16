@@ -187,14 +187,6 @@ void Board::determinePlayerNeedToShowCards()
     myPlayerNeedToShowCards.sort();
     myPlayerNeedToShowCards.unique();
 }
-void Board::setCards(int* theValue)
-{
-    myBoardCards.fromIntArray(theValue);
-}
-void Board::getCards(int* theValue)
-{
-    myBoardCards.toIntArray(theValue);
-}
 
 void Board::setBoardCards(const BoardCards& boardCards)
 {
