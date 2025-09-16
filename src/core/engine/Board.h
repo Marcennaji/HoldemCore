@@ -20,16 +20,16 @@ class Player;
 namespace pkt::core
 {
 
-class HandFsm;
+class Hand;
 
-class BoardFsm : public IBoard
+class Board : public IBoard
 {
   public:
-    BoardFsm(unsigned dealerPosition, const GameEvents& events);
-    ~BoardFsm();
+    Board(unsigned dealerPosition, const GameEvents& events);
+    ~Board();
 
-    void setSeatsListFsm(pkt::core::player::PlayerFsmList seats) override;
-    void setActingPlayersListFsm(pkt::core::player::PlayerFsmList actingPlayers) override;
+    void setSeatsList(pkt::core::player::PlayerList seats) override;
+    void setActingPlayersList(pkt::core::player::PlayerList actingPlayers) override;
 
     void setCards(int* theValue) override;
     void getCards(int* theValue) override;
@@ -42,17 +42,17 @@ class BoardFsm : public IBoard
     void setLastActionPlayerId(unsigned theValue) override;
 
     int getPot() const override { throw std::runtime_error("getPot is deprecated"); }
-    int getPot(const HandFsm& hand) const override;
+    int getPot(const Hand& hand) const override;
     void setPot(int theValue) override { throw std::runtime_error("setPot is deprecated"); }
     int getSets() const override { throw std::runtime_error("getSets is deprecated"); }
-    int getSets(const HandFsm& hand) const override;
+    int getSets(const Hand& hand) const override;
 
     void collectSets() override { throw std::runtime_error("collectSets is deprecated"); }
     void collectPot() override { throw std::runtime_error("collectPot is deprecated"); }
 
     void distributePot() override { throw std::runtime_error("distributePot is deprecated"); }
 
-    void distributePot(HandFsm& hand) override;
+    void distributePot(Hand& hand) override;
     void determinePlayerNeedToShowCards() override;
 
     std::list<unsigned> getWinners() const override;
@@ -64,8 +64,8 @@ class BoardFsm : public IBoard
   private:
   private:
     const GameEvents& myEvents;
-    pkt::core::player::PlayerFsmList mySeatsList;
-    pkt::core::player::PlayerFsmList myActingPlayersList;
+    pkt::core::player::PlayerList mySeatsList;
+    pkt::core::player::PlayerList myActingPlayersList;
 
     std::list<unsigned> myWinners;
     std::list<unsigned> myPlayerNeedToShowCards;

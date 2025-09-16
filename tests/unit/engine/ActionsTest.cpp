@@ -33,17 +33,17 @@ void ActionsPreflopTest::TearDown()
 
 void ActionsPreflopTest::setupBasicHeadsUpScenario()
 {
-    initializeHandFsmWithPlayers(2, gameData);
+    initializeHandWithPlayers(2, gameData);
 }
 
 void ActionsPreflopTest::setupThreePlayerScenario()
 {
-    initializeHandFsmWithPlayers(3, gameData);
+    initializeHandWithPlayers(3, gameData);
 }
 
 void ActionsPreflopTest::setupPlayerWithLimitedCash(int playerId, int cash)
 {
-    auto player = getPlayerFsmById(myActingPlayersListFsm, playerId);
+    auto player = getPlayerById(myActingPlayersList, playerId);
     ASSERT_NE(player, nullptr) << "Player with ID " << playerId << " not found";
     player->setCash(cash);
 }
@@ -51,7 +51,7 @@ void ActionsPreflopTest::setupPlayerWithLimitedCash(int playerId, int cash)
 void ActionsPreflopTest::simulatePlayerAction(int playerId, ActionType actionType, int amount)
 {
     PlayerAction action{playerId, actionType, amount};
-    myHandFsm->handlePlayerAction(action);
+    myHand->handlePlayerAction(action);
 }
 
 bool ActionsPreflopTest::containsAction(const std::vector<ActionType>& actions, ActionType action)
@@ -72,8 +72,8 @@ TEST_F(ActionsPreflopTest, GetValidActionsForPlayerInitialPreflopSmallBlind)
 
     setupBasicHeadsUpScenario();
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto validActions = getValidActionsForPlayer(*myHandFsm, playerSb->getId());
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto validActions = getValidActionsForPlayer(*myHand, playerSb->getId());
 
     EXPECT_FALSE(validActions.empty()) << "Small blind should have valid actions";
 
@@ -94,13 +94,13 @@ TEST_F(ActionsPreflopTest, GetValidActionsForPlayerAfterCall)
 
     setupBasicHeadsUpScenario();
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto playerBb = getPlayerById(myActingPlayersList, 1);
 
     // SB calls
     simulatePlayerAction(playerSb->getId(), ActionType::Call);
 
-    auto validActions = getValidActionsForPlayer(*myHandFsm, playerBb->getId());
+    auto validActions = getValidActionsForPlayer(*myHand, playerBb->getId());
 
     EXPECT_FALSE(validActions.empty()) << "Big blind should have valid actions after SB calls";
 
@@ -123,12 +123,12 @@ TEST_F(ActionsPreflopTest, GetValidActionsForPlayerWithLimitedCash)
 
     setupBasicHeadsUpScenario();
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
 
     // Set SB to have very little cash (less than what's needed for minimum raise)
     setupPlayerWithLimitedCash(playerSb->getId(), 15); // Only 5 chips left after posting SB
 
-    auto validActions = getValidActionsForPlayer(*myHandFsm, playerSb->getId());
+    auto validActions = getValidActionsForPlayer(*myHand, playerSb->getId());
 
     EXPECT_FALSE(validActions.empty()) << "Player with limited cash should still have some valid actions";
 
@@ -152,7 +152,7 @@ TEST_F(ActionsPreflopTest, GetValidActionsForPlayerAllIn)
 
     setupBasicHeadsUpScenario();
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
 
     // Set player to have no cash (simulating all-in state)
     setupPlayerWithLimitedCash(playerSb->getId(), 10); // Exactly the SB amount, so 0 left after posting
@@ -160,7 +160,7 @@ TEST_F(ActionsPreflopTest, GetValidActionsForPlayerAllIn)
     // Debug: Check player's actual cash after posting blind
     logTestMessage("Player SB cash after setup: " + std::to_string(playerSb->getCash()));
 
-    auto validActions = getValidActionsForPlayer(*myHandFsm, playerSb->getId());
+    auto validActions = getValidActionsForPlayer(*myHand, playerSb->getId());
 
     // Player with no cash can still fold, but cannot make any other action that requires chips
     EXPECT_FALSE(validActions.empty()) << "Player should still be able to fold even with no cash";
@@ -193,12 +193,12 @@ TEST_F(ActionsPreflopTest, GetValidActionsForPlayerInThreePlayerScenario)
 
     setupThreePlayerScenario();
 
-    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
+    auto playerDealer = getPlayerById(myActingPlayersList, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 1);
+    auto playerBb = getPlayerById(myActingPlayersList, 2);
 
     // Test dealer's initial actions (first to act after blinds)
-    auto validActionsDealer = getValidActionsForPlayer(*myHandFsm, playerDealer->getId());
+    auto validActionsDealer = getValidActionsForPlayer(*myHand, playerDealer->getId());
 
     EXPECT_FALSE(validActionsDealer.empty()) << "Dealer should have valid actions";
 
@@ -220,7 +220,7 @@ TEST_F(ActionsPreflopTest, GetValidActionsForNonExistentPlayer)
     setupBasicHeadsUpScenario();
 
     // Try to get valid actions for a player that doesn't exist
-    auto validActions = getValidActionsForPlayer(*myHandFsm, 999);
+    auto validActions = getValidActionsForPlayer(*myHand, 999);
 
     EXPECT_TRUE(validActions.empty()) << "Non-existent player should have no valid actions";
 }
@@ -233,11 +233,11 @@ TEST_F(ActionsPreflopTest, ValidatePlayerActionFoldAlwaysValid)
 
     setupBasicHeadsUpScenario();
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
     PlayerAction foldAction{playerSb->getId(), ActionType::Fold, 0};
 
-    bool isValid = validatePlayerAction(myActingPlayersListFsm, foldAction, *myHandFsm->getBettingActions(),
-                                        myHandFsm->getSmallBlind(), myHandFsm->getGameState());
+    bool isValid = validatePlayerAction(myActingPlayersList, foldAction, *myHand->getBettingActions(),
+                                        myHand->getSmallBlind(), myHand->getGameState());
 
     EXPECT_TRUE(isValid) << "Fold action should always be valid for active players";
 }
@@ -248,11 +248,11 @@ TEST_F(ActionsPreflopTest, ValidatePlayerActionCallValid)
 
     setupBasicHeadsUpScenario();
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
     PlayerAction callAction{playerSb->getId(), ActionType::Call, 10};
 
-    bool isValid = validatePlayerAction(myActingPlayersListFsm, callAction, *myHandFsm->getBettingActions(),
-                                        myHandFsm->getSmallBlind(), myHandFsm->getGameState());
+    bool isValid = validatePlayerAction(myActingPlayersList, callAction, *myHand->getBettingActions(),
+                                        myHand->getSmallBlind(), myHand->getGameState());
 
     EXPECT_TRUE(isValid) << "Call action should be valid when there's a bet to call";
 }
@@ -263,11 +263,11 @@ TEST_F(ActionsPreflopTest, ValidatePlayerActionCheckInvalidWhenBetToCall)
 
     setupBasicHeadsUpScenario();
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
     PlayerAction checkAction{playerSb->getId(), ActionType::Check, 0};
 
-    bool isValid = validatePlayerAction(myActingPlayersListFsm, checkAction, *myHandFsm->getBettingActions(),
-                                        myHandFsm->getSmallBlind(), myHandFsm->getGameState());
+    bool isValid = validatePlayerAction(myActingPlayersList, checkAction, *myHand->getBettingActions(),
+                                        myHand->getSmallBlind(), myHand->getGameState());
 
     EXPECT_FALSE(isValid) << "Check action should be invalid when there's a bet to call";
 }
@@ -278,14 +278,14 @@ TEST_F(ActionsPreflopTest, ValidatePlayerActionRaiseValid)
 
     setupBasicHeadsUpScenario();
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
 
     // Valid raise: double the big blind
-    int raiseAmount = myHandFsm->getSmallBlind() * 4; // 40 when SB is 10, BB is 20
+    int raiseAmount = myHand->getSmallBlind() * 4; // 40 when SB is 10, BB is 20
     PlayerAction raiseAction{playerSb->getId(), ActionType::Raise, raiseAmount};
 
-    bool isValid = validatePlayerAction(myActingPlayersListFsm, raiseAction, *myHandFsm->getBettingActions(),
-                                        myHandFsm->getSmallBlind(), myHandFsm->getGameState());
+    bool isValid = validatePlayerAction(myActingPlayersList, raiseAction, *myHand->getBettingActions(),
+                                        myHand->getSmallBlind(), myHand->getGameState());
 
     EXPECT_TRUE(isValid) << "Raise action should be valid with proper amount";
 }
@@ -296,14 +296,14 @@ TEST_F(ActionsPreflopTest, ValidatePlayerActionRaiseInvalidWithTooSmallAmount)
 
     setupBasicHeadsUpScenario();
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
 
     // Invalid raise: less than minimum raise
-    int raiseAmount = myHandFsm->getSmallBlind() * 2; // 20 when BB is 20 - not enough
+    int raiseAmount = myHand->getSmallBlind() * 2; // 20 when BB is 20 - not enough
     PlayerAction raiseAction{playerSb->getId(), ActionType::Raise, raiseAmount};
 
-    bool isValid = validatePlayerAction(myActingPlayersListFsm, raiseAction, *myHandFsm->getBettingActions(),
-                                        myHandFsm->getSmallBlind(), myHandFsm->getGameState());
+    bool isValid = validatePlayerAction(myActingPlayersList, raiseAction, *myHand->getBettingActions(),
+                                        myHand->getSmallBlind(), myHand->getGameState());
 
     EXPECT_FALSE(isValid) << "Raise action should be invalid with too small amount";
 }
@@ -314,11 +314,11 @@ TEST_F(ActionsPreflopTest, ValidatePlayerActionBetInvalidWhenBetExists)
 
     setupBasicHeadsUpScenario();
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
     PlayerAction betAction{playerSb->getId(), ActionType::Bet, 30};
 
-    bool isValid = validatePlayerAction(myActingPlayersListFsm, betAction, *myHandFsm->getBettingActions(),
-                                        myHandFsm->getSmallBlind(), myHandFsm->getGameState());
+    bool isValid = validatePlayerAction(myActingPlayersList, betAction, *myHand->getBettingActions(),
+                                        myHand->getSmallBlind(), myHand->getGameState());
 
     EXPECT_FALSE(isValid) << "Bet action should be invalid when there's already a bet (should use raise)";
 }
@@ -329,11 +329,11 @@ TEST_F(ActionsPreflopTest, ValidatePlayerActionAllinValid)
 
     setupBasicHeadsUpScenario();
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
     PlayerAction allinAction{playerSb->getId(), ActionType::Allin, playerSb->getCash()};
 
-    bool isValid = validatePlayerAction(myActingPlayersListFsm, allinAction, *myHandFsm->getBettingActions(),
-                                        myHandFsm->getSmallBlind(), myHandFsm->getGameState());
+    bool isValid = validatePlayerAction(myActingPlayersList, allinAction, *myHand->getBettingActions(),
+                                        myHand->getSmallBlind(), myHand->getGameState());
 
     EXPECT_TRUE(isValid) << "All-in action should be valid for players with chips";
 }
@@ -346,8 +346,8 @@ TEST_F(ActionsPreflopTest, ValidatePlayerActionInvalidPlayerId)
 
     PlayerAction invalidAction{999, ActionType::Fold, 0};
 
-    bool isValid = validatePlayerAction(myActingPlayersListFsm, invalidAction, *myHandFsm->getBettingActions(),
-                                        myHandFsm->getSmallBlind(), myHandFsm->getGameState());
+    bool isValid = validatePlayerAction(myActingPlayersList, invalidAction, *myHand->getBettingActions(),
+                                        myHand->getSmallBlind(), myHand->getGameState());
 
     EXPECT_FALSE(isValid) << "Action should be invalid for non-existent player";
 }
@@ -357,25 +357,25 @@ TEST_F(ActionsPreflopTest, NoTwoConsecutiveActionsBySamePlayerInRound)
 
     setupThreePlayerScenario();
 
-    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
+    auto playerDealer = getPlayerById(myActingPlayersList, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 1);
+    auto playerBb = getPlayerById(myActingPlayersList, 2);
 
     // This should succeed (dealer acts first in 3-player scenario)
-    myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Call});
+    myHand->handlePlayerAction({playerDealer->getId(), ActionType::Call});
 
     // this should be ignored as duplicate (dealer acting again consecutively)
-    myHandFsm->handlePlayerAction({playerDealer->getId(), ActionType::Call});
+    myHand->handlePlayerAction({playerDealer->getId(), ActionType::Call});
 
     // this should succeed
-    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
 
     // this should be ignored as duplicate (SB acting again consecutively)
-    myHandFsm->handlePlayerAction({playerSb->getId(), ActionType::Raise, 50});
+    myHand->handlePlayerAction({playerSb->getId(), ActionType::Raise, 50});
 
     EXPECT_EQ(myLastGameState, Preflop);
 
-    const auto& history = myHandFsm->getHandActionHistory();
+    const auto& history = myHand->getHandActionHistory();
 
     // Verify no consecutive actions exist in the history
     int nbActions = 0;
@@ -403,8 +403,8 @@ TEST_F(ActionsPreflopTest, IntegrationValidActionsMatchValidation)
 
     setupBasicHeadsUpScenario();
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto validActions = getValidActionsForPlayer(*myHandFsm, playerSb->getId());
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto validActions = getValidActionsForPlayer(*myHand, playerSb->getId());
 
     EXPECT_FALSE(validActions.empty()) << "Player should have valid actions";
 
@@ -414,11 +414,11 @@ TEST_F(ActionsPreflopTest, IntegrationValidActionsMatchValidation)
         int amount = 0;
         if (actionType == ActionType::Raise)
         {
-            amount = myHandFsm->getSmallBlind() * 4; // Valid raise amount
+            amount = myHand->getSmallBlind() * 4; // Valid raise amount
         }
         else if (actionType == ActionType::Bet)
         {
-            amount = myHandFsm->getSmallBlind() * 2; // Valid bet amount
+            amount = myHand->getSmallBlind() * 2; // Valid bet amount
         }
         else if (actionType == ActionType::Call)
         {
@@ -430,8 +430,8 @@ TEST_F(ActionsPreflopTest, IntegrationValidActionsMatchValidation)
         }
 
         PlayerAction action{playerSb->getId(), actionType, amount};
-        bool isValid = validatePlayerAction(myActingPlayersListFsm, action, *myHandFsm->getBettingActions(),
-                                            myHandFsm->getSmallBlind(), myHandFsm->getGameState());
+        bool isValid = validatePlayerAction(myActingPlayersList, action, *myHand->getBettingActions(),
+                                            myHand->getSmallBlind(), myHand->getGameState());
 
         EXPECT_TRUE(isValid) << "Action " << static_cast<int>(actionType)
                              << " should be valid according to validatePlayerAction";
@@ -444,15 +444,15 @@ TEST_F(ActionsPreflopTest, IntegrationInvalidActionsAreRejected)
 
     setupBasicHeadsUpScenario();
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto validActions = getValidActionsForPlayer(*myHandFsm, playerSb->getId());
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto validActions = getValidActionsForPlayer(*myHand, playerSb->getId());
 
     // Test that check is not in valid actions and fails validation
     if (doesNotContainAction(validActions, ActionType::Check))
     {
         PlayerAction checkAction{playerSb->getId(), ActionType::Check, 0};
-        bool isValid = validatePlayerAction(myActingPlayersListFsm, checkAction, *myHandFsm->getBettingActions(),
-                                            myHandFsm->getSmallBlind(), myHandFsm->getGameState());
+        bool isValid = validatePlayerAction(myActingPlayersList, checkAction, *myHand->getBettingActions(),
+                                            myHand->getSmallBlind(), myHand->getGameState());
 
         EXPECT_FALSE(isValid) << "Check action should be invalid according to validatePlayerAction";
     }
@@ -461,8 +461,8 @@ TEST_F(ActionsPreflopTest, IntegrationInvalidActionsAreRejected)
     if (doesNotContainAction(validActions, ActionType::Bet))
     {
         PlayerAction betAction{playerSb->getId(), ActionType::Bet, 30};
-        bool isValid = validatePlayerAction(myActingPlayersListFsm, betAction, *myHandFsm->getBettingActions(),
-                                            myHandFsm->getSmallBlind(), myHandFsm->getGameState());
+        bool isValid = validatePlayerAction(myActingPlayersList, betAction, *myHand->getBettingActions(),
+                                            myHand->getSmallBlind(), myHand->getGameState());
 
         EXPECT_FALSE(isValid) << "Bet action should be invalid according to validatePlayerAction";
     }
@@ -489,17 +489,17 @@ void ActionsPostflopTest::TearDown()
 
 void ActionsPostflopTest::setupBasicHeadsUpScenario()
 {
-    initializeHandFsmWithPlayers(2, gameData);
+    initializeHandWithPlayers(2, gameData);
 }
 
 void ActionsPostflopTest::setupThreePlayerScenario()
 {
-    initializeHandFsmWithPlayers(3, gameData);
+    initializeHandWithPlayers(3, gameData);
 }
 
 void ActionsPostflopTest::setupPlayerWithLimitedCash(int playerId, int cash)
 {
-    auto player = getPlayerFsmById(myActingPlayersListFsm, playerId);
+    auto player = getPlayerById(myActingPlayersList, playerId);
     ASSERT_NE(player, nullptr) << "Player with ID " << playerId << " not found";
     player->setCash(cash);
 }
@@ -507,21 +507,21 @@ void ActionsPostflopTest::setupPlayerWithLimitedCash(int playerId, int cash)
 void ActionsPostflopTest::simulatePlayerAction(int playerId, ActionType actionType, int amount)
 {
     PlayerAction action{playerId, actionType, amount};
-    myHandFsm->handlePlayerAction(action);
+    myHand->handlePlayerAction(action);
 }
 
 void ActionsPostflopTest::advanceToPostflop(GameState targetState)
 {
     // Advance from preflop to the target state by simulating actions
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto playerBb = getPlayerById(myActingPlayersList, 1);
 
     // Complete preflop betting (SB calls, BB checks)
     simulatePlayerAction(playerSb->getId(), ActionType::Call);
     simulatePlayerAction(playerBb->getId(), ActionType::Check);
 
     // Now we should be at Flop
-    EXPECT_EQ(myHandFsm->getGameState(), GameState::Flop);
+    EXPECT_EQ(myHand->getGameState(), GameState::Flop);
 
     if (targetState == GameState::Flop)
     {
@@ -531,7 +531,7 @@ void ActionsPostflopTest::advanceToPostflop(GameState targetState)
     // Advance to Turn if needed
     simulatePlayerAction(playerSb->getId(), ActionType::Check);
     simulatePlayerAction(playerBb->getId(), ActionType::Check);
-    EXPECT_EQ(myHandFsm->getGameState(), GameState::Turn);
+    EXPECT_EQ(myHand->getGameState(), GameState::Turn);
 
     if (targetState == GameState::Turn)
     {
@@ -541,7 +541,7 @@ void ActionsPostflopTest::advanceToPostflop(GameState targetState)
     // Advance to River if needed
     simulatePlayerAction(playerSb->getId(), ActionType::Check);
     simulatePlayerAction(playerBb->getId(), ActionType::Check);
-    EXPECT_EQ(myHandFsm->getGameState(), GameState::River);
+    EXPECT_EQ(myHand->getGameState(), GameState::River);
 }
 
 bool ActionsPostflopTest::containsAction(const std::vector<ActionType>& actions, ActionType action)
@@ -563,8 +563,8 @@ TEST_F(ActionsPostflopTest, GetValidActionsForPlayerFirstToActCanCheckOrBet)
     setupBasicHeadsUpScenario();
     advanceToPostflop(GameState::Flop); // Test on Flop (same logic applies to Turn and River)
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto validActions = getValidActionsForPlayer(*myHandFsm, playerSb->getId());
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto validActions = getValidActionsForPlayer(*myHand, playerSb->getId());
 
     EXPECT_FALSE(validActions.empty()) << "First to act should have valid actions";
 
@@ -586,13 +586,13 @@ TEST_F(ActionsPostflopTest, GetValidActionsForPlayerAfterBet)
     setupBasicHeadsUpScenario();
     advanceToPostflop(GameState::Flop);
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto playerBb = getPlayerById(myActingPlayersList, 1);
 
     // SB bets
     simulatePlayerAction(playerSb->getId(), ActionType::Bet, 50);
 
-    auto validActions = getValidActionsForPlayer(*myHandFsm, playerBb->getId());
+    auto validActions = getValidActionsForPlayer(*myHand, playerBb->getId());
 
     EXPECT_FALSE(validActions.empty()) << "Player facing bet should have valid actions";
 
@@ -616,13 +616,13 @@ TEST_F(ActionsPostflopTest, GetValidActionsForPlayerAfterCheck)
     setupBasicHeadsUpScenario();
     advanceToPostflop(GameState::Turn); // Test on Turn
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto playerBb = getPlayerById(myActingPlayersList, 1);
 
     // SB checks
     simulatePlayerAction(playerSb->getId(), ActionType::Check);
 
-    auto validActions = getValidActionsForPlayer(*myHandFsm, playerBb->getId());
+    auto validActions = getValidActionsForPlayer(*myHand, playerBb->getId());
 
     EXPECT_FALSE(validActions.empty()) << "Player after check should have valid actions";
 
@@ -646,12 +646,12 @@ TEST_F(ActionsPostflopTest, GetValidActionsForPlayerWithLimitedCashPostflop)
     setupBasicHeadsUpScenario();
     advanceToPostflop(GameState::River); // Test on River
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
 
     // Set SB to have very little cash
     setupPlayerWithLimitedCash(playerSb->getId(), 25);
 
-    auto validActions = getValidActionsForPlayer(*myHandFsm, playerSb->getId());
+    auto validActions = getValidActionsForPlayer(*myHand, playerSb->getId());
 
     EXPECT_FALSE(validActions.empty()) << "Player with limited cash should still have some valid actions";
 
@@ -661,7 +661,7 @@ TEST_F(ActionsPostflopTest, GetValidActionsForPlayerWithLimitedCashPostflop)
     EXPECT_TRUE(containsAction(validActions, ActionType::Allin)) << "Player should be able to go all-in";
 
     // Player might be able to bet if they have enough chips
-    if (playerSb->getCash() >= myHandFsm->getSmallBlind())
+    if (playerSb->getCash() >= myHand->getSmallBlind())
     {
         EXPECT_TRUE(containsAction(validActions, ActionType::Bet))
             << "Player with sufficient cash should be able to bet";
@@ -680,18 +680,18 @@ TEST_F(ActionsPostflopTest, GetValidActionsForThreePlayerPostflopScenario)
     setupThreePlayerScenario();
 
     // Advance to flop: dealer folds, SB calls, BB checks
-    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
+    auto playerDealer = getPlayerById(myActingPlayersList, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 1);
+    auto playerBb = getPlayerById(myActingPlayersList, 2);
 
     simulatePlayerAction(playerDealer->getId(), ActionType::Fold);
     simulatePlayerAction(playerSb->getId(), ActionType::Call);
     simulatePlayerAction(playerBb->getId(), ActionType::Check);
 
-    EXPECT_EQ(myHandFsm->getGameState(), GameState::Flop);
+    EXPECT_EQ(myHand->getGameState(), GameState::Flop);
 
     // Test SB's actions (first to act on flop)
-    auto validActionsSb = getValidActionsForPlayer(*myHandFsm, playerSb->getId());
+    auto validActionsSb = getValidActionsForPlayer(*myHand, playerSb->getId());
 
     EXPECT_FALSE(validActionsSb.empty()) << "SB should have valid actions on flop";
 
@@ -715,11 +715,11 @@ TEST_F(ActionsPostflopTest, ValidatePlayerActionCheckValidInPostflop)
     setupBasicHeadsUpScenario();
     advanceToPostflop(GameState::Flop);
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
     PlayerAction checkAction{playerSb->getId(), ActionType::Check, 0};
 
-    bool isValid = validatePlayerAction(myActingPlayersListFsm, checkAction, *myHandFsm->getBettingActions(),
-                                        myHandFsm->getSmallBlind(), myHandFsm->getGameState());
+    bool isValid = validatePlayerAction(myActingPlayersList, checkAction, *myHand->getBettingActions(),
+                                        myHand->getSmallBlind(), myHand->getGameState());
 
     EXPECT_TRUE(isValid) << "Check action should be valid when no bet exists in postflop";
 }
@@ -731,11 +731,11 @@ TEST_F(ActionsPostflopTest, ValidatePlayerActionBetValidInPostflop)
     setupBasicHeadsUpScenario();
     advanceToPostflop(GameState::Turn);
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
     PlayerAction betAction{playerSb->getId(), ActionType::Bet, 50};
 
-    bool isValid = validatePlayerAction(myActingPlayersListFsm, betAction, *myHandFsm->getBettingActions(),
-                                        myHandFsm->getSmallBlind(), myHandFsm->getGameState());
+    bool isValid = validatePlayerAction(myActingPlayersList, betAction, *myHand->getBettingActions(),
+                                        myHand->getSmallBlind(), myHand->getGameState());
 
     EXPECT_TRUE(isValid) << "Bet action should be valid when no bet exists in postflop";
 }
@@ -749,8 +749,8 @@ TEST_F(ActionsPostflopTest, IntegrationPostflopValidActionsMatchValidation)
     setupBasicHeadsUpScenario();
     advanceToPostflop(GameState::River);
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto validActions = getValidActionsForPlayer(*myHandFsm, playerSb->getId());
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto validActions = getValidActionsForPlayer(*myHand, playerSb->getId());
 
     EXPECT_FALSE(validActions.empty()) << "Player should have valid actions in postflop";
 
@@ -760,12 +760,11 @@ TEST_F(ActionsPostflopTest, IntegrationPostflopValidActionsMatchValidation)
         int amount = 0;
         if (actionType == ActionType::Bet)
         {
-            amount = myHandFsm->getSmallBlind() * 2; // Valid bet amount
+            amount = myHand->getSmallBlind() * 2; // Valid bet amount
         }
         else if (actionType == ActionType::Raise)
         {
-            amount =
-                myHandFsm->getSmallBlind() * 4; // Valid raise amount (though this shouldn't happen for first to act)
+            amount = myHand->getSmallBlind() * 4; // Valid raise amount (though this shouldn't happen for first to act)
         }
         else if (actionType == ActionType::Allin)
         {
@@ -773,8 +772,8 @@ TEST_F(ActionsPostflopTest, IntegrationPostflopValidActionsMatchValidation)
         }
 
         PlayerAction action{playerSb->getId(), actionType, amount};
-        bool isValid = validatePlayerAction(myActingPlayersListFsm, action, *myHandFsm->getBettingActions(),
-                                            myHandFsm->getSmallBlind(), myHandFsm->getGameState());
+        bool isValid = validatePlayerAction(myActingPlayersList, action, *myHand->getBettingActions(),
+                                            myHand->getSmallBlind(), myHand->getGameState());
 
         EXPECT_TRUE(isValid) << "Action " << static_cast<int>(actionType)
                              << " should be valid according to validatePlayerAction in postflop";

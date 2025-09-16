@@ -37,11 +37,11 @@ TEST_F(SqlitePlayersStatisticsStoreTest, SaveAndLoadStatistics)
 {
     auto& store = pkt::core::GlobalServices::instance().playersStatisticsStore();
     int nbPlayers = 3;
-    initializeHandFsmWithPlayers(nbPlayers, gameData);
+    initializeHandWithPlayers(nbPlayers, gameData);
 
-    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
+    auto playerDealer = getPlayerById(myActingPlayersList, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 1);
+    auto playerBb = getPlayerById(myActingPlayersList, 2);
 
     // Inject deterministic strategies
     auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
@@ -57,11 +57,11 @@ TEST_F(SqlitePlayersStatisticsStoreTest, SaveAndLoadStatistics)
     playerBb->setStrategy(std::move(bbStrategy));
 
     // Simulate preflop actions via state::promptPlayerAction
-    auto* preflop = dynamic_cast<pkt::core::PreflopState*>(&myHandFsm->getState());
+    auto* preflop = dynamic_cast<pkt::core::PreflopState*>(&myHand->getState());
     ASSERT_NE(preflop, nullptr);
 
-    preflop->promptPlayerAction(*myHandFsm, *playerDealer); // Dealer folds
-    preflop->promptPlayerAction(*myHandFsm, *playerSb);     // Small blind folds
+    preflop->promptPlayerAction(*myHand, *playerDealer); // Dealer folds
+    preflop->promptPlayerAction(*myHand, *playerSb);     // Small blind folds
     // -> round ends automatically, stats should be saved
 
     // Verify loaded statistics for the number of players (index 1-based)

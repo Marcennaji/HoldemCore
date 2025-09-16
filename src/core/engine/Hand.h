@@ -2,7 +2,7 @@
 
 #include <map>
 #include <memory>
-#include "PlayerFsm.h"
+#include "Player.h"
 #include "core/cards/Card.h"
 #include "core/engine/HandPlayersState.h"
 #include "core/engine/model/GameData.h"
@@ -21,13 +21,13 @@ class IHandState;
 class EngineFactory;
 class IBoard;
 
-class HandFsm : public IHandLifecycle, public IHandPlayerAction, public HandPlayersState, public IDeckDealer
+class Hand : public IHandLifecycle, public IHandPlayerAction, public HandPlayersState, public IDeckDealer
 {
   public:
-    HandFsm(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard>,
-            pkt::core::player::PlayerFsmList seats, pkt::core::player::PlayerFsmList actingPlayers, GameData gameData,
-            StartData startData);
-    ~HandFsm();
+    Hand(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard>,
+         pkt::core::player::PlayerList seats, pkt::core::player::PlayerList actingPlayers, GameData gameData,
+         StartData startData);
+    ~Hand();
 
     IActionProcessor* getActionProcessor() const;
     void handlePlayerAction(PlayerAction action) override;

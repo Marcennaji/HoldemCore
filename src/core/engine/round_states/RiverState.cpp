@@ -1,10 +1,10 @@
 #include "RiverState.h"
 #include "GameEvents.h"
-#include "HandFsm.h"
+#include "Hand.h"
 #include "PostRiverState.h"
 #include "core/engine/Helpers.h"
 #include "core/engine/model/PlayerAction.h"
-#include "core/player/PlayerFsm.h"
+#include "core/player/Player.h"
 #include "core/services/GlobalServices.h"
 
 namespace pkt::core
@@ -15,7 +15,7 @@ RiverState::RiverState(const GameEvents& events) : myEvents(events)
 {
 }
 
-void RiverState::enter(HandFsm& hand)
+void RiverState::enter(Hand& hand)
 {
     GlobalServices::instance().logger().info("River");
 
@@ -53,7 +53,7 @@ void RiverState::enter(HandFsm& hand)
     logStateInfo(hand);
 }
 
-void RiverState::exit(HandFsm& hand)
+void RiverState::exit(Hand& hand)
 {
     for (auto& player : *hand.getSeatsList())
     {
@@ -62,12 +62,12 @@ void RiverState::exit(HandFsm& hand)
     }
 }
 
-bool RiverState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const
+bool RiverState::isActionAllowed(const Hand& hand, const PlayerAction action) const
 {
     return (validatePlayerAction(hand.getActingPlayersList(), action, *hand.getBettingActions(), 0, River));
 }
 
-void RiverState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
+void RiverState::promptPlayerAction(Hand& hand, Player& player)
 {
     player.updateCurrentHandContext(River, hand);
     PlayerAction action = player.decideAction(player.getCurrentHandContext());
@@ -75,23 +75,23 @@ void RiverState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
     hand.handlePlayerAction(action);
 }
 
-std::unique_ptr<IHandState> RiverState::computeNextState(HandFsm& hand)
+std::unique_ptr<IHandState> RiverState::computeNextState(Hand& hand)
 {
     return computeBettingRoundNextState(hand, myEvents, River);
 }
 
-std::shared_ptr<player::PlayerFsm> RiverState::getNextPlayerToAct(const HandFsm& hand) const
+std::shared_ptr<player::Player> RiverState::getNextPlayerToAct(const Hand& hand) const
 {
     return getNextPlayerToActInRound(hand, GameState::River);
 }
 
-std::shared_ptr<player::PlayerFsm> RiverState::getFirstPlayerToActInRound(const HandFsm& hand) const
+std::shared_ptr<player::Player> RiverState::getFirstPlayerToActInRound(const Hand& hand) const
 {
     return getNextPlayerToAct(hand);
 }
-bool RiverState::isRoundComplete(const HandFsm& hand) const
+bool RiverState::isRoundComplete(const Hand& hand) const
 {
-    return pkt::core::isRoundComplete(const_cast<HandFsm&>(hand));
+    return pkt::core::isRoundComplete(const_cast<Hand&>(hand));
 }
 
 } // namespace pkt::core

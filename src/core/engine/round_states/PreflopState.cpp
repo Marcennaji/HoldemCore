@@ -1,13 +1,13 @@
 #include "PreflopState.h"
 #include "FlopState.h"
 #include "GameEvents.h"
-#include "HandFsm.h"
+#include "Hand.h"
 #include "PostRiverState.h"
 #include "core/engine/Exception.h"
 #include "core/engine/Helpers.h"
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/model/PlayerPosition.h"
-#include "core/player/PlayerFsm.h"
+#include "core/player/Player.h"
 #include "core/services/GlobalServices.h"
 
 namespace pkt::core
@@ -28,7 +28,7 @@ PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsig
     }
 }
 
-void PreflopState::enter(HandFsm& hand)
+void PreflopState::enter(Hand& hand)
 {
     for (auto& player : *hand.getSeatsList())
     {
@@ -44,7 +44,7 @@ void PreflopState::enter(HandFsm& hand)
     logStateInfo(hand);
 }
 
-void PreflopState::exit(HandFsm& hand)
+void PreflopState::exit(Hand& hand)
 {
     for (auto& player : *hand.getSeatsList())
     {
@@ -53,13 +53,13 @@ void PreflopState::exit(HandFsm& hand)
     }
 }
 
-bool PreflopState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const
+bool PreflopState::isActionAllowed(const Hand& hand, const PlayerAction action) const
 {
     return (
         validatePlayerAction(hand.getActingPlayersList(), action, *hand.getBettingActions(), mySmallBlind, Preflop));
 }
 
-void PreflopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
+void PreflopState::promptPlayerAction(Hand& hand, Player& player)
 {
     player.updateCurrentHandContext(Preflop, hand);
     PlayerAction action = player.decideAction(player.getCurrentHandContext());
@@ -67,12 +67,12 @@ void PreflopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
     hand.handlePlayerAction(action);
 }
 
-std::unique_ptr<IHandState> PreflopState::computeNextState(HandFsm& hand)
+std::unique_ptr<IHandState> PreflopState::computeNextState(Hand& hand)
 {
     return computeBettingRoundNextState(hand, myEvents, Preflop);
 }
 
-void PreflopState::logStateInfo(HandFsm& hand)
+void PreflopState::logStateInfo(Hand& hand)
 {
     IDebuggableState::logStateInfo(hand);
     GlobalServices::instance().logger().info("Blinds: SB=" + std::to_string(mySmallBlind) +
@@ -80,7 +80,7 @@ void PreflopState::logStateInfo(HandFsm& hand)
     logHoleCards(hand);
 }
 
-void PreflopState::logHoleCards(HandFsm& hand)
+void PreflopState::logHoleCards(Hand& hand)
 {
     for (const auto& player : *hand.getSeatsList())
     {
@@ -98,25 +98,25 @@ void PreflopState::logHoleCards(HandFsm& hand)
     }
 }
 
-std::shared_ptr<player::PlayerFsm> PreflopState::getNextPlayerToAct(const HandFsm& hand) const
+std::shared_ptr<player::Player> PreflopState::getNextPlayerToAct(const Hand& hand) const
 {
     return getNextPlayerToActInRound(hand, GameState::Preflop);
 }
 
-std::shared_ptr<player::PlayerFsm> PreflopState::getFirstPlayerToActInRound(const HandFsm& hand) const
+std::shared_ptr<player::Player> PreflopState::getFirstPlayerToActInRound(const Hand& hand) const
 {
     // In preflop, the first player to act is left of the big blind
     // This handles both heads-up (SB acts first) and multi-player (UTG acts first)
     return getNextPlayerToAct(hand);
 }
 
-bool PreflopState::isRoundComplete(const HandFsm& hand) const
+bool PreflopState::isRoundComplete(const Hand& hand) const
 {
 
-    return pkt::core::isRoundComplete(const_cast<HandFsm&>(hand));
+    return pkt::core::isRoundComplete(const_cast<Hand&>(hand));
 }
 
-void PreflopState::setBlinds(HandFsm& hand)
+void PreflopState::setBlinds(Hand& hand)
 {
     for (const auto& player : *hand.getActingPlayersList())
     {

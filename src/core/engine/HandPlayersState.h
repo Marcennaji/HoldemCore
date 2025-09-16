@@ -2,7 +2,7 @@
 
 #include "BettingActions.h"
 #include "core/engine/model/PlayerAction.h"
-#include "core/player/PlayerFsm.h"
+#include "core/player/Player.h"
 #include "typedefs.h"
 
 namespace pkt::core
@@ -11,15 +11,15 @@ namespace pkt::core
 class HandPlayersState
 {
   public:
-    HandPlayersState(pkt::core::player::PlayerFsmList seats, pkt::core::player::PlayerFsmList actingPlayers);
+    HandPlayersState(pkt::core::player::PlayerList seats, pkt::core::player::PlayerList actingPlayers);
     ~HandPlayersState() = default;
 
-    const pkt::core::player::PlayerFsmList getSeatsList() const { return mySeatsList; }
-    const pkt::core::player::PlayerFsmList getActingPlayersList() const { return myActingPlayersList; }
-    const pkt::core::player::PlayerFsmList getPlayersInHandList() const
+    const pkt::core::player::PlayerList getSeatsList() const { return mySeatsList; }
+    const pkt::core::player::PlayerList getActingPlayersList() const { return myActingPlayersList; }
+    const pkt::core::player::PlayerList getPlayersInHandList() const
     {
         // Create a new list with players in hand (not folded, but might include allin players)
-        auto playersInHand = std::make_shared<std::list<std::shared_ptr<pkt::core::player::PlayerFsm>>>();
+        auto playersInHand = std::make_shared<std::list<std::shared_ptr<pkt::core::player::Player>>>();
 
         for (const auto& player : *mySeatsList)
         {
@@ -37,8 +37,8 @@ class HandPlayersState
     int getBigBlindPlayerId() const { return myBigBlindPlayerId; }
 
   protected:
-    pkt::core::player::PlayerFsmList mySeatsList;         // all players
-    pkt::core::player::PlayerFsmList myActingPlayersList; // all players who have not folded and are not all in
+    pkt::core::player::PlayerList mySeatsList;         // all players
+    pkt::core::player::PlayerList myActingPlayersList; // all players who have not folded and are not all in
     int myDealerPlayerId{-1};
     int mySmallBlindPlayerId{-1};
     int myBigBlindPlayerId{-1};

@@ -26,7 +26,7 @@ class PositionManager
      * @param actingPlayers List of players still acting
      * @return true if player has position (acts last), false otherwise
      */
-    static bool hasPosition(PlayerPosition position, const PlayerFsmList& actingPlayers);
+    static bool hasPosition(PlayerPosition position, const PlayerList& actingPlayers);
 
     /**
      * @brief Calculate circular distance between two players
@@ -36,7 +36,7 @@ class PositionManager
      * @param players List of all players
      * @return Number of positions between players (circular)
      */
-    static int playerDistanceCircularOffset(int fromId, int toId, const PlayerFsmList& players);
+    static int playerDistanceCircularOffset(int fromId, int toId, const PlayerList& players);
 
     /**
      * @brief Convert seat offset to player position

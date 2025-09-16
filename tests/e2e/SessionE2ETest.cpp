@@ -1,4 +1,4 @@
-// PokerTraining — E2E tests for SessionFsm (Simplified)
+// PokerTraining — E2E tests for Session (Simplified)
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
@@ -6,7 +6,7 @@
 #include <core/engine/EngineFactory.h>
 #include <core/engine/model/GameData.h>
 #include <core/engine/model/StartData.h>
-#include <core/session/SessionFsm.h>
+#include <core/session/Session.h>
 #include <gtest/gtest.h>
 
 using namespace pkt::core;
@@ -34,33 +34,32 @@ class SessionE2Etest : public ::testing::Test
     StartData startData;
 };
 
-// Test 1: Basic SessionFsm creation and destruction
+// Test 1: Basic Session creation and destruction
 TEST_F(SessionE2Etest, BasicCreationWithRealDependenciesSucceeds)
 {
-    EXPECT_NO_THROW({ SessionFsm session(events); }) << "SessionFsm creation should not throw with real dependencies";
+    EXPECT_NO_THROW({ Session session(events); }) << "Session creation should not throw with real dependencies";
 }
 
-// Test 2: SessionFsm creation with engine factory injection
+// Test 2: Session creation with engine factory injection
 TEST_F(SessionE2Etest, CreationWithFactoryInjectsDependencySucceeds)
 {
     auto factory = std::make_shared<EngineFactory>(events);
 
-    EXPECT_NO_THROW({ SessionFsm session(events, factory); })
-        << "SessionFsm creation with factory injection should succeed";
+    EXPECT_NO_THROW({ Session session(events, factory); }) << "Session creation with factory injection should succeed";
 }
 
-// Test 3: Multiple SessionFsm instances can coexist
+// Test 3: Multiple Session instances can coexist
 TEST_F(SessionE2Etest, MultipleInstancesCanCoexistNoInterference)
 {
     EXPECT_NO_THROW({
-        SessionFsm session1(events);
-        SessionFsm session2(events);
+        Session session1(events);
+        Session session2(events);
         auto factory = std::make_shared<EngineFactory>(events);
-        SessionFsm session3(events, factory);
-    }) << "Multiple SessionFsm instances should coexist without interference";
+        Session session3(events, factory);
+    }) << "Multiple Session instances should coexist without interference";
 }
 
-// Test 4: Performance - SessionFsm creation is reasonably fast
+// Test 4: Performance - Session creation is reasonably fast
 TEST_F(SessionE2Etest, PerformanceCreationTimeIsReasonable)
 {
     auto start = std::chrono::high_resolution_clock::now();
@@ -69,14 +68,14 @@ TEST_F(SessionE2Etest, PerformanceCreationTimeIsReasonable)
     const int iterations = 1000;
     for (int i = 0; i < iterations; ++i)
     {
-        SessionFsm session(events);
+        Session session(events);
     }
 
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
     // Should create 1000 sessions in less than 1 second
-    EXPECT_LT(duration.count(), 1000) << "Creating " << iterations << " SessionFsm instances took " << duration.count()
+    EXPECT_LT(duration.count(), 1000) << "Creating " << iterations << " Session instances took " << duration.count()
                                       << "ms (should be < 1000ms)";
 }
 
@@ -87,7 +86,7 @@ TEST_F(SessionE2Etest, MemoryManagementRAIINoLeaks)
     for (int i = 0; i < 100; ++i)
     {
         auto factory = std::make_shared<EngineFactory>(events);
-        SessionFsm session(events, factory);
+        Session session(events, factory);
         // Destructor should clean up properly
     }
 

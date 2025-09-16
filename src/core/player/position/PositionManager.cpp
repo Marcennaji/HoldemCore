@@ -3,14 +3,14 @@
 // Licensed under the MIT License — see LICENSE file for details.
 
 #include "PositionManager.h"
-#include "core/player/PlayerFsm.h"
+#include "core/player/Player.h"
 
 using namespace pkt::core::player;
 
 namespace pkt::core::player::position
 {
 
-bool PositionManager::hasPosition(PlayerPosition position, const PlayerFsmList& actingPlayers)
+bool PositionManager::hasPosition(PlayerPosition position, const PlayerList& actingPlayers)
 {
     // return true if position is last to play, false if not
     bool hasPositionalAdvantage = true;
@@ -27,7 +27,7 @@ bool PositionManager::hasPosition(PlayerPosition position, const PlayerFsmList& 
     return hasPositionalAdvantage;
 }
 
-int PositionManager::playerDistanceCircularOffset(int fromId, int toId, const PlayerFsmList& players)
+int PositionManager::playerDistanceCircularOffset(int fromId, int toId, const PlayerList& players)
 {
     int distance = 0;
     bool found = false;

@@ -1,6 +1,6 @@
-#include "PotFsm.h"
 #include <algorithm>
 #include <stdexcept>
+#include "Pot.h"
 #include "core/engine/Exception.h"
 #include "core/player/Helpers.h"
 #include "core/services/GlobalServices.h"
@@ -8,12 +8,12 @@
 namespace pkt::core
 {
 
-PotFsm::PotFsm(unsigned total, pkt::core::player::PlayerFsmList seats, unsigned dealerId)
+Pot::Pot(unsigned total, pkt::core::player::PlayerList seats, unsigned dealerId)
     : myTotal(total), mySeats(std::move(seats)), myDealerId(dealerId)
 {
 }
 
-void PotFsm::distribute()
+void Pot::distribute()
 {
     myWinners.clear();
     std::vector<unsigned> contributions = initializePlayerContributions();
@@ -59,7 +59,7 @@ void PotFsm::distribute()
     myWinners.unique();
 }
 
-std::vector<unsigned> PotFsm::initializePlayerContributions()
+std::vector<unsigned> Pot::initializePlayerContributions()
 {
     std::vector<unsigned> result;
     for (const auto& p : *mySeats)
@@ -71,12 +71,12 @@ std::vector<unsigned> PotFsm::initializePlayerContributions()
     return result;
 }
 
-bool PotFsm::hasRemainingChips(const std::vector<unsigned>& c) const
+bool Pot::hasRemainingChips(const std::vector<unsigned>& c) const
 {
     return std::any_of(c.begin(), c.end(), [](unsigned x) { return x > 0; });
 }
 
-unsigned PotFsm::nextLevelAmount(const std::vector<unsigned>& c) const
+unsigned Pot::nextLevelAmount(const std::vector<unsigned>& c) const
 {
     for (unsigned x : c)
         if (x > 0)
@@ -84,7 +84,7 @@ unsigned PotFsm::nextLevelAmount(const std::vector<unsigned>& c) const
     return 0;
 }
 
-std::vector<size_t> PotFsm::eligibleContributors(const std::vector<unsigned>& contributions, unsigned level) const
+std::vector<size_t> Pot::eligibleContributors(const std::vector<unsigned>& contributions, unsigned level) const
 {
     std::vector<size_t> result;
     size_t index = 0;
@@ -97,7 +97,7 @@ std::vector<size_t> PotFsm::eligibleContributors(const std::vector<unsigned>& co
     return result;
 }
 
-std::vector<size_t> PotFsm::determineWinners(const std::vector<size_t>& eligible, unsigned level) const
+std::vector<size_t> Pot::determineWinners(const std::vector<size_t>& eligible, unsigned level) const
 {
     int bestRank = 0;
     for (size_t i : eligible)
@@ -118,7 +118,7 @@ std::vector<size_t> PotFsm::determineWinners(const std::vector<size_t>& eligible
     return winners;
 }
 
-void PotFsm::awardBaseShare(const std::vector<size_t>& winners, int share)
+void Pot::awardBaseShare(const std::vector<size_t>& winners, int share)
 {
     for (size_t i : winners)
     {
@@ -129,7 +129,7 @@ void PotFsm::awardBaseShare(const std::vector<size_t>& winners, int share)
     }
 }
 
-void PotFsm::awardRemainder(const std::vector<size_t>& winners, int remainder)
+void Pot::awardRemainder(const std::vector<size_t>& winners, int remainder)
 {
     if (remainder == 0 || winners.empty())
         return;
@@ -142,14 +142,14 @@ void PotFsm::awardRemainder(const std::vector<size_t>& winners, int remainder)
     }
 }
 
-std::shared_ptr<player::PlayerFsm> PotFsm::resolveRemainderReceiver(const std::vector<size_t>& winnerIndexes) const
+std::shared_ptr<player::Player> Pot::resolveRemainderReceiver(const std::vector<size_t>& winnerIndexes) const
 {
     if (winnerIndexes.empty() || !mySeats || mySeats->empty())
         return nullptr;
 
     // Find the dealer in the seats list
-    auto dealerIt = std::find_if(mySeats->begin(), mySeats->end(), [this](const std::shared_ptr<player::PlayerFsm>& p)
-                                 { return p->getId() == myDealerId; });
+    auto dealerIt = std::find_if(mySeats->begin(), mySeats->end(),
+                                 [this](const std::shared_ptr<player::Player>& p) { return p->getId() == myDealerId; });
 
     // If dealer not found, fallback to first winner
     if (dealerIt == mySeats->end())
@@ -174,13 +174,13 @@ std::shared_ptr<player::PlayerFsm> PotFsm::resolveRemainderReceiver(const std::v
     return *std::next(mySeats->begin(), winnerIndexes.front());
 }
 
-void PotFsm::reduceContributions(std::vector<unsigned>& c, unsigned level)
+void Pot::reduceContributions(std::vector<unsigned>& c, unsigned level)
 {
     for (unsigned& x : c)
         x = (x >= level) ? (x - level) : 0;
 }
 
-void PotFsm::finalizeDistribution()
+void Pot::finalizeDistribution()
 {
     if (myTotal == 0 || !mySeats || mySeats->empty())
         return;
@@ -212,7 +212,7 @@ void PotFsm::finalizeDistribution()
     // Distribute base share to each winner
     for (unsigned id : uniqueWinners)
     {
-        auto it = getPlayerFsmListIteratorById(mySeats, id);
+        auto it = getPlayerListIteratorById(mySeats, id);
         if (it != mySeats->end())
         {
             (*it)->setCash((*it)->getCash() + baseShare);
@@ -234,7 +234,7 @@ void PotFsm::finalizeDistribution()
     myTotal = 0;
 }
 
-std::vector<size_t> PotFsm::indexesOf(const std::list<unsigned>& ids)
+std::vector<size_t> Pot::indexesOf(const std::list<unsigned>& ids)
 {
     std::vector<size_t> result;
 

@@ -15,7 +15,7 @@
 
 namespace pkt::core
 {
-class GameFsm;
+class Game;
 class EngineFactory;
 namespace player
 {
@@ -23,15 +23,15 @@ class StrategyAssigner;
 }
 class IBoard;
 
-class SessionFsm
+class Session
 {
   public:
-    SessionFsm(const GameEvents& events);
+    Session(const GameEvents& events);
 
     // Constructor for dependency injection (testing)
-    SessionFsm(const GameEvents& events, std::shared_ptr<EngineFactory> engineFactory);
+    Session(const GameEvents& events, std::shared_ptr<EngineFactory> engineFactory);
 
-    ~SessionFsm();
+    ~Session();
 
     void startGame(const GameData& gameData, const StartData& startData);
 
@@ -51,21 +51,21 @@ class SessionFsm
     void ensureEngineFactoryInitialized();
 
   private:
-    pkt::core::player::PlayerFsmList createPlayersList(player::DefaultPlayerFactory& playerFactory, int numberOfPlayers,
-                                                       unsigned startMoney, const TableProfile& tableProfile);
+    pkt::core::player::PlayerList createPlayersList(player::DefaultPlayerFactory& playerFactory, int numberOfPlayers,
+                                                    unsigned startMoney, const TableProfile& tableProfile);
 
     struct GameComponents
     {
         std::unique_ptr<player::StrategyAssigner> strategyAssigner;
         std::unique_ptr<player::DefaultPlayerFactory> playerFactory;
-        pkt::core::player::PlayerFsmList playersList;
+        pkt::core::player::PlayerList playersList;
         std::shared_ptr<IBoard> board;
     };
 
     GameComponents createGameComponents(const GameData& gameData, const StartData& startData);
     void initializeGame(GameComponents&& components, const GameData& gameData, const StartData& startData);
 
-    std::unique_ptr<GameFsm> myCurrentGame;
+    std::unique_ptr<Game> myCurrentGame;
     GameEvents myEvents;
     std::shared_ptr<EngineFactory> myEngineFactory; // Injected or created
 };

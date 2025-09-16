@@ -5,7 +5,7 @@
 #include "EngineFactory.h"
 
 #include <core/services/GlobalServices.h>
-#include "core/engine/BoardFsm.h"
+#include "core/engine/Board.h"
 #include "strategy/LooseAggressiveBotStrategy.h"
 #include "strategy/ManiacBotStrategy.h"
 #include "strategy/TightAggressiveBotStrategy.h"
@@ -19,16 +19,15 @@ EngineFactory::EngineFactory(const GameEvents& events) : myEvents(events)
 
 EngineFactory::~EngineFactory() = default;
 
-std::shared_ptr<HandFsm> EngineFactory::createHandFsm(std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
-                                                      pkt::core::player::PlayerFsmList seats,
-                                                      pkt::core::player::PlayerFsmList actingPlayers, GameData gd,
-                                                      StartData sd)
+std::shared_ptr<Hand> EngineFactory::createHand(std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
+                                                pkt::core::player::PlayerList seats,
+                                                pkt::core::player::PlayerList actingPlayers, GameData gd, StartData sd)
 {
-    return std::shared_ptr<HandFsm>(new HandFsm(myEvents, f, b, seats, actingPlayers, gd, sd));
+    return std::shared_ptr<Hand>(new Hand(myEvents, f, b, seats, actingPlayers, gd, sd));
 }
 
-std::shared_ptr<IBoard> EngineFactory::createBoardFsm(unsigned dealerPosition)
+std::shared_ptr<IBoard> EngineFactory::createBoard(unsigned dealerPosition)
 {
-    return std::shared_ptr<IBoard>(new BoardFsm(dealerPosition, myEvents));
+    return std::shared_ptr<IBoard>(new Board(dealerPosition, myEvents));
 }
 } // namespace pkt::core

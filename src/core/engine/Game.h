@@ -17,18 +17,18 @@ namespace pkt::core
 {
 
 struct GameEvents;
-class HandFsm;
+class Hand;
 class IBoard;
 class EngineFactory;
 
-class GameFsm
+class Game
 {
   public:
-    GameFsm(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
-            pkt::core::player::PlayerFsmList seatsList, unsigned dealerId, const GameData& gameData,
-            const StartData& startData);
+    Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
+         pkt::core::player::PlayerList seatsList, unsigned dealerId, const GameData& gameData,
+         const StartData& startData);
 
-    ~GameFsm() = default;
+    ~Game() = default;
 
     void startNewHand();
 
@@ -38,11 +38,11 @@ class GameFsm
   private:
     std::shared_ptr<EngineFactory> myEngineFactory;
     const GameEvents& myEvents;
-    std::shared_ptr<HandFsm> myCurrentHand;
+    std::shared_ptr<Hand> myCurrentHand;
     std::shared_ptr<IBoard> myCurrentBoard;
 
-    pkt::core::player::PlayerFsmList mySeatsList;
-    pkt::core::player::PlayerFsmList myActingPlayersList;
+    pkt::core::player::PlayerList mySeatsList;
+    pkt::core::player::PlayerList myActingPlayersList;
 
     unsigned myDealerPlayerId{0};
     GameData myGameData;

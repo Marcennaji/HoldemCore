@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "core/cards/Card.h"
 #include "core/engine/GameEvents.h"
-#include "core/player/PlayerFsm.h"
+#include "core/player/Player.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;
@@ -86,10 +86,10 @@ TEST_F(HoleCardsTest, ResetToInvalidCards)
     EXPECT_FALSE(holeCards.isValid());
 }
 
-TEST_F(HoleCardsTest, PlayerFsmBackwardCompatibility)
+TEST_F(HoleCardsTest, PlayerBackwardCompatibility)
 {
     GameEvents events;
-    PlayerFsm player(events, 1, "TestPlayer", 1000);
+    Player player(events, 1, "TestPlayer", 1000);
 
     // Test setting cards using old int array method
     int cardIndices[2] = {25, 37}; // Ah, Ks
@@ -109,10 +109,10 @@ TEST_F(HoleCardsTest, PlayerFsmBackwardCompatibility)
     EXPECT_EQ(player.getCardsValueString(), "Ah Ks");
 }
 
-TEST_F(HoleCardsTest, PlayerFsmModernInterface)
+TEST_F(HoleCardsTest, PlayerModernInterface)
 {
     GameEvents events;
-    PlayerFsm player(events, 1, "TestPlayer", 1000);
+    Player player(events, 1, "TestPlayer", 1000);
 
     // Test setting cards using new Card-based interface (preferred)
     player.setHoleCards(Card("Qd"), Card("Jc"));
@@ -132,10 +132,10 @@ TEST_F(HoleCardsTest, PlayerFsmModernInterface)
     EXPECT_EQ(cardIndices[1], 48); // Jc
 }
 
-TEST_F(HoleCardsTest, PlayerFsmStringConstructorInterface)
+TEST_F(HoleCardsTest, PlayerStringConstructorInterface)
 {
     GameEvents events;
-    PlayerFsm player(events, 1, "TestPlayer", 1000);
+    Player player(events, 1, "TestPlayer", 1000);
 
     // Test setting cards using string-based HoleCards constructor
     HoleCards holeCards("As", "Kh");

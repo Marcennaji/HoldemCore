@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "core/cards/Card.h"
 #include "core/engine/GameEvents.h"
-#include "core/player/PlayerFsm.h"
+#include "core/player/Player.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;
@@ -16,7 +16,7 @@ class CardFirstApproachTest : public ::testing::Test
 TEST_F(CardFirstApproachTest, ModernCardFirstWorkflow)
 {
     GameEvents events;
-    PlayerFsm player(events, 1, "ModernPlayer", 1000);
+    Player player(events, 1, "ModernPlayer", 1000);
 
     // NEW APPROACH: Work directly with Card objects
     Card aceOfSpades("As");
@@ -45,7 +45,7 @@ TEST_F(CardFirstApproachTest, ModernCardFirstWorkflow)
 TEST_F(CardFirstApproachTest, ConvenientStringConstructor)
 {
     GameEvents events;
-    PlayerFsm player(events, 2, "ConvenientPlayer", 1000);
+    Player player(events, 2, "ConvenientPlayer", 1000);
 
     // CONVENIENT: Create from strings directly
     HoleCards pocket("Qd", "Jc");
@@ -65,7 +65,7 @@ TEST_F(CardFirstApproachTest, ConvenientStringConstructor)
 TEST_F(CardFirstApproachTest, LegacyInterfaceStillWorksForEngine)
 {
     GameEvents events;
-    PlayerFsm player(events, 3, "BridgePlayer", 1000);
+    Player player(events, 3, "BridgePlayer", 1000);
 
     // When interfacing with legacy engine code that uses int arrays
     int legacyCards[2] = {51, 0}; // Ac, 2d

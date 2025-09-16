@@ -1,6 +1,6 @@
 #include "GuiBridgeWidgets.h"
 #include "core/engine/GameEvents.h"
-#include "core/session/SessionFsm.h"
+#include "core/session/Session.h"
 #include "ui/qtwidgets/poker_ui/PokerTableWindow.h"
 
 using namespace pkt::core;
@@ -8,7 +8,7 @@ using namespace pkt::core;
 namespace pkt::ui::qtwidgets
 {
 
-GuiBridgeWidgets::GuiBridgeWidgets(pkt::core::SessionFsm* session, PokerTableWindow* pokerTableWindow)
+GuiBridgeWidgets::GuiBridgeWidgets(pkt::core::Session* session, PokerTableWindow* pokerTableWindow)
     : m_session(session), m_tableWindow(pokerTableWindow)
 {
 }

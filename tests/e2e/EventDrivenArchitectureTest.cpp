@@ -2,9 +2,9 @@
 
 #include "EventDrivenArchitectureTest.h"
 #include "common/DeterministicStrategy.h"
-#include "core/engine/HandFsm.h"
+#include "core/engine/Hand.h"
 #include "core/player/Helpers.h"
-#include "core/player/PlayerFsm.h"
+#include "core/player/Player.h"
 #include "core/player/strategy/HumanStrategy.h"
 #include "core/services/GlobalServices.h"
 
@@ -97,16 +97,16 @@ void EventDrivenArchitectureTest::createGameEvents()
  */
 TEST_F(EventDrivenArchitectureTest, EngineFiresBettingRoundEvents)
 {
-    initializeHandFsmWithPlayers(2, gameData);
+    initializeHandWithPlayers(2, gameData);
 
     // Configure simple strategies that will fold immediately to test events
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
     auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
     sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Fold});
     playerSb->setStrategy(std::move(sbStrategy));
 
     // Run the hand
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 
     // UI should have received betting round started event
     ASSERT_FALSE(mockUI->bettingRoundsStarted.empty())
@@ -134,11 +134,11 @@ TEST_F(EventDrivenArchitectureTest, EngineFiresBettingRoundEvents)
  */
 TEST_F(EventDrivenArchitectureTest, EngineFiresPlayerActionEvents)
 {
-    initializeHandFsmWithPlayers(2, gameData);
+    initializeHandWithPlayers(2, gameData);
 
     // Configure strategies for a complete hand
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto playerBb = getPlayerById(myActingPlayersList, 1);
 
     auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
     sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Call});
@@ -155,7 +155,7 @@ TEST_F(EventDrivenArchitectureTest, EngineFiresPlayerActionEvents)
     playerBb->setStrategy(std::move(bbStrategy));
 
     // Run the hand
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 
     // UI should have received player actions
     EXPECT_GE(mockUI->playerActions.size(), 4u) << "UI should receive events for all player actions";
@@ -187,17 +187,17 @@ TEST_F(EventDrivenArchitectureTest, EngineFiresPlayerActionEvents)
  */
 TEST_F(EventDrivenArchitectureTest, UIReceivesHumanInputEvents)
 {
-    initializeHandFsmWithPlayers(2, gameData);
+    initializeHandWithPlayers(2, gameData);
 
     // Get the first player who should act (small blind)
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto playerBb = getPlayerById(myActingPlayersList, 1);
 
     // Set up the test strategy for small blind
     auto testStrategy = std::make_unique<TestHumanEventStrategy>(myEvents);
     playerSb->setStrategy(std::move(testStrategy));
 
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 
     // Verify the UI received the human input request with real valid actions
     EXPECT_EQ(mockUI->humanInputRequests.size(), 1u) << "UI should receive human input request";
@@ -231,10 +231,10 @@ TEST_F(EventDrivenArchitectureTest, UIReceivesHumanInputEvents)
  */
 TEST_F(EventDrivenArchitectureTest, UIReceivesPotUpdates)
 {
-    initializeHandFsmWithPlayers(2, gameData);
+    initializeHandWithPlayers(2, gameData);
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto playerBb = getPlayerById(myActingPlayersList, 1);
 
     auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
     sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Call});
@@ -250,7 +250,7 @@ TEST_F(EventDrivenArchitectureTest, UIReceivesPotUpdates)
     bbStrategy->setLastAction(GameState::River, {playerBb->getId(), ActionType::Check});
     playerBb->setStrategy(std::move(bbStrategy)); // FIX: Actually assign the strategy!
 
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 
     // Verify no auto-fold occurred (which would indicate test setup problems)
     for (const auto& error : mockUI->engineErrors)
@@ -267,14 +267,14 @@ TEST_F(EventDrivenArchitectureTest, UIReceivesPotUpdates)
  */
 TEST_F(EventDrivenArchitectureTest, UIReceivesChipUpdates)
 {
-    initializeHandFsmWithPlayers(2, gameData);
+    initializeHandWithPlayers(2, gameData);
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
     auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
     sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Fold});
     playerSb->setStrategy(std::move(sbStrategy));
 
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 
     // UI should receive chip updates for affected players
     EXPECT_FALSE(mockUI->chipUpdates.empty()) << "UI should receive chip stack updates through events";
@@ -306,7 +306,7 @@ TEST_F(EventDrivenArchitectureTest, EngineFiresErrorEvents)
     // Clear events before initializing the game
     mockUI->clear();
 
-    initializeHandFsmWithPlayers(2, gameData);
+    initializeHandWithPlayers(2, gameData);
 
     // Try to make an invalid action (player not in turn)
     PlayerAction invalidAction;
@@ -315,7 +315,7 @@ TEST_F(EventDrivenArchitectureTest, EngineFiresErrorEvents)
     invalidAction.amount = 0;
 
     // This should trigger an error event
-    myHandFsm->handlePlayerAction(invalidAction);
+    myHand->handlePlayerAction(invalidAction);
 
     // Check that error was captured
     EXPECT_FALSE(mockUI->invalidActions.empty()) << "UI should receive invalid action events";
@@ -336,13 +336,13 @@ TEST_F(EventDrivenArchitectureTest, EngineAutoFoldsAfterRepeatedInvalidActions)
     // Clear events before initializing the game
     mockUI->clear();
 
-    initializeHandFsmWithPlayers(2, gameData);
+    initializeHandWithPlayers(2, gameData);
 
     // Get the first player who should act (small blind)
-    auto processor = myHandFsm->getActionProcessor();
+    auto processor = myHand->getActionProcessor();
     ASSERT_NE(processor, nullptr) << "Should have action processor in preflop";
 
-    auto currentPlayer = processor->getNextPlayerToAct(*myHandFsm);
+    auto currentPlayer = processor->getNextPlayerToAct(*myHand);
     ASSERT_NE(currentPlayer, nullptr) << "Should have a player to act";
 
     unsigned playerToAct = currentPlayer->getId();
@@ -356,11 +356,11 @@ TEST_F(EventDrivenArchitectureTest, EngineAutoFoldsAfterRepeatedInvalidActions)
     // Submit the same invalid action multiple times
     for (int i = 0; i < 3; ++i) // Exactly MAX_INVALID_ACTIONS (3)
     {
-        myHandFsm->handlePlayerAction(invalidAction);
+        myHand->handlePlayerAction(invalidAction);
     }
 
     // One more should trigger auto-fold
-    myHandFsm->handlePlayerAction(invalidAction);
+    myHand->handlePlayerAction(invalidAction);
 
     // Check that we received error events
     EXPECT_GE(mockUI->invalidActions.size(), 3u) << "Should receive multiple invalid action events";
@@ -385,12 +385,12 @@ TEST_F(EventDrivenArchitectureTest, EngineAutoFoldsAfterRepeatedInvalidActions)
  */
 TEST_F(EventDrivenArchitectureTest, EngineFiresHandCompletedEvent)
 {
-    initializeHandFsmWithPlayers(3, gameData);
+    initializeHandWithPlayers(3, gameData);
 
     // Configure strategies so we have a clear winner scenario
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);     // Small blind folds
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);     // Big blind folds
-    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 2); // Dealer wins by default
+    auto playerSb = getPlayerById(myActingPlayersList, 0);     // Small blind folds
+    auto playerBb = getPlayerById(myActingPlayersList, 1);     // Big blind folds
+    auto playerDealer = getPlayerById(myActingPlayersList, 2); // Dealer wins by default
 
     auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
     sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Fold});
@@ -407,7 +407,7 @@ TEST_F(EventDrivenArchitectureTest, EngineFiresHandCompletedEvent)
 
     // Clear any existing events and run the hand
     mockUI->clear();
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 
     // UI should have received exactly one hand completion event
     ASSERT_FALSE(mockUI->handCompletions.empty()) << "UI should receive onHandCompleted event when hand finishes";
@@ -454,11 +454,11 @@ TEST_F(EventDrivenArchitectureTest, EngineFiresCardDealingEvents)
     myEvents.onBoardCardsDealt = [&boardCardsDealt](BoardCards boardCards) { boardCardsDealt.push_back(boardCards); };
 
     // Initialize AFTER setting up event handlers so we capture hole cards events
-    initializeHandFsmWithPlayers(2, gameData);
+    initializeHandWithPlayers(2, gameData);
 
     // Configure strategies to play through all rounds so we see all board card events
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto playerBb = getPlayerById(myActingPlayersList, 1);
 
     auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
     sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Call});
@@ -475,7 +475,7 @@ TEST_F(EventDrivenArchitectureTest, EngineFiresCardDealingEvents)
     playerBb->setStrategy(std::move(bbStrategy));
 
     // Run the hand
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 
     // Verify hole cards events
     ASSERT_EQ(holeCardsDealt.size(), 2) << "Should receive hole cards events for both players";

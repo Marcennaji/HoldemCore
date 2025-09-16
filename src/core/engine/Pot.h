@@ -3,22 +3,22 @@
 #include <list>
 #include <memory>
 #include <vector>
-#include "core/player/PlayerFsm.h"
+#include "core/player/Player.h"
 
 namespace pkt::core
 {
 
-class PotFsm
+class Pot
 {
   public:
-    PotFsm(unsigned total, pkt::core::player::PlayerFsmList seats, unsigned dealerId);
+    Pot(unsigned total, pkt::core::player::PlayerList seats, unsigned dealerId);
 
     void distribute();
     const std::list<unsigned>& getWinners() const { return myWinners; }
 
   private:
     unsigned myTotal;
-    pkt::core::player::PlayerFsmList mySeats;
+    pkt::core::player::PlayerList mySeats;
     std::list<unsigned> myWinners;
     unsigned myDealerId;
 
@@ -33,7 +33,7 @@ class PotFsm
     void reduceContributions(std::vector<unsigned>& contributions, unsigned level);
     void finalizeDistribution();
 
-    std::shared_ptr<player::PlayerFsm> resolveRemainderReceiver(const std::vector<size_t>& winnerIndices) const;
+    std::shared_ptr<player::Player> resolveRemainderReceiver(const std::vector<size_t>& winnerIndices) const;
     std::vector<size_t> indexesOf(const std::list<unsigned>& ids);
 };
 

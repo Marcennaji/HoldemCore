@@ -29,19 +29,19 @@ namespace pkt::core::player
 {
 
 // Backward compatibility layer - delegates to the new modules
-inline std::shared_ptr<PlayerFsm> getPlayerFsmById(PlayerFsmList list, unsigned id)
+inline std::shared_ptr<Player> getPlayerById(PlayerList list, unsigned id)
 {
-    return PlayerListUtils::getPlayerFsmById(list, id);
+    return PlayerListUtils::getPlayerById(list, id);
 }
 
-inline PlayerFsmListIterator getPlayerFsmListIteratorById(PlayerFsmList list, unsigned id)
+inline PlayerListIterator getPlayerListIteratorById(PlayerList list, unsigned id)
 {
-    return PlayerListUtils::getPlayerFsmListIteratorById(list, id);
+    return PlayerListUtils::getPlayerListIteratorById(list, id);
 }
 
-inline void updateActingPlayersListFsm(PlayerFsmList& list)
+inline void updateActingPlayersList(PlayerList& list)
 {
-    PlayerListUtils::updateActingPlayersListFsm(list);
+    PlayerListUtils::updateActingPlayersList(list);
 }
 
 inline bool isCardsInRange(const std::string& card1, const std::string& card2, const std::string& range)
@@ -70,12 +70,12 @@ inline int getBoardCardsHigherThan(const std::string& stringBoard, const std::st
     return pkt::core::cards::CardRangeAnalyzer::getBoardCardsHigherThan(stringBoard, card);
 }
 
-inline bool hasPosition(PlayerPosition myPos, PlayerFsmList actingPlayers)
+inline bool hasPosition(PlayerPosition myPos, PlayerList actingPlayers)
 {
     return pkt::core::player::position::PositionManager::hasPosition(myPos, actingPlayers);
 }
 
-inline int playerDistanceCircularOffset(int fromId, int toId, const PlayerFsmList& players)
+inline int playerDistanceCircularOffset(int fromId, int toId, const PlayerList& players)
 {
     return pkt::core::player::position::PositionManager::playerDistanceCircularOffset(fromId, toId, players);
 }

@@ -1,5 +1,5 @@
 #include "HandPlayersState.h"
-#include "core/player/PlayerFsm.h"
+#include "core/player/Player.h"
 #include "core/services/GlobalServices.h"
 
 namespace pkt::core
@@ -7,7 +7,7 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-HandPlayersState::HandPlayersState(PlayerFsmList seats, PlayerFsmList actingPlayers)
+HandPlayersState::HandPlayersState(PlayerList seats, PlayerList actingPlayers)
     : mySeatsList(seats), myActingPlayersList(actingPlayers)
 
 {

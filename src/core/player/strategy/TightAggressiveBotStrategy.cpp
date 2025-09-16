@@ -69,7 +69,7 @@ bool TightAggressiveBotStrategy::preflopShouldCall(const CurrentHandContext& ctx
 
     stringCallingRange = rangesString[(int) callingRange];
 
-    std::shared_ptr<PlayerFsm> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
+    std::shared_ptr<Player> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
 
     if (ctx.commonContext.playersContext.actingPlayersList->size() > 2 &&
         ctx.commonContext.bettingContext.preflopRaisesNumber + ctx.commonContext.bettingContext.preflopCallsNumber >

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/engine/HandFsm.h"
+#include "core/engine/Hand.h"
 #include "core/engine/model/GameState.h"
 #include "core/interfaces/IBoard.h"
 #include "core/services/GlobalServices.h"
@@ -8,14 +8,14 @@
 namespace pkt::core
 {
 
-class HandFsm;
+class Hand;
 
 class IDebuggableState
 {
   public:
     virtual ~IDebuggableState() = default;
 
-    virtual void logStateInfo(HandFsm& hand)
+    virtual void logStateInfo(Hand& hand)
     {
         // Default implementation: log basic info
         std::string boardStr = hand.getStringBoard();

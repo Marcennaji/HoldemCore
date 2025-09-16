@@ -5,8 +5,7 @@
 namespace pkt::ui::qtwidgets
 {
 
-PokerTableWindow::PokerTableWindow(pkt::core::SessionFsm* session, QWidget* parent)
-    : QWidget(parent), m_session(session)
+PokerTableWindow::PokerTableWindow(pkt::core::Session* session, QWidget* parent) : QWidget(parent), m_session(session)
 {
     setupUi();
     connectSignals();
@@ -81,7 +80,7 @@ void PokerTableWindow::refreshPot(int amount)
     m_potLabel->setText(QString("Pot: %1").arg(amount));
 }
 
-void PokerTableWindow::refreshPlayer(int seat, const pkt::core::player::PlayerFsm& player)
+void PokerTableWindow::refreshPlayer(int seat, const pkt::core::player::Player& player)
 {
     if (seat < 0 || seat >= static_cast<int>(m_playerLabels.size()))
         return;

@@ -14,14 +14,14 @@ class BoardCardTest : public EngineTest
 {
 
   public:
-    bool cardsAreUniqueAndValid(const std::shared_ptr<pkt::core::HandFsm>& hand,
+    bool cardsAreUniqueAndValid(const std::shared_ptr<pkt::core::Hand>& hand,
                                 const std::shared_ptr<pkt::core::IBoard>& board,
-                                const pkt::core::player::PlayerFsmList& players);
+                                const pkt::core::player::PlayerList& players);
 };
 
-bool BoardCardTest::cardsAreUniqueAndValid(const std::shared_ptr<pkt::core::HandFsm>& hand,
+bool BoardCardTest::cardsAreUniqueAndValid(const std::shared_ptr<pkt::core::Hand>& hand,
                                            const std::shared_ptr<pkt::core::IBoard>& board,
-                                           const pkt::core::player::PlayerFsmList& players)
+                                           const pkt::core::player::PlayerList& players)
 {
     std::vector<int> allCards;
 
@@ -53,51 +53,51 @@ bool BoardCardTest::cardsAreUniqueAndValid(const std::shared_ptr<pkt::core::Hand
 
 TEST_F(BoardCardTest, DealBoardCardsAndHoleCards_NoOverlap_2Players)
 {
-    initializeHandFsmWithPlayers(2, gameData);
+    initializeHandWithPlayers(2, gameData);
 
-    myHandFsm->dealHoleCards(myHandFsm->dealBoardCards());
+    myHand->dealHoleCards(myHand->dealBoardCards());
 
     // Verify board cards
     int boardCards[5];
-    myHandFsm->getBoard().getCards(boardCards);
+    myHand->getBoard().getCards(boardCards);
     ASSERT_EQ(sizeof(boardCards) / sizeof(boardCards[0]), 5);
 }
 
 TEST_F(BoardCardTest, DealBoardCardsAndHoleCards_NoOverlap_2Players_FullTest)
 {
-    initializeHandFsmWithPlayers(2, gameData);
-    myHandFsm->dealHoleCards(myHandFsm->dealBoardCards());
-    ASSERT_TRUE(cardsAreUniqueAndValid(myHandFsm, myBoardFsm, mySeatsListFsm));
+    initializeHandWithPlayers(2, gameData);
+    myHand->dealHoleCards(myHand->dealBoardCards());
+    ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
 }
 
 TEST_F(BoardCardTest, DealBoardCardsAndHoleCards_NoOverlap_3Players)
 {
-    initializeHandFsmWithPlayers(3, gameData);
-    myHandFsm->dealHoleCards(myHandFsm->dealBoardCards());
-    ASSERT_TRUE(cardsAreUniqueAndValid(myHandFsm, myBoardFsm, mySeatsListFsm));
+    initializeHandWithPlayers(3, gameData);
+    myHand->dealHoleCards(myHand->dealBoardCards());
+    ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
 }
 
 TEST_F(BoardCardTest, DealBoardCardsAndHoleCards_NoOverlap_MaxPlayers)
 {
-    initializeHandFsmWithPlayers(MAX_NUMBER_OF_PLAYERS, gameData);
-    myHandFsm->dealHoleCards(myHandFsm->dealBoardCards());
-    ASSERT_TRUE(cardsAreUniqueAndValid(myHandFsm, myBoardFsm, mySeatsListFsm));
+    initializeHandWithPlayers(MAX_NUMBER_OF_PLAYERS, gameData);
+    myHand->dealHoleCards(myHand->dealBoardCards());
+    ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
 }
 
 TEST_F(BoardCardTest, AllDealtCards_AreWithinValidRange_4Players)
 {
-    initializeHandFsmWithPlayers(4, gameData);
-    myHandFsm->dealHoleCards(myHandFsm->dealBoardCards());
+    initializeHandWithPlayers(4, gameData);
+    myHand->dealHoleCards(myHand->dealBoardCards());
 
     int boardCards[5];
-    myBoardFsm->getCards(boardCards);
+    myBoard->getCards(boardCards);
     for (int card : boardCards)
     {
         ASSERT_GE(card, 0);
         ASSERT_LT(card, 52);
     }
     int cards[2];
-    for (const auto& player : *mySeatsListFsm)
+    for (const auto& player : *mySeatsList)
     {
         player->getCards(cards);
         ASSERT_GE(cards[0], 0);
@@ -111,9 +111,9 @@ TEST_F(BoardCardTest, DealCards_NoOverlap_OverMultipleRounds)
 {
     for (int i = 0; i < 500; ++i)
     {
-        initializeHandFsmWithPlayers(6, gameData);
-        myHandFsm->dealHoleCards(myHandFsm->dealBoardCards());
-        ASSERT_TRUE(cardsAreUniqueAndValid(myHandFsm, myBoardFsm, mySeatsListFsm));
+        initializeHandWithPlayers(6, gameData);
+        myHand->dealHoleCards(myHand->dealBoardCards());
+        ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
     }
 }
 

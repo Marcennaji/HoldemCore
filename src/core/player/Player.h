@@ -27,7 +27,7 @@
 
 namespace pkt::core
 {
-class HandFsm;
+class Hand;
 class IHandState;
 
 } // namespace pkt::core
@@ -35,12 +35,12 @@ class IHandState;
 namespace pkt::core::player
 {
 
-class PlayerFsm
+class Player
 {
   public:
-    PlayerFsm(const GameEvents&, int id, std::string name, int cash);
+    Player(const GameEvents&, int id, std::string name, int cash);
 
-    virtual ~PlayerFsm() = default;
+    virtual ~Player() = default;
 
     int getId() const;
     std::string getName() const;
@@ -83,7 +83,7 @@ class PlayerFsm
     std::string getCardsValueString() const;
 
     const PlayerPosition getPosition() const;
-    void setPosition(const HandFsm& hand);
+    void setPosition(const Hand& hand);
 
     bool checkIfINeedToShowCards() const;
 
@@ -99,14 +99,14 @@ class PlayerFsm
 
     bool isAgressor(const GameState gameState) const;
 
-    void updateCurrentHandContext(const GameState gameState, HandFsm&);
+    void updateCurrentHandContext(const GameState gameState, Hand&);
 
     bool isInVeryLooseMode(const int nbPlayers) const;
 
     std::unique_ptr<RangeEstimator>& getRangeEstimator() { return myRangeEstimator; }
     int getPreflopPotOdd() const;
 
-    void resetForNewHand(const HandFsm& hand);
+    void resetForNewHand(const Hand& hand);
 
     const PlayerStatistics& getStatistics(const int nbPlayers) const;
     const std::unique_ptr<PlayerStatisticsUpdater>& getStatisticsUpdater() const { return myStatisticsUpdater; }

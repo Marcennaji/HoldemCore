@@ -18,25 +18,25 @@
 
 namespace pkt::core::player
 {
-class PlayerFsm;
+class Player;
 } // namespace pkt::core::player
 
 namespace pkt::core
 {
 
 class BettingActions;
-class HandFsm;
+class Hand;
 class IHandState;
 struct GameEvents;
 struct PlayerAction;
 
-std::shared_ptr<player::PlayerFsm> getFirstPlayerToActPostFlop(const HandFsm& hand);
-std::shared_ptr<player::PlayerFsm> getNextPlayerToActInRound(const HandFsm& hand, GameState currentRound);
-std::unique_ptr<pkt::core::IHandState> computeBettingRoundNextState(HandFsm& hand, const GameEvents& events,
+std::shared_ptr<player::Player> getFirstPlayerToActPostFlop(const Hand& hand);
+std::shared_ptr<player::Player> getNextPlayerToActInRound(const Hand& hand, GameState currentRound);
+std::unique_ptr<pkt::core::IHandState> computeBettingRoundNextState(Hand& hand, const GameEvents& events,
                                                                     GameState currentState);
-bool isRoundComplete(HandFsm& hand);
-std::vector<ActionType> getValidActionsForPlayer(const HandFsm& hand, int playerId);
-bool validatePlayerAction(const pkt::core::player::PlayerFsmList& actingPlayersList, const PlayerAction& action,
+bool isRoundComplete(Hand& hand);
+std::vector<ActionType> getValidActionsForPlayer(const Hand& hand, int playerId);
+bool validatePlayerAction(const pkt::core::player::PlayerList& actingPlayersList, const PlayerAction& action,
                           const BettingActions& bettingActions, int smallBlind, const GameState gameState);
 
 } // namespace pkt::core

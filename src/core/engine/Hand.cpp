@@ -1,7 +1,7 @@
-#include "HandFsm.h"
 #include <core/services/GlobalServices.h>
 #include "CardUtilities.h"
 #include "GameEvents.h"
+#include "Hand.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/player/Helpers.h"
 
@@ -20,8 +20,8 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-HandFsm::HandFsm(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
-                 PlayerFsmList seats, PlayerFsmList actingPlayers, GameData gameData, StartData startData)
+Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
+           PlayerList seats, PlayerList actingPlayers, GameData gameData, StartData startData)
     : HandPlayersState(seats, actingPlayers), myEvents(events), myFactory(factory), myBoard(board),
       myStartQuantityPlayers(startData.numberOfPlayers), mySmallBlind(gameData.firstSmallBlind),
       myStartCash(gameData.startMoney)
@@ -35,21 +35,21 @@ HandFsm::HandFsm(const GameEvents& events, std::shared_ptr<EngineFactory> factor
 
     if (mySmallBlind <= 0)
     {
-        throw std::invalid_argument("HandFsm: smallBlind must be > 0");
+        throw std::invalid_argument("Hand: smallBlind must be > 0");
     }
     if (myDealerPlayerId == static_cast<unsigned>(-1))
     {
-        throw std::invalid_argument("HandFsm: dealerPlayerId is invalid");
+        throw std::invalid_argument("Hand: dealerPlayerId is invalid");
     }
     if (startData.startDealerPlayerId >= static_cast<unsigned>(startData.numberOfPlayers))
     {
-        throw std::invalid_argument("HandFsm: startDealerPlayerId is out of range");
+        throw std::invalid_argument("Hand: startDealerPlayerId is out of range");
     }
 }
 
-HandFsm::~HandFsm() = default;
+Hand::~Hand() = default;
 
-void HandFsm::initialize()
+void Hand::initialize()
 {
     GlobalServices::instance().logger().info(
         "\n----------------------  New hand initialization (FSM)  -------------------------------\n");
@@ -68,12 +68,12 @@ void HandFsm::initialize()
     myState->enter(*this);
 }
 
-void HandFsm::end()
+void Hand::end()
 {
     GlobalServices::instance().playersStatisticsStore().savePlayersStatistics(mySeatsList);
 }
 
-void HandFsm::runGameLoop()
+void Hand::runGameLoop()
 {
     // Deal cards at the start of game loop to match legacy timing
     dealHoleCards(0); // Pass 0 as index, since no board cards dealt yet
@@ -129,7 +129,7 @@ void HandFsm::runGameLoop()
     }
 }
 
-void HandFsm::handlePlayerAction(PlayerAction action)
+void Hand::handlePlayerAction(PlayerAction action)
 {
     validateGameState();
     auto* processor = getActionProcessorOrThrow();
@@ -142,9 +142,9 @@ void HandFsm::handlePlayerAction(PlayerAction action)
 
     processValidAction(action);
 }
-void HandFsm::applyActionEffects(const PlayerAction action)
+void Hand::applyActionEffects(const PlayerAction action)
 {
-    auto player = getPlayerFsmById(myActingPlayersList, action.playerId);
+    auto player = getPlayerById(myActingPlayersList, action.playerId);
     if (!player)
         return;
 
@@ -234,7 +234,7 @@ void HandFsm::applyActionEffects(const PlayerAction action)
     // Record action in hand-level chronological history
     getBettingActions()->recordPlayerAction(myState->getGameState(), actionForHistory);
 
-    updateActingPlayersListFsm(myActingPlayersList);
+    updateActingPlayersList(myActingPlayersList);
 
     if (myEvents.onPlayerActed)
     {
@@ -242,13 +242,13 @@ void HandFsm::applyActionEffects(const PlayerAction action)
     }
 }
 
-void HandFsm::initAndShuffleDeck()
+void Hand::initAndShuffleDeck()
 {
     myDeck.initializeFullDeck();
     myDeck.shuffle();
 }
 
-void HandFsm::dealHoleCards(size_t cardsArrayIndex)
+void Hand::dealHoleCards(size_t cardsArrayIndex)
 {
     // Validate that there are enough cards in the deck
     if (!myDeck.hasEnoughCards(0, mySeatsList->size())) // 0 board cards here since already dealt
@@ -292,7 +292,7 @@ void HandFsm::dealHoleCards(size_t cardsArrayIndex)
     }
 }
 
-size_t HandFsm::dealBoardCards()
+size_t Hand::dealBoardCards()
 {
     // Deal 5 cards for the board (flop, turn, river)
     std::vector<Card> boardCardList = myDeck.dealCards(5);
@@ -314,12 +314,12 @@ size_t HandFsm::dealBoardCards()
     return 5; // Number of cards dealt
 }
 
-std::vector<Card> HandFsm::dealCardsFromDeck(int numCards)
+std::vector<Card> Hand::dealCardsFromDeck(int numCards)
 {
     return myDeck.dealCards(numCards);
 }
 
-HandCommonContext HandFsm::updateHandCommonContext(const GameState state)
+HandCommonContext Hand::updateHandCommonContext(const GameState state)
 {
     // general (and shared) game state
     HandCommonContext handContext;
@@ -328,16 +328,15 @@ HandCommonContext HandFsm::updateHandCommonContext(const GameState state)
     handContext.smallBlind = mySmallBlind;
 
     handContext.playersContext.actingPlayersList = getActingPlayersList();
-    handContext.playersContext.lastVPIPPlayer =
-        getPlayerFsmById(getSeatsList(), getBettingActions()->getLastRaiserId());
+    handContext.playersContext.lastVPIPPlayer = getPlayerById(getSeatsList(), getBettingActions()->getLastRaiserId());
     handContext.playersContext.callersPositions = myBettingActions->getCallersPositions();
     handContext.playersContext.raisersPositions = myBettingActions->getRaisersPositions();
     handContext.playersContext.preflopLastRaiser =
-        getPlayerFsmById(getSeatsList(), getBettingActions()->getPreflop().getLastRaiserId());
+        getPlayerById(getSeatsList(), getBettingActions()->getPreflop().getLastRaiserId());
     handContext.playersContext.turnLastRaiser =
-        getPlayerFsmById(getSeatsList(), getBettingActions()->getTurn().getLastRaiserId());
+        getPlayerById(getSeatsList(), getBettingActions()->getTurn().getLastRaiserId());
     handContext.playersContext.flopLastRaiser =
-        getPlayerFsmById(getSeatsList(), getBettingActions()->getFlop().getLastRaiserId());
+        getPlayerById(getSeatsList(), getBettingActions()->getFlop().getLastRaiserId());
 
     handContext.bettingContext.pot = myBoard->getPot(*this);
     // handContext.bettingContext.potOdd = getPotOdd();
@@ -353,7 +352,7 @@ HandCommonContext HandFsm::updateHandCommonContext(const GameState state)
 
     return handContext;
 }
-float HandFsm::getM(int cash) const
+float Hand::getM(int cash) const
 {
     int blinds = mySmallBlind + (mySmallBlind * 2);
     if (blinds > 0 && cash > 0)
@@ -365,7 +364,7 @@ float HandFsm::getM(int cash) const
         return 0;
     }
 }
-std::string HandFsm::getStringBoard() const
+std::string Hand::getStringBoard() const
 {
     const BoardCards& boardCards = myBoard->getBoardCards();
 
@@ -381,7 +380,7 @@ std::string HandFsm::getStringBoard() const
     return " " + boardString;
 }
 
-int HandFsm::getPotOdd(const int playerCash, const int playerSet) const
+int Hand::getPotOdd(const int playerCash, const int playerSet) const
 {
     const int highestBetAmount = min(playerCash, getBettingActions()->getRoundHighestSet());
 
@@ -404,16 +403,16 @@ int HandFsm::getPotOdd(const int playerCash, const int playerSet) const
     return odd;
 }
 
-IActionProcessor* HandFsm::getActionProcessor() const
+IActionProcessor* Hand::getActionProcessor() const
 {
     return dynamic_cast<IActionProcessor*>(myState.get());
 }
 
-int HandFsm::getSmallBlind() const
+int Hand::getSmallBlind() const
 {
     return mySmallBlind;
 }
-void HandFsm::fireOnPotUpdated() const
+void Hand::fireOnPotUpdated() const
 {
     if (myEvents.onPotUpdated)
     {
@@ -421,7 +420,7 @@ void HandFsm::fireOnPotUpdated() const
     }
 }
 
-std::string HandFsm::getActionValidationError(const PlayerAction& action) const
+std::string Hand::getActionValidationError(const PlayerAction& action) const
 {
     if (!myState)
     {
@@ -434,7 +433,7 @@ std::string HandFsm::getActionValidationError(const PlayerAction& action) const
         return "Current game state does not accept player actions";
     }
 
-    auto player = getPlayerFsmById(myActingPlayersList, action.playerId);
+    auto player = getPlayerById(myActingPlayersList, action.playerId);
     if (!player)
     {
         return "Player not found in active players list";
@@ -507,7 +506,7 @@ std::string HandFsm::getActionValidationError(const PlayerAction& action) const
     return "Action validation failed for unknown reason";
 }
 
-PlayerAction HandFsm::getDefaultActionForPlayer(unsigned playerId) const
+PlayerAction Hand::getDefaultActionForPlayer(unsigned playerId) const
 {
     PlayerAction defaultAction;
     defaultAction.playerId = playerId;
@@ -516,18 +515,18 @@ PlayerAction HandFsm::getDefaultActionForPlayer(unsigned playerId) const
     return defaultAction;
 }
 
-void HandFsm::resetInvalidActionCount(unsigned playerId)
+void Hand::resetInvalidActionCount(unsigned playerId)
 {
     myInvalidActionCounts[playerId] = 0;
 }
 
-bool HandFsm::shouldAutoFoldPlayer(unsigned playerId) const
+bool Hand::shouldAutoFoldPlayer(unsigned playerId) const
 {
     auto it = myInvalidActionCounts.find(playerId);
     return (it != myInvalidActionCounts.end() && it->second >= MAX_INVALID_ACTIONS);
 }
 
-void HandFsm::validateGameState() const
+void Hand::validateGameState() const
 {
     if (!myState)
     {
@@ -535,7 +534,7 @@ void HandFsm::validateGameState() const
     }
 }
 
-IActionProcessor* HandFsm::getActionProcessorOrThrow() const
+IActionProcessor* Hand::getActionProcessorOrThrow() const
 {
     auto* processor = dynamic_cast<IActionProcessor*>(myState.get());
     if (!processor)
@@ -546,7 +545,7 @@ IActionProcessor* HandFsm::getActionProcessorOrThrow() const
     return processor;
 }
 
-void HandFsm::handleInvalidAction(const PlayerAction& action)
+void Hand::handleInvalidAction(const PlayerAction& action)
 {
     // Track invalid action attempts
     myInvalidActionCounts[action.playerId]++;
@@ -569,7 +568,7 @@ void HandFsm::handleInvalidAction(const PlayerAction& action)
     }
 }
 
-void HandFsm::handleAutoFold(unsigned playerId)
+void Hand::handleAutoFold(unsigned playerId)
 {
     GlobalServices::instance().logger().error("Player " + std::to_string(playerId) +
                                               " exceeded maximum invalid actions, auto-folding");
@@ -589,7 +588,7 @@ void HandFsm::handleAutoFold(unsigned playerId)
     handlePlayerAction(autoFoldAction);
 }
 
-void HandFsm::processValidAction(const PlayerAction& action)
+void Hand::processValidAction(const PlayerAction& action)
 {
     try
     {

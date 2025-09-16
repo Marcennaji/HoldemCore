@@ -1,7 +1,7 @@
 
 #include "BettingActions.h"
-#include "core/engine/HandFsm.h"
-#include "core/player/PlayerFsm.h"
+#include "core/engine/Hand.h"
+#include "core/player/Player.h"
 #include "core/player/typedefs.h"
 
 #include <algorithm>
@@ -10,7 +10,7 @@ namespace pkt::core
 {
 using namespace pkt::core::player;
 
-BettingActions::BettingActions(PlayerFsmList& seats, PlayerFsmList& actingPlayers)
+BettingActions::BettingActions(PlayerList& seats, PlayerList& actingPlayers)
     : mySeatsList(seats), myActingPlayersList(actingPlayers), myPreflop(GameState::Preflop, seats, actingPlayers),
       myFlop(GameState::Flop, seats, actingPlayers), myTurn(GameState::Turn, seats, actingPlayers),
       myRiver(GameState::River, seats, actingPlayers)

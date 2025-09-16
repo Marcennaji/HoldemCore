@@ -1,14 +1,14 @@
 
 #include "BettingRoundActions.h"
-#include "core/engine/HandFsm.h"
-#include "core/player/PlayerFsm.h"
+#include "core/engine/Hand.h"
+#include "core/player/Player.h"
 #include "core/player/typedefs.h"
 
 namespace pkt::core
 {
 using namespace pkt::core::player;
 
-BettingRoundActions::BettingRoundActions(GameState gameState, PlayerFsmList& seats, PlayerFsmList& actingPlayers)
+BettingRoundActions::BettingRoundActions(GameState gameState, PlayerList& seats, PlayerList& actingPlayers)
     : myGameState(gameState), mySeatsList(seats), myActingPlayersList(actingPlayers)
 {
 }

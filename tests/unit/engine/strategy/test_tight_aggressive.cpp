@@ -62,7 +62,7 @@ TEST_F(TightAggressiveStrategyTest, Preflop_InPosition_CallsWithOdds)
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.personalContext.myHandSimulation.winSd = 0.6f;
     ctx.commonContext.bettingContext.preflopRaisesNumber = 1;
-    ctx.commonContext.playersContext.preflopLastRaiser = std::make_shared<pkt::test::DummyPlayerFsm>(2, events);
+    ctx.commonContext.playersContext.preflopLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events);
     ctx.personalContext.hasPosition = true;
 
     PlayerAction action = strategy.decideAction(ctx);
@@ -80,7 +80,7 @@ TEST_F(TightAggressiveStrategyTest, Flop_HighEquity_Raises)
     ctx.commonContext.stringBoard = "2h 3d 7c";
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.commonContext.bettingContext.flopBetsOrRaisesNumber = 1;
-    ctx.commonContext.playersContext.flopLastRaiser = std::make_shared<pkt::test::DummyPlayerFsm>(2, events);
+    ctx.commonContext.playersContext.flopLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events);
     ctx.personalContext.hasPosition = true;
 
     ctx.personalContext.myHandSimulation.win = 0.92f;
@@ -100,7 +100,7 @@ TEST_F(TightAggressiveStrategyTest, Flop_LowEquity_Folds)
     ctx.commonContext.bettingContext.potOdd = 10;
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.commonContext.bettingContext.flopBetsOrRaisesNumber = 1;
-    ctx.commonContext.playersContext.flopLastRaiser = std::make_shared<pkt::test::DummyPlayerFsm>(2, events);
+    ctx.commonContext.playersContext.flopLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events);
     PlayerAction action = strategy.decideAction(ctx);
 
     EXPECT_EQ(action.type, ActionType::Fold);
@@ -116,7 +116,7 @@ TEST_F(TightAggressiveStrategyTest, Turn_HighEquity_Raises)
     ctx.personalContext.myHandSimulation.winRanged = 0.95f;
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.commonContext.bettingContext.turnBetsOrRaisesNumber = 1;
-    ctx.commonContext.playersContext.turnLastRaiser = std::make_shared<pkt::test::DummyPlayerFsm>(2, events);
+    ctx.commonContext.playersContext.turnLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events);
 
     PlayerAction action = strategy.decideAction(ctx);
 
@@ -131,7 +131,7 @@ TEST_F(TightAggressiveStrategyTest, Turn_LowEquity_DoesNotRaise)
     ctx.personalContext.myHandSimulation.winRanged = 0.4f;
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.commonContext.bettingContext.turnBetsOrRaisesNumber = 1;
-    ctx.commonContext.playersContext.turnLastRaiser = std::make_shared<pkt::test::DummyPlayerFsm>(2, events);
+    ctx.commonContext.playersContext.turnLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events);
 
     PlayerAction action = strategy.decideAction(ctx);
 
@@ -146,7 +146,7 @@ TEST_F(TightAggressiveStrategyTest, Turn_LowEquity_Folds)
     ctx.commonContext.bettingContext.potOdd = 10;
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.commonContext.bettingContext.turnBetsOrRaisesNumber = 1;
-    ctx.commonContext.playersContext.turnLastRaiser = std::make_shared<pkt::test::DummyPlayerFsm>(2, events);
+    ctx.commonContext.playersContext.turnLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events);
 
     PlayerAction action = strategy.decideAction(ctx);
 
@@ -164,7 +164,7 @@ TEST_F(TightAggressiveStrategyTest, River_Nuts_Raises)
     ctx.personalContext.myHandSimulation.winRanged = 1.0f;
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.commonContext.bettingContext.riverBetsOrRaisesNumber = 5;
-    ctx.commonContext.playersContext.lastVPIPPlayer = std::make_shared<pkt::test::DummyPlayerFsm>(2, events);
+    ctx.commonContext.playersContext.lastVPIPPlayer = std::make_shared<pkt::test::DummyPlayer>(2, events);
 
     PlayerAction action = strategy.decideAction(ctx);
 
@@ -178,7 +178,7 @@ TEST_F(TightAggressiveStrategyTest, DISABLED_River_ZeroEquity_Folds)
     ctx.personalContext.myHandSimulation.winSd = 0.0f;
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.commonContext.bettingContext.riverBetsOrRaisesNumber = 5;
-    ctx.commonContext.playersContext.lastVPIPPlayer = std::make_shared<pkt::test::DummyPlayerFsm>(2, events);
+    ctx.commonContext.playersContext.lastVPIPPlayer = std::make_shared<pkt::test::DummyPlayer>(2, events);
 
     PlayerAction action = strategy.decideAction(ctx);
 

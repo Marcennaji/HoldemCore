@@ -70,7 +70,7 @@ bool ManiacBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
         stringCallingRange += HIGH_PAIRS;
     }
 
-    std::shared_ptr<PlayerFsm> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
+    std::shared_ptr<Player> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
 
     if (ctx.commonContext.bettingContext.preflopRaisesNumber < 2 &&
         ctx.personalContext.cash >= ctx.commonContext.bettingContext.pot * 10 && lastRaiser != nullptr &&

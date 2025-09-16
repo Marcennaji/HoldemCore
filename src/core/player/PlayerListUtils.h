@@ -20,29 +20,29 @@ class PlayerListUtils
 {
   public:
     /**
-     * @brief Find a PlayerFsm by ID in a list
+     * @brief Find a Player by ID in a list
      *
-     * @param list List of PlayerFsm objects
+     * @param list List of Player objects
      * @param id Player ID to search for
-     * @return Shared pointer to PlayerFsm if found, nullptr otherwise
+     * @return Shared pointer to Player if found, nullptr otherwise
      */
-    static std::shared_ptr<PlayerFsm> getPlayerFsmById(const PlayerFsmList& list, unsigned id);
+    static std::shared_ptr<Player> getPlayerById(const PlayerList& list, unsigned id);
 
     /**
-     * @brief Get iterator to PlayerFsm by ID
+     * @brief Get iterator to Player by ID
      *
-     * @param list List of PlayerFsm objects
+     * @param list List of Player objects
      * @param id Player ID to search for
-     * @return Iterator to the PlayerFsm if found, end() otherwise
+     * @return Iterator to the Player if found, end() otherwise
      */
-    static PlayerFsmListIterator getPlayerFsmListIteratorById(PlayerFsmList& list, unsigned id);
+    static PlayerListIterator getPlayerListIteratorById(PlayerList& list, unsigned id);
 
     /**
      * @brief Update acting players list by removing folded/all-in players
      *
      * @param actingPlayersList List to update (modified in place)
      */
-    static void updateActingPlayersListFsm(PlayerFsmList& actingPlayersList);
+    static void updateActingPlayersList(PlayerList& actingPlayersList);
 };
 
 } // namespace pkt::core::player

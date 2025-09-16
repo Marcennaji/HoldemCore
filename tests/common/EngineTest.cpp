@@ -1,6 +1,6 @@
 #include "common/EngineTest.h"
 #include "FakeRandomizer.h"
-#include "PlayerFsm.h"
+#include "Player.h"
 #include "common/DummyPlayer.h"
 #include "core/engine/Exception.h"
 #include "core/engine/model/GameData.h"
@@ -39,47 +39,46 @@ void EngineTest::TearDown()
 {
 }
 
-void EngineTest::createPlayersFsmLists(size_t playerCount)
+void EngineTest::createPlayersLists(size_t playerCount)
 {
-    mySeatsListFsm = std::make_shared<std::list<std::shared_ptr<PlayerFsm>>>();
+    mySeatsList = std::make_shared<std::list<std::shared_ptr<Player>>>();
     for (size_t i = 0; i < playerCount; ++i)
     {
-        auto playerFsm = std::make_shared<DummyPlayerFsm>(i, myEvents);
-        mySeatsListFsm->push_back(playerFsm);
+        auto player = std::make_shared<DummyPlayer>(i, myEvents);
+        mySeatsList->push_back(player);
     }
 
-    myActingPlayersListFsm = std::make_shared<std::list<std::shared_ptr<PlayerFsm>>>();
-    for (const auto& player : *mySeatsListFsm)
+    myActingPlayersList = std::make_shared<std::list<std::shared_ptr<Player>>>();
+    for (const auto& player : *mySeatsList)
     {
-        myActingPlayersListFsm->push_back(player);
+        myActingPlayersList->push_back(player);
     }
 }
-void EngineTest::initializeHandFsmWithPlayers(size_t activePlayerCount, GameData gameData)
+void EngineTest::initializeHandWithPlayers(size_t activePlayerCount, GameData gameData)
 {
-    createPlayersFsmLists(activePlayerCount);
-    myBoardFsm = myFactory->createBoardFsm(startDealerPlayerId);
-    myBoardFsm->setSeatsListFsm(mySeatsListFsm);
-    myBoardFsm->setActingPlayersListFsm(myActingPlayersListFsm);
+    createPlayersLists(activePlayerCount);
+    myBoard = myFactory->createBoard(startDealerPlayerId);
+    myBoard->setSeatsList(mySeatsList);
+    myBoard->setActingPlayersList(myActingPlayersList);
 
     StartData startData;
     startData.startDealerPlayerId = startDealerPlayerId;
     startData.numberOfPlayers = static_cast<int>(activePlayerCount);
 
-    myHandFsm =
-        myFactory->createHandFsm(myFactory, myBoardFsm, mySeatsListFsm, myActingPlayersListFsm, gameData, startData);
+    myHand = myFactory->createHand(myFactory, myBoard, mySeatsList, myActingPlayersList, gameData, startData);
 
-    myHandFsm->initialize();
+    myHand->initialize();
 }
 void EngineTest::checkPostRiverConditions()
 {
 
-    EXPECT_EQ(myHandFsm->getGameState(), PostRiver);
-    EXPECT_EQ(myHandFsm->getBoard().getPot(*myHandFsm), 0); // Pot should be reset to 0
+    EXPECT_EQ(myHand->getGameState(), PostRiver);
+    EXPECT_EQ(myHand->getBoard().getPot(*myHand), 0); // Pot should be reset to 0
 }
 
 bool EngineTest::isPlayerStillActive(unsigned id) const
 {
-    for (const auto& p : *myHandFsm->getActingPlayersList())
+    for (const auto& p : *myHand->getActingPlayersList())
     {
         if (p->getId() == id)
             return true;

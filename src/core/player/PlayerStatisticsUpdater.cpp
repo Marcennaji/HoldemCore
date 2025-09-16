@@ -1,6 +1,6 @@
 
 #include "PlayerStatisticsUpdater.h"
-#include "core/player/PlayerFsm.h"
+#include "core/player/Player.h"
 #include "core/player/strategy/CurrentHandContext.h"
 #include "core/services/GlobalServices.h"
 

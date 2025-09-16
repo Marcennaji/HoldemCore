@@ -2,7 +2,7 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
-#include "GameFsm.h"
+#include "Game.h"
 
 #include "EngineFactory.h"
 #include "Exception.h"
@@ -19,8 +19,8 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-GameFsm::GameFsm(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
-                 PlayerFsmList seatsList, unsigned dealerId, const GameData& gameData, const StartData& startData)
+Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
+           PlayerList seatsList, unsigned dealerId, const GameData& gameData, const StartData& startData)
     : myEngineFactory(factory), myEvents(events), myCurrentBoard(board), mySeatsList(seatsList),
       myDealerPlayerId(dealerId), myGameData(gameData), myStartData(startData)
 {
@@ -28,27 +28,27 @@ GameFsm::GameFsm(const GameEvents& events, std::shared_ptr<EngineFactory> factor
         throw Exception(__FILE__, __LINE__, EngineError::MissingParameter);
 
     // Acting players list starts identical to seats list
-    myActingPlayersList = std::make_shared<std::list<std::shared_ptr<PlayerFsm>>>(*mySeatsList);
+    myActingPlayersList = std::make_shared<std::list<std::shared_ptr<Player>>>(*mySeatsList);
 
     // Validate dealer exists
-    auto it = getPlayerFsmListIteratorById(mySeatsList, dealerId);
+    auto it = getPlayerListIteratorById(mySeatsList, dealerId);
     if (it == mySeatsList->end())
         throw Exception(__FILE__, __LINE__, EngineError::DealerNotFound);
 }
 
-void GameFsm::startNewHand()
+void Game::startNewHand()
 {
-    myCurrentHand = myEngineFactory->createHandFsm(myEngineFactory, myCurrentBoard, mySeatsList, myActingPlayersList,
-                                                   myGameData, myStartData);
+    myCurrentHand = myEngineFactory->createHand(myEngineFactory, myCurrentBoard, mySeatsList, myActingPlayersList,
+                                                myGameData, myStartData);
     findNextDealer();
     myCurrentHand->initialize();
     myCurrentHand->runGameLoop();
 }
 
-void GameFsm::findNextDealer()
+void Game::findNextDealer()
 {
     bool nextDealerFound = false;
-    auto dealerPos = getPlayerFsmListIteratorById(myCurrentHand->getSeatsList(), myDealerPlayerId);
+    auto dealerPos = getPlayerListIteratorById(myCurrentHand->getSeatsList(), myDealerPlayerId);
 
     // Current dealer must exist in the seats list
     if (dealerPos == myCurrentHand->getSeatsList()->end())
@@ -60,7 +60,7 @@ void GameFsm::findNextDealer()
         if (dealerPos == myCurrentHand->getSeatsList()->end())
             dealerPos = myCurrentHand->getSeatsList()->begin();
 
-        auto playerIt = getPlayerFsmListIteratorById(myCurrentHand->getSeatsList(), (*dealerPos)->getId());
+        auto playerIt = getPlayerListIteratorById(myCurrentHand->getSeatsList(), (*dealerPos)->getId());
         if (playerIt != myCurrentHand->getSeatsList()->end())
         {
             myDealerPlayerId = (*playerIt)->getId();

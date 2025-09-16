@@ -2,13 +2,13 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
-#include "BoardFsm.h"
+#include "Board.h"
 
 #include <core/services/GlobalServices.h>
 #include "Exception.h"
-#include "PotFsm.h"
-#include "core/engine/HandFsm.h"
-#include "core/player/PlayerFsm.h"
+#include "Pot.h"
+#include "core/engine/Hand.h"
+#include "core/player/Player.h"
 #include "model/EngineError.h"
 
 #include <algorithm>
@@ -17,25 +17,25 @@ namespace pkt::core
 {
 using namespace pkt::core::player;
 
-BoardFsm::BoardFsm(unsigned dp, const GameEvents& events) : myDealerPlayerId(dp), myEvents(events)
+Board::Board(unsigned dp, const GameEvents& events) : myDealerPlayerId(dp), myEvents(events)
 {
     myBoardCards.reset(); // Initialize with invalid cards
 }
 
-BoardFsm::~BoardFsm()
+Board::~Board()
 {
 }
 
-void BoardFsm::setSeatsListFsm(PlayerFsmList seats)
+void Board::setSeatsList(PlayerList seats)
 {
     mySeatsList = seats;
 }
-void BoardFsm::setActingPlayersListFsm(PlayerFsmList actingPlayers)
+void Board::setActingPlayersList(PlayerList actingPlayers)
 {
     myActingPlayersList = actingPlayers;
 }
 
-void BoardFsm::distributePot(HandFsm& hand)
+void Board::distributePot(Hand& hand)
 {
     int totalPot = 0;
 
@@ -43,7 +43,7 @@ void BoardFsm::distributePot(HandFsm& hand)
     {
         totalPot += player->getCurrentHandActions().getHandTotalBetAmount();
     }
-    PotFsm pot(totalPot, mySeatsList, myDealerPlayerId);
+    Pot pot(totalPot, mySeatsList, myDealerPlayerId);
     pot.distribute();
     myWinners = pot.getWinners();
 
@@ -51,7 +51,7 @@ void BoardFsm::distributePot(HandFsm& hand)
         myEvents.onHandCompleted(myWinners, totalPot);
 }
 
-void BoardFsm::determinePlayerNeedToShowCards()
+void Board::determinePlayerNeedToShowCards()
 {
 
     myPlayerNeedToShowCards.clear();
@@ -75,8 +75,8 @@ void BoardFsm::determinePlayerNeedToShowCards()
 
         std::list<std::pair<int, int>> level;
 
-        PlayerFsmListConstIterator lastActionPlayerIt;
-        PlayerFsmListConstIterator itC;
+        PlayerListConstIterator lastActionPlayerIt;
+        PlayerListConstIterator itC;
 
         // search lastActionPlayer
         for (itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
@@ -187,52 +187,52 @@ void BoardFsm::determinePlayerNeedToShowCards()
     myPlayerNeedToShowCards.sort();
     myPlayerNeedToShowCards.unique();
 }
-void BoardFsm::setCards(int* theValue)
+void Board::setCards(int* theValue)
 {
     myBoardCards.fromIntArray(theValue);
 }
-void BoardFsm::getCards(int* theValue)
+void Board::getCards(int* theValue)
 {
     myBoardCards.toIntArray(theValue);
 }
 
-void BoardFsm::setBoardCards(const BoardCards& boardCards)
+void Board::setBoardCards(const BoardCards& boardCards)
 {
     myBoardCards = boardCards;
 }
 
-const BoardCards& BoardFsm::getBoardCards() const
+const BoardCards& Board::getBoardCards() const
 {
     return myBoardCards;
 }
 
-void BoardFsm::setAllInCondition(bool theValue)
+void Board::setAllInCondition(bool theValue)
 {
     myAllInCondition = theValue;
 }
-void BoardFsm::setLastActionPlayerId(unsigned theValue)
+void Board::setLastActionPlayerId(unsigned theValue)
 {
     myLastActionPlayerId = theValue;
 }
 
-std::list<unsigned> BoardFsm::getWinners() const
+std::list<unsigned> Board::getWinners() const
 {
     return myWinners;
 }
-void BoardFsm::setWinners(const std::list<unsigned>& w)
+void Board::setWinners(const std::list<unsigned>& w)
 {
     myWinners = w;
 }
 
-std::list<unsigned> BoardFsm::getPlayerNeedToShowCards() const
+std::list<unsigned> Board::getPlayerNeedToShowCards() const
 {
     return myPlayerNeedToShowCards;
 }
-void BoardFsm::setPlayerNeedToShowCards(const std::list<unsigned>& p)
+void Board::setPlayerNeedToShowCards(const std::list<unsigned>& p)
 {
     myPlayerNeedToShowCards = p;
 }
-int BoardFsm::getPot(const HandFsm& hand) const
+int Board::getPot(const Hand& hand) const
 {
     int totalPot = 0;
 
@@ -242,7 +242,7 @@ int BoardFsm::getPot(const HandFsm& hand) const
     }
     return totalPot;
 }
-int BoardFsm::getSets(const HandFsm& hand) const
+int Board::getSets(const Hand& hand) const
 {
     int total = 0;
     GameState currentRound = hand.getGameState();

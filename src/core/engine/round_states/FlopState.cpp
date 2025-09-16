@@ -1,11 +1,11 @@
 #include "FlopState.h"
 #include "GameEvents.h"
-#include "HandFsm.h"
+#include "Hand.h"
 #include "PostRiverState.h"
 #include "TurnState.h"
 #include "core/engine/Helpers.h"
 #include "core/engine/model/PlayerAction.h"
-#include "core/player/PlayerFsm.h"
+#include "core/player/Player.h"
 #include "core/services/GlobalServices.h"
 
 namespace pkt::core
@@ -16,7 +16,7 @@ FlopState::FlopState(const GameEvents& events) : myEvents(events)
 {
 }
 
-void FlopState::enter(HandFsm& hand)
+void FlopState::enter(Hand& hand)
 {
     // Reset betting amounts for new round
     hand.getBettingActions()->resetRoundHighestSet();
@@ -51,7 +51,7 @@ void FlopState::enter(HandFsm& hand)
     logStateInfo(hand);
 }
 
-void FlopState::exit(HandFsm& hand)
+void FlopState::exit(Hand& hand)
 {
     for (auto& player : *hand.getSeatsList())
     {
@@ -60,12 +60,12 @@ void FlopState::exit(HandFsm& hand)
     }
 }
 
-bool FlopState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const
+bool FlopState::isActionAllowed(const Hand& hand, const PlayerAction action) const
 {
     return (validatePlayerAction(hand.getActingPlayersList(), action, *hand.getBettingActions(), 0, Flop));
 }
 
-void FlopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
+void FlopState::promptPlayerAction(Hand& hand, Player& player)
 {
     player.updateCurrentHandContext(Flop, hand);
     PlayerAction action = player.decideAction(player.getCurrentHandContext());
@@ -73,24 +73,24 @@ void FlopState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
     hand.handlePlayerAction(action);
 }
 
-std::unique_ptr<IHandState> FlopState::computeNextState(HandFsm& hand)
+std::unique_ptr<IHandState> FlopState::computeNextState(Hand& hand)
 {
     return computeBettingRoundNextState(hand, myEvents, Flop);
 }
 
-std::shared_ptr<player::PlayerFsm> FlopState::getNextPlayerToAct(const HandFsm& hand) const
+std::shared_ptr<player::Player> FlopState::getNextPlayerToAct(const Hand& hand) const
 {
     return getNextPlayerToActInRound(hand, GameState::Flop);
 }
 
-std::shared_ptr<player::PlayerFsm> FlopState::getFirstPlayerToActInRound(const HandFsm& hand) const
+std::shared_ptr<player::Player> FlopState::getFirstPlayerToActInRound(const Hand& hand) const
 {
     return getNextPlayerToAct(hand);
 }
 
-bool FlopState::isRoundComplete(const HandFsm& hand) const
+bool FlopState::isRoundComplete(const Hand& hand) const
 {
-    return pkt::core::isRoundComplete(const_cast<HandFsm&>(hand));
+    return pkt::core::isRoundComplete(const_cast<Hand&>(hand));
 }
 
 } // namespace pkt::core

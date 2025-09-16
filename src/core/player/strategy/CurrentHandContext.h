@@ -9,18 +9,18 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/interfaces/IHandEvaluationEngine.h"
-#include "core/player/PlayerFsm.h"
+#include "core/player/Player.h"
 
 namespace pkt::core::player
 {
 struct PlayersInHandContext
 {
-    int nbPlayers = 0;               // total number of players in the current hand, including the ones who folded
-    PlayerFsmList actingPlayersList; // list of players still acting in the hand (not folded and not allin)
-    std::shared_ptr<PlayerFsm> preflopLastRaiser = nullptr;
-    std::shared_ptr<PlayerFsm> flopLastRaiser = nullptr;
-    std::shared_ptr<PlayerFsm> turnLastRaiser = nullptr;
-    std::shared_ptr<PlayerFsm> lastVPIPPlayer = nullptr; // last player who voluntarily put money in the pot
+    int nbPlayers = 0;            // total number of players in the current hand, including the ones who folded
+    PlayerList actingPlayersList; // list of players still acting in the hand (not folded and not allin)
+    std::shared_ptr<Player> preflopLastRaiser = nullptr;
+    std::shared_ptr<Player> flopLastRaiser = nullptr;
+    std::shared_ptr<Player> turnLastRaiser = nullptr;
+    std::shared_ptr<Player> lastVPIPPlayer = nullptr; // last player who voluntarily put money in the pot
 
     std::vector<pkt::core::PlayerPosition> callersPositions;
     std::vector<pkt::core::PlayerPosition> raisersPositions;

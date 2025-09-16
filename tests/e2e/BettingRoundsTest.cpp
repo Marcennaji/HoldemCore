@@ -1,6 +1,6 @@
-// tests/BettingRoundsFsmTest.cpp
+// tests/BettingRoundsTest.cpp
 
-#include "BettingRoundsFsmTest.h"
+#include "BettingRoundsTest.h"
 #include "common/DeterministicStrategy.h"
 #include "core/engine/Helpers.h"
 #include "core/engine/model/PlayerAction.h"
@@ -13,12 +13,12 @@ using namespace pkt::core::player;
 namespace pkt::test
 {
 
-void BettingRoundsFsmTest::logTestMessage(const std::string& message) const
+void BettingRoundsTest::logTestMessage(const std::string& message) const
 {
-    GlobalServices::instance().logger().verbose("BettingRoundsFsmTest : " + message);
+    GlobalServices::instance().logger().verbose("BettingRoundsTest : " + message);
 }
 
-void BettingRoundsFsmTest::SetUp()
+void BettingRoundsTest::SetUp()
 {
     EngineTest::SetUp();
     myEvents.clear();
@@ -31,22 +31,22 @@ void BettingRoundsFsmTest::SetUp()
     };
 }
 
-void BettingRoundsFsmTest::TearDown()
+void BettingRoundsTest::TearDown()
 {
     checkPostRiverConditions();
     checkStateTransitions();
 }
 
-bool BettingRoundsFsmTest::isPlayerStillActive(unsigned id) const
+bool BettingRoundsTest::isPlayerStillActive(unsigned id) const
 {
-    for (const auto& p : *myHandFsm->getActingPlayersList())
+    for (const auto& p : *myHand->getActingPlayersList())
     {
         if (p->getId() == id)
             return true;
     }
     return false;
 }
-void BettingRoundsFsmTest::checkStateTransitions()
+void BettingRoundsTest::checkStateTransitions()
 {
     // Verify we have a valid sequence
     EXPECT_FALSE(stateSequence.empty()) << "Should have recorded state transitions";
@@ -74,14 +74,14 @@ void BettingRoundsFsmTest::checkStateTransitions()
 
 // Tests for FSM betting rounds and transitions
 
-TEST_F(BettingRoundsFsmTest, StartShouldGoFromPreflopToPostRiverHeadsUp)
+TEST_F(BettingRoundsTest, StartShouldGoFromPreflopToPostRiverHeadsUp)
 {
     logTestMessage("Testing heads-up hand completion");
 
-    initializeHandFsmWithPlayers(2, gameData);
+    initializeHandWithPlayers(2, gameData);
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto playerBb = getPlayerById(myActingPlayersList, 1);
 
     // Inject deterministic strategies - SB folds, BB wins
     auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
@@ -92,24 +92,24 @@ TEST_F(BettingRoundsFsmTest, StartShouldGoFromPreflopToPostRiverHeadsUp)
     // Big blind does nothing here; we don't configure Preflop action
     playerBb->setStrategy(std::move(bbStrategy));
 
-    myHandFsm->runGameLoop(); // Automatically prompts players and drives game to completion
+    myHand->runGameLoop(); // Automatically prompts players and drives game to completion
 
     // Verify we reached PostRiver state
     EXPECT_EQ(myLastGameState, PostRiver) << "Hand should complete and reach PostRiver state";
 
     // Verify final state is terminal
-    EXPECT_TRUE(myHandFsm->getState().isTerminal()) << "Final state should be terminal";
+    EXPECT_TRUE(myHand->getState().isTerminal()) << "Final state should be terminal";
 }
 
-TEST_F(BettingRoundsFsmTest, StartShouldGoFromPreflopToPostRiver3Players)
+TEST_F(BettingRoundsTest, StartShouldGoFromPreflopToPostRiver3Players)
 {
     logTestMessage("Testing 3-player hand completion");
 
-    initializeHandFsmWithPlayers(3, gameData);
+    initializeHandWithPlayers(3, gameData);
 
-    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
+    auto playerDealer = getPlayerById(myActingPlayersList, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 1);
+    auto playerBb = getPlayerById(myActingPlayersList, 2);
 
     // Inject deterministic strategies
     auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
@@ -124,24 +124,24 @@ TEST_F(BettingRoundsFsmTest, StartShouldGoFromPreflopToPostRiver3Players)
     // Big blind does nothing here; we don’t configure Preflop action
     playerBb->setStrategy(std::move(bbStrategy));
 
-    myHandFsm->runGameLoop(); // Automatically prompts players and drives game to completion
+    myHand->runGameLoop(); // Automatically prompts players and drives game to completion
 
     // Verify we reached PostRiver state
     EXPECT_EQ(myLastGameState, PostRiver) << "3-player hand should complete and reach PostRiver state";
 }
 
-TEST_F(BettingRoundsFsmTest, StartShouldGoFromPreflopToPostRiver6Players)
+TEST_F(BettingRoundsTest, StartShouldGoFromPreflopToPostRiver6Players)
 {
     logTestMessage("Testing 6-player hand completion");
 
-    initializeHandFsmWithPlayers(6, gameData);
+    initializeHandWithPlayers(6, gameData);
 
-    auto player0 = getPlayerFsmById(myActingPlayersListFsm, 0); // Dealer
-    auto player1 = getPlayerFsmById(myActingPlayersListFsm, 1); // SB
-    auto player2 = getPlayerFsmById(myActingPlayersListFsm, 2); // BB
-    auto player3 = getPlayerFsmById(myActingPlayersListFsm, 3); // UTG
-    auto player4 = getPlayerFsmById(myActingPlayersListFsm, 4); // MP
-    auto player5 = getPlayerFsmById(myActingPlayersListFsm, 5); // CO
+    auto player0 = getPlayerById(myActingPlayersList, 0); // Dealer
+    auto player1 = getPlayerById(myActingPlayersList, 1); // SB
+    auto player2 = getPlayerById(myActingPlayersList, 2); // BB
+    auto player3 = getPlayerById(myActingPlayersList, 3); // UTG
+    auto player4 = getPlayerById(myActingPlayersList, 4); // MP
+    auto player5 = getPlayerById(myActingPlayersList, 5); // CO
 
     // Inject deterministic strategies - most players fold, BB wins
     auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
@@ -168,24 +168,24 @@ TEST_F(BettingRoundsFsmTest, StartShouldGoFromPreflopToPostRiver6Players)
     coStrategy->setLastAction(pkt::core::GameState::Preflop, {player5->getId(), pkt::core::ActionType::Fold});
     player5->setStrategy(std::move(coStrategy));
 
-    myHandFsm->runGameLoop(); // Automatically prompts players and drives game to completion
+    myHand->runGameLoop(); // Automatically prompts players and drives game to completion
 
     // Verify we reached PostRiver state
     EXPECT_EQ(myLastGameState, PostRiver) << "6-player hand should complete and reach PostRiver state";
 
     // Verify final state is terminal
-    EXPECT_TRUE(myHandFsm->getState().isTerminal()) << "Final state should be terminal";
+    EXPECT_TRUE(myHand->getState().isTerminal()) << "Final state should be terminal";
 }
 
-TEST_F(BettingRoundsFsmTest, AllInPlayersTransitionToPostRiverCorrectly)
+TEST_F(BettingRoundsTest, AllInPlayersTransitionToPostRiverCorrectly)
 {
     logTestMessage("Testing all-in scenario transitions to PostRiver");
 
-    initializeHandFsmWithPlayers(2, gameData);
+    initializeHandWithPlayers(2, gameData);
 
     // Set up one player with limited cash to force all-in
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto playerBb = getPlayerById(myActingPlayersList, 1);
 
     // Reduce SB player's cash to force all-in scenario
     playerSb->setCash(50); // After posting SB (10), they'll have 40 left
@@ -199,7 +199,7 @@ TEST_F(BettingRoundsFsmTest, AllInPlayersTransitionToPostRiverCorrectly)
     bbStrategy->setLastAction(pkt::core::GameState::Preflop, {playerBb->getId(), pkt::core::ActionType::Call});
     playerBb->setStrategy(std::move(bbStrategy));
 
-    myHandFsm->runGameLoop(); // Automatically prompts players and drives game to completion
+    myHand->runGameLoop(); // Automatically prompts players and drives game to completion
 
     EXPECT_EQ(stateSequence.size(), 2)
         << "This preflop All-in scenario should have only 2 states: Preflop and PostRiver";
@@ -207,16 +207,16 @@ TEST_F(BettingRoundsFsmTest, AllInPlayersTransitionToPostRiverCorrectly)
     EXPECT_EQ(stateSequence[1], PostRiver) << "Second state should be PostRiver";
 }
 
-TEST_F(BettingRoundsFsmTest, PlayersDoNotActAfterFolding)
+TEST_F(BettingRoundsTest, PlayersDoNotActAfterFolding)
 {
     logTestMessage("Testing that folded players don't act in later rounds");
 
-    initializeHandFsmWithPlayers(4, gameData);
+    initializeHandWithPlayers(4, gameData);
 
-    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
-    auto playerUtg = getPlayerFsmById(myActingPlayersListFsm, 3);
+    auto playerDealer = getPlayerById(myActingPlayersList, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 1);
+    auto playerBb = getPlayerById(myActingPlayersList, 2);
+    auto playerUtg = getPlayerById(myActingPlayersList, 3);
 
     // Setup strategies - Dealer and UTG fold, SB folds, BB wins
     auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
@@ -235,7 +235,7 @@ TEST_F(BettingRoundsFsmTest, PlayersDoNotActAfterFolding)
     utgStrategy->setLastAction(pkt::core::GameState::Preflop, {playerUtg->getId(), pkt::core::ActionType::Fold});
     playerUtg->setStrategy(std::move(utgStrategy));
 
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 
     EXPECT_EQ(myLastGameState, PostRiver) << "Hand should complete after folds";
 
@@ -245,7 +245,7 @@ TEST_F(BettingRoundsFsmTest, PlayersDoNotActAfterFolding)
     EXPECT_FALSE(isPlayerStillActive(playerUtg->getId())) << "UTG should have folded and not be active";
 
     // Use hand action history to verify folded players don't act after folding
-    const auto& handHistory = myHandFsm->getHandActionHistory();
+    const auto& handHistory = myHand->getHandActionHistory();
     EXPECT_FALSE(handHistory.empty()) << "Hand action history should not be empty";
 
     // Count fold actions in hand history - should match our expected folds
@@ -268,15 +268,15 @@ TEST_F(BettingRoundsFsmTest, PlayersDoNotActAfterFolding)
 }
 
 // TODO: Add more tests following the BettingRoundsLegacyTest pattern:
-TEST_F(BettingRoundsFsmTest, ShouldRecordAllActionsInHandHistoryChronologically)
+TEST_F(BettingRoundsTest, ShouldRecordAllActionsInHandHistoryChronologically)
 {
     logTestMessage("Testing that all player actions are recorded chronologically in hand history");
 
-    initializeHandFsmWithPlayers(3, gameData);
+    initializeHandWithPlayers(3, gameData);
 
-    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
+    auto playerDealer = getPlayerById(myActingPlayersList, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 1);
+    auto playerBb = getPlayerById(myActingPlayersList, 2);
 
     // Setup deterministic strategies - specific actions for verification
     auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
@@ -291,10 +291,10 @@ TEST_F(BettingRoundsFsmTest, ShouldRecordAllActionsInHandHistoryChronologically)
     // BB wins when others fold
     playerBb->setStrategy(std::move(bbStrategy));
 
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 
     // Verify the hand action history contains exactly what we expect
-    const auto& handHistory = myHandFsm->getHandActionHistory();
+    const auto& handHistory = myHand->getHandActionHistory();
     EXPECT_FALSE(handHistory.empty()) << "Hand action history should not be empty";
 
     // Find preflop round
@@ -319,14 +319,14 @@ TEST_F(BettingRoundsFsmTest, ShouldRecordAllActionsInHandHistoryChronologically)
     EXPECT_EQ(preflopActions[3].second, ActionType::Fold) << "Fourth action should be Fold";
 }
 
-TEST_F(BettingRoundsFsmTest, ActionOrderStartsCorrectlyInHeadsUpPreflop)
+TEST_F(BettingRoundsTest, ActionOrderStartsCorrectlyInHeadsUpPreflop)
 {
     logTestMessage("Testing that action order starts correctly in heads-up preflop");
 
-    initializeHandFsmWithPlayers(2, gameData);
+    initializeHandWithPlayers(2, gameData);
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto playerBb = getPlayerById(myActingPlayersList, 1);
 
     // Setup strategies - SB folds to avoid infinite loop, we just need to verify the action order
     auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
@@ -337,10 +337,10 @@ TEST_F(BettingRoundsFsmTest, ActionOrderStartsCorrectlyInHeadsUpPreflop)
     // BB doesn't need to act if SB folds
     playerBb->setStrategy(std::move(bbStrategy));
 
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 
     // Verify the hand action history shows correct action order
-    const auto& handHistory = myHandFsm->getHandActionHistory();
+    const auto& handHistory = myHand->getHandActionHistory();
     EXPECT_FALSE(handHistory.empty()) << "Hand action history should not be empty";
 
     // Find preflop round
@@ -364,17 +364,17 @@ TEST_F(BettingRoundsFsmTest, ActionOrderStartsCorrectlyInHeadsUpPreflop)
     EXPECT_EQ(preflopActions[2].second, ActionType::Fold) << "Third action should be Fold";
 }
 
-TEST_F(BettingRoundsFsmTest, ValidActionsAreCorrectlyDetermined)
+TEST_F(BettingRoundsTest, ValidActionsAreCorrectlyDetermined)
 {
     logTestMessage("Testing that valid actions are correctly determined for players");
 
-    initializeHandFsmWithPlayers(2, gameData);
+    initializeHandWithPlayers(2, gameData);
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto playerBb = getPlayerById(myActingPlayersList, 1);
 
     // Check valid actions for SB after blinds are posted (after initialization)
-    auto validActionsSb = getValidActionsForPlayer(*myHandFsm, playerSb->getId());
+    auto validActionsSb = getValidActionsForPlayer(*myHand, playerSb->getId());
     EXPECT_FALSE(validActionsSb.empty()) << "SB should have valid actions available";
 
     // SB should be able to fold, call (to match BB), or raise
@@ -402,17 +402,17 @@ TEST_F(BettingRoundsFsmTest, ValidActionsAreCorrectlyDetermined)
     // BB wins when SB folds
     playerBb->setStrategy(std::move(bbStrategy));
 
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 }
 
-TEST_F(BettingRoundsFsmTest, HeadsUpPositionAssignmentIsCorrect)
+TEST_F(BettingRoundsTest, HeadsUpPositionAssignmentIsCorrect)
 {
     logTestMessage("Testing that position assignment is correct in heads-up");
 
-    initializeHandFsmWithPlayers(2, gameData);
+    initializeHandWithPlayers(2, gameData);
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto playerBb = getPlayerById(myActingPlayersList, 1);
 
     // Setup simple scenario: SB folds preflop to keep it simple
     auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
@@ -423,7 +423,7 @@ TEST_F(BettingRoundsFsmTest, HeadsUpPositionAssignmentIsCorrect)
     // BB wins when SB folds - no action needed
     playerBb->setStrategy(std::move(bbStrategy));
 
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 
     // Verify the position assignment is correct
     EXPECT_EQ(playerSb->getPosition(), PlayerPosition::ButtonSmallBlind)
@@ -431,14 +431,14 @@ TEST_F(BettingRoundsFsmTest, HeadsUpPositionAssignmentIsCorrect)
     EXPECT_EQ(playerBb->getPosition(), PlayerPosition::BigBlind) << "Player 1 should be Big Blind in heads-up";
 }
 
-TEST_F(BettingRoundsFsmTest, SmallBlindActsFirstPostflopInHeadsUp)
+TEST_F(BettingRoundsTest, SmallBlindActsFirstPostflopInHeadsUp)
 {
     logTestMessage("Testing that Small Blind acts first postflop in heads-up");
 
-    initializeHandFsmWithPlayers(2, gameData);
+    initializeHandWithPlayers(2, gameData);
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto playerBb = getPlayerById(myActingPlayersList, 1);
 
     // In heads-up, SB is also button, so after SB calls, BB should have option to check
     auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
@@ -456,9 +456,9 @@ TEST_F(BettingRoundsFsmTest, SmallBlindActsFirstPostflopInHeadsUp)
     bbStrategy->setLastAction(pkt::core::GameState::River, {playerBb->getId(), pkt::core::ActionType::Check});
     playerBb->setStrategy(std::move(bbStrategy));
 
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 
-    const auto& handHistory = myHandFsm->getHandActionHistory();
+    const auto& handHistory = myHand->getHandActionHistory();
     // Verify we reached flop
     auto flopRound = std::find_if(handHistory.begin(), handHistory.end(),
                                   [](const auto& round) { return round.round == GameState::Flop; });
@@ -479,15 +479,15 @@ TEST_F(BettingRoundsFsmTest, SmallBlindActsFirstPostflopInHeadsUp)
     }
 }
 
-TEST_F(BettingRoundsFsmTest, FirstToActPostflopIsSmallBlindInThreePlayers)
+TEST_F(BettingRoundsTest, FirstToActPostflopIsSmallBlindInThreePlayers)
 {
     logTestMessage("Testing that Small Blind acts first postflop with 3 players");
 
-    initializeHandFsmWithPlayers(3, gameData);
+    initializeHandWithPlayers(3, gameData);
 
-    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
+    auto playerDealer = getPlayerById(myActingPlayersList, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 1);
+    auto playerBb = getPlayerById(myActingPlayersList, 2);
 
     // Setup strategies to reach flop with all players
     auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
@@ -509,10 +509,10 @@ TEST_F(BettingRoundsFsmTest, FirstToActPostflopIsSmallBlindInThreePlayers)
     bbStrategy->setLastAction(pkt::core::GameState::River, {playerBb->getId(), pkt::core::ActionType::Check});
     playerBb->setStrategy(std::move(bbStrategy));
 
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 
     // Verify we reached flop
-    const auto& handHistory = myHandFsm->getHandActionHistory();
+    const auto& handHistory = myHand->getHandActionHistory();
     auto flopRound = std::find_if(handHistory.begin(), handHistory.end(),
                                   [](const auto& round) { return round.round == GameState::Flop; });
 
@@ -525,15 +525,15 @@ TEST_F(BettingRoundsFsmTest, FirstToActPostflopIsSmallBlindInThreePlayers)
     EXPECT_EQ(playerSb->getPosition(), PlayerPosition::SmallBlind) << "Player should be Small Blind";
 }
 
-TEST_F(BettingRoundsFsmTest, NoPlayerStartsPostFlopRoundWithRaise)
+TEST_F(BettingRoundsTest, NoPlayerStartsPostFlopRoundWithRaise)
 {
     logTestMessage("Testing that engine rejects raise actions when starting post-flop rounds");
 
-    initializeHandFsmWithPlayers(3, gameData);
+    initializeHandWithPlayers(3, gameData);
 
-    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
+    auto playerDealer = getPlayerById(myActingPlayersList, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 1);
+    auto playerBb = getPlayerById(myActingPlayersList, 2);
 
     // Setup strategies to reach flop
     auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
@@ -556,7 +556,7 @@ TEST_F(BettingRoundsFsmTest, NoPlayerStartsPostFlopRoundWithRaise)
     { invalidActions.push_back(std::make_tuple(playerId, action, reason)); };
 
     // Run the hand - this should trigger the invalid raise on flop
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 
     // Verify the engine rejected the invalid raise action
     EXPECT_FALSE(invalidActions.empty()) << "Engine should reject raise action at start of post-flop round";
@@ -589,16 +589,16 @@ TEST_F(BettingRoundsFsmTest, NoPlayerStartsPostFlopRoundWithRaise)
         << gameStateToString(myLastGameState);
 }
 
-TEST_F(BettingRoundsFsmTest, NoPlayerBetsAfterRaise)
+TEST_F(BettingRoundsTest, NoPlayerBetsAfterRaise)
 {
     logTestMessage("Testing that engine rejects bet actions after a raise has been made");
 
-    initializeHandFsmWithPlayers(4, gameData);
+    initializeHandWithPlayers(4, gameData);
 
-    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
-    auto playerUtg = getPlayerFsmById(myActingPlayersListFsm, 3);
+    auto playerDealer = getPlayerById(myActingPlayersList, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 1);
+    auto playerBb = getPlayerById(myActingPlayersList, 2);
+    auto playerUtg = getPlayerById(myActingPlayersList, 3);
 
     // Setup strategies to create a scenario where one player raises, then another tries to bet
     auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
@@ -630,7 +630,7 @@ TEST_F(BettingRoundsFsmTest, NoPlayerBetsAfterRaise)
     { invalidActions.push_back(std::make_tuple(playerId, action, reason)); };
 
     // Run the hand - this should trigger the invalid bet after raise
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 
     // Verify the engine rejected the invalid bet action after raise
     EXPECT_FALSE(invalidActions.empty()) << "Engine should reject bet action after a raise has been made";
@@ -666,16 +666,16 @@ TEST_F(BettingRoundsFsmTest, NoPlayerBetsAfterRaise)
         << gameStateToString(myLastGameState);
 }
 
-TEST_F(BettingRoundsFsmTest, NoPlayerChecksAfterBetOrRaise)
+TEST_F(BettingRoundsTest, NoPlayerChecksAfterBetOrRaise)
 {
     logTestMessage("Testing that engine rejects check actions after a bet or raise has been made");
 
-    initializeHandFsmWithPlayers(4, gameData);
+    initializeHandWithPlayers(4, gameData);
 
-    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
-    auto playerUtg = getPlayerFsmById(myActingPlayersListFsm, 3);
+    auto playerDealer = getPlayerById(myActingPlayersList, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 1);
+    auto playerBb = getPlayerById(myActingPlayersList, 2);
+    auto playerUtg = getPlayerById(myActingPlayersList, 3);
 
     // Setup strategies to create a scenario where one player bets, then another tries to check
     auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
@@ -707,7 +707,7 @@ TEST_F(BettingRoundsFsmTest, NoPlayerChecksAfterBetOrRaise)
     { invalidActions.push_back(std::make_tuple(playerId, action, reason)); };
 
     // Run the hand - this should trigger invalid check actions after bet
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 
     // Verify the engine rejected the invalid check actions after bet
     EXPECT_FALSE(invalidActions.empty()) << "Engine should reject check actions after a bet has been made";
@@ -745,16 +745,16 @@ TEST_F(BettingRoundsFsmTest, NoPlayerChecksAfterBetOrRaise)
         << gameStateToString(myLastGameState);
 }
 
-TEST_F(BettingRoundsFsmTest, FoldedPlayerDoesNotReappearInLaterRounds)
+TEST_F(BettingRoundsTest, FoldedPlayerDoesNotReappearInLaterRounds)
 {
     logTestMessage("Testing that engine rejects actions from players who have already folded");
 
-    initializeHandFsmWithPlayers(4, gameData);
+    initializeHandWithPlayers(4, gameData);
 
-    auto playerDealer = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 1);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 2);
-    auto playerUtg = getPlayerFsmById(myActingPlayersListFsm, 3);
+    auto playerDealer = getPlayerById(myActingPlayersList, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 1);
+    auto playerBb = getPlayerById(myActingPlayersList, 2);
+    auto playerUtg = getPlayerById(myActingPlayersList, 3);
 
     // Setup strategies: Only 2 players continue to flop
     auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
@@ -781,20 +781,20 @@ TEST_F(BettingRoundsFsmTest, FoldedPlayerDoesNotReappearInLaterRounds)
     { invalidActions.push_back(std::make_tuple(playerId, action, reason)); };
 
     // Run the complete hand until it reaches a later round or ends
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 
     // Now manually try to submit an action from a folded player
     // This should happen after the players have folded in preflop
     PlayerAction invalidActionFromFoldedPlayer{playerDealer->getId(), ActionType::Check, 0};
 
     logTestMessage("Attempting to submit action from folded player (Dealer)");
-    myHandFsm->handlePlayerAction(invalidActionFromFoldedPlayer);
+    myHand->handlePlayerAction(invalidActionFromFoldedPlayer);
 
     // Try another action from another folded player
     PlayerAction anotherInvalidAction{playerUtg->getId(), ActionType::Bet, 50};
 
     logTestMessage("Attempting to submit action from folded player (UTG)");
-    myHandFsm->handlePlayerAction(anotherInvalidAction);
+    myHand->handlePlayerAction(anotherInvalidAction);
 
     // Verify the engine rejected actions from folded players
     EXPECT_FALSE(invalidActions.empty()) << "Engine should reject actions from players who have already folded";
@@ -826,15 +826,15 @@ TEST_F(BettingRoundsFsmTest, FoldedPlayerDoesNotReappearInLaterRounds)
     EXPECT_FALSE(isPlayerStillActive(playerUtg->getId())) << "UTG should not be active after folding";
 }
 
-TEST_F(BettingRoundsFsmTest, NoExtraActionsAfterFinalCall)
+TEST_F(BettingRoundsTest, NoExtraActionsAfterFinalCall)
 {
     logTestMessage("Testing that engine rejects extra actions after final call completes betting round");
 
-    initializeHandFsmWithPlayers(3, gameData);
+    initializeHandWithPlayers(3, gameData);
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
-    auto playerUtg = getPlayerFsmById(myActingPlayersListFsm, 2);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto playerBb = getPlayerById(myActingPlayersList, 1);
+    auto playerUtg = getPlayerById(myActingPlayersList, 2);
 
     // Setup strategies: Create scenario where betting round ends with final call
     // In 3-player preflop: SB=0, BB=1, UTG=2 (positions might rotate, but SB posts first)
@@ -861,7 +861,7 @@ TEST_F(BettingRoundsFsmTest, NoExtraActionsAfterFinalCall)
     { invalidActions.push_back(std::make_tuple(playerId, action, reason)); };
 
     // Run the hand until flop betting is complete
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 
     // At this point, the flop betting should be complete:
     // SB checked, BB bet 30, UTG called 30 (final call)
@@ -870,17 +870,17 @@ TEST_F(BettingRoundsFsmTest, NoExtraActionsAfterFinalCall)
     // Try to make SB act again after the round is complete
     PlayerAction extraActionFromSb{playerSb->getId(), ActionType::Raise, 60};
     logTestMessage("Attempting extra action from SB after final call");
-    myHandFsm->handlePlayerAction(extraActionFromSb);
+    myHand->handlePlayerAction(extraActionFromSb);
 
     // Try to make BB act again after the round is complete
     PlayerAction extraActionFromBb{playerBb->getId(), ActionType::Bet, 50};
     logTestMessage("Attempting extra action from BB after final call");
-    myHandFsm->handlePlayerAction(extraActionFromBb);
+    myHand->handlePlayerAction(extraActionFromBb);
 
     // Try to make UTG act again after the round is complete
     PlayerAction extraActionFromUtg{playerUtg->getId(), ActionType::Check, 0};
     logTestMessage("Attempting extra action from UTG after final call");
-    myHandFsm->handlePlayerAction(extraActionFromUtg);
+    myHand->handlePlayerAction(extraActionFromUtg);
 
     // Verify the engine rejected extra actions after final call
     EXPECT_FALSE(invalidActions.empty()) << "Engine should reject extra actions after betting round is complete";
@@ -904,18 +904,18 @@ TEST_F(BettingRoundsFsmTest, NoExtraActionsAfterFinalCall)
     }
 
     // Verify the hand has progressed beyond flop (indicating the round properly ended)
-    EXPECT_NE(myHandFsm->getGameState(), GameState::Flop)
+    EXPECT_NE(myHand->getGameState(), GameState::Flop)
         << "Hand should have progressed beyond flop after all players acted";
 }
 
-TEST_F(BettingRoundsFsmTest, NoBettingInPostRiverRound)
+TEST_F(BettingRoundsTest, NoBettingInPostRiverRound)
 {
     logTestMessage("Testing that engine rejects betting actions in PostRiver state");
 
-    initializeHandFsmWithPlayers(2, gameData);
+    initializeHandWithPlayers(2, gameData);
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto playerBb = getPlayerById(myActingPlayersList, 1);
 
     // Setup strategies to quickly reach PostRiver state
     // SB folds immediately, BB wins, hand goes directly to PostRiver
@@ -933,33 +933,33 @@ TEST_F(BettingRoundsFsmTest, NoBettingInPostRiverRound)
     { invalidActions.push_back(std::make_tuple(playerId, action, reason)); };
 
     // Run the hand to completion (should reach PostRiver)
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 
     // Verify we've reached PostRiver state
-    EXPECT_EQ(myHandFsm->getGameState(), GameState::PostRiver) << "Hand should have reached PostRiver state after fold";
+    EXPECT_EQ(myHand->getGameState(), GameState::PostRiver) << "Hand should have reached PostRiver state after fold";
 
     // Now try to submit various betting actions in PostRiver state
     // These should all be rejected by the engine
 
     PlayerAction invalidBet{playerSb->getId(), ActionType::Bet, 50};
     logTestMessage("Attempting to bet in PostRiver state");
-    myHandFsm->handlePlayerAction(invalidBet);
+    myHand->handlePlayerAction(invalidBet);
 
     PlayerAction invalidRaise{playerBb->getId(), ActionType::Raise, 100};
     logTestMessage("Attempting to raise in PostRiver state");
-    myHandFsm->handlePlayerAction(invalidRaise);
+    myHand->handlePlayerAction(invalidRaise);
 
     PlayerAction invalidCall{playerSb->getId(), ActionType::Call, 0};
     logTestMessage("Attempting to call in PostRiver state");
-    myHandFsm->handlePlayerAction(invalidCall);
+    myHand->handlePlayerAction(invalidCall);
 
     PlayerAction invalidCheck{playerBb->getId(), ActionType::Check, 0};
     logTestMessage("Attempting to check in PostRiver state");
-    myHandFsm->handlePlayerAction(invalidCheck);
+    myHand->handlePlayerAction(invalidCheck);
 
     PlayerAction invalidAllIn{playerSb->getId(), ActionType::Allin, 0};
     logTestMessage("Attempting to go all-in in PostRiver state");
-    myHandFsm->handlePlayerAction(invalidAllIn);
+    myHand->handlePlayerAction(invalidAllIn);
 
     // Verify the engine rejected all betting actions in PostRiver
     EXPECT_FALSE(invalidActions.empty()) << "Engine should reject all betting actions in PostRiver state";
@@ -982,19 +982,19 @@ TEST_F(BettingRoundsFsmTest, NoBettingInPostRiverRound)
     }
 
     // Verify the game state remains PostRiver (no state changes from invalid actions)
-    EXPECT_EQ(myHandFsm->getGameState(), GameState::PostRiver)
+    EXPECT_EQ(myHand->getGameState(), GameState::PostRiver)
         << "Game state should remain PostRiver after rejected actions";
 }
 
-TEST_F(BettingRoundsFsmTest, AllInPlayerDoesNotActAgain)
+TEST_F(BettingRoundsTest, AllInPlayerDoesNotActAgain)
 {
     logTestMessage("Testing that all-in players cannot act again in subsequent rounds");
 
-    initializeHandFsmWithPlayers(3, gameData);
+    initializeHandWithPlayers(3, gameData);
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
-    auto playerUtg = getPlayerFsmById(myActingPlayersListFsm, 2);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto playerBb = getPlayerById(myActingPlayersList, 1);
+    auto playerUtg = getPlayerById(myActingPlayersList, 2);
 
     // Reduce SB player's cash to create all-in scenario
     playerSb->setCash(50); // After posting SB (10), they'll have 40 left for all-in
@@ -1020,34 +1020,33 @@ TEST_F(BettingRoundsFsmTest, AllInPlayerDoesNotActAgain)
     { invalidActions.push_back(std::make_tuple(playerId, action, reason)); };
 
     // Run the hand until we reach flop (SB should be all-in from preflop)
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 
     // Verify the hand progressed beyond preflop
-    EXPECT_NE(myHandFsm->getGameState(), GameState::Preflop)
-        << "Hand should have progressed beyond preflop after all-in";
+    EXPECT_NE(myHand->getGameState(), GameState::Preflop) << "Hand should have progressed beyond preflop after all-in";
 
     // Now try to make the all-in player (SB) act again in later rounds
     // This should be rejected since they're already all-in
 
     PlayerAction invalidBetFromAllIn{playerSb->getId(), ActionType::Bet, 20};
     logTestMessage("Attempting bet from all-in player");
-    myHandFsm->handlePlayerAction(invalidBetFromAllIn);
+    myHand->handlePlayerAction(invalidBetFromAllIn);
 
     PlayerAction invalidRaiseFromAllIn{playerSb->getId(), ActionType::Raise, 50};
     logTestMessage("Attempting raise from all-in player");
-    myHandFsm->handlePlayerAction(invalidRaiseFromAllIn);
+    myHand->handlePlayerAction(invalidRaiseFromAllIn);
 
     PlayerAction invalidCallFromAllIn{playerSb->getId(), ActionType::Call, 0};
     logTestMessage("Attempting call from all-in player");
-    myHandFsm->handlePlayerAction(invalidCallFromAllIn);
+    myHand->handlePlayerAction(invalidCallFromAllIn);
 
     PlayerAction invalidCheckFromAllIn{playerSb->getId(), ActionType::Check, 0};
     logTestMessage("Attempting check from all-in player");
-    myHandFsm->handlePlayerAction(invalidCheckFromAllIn);
+    myHand->handlePlayerAction(invalidCheckFromAllIn);
 
     PlayerAction invalidFoldFromAllIn{playerSb->getId(), ActionType::Fold, 0};
     logTestMessage("Attempting fold from all-in player");
-    myHandFsm->handlePlayerAction(invalidFoldFromAllIn);
+    myHand->handlePlayerAction(invalidFoldFromAllIn);
 
     // Verify the engine rejected actions from the all-in player
     EXPECT_FALSE(invalidActions.empty()) << "Engine should reject actions from players who are already all-in";
@@ -1073,14 +1072,14 @@ TEST_F(BettingRoundsFsmTest, AllInPlayerDoesNotActAgain)
     }
 }
 
-TEST_F(BettingRoundsFsmTest, HeadsUpEndsImmediatelyOnFold)
+TEST_F(BettingRoundsTest, HeadsUpEndsImmediatelyOnFold)
 {
     logTestMessage("Testing that heads-up hands end immediately when one player folds");
 
-    initializeHandFsmWithPlayers(2, gameData);
+    initializeHandWithPlayers(2, gameData);
 
-    auto playerSb = getPlayerFsmById(myActingPlayersListFsm, 0);
-    auto playerBb = getPlayerFsmById(myActingPlayersListFsm, 1);
+    auto playerSb = getPlayerById(myActingPlayersList, 0);
+    auto playerBb = getPlayerById(myActingPlayersList, 1);
 
     // Test scenario 1: SB folds preflop - hand should end immediately
     logTestMessage("Testing SB fold in preflop");
@@ -1100,10 +1099,10 @@ TEST_F(BettingRoundsFsmTest, HeadsUpEndsImmediatelyOnFold)
     { invalidActions.push_back(std::make_tuple(playerId, action, reason)); };
 
     // Run the hand
-    myHandFsm->runGameLoop();
+    myHand->runGameLoop();
 
     // Verify the hand went directly to PostRiver after the fold
-    EXPECT_EQ(myHandFsm->getGameState(), GameState::PostRiver)
+    EXPECT_EQ(myHand->getGameState(), GameState::PostRiver)
         << "Heads-up hand should end immediately and reach PostRiver when one player folds";
 
     // Verify the state sequence shows immediate transition
@@ -1120,17 +1119,17 @@ TEST_F(BettingRoundsFsmTest, HeadsUpEndsImmediatelyOnFold)
     EXPECT_FALSE(isPlayerStillActive(playerSb->getId())) << "Folded player should not be active after folding";
 
     // Verify winner (BB) is still active or properly determined
-    EXPECT_TRUE(isPlayerStillActive(playerBb->getId()) || myHandFsm->getGameState() == GameState::PostRiver)
+    EXPECT_TRUE(isPlayerStillActive(playerBb->getId()) || myHand->getGameState() == GameState::PostRiver)
         << "Winning player should be active or hand should be in PostRiver";
 
     // Test that attempting actions after the fold is rejected
     PlayerAction invalidActionAfterFold{playerSb->getId(), ActionType::Bet, 20};
     logTestMessage("Attempting action from folded player after heads-up fold");
-    myHandFsm->handlePlayerAction(invalidActionAfterFold);
+    myHand->handlePlayerAction(invalidActionAfterFold);
 
     PlayerAction invalidActionFromWinner{playerBb->getId(), ActionType::Check, 0};
     logTestMessage("Attempting action from winner after heads-up fold");
-    myHandFsm->handlePlayerAction(invalidActionFromWinner);
+    myHand->handlePlayerAction(invalidActionFromWinner);
 
     // Verify these actions were rejected
     EXPECT_FALSE(invalidActions.empty()) << "Engine should reject actions after heads-up hand has ended";
@@ -1153,7 +1152,7 @@ TEST_F(BettingRoundsFsmTest, HeadsUpEndsImmediatelyOnFold)
     }
 
     // Verify hand action history shows the immediate fold
-    const auto& handHistory = myHandFsm->getHandActionHistory();
+    const auto& handHistory = myHand->getHandActionHistory();
     EXPECT_FALSE(handHistory.empty()) << "Hand action history should not be empty";
 
     // Should have preflop round with SB fold

@@ -3,7 +3,7 @@
 // Licensed under the MIT License — see LICENSE file for details.
 
 #include "PlayerListUtils.h"
-#include "PlayerFsm.h"
+#include "Player.h"
 #include "core/engine/model/PlayerAction.h"
 #include "core/services/GlobalServices.h"
 
@@ -14,7 +14,7 @@ using namespace pkt::core;
 namespace pkt::core::player
 {
 
-std::shared_ptr<PlayerFsm> PlayerListUtils::getPlayerFsmById(const PlayerFsmList& list, unsigned id)
+std::shared_ptr<Player> PlayerListUtils::getPlayerById(const PlayerList& list, unsigned id)
 {
     for (auto i = list->begin(); i != list->end(); ++i)
     {
@@ -24,19 +24,19 @@ std::shared_ptr<PlayerFsm> PlayerListUtils::getPlayerFsmById(const PlayerFsmList
     return nullptr;
 }
 
-PlayerFsmListIterator PlayerListUtils::getPlayerFsmListIteratorById(PlayerFsmList& list, unsigned id)
+PlayerListIterator PlayerListUtils::getPlayerListIteratorById(PlayerList& list, unsigned id)
 {
     return std::find_if(list->begin(), list->end(),
-                        [id](const std::shared_ptr<PlayerFsm>& p) { return p->getId() == id; });
+                        [id](const std::shared_ptr<Player>& p) { return p->getId() == id; });
 }
 
-void PlayerListUtils::updateActingPlayersListFsm(PlayerFsmList& myActingPlayersListFsm)
+void PlayerListUtils::updateActingPlayersList(PlayerList& myActingPlayersList)
 {
-    GlobalServices::instance().logger().verbose("Updating myActingPlayersListFsm...");
+    GlobalServices::instance().logger().verbose("Updating myActingPlayersList...");
 
-    PlayerFsmListIterator it, it1;
+    PlayerListIterator it, it1;
 
-    for (it = myActingPlayersListFsm->begin(); it != myActingPlayersListFsm->end();)
+    for (it = myActingPlayersList->begin(); it != myActingPlayersList->end();)
     {
         GlobalServices::instance().logger().verbose("Checking player: " + (*it)->getName() +
                                                     ", action: " + actionTypeToString((*it)->getLastAction().type));
@@ -45,38 +45,38 @@ void PlayerListUtils::updateActingPlayersListFsm(PlayerFsmList& myActingPlayersL
         {
             GlobalServices::instance().logger().verbose(
                 "Removing player: " + (*it)->getName() +
-                " from myActingPlayersListFsm due to action: " + actionTypeToString((*it)->getLastAction().type));
+                " from myActingPlayersList due to action: " + actionTypeToString((*it)->getLastAction().type));
 
-            it = myActingPlayersListFsm->erase(it);
+            it = myActingPlayersList->erase(it);
 
-            if (!myActingPlayersListFsm->empty())
+            if (!myActingPlayersList->empty())
             {
                 GlobalServices::instance().logger().verbose(
-                    "myActingPlayersListFsm is not empty after removal. Updating current player's turn.");
+                    "myActingPlayersList is not empty after removal. Updating current player's turn.");
 
                 it1 = it;
-                if (it1 == myActingPlayersListFsm->begin())
+                if (it1 == myActingPlayersList->begin())
                 {
                     GlobalServices::instance().logger().verbose(
                         "Iterator points to the beginning of the list. Wrapping around to the end.");
-                    it1 = myActingPlayersListFsm->end();
+                    it1 = myActingPlayersList->end();
                 }
                 --it1;
             }
             else
             {
-                GlobalServices::instance().logger().verbose("myActingPlayersListFsm is now empty after removal.");
+                GlobalServices::instance().logger().verbose("myActingPlayersList is now empty after removal.");
             }
         }
         else
         {
-            GlobalServices::instance().logger().verbose(
-                "Player: " + (*it)->getName() + " remains in myActingPlayersListFsm. Moving to the next player.");
+            GlobalServices::instance().logger().verbose("Player: " + (*it)->getName() +
+                                                        " remains in myActingPlayersList. Moving to the next player.");
             ++it;
         }
     }
 
-    GlobalServices::instance().logger().verbose("Finished updating myActingPlayersListFsm.");
+    GlobalServices::instance().logger().verbose("Finished updating myActingPlayersList.");
 }
 
 } // namespace pkt::core::player

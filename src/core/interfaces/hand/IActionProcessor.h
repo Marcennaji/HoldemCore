@@ -1,13 +1,13 @@
 #pragma once
 
 #include "core/engine/model/PlayerAction.h"
-#include "core/player/PlayerFsm.h"
+#include "core/player/Player.h"
 
 #include <memory>
 
 namespace pkt::core
 {
-class HandFsm;
+class Hand;
 class IHandState;
 
 class IActionProcessor
@@ -15,12 +15,12 @@ class IActionProcessor
   public:
     virtual ~IActionProcessor() = default;
 
-    virtual void promptPlayerAction(HandFsm& hand, player::PlayerFsm& player) = 0;
-    virtual std::unique_ptr<IHandState> computeNextState(HandFsm& hand) = 0;
-    virtual bool isActionAllowed(const HandFsm& hand, PlayerAction action) const = 0;
+    virtual void promptPlayerAction(Hand& hand, player::Player& player) = 0;
+    virtual std::unique_ptr<IHandState> computeNextState(Hand& hand) = 0;
+    virtual bool isActionAllowed(const Hand& hand, PlayerAction action) const = 0;
 
-    virtual std::shared_ptr<player::PlayerFsm> getNextPlayerToAct(const HandFsm& hand) const = 0;
-    virtual std::shared_ptr<player::PlayerFsm> getFirstPlayerToActInRound(const HandFsm& hand) const = 0;
-    virtual bool isRoundComplete(const HandFsm& hand) const = 0;
+    virtual std::shared_ptr<player::Player> getNextPlayerToAct(const Hand& hand) const = 0;
+    virtual std::shared_ptr<player::Player> getFirstPlayerToActInRound(const Hand& hand) const = 0;
+    virtual bool isRoundComplete(const Hand& hand) const = 0;
 };
 } // namespace pkt::core

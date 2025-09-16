@@ -2,11 +2,11 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
-#include "PlayerFsm.h"
+#include "Player.h"
 
 #include <core/engine/CardUtilities.h>
+#include <core/engine/Hand.h>
 #include <core/engine/HandEvaluator.h>
-#include <core/engine/HandFsm.h>
 #include <core/engine/Helpers.h>
 #include <core/engine/model/Ranges.h>
 #include <core/interfaces/persistence/PlayersStatisticsStore.h>
@@ -22,7 +22,7 @@ namespace pkt::core::player
 
 using namespace std;
 
-PlayerFsm::PlayerFsm(const GameEvents& events, int id, std::string name, int cash)
+Player::Player(const GameEvents& events, int id, std::string name, int cash)
     : myID(id), myName(name), myCash(cash), myEvents(events)
 {
     myRangeEstimator = std::make_unique<RangeEstimator>(myID);
@@ -34,26 +34,26 @@ PlayerFsm::PlayerFsm(const GameEvents& events, int id, std::string name, int cas
     myHoleCards.reset();
 }
 
-const PlayerPosition PlayerFsm::getPosition() const
+const PlayerPosition Player::getPosition() const
 {
     return myPosition;
 }
 
-int PlayerFsm::getId() const
+int Player::getId() const
 {
     return myID;
 }
-const CurrentHandActions& PlayerFsm::getCurrentHandActions() const
+const CurrentHandActions& Player::getCurrentHandActions() const
 {
     return myCurrentHandActions;
 }
 
-std::string PlayerFsm::getName() const
+std::string Player::getName() const
 {
     return myName;
 }
 
-void PlayerFsm::setCash(int theValue)
+void Player::setCash(int theValue)
 {
     myCash = theValue;
     if (myEvents.onPlayerChipsUpdated)
@@ -61,12 +61,12 @@ void PlayerFsm::setCash(int theValue)
         myEvents.onPlayerChipsUpdated(myID, myCash);
     }
 }
-int PlayerFsm::getCash() const
+int Player::getCash() const
 {
     return myCash;
 }
 
-void PlayerFsm::addBetAmount(int theValue)
+void Player::addBetAmount(int theValue)
 {
     myCash -= theValue;
     if (myEvents.onPlayerChipsUpdated)
@@ -75,64 +75,64 @@ void PlayerFsm::addBetAmount(int theValue)
     }
 }
 
-PlayerAction PlayerFsm::getLastAction() const
+PlayerAction Player::getLastAction() const
 {
     return getCurrentHandActions().getLastAction();
 }
 
 // will set hole cards from int array, maintaining backward compatibility
-void PlayerFsm::setCards(int* theValue)
+void Player::setCards(int* theValue)
 {
     myHoleCards.fromIntArray(theValue);
 }
 
-void PlayerFsm::getCards(int* theValue) const
+void Player::getCards(int* theValue) const
 {
     myHoleCards.toIntArray(theValue);
 }
 
-void PlayerFsm::setCardsFlip(bool theValue)
+void Player::setCardsFlip(bool theValue)
 {
     myCardsFlip = theValue;
 }
-bool PlayerFsm::getCardsFlip() const
+bool Player::getCardsFlip() const
 {
     return myCardsFlip;
 }
 
-void PlayerFsm::setHandRanking(int theValue)
+void Player::setHandRanking(int theValue)
 {
     myHandRanking = theValue;
 }
-int PlayerFsm::getHandRanking() const
+int Player::getHandRanking() const
 {
     return myHandRanking;
 }
 
-void PlayerFsm::setCashAtHandStart(int theValue)
+void Player::setCashAtHandStart(int theValue)
 {
     myCashAtHandStart = theValue;
 }
-int PlayerFsm::getCashAtHandStart() const
+int Player::getCashAtHandStart() const
 {
     return myCashAtHandStart;
 }
 
-void PlayerFsm::setLastMoneyWon(int theValue)
+void Player::setLastMoneyWon(int theValue)
 {
     lastMoneyWon = theValue;
 }
-int PlayerFsm::getLastMoneyWon() const
+int Player::getLastMoneyWon() const
 {
     return lastMoneyWon;
 }
 
-std::string PlayerFsm::getCardsValueString() const
+std::string Player::getCardsValueString() const
 {
     return myHoleCards.toString();
 }
 
-const HandSimulationStats PlayerFsm::computeHandSimulation() const
+const HandSimulationStats Player::computeHandSimulation() const
 {
 #if (False)
     const int nbOpponents = mySeatsList->size() - 1;
@@ -145,7 +145,7 @@ const HandSimulationStats PlayerFsm::computeHandSimulation() const
 #endif
 }
 
-float PlayerFsm::getMaxOpponentsStrengths() const
+float Player::getMaxOpponentsStrengths() const
 {
 
     std::map<int, float> strenghts = evaluateOpponentsStrengths(); // id player --> % of possible hands that beat us
@@ -167,7 +167,7 @@ float PlayerFsm::getMaxOpponentsStrengths() const
 
     //	// if we are facing a single opponent in very loose mode, don't adjust the strength
     //	if (strenghts.size() == 1){
-    //		std::shared_ptr<PlayerFsm> opponent = getPlayerByUniqueId(opponentID);
+    //		std::shared_ptr<Player> opponent = getPlayerByUniqueId(opponentID);
     //
     //		if (opponent->isInVeryLooseMode(nbPlayers))
     //			return maxOpponentsStrengths;
@@ -218,12 +218,12 @@ float PlayerFsm::getMaxOpponentsStrengths() const
 }
 
 // get an opponent winning hands % against me, giving his supposed range
-float PlayerFsm::getOpponentWinningHandsPercentage(const int opponentId, std::string board) const
+float Player::getOpponentWinningHandsPercentage(const int opponentId, std::string board) const
 {
 #if (false)
     float result = 0;
 
-    auto opponent = *getPlayerFsmListIteratorById(myCurrentHandContext->commonContext.mySeatsList, opponentId);
+    auto opponent = *getPlayerListIteratorById(myCurrentHandContext->commonContext.mySeatsList, opponentId);
 
     assert(myHandRanking > 0);
 
@@ -295,15 +295,15 @@ float PlayerFsm::getOpponentWinningHandsPercentage(const int opponentId, std::st
 #endif
 }
 
-std::map<int, float> PlayerFsm::evaluateOpponentsStrengths() const
+std::map<int, float> Player::evaluateOpponentsStrengths() const
 {
 
     map<int, float> result;
 #if (False)
-    PlayerFsmList players = mySeatsList;
+    PlayerList players = mySeatsList;
     const int nbPlayers = mySeatsList->size();
 
-    for (PlayerFsmListIterator it = players->begin(); it != players->end(); ++it)
+    for (PlayerListIterator it = players->begin(); it != players->end(); ++it)
     {
 
         if ((*it)->getId() == myID || (*it)->getLastAction().type == ActionType::Fold ||
@@ -322,7 +322,7 @@ std::map<int, float> PlayerFsm::evaluateOpponentsStrengths() const
     return result;
 }
 
-bool PlayerFsm::isPreflopBigBet() const
+bool Player::isPreflopBigBet() const
 {
 #if (False)
     if (getPotOdd() > 70)
@@ -341,7 +341,7 @@ bool PlayerFsm::isPreflopBigBet() const
     return false;
 }
 
-bool PlayerFsm::isAgressor(const GameState gameState) const
+bool Player::isAgressor(const GameState gameState) const
 {
 #if (False)
     if (gameState == Preflop && currentHand.getPreflopLastRaiserId() == myID)
@@ -367,17 +367,17 @@ bool PlayerFsm::isAgressor(const GameState gameState) const
     return false;
 }
 
-int PlayerFsm::getPreflopPotOdd() const
+int Player::getPreflopPotOdd() const
 {
     return myPreflopPotOdd;
 }
 
-void PlayerFsm::setPreflopPotOdd(const int potOdd)
+void Player::setPreflopPotOdd(const int potOdd)
 {
     myPreflopPotOdd = potOdd;
 }
 
-bool PlayerFsm::isInVeryLooseMode(const int nbPlayers) const
+bool Player::isInVeryLooseMode(const int nbPlayers) const
 {
     PlayerStatistics stats = myStatisticsUpdater->getStatistics(nbPlayers);
 
@@ -395,7 +395,7 @@ bool PlayerFsm::isInVeryLooseMode(const int nbPlayers) const
     }
 }
 
-void PlayerFsm::updateCurrentHandContext(const GameState state, HandFsm& currentHand)
+void Player::updateCurrentHandContext(const GameState state, Hand& currentHand)
 {
     // common context
     myCurrentHandContext->commonContext = currentHand.updateHandCommonContext(state);
@@ -428,12 +428,12 @@ void PlayerFsm::updateCurrentHandContext(const GameState state, HandFsm& current
     myCurrentHandContext->personalContext.postFlopAnalysisFlags = getPostFlopAnalysisFlags();
 }
 
-float PlayerFsm::calculatePreflopCallingRange(const CurrentHandContext& ctx) const
+float Player::calculatePreflopCallingRange(const CurrentHandContext& ctx) const
 {
     return myRangeEstimator->getStandardCallingRange(ctx.commonContext.playersContext.actingPlayersList->size());
 }
 
-void PlayerFsm::resetForNewHand(const HandFsm& hand)
+void Player::resetForNewHand(const Hand& hand)
 {
     setCardsFlip(0);
     myCurrentHandActions.reset();
@@ -441,7 +441,7 @@ void PlayerFsm::resetForNewHand(const HandFsm& hand)
     setPosition(hand);
     getRangeEstimator()->setEstimatedRange("");
 }
-const PostFlopAnalysisFlags PlayerFsm::getPostFlopAnalysisFlags() const
+const PostFlopAnalysisFlags Player::getPostFlopAnalysisFlags() const
 {
     std::string stringHand = getCardsValueString();
     std::string stringBoard = myCurrentHandContext->commonContext.stringBoard;
@@ -449,7 +449,7 @@ const PostFlopAnalysisFlags PlayerFsm::getPostFlopAnalysisFlags() const
     return GlobalServices::instance().handEvaluationEngine().analyzeHand(getCardsValueString(), stringBoard);
 }
 
-bool PlayerFsm::checkIfINeedToShowCards() const
+bool Player::checkIfINeedToShowCards() const
 {
 #if false
     std::list<unsigned> playerNeedToShowCardsList = currentHand.getBoard()->getPlayerNeedToShowCards();
@@ -464,12 +464,12 @@ bool PlayerFsm::checkIfINeedToShowCards() const
 #endif
     return false;
 }
-void PlayerFsm::setPosition(const HandFsm& hand)
+void Player::setPosition(const Hand& hand)
 {
     myPosition = Unknown;
 
     const int dealerId = hand.getDealerPlayerId();
-    const PlayerFsmList players = hand.getSeatsList();
+    const PlayerList players = hand.getSeatsList();
     const int nbPlayers = players->size();
 
     // Compute relative offset clockwise from dealer
@@ -479,7 +479,7 @@ void PlayerFsm::setPosition(const HandFsm& hand)
     assert(myPosition != Unknown);
 }
 
-void PlayerFsm::setAction(IHandState& state, const PlayerAction& action)
+void Player::setAction(IHandState& state, const PlayerAction& action)
 {
     if (action.type != ActionType::None)
     {
@@ -489,7 +489,7 @@ void PlayerFsm::setAction(IHandState& state, const PlayerAction& action)
     myCurrentHandActions.addAction(state.getGameState(), action);
 }
 
-const PlayerStatistics& PlayerFsm::getStatistics(const int nbPlayers) const
+const PlayerStatistics& Player::getStatistics(const int nbPlayers) const
 {
     return myStatisticsUpdater->getStatistics(nbPlayers);
 }

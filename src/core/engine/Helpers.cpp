@@ -3,10 +3,10 @@
 #include "core/engine/BettingActions.h"
 #include "core/engine/CardUtilities.h"
 #include "core/engine/Exception.h"
-#include "core/engine/HandFsm.h"
+#include "core/engine/Hand.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/player/Helpers.h"
-#include "core/player/PlayerFsm.h"
+#include "core/player/Player.h"
 #include "core/services/GlobalServices.h"
 // Include FSM states for the helper function
 #include "core/engine/round_states/FlopState.h"
@@ -26,11 +26,11 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-static std::vector<ActionType> getValidActionsForPlayer(const PlayerFsmList& actingPlayersList, int playerId,
+static std::vector<ActionType> getValidActionsForPlayer(const PlayerList& actingPlayersList, int playerId,
                                                         const BettingActions& bettingActions, int smallBlind,
                                                         const GameState gameState);
 
-std::vector<ActionType> getValidActionsForPlayer(const HandFsm& hand, int playerId)
+std::vector<ActionType> getValidActionsForPlayer(const Hand& hand, int playerId)
 {
     int smallBlind = hand.getSmallBlind();
 
@@ -38,14 +38,14 @@ std::vector<ActionType> getValidActionsForPlayer(const HandFsm& hand, int player
                                     hand.getGameState());
 }
 
-std::vector<ActionType> getValidActionsForPlayer(const PlayerFsmList& actingPlayersList, int playerId,
+std::vector<ActionType> getValidActionsForPlayer(const PlayerList& actingPlayersList, int playerId,
                                                  const BettingActions& bettingActions, int smallBlind,
                                                  const GameState gameState)
 {
     std::vector<ActionType> validActions;
 
     // Find the player in the acting players list
-    auto player = getPlayerFsmById(actingPlayersList, playerId);
+    auto player = getPlayerById(actingPlayersList, playerId);
     if (!player)
     {
         return validActions; // Return empty list if player not found
@@ -102,7 +102,7 @@ std::vector<ActionType> getValidActionsForPlayer(const PlayerFsmList& actingPlay
     return validActions;
 }
 
-std::shared_ptr<player::PlayerFsm> getFirstPlayerToActPostFlop(const HandFsm& hand)
+std::shared_ptr<player::Player> getFirstPlayerToActPostFlop(const Hand& hand)
 {
     auto actingPlayers = hand.getActingPlayersList();
 
@@ -124,7 +124,7 @@ std::shared_ptr<player::PlayerFsm> getFirstPlayerToActPostFlop(const HandFsm& ha
     return actingPlayers->front();
 }
 
-std::unique_ptr<pkt::core::IHandState> computeBettingRoundNextState(pkt::core::HandFsm& hand,
+std::unique_ptr<pkt::core::IHandState> computeBettingRoundNextState(pkt::core::Hand& hand,
                                                                     const pkt::core::GameEvents& events,
                                                                     pkt::core::GameState currentState)
 {
@@ -169,7 +169,7 @@ std::unique_ptr<pkt::core::IHandState> computeBettingRoundNextState(pkt::core::H
     return nullptr; // Stay in current state - more betting needed
 }
 
-bool isRoundComplete(HandFsm& hand)
+bool isRoundComplete(Hand& hand)
 {
     assert(hand.getGameState() != GameState::None);
 
@@ -230,9 +230,9 @@ bool isConsecutiveActionAllowed(const BettingActions& bettingActions, const Play
 }
 
 // Helper function to check if action type is valid for the player
-bool isActionTypeValid(const PlayerFsmList& actingPlayersList, const PlayerAction& action,
+bool isActionTypeValid(const PlayerList& actingPlayersList, const PlayerAction& action,
                        const BettingActions& bettingActions, int smallBlind, const GameState gameState,
-                       const std::shared_ptr<player::PlayerFsm>& player)
+                       const std::shared_ptr<player::Player>& player)
 {
     std::vector<ActionType> validActions =
         getValidActionsForPlayer(actingPlayersList, action.playerId, bettingActions, smallBlind, gameState);
@@ -250,7 +250,7 @@ bool isActionTypeValid(const PlayerFsmList& actingPlayersList, const PlayerActio
 
 // Helper function to validate action amounts
 bool isActionAmountValid(const PlayerAction& action, const BettingActions& bettingActions, int smallBlind,
-                         const GameState gameState, const std::shared_ptr<player::PlayerFsm>& player)
+                         const GameState gameState, const std::shared_ptr<player::Player>& player)
 {
     const int currentHighestBet = bettingActions.getRoundHighestSet();
     const int playerBet = player->getCurrentHandActions().getRoundTotalBetAmount(gameState);
@@ -304,10 +304,10 @@ bool isActionAmountValid(const PlayerAction& action, const BettingActions& betti
     return isValid;
 }
 
-bool validatePlayerAction(const PlayerFsmList& actingPlayersList, const PlayerAction& action,
+bool validatePlayerAction(const PlayerList& actingPlayersList, const PlayerAction& action,
                           const BettingActions& bettingActions, int smallBlind, const GameState gameState)
 {
-    auto player = pkt::core::player::getPlayerFsmById(actingPlayersList, action.playerId);
+    auto player = pkt::core::player::getPlayerById(actingPlayersList, action.playerId);
     if (!player)
     {
         GlobalServices::instance().logger().error(gameStateToString(gameState) + ": player with id " +
@@ -336,7 +336,7 @@ bool validatePlayerAction(const PlayerFsmList& actingPlayersList, const PlayerAc
     return true;
 }
 
-std::shared_ptr<player::PlayerFsm> getNextPlayerToActInRound(const HandFsm& hand, GameState currentRound)
+std::shared_ptr<player::Player> getNextPlayerToActInRound(const Hand& hand, GameState currentRound)
 {
     auto actingPlayers = hand.getActingPlayersList();
     if (actingPlayers->empty())

@@ -1,7 +1,7 @@
 #include "common/common.h"
 
 #include "common/DummyPlayer.h"
-#include "core/engine/PotFsm.h"
+#include "core/engine/Pot.h"
 #include "core/engine/model/GameState.h"
 #include "core/engine/round_states/RiverState.h"
 #include "core/player/typedefs.h"
@@ -15,15 +15,15 @@ namespace pkt::test
 class PotTest : public ::testing::Test
 {
   protected:
-    PlayerFsmList seats;
+    PlayerList seats;
     GameEvents events;
-    std::unique_ptr<PotFsm> pot;
+    std::unique_ptr<Pot> pot;
     std::unique_ptr<RiverState> state = std::make_unique<RiverState>(events);
 
-    std::shared_ptr<DummyPlayerFsm> createPlayerFsm(int id, int cashAtHandStart, int remainingCash, int handRank,
-                                                    ActionType action)
+    std::shared_ptr<DummyPlayer> createPlayer(int id, int cashAtHandStart, int remainingCash, int handRank,
+                                              ActionType action)
     {
-        auto p = std::make_shared<DummyPlayerFsm>(id, events);
+        auto p = std::make_shared<DummyPlayer>(id, events);
         p->setCashAtHandStart(cashAtHandStart);
         p->setCash(remainingCash);
         p->setHandRanking(handRank);
@@ -32,19 +32,19 @@ class PotTest : public ::testing::Test
         return p;
     }
 
-    void setupPot(std::initializer_list<std::shared_ptr<DummyPlayerFsm>> players, int potAmount, int dealerId)
+    void setupPot(std::initializer_list<std::shared_ptr<DummyPlayer>> players, int potAmount, int dealerId)
     {
-        seats = std::make_shared<std::list<std::shared_ptr<PlayerFsm>>>();
+        seats = std::make_shared<std::list<std::shared_ptr<Player>>>();
         for (const auto& p : players)
-            seats->push_back(std::static_pointer_cast<PlayerFsm>(p));
-        pot = std::make_unique<PotFsm>(potAmount, seats, dealerId);
+            seats->push_back(std::static_pointer_cast<Player>(p));
+        pot = std::make_unique<Pot>(potAmount, seats, dealerId);
     }
 };
 
 TEST_F(PotTest, SingleWinnerGetsFullPot)
 {
-    auto p1 = createPlayerFsm(0, 1000, 750, 200, ActionType::Call);
-    auto p2 = createPlayerFsm(1, 1000, 750, 100, ActionType::Call);
+    auto p1 = createPlayer(0, 1000, 750, 200, ActionType::Call);
+    auto p2 = createPlayer(1, 1000, 750, 100, ActionType::Call);
     setupPot({p1, p2}, 500, 0);
     pot->distribute();
 
@@ -54,8 +54,8 @@ TEST_F(PotTest, SingleWinnerGetsFullPot)
 
 TEST_F(PotTest, EqualSplitBetweenTwoWinners)
 {
-    auto p1 = createPlayerFsm(0, 1000, 750, 150, ActionType::Call);
-    auto p2 = createPlayerFsm(1, 1000, 750, 150, ActionType::Call);
+    auto p1 = createPlayer(0, 1000, 750, 150, ActionType::Call);
+    auto p2 = createPlayer(1, 1000, 750, 150, ActionType::Call);
     setupPot({p1, p2}, 500, 0);
     pot->distribute();
 
@@ -65,8 +65,8 @@ TEST_F(PotTest, EqualSplitBetweenTwoWinners)
 
 TEST_F(PotTest, OddChipGoesToLeftOfDealer)
 {
-    auto p1 = createPlayerFsm(0, 1000, 0, 150, ActionType::Call);
-    auto p2 = createPlayerFsm(1, 1000, 0, 150, ActionType::Call);
+    auto p1 = createPlayer(0, 1000, 0, 150, ActionType::Call);
+    auto p2 = createPlayer(1, 1000, 0, 150, ActionType::Call);
     setupPot({p1, p2}, 501, 0);
     pot->distribute();
 
@@ -76,8 +76,8 @@ TEST_F(PotTest, OddChipGoesToLeftOfDealer)
 
 TEST_F(PotTest, FoldedPlayerGetsNothing2Players)
 {
-    auto p1 = createPlayerFsm(0, 1000, 300, 100, ActionType::Call);
-    auto p2 = createPlayerFsm(1, 1000, 200, 120, ActionType::Fold);
+    auto p1 = createPlayer(0, 1000, 300, 100, ActionType::Call);
+    auto p2 = createPlayer(1, 1000, 200, 120, ActionType::Fold);
     setupPot({p1, p2}, 500, 0);
     pot->distribute();
 
@@ -86,9 +86,9 @@ TEST_F(PotTest, FoldedPlayerGetsNothing2Players)
 
 TEST_F(PotTest, SidePotWithShortStack)
 {
-    auto p1 = createPlayerFsm(0, 100, 0, 150, ActionType::Call);
-    auto p2 = createPlayerFsm(1, 300, 0, 100, ActionType::Call);
-    auto p3 = createPlayerFsm(2, 300, 0, 120, ActionType::Call);
+    auto p1 = createPlayer(0, 100, 0, 150, ActionType::Call);
+    auto p2 = createPlayer(1, 300, 0, 100, ActionType::Call);
+    auto p3 = createPlayer(2, 300, 0, 120, ActionType::Call);
     setupPot({p1, p2, p3}, 700, 2);
     pot->distribute();
 
@@ -98,8 +98,8 @@ TEST_F(PotTest, SidePotWithShortStack)
 
 TEST_F(PotTest, NoWinnersMeansNoDistribution)
 {
-    auto p1 = createPlayerFsm(0, 1000, 0, 100, ActionType::Fold);
-    auto p2 = createPlayerFsm(1, 1000, 0, 100, ActionType::Fold);
+    auto p1 = createPlayer(0, 1000, 0, 100, ActionType::Fold);
+    auto p2 = createPlayer(1, 1000, 0, 100, ActionType::Fold);
     setupPot({p1, p2}, 500, 1);
     pot->distribute();
 
@@ -109,9 +109,9 @@ TEST_F(PotTest, NoWinnersMeansNoDistribution)
 
 TEST_F(PotTest, AllInPlayerWinsSidePot)
 {
-    auto p1 = createPlayerFsm(0, 100, 0, 200, ActionType::Call); // All-in
-    auto p2 = createPlayerFsm(1, 300, 0, 150, ActionType::Call);
-    auto p3 = createPlayerFsm(2, 300, 0, 100, ActionType::Call);
+    auto p1 = createPlayer(0, 100, 0, 200, ActionType::Call); // All-in
+    auto p2 = createPlayer(1, 300, 0, 150, ActionType::Call);
+    auto p3 = createPlayer(2, 300, 0, 100, ActionType::Call);
     setupPot({p1, p2, p3}, 700, 2);
     pot->distribute();
 
@@ -120,9 +120,9 @@ TEST_F(PotTest, AllInPlayerWinsSidePot)
 }
 TEST_F(PotTest, FoldedPlayersGetsNothing3Players)
 {
-    auto p1 = createPlayerFsm(0, 1000, 700, 200, ActionType::Call);
-    auto p2 = createPlayerFsm(1, 1000, 900, 150, ActionType::Fold);
-    auto p3 = createPlayerFsm(2, 1000, 900, 100, ActionType::Call);
+    auto p1 = createPlayer(0, 1000, 700, 200, ActionType::Call);
+    auto p2 = createPlayer(1, 1000, 900, 150, ActionType::Fold);
+    auto p3 = createPlayer(2, 1000, 900, 100, ActionType::Call);
     setupPot({p1, p2, p3}, 500, 0);
     pot->distribute();
 
@@ -131,8 +131,8 @@ TEST_F(PotTest, FoldedPlayersGetsNothing3Players)
 }
 TEST_F(PotTest, PotFullyDistributed)
 {
-    auto p1 = createPlayerFsm(0, 1000, 700, 200, ActionType::Call);
-    auto p2 = createPlayerFsm(1, 1000, 900, 150, ActionType::Call);
+    auto p1 = createPlayer(0, 1000, 700, 200, ActionType::Call);
+    auto p2 = createPlayer(1, 1000, 900, 150, ActionType::Call);
     setupPot({p1, p2}, 400, 0);
     pot->distribute();
 
@@ -140,8 +140,8 @@ TEST_F(PotTest, PotFullyDistributed)
 }
 TEST_F(PotTest, AllInPlayerWinsEntirePot)
 {
-    auto p1 = createPlayerFsm(0, 1000, 0, 200, ActionType::Call); // All-in
-    auto p2 = createPlayerFsm(1, 1500, 500, 150, ActionType::Call);
+    auto p1 = createPlayer(0, 1000, 0, 200, ActionType::Call); // All-in
+    auto p2 = createPlayer(1, 1500, 500, 150, ActionType::Call);
     setupPot({p1, p2}, 1500, 0);
     pot->distribute();
 

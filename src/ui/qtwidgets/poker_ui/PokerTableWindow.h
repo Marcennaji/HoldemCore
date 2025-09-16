@@ -9,8 +9,8 @@
 #include <memory>
 
 #include "core/engine/model/GameState.h"
-#include "core/player/PlayerFsm.h"
-#include "core/session/SessionFsm.h"
+#include "core/player/Player.h"
+#include "core/session/Session.h"
 
 namespace pkt::core
 {
@@ -24,12 +24,12 @@ class PokerTableWindow : public QWidget
     Q_OBJECT
 
   public:
-    explicit PokerTableWindow(pkt::core::SessionFsm* session, QWidget* parent = nullptr);
+    explicit PokerTableWindow(pkt::core::Session* session, QWidget* parent = nullptr);
     ~PokerTableWindow() override = default;
 
     void refresh();
     void refreshPot(int amount);
-    void refreshPlayer(int seat, const pkt::core::player::PlayerFsm& player);
+    void refreshPlayer(int seat, const pkt::core::player::Player& player);
     void showHoleCards(int seat, int card1, int card2);
     void showBoardCards(const std::array<int, 5>& cards);
 
@@ -45,7 +45,7 @@ class PokerTableWindow : public QWidget
     void setupUi();
     void connectSignals();
 
-    pkt::core::SessionFsm* m_session;
+    pkt::core::Session* m_session;
     QGridLayout* m_layout;
     QLabel* m_potLabel;
     std::array<QLabel*, 9> m_playerLabels;

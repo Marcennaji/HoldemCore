@@ -1,11 +1,11 @@
 #include "TurnState.h"
 #include "GameEvents.h"
-#include "HandFsm.h"
+#include "Hand.h"
 #include "PostRiverState.h"
 #include "RiverState.h"
 #include "core/engine/Helpers.h"
 #include "core/engine/model/PlayerAction.h"
-#include "core/player/PlayerFsm.h"
+#include "core/player/Player.h"
 #include "core/services/GlobalServices.h"
 
 namespace pkt::core
@@ -16,7 +16,7 @@ TurnState::TurnState(const GameEvents& events) : myEvents(events)
 {
 }
 
-void TurnState::enter(HandFsm& hand)
+void TurnState::enter(Hand& hand)
 {
     GlobalServices::instance().logger().info("Turn");
 
@@ -53,7 +53,7 @@ void TurnState::enter(HandFsm& hand)
     logStateInfo(hand);
 }
 
-void TurnState::exit(HandFsm& hand)
+void TurnState::exit(Hand& hand)
 {
     for (auto& player : *hand.getSeatsList())
     {
@@ -62,12 +62,12 @@ void TurnState::exit(HandFsm& hand)
     }
 }
 
-bool TurnState::isActionAllowed(const HandFsm& hand, const PlayerAction action) const
+bool TurnState::isActionAllowed(const Hand& hand, const PlayerAction action) const
 {
     return (validatePlayerAction(hand.getActingPlayersList(), action, *hand.getBettingActions(), 0, Turn));
 }
 
-void TurnState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
+void TurnState::promptPlayerAction(Hand& hand, Player& player)
 {
     player.updateCurrentHandContext(Turn, hand);
     PlayerAction action = player.decideAction(player.getCurrentHandContext());
@@ -75,24 +75,24 @@ void TurnState::promptPlayerAction(HandFsm& hand, PlayerFsm& player)
     hand.handlePlayerAction(action);
 }
 
-std::unique_ptr<IHandState> TurnState::computeNextState(HandFsm& hand)
+std::unique_ptr<IHandState> TurnState::computeNextState(Hand& hand)
 {
     return computeBettingRoundNextState(hand, myEvents, Turn);
 }
 
-std::shared_ptr<player::PlayerFsm> TurnState::getNextPlayerToAct(const HandFsm& hand) const
+std::shared_ptr<player::Player> TurnState::getNextPlayerToAct(const Hand& hand) const
 {
     return getNextPlayerToActInRound(hand, GameState::Turn);
 }
 
-std::shared_ptr<player::PlayerFsm> TurnState::getFirstPlayerToActInRound(const HandFsm& hand) const
+std::shared_ptr<player::Player> TurnState::getFirstPlayerToActInRound(const Hand& hand) const
 {
     // In post-flop rounds, the first player to act is left of the dealer
     return getNextPlayerToAct(hand);
 }
-bool TurnState::isRoundComplete(const HandFsm& hand) const
+bool TurnState::isRoundComplete(const Hand& hand) const
 {
-    return pkt::core::isRoundComplete(const_cast<HandFsm&>(hand));
+    return pkt::core::isRoundComplete(const_cast<Hand&>(hand));
 }
 
 } // namespace pkt::core

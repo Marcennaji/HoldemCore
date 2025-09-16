@@ -4,7 +4,7 @@
 #include <core/player/Helpers.h>
 #include <core/services/GlobalServices.h>
 #include "CurrentHandContext.h"
-#include "core/player/PlayerFsm.h"
+#include "core/player/Player.h"
 
 using namespace std;
 
@@ -367,7 +367,7 @@ bool BotStrategyBase::isPossibleToBluff(const CurrentHandContext& ctx) const
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
     const int nbRaises = ctx.commonContext.bettingContext.preflopRaisesNumber;
 
-    PlayerFsmList players = ctx.commonContext.playersContext.actingPlayersList;
+    PlayerList players = ctx.commonContext.playersContext.actingPlayersList;
 
     if (players == nullptr)
     {
@@ -382,7 +382,7 @@ bool BotStrategyBase::isPossibleToBluff(const CurrentHandContext& ctx) const
         return false;
     }
 
-    for (PlayerFsmListIterator it = players->begin(); it != players->end(); ++it)
+    for (PlayerListIterator it = players->begin(); it != players->end(); ++it)
     {
 
         if ((*it)->getId() == ctx.personalContext.id)

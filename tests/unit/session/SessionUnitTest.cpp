@@ -1,35 +1,33 @@
-// PokerTraining — Unit tests for SessionFsm
+// PokerTraining — Unit tests for Session
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
 #include <core/engine/model/GameData.h>
 #include <core/engine/model/StartData.h>
-#include <core/session/SessionFsm.h>
+#include <core/session/Session.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <memory>
-#include "SessionFsmTestMocks.h"
+#include "SessionTestMocks.h"
 
 using namespace pkt::core;
 using namespace pkt::core::test;
 
 // Helper class to access protected methods for testing
-class SessionFsmTestHelper : public SessionFsm
+class SessionTestHelper : public Session
 {
   public:
-    SessionFsmTestHelper(const GameEvents& events) : SessionFsm(events) {}
-    SessionFsmTestHelper(const GameEvents& events, std::shared_ptr<EngineFactory> factory) : SessionFsm(events, factory)
-    {
-    }
+    SessionTestHelper(const GameEvents& events) : Session(events) {}
+    SessionTestHelper(const GameEvents& events, std::shared_ptr<EngineFactory> factory) : Session(events, factory) {}
 
     // Expose protected methods for testing
-    using SessionFsm::createBoard;
-    using SessionFsm::ensureEngineFactoryInitialized;
-    using SessionFsm::fireGameInitializedEvent;
-    using SessionFsm::validateGameParameters;
+    using Session::createBoard;
+    using Session::ensureEngineFactoryInitialized;
+    using Session::fireGameInitializedEvent;
+    using Session::validateGameParameters;
 };
 
-class SessionFsmUnitTest : public ::testing::Test
+class SessionUnitTest : public ::testing::Test
 {
   protected:
     void SetUp() override
@@ -46,24 +44,24 @@ class SessionFsmUnitTest : public ::testing::Test
 };
 
 // Test 1: Constructor with just events
-TEST_F(SessionFsmUnitTest, ConstructorWithEventsOnlyCreatesValidSession)
+TEST_F(SessionUnitTest, ConstructorWithEventsOnlyCreatesValidSession)
 {
-    TestableSessionFsm session(events);
+    TestableSession session(events);
     EXPECT_FALSE(session.hasEngineFactory()) << "Session should not have engine factory when created with events only";
 }
 
 // Test 2: Constructor with events and factory
-TEST_F(SessionFsmUnitTest, ConstructorWithEventsAndFactoryCreatesValidSession)
+TEST_F(SessionUnitTest, ConstructorWithEventsAndFactoryCreatesValidSession)
 {
     auto factory = std::make_shared<EngineFactory>(events);
-    TestableSessionFsm session(events, factory);
+    TestableSession session(events, factory);
     EXPECT_TRUE(session.hasEngineFactory()) << "Session should have engine factory when provided in constructor";
 }
 
 // Test 3: Test exception handling for factory methods
-TEST_F(SessionFsmUnitTest, FactoryMethodsWithoutEngineFactoryThrowsException)
+TEST_F(SessionUnitTest, FactoryMethodsWithoutEngineFactoryThrowsException)
 {
-    TestableSessionFsm session(events);
+    TestableSession session(events);
 
     // These methods should throw when no engine factory is available
     EXPECT_THROW(session.testCreateBoard(testStartData), std::exception)
@@ -71,48 +69,47 @@ TEST_F(SessionFsmUnitTest, FactoryMethodsWithoutEngineFactoryThrowsException)
 }
 
 // Test 4: Test strategy assigner creation
-TEST_F(SessionFsmUnitTest, CreateStrategyAssignerWithValidParamsReturnsAssigner)
+TEST_F(SessionUnitTest, CreateStrategyAssignerWithValidParamsReturnsAssigner)
 {
-    TestableSessionFsm session(events);
+    TestableSession session(events);
     auto assigner = session.testCreateStrategyAssigner(testTableProfile, 3);
     EXPECT_NE(assigner, nullptr) << "Strategy assigner should be created successfully";
 }
 
 // Test 5: Test player factory creation
-TEST_F(SessionFsmUnitTest, CreatePlayerFactoryWithValidParamsReturnsFactory)
+TEST_F(SessionUnitTest, CreatePlayerFactoryWithValidParamsReturnsFactory)
 {
-    TestableSessionFsm session(events);
+    TestableSession session(events);
     auto assigner = session.testCreateStrategyAssigner(testTableProfile, 3);
     auto factory = session.testCreatePlayerFactory(events, assigner.get());
     EXPECT_NE(factory, nullptr) << "Player factory should be created successfully";
 }
 
-// Test 6: Test SessionFsm basic instantiation
-TEST_F(SessionFsmUnitTest, SessionFsmInstantiationBasicSucceeds)
+// Test 6: Test Session basic instantiation
+TEST_F(SessionUnitTest, SessionInstantiationBasicSucceeds)
 {
-    EXPECT_NO_THROW({ SessionFsm session(events); }) << "Basic SessionFsm instantiation should not throw";
+    EXPECT_NO_THROW({ Session session(events); }) << "Basic Session instantiation should not throw";
 }
 
-// Test 7: Test SessionFsm with engine factory instantiation
-TEST_F(SessionFsmUnitTest, SessionFsmInstantiationWithFactorySucceeds)
+// Test 7: Test Session with engine factory instantiation
+TEST_F(SessionUnitTest, SessionInstantiationWithFactorySucceeds)
 {
     auto factory = std::make_shared<EngineFactory>(events);
-    EXPECT_NO_THROW({ SessionFsm session(events, factory); })
-        << "SessionFsm instantiation with factory should not throw";
+    EXPECT_NO_THROW({ Session session(events, factory); }) << "Session instantiation with factory should not throw";
 }
 
 // Test 8: Test copy/move semantics
-TEST_F(SessionFsmUnitTest, SessionFsmCopyConstructorIsDeleted)
+TEST_F(SessionUnitTest, SessionCopyConstructorIsDeleted)
 {
-    // Verify that SessionFsm is not copyable (good for RAII)
-    static_assert(!std::is_copy_constructible_v<SessionFsm>, "SessionFsm should not be copy constructible");
-    static_assert(!std::is_copy_assignable_v<SessionFsm>, "SessionFsm should not be copy assignable");
+    // Verify that Session is not copyable (good for RAII)
+    static_assert(!std::is_copy_constructible_v<Session>, "Session should not be copy constructible");
+    static_assert(!std::is_copy_assignable_v<Session>, "Session should not be copy assignable");
 }
 
 // Test 9: Basic factory method functionality test
-TEST_F(SessionFsmUnitTest, FactoryMethodsCreateComponentsReturnsValidPointers)
+TEST_F(SessionUnitTest, FactoryMethodsCreateComponentsReturnsValidPointers)
 {
-    TestableSessionFsm session(events);
+    TestableSession session(events);
 
     // Test strategy assigner creation
     auto assigner = session.testCreateStrategyAssigner(testTableProfile, 2);
@@ -124,9 +121,9 @@ TEST_F(SessionFsmUnitTest, FactoryMethodsCreateComponentsReturnsValidPointers)
 }
 
 // Test 10: Parameter validation tests
-TEST_F(SessionFsmUnitTest, ValidateGameParametersWithValidDataDoesNotThrow)
+TEST_F(SessionUnitTest, ValidateGameParametersWithValidDataDoesNotThrow)
 {
-    SessionFsmTestHelper session(events);
+    SessionTestHelper session(events);
     GameData validGameData;
     validGameData.startMoney = 1000;
 
@@ -138,9 +135,9 @@ TEST_F(SessionFsmUnitTest, ValidateGameParametersWithValidDataDoesNotThrow)
         << "Valid parameters should not throw";
 }
 
-TEST_F(SessionFsmUnitTest, ValidateGameParametersWithInvalidPlayerCountThrows)
+TEST_F(SessionUnitTest, ValidateGameParametersWithInvalidPlayerCountThrows)
 {
-    SessionFsmTestHelper session(events);
+    SessionTestHelper session(events);
     GameData gameData;
     gameData.startMoney = 1000;
 
@@ -158,9 +155,9 @@ TEST_F(SessionFsmUnitTest, ValidateGameParametersWithInvalidPlayerCountThrows)
         << "Too many players should throw";
 }
 
-TEST_F(SessionFsmUnitTest, ValidateGameParametersWithInvalidMoneyThrows)
+TEST_F(SessionUnitTest, ValidateGameParametersWithInvalidMoneyThrows)
 {
-    SessionFsmTestHelper session(events);
+    SessionTestHelper session(events);
     GameData invalidGameData;
     invalidGameData.startMoney = 0; // Invalid
 
@@ -172,9 +169,9 @@ TEST_F(SessionFsmUnitTest, ValidateGameParametersWithInvalidMoneyThrows)
         << "Zero start money should throw";
 }
 
-TEST_F(SessionFsmUnitTest, ValidateGameParametersWithInvalidDealerIdThrows)
+TEST_F(SessionUnitTest, ValidateGameParametersWithInvalidDealerIdThrows)
 {
-    SessionFsmTestHelper session(events);
+    SessionTestHelper session(events);
     GameData gameData;
     gameData.startMoney = 1000;
 
@@ -187,7 +184,7 @@ TEST_F(SessionFsmUnitTest, ValidateGameParametersWithInvalidDealerIdThrows)
 }
 
 // Test 11: Event firing tests
-TEST_F(SessionFsmUnitTest, FireGameInitializedEventWithValidHandlerCallsEvent)
+TEST_F(SessionUnitTest, FireGameInitializedEventWithValidHandlerCallsEvent)
 {
     bool eventCalled = false;
     int receivedSpeed = 0;
@@ -199,27 +196,27 @@ TEST_F(SessionFsmUnitTest, FireGameInitializedEventWithValidHandlerCallsEvent)
         receivedSpeed = speed;
     };
 
-    SessionFsmTestHelper session(testEvents);
+    SessionTestHelper session(testEvents);
     session.fireGameInitializedEvent(100);
 
     EXPECT_TRUE(eventCalled) << "Event should have been called";
     EXPECT_EQ(receivedSpeed, 100) << "Event should receive correct speed";
 }
 
-TEST_F(SessionFsmUnitTest, FireGameInitializedEventWithNullHandlerDoesNotCrash)
+TEST_F(SessionUnitTest, FireGameInitializedEventWithNullHandlerDoesNotCrash)
 {
     GameEvents testEvents;
     testEvents.onGameInitialized = nullptr; // Null handler
 
-    SessionFsmTestHelper session(testEvents);
+    SessionTestHelper session(testEvents);
 
     EXPECT_NO_THROW(session.fireGameInitializedEvent(50)) << "Null event handler should not crash";
 }
 
 // Test 12: Engine factory initialization tests
-TEST_F(SessionFsmUnitTest, EnsureEngineFactoryInitializedWithoutFactoryCreatesFactory)
+TEST_F(SessionUnitTest, EnsureEngineFactoryInitializedWithoutFactoryCreatesFactory)
 {
-    SessionFsmTestHelper session(events);
+    SessionTestHelper session(events);
 
     // Before initialization, createBoard should throw
     StartData testData{};
@@ -232,14 +229,14 @@ TEST_F(SessionFsmUnitTest, EnsureEngineFactoryInitializedWithoutFactoryCreatesFa
     EXPECT_NO_THROW(session.createBoard(testData)) << "Should not throw after factory initialization";
 }
 
-TEST_F(SessionFsmUnitTest, EnsureEngineFactoryInitializedWithExistingFactoryDoesNotReplace)
+TEST_F(SessionUnitTest, EnsureEngineFactoryInitializedWithExistingFactoryDoesNotReplace)
 {
     auto factory = std::make_shared<EngineFactory>(events);
-    TestableSessionFsm session(events, factory);
+    TestableSession session(events, factory);
     EXPECT_TRUE(session.hasEngineFactory()) << "Should start with factory";
 
     // Test that it still works after calling the method
-    SessionFsmTestHelper testSession(events, factory);
+    SessionTestHelper testSession(events, factory);
     testSession.ensureEngineFactoryInitialized();
 
     StartData testData{};

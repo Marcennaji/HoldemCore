@@ -5,7 +5,7 @@
 
 namespace pkt::core::player
 {
-class PlayerFsm;
+class Player;
 }
 
 namespace pkt::core
@@ -18,23 +18,23 @@ class PreflopState : public IHandState, public IActionProcessor, public IDebugga
   public:
     PreflopState(const GameEvents& events, const int smallBlind, unsigned dealerPlayerId);
 
-    void enter(HandFsm&) override;
-    void exit(HandFsm&) override;
-    std::unique_ptr<IHandState> computeNextState(HandFsm& hand) override;
+    void enter(Hand&) override;
+    void exit(Hand&) override;
+    std::unique_ptr<IHandState> computeNextState(Hand& hand) override;
 
-    bool isActionAllowed(const HandFsm&, const PlayerAction) const override;
+    bool isActionAllowed(const Hand&, const PlayerAction) const override;
 
-    std::shared_ptr<player::PlayerFsm> getNextPlayerToAct(const HandFsm& hand) const override;
-    std::shared_ptr<player::PlayerFsm> getFirstPlayerToActInRound(const HandFsm& hand) const override;
-    bool isRoundComplete(const HandFsm& hand) const override;
+    std::shared_ptr<player::Player> getNextPlayerToAct(const Hand& hand) const override;
+    std::shared_ptr<player::Player> getFirstPlayerToActInRound(const Hand& hand) const override;
+    bool isRoundComplete(const Hand& hand) const override;
 
-    void logStateInfo(HandFsm& hand) override;
+    void logStateInfo(Hand& hand) override;
     const GameState getGameState() const override { return GameState::Preflop; }
-    void promptPlayerAction(HandFsm&, player::PlayerFsm& player) override;
+    void promptPlayerAction(Hand&, player::Player& player) override;
 
   private:
-    void setBlinds(HandFsm& hand);
-    void logHoleCards(HandFsm& hand);
+    void setBlinds(Hand& hand);
+    void logHoleCards(Hand& hand);
 
     const GameEvents& myEvents;
     const int mySmallBlind;

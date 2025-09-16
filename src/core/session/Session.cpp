@@ -2,9 +2,9 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
-#include "SessionFsm.h"
+#include <core/engine/Game.h>
 #include <core/engine/GameEvents.h>
-#include <core/engine/GameFsm.h>
+#include "Session.h"
 
 #include <core/engine/EngineFactory.h>
 
@@ -27,50 +27,50 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-SessionFsm::SessionFsm(const GameEvents& events) : myEvents(events), myEngineFactory(nullptr)
+Session::Session(const GameEvents& events) : myEvents(events), myEngineFactory(nullptr)
 {
 }
 
-SessionFsm::SessionFsm(const GameEvents& events, std::shared_ptr<EngineFactory> engineFactory)
+Session::Session(const GameEvents& events, std::shared_ptr<EngineFactory> engineFactory)
     : myEvents(events), myEngineFactory(engineFactory)
 {
 }
 
-SessionFsm::~SessionFsm() = default;
+Session::~Session() = default;
 
-pkt::core::player::PlayerFsmList SessionFsm::createPlayersList(DefaultPlayerFactory& playerFactory, int numberOfPlayers,
-                                                               unsigned startMoney, const TableProfile& tableProfile)
+pkt::core::player::PlayerList Session::createPlayersList(DefaultPlayerFactory& playerFactory, int numberOfPlayers,
+                                                         unsigned startMoney, const TableProfile& tableProfile)
 {
-    auto playersList = std::make_shared<std::list<std::shared_ptr<PlayerFsm>>>();
+    auto playersList = std::make_shared<std::list<std::shared_ptr<Player>>>();
 
     for (int i = 0; i < numberOfPlayers; ++i)
-        playersList->push_back(playerFactory.createPlayerFsm(i, tableProfile, startMoney));
+        playersList->push_back(playerFactory.createPlayer(i, tableProfile, startMoney));
 
     return playersList;
 }
 
-std::unique_ptr<player::StrategyAssigner> SessionFsm::createStrategyAssigner(const TableProfile& tableProfile,
-                                                                             int numberOfBots)
+std::unique_ptr<player::StrategyAssigner> Session::createStrategyAssigner(const TableProfile& tableProfile,
+                                                                          int numberOfBots)
 {
     return std::make_unique<player::StrategyAssigner>(tableProfile, numberOfBots);
 }
 
-std::unique_ptr<player::DefaultPlayerFactory>
-SessionFsm::createPlayerFactory(const GameEvents& events, player::StrategyAssigner* strategyAssigner)
+std::unique_ptr<player::DefaultPlayerFactory> Session::createPlayerFactory(const GameEvents& events,
+                                                                           player::StrategyAssigner* strategyAssigner)
 {
     return std::make_unique<player::DefaultPlayerFactory>(events, strategyAssigner);
 }
 
-std::shared_ptr<IBoard> SessionFsm::createBoard(const StartData& startData)
+std::shared_ptr<IBoard> Session::createBoard(const StartData& startData)
 {
     if (!myEngineFactory)
         throw std::runtime_error("EngineFactory not initialized");
 
-    auto board = myEngineFactory->createBoardFsm(startData.startDealerPlayerId);
+    auto board = myEngineFactory->createBoard(startData.startDealerPlayerId);
     return board;
 }
 
-void SessionFsm::startGame(const GameData& gameData, const StartData& startData)
+void Session::startGame(const GameData& gameData, const StartData& startData)
 {
     validateGameParameters(gameData, startData);
     ensureEngineFactoryInitialized();
@@ -78,7 +78,7 @@ void SessionFsm::startGame(const GameData& gameData, const StartData& startData)
     initializeGame(std::move(gameComponents), gameData, startData);
 }
 
-void SessionFsm::validateGameParameters(const GameData& gameData, const StartData& startData)
+void Session::validateGameParameters(const GameData& gameData, const StartData& startData)
 {
     if (startData.numberOfPlayers < 2)
     {
@@ -98,7 +98,7 @@ void SessionFsm::validateGameParameters(const GameData& gameData, const StartDat
     }
 }
 
-void SessionFsm::fireGameInitializedEvent(int guiSpeed)
+void Session::fireGameInitializedEvent(int guiSpeed)
 {
     if (myEvents.onGameInitialized)
     {
@@ -106,7 +106,7 @@ void SessionFsm::fireGameInitializedEvent(int guiSpeed)
     }
 }
 
-void SessionFsm::ensureEngineFactoryInitialized()
+void Session::ensureEngineFactoryInitialized()
 {
     if (!myEngineFactory)
     {
@@ -114,7 +114,7 @@ void SessionFsm::ensureEngineFactoryInitialized()
     }
 }
 
-SessionFsm::GameComponents SessionFsm::createGameComponents(const GameData& gameData, const StartData& startData)
+Session::GameComponents Session::createGameComponents(const GameData& gameData, const StartData& startData)
 {
     GameComponents components;
 
@@ -127,16 +127,16 @@ SessionFsm::GameComponents SessionFsm::createGameComponents(const GameData& game
 
     // Create board using factory method (testable)
     components.board = createBoard(startData);
-    components.board->setSeatsListFsm(components.playersList);
-    components.board->setActingPlayersListFsm(components.playersList);
+    components.board->setSeatsList(components.playersList);
+    components.board->setActingPlayersList(components.playersList);
 
     return components;
 }
 
-void SessionFsm::initializeGame(GameComponents&& components, const GameData& gameData, const StartData& startData)
+void Session::initializeGame(GameComponents&& components, const GameData& gameData, const StartData& startData)
 {
-    myCurrentGame = std::make_unique<GameFsm>(myEvents, myEngineFactory, components.board, components.playersList,
-                                              startData.startDealerPlayerId, gameData, startData);
+    myCurrentGame = std::make_unique<Game>(myEvents, myEngineFactory, components.board, components.playersList,
+                                           startData.startDealerPlayerId, gameData, startData);
     fireGameInitializedEvent(gameData.guiSpeed);
     myCurrentGame->startNewHand();
 }

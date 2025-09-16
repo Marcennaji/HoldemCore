@@ -33,7 +33,7 @@ class NullPlayersStatisticsStore : public PlayersStatisticsStore
         return myNullPlayerStatistics;
     }
 
-    virtual void savePlayersStatistics(pkt::core::player::PlayerFsmList) override {}
+    virtual void savePlayersStatistics(pkt::core::player::PlayerList) override {}
 
   private:
     std::array<pkt::core::player::PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> myNullPlayerStatistics;

@@ -16,7 +16,7 @@
 namespace pkt::infra
 {
 
-using core::player::PlayerFsmList;
+using core::player::PlayerList;
 using core::player::PlayerStatistics;
 
 class SqlitePlayersStatisticsStore : public pkt::core::PlayersStatisticsStore
@@ -27,7 +27,7 @@ class SqlitePlayersStatisticsStore : public pkt::core::PlayersStatisticsStore
 
     ~SqlitePlayersStatisticsStore();
 
-    void savePlayersStatistics(PlayerFsmList seatsList) override;
+    void savePlayersStatistics(PlayerList seatsList) override;
     std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1>
     loadPlayerStatistics(const std::string& playerName) override;
 

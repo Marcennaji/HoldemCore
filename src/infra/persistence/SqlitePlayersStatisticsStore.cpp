@@ -1,7 +1,7 @@
 #include "SqlitePlayersStatisticsStore.h"
 #include "SqliteDb.h"
 #include "SqliteStatement.h"
-#include "core/player/PlayerFsm.h"
+#include "core/player/Player.h"
 
 #include <sstream>
 #include <stdexcept>
@@ -93,7 +93,7 @@ void SqlitePlayersStatisticsStore::initializeStrategyStatistics(const std::strin
     stmt->step();
 }
 
-void SqlitePlayersStatisticsStore::savePlayersStatistics(PlayerFsmList seatsList)
+void SqlitePlayersStatisticsStore::savePlayersStatistics(PlayerList seatsList)
 {
     int nbPlayers = static_cast<int>(seatsList->size());
 
