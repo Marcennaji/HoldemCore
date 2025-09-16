@@ -119,14 +119,34 @@ class StrategiesE2ETest : public EngineTest
         // Override board cards when dealt
         myEvents.onBoardCardsDealt = [this](BoardCards dealtBoard)
         {
-            // Set our predetermined board: 9h 8h 7d As 2c
+            // Check the current game state to determine which cards to set
+            GameState currentState = myHand->getGameState();
+
             BoardCards predeterminedBoard;
-            predeterminedBoard.dealFlop(Card("9h"), Card("8h"), Card("7d"));
-            predeterminedBoard.dealTurn(Card("As"));
-            predeterminedBoard.dealRiver(Card("2c"));
+
+            if (currentState == GameState::Flop)
+            {
+                // Only set flop cards (3 cards)
+                predeterminedBoard.dealFlop(Card("9h"), Card("8h"), Card("7d"));
+                logTestMessage("Override flop cards to: 9h 8h 7d");
+            }
+            else if (currentState == GameState::Turn)
+            {
+                // Set flop + turn cards (4 cards)
+                predeterminedBoard.dealFlop(Card("9h"), Card("8h"), Card("7d"));
+                predeterminedBoard.dealTurn(Card("As"));
+                logTestMessage("Override turn card to: As (board now: 9h 8h 7d As)");
+            }
+            else if (currentState == GameState::River)
+            {
+                // Set all 5 cards
+                predeterminedBoard.dealFlop(Card("9h"), Card("8h"), Card("7d"));
+                predeterminedBoard.dealTurn(Card("As"));
+                predeterminedBoard.dealRiver(Card("2c"));
+                logTestMessage("Override river card to: 2c (board now: 9h 8h 7d As 2c)");
+            }
 
             myHand->getBoard().setBoardCards(predeterminedBoard);
-            logTestMessage("Override board cards to: 9h 8h 7d As 2c");
         };
 
         logTestMessage("Predetermined card override events registered");
@@ -137,31 +157,31 @@ class StrategiesE2ETest : public EngineTest
         for (const auto& player : *mySeatsList)
         {
             auto lastAction = player->getLastAction();
-            std::cout << "Player " << player->getId() << " (" << player->getName() << ") "
-                      << "Cards: " << player->getHoleCards().toString()
-                      << " Last Action: " << actionTypeToString(lastAction.type) << " Amount: " << lastAction.amount
-                      << std::endl;
+            GlobalServices::instance().logger().info(
+                "Player " + std::to_string(player->getId()) + " (" + player->getName() + ") " +
+                "Cards: " + player->getHoleCards().toString() + " Last Action: " + actionTypeToString(lastAction.type) +
+                " Amount: " + std::to_string(lastAction.amount));
         }
     }
 
     void logPlayersHoleCardsAfterDealing()
     {
-        std::cout << "\n=== Players' Hole Cards After Override ===\n";
+        GlobalServices::instance().logger().info("=== Players' Hole Cards After Override ===");
         for (const auto& player : *mySeatsList)
         {
             const HoleCards& holeCards = player->getHoleCards();
             if (holeCards.isValid())
             {
-                std::cout << "Player " << player->getId() << " (" << player->getName() << "): " << holeCards.toString()
-                          << std::endl;
+                GlobalServices::instance().logger().info("Player " + std::to_string(player->getId()) + " (" +
+                                                         player->getName() + "): " + holeCards.toString());
             }
             else
             {
-                std::cout << "Player " << player->getId() << " (" << player->getName() << "): No valid hole cards"
-                          << std::endl;
+                GlobalServices::instance().logger().info("Player " + std::to_string(player->getId()) + " (" +
+                                                         player->getName() + "): No valid hole cards");
             }
         }
-        std::cout << std::endl;
+        GlobalServices::instance().logger().info(""); // Empty line for spacing
     }
 
     void logTestMessage(const std::string& message) const
@@ -257,16 +277,17 @@ TEST_F(StrategiesE2ETest, StrategiesBehaveDifferentlyInSameScenario)
     BoardCards boardCards("Ts", "9c", "8h", "7s", "2d");
     myBoard->setBoardCards(boardCards);
 
-    std::cout << "\n=== Testing Strategy Differences ===\n";
-    std::cout << "All players have Qd Js on board Ts 9c 8h 7s 2d\n";
-    std::cout << "All players have a straight!\n" << std::endl;
+    GlobalServices::instance().logger().info("=== Testing Strategy Differences ===");
+    GlobalServices::instance().logger().info("All players have Qd Js on board Ts 9c 8h 7s 2d");
+    GlobalServices::instance().logger().info("All players have a straight!");
+    GlobalServices::instance().logger().info(""); // Empty line for spacing
 
     // Run the hand and observe different behaviors
     myHand->runGameLoop();
 
     EXPECT_EQ(myHand->getGameState(), PostRiver);
 
-    std::cout << "Final actions show strategy differences:" << std::endl;
+    GlobalServices::instance().logger().info("Final actions show strategy differences:");
     logPlayerActions();
 
     // Even with identical hands, strategies should potentially show different betting patterns
@@ -313,8 +334,9 @@ TEST_F(StrategiesE2ETest, ManiacVsTightStrategiesShowClearDifferences)
     BoardCards boardCards("Ah", "8c", "5d", "2s", "Qh");
     myBoard->setBoardCards(boardCards);
 
-    std::cout << "\n=== Testing Weak Hands Strategy Differences ===\n";
-    std::cout << "Weak hands on rainbow board - strategies should differ significantly\n" << std::endl;
+    GlobalServices::instance().logger().info("=== Testing Weak Hands Strategy Differences ===");
+    GlobalServices::instance().logger().info("Weak hands on rainbow board - strategies should differ significantly");
+    GlobalServices::instance().logger().info(""); // Empty line for spacing
 
     // Log the manually set hole cards
     logPlayersHoleCardsAfterDealing();
@@ -323,7 +345,7 @@ TEST_F(StrategiesE2ETest, ManiacVsTightStrategiesShowClearDifferences)
 
     EXPECT_EQ(myHand->getGameState(), PostRiver);
 
-    std::cout << "Strategy differences with weak hands:" << std::endl;
+    GlobalServices::instance().logger().info("Strategy differences with weak hands:");
     logPlayerActions();
 
     // This scenario should show clear differences between tight and loose/maniac strategies
