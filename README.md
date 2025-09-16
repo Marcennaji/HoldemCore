@@ -29,6 +29,7 @@ cd PokerTraining
 cmake --preset debug-widgets
 cmake --build build/debug-widgets
 .\build\debug-widgets\tests\unit_tests.exe
+.\build\debug-widgets\tests\e2e_tests.exe
 ```
 
 ---
@@ -120,20 +121,17 @@ player.setStrategy(std::make_unique<MyCustomBotStrategy>());
 - **2011** — Initial version published on SourceForge (5⭐ project, >11,000 downloads).  
   The original version reused portions of the open-source **PokerTH** (GPLv2) engine, with a focus on creating **poker bot strategies and AI logic** (the existing PokerTH builtin bot AI was not reused at all).  
 
-- **2025 (today)** — Migrated to GitHub and undergoing a **major architectural rewrite**.  
+- **2025 (today)** — Migrated to GitHub and completed a **major architectural rewrite**.  
 
-  The legacy PokerTH code used a layered architecture with the Boost C++ library. This has been **progressively refactored and replaced** with a new **FSM-driven, modular architecture** using hexagonal design principles and pure standard C++.
+  The legacy PokerTH code used a layered architecture with the Boost C++ library. This has been **completely refactored and replaced** with a new **FSM-driven, modular architecture** using hexagonal design principles and pure standard C++.
   
   Key improvements:
   - **Enhanced testability** through dependency injection
   - **Multi-UI support** (Qt Widgets, QML, web frontends)
-  - **Legacy preservation** in 'deprecated' directories for validation testing
   
-  As of September 2025, the ongoing refactor has replaced almost all legacy code. 
+  As of September 2025, the architectural rewrite is **complete** — the codebase is now fully original and MIT-licensed. 
 
-## 🚧🚧🚧 **UNDER CONSTRUCTION** 🚧🚧🚧
-
-Since it is still under refactoring for the core engine, and since UI development is still on progress, **no public release or announcement has been made yet**.  
+🚧🚧🚧 Since UI development is still on progress, **no public release or announcement has been made yet**. 🚧🚧🚧  
 
 
 ---
@@ -141,7 +139,6 @@ Since it is still under refactoring for the core engine, and since UI developmen
 ## 📋 Roadmap 
 
 **Short-term**
-- Enhance testing on the new FSM-based hand street transitions, and remove the remaining legacy code
 - Redesign Qt Widgets table UI with a modern layout
 
 **Medium-term**
@@ -174,6 +171,6 @@ This project, PokerTraining, is released under the MIT License — you are free 
 ⚖️ Note on legacy code:
 The initial version of PokerTraining (2011, SourceForge) reused portions of the open-source [PokerTH](https://github.com/pokerth/pokerth) engine, which at that time was distributed under **GPLv2**. That early codebase focused mainly on adding poker bot strategies and AI logic.  
 
-Since 2025, the engine has been undergoing a **progressive rewrite**: nearly all PokerTH-derived code has been replaced with a **fully original, modular codebase under MIT**.  
+Since 2025, the engine has undergone a **complete rewrite**: all PokerTH-derived code has been replaced with a **fully original, modular codebase under MIT**.  
 
-🙏 Acknowledgment to the PokerTH project for providing the initial foundation that enabled focusing on bot AI development.
+🙏 Acknowledgment to the PokerTH project for providing the initial foundation that enabled focusing on bot AI development in the early years.
