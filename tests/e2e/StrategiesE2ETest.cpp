@@ -310,7 +310,6 @@ class StrategiesE2ETest : public EngineTest
                                                          player->getName() + "): No valid hole cards");
             }
         }
-        GlobalServices::instance().logger().info(""); // Empty line for spacing
     }
 
     void logTestMessage(const std::string& message) const
@@ -376,6 +375,88 @@ TestScenario ThreePlayerScenario()
 
     return TestScenario("Three Players", players, board, 0, 10, "Three-player hand with strong starting hands");
 }
+
+// === ALL-IN SCENARIOS ===
+
+TestScenario ShortStackAllInPreflop()
+{
+    std::vector<PlayerConfig> players = {
+        PlayerConfig(0, "TightAggressive", StrategyType::TightAggressive, HoleCards("As", "Ah"), 1000),
+        PlayerConfig(1, "LooseAggressive", StrategyType::LooseAggressive, HoleCards("Kh", "Kd"), 1000),
+        PlayerConfig(2, "UltraTight", StrategyType::UltraTight, HoleCards("Qc", "Qd"), 50), // Short stack
+        PlayerConfig(3, "Maniac", StrategyType::Maniac, HoleCards("Jh", "Js"), 1000)};
+
+    BoardConfig board("9h", "8c", "7d", "2s", "As");
+
+    return TestScenario("Short Stack All-In Preflop", players, board, 0, 10,
+                        "Test all-in with short stack preflop - validates pot calculation");
+}
+
+TestScenario MidHandAllIn()
+{
+    std::vector<PlayerConfig> players = {
+        PlayerConfig(0, "TightAggressive", StrategyType::TightAggressive, HoleCards("Ah", "Kh"), 1000),
+        PlayerConfig(1, "LooseAggressive", StrategyType::LooseAggressive, HoleCards("9s", "8s"), 200), // Medium stack
+        PlayerConfig(2, "UltraTight", StrategyType::UltraTight, HoleCards("7c", "6c"), 1000),
+        PlayerConfig(3, "Maniac", StrategyType::Maniac, HoleCards("2d", "2h"), 1000)};
+
+    BoardConfig board("9h", "8h", "7d", "Kc", "2c");
+
+    return TestScenario("Mid-Hand All-In", players, board, 0, 10,
+                        "Test all-in during flop/turn - validates betting round continuation");
+}
+
+TestScenario MultipleAllIns()
+{
+    std::vector<PlayerConfig> players = {
+        PlayerConfig(0, "TightAggressive", StrategyType::TightAggressive, HoleCards("As", "Ad"), 300),
+        PlayerConfig(1, "LooseAggressive", StrategyType::LooseAggressive, HoleCards("Kh", "Kd"), 150),
+        PlayerConfig(2, "UltraTight", StrategyType::UltraTight, HoleCards("Qc", "Qd"), 75),
+        PlayerConfig(3, "Maniac", StrategyType::Maniac, HoleCards("Jh", "Js"), 1000)};
+
+    BoardConfig board("9h", "8c", "7d", "6s", "5c");
+
+    return TestScenario("Multiple All-Ins", players, board, 0, 10,
+                        "Test multiple all-ins with different stack sizes - validates side pot creation");
+}
+
+// === HEADS-UP SCENARIOS ===
+
+TestScenario HeadsUpTightVsAggressive()
+{
+    std::vector<PlayerConfig> players = {
+        PlayerConfig(0, "TightAggressive", StrategyType::TightAggressive, HoleCards("As", "Kd"), 1000),
+        PlayerConfig(1, "LooseAggressive", StrategyType::LooseAggressive, HoleCards("Tc", "9c"), 1000)};
+
+    BoardConfig board("Kh", "9s", "7d", "2c", "Ah");
+
+    return TestScenario("Heads-Up Tight vs Aggressive", players, board, 0, 10,
+                        "Test two-player dynamics - validates minimal player count handling");
+}
+
+TestScenario HeadsUpPositionTest()
+{
+    std::vector<PlayerConfig> players = {
+        PlayerConfig(0, "UltraTight", StrategyType::UltraTight, HoleCards("Qh", "Jh"), 1000), // Button/Small blind
+        PlayerConfig(1, "Maniac", StrategyType::Maniac, HoleCards("8d", "7s"), 1000)};        // Big blind
+
+    BoardConfig board("Jc", "8h", "6d", "3s", "Qc");
+
+    return TestScenario("Heads-Up Position Test", players, board, 0, 10,
+                        "Test button vs big blind dynamics in heads-up play");
+}
+
+TestScenario HeadsUpShortStacks()
+{
+    std::vector<PlayerConfig> players = {
+        PlayerConfig(0, "TightAggressive", StrategyType::TightAggressive, HoleCards("Ad", "Kc"), 80),
+        PlayerConfig(1, "LooseAggressive", StrategyType::LooseAggressive, HoleCards("Th", "9h"), 120)};
+
+    BoardConfig board("Kd", "Ts", "4h", "2c", "As");
+
+    return TestScenario("Heads-Up Short Stacks", players, board, 0, 10,
+                        "Test heads-up with short stacks - validates push/fold scenarios");
+}
 } // namespace TestScenarios
 
 TEST_F(StrategiesE2ETest, FourStrategiesCompleteHandFromPreflopToPostRiver)
@@ -396,6 +477,40 @@ TEST_F(StrategiesE2ETest, ManiacVsTightStrategiesShowClearDifferences)
 TEST_F(StrategiesE2ETest, ThreePlayerScenario)
 {
     runTestScenario(TestScenarios::ThreePlayerScenario());
+}
+
+// === ALL-IN SCENARIO TESTS ===
+
+TEST_F(StrategiesE2ETest, ShortStackAllInPreflopValidatesPotCalculation)
+{
+    runTestScenario(TestScenarios::ShortStackAllInPreflop());
+}
+
+TEST_F(StrategiesE2ETest, MidHandAllInValidatesBettingContinuation)
+{
+    runTestScenario(TestScenarios::MidHandAllIn());
+}
+
+TEST_F(StrategiesE2ETest, MultipleAllInsValidateSidePotCreation)
+{
+    runTestScenario(TestScenarios::MultipleAllIns());
+}
+
+// === HEADS-UP SCENARIO TESTS ===
+
+TEST_F(StrategiesE2ETest, HeadsUpValidatesMinimalPlayerCount)
+{
+    runTestScenario(TestScenarios::HeadsUpTightVsAggressive());
+}
+
+TEST_F(StrategiesE2ETest, HeadsUpPositionDynamicsValidation)
+{
+    runTestScenario(TestScenarios::HeadsUpPositionTest());
+}
+
+TEST_F(StrategiesE2ETest, HeadsUpShortStacksPushFoldValidation)
+{
+    runTestScenario(TestScenarios::HeadsUpShortStacks());
 }
 
 } // namespace pkt::test

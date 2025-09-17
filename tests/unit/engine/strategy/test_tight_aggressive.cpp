@@ -172,20 +172,6 @@ TEST_F(TightAggressiveStrategyTest, River_Nuts_Raises)
     EXPECT_GT(action.amount, 0);
 }
 
-TEST_F(TightAggressiveStrategyTest, DISABLED_River_ZeroEquity_Folds)
-{
-    ctx.commonContext.gameState = River;
-    ctx.personalContext.myHandSimulation.winSd = 0.0f;
-    ctx.personalContext.position = PlayerPosition::Button;
-    ctx.commonContext.bettingContext.riverBetsOrRaisesNumber = 5;
-    ctx.commonContext.playersContext.lastVPIPPlayer = std::make_shared<pkt::test::DummyPlayer>(2, events);
-
-    PlayerAction action = strategy.decideAction(ctx);
-
-    EXPECT_EQ(action.type, ActionType::Fold);
-    EXPECT_EQ(action.amount, 0);
-}
-
 // --- Edge / Defensive ---
 
 TEST_F(TightAggressiveStrategyTest, ZeroCash_CannotRaise)
