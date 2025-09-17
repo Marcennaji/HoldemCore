@@ -41,12 +41,17 @@ class Player
 {
   public:
     Player(const GameEvents&, int id, std::string name, int cash);
-
     virtual ~Player() = default;
 
+    // ========================================
+    // Core Identity & Properties
+    // ========================================
     int getId() const;
     std::string getName() const;
 
+    // ========================================
+    // Strategy Management (Delegates to myStrategy)
+    // ========================================
     void setStrategy(std::unique_ptr<PlayerStrategy> strategy) { myStrategy = std::move(strategy); }
 
     PlayerAction decideAction(const CurrentHandContext& ctx)
@@ -55,19 +60,16 @@ class Player
         return myStrategy->decideAction(ctx);
     }
 
-    // For testing purposes: get strategy type information
     std::string getStrategyTypeName() const
     {
         if (!myStrategy)
         {
             return "None";
         }
-        // Store in variable to avoid warning about potentially-evaluated-expression
         const auto& strategy = *myStrategy;
         return typeid(strategy).name();
     }
 
-    // For testing purposes: check if strategy is of specific type
     template <typename StrategyType> bool hasStrategyType() const
     {
         if (!myStrategy)
@@ -77,81 +79,69 @@ class Player
         return dynamic_cast<const StrategyType*>(myStrategy.get()) != nullptr;
     }
 
+    // ========================================
+    // Context Access & Management
+    // ========================================
+    CurrentHandContext& getCurrentHandContext() { return *myCurrentHandContext; }
+    void updateCurrentHandContext(const GameState gameState, Hand&);
+    void resetForNewHand(const Hand& hand);
+
+    // ========================================
+    // State Delegates (Delegate to myCurrentHandContext)
+    // ========================================
+    // Cash management
     void setCash(int theValue);
     int getCash() const;
     void addBetAmount(int theValue);
-
-    void setAction(IHandState& state, const PlayerAction& action);
-    PlayerAction getLastAction() const;
-
-    // Modern Card-based interface - preferred for new code
-    const HoleCards& getHoleCards() const { return myHoleCards; }
-    void setHoleCards(const HoleCards& cards) { myHoleCards = cards; }
-    void setHoleCards(const Card& card1, const Card& card2) { myHoleCards = HoleCards(card1, card2); }
-
-    void setCardsFlip(bool theValue);
-    bool getCardsFlip() const;
-
-    void setHandRanking(int theValue);
-    int getHandRanking() const;
-
     void setCashAtHandStart(int theValue);
     int getCashAtHandStart() const;
-
     void setLastMoneyWon(int theValue);
     int getLastMoneyWon() const;
 
+    // Cards & position
+    const HoleCards& getHoleCards() const;
+    void setHoleCards(const HoleCards& cards);
+    void setHoleCards(const Card& card1, const Card& card2);
     std::string getCardsValueString() const;
-
     const PlayerPosition getPosition() const;
     void setPosition(const Hand& hand);
 
-    bool checkIfINeedToShowCards() const;
-
-    CurrentHandContext& getCurrentHandContext() { return *myCurrentHandContext; };
-
-    virtual float calculatePreflopCallingRange(const CurrentHandContext& ctx) const;
-
+    // Hand evaluation & ranking
+    void setHandRanking(int theValue);
+    int getHandRanking() const;
     const PostFlopAnalysisFlags getPostFlopAnalysisFlags() const;
+
+    // Actions & gameplay
+    void setAction(IHandState& state, const PlayerAction& action);
+    PlayerAction getLastAction() const;
     const CurrentHandActions& getCurrentHandActions() const;
-    void resetCurrentHandActions() { myCurrentHandActions.reset(); }
+    void resetCurrentHandActions();
 
-    void setPreflopPotOdd(const int potOdd);
-
-    bool isAgressor(const GameState gameState) const;
-
-    void updateCurrentHandContext(const GameState gameState, Hand&);
-
-    bool isInVeryLooseMode(const int nbPlayers) const;
-
-    std::unique_ptr<RangeEstimator>& getRangeEstimator() { return myRangeEstimator; }
-    int getPreflopPotOdd() const;
-
-    void resetForNewHand(const Hand& hand);
-
+    // ========================================
+    // Statistics Delegates (Delegate to myStatisticsUpdater)
+    // ========================================
     const PlayerStatistics& getStatistics(const int nbPlayers) const;
     const std::unique_ptr<PlayerStatisticsUpdater>& getStatisticsUpdater() const { return myStatisticsUpdater; }
 
+    // ========================================
+    // Range Estimation Delegates (Delegate to myRangeEstimator)
+    // ========================================
+    virtual float calculatePreflopCallingRange(const CurrentHandContext& ctx) const;
+    std::unique_ptr<RangeEstimator>& getRangeEstimator() { return myRangeEstimator; }
+
+    // ========================================
+    // Business Logic Methods (Actual Implementation)
+    // ========================================
+    bool isInVeryLooseMode(const int nbPlayers) const;
+
   protected:
     float getMaxOpponentsStrengths() const;
-    bool isPreflopBigBet() const;
     float getOpponentWinningHandsPercentage(const int idPlayer, std::string board) const;
 
     const GameEvents& myEvents;
-    CurrentHandActions myCurrentHandActions;
     std::unique_ptr<CurrentHandContext> myCurrentHandContext;
     const int myID;
     const std::string myName;
-    PlayerPosition myPosition;
-
-    int myHandRanking{0};
-    HoleCards myHoleCards;
-    int myCash{0};
-    int myCashAtHandStart{0};
-
-    bool myCardsFlip{false}; // 0 = cards are not fliped, 1 = cards are already flipped,
-    int lastMoneyWon{0};
-    int myPreflopPotOdd{0};
     std::unique_ptr<RangeEstimator> myRangeEstimator;
 
   private:

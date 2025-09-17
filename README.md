@@ -172,4 +172,4 @@ This project, PokerTraining, is released under the MIT License — you are free 
 
 Since 2025, the engine has undergone a **complete rewrite**: all PokerTH-derived code has been replaced with a **fully original, modular codebase under MIT**.  
 
-🙏 Acknowledgment to the PokerTH project for providing the initial foundation that enabled focusing on bot AI development in the early years.
+🙏 Acknowledgment to the PokerTH project for providing the initial foundation that enabled focusing on bot AI development in 2011.

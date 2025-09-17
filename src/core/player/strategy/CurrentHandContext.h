@@ -64,6 +64,11 @@ struct PerPlayerHandContext
     pkt::core::HoleCards holeCards;
     pkt::core::PlayerPosition position = PlayerPosition::Unknown;
 
+    // Game state that persists or resets between hands
+    int handRanking = 0;     // Hand strength ranking
+    int cashAtHandStart = 0; // Cash amount at start of hand
+    int lastMoneyWon = 0;    // Money won in last hand
+
     PlayerStatistics statistics{};
     PostFlopAnalysisFlags postFlopAnalysisFlags{}; // what are the possibilities, given the board and the hole cards ?
 
