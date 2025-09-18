@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <vector>
-#include "core/cards/Card.h"
-#include "core/engine/CardUtilities.h"
+#include "core/engine/cards/Card.h"
+#include "core/engine/cards/CardUtilities.h"
 
 using namespace pkt::core;
 

@@ -1,6 +1,6 @@
 
 #include "BettingActions.h"
-#include "core/engine/Hand.h"
+#include "../hand/Hand.h"
 #include "core/player/Player.h"
 #include "core/player/typedefs.h"
 

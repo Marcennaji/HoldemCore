@@ -1,7 +1,7 @@
 #include "SqlitePlayersStatisticsStoreTest.h"
 #include "common/DeterministicStrategy.h"
 #include "common/EngineTest.h"
-#include "core/engine/round_states/PreflopState.h"
+#include "core/engine/state/PreflopState.h"
 #include "core/interfaces/persistence/NullPlayersStatisticsStore.h"
 #include "core/player/Helpers.h"
 #include "core/services/GlobalServices.h"

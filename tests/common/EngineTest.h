@@ -3,8 +3,8 @@
 
 #include "common/common.h"
 
-#include "core/engine/Board.h"
 #include "core/engine/EngineFactory.h"
+#include "core/engine/game/Board.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/GameState.h"
 #include "core/interfaces/NullLogger.h"

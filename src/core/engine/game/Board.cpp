@@ -7,8 +7,8 @@
 #include <core/services/GlobalServices.h>
 #include "Exception.h"
 #include "Pot.h"
-#include "core/engine/Hand.h"
 #include "core/player/Player.h"
+#include "hand/Hand.h"
 #include "model/EngineError.h"
 
 #include <algorithm>

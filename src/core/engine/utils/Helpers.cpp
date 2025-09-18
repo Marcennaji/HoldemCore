@@ -1,19 +1,19 @@
 
 #include "Helpers.h"
-#include "core/engine/ActionValidator.h"
-#include "core/engine/BettingActions.h"
-#include "core/engine/CardUtilities.h"
+#include "actions/ActionValidator.h"
+#include "actions/BettingActions.h"
 #include "core/engine/Exception.h"
-#include "core/engine/Hand.h"
+#include "core/engine/cards/CardUtilities.h"
+#include "core/engine/hand/Hand.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/player/Helpers.h"
 #include "core/player/Player.h"
 #include "core/services/GlobalServices.h"
 // Include FSM states for the helper function
-#include "core/engine/round_states/FlopState.h"
-#include "core/engine/round_states/PostRiverState.h"
-#include "core/engine/round_states/RiverState.h"
-#include "core/engine/round_states/TurnState.h"
+#include "core/engine/state/FlopState.h"
+#include "core/engine/state/PostRiverState.h"
+#include "core/engine/state/RiverState.h"
+#include "core/engine/state/TurnState.h"
 
 #include <algorithm>
 #include <cmath>

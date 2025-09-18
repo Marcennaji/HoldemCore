@@ -3,8 +3,8 @@
 // Licensed under the MIT License — see LICENSE file for details.
 #pragma once
 
-#include "core/cards/Card.h"
 #include "core/engine/GameEvents.h"
+#include "core/engine/cards/Card.h"
 #include "core/interfaces/IBoard.h"
 #include "core/player/typedefs.h"
 

@@ -3,7 +3,7 @@
 // Licensed under the MIT License — see LICENSE file for details.
 
 #include "CardRangeAnalyzer.h"
-#include "core/engine/CardUtilities.h"
+#include "core/engine/cards/CardUtilities.h"
 
 #include <algorithm>
 #include <cstring>

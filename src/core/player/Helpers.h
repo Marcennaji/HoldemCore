@@ -6,11 +6,11 @@
 #pragma once
 
 // Include the new focused modules
-#include "core/cards/Card.h"
-#include "core/cards/CardRangeAnalyzer.h"
+#include "core/engine/cards/Card.h"
+#include "core/engine/cards/CardRangeAnalyzer.h"
+#include "core/engine/probability/DrawProbabilityCalculator.h"
 #include "core/player/PlayerListUtils.h"
 #include "core/player/position/PositionManager.h"
-#include "core/probability/DrawProbabilityCalculator.h"
 
 #include "core/engine/model/GameState.h"
 #include "core/engine/model/PlayerAction.h"

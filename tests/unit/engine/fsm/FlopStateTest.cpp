@@ -2,7 +2,7 @@
 
 #include "FlopStateTest.h"
 #include "core/engine/model/PlayerAction.h"
-#include "core/engine/round_states/FlopState.h"
+#include "core/engine/state/FlopState.h"
 #include "core/player/Helpers.h"
 #include "core/services/GlobalServices.h"
 

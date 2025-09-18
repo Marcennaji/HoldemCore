@@ -1,7 +1,7 @@
 #include "PostRiverStateTest.h"
 #include "core/engine/EngineDefs.h"
-#include "core/engine/round_states/PostRiverState.h"
-#include "core/engine/round_states/PreflopState.h"
+#include "core/engine/state/PostRiverState.h"
+#include "core/engine/state/PreflopState.h"
 #include "core/player/Helpers.h"
 #include "core/services/GlobalServices.h"
 

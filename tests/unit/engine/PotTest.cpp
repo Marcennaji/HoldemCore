@@ -1,9 +1,9 @@
 #include "common/common.h"
 
 #include "common/DummyPlayer.h"
-#include "core/engine/Pot.h"
+#include "core/engine/game/Pot.h"
 #include "core/engine/model/GameState.h"
-#include "core/engine/round_states/RiverState.h"
+#include "core/engine/state/RiverState.h"
 #include "core/player/typedefs.h"
 
 using namespace pkt::core;

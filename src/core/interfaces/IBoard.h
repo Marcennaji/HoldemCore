@@ -5,8 +5,8 @@
 #pragma once
 
 #include <core/player/typedefs.h>
-#include "core/cards/Card.h"
 #include "core/engine/EngineDefs.h"
+#include "core/engine/cards/Card.h"
 
 #include <list>
 #include <stdexcept>

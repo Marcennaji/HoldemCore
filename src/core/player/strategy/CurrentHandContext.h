@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "core/cards/Card.h" // For HoleCards
+#include "core/engine/cards/Card.h" // For HoleCards
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/interfaces/IHandEvaluationEngine.h"

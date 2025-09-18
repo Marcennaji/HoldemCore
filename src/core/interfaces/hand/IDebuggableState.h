@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/engine/Hand.h"
+#include "core/engine/hand/Hand.h"
 #include "core/engine/model/GameState.h"
 #include "core/interfaces/IBoard.h"
 #include "core/services/GlobalServices.h"

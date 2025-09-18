@@ -6,7 +6,7 @@
 
 #include "EngineFactory.h"
 
-#include "core/engine/Hand.h"
+#include "core/engine/hand/Hand.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
 #include "core/interfaces/IBoard.h"

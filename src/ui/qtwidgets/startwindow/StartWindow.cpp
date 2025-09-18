@@ -6,7 +6,7 @@
 #include <ui/qtwidgets/poker_ui/PokerTableWindow.h>
 
 #include <core/engine/EngineDefs.h>
-#include <core/engine/Game.h>
+#include <core/engine/game/Game.h>
 #include "core/services/GlobalServices.h"
 
 #include <core/engine/model/GameData.h>

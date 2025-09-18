@@ -1,6 +1,6 @@
 #include "common/EngineTest.h"
 #include "common/common.h"
-#include "core/cards/Card.h"
+#include "core/engine/cards/Card.h"
 
 #include <memory>
 

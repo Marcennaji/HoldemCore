@@ -1,6 +1,6 @@
 #include "common/common.h"
 
-#include "core/cards/CardRangeAnalyzer.h"
+#include "core/engine/cards/CardRangeAnalyzer.h"
 
 using namespace pkt::core::cards;
 

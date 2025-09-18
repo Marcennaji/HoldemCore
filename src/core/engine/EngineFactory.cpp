@@ -5,7 +5,7 @@
 #include "EngineFactory.h"
 
 #include <core/services/GlobalServices.h>
-#include "core/engine/Board.h"
+#include "core/engine/game/Board.h"
 #include "strategy/LooseAggressiveBotStrategy.h"
 #include "strategy/ManiacBotStrategy.h"
 #include "strategy/TightAggressiveBotStrategy.h"

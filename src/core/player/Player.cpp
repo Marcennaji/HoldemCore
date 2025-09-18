@@ -4,11 +4,11 @@
 
 #include "Player.h"
 
-#include <core/engine/CardUtilities.h>
-#include <core/engine/Hand.h>
-#include <core/engine/HandEvaluator.h>
-#include <core/engine/Helpers.h>
+#include <core/engine/cards/CardUtilities.h>
+#include <core/engine/hand/Hand.h>
+#include <core/engine/hand/HandEvaluator.h>
 #include <core/engine/model/Ranges.h>
+#include <core/engine/utils/Helpers.h>
 #include <core/interfaces/persistence/PlayersStatisticsStore.h>
 #include <core/player/range/RangeParser.h>
 #include <core/player/strategy/CurrentHandContext.h>

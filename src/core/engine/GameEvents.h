@@ -1,5 +1,5 @@
 #pragma once
-#include "core/cards/Card.h"
+#include "cards/Card.h"
 #include "core/engine/model/GameState.h"
 #include "core/engine/model/PlayerAction.h"
 

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include "core/cards/Card.h"
 #include "core/engine/GameEvents.h"
+#include "core/engine/cards/Card.h"
 #include "core/player/Player.h"
 
 using namespace pkt::core;

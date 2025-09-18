@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/engine/BettingRoundActions.h"
+#include "BettingRoundActions.h"
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/interfaces/hand/IHandState.h"

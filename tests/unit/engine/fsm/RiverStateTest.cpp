@@ -2,7 +2,7 @@
 
 #include "RiverStateTest.h"
 #include "core/engine/model/PlayerAction.h"
-#include "core/engine/round_states/RiverState.h"
+#include "core/engine/state/RiverState.h"
 #include "core/player/Helpers.h"
 #include "core/services/GlobalServices.h"
 

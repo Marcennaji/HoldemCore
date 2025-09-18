@@ -2,9 +2,9 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
-#include <core/engine/Game.h>
-#include <core/engine/GameEvents.h>
 #include "Session.h"
+#include <core/engine/GameEvents.h>
+#include <core/engine/game/Game.h>
 
 #include <core/engine/EngineFactory.h>
 

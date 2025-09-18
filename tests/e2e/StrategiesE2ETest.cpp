@@ -6,8 +6,8 @@
 #include <optional>
 
 #include "common/EngineTest.h"
-#include "core/cards/Card.h"
-#include "core/engine/Hand.h"
+#include "core/engine/cards/Card.h"
+#include "core/engine/hand/Hand.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
 #include "core/player/strategy/LooseAggressiveBotStrategy.h"

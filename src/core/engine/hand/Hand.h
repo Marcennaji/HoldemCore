@@ -2,13 +2,13 @@
 
 #include <map>
 #include <memory>
+#include "../actions/ActionValidator.h"
+#include "../actions/InvalidActionHandler.h"
+#include "../cards/Card.h"
 #include "Player.h"
-#include "core/cards/Card.h"
-#include "core/engine/ActionValidator.h"
-#include "core/engine/DeckManager.h"
-#include "core/engine/HandPlayersState.h"
-#include "core/engine/HandStateManager.h"
-#include "core/engine/InvalidActionHandler.h"
+#include "core/engine/cards/DeckManager.h"
+#include "core/engine/hand/HandPlayersState.h"
+#include "core/engine/hand/HandStateManager.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
 #include "core/interfaces/hand/IActionProcessor.h"

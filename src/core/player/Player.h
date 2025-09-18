@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <core/engine/HandEvaluator.h>
+#include <core/engine/hand/HandEvaluator.h>
 #include "core/engine/GameEvents.h"
 
-#include "core/cards/Card.h"
+#include "core/engine/cards/Card.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/player/PlayerStatisticsUpdater.h"
 #include "core/player/strategy/PlayerStrategy.h"

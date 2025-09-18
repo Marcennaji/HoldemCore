@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/engine/CardUtilities.h"
+#include "core/engine/cards/CardUtilities.h"
 #include "core/services/GlobalServices.h"
 
 #include <algorithm>

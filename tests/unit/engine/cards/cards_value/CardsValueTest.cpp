@@ -1,5 +1,5 @@
 #include "common/common.h"
-#include "core/engine/HandEvaluator.h"
+#include "core/engine/hand/HandEvaluator.h"
 #include "core/services/GlobalServices.h"
 #include "infra/ConsoleLogger.h"
 #include "infra/eval/PsimHandEvaluationEngine.h"

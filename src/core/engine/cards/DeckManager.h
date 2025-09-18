@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "core/cards/Card.h"
+#include "core/engine/cards/Card.h"
 
 namespace pkt::core
 {

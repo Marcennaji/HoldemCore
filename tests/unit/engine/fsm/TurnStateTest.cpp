@@ -2,7 +2,7 @@
 
 #include "TurnStateTest.h"
 #include "core/engine/model/PlayerAction.h"
-#include "core/engine/round_states/TurnState.h"
+#include "core/engine/state/TurnState.h"
 #include "core/player/Helpers.h"
 #include "core/services/GlobalServices.h"
 

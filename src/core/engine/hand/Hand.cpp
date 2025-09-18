@@ -10,7 +10,7 @@
 #include "model/EngineError.h"
 
 #include "Helpers.h"
-#include "core/engine/round_states/PreflopState.h"
+#include "core/engine/state/PreflopState.h"
 #include "core/player/typedefs.h"
 
 #include <algorithm>

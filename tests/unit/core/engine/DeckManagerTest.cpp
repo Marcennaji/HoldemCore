@@ -1,4 +1,4 @@
-#include "core/engine/DeckManager.h"
+#include "core/engine/cards/DeckManager.h"
 #include <gtest/gtest.h>
 
 namespace pkt::core
