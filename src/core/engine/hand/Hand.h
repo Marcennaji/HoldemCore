@@ -55,6 +55,12 @@ class Hand : public IHandLifecycle, public IHandPlayerAction, public HandPlayers
     GameState getGameState() const { return myStateManager->getGameState(); }
     IBoard& getBoard() { return *myBoard; }
 
+    // Accessor methods for ActionApplier
+    HandStateManager* getStateManager() const { return myStateManager.get(); }
+    const GameEvents& getEvents() const { return myEvents; }
+    void fireOnPotUpdated() const;
+    pkt::core::player::PlayerList& getActingPlayersListMutable() { return myActingPlayersList; }
+
     // Hand action history methods (delegates to BettingActions)
     const std::vector<pkt::core::BettingRoundHistory>& getHandActionHistory() const
     {
@@ -62,8 +68,6 @@ class Hand : public IHandLifecycle, public IHandPlayerAction, public HandPlayers
     }
 
   private:
-    void applyActionEffects(const PlayerAction action);
-    void fireOnPotUpdated() const;
     std::string getActionValidationError(const PlayerAction& action) const;
     PlayerAction getDefaultActionForPlayer(unsigned playerId) const;
 

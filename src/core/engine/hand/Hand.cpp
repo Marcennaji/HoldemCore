@@ -3,6 +3,7 @@
 #include "CardUtilities.h"
 #include "DeckManager.h"
 #include "GameEvents.h"
+#include "core/engine/actions/ActionApplier.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/player/Helpers.h"
 
@@ -113,161 +114,6 @@ void Hand::handlePlayerAction(PlayerAction action)
 
     processValidAction(action);
 }
-void Hand::applyActionEffects(const PlayerAction action)
-{
-    auto player = getPlayerById(myActingPlayersList, action.playerId);
-    if (!player)
-        return;
-
-    int currentHighest = getBettingActions()->getRoundHighestSet();
-    int playerBet = player->getCurrentHandActions().getRoundTotalBetAmount(myStateManager->getGameState());
-
-    // Create a copy for storing in action history with correct increment amounts
-    PlayerAction actionForHistory = action;
-
-    switch (action.type)
-    {
-    case ActionType::Fold:
-        // No amount change needed
-        break;
-
-    case ActionType::Call:
-    {
-        int amountToCall = currentHighest - playerBet;
-        if (player->getCash() < amountToCall)
-        {
-            amountToCall = player->getCash();
-        }
-
-        // If this call uses all remaining cash, treat it as an all-in
-        if (amountToCall == player->getCash())
-        {
-            actionForHistory.type = ActionType::Allin;
-            player->setCash(0);
-        }
-
-        actionForHistory.amount = amountToCall; // store the actual call amount
-        player->addBetAmount(amountToCall);
-        fireOnPotUpdated();
-        break;
-    }
-
-    case ActionType::Raise:
-    {
-        int raiseIncrement = action.amount - playerBet;
-        actionForHistory.amount = raiseIncrement; // store only the increment in history
-        player->addBetAmount(raiseIncrement);
-        fireOnPotUpdated();
-        getBettingActions()->updateRoundHighestSet(action.amount);
-
-        // Record last raiser for the current betting round
-        switch (myStateManager->getGameState())
-        {
-        case GameState::Preflop:
-            getBettingActions()->getPreflop().setLastRaiserId(player->getId());
-            break;
-        case GameState::Flop:
-            getBettingActions()->getFlop().setLastRaiserId(player->getId());
-            break;
-        case GameState::Turn:
-            getBettingActions()->getTurn().setLastRaiserId(player->getId());
-            break;
-        case GameState::River:
-            getBettingActions()->getRiver().setLastRaiserId(player->getId());
-            break;
-        default:
-            break;
-        }
-        break;
-    }
-
-    case ActionType::Bet:
-    {
-        // For bet, the amount is already the increment
-        player->addBetAmount(action.amount);
-        fireOnPotUpdated();
-        getBettingActions()->updateRoundHighestSet(action.amount);
-
-        // Record last raiser (bettor) for the current betting round
-        switch (myStateManager->getGameState())
-        {
-        case GameState::Preflop:
-            getBettingActions()->getPreflop().setLastRaiserId(player->getId());
-            break;
-        case GameState::Flop:
-            getBettingActions()->getFlop().setLastRaiserId(player->getId());
-            break;
-        case GameState::Turn:
-            getBettingActions()->getTurn().setLastRaiserId(player->getId());
-            break;
-        case GameState::River:
-            getBettingActions()->getRiver().setLastRaiserId(player->getId());
-            break;
-        default:
-            break;
-        }
-        break;
-    }
-
-    case ActionType::Check:
-    {
-        // No amount change needed
-        break;
-    }
-
-    case ActionType::Allin:
-    {
-        int allinIncrement = player->getCash();   // The increment is all remaining cash
-        actionForHistory.amount = allinIncrement; // store only the increment in history
-
-        player->addBetAmount(allinIncrement);
-        fireOnPotUpdated();
-        player->setCash(0);
-
-        if (allinIncrement > currentHighest)
-        {
-            getBettingActions()->updateRoundHighestSet(allinIncrement);
-
-            // Record last raiser (all-in as raise) for the current betting round
-            switch (myStateManager->getGameState())
-            {
-            case GameState::Preflop:
-                getBettingActions()->getPreflop().setLastRaiserId(player->getId());
-                break;
-            case GameState::Flop:
-                getBettingActions()->getFlop().setLastRaiserId(player->getId());
-                break;
-            case GameState::Turn:
-                getBettingActions()->getTurn().setLastRaiserId(player->getId());
-                break;
-            case GameState::River:
-                getBettingActions()->getRiver().setLastRaiserId(player->getId());
-                break;
-            default:
-                break;
-            }
-        }
-        break;
-    }
-
-    case ActionType::None:
-    default:
-        break;
-    }
-
-    player->setAction(myStateManager->getCurrentState(), actionForHistory);
-
-    // Record action in hand-level chronological history
-    getBettingActions()->recordPlayerAction(myStateManager->getGameState(), actionForHistory);
-
-    updateActingPlayersList(myActingPlayersList);
-
-    if (myEvents.onPlayerActed)
-    {
-        myEvents.onPlayerActed(action);
-    }
-}
-
 void Hand::initAndShuffleDeck()
 {
     myDeckManager->initializeAndShuffle();
@@ -528,7 +374,7 @@ void Hand::processValidAction(const PlayerAction& action)
         // Reset invalid action count on successful action
         myInvalidActionHandler->resetInvalidActionCount(action.playerId);
 
-        applyActionEffects(action);
+        ActionApplier::apply(*this, action);
 
         // Delegate state transition to HandStateManager
         myStateManager->transitionToNextState(*this);

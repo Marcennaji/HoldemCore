@@ -542,9 +542,9 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopAnaly
           ctx.personalContext.statistics.riverStatistics.hands > MIN_HANDS_STATISTICS_ACCURATE))
     {
 
-        if (!(((testedHand.isTwoPair && !testedHand.isFullHousePossible) && !testedHand.isFullHousePossible) ||
-              testedHand.isStraight || testedHand.isFlush || testedHand.isFullHouse || testedHand.isTrips ||
-              testedHand.isQuads || testedHand.isStFlush || testedHand.isOverCards || testedHand.isFlushDrawPossible ||
+        if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight ||
+              testedHand.isFlush || testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads ||
+              testedHand.isStFlush || testedHand.isOverCards || testedHand.isFlushDrawPossible ||
               testedHand.flushOuts >= 8 || testedHand.straightOuts >= 8))
         {
 
