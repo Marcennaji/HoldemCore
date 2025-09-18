@@ -10,7 +10,7 @@ class DeckManagerTest : public ::testing::Test
     DeckManager deckManager;
 };
 
-TEST_F(DeckManagerTest, InitializeAndShuffle_CreatesValidDeck)
+TEST_F(DeckManagerTest, InitializeAndShuffleCreatesValidDeck)
 {
     deckManager.initializeAndShuffle();
 
@@ -18,7 +18,7 @@ TEST_F(DeckManagerTest, InitializeAndShuffle_CreatesValidDeck)
     EXPECT_TRUE(deckManager.hasEnoughCards(5, 9)); // 5 board + 9 players * 2 = 23 cards needed
 }
 
-TEST_F(DeckManagerTest, DealCards_ReducesRemainingCards)
+TEST_F(DeckManagerTest, DealCardsReducesRemainingCards)
 {
     deckManager.initializeAndShuffle();
 
@@ -28,7 +28,7 @@ TEST_F(DeckManagerTest, DealCards_ReducesRemainingCards)
     EXPECT_EQ(47, deckManager.remainingCards());
 }
 
-TEST_F(DeckManagerTest, DealCards_ThrowsWhenNotEnoughCards)
+TEST_F(DeckManagerTest, DealCardsThrowsWhenNotEnoughCards)
 {
     deckManager.initializeAndShuffle();
     deckManager.dealCards(50); // Leave only 2 cards
@@ -36,7 +36,7 @@ TEST_F(DeckManagerTest, DealCards_ThrowsWhenNotEnoughCards)
     EXPECT_THROW(deckManager.dealCards(5), std::runtime_error);
 }
 
-TEST_F(DeckManagerTest, HasEnoughCards_CalculatesCorrectly)
+TEST_F(DeckManagerTest, HasEnoughCardsCalculatesCorrectly)
 {
     deckManager.initializeAndShuffle();
 
@@ -45,7 +45,7 @@ TEST_F(DeckManagerTest, HasEnoughCards_CalculatesCorrectly)
     EXPECT_FALSE(deckManager.hasEnoughCards(5, 24)); // 53 cards needed, 52 available
 }
 
-TEST_F(DeckManagerTest, ResetDealPosition_RestoresFullDeck)
+TEST_F(DeckManagerTest, ResetDealPositionRestoresFullDeck)
 {
     deckManager.initializeAndShuffle();
     deckManager.dealCards(10);

@@ -24,8 +24,9 @@ using namespace pkt::core::player;
 Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
            PlayerList seats, PlayerList actingPlayers, GameData gameData, StartData startData)
     : HandPlayersState(seats, actingPlayers), myEvents(events), myFactory(factory), myBoard(board),
-      myDeckManager(std::make_unique<DeckManager>()), myStartQuantityPlayers(startData.numberOfPlayers),
-      mySmallBlind(gameData.firstSmallBlind), myStartCash(gameData.startMoney)
+      myDeckManager(std::make_unique<DeckManager>()), myActionValidator(std::make_unique<ActionValidator>()),
+      myStartQuantityPlayers(startData.numberOfPlayers), mySmallBlind(gameData.firstSmallBlind),
+      myStartCash(gameData.startMoney)
 
 {
     mySeatsList = seats;
@@ -500,64 +501,14 @@ std::string Hand::getActionValidationError(const PlayerAction& action) const
         return "It's not this player's turn to act";
     }
 
-    // Check specific action validation based on type
-    switch (action.type)
+    // Use the comprehensive ActionValidator
+    if (!myActionValidator->validatePlayerAction(myActingPlayersList, action, *getBettingActions(), mySmallBlind,
+                                                 myState->getGameState()))
     {
-    case ActionType::Fold:
-        return "Fold action is always valid"; // This shouldn't be called for valid folds
-
-    case ActionType::Check:
-        if (getBettingActions()->getRoundHighestSet() >
-            player->getCurrentHandActions().getRoundTotalBetAmount(myState->getGameState()))
-        {
-            return "Cannot check when there is a bet to call";
-        }
-        break;
-
-    case ActionType::Call:
-        if (getBettingActions()->getRoundHighestSet() <=
-            player->getCurrentHandActions().getRoundTotalBetAmount(myState->getGameState()))
-        {
-            return "Cannot call when no bet needs to be called";
-        }
-        break;
-
-    case ActionType::Raise:
-        if (action.amount <= getBettingActions()->getRoundHighestSet())
-        {
-            return "Raise amount must be higher than current highest bet";
-        }
-        if (action.amount >
-            player->getCash() + player->getCurrentHandActions().getRoundTotalBetAmount(myState->getGameState()))
-        {
-            return "Raise amount exceeds available chips";
-        }
-        break;
-
-    case ActionType::Bet:
-        if (getBettingActions()->getRoundHighestSet() > 0)
-        {
-            return "Cannot bet when there is already a bet in this round";
-        }
-        if (action.amount > player->getCash())
-        {
-            return "Bet amount exceeds available chips";
-        }
-        break;
-
-    case ActionType::Allin:
-        // All-in is generally valid if player has chips
-        if (player->getCash() <= 0)
-        {
-            return "Cannot go all-in with no chips";
-        }
-        break;
-
-    default:
-        return "Unknown or unsupported action type";
+        return "Action validation failed - see logs for details";
     }
 
-    return "Action validation failed for unknown reason";
+    return ""; // Empty string means action is valid
 }
 
 PlayerAction Hand::getDefaultActionForPlayer(unsigned playerId) const

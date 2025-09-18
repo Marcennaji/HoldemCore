@@ -1,5 +1,6 @@
 
 #include "Helpers.h"
+#include "core/engine/ActionValidator.h"
 #include "core/engine/BettingActions.h"
 #include "core/engine/CardUtilities.h"
 #include "core/engine/Exception.h"
@@ -25,10 +26,6 @@ namespace pkt::core
 {
 using namespace std;
 using namespace pkt::core::player;
-
-static std::vector<ActionType> getValidActionsForPlayer(const PlayerList& actingPlayersList, int playerId,
-                                                        const BettingActions& bettingActions, int smallBlind,
-                                                        const GameState gameState);
 
 std::vector<ActionType> getValidActionsForPlayer(const Hand& hand, int playerId)
 {
@@ -205,135 +202,11 @@ bool isRoundComplete(const Hand& hand)
     return true;
 }
 
-// Helper function to check for consecutive actions by the same player
-bool isConsecutiveActionAllowed(const BettingActions& bettingActions, const PlayerAction& action,
-                                const GameState gameState)
-{
-    const auto& handHistory = bettingActions.getHandActionHistory();
-    for (const auto& round : handHistory)
-    {
-        if (round.round == gameState && !round.actions.empty())
-        {
-            // Get the last action in this round
-            const auto& lastAction = round.actions.back();
-            if (lastAction.first == action.playerId)
-            {
-                GlobalServices::instance().logger().error(gameStateToString(gameState) + ": Player " +
-                                                          std::to_string(action.playerId) +
-                                                          " cannot act twice consecutively in the same round");
-                return false;
-            }
-            break;
-        }
-    }
-    return true;
-}
-
-// Helper function to check if action type is valid for the player
-bool isActionTypeValid(const PlayerList& actingPlayersList, const PlayerAction& action,
-                       const BettingActions& bettingActions, int smallBlind, const GameState gameState,
-                       const std::shared_ptr<player::Player>& player)
-{
-    std::vector<ActionType> validActions =
-        getValidActionsForPlayer(actingPlayersList, action.playerId, bettingActions, smallBlind, gameState);
-
-    bool isValid = std::find(validActions.begin(), validActions.end(), action.type) != validActions.end();
-
-    if (!isValid)
-    {
-        GlobalServices::instance().logger().error(gameStateToString(gameState) + ": Invalid action type for player " +
-                                                  player->getName() + " : " + actionTypeToString(action.type));
-    }
-
-    return isValid;
-}
-
-// Helper function to validate action amounts
-bool isActionAmountValid(const PlayerAction& action, const BettingActions& bettingActions, int smallBlind,
-                         const GameState gameState, const std::shared_ptr<player::Player>& player)
-{
-    const int currentHighestBet = bettingActions.getRoundHighestSet();
-    const int playerBet = player->getCurrentHandActions().getRoundTotalBetAmount(gameState);
-
-    bool isValid = true;
-
-    switch (action.type)
-    {
-    case ActionType::Fold:
-        // Fold doesn't require amount validation
-        break;
-
-    case ActionType::Check:
-        isValid = (action.amount == 0);
-        break;
-
-    case ActionType::Call:
-        // Amount will be calculated by the system
-        break;
-
-    case ActionType::Bet:
-        isValid = (action.amount > 0 && action.amount <= player->getCash());
-        break;
-
-    case ActionType::Raise:
-    {
-        isValid = (action.amount > currentHighestBet);
-
-        int minRaise = bettingActions.getMinRaise(smallBlind);
-        isValid = (isValid && action.amount >= currentHighestBet + minRaise);
-
-        const int extraChipsRequired = action.amount - playerBet;
-        isValid = (isValid && extraChipsRequired <= player->getCash());
-        break;
-    }
-    case ActionType::Allin:
-        // All-in doesn't require specific amount validation
-        break;
-
-    default:
-        isValid = false;
-    }
-
-    if (!isValid)
-    {
-        GlobalServices::instance().logger().error(
-            gameStateToString(gameState) + ": Invalid action amount for player " + std::to_string(action.playerId) +
-            " : " + actionTypeToString(action.type) + " with amount = " + std::to_string(action.amount));
-    }
-
-    return isValid;
-}
-
+// Legacy function for backwards compatibility - delegates to ActionValidator
 bool validatePlayerAction(const PlayerList& actingPlayersList, const PlayerAction& action,
                           const BettingActions& bettingActions, int smallBlind, const GameState gameState)
 {
-    auto player = pkt::core::player::getPlayerById(actingPlayersList, action.playerId);
-    if (!player)
-    {
-        GlobalServices::instance().logger().error(gameStateToString(gameState) + ": player with id " +
-                                                  std::to_string(action.playerId) + " not found in actingPlayersList");
-        return false;
-    }
-
-    // Validate consecutive actions
-    if (!isConsecutiveActionAllowed(bettingActions, action, gameState))
-    {
-        return false;
-    }
-
-    // Validate action type
-    if (!isActionTypeValid(actingPlayersList, action, bettingActions, smallBlind, gameState, player))
-    {
-        return false;
-    }
-
-    // Validate action amount
-    if (!isActionAmountValid(action, bettingActions, smallBlind, gameState, player))
-    {
-        return false;
-    }
-
-    return true;
+    return ActionValidator::validate(actingPlayersList, action, bettingActions, smallBlind, gameState);
 }
 
 std::shared_ptr<player::Player> getNextPlayerToActInRound(const Hand& hand, GameState currentRound)

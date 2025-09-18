@@ -24,6 +24,7 @@ class Player;
 namespace pkt::core
 {
 
+class ActionValidator;
 class BettingActions;
 class Hand;
 class IHandState;
@@ -36,6 +37,11 @@ std::unique_ptr<pkt::core::IHandState> computeBettingRoundNextState(Hand& hand, 
                                                                     GameState currentState);
 bool isRoundComplete(const Hand& hand);
 std::vector<ActionType> getValidActionsForPlayer(const Hand& hand, int playerId);
+std::vector<ActionType> getValidActionsForPlayer(const pkt::core::player::PlayerList& actingPlayersList, int playerId,
+                                                 const BettingActions& bettingActions, int smallBlind,
+                                                 const GameState gameState);
+
+// Legacy function for backwards compatibility - delegates to ActionValidator
 bool validatePlayerAction(const pkt::core::player::PlayerList& actingPlayersList, const PlayerAction& action,
                           const BettingActions& bettingActions, int smallBlind, const GameState gameState);
 
