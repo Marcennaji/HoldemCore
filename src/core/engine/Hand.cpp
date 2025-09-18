@@ -1,6 +1,7 @@
 #include "Hand.h"
 #include <core/services/GlobalServices.h>
 #include "CardUtilities.h"
+#include "DeckManager.h"
 #include "GameEvents.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/player/Helpers.h"
@@ -23,8 +24,8 @@ using namespace pkt::core::player;
 Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
            PlayerList seats, PlayerList actingPlayers, GameData gameData, StartData startData)
     : HandPlayersState(seats, actingPlayers), myEvents(events), myFactory(factory), myBoard(board),
-      myStartQuantityPlayers(startData.numberOfPlayers), mySmallBlind(gameData.firstSmallBlind),
-      myStartCash(gameData.startMoney)
+      myDeckManager(std::make_unique<DeckManager>()), myStartQuantityPlayers(startData.numberOfPlayers),
+      mySmallBlind(gameData.firstSmallBlind), myStartCash(gameData.startMoney)
 
 {
     mySeatsList = seats;
@@ -298,14 +299,13 @@ void Hand::applyActionEffects(const PlayerAction action)
 
 void Hand::initAndShuffleDeck()
 {
-    myDeck.initializeFullDeck();
-    myDeck.shuffle();
+    myDeckManager->initializeAndShuffle();
 }
 
 void Hand::dealHoleCards(size_t cardsArrayIndex)
 {
     // Validate that there are enough cards in the deck
-    if (!myDeck.hasEnoughCards(0, mySeatsList->size())) // 0 board cards here since already dealt
+    if (!myDeckManager->hasEnoughCards(0, mySeatsList->size())) // 0 board cards here since already dealt
     {
         throw std::runtime_error("Not enough cards in the deck to deal hole cards to all players.");
     }
@@ -313,7 +313,7 @@ void Hand::dealHoleCards(size_t cardsArrayIndex)
     for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
     {
         // Deal 2 hole cards for this player
-        std::vector<Card> holeCardList = myDeck.dealCards(2);
+        std::vector<Card> holeCardList = myDeckManager->dealCards(2);
 
         // Create HoleCards from the dealt cards
         HoleCards holeCards(holeCardList[0], holeCardList[1]);
@@ -349,7 +349,7 @@ void Hand::dealHoleCards(size_t cardsArrayIndex)
 size_t Hand::dealBoardCards()
 {
     // Deal 5 cards for the board (flop, turn, river)
-    std::vector<Card> boardCardList = myDeck.dealCards(5);
+    std::vector<Card> boardCardList = myDeckManager->dealCards(5);
 
     // Create BoardCards and progressively deal them
     BoardCards boardCards;
@@ -370,7 +370,7 @@ size_t Hand::dealBoardCards()
 
 std::vector<Card> Hand::dealCardsFromDeck(int numCards)
 {
-    return myDeck.dealCards(numCards);
+    return myDeckManager->dealCards(numCards);
 }
 
 HandCommonContext Hand::updateHandCommonContext(const GameState state)

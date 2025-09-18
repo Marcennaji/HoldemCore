@@ -4,6 +4,7 @@
 #include <memory>
 #include "Player.h"
 #include "core/cards/Card.h"
+#include "core/engine/DeckManager.h"
 #include "core/engine/HandPlayersState.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
@@ -76,7 +77,7 @@ class Hand : public IHandLifecycle, public IHandPlayerAction, public HandPlayers
     const GameEvents& myEvents;
     std::shared_ptr<IBoard> myBoard;
     std::unique_ptr<IHandState> myState;
-    Deck myDeck;
+    std::unique_ptr<DeckManager> myDeckManager;
     int myStartQuantityPlayers;
     int myStartCash;
     int mySmallBlind;

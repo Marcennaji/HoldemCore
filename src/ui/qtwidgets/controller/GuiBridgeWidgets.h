@@ -22,8 +22,8 @@ class GuiBridgeWidgets
   private:
     void connectSignalsFromUi();
 
-    PokerTableWindow* m_tableWindow = nullptr;
-    pkt::core::Session* m_session = nullptr;
+    PokerTableWindow* myTableWindow = nullptr;
+    pkt::core::Session* mySession = nullptr;
 };
 
 } // namespace pkt::ui::qtwidgets
