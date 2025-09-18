@@ -7,6 +7,7 @@
 #include "core/engine/ActionValidator.h"
 #include "core/engine/DeckManager.h"
 #include "core/engine/HandPlayersState.h"
+#include "core/engine/InvalidActionHandler.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
 #include "core/interfaces/hand/IActionProcessor.h"
@@ -64,13 +65,10 @@ class Hand : public IHandLifecycle, public IHandPlayerAction, public HandPlayers
     void fireOnPotUpdated() const;
     std::string getActionValidationError(const PlayerAction& action) const;
     PlayerAction getDefaultActionForPlayer(unsigned playerId) const;
-    void resetInvalidActionCount(unsigned playerId);
-    bool shouldAutoFoldPlayer(unsigned playerId) const;
 
     // New focused methods for handlePlayerAction refactoring
     void validateGameState() const;
     IActionProcessor* getActionProcessorOrThrow() const;
-    void handleInvalidAction(const PlayerAction& action);
     void handleAutoFold(unsigned playerId);
     void processValidAction(const PlayerAction& action);
 
@@ -80,13 +78,12 @@ class Hand : public IHandLifecycle, public IHandPlayerAction, public HandPlayers
     std::unique_ptr<IHandState> myState;
     std::unique_ptr<DeckManager> myDeckManager;
     std::unique_ptr<ActionValidator> myActionValidator;
+    std::unique_ptr<InvalidActionHandler> myInvalidActionHandler;
     int myStartQuantityPlayers;
     int myStartCash;
     int mySmallBlind;
 
-    // Error handling state
-    std::map<unsigned, int> myInvalidActionCounts;    // Track invalid actions per player
-    static const int MAX_INVALID_ACTIONS = 3;         // Max invalid actions before auto-fold
+    // Game loop protection
     static const int MAX_GAME_LOOP_ITERATIONS = 1000; // Emergency brake for infinite loops
 
     bool myAllInCondition{false};

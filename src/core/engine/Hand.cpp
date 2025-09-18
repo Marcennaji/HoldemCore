@@ -35,6 +35,13 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
     mySmallBlindPlayerId = startData.startDealerPlayerId;
     myBigBlindPlayerId = startData.startDealerPlayerId;
 
+    // Create InvalidActionHandler with callbacks
+    auto errorProvider = [this](const PlayerAction& action) -> std::string { return getActionValidationError(action); };
+
+    auto autoFoldCallback = [this](unsigned playerId) { handleAutoFold(playerId); };
+
+    myInvalidActionHandler = std::make_unique<InvalidActionHandler>(myEvents, errorProvider, autoFoldCallback);
+
     if (mySmallBlind <= 0)
     {
         throw std::invalid_argument("Hand: smallBlind must be > 0");
@@ -137,7 +144,7 @@ void Hand::handlePlayerAction(PlayerAction action)
 
     if (!processor->isActionAllowed(*this, action))
     {
-        handleInvalidAction(action);
+        myInvalidActionHandler->handleInvalidAction(action);
         return;
     }
 
@@ -520,17 +527,6 @@ PlayerAction Hand::getDefaultActionForPlayer(unsigned playerId) const
     return defaultAction;
 }
 
-void Hand::resetInvalidActionCount(unsigned playerId)
-{
-    myInvalidActionCounts[playerId] = 0;
-}
-
-bool Hand::shouldAutoFoldPlayer(unsigned playerId) const
-{
-    auto it = myInvalidActionCounts.find(playerId);
-    return (it != myInvalidActionCounts.end() && it->second >= MAX_INVALID_ACTIONS);
-}
-
 void Hand::validateGameState() const
 {
     if (!myState)
@@ -550,29 +546,6 @@ IActionProcessor* Hand::getActionProcessorOrThrow() const
     return processor;
 }
 
-void Hand::handleInvalidAction(const PlayerAction& action)
-{
-    // Track invalid action attempts
-    myInvalidActionCounts[action.playerId]++;
-
-    // Fire event to notify UI of invalid action
-    if (myEvents.onInvalidPlayerAction)
-    {
-        std::string reason = getActionValidationError(action);
-        myEvents.onInvalidPlayerAction(action.playerId, action, reason);
-    }
-
-    GlobalServices::instance().logger().error("Invalid action from player " + std::to_string(action.playerId) +
-                                              " (attempt " + std::to_string(myInvalidActionCounts[action.playerId]) +
-                                              "): " + getActionValidationError(action));
-
-    // Check if player should be auto-folded due to repeated invalid actions
-    if (shouldAutoFoldPlayer(action.playerId))
-    {
-        handleAutoFold(action.playerId);
-    }
-}
-
 void Hand::handleAutoFold(unsigned playerId)
 {
     GlobalServices::instance().logger().error("Player " + std::to_string(playerId) +
@@ -586,9 +559,6 @@ void Hand::handleAutoFold(unsigned playerId)
         myEvents.onEngineError("Player " + std::to_string(playerId) + " auto-folded due to repeated invalid actions");
     }
 
-    // Reset counter and process the auto-fold
-    resetInvalidActionCount(playerId);
-
     // Recursively call with the auto-fold action
     handlePlayerAction(autoFoldAction);
 }
@@ -598,7 +568,7 @@ void Hand::processValidAction(const PlayerAction& action)
     try
     {
         // Reset invalid action count on successful action
-        resetInvalidActionCount(action.playerId);
+        myInvalidActionHandler->resetInvalidActionCount(action.playerId);
 
         applyActionEffects(action);
 
