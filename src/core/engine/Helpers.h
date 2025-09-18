@@ -34,7 +34,7 @@ std::shared_ptr<player::Player> getFirstPlayerToActPostFlop(const Hand& hand);
 std::shared_ptr<player::Player> getNextPlayerToActInRound(const Hand& hand, GameState currentRound);
 std::unique_ptr<pkt::core::IHandState> computeBettingRoundNextState(Hand& hand, const GameEvents& events,
                                                                     GameState currentState);
-bool isRoundComplete(Hand& hand);
+bool isRoundComplete(const Hand& hand);
 std::vector<ActionType> getValidActionsForPlayer(const Hand& hand, int playerId);
 bool validatePlayerAction(const pkt::core::player::PlayerList& actingPlayersList, const PlayerAction& action,
                           const BettingActions& bettingActions, int smallBlind, const GameState gameState);

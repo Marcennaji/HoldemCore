@@ -113,7 +113,7 @@ std::shared_ptr<player::Player> PreflopState::getFirstPlayerToActInRound(const H
 bool PreflopState::isRoundComplete(const Hand& hand) const
 {
 
-    return pkt::core::isRoundComplete(const_cast<Hand&>(hand));
+    return pkt::core::isRoundComplete(hand);
 }
 
 void PreflopState::setBlinds(Hand& hand)

@@ -92,7 +92,7 @@ std::shared_ptr<player::Player> TurnState::getFirstPlayerToActInRound(const Hand
 }
 bool TurnState::isRoundComplete(const Hand& hand) const
 {
-    return pkt::core::isRoundComplete(const_cast<Hand&>(hand));
+    return pkt::core::isRoundComplete(hand);
 }
 
 } // namespace pkt::core

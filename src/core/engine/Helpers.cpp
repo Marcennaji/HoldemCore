@@ -169,7 +169,7 @@ std::unique_ptr<pkt::core::IHandState> computeBettingRoundNextState(pkt::core::H
     return nullptr; // Stay in current state - more betting needed
 }
 
-bool isRoundComplete(Hand& hand)
+bool isRoundComplete(const Hand& hand)
 {
     assert(hand.getGameState() != GameState::None);
 
