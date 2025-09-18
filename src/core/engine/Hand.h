@@ -7,6 +7,7 @@
 #include "core/engine/ActionValidator.h"
 #include "core/engine/DeckManager.h"
 #include "core/engine/HandPlayersState.h"
+#include "core/engine/HandStateManager.h"
 #include "core/engine/InvalidActionHandler.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
@@ -50,8 +51,8 @@ class Hand : public IHandLifecycle, public IHandPlayerAction, public HandPlayers
     int getPotOdd(const int playerCash, const int playerSet) const;
     float getM(int cash) const;
     int getSmallBlind() const;
-    IHandState& getState() { return *myState; }
-    GameState getGameState() const { return myState->getGameState(); }
+    IHandState& getState() { return myStateManager->getCurrentState(); }
+    GameState getGameState() const { return myStateManager->getGameState(); }
     IBoard& getBoard() { return *myBoard; }
 
     // Hand action history methods (delegates to BettingActions)
@@ -67,24 +68,19 @@ class Hand : public IHandLifecycle, public IHandPlayerAction, public HandPlayers
     PlayerAction getDefaultActionForPlayer(unsigned playerId) const;
 
     // New focused methods for handlePlayerAction refactoring
-    void validateGameState() const;
-    IActionProcessor* getActionProcessorOrThrow() const;
     void handleAutoFold(unsigned playerId);
     void processValidAction(const PlayerAction& action);
 
     std::shared_ptr<EngineFactory> myFactory;
     const GameEvents& myEvents;
     std::shared_ptr<IBoard> myBoard;
-    std::unique_ptr<IHandState> myState;
+    std::unique_ptr<HandStateManager> myStateManager;
     std::unique_ptr<DeckManager> myDeckManager;
     std::unique_ptr<ActionValidator> myActionValidator;
     std::unique_ptr<InvalidActionHandler> myInvalidActionHandler;
     int myStartQuantityPlayers;
     int myStartCash;
     int mySmallBlind;
-
-    // Game loop protection
-    static const int MAX_GAME_LOOP_ITERATIONS = 1000; // Emergency brake for infinite loops
 
     bool myAllInCondition{false};
     bool myCardsShown{false};

@@ -37,10 +37,10 @@ class PreflopState : public IHandState, public IActionProcessor, public IDebugga
     void logHoleCards(Hand& hand);
 
     const GameEvents& myEvents;
-    const int mySmallBlind;
-    unsigned myDealerPlayerId;
-    unsigned mySmallBlindPlayerId;
-    unsigned myBigBlindPlayerId;
+    const int mySmallBlind{0};
+    unsigned myDealerPlayerId{static_cast<unsigned>(-1)};
+    unsigned mySmallBlindPlayerId{static_cast<unsigned>(-1)};
+    unsigned myBigBlindPlayerId{static_cast<unsigned>(-1)};
 };
 
 } // namespace pkt::core

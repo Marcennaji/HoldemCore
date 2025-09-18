@@ -56,7 +56,7 @@ class BettingActions
 
     int myRoundHighestSet = 0;
     std::optional<unsigned int> myLastRaiserId = std::nullopt;
-    int myLastActionPlayerId;
+    int myLastActionPlayerId{-1};
     int myPreviousPlayerId{-1};
 
     const pkt::core::player::PlayerList& mySeatsList;

@@ -103,7 +103,7 @@ player.setStrategy(std::make_unique<MyCustomBotStrategy>());
 - Ensures predictable and maintainable game flow
 
 ### 6. **Testing Infrastructure**
-- GoogleTest-based unit tests in `tests/`
+- GoogleTest-based unit tests and end-to-end tests, in `tests/`
 
 ---
 
@@ -139,7 +139,8 @@ player.setStrategy(std::make_unique<MyCustomBotStrategy>());
 ## 📋 Roadmap 
 
 **Short-term**
-- Redesign Qt Widgets table UI with a modern layout
+- Continue improving engine design, by refactoring
+- Implement from scratch a Qt Widgets table UI
 
 **Medium-term**
 - Implement WebSocket server & JSON protocol

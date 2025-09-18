@@ -312,8 +312,8 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopAnal
                 return true;
             }
 
-            if (testedHand.isOnePair && !testedHand.isFullHousePossible &&
-                !testedHand.isTopPair & !testedHand.isOverPair)
+            if (testedHand.isOnePair && !testedHand.isFullHousePossible && !testedHand.isTopPair &&
+                !testedHand.isOverPair)
             {
                 return true;
             }
@@ -371,7 +371,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopAllin(const PostFlopAnal
             return true;
         }
 
-        if (testedHand.isOnePair && !testedHand.isFullHousePossible && !testedHand.isTopPair & !testedHand.isOverPair)
+        if (testedHand.isOnePair && !testedHand.isFullHousePossible && !testedHand.isTopPair && !testedHand.isOverPair)
         {
             return true;
         }
@@ -799,7 +799,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(const PostFlopAnal
                 return true;
             }
 
-            if (testedHand.isOnePair && !testedHand.isTopPair & !testedHand.isOverPair)
+            if (testedHand.isOnePair && !testedHand.isTopPair && !testedHand.isOverPair)
             {
                 return true;
             }

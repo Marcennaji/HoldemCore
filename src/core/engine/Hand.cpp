@@ -42,6 +42,17 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
 
     myInvalidActionHandler = std::make_unique<InvalidActionHandler>(myEvents, errorProvider, autoFoldCallback);
 
+    // Create HandStateManager with error callback for game loop issues
+    auto gameLoopErrorCallback = [this](const std::string& error)
+    {
+        if (myEvents.onEngineError)
+        {
+            myEvents.onEngineError(error);
+        }
+    };
+    myStateManager = std::make_unique<HandStateManager>(myEvents, mySmallBlind, startData.startDealerPlayerId,
+                                                        gameLoopErrorCallback);
+
     if (mySmallBlind <= 0)
     {
         throw std::invalid_argument("Hand: smallBlind must be > 0");
@@ -72,8 +83,7 @@ void Hand::initialize()
 
     getBettingActions()->getPreflop().setLastRaiserId(-1);
 
-    myState = std::make_unique<PreflopState>(myEvents, mySmallBlind, myDealerPlayerId);
-    myState->enter(*this);
+    myStateManager->initializeState(*this);
 }
 
 void Hand::end()
@@ -86,63 +96,16 @@ void Hand::runGameLoop()
     // Deal cards at the start of game loop to match legacy timing
     dealHoleCards(0); // Pass 0 as index, since no board cards dealt yet
 
-    // Automatic game loop
-    // This method drives the game forward by prompting players for actions
-
-    int iterationCount = 0; // Emergency brake for infinite loops
-
-    while (!myState->isTerminal() && iterationCount < MAX_GAME_LOOP_ITERATIONS)
-    {
-        iterationCount++;
-
-        if (auto* processor = dynamic_cast<IActionProcessor*>(myState.get()))
-        {
-            auto nextPlayer = processor->getNextPlayerToAct(*this);
-            if (nextPlayer)
-            {
-                processor->promptPlayerAction(*this, *nextPlayer);
-            }
-            else
-            {
-                // No next player to act, round should be complete
-                // Transition to next state (e.g., flop -> turn)
-                auto next = processor->computeNextState(*this);
-                assert(next);
-                myState->exit(*this);
-                myState = std::move(next);
-                myState->enter(*this);
-            }
-        }
-    }
-
-    // Check if we hit the emergency brake
-    if (iterationCount >= MAX_GAME_LOOP_ITERATIONS)
-    {
-        GlobalServices::instance().logger().error("Game loop hit maximum iterations (" +
-                                                  std::to_string(MAX_GAME_LOOP_ITERATIONS) +
-                                                  "), terminating to prevent infinite loop");
-
-        if (myEvents.onEngineError)
-        {
-            myEvents.onEngineError("Game loop terminated due to possible infinite loop");
-        }
-
-        // Force terminate the game
-        return;
-    }
-
-    if (myState->isTerminal())
-    {
-        end();
-    }
+    // Delegate game loop management to HandStateManager
+    myStateManager->runGameLoop(*this);
 }
 
 void Hand::handlePlayerAction(PlayerAction action)
 {
-    validateGameState();
-    auto* processor = getActionProcessorOrThrow();
+    auto* processor = getActionProcessor();
 
-    if (!processor->isActionAllowed(*this, action))
+    // If there's no processor, it means the game state doesn't accept actions
+    if (!processor || !processor->isActionAllowed(*this, action))
     {
         myInvalidActionHandler->handleInvalidAction(action);
         return;
@@ -157,7 +120,7 @@ void Hand::applyActionEffects(const PlayerAction action)
         return;
 
     int currentHighest = getBettingActions()->getRoundHighestSet();
-    int playerBet = player->getCurrentHandActions().getRoundTotalBetAmount(myState->getGameState());
+    int playerBet = player->getCurrentHandActions().getRoundTotalBetAmount(myStateManager->getGameState());
 
     // Create a copy for storing in action history with correct increment amounts
     PlayerAction actionForHistory = action;
@@ -198,7 +161,7 @@ void Hand::applyActionEffects(const PlayerAction action)
         getBettingActions()->updateRoundHighestSet(action.amount);
 
         // Record last raiser for the current betting round
-        switch (myState->getGameState())
+        switch (myStateManager->getGameState())
         {
         case GameState::Preflop:
             getBettingActions()->getPreflop().setLastRaiserId(player->getId());
@@ -226,7 +189,7 @@ void Hand::applyActionEffects(const PlayerAction action)
         getBettingActions()->updateRoundHighestSet(action.amount);
 
         // Record last raiser (bettor) for the current betting round
-        switch (myState->getGameState())
+        switch (myStateManager->getGameState())
         {
         case GameState::Preflop:
             getBettingActions()->getPreflop().setLastRaiserId(player->getId());
@@ -266,7 +229,7 @@ void Hand::applyActionEffects(const PlayerAction action)
             getBettingActions()->updateRoundHighestSet(allinIncrement);
 
             // Record last raiser (all-in as raise) for the current betting round
-            switch (myState->getGameState())
+            switch (myStateManager->getGameState())
             {
             case GameState::Preflop:
                 getBettingActions()->getPreflop().setLastRaiserId(player->getId());
@@ -292,10 +255,10 @@ void Hand::applyActionEffects(const PlayerAction action)
         break;
     }
 
-    player->setAction(*myState, actionForHistory);
+    player->setAction(myStateManager->getCurrentState(), actionForHistory);
 
     // Record action in hand-level chronological history
-    getBettingActions()->recordPlayerAction(myState->getGameState(), actionForHistory);
+    getBettingActions()->recordPlayerAction(myStateManager->getGameState(), actionForHistory);
 
     updateActingPlayersList(myActingPlayersList);
 
@@ -467,7 +430,7 @@ int Hand::getPotOdd(const int playerCash, const int playerSet) const
 
 IActionProcessor* Hand::getActionProcessor() const
 {
-    return dynamic_cast<IActionProcessor*>(myState.get());
+    return myStateManager->getActionProcessor();
 }
 
 int Hand::getSmallBlind() const
@@ -484,12 +447,12 @@ void Hand::fireOnPotUpdated() const
 
 std::string Hand::getActionValidationError(const PlayerAction& action) const
 {
-    if (!myState)
+    if (myStateManager->isTerminal())
     {
-        return "Game state is invalid";
+        return "Game state is terminal";
     }
 
-    auto* processor = dynamic_cast<IActionProcessor*>(myState.get());
+    auto* processor = myStateManager->getActionProcessor();
     if (!processor)
     {
         return "Current game state does not accept player actions";
@@ -510,9 +473,9 @@ std::string Hand::getActionValidationError(const PlayerAction& action) const
 
     // Use the comprehensive ActionValidator
     if (!myActionValidator->validatePlayerAction(myActingPlayersList, action, *getBettingActions(), mySmallBlind,
-                                                 myState->getGameState()))
+                                                 myStateManager->getGameState()))
     {
-        return "Action validation failed - see logs for details";
+        return "Action validation failed.";
     }
 
     return ""; // Empty string means action is valid
@@ -527,29 +490,24 @@ PlayerAction Hand::getDefaultActionForPlayer(unsigned playerId) const
     return defaultAction;
 }
 
-void Hand::validateGameState() const
-{
-    if (!myState)
-    {
-        throw Exception(__FILE__, __LINE__, EngineError::PlayerActionError);
-    }
-}
-
-IActionProcessor* Hand::getActionProcessorOrThrow() const
-{
-    auto* processor = dynamic_cast<IActionProcessor*>(myState.get());
-    if (!processor)
-    {
-        // Current state doesn't support actions - this is a programming error
-        throw Exception(__FILE__, __LINE__, EngineError::PlayerActionError);
-    }
-    return processor;
-}
-
 void Hand::handleAutoFold(unsigned playerId)
 {
     GlobalServices::instance().logger().error("Player " + std::to_string(playerId) +
                                               " exceeded maximum invalid actions, auto-folding");
+
+    // If the game state is terminal, don't try to process any actions
+    if (myStateManager->isTerminal())
+    {
+        GlobalServices::instance().logger().error("Cannot auto-fold player " + std::to_string(playerId) +
+                                                  " - game state is terminal");
+
+        if (myEvents.onEngineError)
+        {
+            myEvents.onEngineError("Player " + std::to_string(playerId) +
+                                   " attempted action in terminal state - no auto-fold processed");
+        }
+        return;
+    }
 
     // Create a fold action as default
     PlayerAction autoFoldAction = getDefaultActionForPlayer(playerId);
@@ -572,19 +530,8 @@ void Hand::processValidAction(const PlayerAction& action)
 
         applyActionEffects(action);
 
-        auto* processor = getActionProcessorOrThrow();
-        auto next = processor->computeNextState(*this);
-        if (next)
-        {
-            myState->exit(*this);
-            myState = std::move(next);
-            myState->enter(*this);
-            if (myState->isTerminal())
-            {
-                myState->exit(*this);
-                end();
-            }
-        }
+        // Delegate state transition to HandStateManager
+        myStateManager->transitionToNextState(*this);
     }
     catch (const std::exception& e)
     {
