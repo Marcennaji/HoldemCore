@@ -66,7 +66,7 @@ class Session
     void initializeGame(GameComponents&& components, const GameData& gameData, const StartData& startData);
 
     std::unique_ptr<Game> myCurrentGame;
-    GameEvents myEvents;
+    const GameEvents& myEvents;
     std::shared_ptr<EngineFactory> myEngineFactory; // Injected or created
 };
 
