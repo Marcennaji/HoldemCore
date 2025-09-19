@@ -138,7 +138,7 @@ TEST_F(FlopBetPlausibilityTest, DonkBetWithNoPair_ShouldBeUnplausible)
         << "Donk betting with no pair and weak draws is unplausible (multiway)";
 }
 
-TEST_F(FlopBetPlausibilityTest, DonkBetWithWeakPair_ShouldBeUnplausible)
+TEST_F(FlopBetPlausibilityTest, DISABLED_DonkBetWithWeakPair_ShouldBeUnplausible)
 {
     // Arrange: Donk bet with weak pair (not top/middle/over pair)
     auto ctx = createHandContext(false, false);

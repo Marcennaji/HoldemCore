@@ -7,6 +7,14 @@
 
 struct PostFlopAnalysisFlags;
 
+// Forward declarations for the specialized classes
+namespace pkt::core::player
+{
+class FlopPlausibilityChecker;
+class TurnPlausibilityChecker;
+class RiverPlausibilityChecker;
+} // namespace pkt::core::player
+
 namespace pkt::core::player
 {
 
