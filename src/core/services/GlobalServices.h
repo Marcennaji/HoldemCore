@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/interfaces/IHandEvaluationEngine.h"
+#include "core/interfaces/HandEvaluationEngine.h"
 #include "core/interfaces/ILogger.h"
 #include "core/interfaces/IRandomizer.h"
 #include "core/interfaces/persistence/PlayersStatisticsStore.h"
@@ -21,7 +21,7 @@ class GlobalServices
 
     ILogger& logger() { return *myLogger; }
     PlayersStatisticsStore& playersStatisticsStore() { return *myPlayersStatisticsStore; }
-    IHandEvaluationEngine& handEvaluationEngine() { return *myHandEvaluationEngine; }
+    HandEvaluationEngine& handEvaluationEngine() { return *myHandEvaluationEngine; }
     IRandomizer& randomizer() { return *myRandomizer; }
 
     void setLogger(std::unique_ptr<ILogger> logger) { myLogger = std::move(logger); }
@@ -29,7 +29,7 @@ class GlobalServices
     {
         myPlayersStatisticsStore = std::move(store);
     }
-    void setHandEvaluationEngine(std::unique_ptr<IHandEvaluationEngine> engine)
+    void setHandEvaluationEngine(std::unique_ptr<HandEvaluationEngine> engine)
     {
         myHandEvaluationEngine = std::move(engine);
     }
@@ -40,7 +40,7 @@ class GlobalServices
 
     std::unique_ptr<ILogger> myLogger;
     std::unique_ptr<PlayersStatisticsStore> myPlayersStatisticsStore;
-    std::unique_ptr<IHandEvaluationEngine> myHandEvaluationEngine;
+    std::unique_ptr<HandEvaluationEngine> myHandEvaluationEngine;
     std::unique_ptr<IRandomizer> myRandomizer;
 };
 

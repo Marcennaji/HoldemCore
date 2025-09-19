@@ -1,5 +1,5 @@
 #include "PsimHandEvaluationEngine.h"
-#include "core/interfaces/IHandEvaluationEngine.h"
+#include "core/interfaces/HandEvaluationEngine.h"
 #include "core/services/GlobalServices.h"
 #include "third_party/psim/psim.hpp"
 

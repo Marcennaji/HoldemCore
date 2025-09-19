@@ -8,7 +8,7 @@
 #include "core/engine/cards/Card.h" // For HoleCards
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/model/PlayerPosition.h"
-#include "core/interfaces/IHandEvaluationEngine.h"
+#include "core/interfaces/HandEvaluationEngine.h"
 #include "core/player/Player.h"
 
 namespace pkt::core::player

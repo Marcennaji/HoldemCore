@@ -10,7 +10,6 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(const PostFlopAnal
                                                               const CurrentHandContext& ctx)
 {
 
-    const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
     const bool bHavePosition = ctx.personalContext.hasPosition;
     auto& flop = ctx.personalContext.statistics.flopStatistics;
 
@@ -61,7 +60,6 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopAnalys
                                                             const CurrentHandContext& ctx)
 {
 
-    const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
     const bool bHavePosition = ctx.personalContext.hasPosition;
     auto& flop = ctx.personalContext.statistics.flopStatistics;
 
@@ -189,8 +187,6 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(const PostFlopAnaly
                                                              const CurrentHandContext& ctx)
 {
 
-    const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
-    const bool bHavePosition = ctx.personalContext.hasPosition;
     auto& flop = ctx.personalContext.statistics.flopStatistics;
 
     if (ctx.commonContext.bettingContext.potOdd < 20)
@@ -251,8 +247,6 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopAnal
                                                               const CurrentHandContext& ctx)
 {
 
-    const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
-    const bool bHavePosition = ctx.personalContext.hasPosition;
     auto& flop = ctx.personalContext.statistics.flopStatistics;
 
     if (flop.getAgressionFactor() > 3 && flop.getAgressionFrequency() > 50 &&
@@ -337,8 +331,6 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopAllin(const PostFlopAnal
                                                               const CurrentHandContext& ctx)
 {
 
-    const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
-    const bool bHavePosition = ctx.personalContext.hasPosition;
     auto& flop = ctx.personalContext.statistics.flopStatistics;
 
     if (ctx.commonContext.bettingContext.potOdd < 20)
@@ -486,7 +478,6 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopAnaly
                                                              const CurrentHandContext& ctx)
 {
 
-    const bool bHavePosition = ctx.personalContext.hasPosition;
     auto& turn = ctx.personalContext.statistics.turnStatistics;
 
     if (ctx.commonContext.bettingContext.potOdd < 20)
@@ -568,7 +559,6 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopAnal
                                                               const CurrentHandContext& ctx)
 {
 
-    const bool bHavePosition = ctx.personalContext.hasPosition;
     auto& turn = ctx.personalContext.statistics.turnStatistics;
 
     if (turn.getAgressionFactor() > 3 && turn.getAgressionFrequency() > 50 &&
@@ -640,7 +630,6 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnAllin(const PostFlopAnal
                                                               const CurrentHandContext& ctx)
 {
 
-    const bool bHavePosition = ctx.personalContext.hasPosition;
     auto& turn = ctx.personalContext.statistics.turnStatistics;
 
     if (ctx.commonContext.bettingContext.potOdd < 20)
@@ -686,12 +675,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnAllin(const PostFlopAnal
 bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCheck(const PostFlopAnalysisFlags& testedHand,
                                                                const CurrentHandContext& ctx)
 {
-
-    const bool bHavePosition = ctx.personalContext.hasPosition;
-    auto& river = ctx.personalContext.statistics.riverStatistics;
-
-    // todo
-
+    // TODO implement river check analysis
     return false;
 }
 
@@ -760,7 +744,6 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(const PostFlopAnal
                                                               const CurrentHandContext& ctx)
 {
 
-    const bool bHavePosition = ctx.personalContext.hasPosition;
     auto& river = ctx.personalContext.statistics.riverStatistics;
 
     if (ctx.commonContext.bettingContext.potOdd < 20)
@@ -885,7 +868,6 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenRiverAllin(const PostFlopAna
                                                                const CurrentHandContext& ctx)
 {
 
-    const bool bHavePosition = ctx.personalContext.hasPosition;
     auto& river = ctx.personalContext.statistics.riverStatistics;
 
     if (ctx.commonContext.bettingContext.potOdd < 20)

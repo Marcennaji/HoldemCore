@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "core/interfaces/IHandEvaluationEngine.h"
+#include "core/interfaces/HandEvaluationEngine.h"
 
 namespace pkt::core::probability
 {

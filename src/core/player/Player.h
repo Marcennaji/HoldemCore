@@ -18,7 +18,7 @@
 #include "range/RangeEstimator.h"
 #include "strategy/CurrentHandContext.h"
 
-#include "core/interfaces/IHandEvaluationEngine.h"
+#include "core/interfaces/HandEvaluationEngine.h"
 
 #include <array>
 #include <assert.h>

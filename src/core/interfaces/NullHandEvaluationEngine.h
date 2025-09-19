@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "core/interfaces/IHandEvaluationEngine.h"
+#include "core/interfaces/HandEvaluationEngine.h"
 
 struct SimResults;
 struct PostFlopState;
@@ -9,7 +9,7 @@ namespace pkt::core
 {
 
 /// Poker hand evaluator using the psim library
-class NullHandEvaluationEngine : public pkt::core::IHandEvaluationEngine
+class NullHandEvaluationEngine : public pkt::core::HandEvaluationEngine
 {
   public:
     unsigned int rankHand(const char* hand) override { return 0; }
