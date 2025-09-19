@@ -611,7 +611,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopAnal
         }
     }
     // the player has raised twice the turn, and is not a maniac player : he should have at least two pairs
-    if (ctx.personalContext.actions.currentHandActions.getActionsNumber(GameState::Flop, ActionType::Raise) == 2 &&
+    if (ctx.personalContext.actions.currentHandActions.getActionsNumber(GameState::Turn, ActionType::Raise) == 2 &&
         !((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight || testedHand.isFlush ||
           testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads || testedHand.isStFlush))
     {
@@ -619,7 +619,7 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopAnal
     }
 
     // the player has raised 3 times the turn, and is not a maniac player : he should have better than a set
-    if (ctx.personalContext.actions.currentHandActions.getActionsNumber(GameState::Flop, ActionType::Raise) > 2 &&
+    if (ctx.personalContext.actions.currentHandActions.getActionsNumber(GameState::Turn, ActionType::Raise) > 2 &&
         !(testedHand.isStraight || testedHand.isFlush || testedHand.isFullHouse || testedHand.isQuads ||
           testedHand.isStFlush))
     {
