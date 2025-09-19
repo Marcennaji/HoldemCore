@@ -144,16 +144,17 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopAnalys
                     return true;
                 }
 
-                if (!testedHand.isMiddlePair && !testedHand.isTopPair && !testedHand.isOverPair)
+                if (testedHand.isMiddlePair || testedHand.isTopPair || testedHand.isOverPair)
                 {
-                    return true;
+                    return false;
                 }
             }
         }
     }
 
-    // on a 3 or more players pot : if the player is first to act, and bets, he should have at least a top pair
-    if (ctx.personalContext.actions.currentHandActions.getActionsNumber(GameState::Flop, ActionType::Check) == 0 &&
+    // on a 3 or more players pot : if the player is first to act and bets, he should have at least a
+    // top pair
+    if (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber == 0 &&
         ctx.commonContext.playersContext.actingPlayersList->size() > 2)
     {
 

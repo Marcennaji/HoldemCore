@@ -190,6 +190,15 @@ void HandPlausibilityTestBase::setPassiveAction(CurrentHandContext& ctx)
     ctx.commonContext.bettingContext.riverBetsOrRaisesNumber = 0;
 }
 
+void HandPlausibilityTestBase::setFirstToAct(CurrentHandContext& ctx)
+{
+    // First to act means no prior checks in the round
+    // The logic checks: getActionsNumber(GameState::Flop, ActionType::Check) == 0
+    // We ensure no checks have been made by clearing actions for this round
+    ctx.personalContext.actions.currentHandActions.reset();
+    setPassiveAction(ctx); // Also set no prior bets/raises
+}
+
 void HandPlausibilityTestBase::setPreviousAggressor(CurrentHandContext& ctx, GameState street)
 {
     switch (street)

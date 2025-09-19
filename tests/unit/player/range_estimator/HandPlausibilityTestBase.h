@@ -124,6 +124,12 @@ class HandPlausibilityTestBase : public ::testing::Test
     void setPassiveAction(CurrentHandContext& ctx);
 
     /**
+     * Sets betting context for first to act scenario (no prior checks)
+     * @param ctx Context to modify
+     */
+    void setFirstToAct(CurrentHandContext& ctx);
+
+    /**
      * Sets player as aggressor on previous street
      * @param ctx Context to modify
      * @param street GameState where player was aggressor
