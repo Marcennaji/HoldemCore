@@ -82,6 +82,12 @@ class HandPlausibilityTestBase : public ::testing::Test
     void setLooseAggressiveProfile(CurrentHandContext& ctx);
 
     /**
+     * Creates moderate aggressive player profile (allows some slowplay)
+     * @param ctx Context to modify
+     */
+    void setModerateProfile(CurrentHandContext& ctx);
+
+    /**
      * Creates maniac player profile (very loose and aggressive)
      * @param ctx Context to modify
      */
@@ -301,11 +307,20 @@ class HandPlausibilityTestBase : public ::testing::Test
     // Constants for Testing
     // ========================================
 
-    // Aggression thresholds
-    static constexpr float PASSIVE_AGGRESSION_FACTOR = 2.0f;
-    static constexpr float PASSIVE_AGGRESSION_FREQUENCY = 30.0f;
-    static constexpr float AGGRESSIVE_AGGRESSION_FACTOR = 3.0f;
-    static constexpr float AGGRESSIVE_AGGRESSION_FREQUENCY = 50.0f;
+    // Aggression thresholds based on HandPlausibilityChecker logic
+    // Passive: aggressionFactor < 2 AND aggressionFrequency < 30
+    static constexpr float PASSIVE_AGGRESSION_FACTOR = 1.5f;
+    static constexpr float PASSIVE_AGGRESSION_FREQUENCY = 25.0f;
+
+    // Aggressive: aggressionFactor >= 2 OR aggressionFrequency >= 30 (but still allows some slowplay)
+    static constexpr float AGGRESSIVE_AGGRESSION_FACTOR = 2.5f;
+    static constexpr float AGGRESSIVE_AGGRESSION_FREQUENCY = 35.0f;
+
+    // Moderate: aggressive enough to not be passive, but moderate enough to allow some slowplay
+    static constexpr float MODERATE_AGGRESSION_FACTOR = 2.2f;
+    static constexpr float MODERATE_AGGRESSION_FREQUENCY = 32.0f;
+
+    // Maniac: very aggressive (aggressionFactor > 3 AND aggressionFrequency > 50)
     static constexpr float MANIAC_AGGRESSION_FACTOR = 5.0f;
     static constexpr float MANIAC_AGGRESSION_FREQUENCY = 70.0f;
 

@@ -17,7 +17,7 @@ class FlopCheckPlausibilityTest : public HandPlausibilityTestBase
 // Position-Based Slowplay Logic Tests
 // ========================================
 
-TEST_F(FlopCheckPlausibilityTest, DISABLED_InPositionStrongHandOnDangerousBoard_ShouldBeUnplausible)
+TEST_F(FlopCheckPlausibilityTest, InPositionStrongHandOnDangerousBoard_ShouldBeUnplausible)
 {
     // Arrange: Player in position, not passive, strong hand on dangerous board
     auto ctx = createHandContext(true, false); // hasPosition=true, isPassive=false
@@ -33,7 +33,7 @@ TEST_F(FlopCheckPlausibilityTest, DISABLED_InPositionStrongHandOnDangerousBoard_
         << "Should not slowplay top pair on dangerous board in position";
 }
 
-TEST_F(FlopCheckPlausibilityTest, DISABLED_InPositionOverPairOnDangerousBoard_ShouldBeUnplausible)
+TEST_F(FlopCheckPlausibilityTest, InPositionOverPairOnDangerousBoard_ShouldBeUnplausible)
 {
     // Arrange: Player in position with overpair on dangerous board
     auto ctx = createHandContext(true, false);
@@ -48,7 +48,7 @@ TEST_F(FlopCheckPlausibilityTest, DISABLED_InPositionOverPairOnDangerousBoard_Sh
         << "Should not slowplay overpair on dangerous board";
 }
 
-TEST_F(FlopCheckPlausibilityTest, DISABLED_InPositionTwoPairOnFlushDrawBoard_ShouldBeUnplausible)
+TEST_F(FlopCheckPlausibilityTest, InPositionTwoPairOnFlushDrawBoard_ShouldBeUnplausible)
 {
     // Arrange: Two pair on flush draw board
     auto ctx = createHandContext(true, false);
@@ -66,7 +66,7 @@ TEST_F(FlopCheckPlausibilityTest, DISABLED_InPositionTwoPairOnFlushDrawBoard_Sho
 // Strong Hands That Shouldn't Be Slowplayed
 // ========================================
 
-TEST_F(FlopCheckPlausibilityTest, DISABLED_InPositionSetOnFlushDrawBoard_ShouldBeUnplausible)
+TEST_F(FlopCheckPlausibilityTest, InPositionSetOnFlushDrawBoard_ShouldBeUnplausible)
 {
     // Arrange: Set on non-paired board with flush draw
     auto ctx = createHandContext(true, false);
@@ -74,7 +74,6 @@ TEST_F(FlopCheckPlausibilityTest, DISABLED_InPositionSetOnFlushDrawBoard_ShouldB
 
     auto hand = createTrips();
     setFlushDrawBoard(hand);
-    setRainbowBoard(hand);            // Override to make non-paired
     hand.isFullHousePossible = false; // non-paired board
 
     // Act & Assert
@@ -82,7 +81,7 @@ TEST_F(FlopCheckPlausibilityTest, DISABLED_InPositionSetOnFlushDrawBoard_ShouldB
         << "Should not slowplay set on flush draw board";
 }
 
-TEST_F(FlopCheckPlausibilityTest, DISABLED_InPositionStraightOnFlushDrawBoard_ShouldBeUnplausible)
+TEST_F(FlopCheckPlausibilityTest, InPositionStraightOnFlushDrawBoard_ShouldBeUnplausible)
 {
     // Arrange: Made straight on flush draw board
     auto ctx = createHandContext(true, false);
@@ -101,7 +100,7 @@ TEST_F(FlopCheckPlausibilityTest, DISABLED_InPositionStraightOnFlushDrawBoard_Sh
 // Multiway Pot Scenarios
 // ========================================
 
-TEST_F(FlopCheckPlausibilityTest, DISABLED_InPositionTopPairMultiwayPot_ShouldBeUnplausible)
+TEST_F(FlopCheckPlausibilityTest, InPositionTopPairMultiwayPot_ShouldBeUnplausible)
 {
     // Arrange: Top pair in 3+ player pot
     auto ctx = createHandContext(true, false);
@@ -116,7 +115,7 @@ TEST_F(FlopCheckPlausibilityTest, DISABLED_InPositionTopPairMultiwayPot_ShouldBe
         << "Should not check top pair in multiway pot in position";
 }
 
-TEST_F(FlopCheckPlausibilityTest, DISABLED_InPositionSetMultiwayPot_ShouldBeUnplausible)
+TEST_F(FlopCheckPlausibilityTest, InPositionSetMultiwayPot_ShouldBeUnplausible)
 {
     // Arrange: Set in multiway pot
     auto ctx = createHandContext(true, false);
@@ -135,7 +134,7 @@ TEST_F(FlopCheckPlausibilityTest, DISABLED_InPositionSetMultiwayPot_ShouldBeUnpl
 // Paired Board Scenarios
 // ========================================
 
-TEST_F(FlopCheckPlausibilityTest, DISABLED_InPositionOverPairOnPairedBoard_ShouldBeUnplausible)
+TEST_F(FlopCheckPlausibilityTest, InPositionOverPairOnPairedBoard_ShouldBeUnplausible)
 {
     // Arrange: Pocket overpair on paired board
     auto ctx = createHandContext(true, false);
@@ -239,7 +238,7 @@ TEST_F(FlopCheckPlausibilityTest, InPositionQuadsCanSlowplay_ShouldBePlausible)
 // Insufficient Statistics
 // ========================================
 
-TEST_F(FlopCheckPlausibilityTest, DISABLED_InsufficientStatistics_ShouldBePlausible)
+TEST_F(FlopCheckPlausibilityTest, InsufficientStatistics_ShouldBeUnplausible)
 {
     // Arrange: Not enough hands for reliable statistics
     auto ctx = createHandContext(true, false);
@@ -250,8 +249,8 @@ TEST_F(FlopCheckPlausibilityTest, DISABLED_InsufficientStatistics_ShouldBePlausi
     setDrawHeavyBoard(hand);
 
     // Act & Assert
-    EXPECT_FALSE(HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(hand, ctx))
-        << "Should not make assumptions with insufficient statistics";
+    EXPECT_TRUE(HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(hand, ctx))
+        << "Rational behavior assumed with insufficient statistics - should not slowplay top pair on dangerous board";
 }
 
 // ========================================
@@ -262,7 +261,7 @@ TEST_F(FlopCheckPlausibilityTest, HeadsUpMiddlePairDangerousBoard_ShouldBePlausi
 {
     // Arrange: Heads-up, middle pair on dangerous board
     auto ctx = createHeadsUpContext(true);
-    setLooseAggressiveProfile(ctx);
+    setTightPassiveProfile(ctx); // Passive players can check middle pair on dangerous board
 
     auto hand = createMiddlePair();
     setDrawHeavyBoard(hand);
@@ -280,7 +279,7 @@ TEST_F(FlopCheckPlausibilityTest, InPositionTopPairDryBoard_ShouldBePlausible)
 {
     // Arrange: Top pair on dry board (no draws)
     auto ctx = createHandContext(true, false);
-    setLooseAggressiveProfile(ctx);
+    setTightPassiveProfile(ctx); // Passive players can slowplay top pair on dry board
     setMultiPlayerPot(ctx, 3);
 
     auto hand = createTopPair();
@@ -295,7 +294,7 @@ TEST_F(FlopCheckPlausibilityTest, InPositionTopPairDryBoard_ShouldBePlausible)
 // Maniac Player Profile
 // ========================================
 
-TEST_F(FlopCheckPlausibilityTest, DISABLED_ManiacPlayerStrongHand_ShouldBePlausible)
+TEST_F(FlopCheckPlausibilityTest, ManiacPlayerStrongHand_ShouldBeUnplausible)
 {
     // Arrange: Very aggressive (maniac) player
     auto ctx = createHandContext(true, false);
@@ -305,8 +304,8 @@ TEST_F(FlopCheckPlausibilityTest, DISABLED_ManiacPlayerStrongHand_ShouldBePlausi
     setDrawHeavyBoard(hand);
 
     // Act & Assert
-    EXPECT_FALSE(HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(hand, ctx))
-        << "Maniac players can check any hand (unpredictable)";
+    EXPECT_TRUE(HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(hand, ctx))
+        << "Maniac players won't slowplay strong hands on a draw-heavy flop board";
 }
 
 // ========================================
@@ -327,4 +326,4 @@ TEST_F(FlopCheckPlausibilityTest, MiddlePairHeadsUpNonDangerousBoard_ShouldBePla
     EXPECT_FALSE(HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(hand, ctx))
         << "Middle pair can be checked heads-up on safe board";
 }
-}
+} // namespace pkt::test

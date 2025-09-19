@@ -13,11 +13,13 @@ bool HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(const PostFlopAnal
     const bool bHavePosition = ctx.personalContext.hasPosition;
     auto& flop = ctx.personalContext.statistics.flopStatistics;
 
+    float agressionFactor = flop.getAgressionFactor();
+    float agressionFrequency = flop.getAgressionFrequency();
+
     // the player is in position, he didn't bet on flop, he is not usually passive, and everybody checked on flop :
 
     if (bHavePosition &&
-        !(flop.getAgressionFactor() < 2 && flop.getAgressionFrequency() < 30 &&
-          flop.hands > MIN_HANDS_STATISTICS_ACCURATE) &&
+        !(agressionFactor < 2 && agressionFrequency < 30 && flop.hands > MIN_HANDS_STATISTICS_ACCURATE) &&
         (testedHand.usesFirst || testedHand.usesSecond))
     {
 

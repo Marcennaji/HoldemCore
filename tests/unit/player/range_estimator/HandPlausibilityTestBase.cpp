@@ -81,35 +81,64 @@ void HandPlausibilityTestBase::setPlayerStatistics(CurrentHandContext& ctx, floa
     // Initialize all statistics structures
     ctx.personalContext.statistics.totalHands = handsSample;
 
+    // Calculate raw statistics to achieve desired aggression metrics
+    // Aggression Factor = (raises + bets) / calls
+    // Aggression Frequency = (raises + bets) / (raises + bets + calls + checks + folds) * 100
+
+    long totalActions = handsSample;
+    long folds = static_cast<long>(handsSample * 0.1f); // 10% folds
+
+    // Calculate aggressive actions from frequency
+    long aggressiveActions = static_cast<long>(totalActions * aggressionFreq / 100.0f);
+    long bets = static_cast<long>(aggressiveActions * 0.6f); // 60% of aggressive actions are bets
+    long raises = aggressiveActions - bets;                  // Rest are raises
+
+    // Calculate calls to achieve desired aggression factor
+    // aggressionFactor = (raises + bets) / calls
+    // calls = (raises + bets) / aggressionFactor
+    long calls = (aggressionFactor > 0) ? static_cast<long>((raises + bets) / aggressionFactor)
+                                        : static_cast<long>(handsSample * 0.3f); // fallback to 30%
+
+    // Remaining actions are checks
+    long checks = totalActions - bets - raises - calls - folds;
+    if (checks < 0)
+    {
+        // Adjust if we over-allocated
+        checks = static_cast<long>(handsSample * 0.2f);
+        calls = totalActions - bets - raises - checks - folds;
+    }
+
     // Set flop statistics (most relevant for our tests)
     ctx.personalContext.statistics.flopStatistics.hands = handsSample;
-    ctx.personalContext.statistics.flopStatistics.bets =
-        static_cast<long>(handsSample * aggressionFreq / 100.0f * 0.3f);
-    ctx.personalContext.statistics.flopStatistics.raises =
-        static_cast<long>(handsSample * aggressionFreq / 100.0f * 0.2f);
-    ctx.personalContext.statistics.flopStatistics.calls = static_cast<long>(handsSample * 0.3f);
-    ctx.personalContext.statistics.flopStatistics.checks =
-        handsSample - ctx.personalContext.statistics.flopStatistics.bets -
-        ctx.personalContext.statistics.flopStatistics.raises - ctx.personalContext.statistics.flopStatistics.calls;
+    ctx.personalContext.statistics.flopStatistics.bets = bets;
+    ctx.personalContext.statistics.flopStatistics.raises = raises;
+    ctx.personalContext.statistics.flopStatistics.calls = calls;
+    ctx.personalContext.statistics.flopStatistics.checks = checks;
+    ctx.personalContext.statistics.flopStatistics.folds = folds;
+    ctx.personalContext.statistics.flopStatistics.threeBets = 0;
+    ctx.personalContext.statistics.flopStatistics.fourBets = 0;
+    ctx.personalContext.statistics.flopStatistics.continuationBets = 0;
+    ctx.personalContext.statistics.flopStatistics.continuationBetsOpportunities = 0;
 
-    // Set turn statistics
+    // Set turn statistics (similar distribution)
     ctx.personalContext.statistics.turnStatistics.hands = handsSample;
-    ctx.personalContext.statistics.turnStatistics.bets =
-        static_cast<long>(handsSample * aggressionFreq / 100.0f * 0.25f);
-    ctx.personalContext.statistics.turnStatistics.raises =
-        static_cast<long>(handsSample * aggressionFreq / 100.0f * 0.15f);
-    ctx.personalContext.statistics.turnStatistics.calls = static_cast<long>(handsSample * 0.25f);
+    ctx.personalContext.statistics.turnStatistics.bets = bets;
+    ctx.personalContext.statistics.turnStatistics.raises = raises;
+    ctx.personalContext.statistics.turnStatistics.calls = calls;
+    ctx.personalContext.statistics.turnStatistics.checks = checks;
+    ctx.personalContext.statistics.turnStatistics.folds = folds;
+    ctx.personalContext.statistics.turnStatistics.threeBets = 0;
+    ctx.personalContext.statistics.turnStatistics.fourBets = 0;
 
-    // Set river statistics
+    // Set river statistics (similar distribution)
     ctx.personalContext.statistics.riverStatistics.hands = handsSample;
-    ctx.personalContext.statistics.riverStatistics.bets =
-        static_cast<long>(handsSample * aggressionFreq / 100.0f * 0.2f);
-    ctx.personalContext.statistics.riverStatistics.raises =
-        static_cast<long>(handsSample * aggressionFreq / 100.0f * 0.1f);
-    ctx.personalContext.statistics.riverStatistics.calls = static_cast<long>(handsSample * 0.2f);
-
-    // Note: Aggression factor is calculated by the methods, so we set up the raw stats
-    // to produce the desired aggression factor and frequency
+    ctx.personalContext.statistics.riverStatistics.bets = bets;
+    ctx.personalContext.statistics.riverStatistics.raises = raises;
+    ctx.personalContext.statistics.riverStatistics.calls = calls;
+    ctx.personalContext.statistics.riverStatistics.checks = checks;
+    ctx.personalContext.statistics.riverStatistics.folds = folds;
+    ctx.personalContext.statistics.riverStatistics.threeBets = 0;
+    ctx.personalContext.statistics.riverStatistics.fourBets = 0;
 }
 
 void HandPlausibilityTestBase::setTightPassiveProfile(CurrentHandContext& ctx)
@@ -122,6 +151,11 @@ void HandPlausibilityTestBase::setLooseAggressiveProfile(CurrentHandContext& ctx
     setPlayerStatistics(ctx, AGGRESSIVE_AGGRESSION_FACTOR, AGGRESSIVE_AGGRESSION_FREQUENCY, 100);
 }
 
+void HandPlausibilityTestBase::setModerateProfile(CurrentHandContext& ctx)
+{
+    setPlayerStatistics(ctx, MODERATE_AGGRESSION_FACTOR, MODERATE_AGGRESSION_FREQUENCY, 100);
+}
+
 void HandPlausibilityTestBase::setManiacProfile(CurrentHandContext& ctx)
 {
     setPlayerStatistics(ctx, MANIAC_AGGRESSION_FACTOR, MANIAC_AGGRESSION_FREQUENCY, 100);
@@ -130,7 +164,8 @@ void HandPlausibilityTestBase::setManiacProfile(CurrentHandContext& ctx)
 
 void HandPlausibilityTestBase::setInsufficientStatistics(CurrentHandContext& ctx)
 {
-    setPlayerStatistics(ctx, 2.0f, 30.0f, 25); // Below MIN_HANDS_STATISTICS_ACCURATE
+    setPlayerStatistics(ctx, 2.0f, 30.0f,
+                        MIN_HANDS_STATISTICS_ACCURATE - 5); // Below MIN_HANDS_STATISTICS_ACCURATE (30)
 }
 
 // ========================================
@@ -416,4 +451,4 @@ std::shared_ptr<std::list<std::shared_ptr<Player>>> HandPlausibilityTestBase::cr
 
     return playerList;
 }
-}
+} // namespace pkt::test
