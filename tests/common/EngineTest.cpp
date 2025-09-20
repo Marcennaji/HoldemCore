@@ -5,7 +5,8 @@
 #include "core/engine/Exception.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
-#include "core/services/GlobalServices.h"
+#include "core/services/PokerServices.h"
+#include "core/services/ServiceContainer.h"
 #include "infra/ConsoleLogger.h"
 #include "infra/eval/PsimHandEvaluationEngine.h"
 
@@ -19,15 +20,17 @@ namespace pkt::test
 
 void EngineTest::SetUp()
 {
-    myFactory = std::make_unique<EngineFactory>(myEvents);
-    auto& services = pkt::core::GlobalServices::instance();
+    myServices = std::make_shared<pkt::core::AppServiceContainer>();
     auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
     logger->setLogLevel(pkt::core::LogLevel::Info);
-    services.setLogger(std::move(logger));
-    services.setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>());
+    myServices->setLogger(std::move(logger));
+    myServices->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>());
     auto randomizer = std::make_unique<FakeRandomizer>();
     randomizer->values = {3, 5, 7};
-    services.setRandomizer(std::move(randomizer));
+    myServices->setRandomizer(std::move(randomizer));
+
+    auto pokerServices = std::make_shared<pkt::core::PokerServices>(myServices);
+    myFactory = std::make_unique<EngineFactory>(myEvents, pokerServices);
 
     gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
     gameData.startMoney = 1000;
@@ -84,6 +87,16 @@ bool EngineTest::isPlayerStillActive(unsigned id) const
             return true;
     }
     return false;
+}
+
+pkt::core::ILogger& EngineTest::getLogger() const
+{
+    return myServices->logger();
+}
+
+std::shared_ptr<pkt::core::ServiceContainer> EngineTest::getServices() const
+{
+    return myServices;
 }
 
 } // namespace pkt::test

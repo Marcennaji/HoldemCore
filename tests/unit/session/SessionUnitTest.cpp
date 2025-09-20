@@ -4,6 +4,7 @@
 
 #include <core/engine/model/GameData.h>
 #include <core/engine/model/StartData.h>
+#include <core/services/ServiceContainer.h>
 #include <core/session/Session.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -19,10 +20,15 @@ class SessionTestHelper : public Session
   public:
     SessionTestHelper(const GameEvents& events) : Session(events) {}
     SessionTestHelper(const GameEvents& events, std::shared_ptr<EngineFactory> factory) : Session(events, factory) {}
+    SessionTestHelper(const GameEvents& events, std::shared_ptr<ServiceContainer> serviceContainer)
+        : Session(events, serviceContainer)
+    {
+    }
 
     // Expose protected methods for testing
     using Session::createBoard;
     using Session::ensureEngineFactoryInitialized;
+    using Session::ensureServiceContainerInitialized;
     using Session::fireGameInitializedEvent;
     using Session::validateGameParameters;
 };
@@ -56,6 +62,17 @@ TEST_F(SessionUnitTest, ConstructorWithEventsAndFactoryCreatesValidSession)
     auto factory = std::make_shared<EngineFactory>(events);
     TestableSession session(events, factory);
     EXPECT_TRUE(session.hasEngineFactory()) << "Session should have engine factory when provided in constructor";
+}
+
+// Test 2b: Constructor with events and ServiceContainer
+TEST_F(SessionUnitTest, ConstructorWithEventsAndServiceContainerCreatesValidSession)
+{
+    auto serviceContainer = std::make_shared<AppServiceContainer>();
+    SessionTestHelper session(events, serviceContainer);
+
+    // The session should be successfully created with the service container
+    // We can test this by calling ensureServiceContainerInitialized() which should not throw
+    EXPECT_NO_THROW(session.ensureServiceContainerInitialized()) << "Session should have valid service container";
 }
 
 // Test 3: Test exception handling for factory methods

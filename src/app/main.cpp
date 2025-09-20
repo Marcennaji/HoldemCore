@@ -5,7 +5,7 @@
 #include <infra/AppDirectories.h>
 #include <infra/ConsoleLogger.h>
 #include <infra/eval/PsimHandEvaluationEngine.h>
-#include "core/services/GlobalServices.h"
+#include "core/services/ServiceContainer.h"
 #include "infra/persistence/SqliteDb.h"
 #include "infra/persistence/SqlitePlayersStatisticsStore.h"
 
@@ -32,13 +32,13 @@ int main(int argc, char** argv)
 {
     pkt::infra::AppDirectories dirs = pkt::infra::AppDirectories::initialize();
 
-    auto& services = pkt::core::GlobalServices::instance();
-    services.setLogger(std::make_unique<pkt::infra::ConsoleLogger>());
-    services.setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>());
+    auto services = std::make_shared<pkt::core::AppServiceContainer>();
+    services->setLogger(std::make_unique<pkt::infra::ConsoleLogger>());
+    services->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>(services));
     auto db = std::make_unique<pkt::infra::SqliteDb>(dirs.logDir + string("/pokerTraining.db"));
-    services.setPlayersStatisticsStore(std::make_unique<pkt::infra::SqlitePlayersStatisticsStore>(std::move(db)));
+    services->setPlayersStatisticsStore(std::make_unique<pkt::infra::SqlitePlayersStatisticsStore>(std::move(db)));
 
-    GuiAppController controller(QString::fromStdString(dirs.appDataDir));
+    GuiAppController controller(QString::fromStdString(dirs.appDataDir), services);
     controller.createMainWindow();
 
     return QApplication::exec();

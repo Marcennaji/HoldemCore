@@ -4,7 +4,6 @@
 
 #include "Board.h"
 
-#include <core/services/GlobalServices.h>
 #include "Exception.h"
 #include "Pot.h"
 #include "core/player/Player.h"

@@ -12,6 +12,7 @@
 #include <core/player/typedefs.h>
 #include "core/engine/GameEvents.h"
 #include "core/interfaces/IBoard.h"
+#include "core/services/ServiceContainer.h"
 
 namespace pkt::core
 {
@@ -31,6 +32,9 @@ class Session
     // Constructor for dependency injection (testing)
     Session(const GameEvents& events, std::shared_ptr<EngineFactory> engineFactory);
 
+    // Constructor with ServiceContainer for proper dependency injection
+    Session(const GameEvents& events, std::shared_ptr<ServiceContainer> serviceContainer);
+
     ~Session();
 
     void startGame(const GameData& gameData, const StartData& startData);
@@ -49,6 +53,7 @@ class Session
     void validateGameParameters(const GameData& gameData, const StartData& startData);
     void fireGameInitializedEvent(int guiSpeed);
     void ensureEngineFactoryInitialized();
+    void ensureServiceContainerInitialized();
 
   private:
     pkt::core::player::PlayerList createPlayersList(player::DefaultPlayerFactory& playerFactory, int numberOfPlayers,
@@ -67,7 +72,8 @@ class Session
 
     std::unique_ptr<Game> myCurrentGame;
     const GameEvents& myEvents;
-    std::shared_ptr<EngineFactory> myEngineFactory; // Injected or created
+    std::shared_ptr<EngineFactory> myEngineFactory;       // Injected or created
+    std::shared_ptr<ServiceContainer> myServiceContainer; // Injected service container
 };
 
 } // namespace pkt::core

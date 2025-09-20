@@ -1,10 +1,10 @@
 // tests/RiverStateTest.cpp
 
 #include "RiverStateTest.h"
+#include <iostream>
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/state/RiverState.h"
 #include "core/player/Helpers.h"
-#include "core/services/GlobalServices.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;
@@ -15,7 +15,7 @@ namespace pkt::test
 
 void RiverStateTest::logTestMessage(const std::string& message) const
 {
-    GlobalServices::instance().logger().verbose("RiverState : " + message);
+    getLogger().info("RiverState : " + message);
 }
 
 void RiverStateTest::SetUp()

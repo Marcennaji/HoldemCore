@@ -14,6 +14,7 @@ class ManiacBotStrategy : public BotStrategyBase
 
   public:
     ManiacBotStrategy();
+    ManiacBotStrategy(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
     ~ManiacBotStrategy();
 
   protected:

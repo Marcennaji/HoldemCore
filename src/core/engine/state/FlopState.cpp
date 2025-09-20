@@ -6,7 +6,6 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/utils/Helpers.h"
 #include "core/player/Player.h"
-#include "core/services/GlobalServices.h"
 
 namespace pkt::core
 {
@@ -53,11 +52,6 @@ void FlopState::enter(Hand& hand)
 
 void FlopState::exit(Hand& hand)
 {
-    for (auto& player : *hand.getSeatsList())
-    {
-        player->updateCurrentHandContext(GameState::Flop, hand);
-        player->getStatisticsUpdater()->updateFlopStatistics(player->getCurrentHandContext());
-    }
 }
 
 bool FlopState::isActionAllowed(const Hand& hand, const PlayerAction action) const
@@ -67,7 +61,7 @@ bool FlopState::isActionAllowed(const Hand& hand, const PlayerAction action) con
 
 void FlopState::promptPlayerAction(Hand& hand, Player& player)
 {
-    player.updateCurrentHandContext(Flop, hand);
+    player.updateCurrentHandContext(hand);
     PlayerAction action = player.decideAction(player.getCurrentHandContext());
 
     hand.handlePlayerAction(action);

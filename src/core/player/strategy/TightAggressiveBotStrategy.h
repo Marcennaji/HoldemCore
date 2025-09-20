@@ -15,6 +15,7 @@ class TightAggressiveBotStrategy : public BotStrategyBase
 
   public:
     TightAggressiveBotStrategy();
+    TightAggressiveBotStrategy(std::shared_ptr<pkt::core::ServiceContainer> services);
     ~TightAggressiveBotStrategy();
 
   private:

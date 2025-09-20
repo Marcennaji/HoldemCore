@@ -16,6 +16,7 @@
 #include "core/interfaces/hand/IHandLifecycle.h"
 #include "core/interfaces/hand/IHandPlayerAction.h"
 #include "core/interfaces/hand/IHandState.h"
+#include "core/services/PokerServices.h"
 #include "strategy/CurrentHandContext.h"
 
 namespace pkt::core
@@ -31,6 +32,12 @@ class Hand : public IHandLifecycle, public IHandPlayerAction, public HandPlayers
     Hand(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard>,
          pkt::core::player::PlayerList seats, pkt::core::player::PlayerList actingPlayers, GameData gameData,
          StartData startData);
+
+    // Constructor with PokerServices for dependency injection
+    Hand(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard>,
+         pkt::core::player::PlayerList seats, pkt::core::player::PlayerList actingPlayers, GameData gameData,
+         StartData startData, std::shared_ptr<PokerServices> services);
+
     ~Hand();
 
     IActionProcessor* getActionProcessor() const;
@@ -45,7 +52,7 @@ class Hand : public IHandLifecycle, public IHandPlayerAction, public HandPlayers
     // Method for round states to deal cards progressively
     std::vector<Card> dealCardsFromDeck(int numCards);
 
-    pkt::core::player::HandCommonContext updateHandCommonContext(const GameState);
+    pkt::core::player::HandCommonContext updateHandCommonContext();
 
     std::string getStringBoard() const;
     int getPotOdd(const int playerCash, const int playerSet) const;
@@ -74,10 +81,12 @@ class Hand : public IHandLifecycle, public IHandPlayerAction, public HandPlayers
     // New focused methods for handlePlayerAction refactoring
     void handleAutoFold(unsigned playerId);
     void processValidAction(const PlayerAction& action);
+    void ensureServicesInitialized() const;
 
     std::shared_ptr<EngineFactory> myFactory;
     const GameEvents& myEvents;
     std::shared_ptr<IBoard> myBoard;
+    mutable std::shared_ptr<PokerServices> myServices; // Injected service container
     std::unique_ptr<HandStateManager> myStateManager;
     std::unique_ptr<DeckManager> myDeckManager;
     std::unique_ptr<ActionValidator> myActionValidator;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/engine/cards/CardUtilities.h"
-#include "core/services/GlobalServices.h"
+#include "core/services/ServiceContainer.h"
 
 #include <algorithm>
 #include <random>
@@ -11,6 +11,8 @@
 
 namespace pkt::core
 {
+
+class ServiceContainer;
 
 /// Represents a playing card with suit and rank.
 /// Wraps the existing int-based card representation to maintain compatibility.
@@ -408,8 +410,15 @@ class Deck
     /// Shuffle the deck using random number generator
     void shuffle()
     {
-        // Use the global randomizer service for consistency with the rest of the system
-        auto& randomizer = GlobalServices::instance().randomizer();
+        auto services = std::make_shared<pkt::core::AppServiceContainer>();
+        shuffle(services);
+    }
+
+    /// Shuffle the deck using ServiceContainer
+    void shuffle(std::shared_ptr<pkt::core::ServiceContainer> services)
+    {
+        // Use the randomizer service for consistency with the rest of the system
+        auto& randomizer = services->randomizer();
 
         // Use a simple shuffle algorithm that uses our randomizer
         for (size_t i = cards.size() - 1; i > 0; --i)

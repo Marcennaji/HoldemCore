@@ -5,7 +5,6 @@
 #define NOMINMAX // for Windows
 
 #include "DefaultRandomizer.h"
-#include <core/services/GlobalServices.h>
 
 #include <algorithm>
 #include <memory>

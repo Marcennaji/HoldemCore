@@ -6,6 +6,11 @@
 
 namespace pkt::core
 {
+class ServiceContainer;
+} // namespace pkt::core
+
+namespace pkt::core
+{
 
 class Hand;
 class IHandState;
@@ -26,6 +31,9 @@ class HandStateManager
 
     HandStateManager(const GameEvents& events, int smallBlind, unsigned dealerPlayerId,
                      GameLoopErrorCallback errorCallback);
+    explicit HandStateManager(const GameEvents& events, int smallBlind, unsigned dealerPlayerId,
+                              GameLoopErrorCallback errorCallback,
+                              std::shared_ptr<pkt::core::ServiceContainer> services);
     ~HandStateManager() = default;
 
     // State lifecycle management
@@ -46,10 +54,12 @@ class HandStateManager
   private:
     void transitionState(Hand& hand, std::unique_ptr<IHandState> newState);
     void checkAndHandleTerminalState(Hand& hand);
+    void ensureServicesInitialized() const;
 
     const GameEvents& myEvents;
     std::unique_ptr<IHandState> myCurrentState;
     GameLoopErrorCallback myErrorCallback;
+    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices;
 
     // State initialization parameters
     int mySmallBlind;

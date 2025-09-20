@@ -1,10 +1,10 @@
 // tests/FlopState.cpp
 
 #include "FlopStateTest.h"
+#include <iostream>
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/state/FlopState.h"
 #include "core/player/Helpers.h"
-#include "core/services/GlobalServices.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;
@@ -15,7 +15,7 @@ namespace pkt::test
 
 void FlopStateTest::logTestMessage(const std::string& message) const
 {
-    GlobalServices::instance().logger().verbose("FlopState : " + message);
+    getLogger().info("FlopState : " + message);
 }
 
 void FlopStateTest::SetUp()

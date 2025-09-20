@@ -2,7 +2,6 @@
 
 #include <core/engine/model/Ranges.h>
 #include <core/player/Helpers.h>
-#include <core/services/GlobalServices.h>
 #include "CurrentHandContext.h"
 #include "core/player/Player.h"
 
@@ -10,8 +9,28 @@ using namespace std;
 
 namespace pkt::core::player
 {
+
+BotStrategyBase::BotStrategyBase()
+{
+    // Default constructor - services will be initialized lazily
+}
+
+BotStrategyBase::BotStrategyBase(std::shared_ptr<pkt::core::ServiceContainer> services) : myServices(services)
+{
+    // Constructor with services injection
+}
+
+void BotStrategyBase::ensureServicesInitialized() const
+{
+    if (!myServices)
+    {
+        myServices = std::make_shared<pkt::core::AppServiceContainer>();
+    }
+}
+
 PlayerAction BotStrategyBase::decidePreflop(const CurrentHandContext& ctx)
 {
+    ensureServicesInitialized();
     PlayerAction resultingAction;
     resultingAction.playerId = ctx.personalContext.id;
 
@@ -48,6 +67,7 @@ PlayerAction BotStrategyBase::decidePreflop(const CurrentHandContext& ctx)
 }
 PlayerAction BotStrategyBase::decideFlop(const CurrentHandContext& ctx)
 {
+    ensureServicesInitialized();
     PlayerAction resultingAction;
     resultingAction.playerId = ctx.personalContext.id;
 
@@ -100,6 +120,7 @@ PlayerAction BotStrategyBase::decideFlop(const CurrentHandContext& ctx)
 }
 PlayerAction BotStrategyBase::decideTurn(const CurrentHandContext& ctx)
 {
+    ensureServicesInitialized();
     PlayerAction resultingAction;
     resultingAction.playerId = ctx.personalContext.id;
 
@@ -152,6 +173,7 @@ PlayerAction BotStrategyBase::decideTurn(const CurrentHandContext& ctx)
 }
 PlayerAction BotStrategyBase::decideRiver(const CurrentHandContext& ctx)
 {
+    ensureServicesInitialized();
     PlayerAction resultingAction;
     resultingAction.playerId = ctx.personalContext.id;
 
@@ -267,7 +289,8 @@ bool BotStrategyBase::shouldPotControlOnTurn(const CurrentHandContext& ctx, int 
 
 void BotStrategyBase::logPotControl() const
 {
-    GlobalServices::instance().logger().verbose("\t\tShould control pot");
+    ensureServicesInitialized();
+    myServices->logger().verbose("\t\tShould control pot");
 }
 
 int BotStrategyBase::computePreflopRaiseAmount(const CurrentHandContext& ctx)
@@ -371,8 +394,8 @@ bool BotStrategyBase::isPossibleToBluff(const CurrentHandContext& ctx) const
 
     if (players == nullptr)
     {
-        GlobalServices::instance().logger().info(
-            "BotStrategyBase::isPossibleToBluff() is not compatible with legacy (non FSM) code");
+        ensureServicesInitialized();
+        myServices->logger().info("BotStrategyBase::isPossibleToBluff() is not compatible with legacy (non FSM) code");
         return false; // TODO remove this after FSM migration is complete
     }
 

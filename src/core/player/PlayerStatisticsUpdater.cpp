@@ -1,11 +1,15 @@
 
 #include "PlayerStatisticsUpdater.h"
+#include <core/services/ServiceContainer.h>
 #include "core/player/Player.h"
 #include "core/player/strategy/CurrentHandContext.h"
-#include "core/services/GlobalServices.h"
 
 namespace pkt::core::player
 {
+PlayerStatisticsUpdater::PlayerStatisticsUpdater(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer)
+    : myServices(serviceContainer)
+{
+}
 
 const PlayerStatistics& PlayerStatisticsUpdater::getStatistics(const int nbPlayers) const
 {
@@ -17,6 +21,26 @@ void PlayerStatisticsUpdater::resetPlayerStatistics()
     for (int i = 0; i <= MAX_NUMBER_OF_PLAYERS; i++)
     {
         myStatistics[i].reset();
+    }
+}
+void PlayerStatisticsUpdater::updateStatistics(GameState state, const CurrentHandContext& ctx)
+{
+    switch (state)
+    {
+    case GameState::Preflop:
+        updatePreflopStatistics(ctx);
+        break;
+    case GameState::Flop:
+        updateFlopStatistics(ctx);
+        break;
+    case GameState::Turn:
+        updateTurnStatistics(ctx);
+        break;
+    case GameState::River:
+        updateRiverStatistics(ctx);
+        break;
+    default:
+        break;
     }
 }
 
@@ -233,12 +257,21 @@ void PlayerStatisticsUpdater::updateRiverStatistics(const CurrentHandContext& ct
     }
 }
 
+void PlayerStatisticsUpdater::ensureServicesInitialized() const
+{
+    if (!myServices)
+    {
+        myServices = std::make_shared<pkt::core::AppServiceContainer>();
+    }
+}
+
 void PlayerStatisticsUpdater::loadStatistics(const std::string& playerName)
 {
+    ensureServicesInitialized();
 
     resetPlayerStatistics(); // reset stats to 0
 
-    myStatistics = GlobalServices::instance().playersStatisticsStore().loadPlayerStatistics(playerName);
+    myStatistics = myServices->playersStatisticsStore().loadPlayerStatistics(playerName);
     if (myStatistics.empty())
     {
         myStatistics.fill(PlayerStatistics());

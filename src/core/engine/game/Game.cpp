@@ -7,7 +7,6 @@
 #include "EngineFactory.h"
 #include "Exception.h"
 #include "core/player/Helpers.h"
-#include "core/services/GlobalServices.h"
 #include "model/EngineError.h"
 #include "model/StartData.h"
 

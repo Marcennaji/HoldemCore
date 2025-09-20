@@ -16,6 +16,11 @@
 #include <string>
 #include <vector>
 
+namespace pkt::core
+{
+class ServiceContainer;
+} // namespace pkt::core
+
 namespace pkt::core::player
 {
 class Player;
@@ -36,6 +41,7 @@ std::shared_ptr<player::Player> getNextPlayerToActInRound(const Hand& hand, Game
 std::unique_ptr<pkt::core::IHandState> computeBettingRoundNextState(Hand& hand, const GameEvents& events,
                                                                     GameState currentState);
 bool isRoundComplete(const Hand& hand);
+bool isRoundComplete(const Hand& hand, std::shared_ptr<pkt::core::ServiceContainer> services);
 std::vector<ActionType> getValidActionsForPlayer(const Hand& hand, int playerId);
 std::vector<ActionType> getValidActionsForPlayer(const pkt::core::player::PlayerList& actingPlayersList, int playerId,
                                                  const BettingActions& bettingActions, int smallBlind,

@@ -12,7 +12,6 @@
 #include <core/interfaces/persistence/PlayersStatisticsStore.h>
 #include <core/player/range/RangeParser.h>
 #include <core/player/strategy/CurrentHandContext.h>
-#include <core/services/GlobalServices.h>
 #include "Helpers.h"
 
 #include <sstream>
@@ -26,12 +25,33 @@ Player::Player(const GameEvents& events, int id, std::string name, int cash) : m
 {
     myRangeEstimator = std::make_unique<RangeEstimator>(myID);
     myCurrentHandContext = std::make_unique<CurrentHandContext>();
-    myStatisticsUpdater = std::make_unique<PlayerStatisticsUpdater>();
+    myStatisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(myServices);
     myStatisticsUpdater->loadStatistics(name);
 
     // Initialize cash in context
     myCurrentHandContext->personalContext.cash = cash;
     // Initialize with invalid cards - this will be set via context when needed
+}
+
+Player::Player(const GameEvents& events, std::shared_ptr<ServiceContainer> services, int id, std::string name, int cash)
+    : myID(id), myName(name), myEvents(events), myServices(services)
+{
+    myRangeEstimator = std::make_unique<RangeEstimator>(myID, myServices);
+    myCurrentHandContext = std::make_unique<CurrentHandContext>();
+    myStatisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(myServices);
+    myStatisticsUpdater->loadStatistics(name);
+
+    // Initialize cash in context
+    myCurrentHandContext->personalContext.cash = cash;
+    // Initialize with invalid cards - this will be set via context when needed
+}
+
+void Player::ensureServicesInitialized() const
+{
+    if (!myServices)
+    {
+        myServices = std::make_shared<AppServiceContainer>();
+    }
 }
 
 const PlayerPosition Player::getPosition() const
@@ -181,10 +201,12 @@ const HandSimulationStats Player::computeHandSimulation() const
     const int nbOpponents = mySeatsList->size() - 1;
     // evaluate my strength against my opponents's guessed ranges :
     float maxOpponentsStrengths = getMaxOpponentsStrengths();
-    return GlobalServices::instance().handEvaluationEngine().simulateHandEquity(getCardsValueString(), getStringBoard(),
-                                                                                nbOpponents, maxOpponentsStrengths);
+    ensureServicesInitialized();
+    return myServices->handEvaluationEngine().simulateHandEquity(getCardsValueString(), getStringBoard(), nbOpponents,
+                                                                 maxOpponentsStrengths);
 #else
-    return GlobalServices::instance().handEvaluationEngine().simulateHandEquity("As 6d", "", 2, 0.5);
+    ensureServicesInitialized();
+    return myServices->handEvaluationEngine().simulateHandEquity("As 6d", "", 2, 0.5);
 #endif
 }
 
@@ -287,7 +309,8 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 
         if ((*i).size() != 4)
         {
-            GlobalServices::instance().logger().error("invalid hand : " + (*i));
+            ensureServicesInitialized();
+            myServices->logger().error("invalid hand : " + (*i));
             continue;
         }
         string s1 = (*i).substr(0, 2);
@@ -320,7 +343,8 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 
     for (vector<std::string>::const_iterator i = newRanges.begin(); i != newRanges.end(); i++)
     {
-        const int rank = GlobalServices::instance().handEvaluationEngine().rankHand(((*i) + board).c_str());
+        ensureServicesInitialized();
+        const int rank = myServices->handEvaluationEngine().rankHand(((*i) + board).c_str());
         if (rank > getHandRanking())
         {
             nbWinningHands++;
@@ -328,7 +352,8 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
     }
     if (ranges.size() == 0)
     {
-        GlobalServices::instance().logger().error("no ranges for opponent " + std::to_string(opponentId));
+        ensureServicesInitialized();
+        myServices->logger().error("no ranges for opponent " + std::to_string(opponentId));
         return 0;
     }
     assert(nbWinningHands / ranges.size() <= 1.0);
@@ -384,10 +409,10 @@ bool Player::isInVeryLooseMode(const int nbPlayers) const
     }
 }
 
-void Player::updateCurrentHandContext(const GameState state, Hand& currentHand)
+void Player::updateCurrentHandContext(Hand& currentHand)
 {
     // common context
-    myCurrentHandContext->commonContext = currentHand.updateHandCommonContext(state);
+    myCurrentHandContext->commonContext = currentHand.updateHandCommonContext();
 
     // Calculate valid actions for this specific player
     myCurrentHandContext->commonContext.validActions = pkt::core::getValidActionsForPlayer(currentHand, myID);
@@ -442,12 +467,20 @@ void Player::resetForNewHand(const Hand& hand)
     setPosition(hand);
     getRangeEstimator()->setEstimatedRange("");
 }
+void Player::processAction(const PlayerAction& action, Hand& hand)
+{
+    setAction(hand.getStateManager()->getCurrentState(), action);
+    updateCurrentHandContext(hand);
+    getStatisticsUpdater()->updateStatistics(hand.getStateManager()->getGameState(), getCurrentHandContext());
+    getRangeEstimator()->updateUnplausibleRanges(hand.getStateManager()->getGameState(), getCurrentHandContext());
+}
 const PostFlopAnalysisFlags Player::getPostFlopAnalysisFlags() const
 {
     std::string stringHand = getCardsValueString();
     std::string stringBoard = myCurrentHandContext->commonContext.stringBoard;
 
-    return GlobalServices::instance().handEvaluationEngine().analyzeHand(getCardsValueString(), stringBoard);
+    ensureServicesInitialized();
+    return myServices->handEvaluationEngine().analyzeHand(getCardsValueString(), stringBoard);
 }
 
 void Player::setPosition(const Hand& hand)
@@ -473,8 +506,9 @@ void Player::setAction(IHandState& state, const PlayerAction& action)
 {
     if (action.type != ActionType::None)
     {
-        GlobalServices::instance().logger().info(myName + " " + std::string(actionTypeToString(action.type)) +
-                                                 (action.amount ? " " + std::to_string(action.amount) : ""));
+        ensureServicesInitialized();
+        myServices->logger().info(myName + " " + std::string(actionTypeToString(action.type)) +
+                                  (action.amount ? " " + std::to_string(action.amount) : ""));
     }
     myCurrentHandContext->personalContext.actions.currentHandActions.addAction(state.getGameState(), action);
 }

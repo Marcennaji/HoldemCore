@@ -16,6 +16,7 @@ class LooseAggressiveBotStrategy : public BotStrategyBase
 
   public:
     LooseAggressiveBotStrategy();
+    LooseAggressiveBotStrategy(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
     ~LooseAggressiveBotStrategy();
 
   protected:

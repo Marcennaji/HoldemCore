@@ -12,6 +12,11 @@
 
 #include <QtWidgets/QMainWindow>
 
+namespace pkt::core
+{
+class ServiceContainer;
+}
+
 namespace pkt::ui::qtwidgets
 {
 class PokerTableWindow;
@@ -21,6 +26,11 @@ class StartWindow : public QMainWindow, public Ui::StartWindow
   public:
     StartWindow(const QString& appDataPath, PokerTableWindow* tableWindow, pkt::core::Session* session,
                 QWidget* parent);
+
+    /// Constructor with ServiceContainer dependency injection
+    StartWindow(const QString& appDataPath, PokerTableWindow* tableWindow, pkt::core::Session* session,
+                std::shared_ptr<pkt::core::ServiceContainer> services, QWidget* parent);
+
     ~StartWindow();
 
     void setSession(pkt::core::Session* session) { mySession = session; }
@@ -44,6 +54,12 @@ class StartWindow : public QMainWindow, public Ui::StartWindow
 
     std::shared_ptr<PokerTableWindow> myPokerTableWindow;
     pkt::core::Session* mySession;
+
+    /// Ensures services are initialized (lazy initialization)
+    void ensureServicesInitialized();
+
+    /// ServiceContainer for dependency injection
+    std::shared_ptr<pkt::core::ServiceContainer> myServices;
 };
 
 } // namespace pkt::ui::qtwidgets

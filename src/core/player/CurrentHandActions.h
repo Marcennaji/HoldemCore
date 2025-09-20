@@ -1,10 +1,13 @@
 
 #pragma once
 
+#include <core/services/ServiceContainer.h>
 #include "core/engine/model/GameState.h"
 #include "core/engine/model/PlayerAction.h"
+#include "core/interfaces/ILogger.h"
 
 #include <map>
+#include <memory>
 #include <vector>
 
 namespace pkt::core::player
@@ -14,6 +17,7 @@ class CurrentHandActions
 {
   public:
     CurrentHandActions();
+    explicit CurrentHandActions(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
     ~CurrentHandActions() = default;
 
     void reset();
@@ -30,8 +34,12 @@ class CurrentHandActions
     PlayerAction getLastAction() const { return myLastAction; }
 
     void writeActionsToLog() const;
+    void writeActionsToLog(ILogger& logger) const;
 
   private:
+    void ensureServicesInitialized() const;
+    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices; // Injected service container
+
     std::map<GameState, std::vector<PlayerAction>> myActionsByState;
     PlayerAction myLastAction{-1, ActionType::None, 0};
 };

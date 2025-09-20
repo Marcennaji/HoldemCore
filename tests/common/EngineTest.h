@@ -27,6 +27,10 @@ class EngineTest : public ::testing::Test
     void checkPostRiverConditions();
     bool isPlayerStillActive(unsigned id) const;
 
+    // Access to services for test logging
+    pkt::core::ILogger& getLogger() const;
+    std::shared_ptr<pkt::core::ServiceContainer> getServices() const;
+
     pkt::core::GameEvents myEvents;
     std::shared_ptr<pkt::core::EngineFactory> myFactory;
     std::shared_ptr<pkt::core::Hand> myHand;
@@ -41,6 +45,7 @@ class EngineTest : public ::testing::Test
   private:
     void createPlayersLists(size_t playerCount);
 
+    std::shared_ptr<pkt::core::AppServiceContainer> myServices; // Store services for logger access
     const int startDealerPlayerId{0}; // Starting dealer player ID, can be set to any valid player ID
 };
 } // namespace pkt::test

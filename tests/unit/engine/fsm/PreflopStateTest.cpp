@@ -1,10 +1,10 @@
 // tests/PreflopState.cpp
 
 #include "PreflopStateTest.h"
+#include <iostream>
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/state/PreflopState.h"
 #include "core/player/Helpers.h"
-#include "core/services/GlobalServices.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;
@@ -14,7 +14,7 @@ namespace pkt::test
 {
 void PreflopStateTest::logTestMessage(const std::string& message) const
 {
-    GlobalServices::instance().logger().verbose("PreflopState : " + message);
+    getLogger().info("PreflopState : " + message);
 }
 
 void PreflopStateTest::SetUp()

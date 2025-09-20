@@ -5,7 +5,7 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/utils/Helpers.h"
 #include "core/player/Player.h"
-#include "core/services/GlobalServices.h"
+#include "core/services/ServiceContainer.h"
 
 namespace pkt::core
 {
@@ -15,9 +15,23 @@ RiverState::RiverState(const GameEvents& events) : myEvents(events)
 {
 }
 
+RiverState::RiverState(const GameEvents& events, std::shared_ptr<pkt::core::ServiceContainer> services)
+    : myEvents(events), myServices(std::move(services))
+{
+}
+
+void RiverState::ensureServicesInitialized() const
+{
+    if (!myServices)
+    {
+        myServices = std::make_shared<pkt::core::AppServiceContainer>();
+    }
+}
+
 void RiverState::enter(Hand& hand)
 {
-    GlobalServices::instance().logger().info("River");
+    ensureServicesInitialized();
+    myServices->logger().info("River");
 
     for (auto& player : *hand.getActingPlayersList())
     {
@@ -55,11 +69,6 @@ void RiverState::enter(Hand& hand)
 
 void RiverState::exit(Hand& hand)
 {
-    for (auto& player : *hand.getSeatsList())
-    {
-        player->updateCurrentHandContext(GameState::River, hand);
-        player->getStatisticsUpdater()->updateRiverStatistics(player->getCurrentHandContext());
-    }
 }
 
 bool RiverState::isActionAllowed(const Hand& hand, const PlayerAction action) const
@@ -69,7 +78,7 @@ bool RiverState::isActionAllowed(const Hand& hand, const PlayerAction action) co
 
 void RiverState::promptPlayerAction(Hand& hand, Player& player)
 {
-    player.updateCurrentHandContext(River, hand);
+    player.updateCurrentHandContext(hand);
     PlayerAction action = player.decideAction(player.getCurrentHandContext());
 
     hand.handlePlayerAction(action);

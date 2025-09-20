@@ -85,11 +85,6 @@ TEST_F(FlopBetPlausibilityTest, DonkBetWithOvercards_ShouldBeUnplausible)
     // Not a made hand, not a draw
     setDryBoard(hand);
 
-    // Debug output
-    std::cout << "DonkBetWithOvercards: hasPosition=" << ctx.personalContext.hasPosition
-              << ", preflopIsAggressor=" << ctx.personalContext.actions.preflopIsAggressor
-              << ", numPlayers=" << ctx.commonContext.playersContext.nbPlayers << ", isOverCards=" << hand.isOverCards
-              << ", isNoPair=" << hand.isNoPair << std::endl;
     // Act & Assert
     EXPECT_TRUE(HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(hand, ctx))
         << "Donk betting with just overcards is unplausible (multiway)";
@@ -128,11 +123,6 @@ TEST_F(FlopBetPlausibilityTest, DonkBetWithNoPair_ShouldBeUnplausible)
     // Not a made hand, not a draw
     setDryBoard(hand);
 
-    // Debug output
-    std::cout << "DonkBetWithNoPair: hasPosition=" << ctx.personalContext.hasPosition
-              << ", preflopIsAggressor=" << ctx.personalContext.actions.preflopIsAggressor
-              << ", numPlayers=" << ctx.commonContext.playersContext.nbPlayers << ", isOverCards=" << hand.isOverCards
-              << ", isNoPair=" << hand.isNoPair << std::endl;
     // Act & Assert
     EXPECT_TRUE(HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(hand, ctx))
         << "Donk betting with no pair and weak draws is unplausible (multiway)";

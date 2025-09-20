@@ -1,9 +1,8 @@
+#include "Pot.h"
 #include <algorithm>
 #include <stdexcept>
-#include "Pot.h"
 #include "core/engine/Exception.h"
 #include "core/player/Helpers.h"
-#include "core/services/GlobalServices.h"
 
 namespace pkt::core
 {
@@ -13,8 +12,24 @@ Pot::Pot(unsigned total, pkt::core::player::PlayerList seats, unsigned dealerId)
 {
 }
 
+Pot::Pot(unsigned total, pkt::core::player::PlayerList seats, unsigned dealerId,
+         std::shared_ptr<ServiceContainer> serviceContainer)
+    : myTotal(total), mySeats(std::move(seats)), myDealerId(dealerId), myServices(serviceContainer)
+{
+}
+
+void Pot::ensureServicesInitialized() const
+{
+    if (!myServices)
+    {
+        myServices = std::make_shared<AppServiceContainer>();
+    }
+}
+
 void Pot::distribute()
 {
+    ensureServicesInitialized();
+
     myWinners.clear();
     std::vector<unsigned> contributions = initializePlayerContributions();
     std::vector<unsigned> remaining = contributions;
@@ -31,8 +46,8 @@ void Pot::distribute()
         int potLevel = static_cast<int>(eligible.size() * level);
         if (potLevel > myTotal)
         {
-            GlobalServices::instance().logger().info("Pot level " + std::to_string(potLevel) +
-                                                     " exceeds total available chips : " + std::to_string(myTotal));
+            myServices->logger().info("Pot level " + std::to_string(potLevel) +
+                                      " exceeds total available chips : " + std::to_string(myTotal));
             potLevel = myTotal;
         }
 

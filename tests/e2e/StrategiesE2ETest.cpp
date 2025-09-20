@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 #include <optional>
 
+#include <iostream>
 #include "common/EngineTest.h"
 #include "core/engine/cards/Card.h"
 #include "core/engine/hand/Hand.h"
@@ -14,7 +15,6 @@
 #include "core/player/strategy/ManiacBotStrategy.h"
 #include "core/player/strategy/TightAggressiveBotStrategy.h"
 #include "core/player/strategy/UltraTightBotStrategy.h"
-#include "core/services/GlobalServices.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;
@@ -111,13 +111,13 @@ class StrategiesE2ETest : public EngineTest
         switch (strategyType)
         {
         case StrategyType::TightAggressive:
-            return std::make_unique<TightAggressiveBotStrategy>();
+            return std::make_unique<TightAggressiveBotStrategy>(getServices());
         case StrategyType::LooseAggressive:
-            return std::make_unique<LooseAggressiveBotStrategy>();
+            return std::make_unique<LooseAggressiveBotStrategy>(getServices());
         case StrategyType::UltraTight:
-            return std::make_unique<UltraTightBotStrategy>();
+            return std::make_unique<UltraTightBotStrategy>(getServices());
         case StrategyType::Maniac:
-            return std::make_unique<ManiacBotStrategy>();
+            return std::make_unique<ManiacBotStrategy>(getServices());
         default:
             throw std::invalid_argument("Unknown strategy type");
         }
@@ -137,8 +137,8 @@ class StrategiesE2ETest : public EngineTest
 
         for (const auto& playerConfig : scenario.players)
         {
-            auto player = std::make_shared<Player>(myEvents, playerConfig.playerId, playerConfig.playerName,
-                                                   playerConfig.startingCash);
+            auto player = std::make_shared<Player>(myEvents, getServices(), playerConfig.playerId,
+                                                   playerConfig.playerName, playerConfig.startingCash);
             player->setStrategy(createStrategy(playerConfig.strategyType));
             mySeatsList->push_back(player);
         }
@@ -249,7 +249,7 @@ class StrategiesE2ETest : public EngineTest
     // Generic method to run any test scenario
     void runTestScenario(const TestScenario& scenario)
     {
-        GlobalServices::instance().logger().info("=== Running Scenario: " + scenario.scenarioName + " ===");
+        getLogger().info("=== Running Scenario: " + scenario.scenarioName + " ===");
 
         setupPlayersFromScenario(scenario);
 
@@ -277,8 +277,8 @@ class StrategiesE2ETest : public EngineTest
         EXPECT_EQ(myHand->getGameState(), PostRiver);
 
         // Log final results
-        GlobalServices::instance().logger().info("=== Scenario " + scenario.scenarioName + " Completed ===");
-        GlobalServices::instance().logger().info("");
+        getLogger().info("=== Scenario " + scenario.scenarioName + " Completed ===");
+        getLogger().info("");
     }
 
     void logPlayerActions()
@@ -286,36 +286,32 @@ class StrategiesE2ETest : public EngineTest
         for (const auto& player : *mySeatsList)
         {
             auto lastAction = player->getLastAction();
-            GlobalServices::instance().logger().info(
-                "Player " + std::to_string(player->getId()) + " (" + player->getName() + ") " +
-                "Cards: " + player->getHoleCards().toString() + " Last Action: " + actionTypeToString(lastAction.type) +
-                " Amount: " + std::to_string(lastAction.amount));
+            getLogger().info("Player " + std::to_string(player->getId()) + " (" + player->getName() + ") " +
+                             "Cards: " + player->getHoleCards().toString() + " Last Action: " +
+                             actionTypeToString(lastAction.type) + " Amount: " + std::to_string(lastAction.amount));
         }
     }
 
     void logPlayersHoleCardsAfterDealing()
     {
-        GlobalServices::instance().logger().info("=== Players' Hole Cards After Override ===");
+        getLogger().info("=== Players' Hole Cards After Override ===");
         for (const auto& player : *mySeatsList)
         {
             const HoleCards& holeCards = player->getHoleCards();
             if (holeCards.isValid())
             {
-                GlobalServices::instance().logger().info("Player " + std::to_string(player->getId()) + " (" +
-                                                         player->getName() + "): " + holeCards.toString());
+                getLogger().info("Player " + std::to_string(player->getId()) + " (" + player->getName() +
+                                 "): " + holeCards.toString());
             }
             else
             {
-                GlobalServices::instance().logger().info("Player " + std::to_string(player->getId()) + " (" +
-                                                         player->getName() + "): No valid hole cards");
+                getLogger().info("Player " + std::to_string(player->getId()) + " (" + player->getName() +
+                                 "): No valid hole cards");
             }
         }
     }
 
-    void logTestMessage(const std::string& message) const
-    {
-        GlobalServices::instance().logger().info("StrategiesE2ETest: " + message);
-    }
+    void logTestMessage(const std::string& message) const { getLogger().info("StrategiesE2ETest: " + message); }
 };
 
 // Predefined scenarios for easy reuse

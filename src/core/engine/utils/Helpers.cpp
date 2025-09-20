@@ -8,7 +8,7 @@
 #include "core/engine/model/PlayerPosition.h"
 #include "core/player/Helpers.h"
 #include "core/player/Player.h"
-#include "core/services/GlobalServices.h"
+#include "core/services/ServiceContainer.h"
 // Include FSM states for the helper function
 #include "core/engine/state/FlopState.h"
 #include "core/engine/state/PostRiverState.h"
@@ -168,23 +168,28 @@ std::unique_ptr<pkt::core::IHandState> computeBettingRoundNextState(pkt::core::H
 
 bool isRoundComplete(const Hand& hand)
 {
+    auto services = std::make_shared<pkt::core::AppServiceContainer>();
+    return isRoundComplete(hand, services);
+}
+
+bool isRoundComplete(const Hand& hand, std::shared_ptr<pkt::core::ServiceContainer> services)
+{
     assert(hand.getGameState() != GameState::None);
 
     for (auto player = hand.getActingPlayersList()->begin(); player != hand.getActingPlayersList()->end(); ++player)
     {
-        GlobalServices::instance().logger().verbose("checking if round " + gameStateToString(hand.getGameState()) +
-                                                    " is complete : Checking player: " + (*player)->getName());
+        services->logger().verbose("checking if round " + gameStateToString(hand.getGameState()) +
+                                   " is complete : Checking player: " + (*player)->getName());
 
         if ((*player)->getLastAction().type == ActionType::None ||
             (*player)->getLastAction().type == ActionType::PostBigBlind ||
             (*player)->getLastAction().type == ActionType::PostSmallBlind)
         {
-            GlobalServices::instance().logger().verbose("  ROUND NOT COMPLETE, as player " + (*player)->getName() +
-                                                        " did not act.");
+            services->logger().verbose("  ROUND NOT COMPLETE, as player " + (*player)->getName() + " did not act.");
             return false;
         }
 
-        GlobalServices::instance().logger().verbose(
+        services->logger().verbose(
             "  player round bet amount: " +
             std::to_string((*player)->getCurrentHandActions().getRoundTotalBetAmount(hand.getGameState())) +
             ", hand total bet amount : " + std::to_string((*player)->getCurrentHandActions().getHandTotalBetAmount()) +
@@ -193,12 +198,12 @@ bool isRoundComplete(const Hand& hand)
         if ((*player)->getCurrentHandActions().getRoundTotalBetAmount(hand.getGameState()) <
             hand.getBettingActions()->getRoundHighestSet())
         {
-            GlobalServices::instance().logger().verbose("  ROUND NOT COMPLETE, as player " + (*player)->getName() +
-                                                        " has not matched the highest bet yet.");
+            services->logger().verbose("  ROUND NOT COMPLETE, as player " + (*player)->getName() +
+                                       " has not matched the highest bet yet.");
             return false;
         }
     }
-    GlobalServices::instance().logger().verbose("  ROUND " + gameStateToString(hand.getGameState()) + " COMPLETE");
+    services->logger().verbose("  ROUND " + gameStateToString(hand.getGameState()) + " COMPLETE");
     return true;
 }
 

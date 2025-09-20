@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include "core/player/Player.h"
+#include "core/services/ServiceContainer.h"
 
 namespace pkt::core
 {
@@ -12,6 +13,8 @@ class Pot
 {
   public:
     Pot(unsigned total, pkt::core::player::PlayerList seats, unsigned dealerId);
+    explicit Pot(unsigned total, pkt::core::player::PlayerList seats, unsigned dealerId,
+                 std::shared_ptr<ServiceContainer> serviceContainer);
 
     void distribute();
     const std::list<unsigned>& getWinners() const { return myWinners; }
@@ -35,6 +38,9 @@ class Pot
 
     std::shared_ptr<player::Player> resolveRemainderReceiver(const std::vector<size_t>& winnerIndices) const;
     std::vector<size_t> indexesOf(const std::list<unsigned>& ids);
+    void ensureServicesInitialized() const;
+
+    mutable std::shared_ptr<ServiceContainer> myServices; // Injected service container
 };
 
 } // namespace pkt::core

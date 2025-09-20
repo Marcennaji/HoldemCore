@@ -1,5 +1,5 @@
 #include "Hand.h"
-#include <core/services/GlobalServices.h>
+#include <core/services/ServiceContainer.h>
 #include "CardUtilities.h"
 #include "DeckManager.h"
 #include "GameEvents.h"
@@ -24,11 +24,28 @@ using namespace pkt::core::player;
 
 Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
            PlayerList seats, PlayerList actingPlayers, GameData gameData, StartData startData)
-    : HandPlayersState(seats, actingPlayers), myEvents(events), myFactory(factory), myBoard(board),
+    : HandPlayersState(seats, actingPlayers), myEvents(events), myFactory(factory), myBoard(board), myServices(nullptr),
       myDeckManager(std::make_unique<DeckManager>()), myActionValidator(std::make_unique<ActionValidator>()),
       myStartQuantityPlayers(startData.numberOfPlayers), mySmallBlind(gameData.firstSmallBlind),
       myStartCash(gameData.startMoney)
+{
+    mySeatsList = seats;
+    myActingPlayersList = actingPlayers;
+    myDealerPlayerId = startData.startDealerPlayerId;
+    mySmallBlindPlayerId = startData.startDealerPlayerId;
+    myBigBlindPlayerId = startData.startDealerPlayerId;
 
+    // Create InvalidActionHandler with callbacks
+    auto errorProvider = [this](const PlayerAction& action) -> std::string { return getActionValidationError(action); };
+}
+
+Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
+           PlayerList seats, PlayerList actingPlayers, GameData gameData, StartData startData,
+           std::shared_ptr<PokerServices> services)
+    : HandPlayersState(seats, actingPlayers), myEvents(events), myFactory(factory), myBoard(board),
+      myServices(services), myDeckManager(std::make_unique<DeckManager>()),
+      myActionValidator(std::make_unique<ActionValidator>()), myStartQuantityPlayers(startData.numberOfPlayers),
+      mySmallBlind(gameData.firstSmallBlind), myStartCash(gameData.startMoney)
 {
     mySeatsList = seats;
     myActingPlayersList = actingPlayers;
@@ -70,9 +87,19 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
 
 Hand::~Hand() = default;
 
+void Hand::ensureServicesInitialized() const
+{
+    if (!myServices)
+    {
+        auto baseContainer = std::make_shared<AppServiceContainer>();
+        myServices = std::make_shared<PokerServices>(baseContainer);
+    }
+}
+
 void Hand::initialize()
 {
-    GlobalServices::instance().logger().info("\n----------------------  New hand ----------------------------\n");
+    ensureServicesInitialized();
+    myServices->logger().info("\n----------------------  New hand ----------------------------\n");
 
     // Initialize deck but don't deal cards yet - wait until runGameLoop() to match legacy timing
     initAndShuffleDeck();
@@ -89,7 +116,8 @@ void Hand::initialize()
 
 void Hand::end()
 {
-    GlobalServices::instance().playersStatisticsStore().savePlayersStatistics(mySeatsList);
+    ensureServicesInitialized();
+    myServices->playersStatisticsStore().savePlayersStatistics(mySeatsList);
 }
 
 void Hand::runGameLoop()
@@ -190,11 +218,11 @@ std::vector<Card> Hand::dealCardsFromDeck(int numCards)
     return myDeckManager->dealCards(numCards);
 }
 
-HandCommonContext Hand::updateHandCommonContext(const GameState state)
+HandCommonContext Hand::updateHandCommonContext()
 {
     // general (and shared) game state
     HandCommonContext handContext;
-    handContext.gameState = state;
+    handContext.gameState = myStateManager->getGameState();
     handContext.stringBoard = getStringBoard();
     handContext.smallBlind = mySmallBlind;
 
@@ -259,9 +287,9 @@ int Hand::getPotOdd(const int playerCash, const int playerSet) const
 
     if (pot == 0)
     { // shouldn't happen, but...
-        GlobalServices::instance().logger().error("Pot = " + std::to_string(myBoard->getPot(*this)) + " + " +
-                                                  std::to_string(myBoard->getSets(*this)) + " = " +
-                                                  std::to_string(pot));
+        ensureServicesInitialized();
+        myServices->logger().error("Pot = " + std::to_string(myBoard->getPot(*this)) + " + " +
+                                   std::to_string(myBoard->getSets(*this)) + " = " + std::to_string(pot));
         return 0;
     }
 
@@ -338,14 +366,14 @@ PlayerAction Hand::getDefaultActionForPlayer(unsigned playerId) const
 
 void Hand::handleAutoFold(unsigned playerId)
 {
-    GlobalServices::instance().logger().error("Player " + std::to_string(playerId) +
-                                              " exceeded maximum invalid actions, auto-folding");
+    ensureServicesInitialized();
+    myServices->logger().error("Player " + std::to_string(playerId) +
+                               " exceeded maximum invalid actions, auto-folding");
 
     // If the game state is terminal, don't try to process any actions
     if (myStateManager->isTerminal())
     {
-        GlobalServices::instance().logger().error("Cannot auto-fold player " + std::to_string(playerId) +
-                                                  " - game state is terminal");
+        myServices->logger().error("Cannot auto-fold player " + std::to_string(playerId) + " - game state is terminal");
 
         if (myEvents.onEngineError)
         {
@@ -386,7 +414,8 @@ void Hand::processValidAction(const PlayerAction& action)
             myEvents.onEngineError("Error processing player action: " + std::string(e.what()));
         }
 
-        GlobalServices::instance().logger().error("Error in handlePlayerAction: " + std::string(e.what()));
+        ensureServicesInitialized();
+        myServices->logger().error("Error in handlePlayerAction: " + std::string(e.what()));
 
         // Re-throw critical errors
         throw;

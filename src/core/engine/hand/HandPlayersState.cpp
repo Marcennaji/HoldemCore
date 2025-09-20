@@ -1,6 +1,5 @@
 #include "HandPlayersState.h"
 #include "core/player/Player.h"
-#include "core/services/GlobalServices.h"
 
 namespace pkt::core
 {

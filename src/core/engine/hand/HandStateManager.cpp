@@ -4,7 +4,7 @@
 #include "core/engine/state/PreflopState.h"
 #include "core/interfaces/hand/IActionProcessor.h"
 #include "core/interfaces/hand/IHandState.h"
-#include "core/services/GlobalServices.h"
+#include "core/services/ServiceContainer.h"
 
 #include <cassert>
 
@@ -18,6 +18,22 @@ HandStateManager::HandStateManager(const GameEvents& events, int smallBlind, uns
 {
 }
 
+HandStateManager::HandStateManager(const GameEvents& events, int smallBlind, unsigned dealerPlayerId,
+                                   GameLoopErrorCallback errorCallback,
+                                   std::shared_ptr<pkt::core::ServiceContainer> services)
+    : myEvents(events), myErrorCallback(std::move(errorCallback)), mySmallBlind(smallBlind),
+      myDealerPlayerId(dealerPlayerId), myServices(std::move(services))
+{
+}
+
+void HandStateManager::ensureServicesInitialized() const
+{
+    if (!myServices)
+    {
+        myServices = std::make_shared<pkt::core::AppServiceContainer>();
+    }
+}
+
 void HandStateManager::initializeState(Hand& hand)
 {
     myCurrentState = std::make_unique<PreflopState>(myEvents, mySmallBlind, myDealerPlayerId);
@@ -26,6 +42,7 @@ void HandStateManager::initializeState(Hand& hand)
 
 void HandStateManager::runGameLoop(Hand& hand)
 {
+    ensureServicesInitialized();
     int iterationCount = 0;
 
     while (!isTerminal() && iterationCount < MAX_GAME_LOOP_ITERATIONS)
@@ -53,9 +70,8 @@ void HandStateManager::runGameLoop(Hand& hand)
     // Check if we hit the emergency brake
     if (iterationCount >= MAX_GAME_LOOP_ITERATIONS)
     {
-        GlobalServices::instance().logger().error("Game loop hit maximum iterations (" +
-                                                  std::to_string(MAX_GAME_LOOP_ITERATIONS) +
-                                                  "), terminating to prevent infinite loop");
+        myServices->logger().error("Game loop hit maximum iterations (" + std::to_string(MAX_GAME_LOOP_ITERATIONS) +
+                                   "), terminating to prevent infinite loop");
 
         if (myErrorCallback)
         {

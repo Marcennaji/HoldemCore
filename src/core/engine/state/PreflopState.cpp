@@ -8,7 +8,7 @@
 #include "core/engine/model/PlayerPosition.h"
 #include "core/engine/utils/Helpers.h"
 #include "core/player/Player.h"
-#include "core/services/GlobalServices.h"
+#include "core/services/ServiceContainer.h"
 
 namespace pkt::core
 {
@@ -25,6 +25,29 @@ PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsig
     if (dealerPlayerId == static_cast<unsigned>(-1))
     {
         throw std::invalid_argument("PreflopState: dealerPlayerId is invalid");
+    }
+}
+
+PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsigned dealerPlayerId,
+                           std::shared_ptr<pkt::core::ServiceContainer> services)
+    : myEvents(events), mySmallBlind(smallBlind), myDealerPlayerId(dealerPlayerId), myServices(std::move(services))
+{
+    if (smallBlind <= 0)
+    {
+        throw std::invalid_argument("PreflopState: smallBlind must be > 0");
+    }
+
+    if (dealerPlayerId == static_cast<unsigned>(-1))
+    {
+        throw std::invalid_argument("PreflopState: dealerPlayerId is invalid");
+    }
+}
+
+void PreflopState::ensureServicesInitialized() const
+{
+    if (!myServices)
+    {
+        myServices = std::make_shared<pkt::core::AppServiceContainer>();
     }
 }
 
@@ -46,11 +69,6 @@ void PreflopState::enter(Hand& hand)
 
 void PreflopState::exit(Hand& hand)
 {
-    for (auto& player : *hand.getSeatsList())
-    {
-        player->updateCurrentHandContext(GameState::Preflop, hand);
-        player->getStatisticsUpdater()->updatePreflopStatistics(player->getCurrentHandContext());
-    }
 }
 
 bool PreflopState::isActionAllowed(const Hand& hand, const PlayerAction action) const
@@ -61,7 +79,7 @@ bool PreflopState::isActionAllowed(const Hand& hand, const PlayerAction action) 
 
 void PreflopState::promptPlayerAction(Hand& hand, Player& player)
 {
-    player.updateCurrentHandContext(Preflop, hand);
+    player.updateCurrentHandContext(hand);
     PlayerAction action = player.decideAction(player.getCurrentHandContext());
 
     hand.handlePlayerAction(action);
@@ -74,26 +92,28 @@ std::unique_ptr<IHandState> PreflopState::computeNextState(Hand& hand)
 
 void PreflopState::logStateInfo(Hand& hand)
 {
+    ensureServicesInitialized();
     IDebuggableState::logStateInfo(hand);
-    GlobalServices::instance().logger().info("Blinds: SB=" + std::to_string(mySmallBlind) +
-                                             ", BB=" + std::to_string(2 * mySmallBlind));
+    myServices->logger().info("Blinds: SB=" + std::to_string(mySmallBlind) +
+                              ", BB=" + std::to_string(2 * mySmallBlind));
     logHoleCards(hand);
 }
 
 void PreflopState::logHoleCards(Hand& hand)
 {
+    ensureServicesInitialized();
     for (const auto& player : *hand.getSeatsList())
     {
         const HoleCards& holeCards = player->getHoleCards();
         if (holeCards.isValid())
         {
-            GlobalServices::instance().logger().info("Player " + std::to_string(player->getId()) + " (" +
-                                                     player->getName() + "): " + holeCards.toString());
+            myServices->logger().info("Player " + std::to_string(player->getId()) + " (" + player->getName() +
+                                      "): " + holeCards.toString());
         }
         else
         {
-            GlobalServices::instance().logger().info("Player " + std::to_string(player->getId()) + " (" +
-                                                     player->getName() + "): No hole cards");
+            myServices->logger().info("Player " + std::to_string(player->getId()) + " (" + player->getName() +
+                                      "): No hole cards");
         }
     }
 }

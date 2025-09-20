@@ -15,6 +15,7 @@ class UltraTightBotStrategy : public BotStrategyBase
 
   public:
     UltraTightBotStrategy();
+    UltraTightBotStrategy(std::shared_ptr<ServiceContainer> serviceContainer);
     ~UltraTightBotStrategy();
 
   protected:

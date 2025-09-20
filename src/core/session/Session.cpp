@@ -12,7 +12,7 @@
 #include <core/player/strategy/ManiacBotStrategy.h>
 #include <core/player/strategy/TightAggressiveBotStrategy.h>
 #include <core/player/strategy/UltraTightBotStrategy.h>
-#include <core/services/GlobalServices.h>
+#include <core/services/ServiceContainer.h>
 #include "core/player/DefaultPlayerFactory.h"
 #include "core/player/strategy/StrategyAssigner.h"
 
@@ -27,12 +27,17 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-Session::Session(const GameEvents& events) : myEvents(events), myEngineFactory(nullptr)
+Session::Session(const GameEvents& events) : myEvents(events), myEngineFactory(nullptr), myServiceContainer(nullptr)
 {
 }
 
 Session::Session(const GameEvents& events, std::shared_ptr<EngineFactory> engineFactory)
-    : myEvents(events), myEngineFactory(engineFactory)
+    : myEvents(events), myEngineFactory(engineFactory), myServiceContainer(nullptr)
+{
+}
+
+Session::Session(const GameEvents& events, std::shared_ptr<ServiceContainer> serviceContainer)
+    : myEvents(events), myEngineFactory(nullptr), myServiceContainer(serviceContainer)
 {
 }
 
@@ -74,6 +79,7 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
 {
     validateGameParameters(gameData, startData);
     ensureEngineFactoryInitialized();
+    ensureServiceContainerInitialized();
     auto gameComponents = createGameComponents(gameData, startData);
     initializeGame(std::move(gameComponents), gameData, startData);
 }
@@ -111,6 +117,14 @@ void Session::ensureEngineFactoryInitialized()
     if (!myEngineFactory)
     {
         myEngineFactory = std::make_shared<EngineFactory>(myEvents);
+    }
+}
+
+void Session::ensureServiceContainerInitialized()
+{
+    if (!myServiceContainer)
+    {
+        myServiceContainer = std::make_shared<AppServiceContainer>();
     }
 }
 

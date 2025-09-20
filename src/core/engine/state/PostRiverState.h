@@ -3,6 +3,13 @@
 #include "core/interfaces/hand/IDebuggableState.h"
 #include "core/interfaces/hand/IHandState.h"
 
+#include <memory>
+
+namespace pkt::core
+{
+class ServiceContainer;
+} // namespace pkt::core
+
 namespace pkt::core::player
 {
 class Player;
@@ -16,6 +23,7 @@ class PostRiverState : public IHandState, public IActionProcessor, public IDebug
 {
   public:
     explicit PostRiverState(const GameEvents& events);
+    explicit PostRiverState(const GameEvents& events, std::shared_ptr<pkt::core::ServiceContainer> services);
 
     void enter(Hand&) override;
     void exit(Hand&) override;
@@ -32,7 +40,10 @@ class PostRiverState : public IHandState, public IActionProcessor, public IDebug
     void promptPlayerAction(Hand&, player::Player& player) override;
 
   private:
+    void ensureServicesInitialized() const;
+
     const GameEvents& myEvents;
+    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices;
 };
 
 } // namespace pkt::core

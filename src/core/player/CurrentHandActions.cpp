@@ -2,7 +2,8 @@
 
 #include "CurrentHandActions.h"
 #include <core/engine/model/GameState.h>
-#include "core/services/GlobalServices.h"
+#include <core/services/ServiceContainer.h>
+#include "core/player/Helpers.h"
 
 #include <cassert>
 
@@ -10,15 +11,17 @@ namespace pkt::core::player
 {
 using namespace pkt::core;
 
-void checkActionAmount(const PlayerAction& action)
+void checkActionAmount(const PlayerAction& action, pkt::core::ServiceContainer& services)
 {
     if (action.type == ActionType::Bet || action.type == ActionType::Raise)
     {
         // NB. an amount is only required for a bet or a raise
         if (action.amount == 0)
         {
-            GlobalServices::instance().logger().error("Action amount missing for action type " +
-                                                      std::string(actionTypeToString(action.type)));
+            std::string errorMsg =
+                "Action amount missing for action type " + std::string(actionTypeToString(action.type));
+
+            services.logger().error(errorMsg);
             assert(false);
         }
     }
@@ -32,6 +35,25 @@ CurrentHandActions::CurrentHandActions()
     myActionsByState[GameState::River] = {};
     myActionsByState[GameState::PostRiver] = {};
     myActionsByState[GameState::None] = {};
+}
+
+CurrentHandActions::CurrentHandActions(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer)
+    : myServices(serviceContainer)
+{
+    myActionsByState[GameState::Preflop] = {};
+    myActionsByState[GameState::Flop] = {};
+    myActionsByState[GameState::Turn] = {};
+    myActionsByState[GameState::River] = {};
+    myActionsByState[GameState::PostRiver] = {};
+    myActionsByState[GameState::None] = {};
+}
+
+void CurrentHandActions::ensureServicesInitialized() const
+{
+    if (!myServices)
+    {
+        myServices = std::make_shared<pkt::core::AppServiceContainer>();
+    }
 }
 
 void CurrentHandActions::reset()
@@ -53,6 +75,8 @@ int CurrentHandActions::getActionsNumber(const GameState& state, const ActionTyp
 
 int CurrentHandActions::getLastBetAmount(const GameState& state) const
 {
+    ensureServicesInitialized();
+
     const auto& actions = myActionsByState.at(state);
     for (auto action = actions.rbegin(); action != actions.rend(); ++action)
     {
@@ -60,7 +84,7 @@ int CurrentHandActions::getLastBetAmount(const GameState& state) const
         {
             if (action->type == ActionType::Bet || action->type == ActionType::Raise)
             {
-                checkActionAmount(*action);
+                checkActionAmount(*action, *myServices);
             }
         }
         return action->amount;
@@ -70,12 +94,14 @@ int CurrentHandActions::getLastBetAmount(const GameState& state) const
 
 int CurrentHandActions::getRoundTotalBetAmount(const GameState& state) const
 {
+    ensureServicesInitialized();
+
     int total = 0;
     for (const auto& action : myActionsByState.at(state))
     {
         if (action.type == ActionType::Bet || action.type == ActionType::Raise)
         {
-            checkActionAmount(action);
+            checkActionAmount(action, *myServices);
         }
         total += action.amount;
     }
@@ -85,6 +111,8 @@ int CurrentHandActions::getRoundTotalBetAmount(const GameState& state) const
 
 int CurrentHandActions::getHandTotalBetAmount() const
 {
+    ensureServicesInitialized();
+
     int total = 0;
     for (const auto& [state, actions] : myActionsByState)
     {
@@ -92,7 +120,7 @@ int CurrentHandActions::getHandTotalBetAmount() const
         {
             if (action.type == ActionType::Bet || action.type == ActionType::Raise)
             {
-                checkActionAmount(action);
+                checkActionAmount(action, *myServices);
             }
             total += action.amount;
         }
@@ -101,14 +129,19 @@ int CurrentHandActions::getHandTotalBetAmount() const
 }
 void CurrentHandActions::writeActionsToLog() const
 {
+    ensureServicesInitialized();
+    writeActionsToLog(myServices->logger());
+}
+
+void CurrentHandActions::writeActionsToLog(ILogger& logger) const
+{
     for (const auto& [state, actions] : myActionsByState)
     {
-        GlobalServices::instance().logger().error("List of player's actions for state: " + gameStateToString(state));
+        logger.error("List of player's actions for state: " + gameStateToString(state));
         for (const auto& action : actions)
         {
-            GlobalServices::instance().logger().error("Player " + std::to_string(action.playerId) + " performed " +
-                                                      actionTypeToString(action.type) +
-                                                      " with amount = " + std::to_string(action.amount));
+            logger.error("Player " + std::to_string(action.playerId) + " performed " + actionTypeToString(action.type) +
+                         " with amount = " + std::to_string(action.amount));
         }
     }
 }

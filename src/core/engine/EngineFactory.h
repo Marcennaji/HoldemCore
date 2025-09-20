@@ -11,6 +11,7 @@
 #include "core/engine/model/StartData.h"
 #include "core/interfaces/IBoard.h"
 #include "core/player/Player.h"
+#include "core/services/PokerServices.h"
 
 #include <memory>
 #include <vector>
@@ -23,6 +24,10 @@ class EngineFactory
 {
   public:
     EngineFactory(const GameEvents&);
+
+    // Constructor with PokerServices for dependency injection
+    EngineFactory(const GameEvents&, std::shared_ptr<PokerServices> services);
+
     ~EngineFactory();
 
     virtual std::shared_ptr<Hand> createHand(std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
@@ -33,6 +38,9 @@ class EngineFactory
 
   private:
     const GameEvents& myEvents;
+    std::shared_ptr<PokerServices> myServices; // Injected service container
+
+    void ensureServicesInitialized();
 };
 
 } // namespace pkt::core

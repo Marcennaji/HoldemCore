@@ -5,7 +5,6 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/utils/Helpers.h"
 #include "core/player/Helpers.h"
-#include "core/services/GlobalServices.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;
@@ -27,7 +26,7 @@ class BettingRoundsTest : public EngineTest
 
 void BettingRoundsTest::logTestMessage(const std::string& message) const
 {
-    GlobalServices::instance().logger().verbose("BettingRoundsTest : " + message);
+    getLogger().info("BettingRoundsTest : " + message);
 }
 
 void BettingRoundsTest::SetUp()

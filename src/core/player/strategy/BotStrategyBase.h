@@ -2,6 +2,9 @@
 
 #include "core/engine/model/PlayerAction.h"
 #include "core/player/strategy/BotStrategy.h"
+#include "core/services/ServiceContainer.h"
+
+#include <memory>
 
 namespace pkt::core::player
 {
@@ -9,7 +12,12 @@ struct CurrentHandContext;
 
 class BotStrategyBase : public virtual BotStrategy
 {
+  public:
+    BotStrategyBase();
+    BotStrategyBase(std::shared_ptr<pkt::core::ServiceContainer> services);
+
   protected:
+    void ensureServicesInitialized() const;
     pkt::core::PlayerAction decidePreflop(const CurrentHandContext&) override;
     pkt::core::PlayerAction decideFlop(const CurrentHandContext&) override;
     pkt::core::PlayerAction decideTurn(const CurrentHandContext&) override;
@@ -20,6 +28,8 @@ class BotStrategyBase : public virtual BotStrategy
     bool isPossibleToBluff(const CurrentHandContext& ctx) const;
     bool myShouldCall;
     bool myShouldRaise;
+
+    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices; // Injected service container
 
   private:
     virtual bool preflopShouldCall(const CurrentHandContext& ctx) = 0;

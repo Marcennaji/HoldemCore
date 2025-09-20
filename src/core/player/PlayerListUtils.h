@@ -7,6 +7,12 @@
 #include <memory>
 #include "typedefs.h"
 
+namespace pkt::core
+{
+class ILogger;
+class ServiceContainer;
+} // namespace pkt::core
+
 namespace pkt::core::player
 {
 
@@ -43,6 +49,23 @@ class PlayerListUtils
      * @param actingPlayersList List to update (modified in place)
      */
     static void updateActingPlayersList(PlayerList& actingPlayersList);
+
+    /**
+     * @brief Update acting players list by removing folded/all-in players
+     *
+     * @param actingPlayersList List to update (modified in place)
+     * @param services ServiceContainer for accessing services
+     */
+    static void updateActingPlayersList(PlayerList& actingPlayersList,
+                                        std::shared_ptr<pkt::core::ServiceContainer> services);
+
+    /**
+     * @brief Update acting players list by removing folded/all-in players
+     *
+     * @param actingPlayersList List to update (modified in place)
+     * @param logger Logger to use for verbose output
+     */
+    static void updateActingPlayersList(PlayerList& actingPlayersList, pkt::core::ILogger& logger);
 };
 
 } // namespace pkt::core::player

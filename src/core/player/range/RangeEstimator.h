@@ -5,7 +5,9 @@
 #pragma once
 
 #include <core/engine/EngineDefs.h>
+#include <core/engine/model/GameState.h>
 #include <core/player/PlayerStatistics.h>
+#include <core/services/ServiceContainer.h>
 #include "PreflopRangeEstimator.h"
 
 #include <memory>
@@ -33,12 +35,13 @@ class RangeEstimator
 {
   public:
     RangeEstimator(int playerId);
+    explicit RangeEstimator(int playerId, std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
 
     void setEstimatedRange(const std::string& range);
     std::string getEstimatedRange() const;
 
     void computeEstimatedPreflopRange(const CurrentHandContext&);
-
+    void updateUnplausibleRanges(GameState, const CurrentHandContext&);
     static int getStandardRaisingRange(int nbPlayers);
     static int getStandardCallingRange(int nbPlayers);
 
@@ -46,12 +49,14 @@ class RangeEstimator
     static std::string getFilledRange(std::vector<std::string>& ranges, std::vector<float>& rangesValues,
                                       const float rangeMax, int nbPlayers);
 
+  private:
     void updateUnplausibleRangesGivenPreflopActions(const CurrentHandContext&);
     void updateUnplausibleRangesGivenFlopActions(const CurrentHandContext&);
     void updateUnplausibleRangesGivenTurnActions(const CurrentHandContext&);
     void updateUnplausibleRangesGivenRiverActions(const CurrentHandContext&);
+    void ensureServicesInitialized() const;
+    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices; // Injected service container
 
-  private:
     std::unique_ptr<PreflopRangeEstimator> myPreflopRangeEstimator;
     std::string myEstimatedRange;
     int myPlayerId;

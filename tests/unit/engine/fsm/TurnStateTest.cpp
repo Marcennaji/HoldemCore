@@ -1,10 +1,10 @@
 // tests/TurnStateTest.cpp
 
 #include "TurnStateTest.h"
+#include <iostream>
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/state/TurnState.h"
 #include "core/player/Helpers.h"
-#include "core/services/GlobalServices.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;
@@ -15,7 +15,7 @@ namespace pkt::test
 
 void TurnStateTest::logTestMessage(const std::string& message) const
 {
-    GlobalServices::instance().logger().verbose("TurnState : " + message);
+    getLogger().info("TurnState : " + message);
 }
 
 void TurnStateTest::SetUp()

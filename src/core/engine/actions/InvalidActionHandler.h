@@ -2,8 +2,14 @@
 
 #include <functional>
 #include <map>
+#include <memory>
 #include <string>
 #include "core/engine/model/PlayerAction.h"
+
+namespace pkt::core
+{
+class ServiceContainer;
+} // namespace pkt::core
 
 namespace pkt::core
 {
@@ -25,6 +31,9 @@ class InvalidActionHandler
 
     InvalidActionHandler(const GameEvents& events, ErrorMessageProvider errorProvider,
                          AutoFoldCallback autoFoldCallback);
+    explicit InvalidActionHandler(const GameEvents& events, ErrorMessageProvider errorProvider,
+                                  AutoFoldCallback autoFoldCallback,
+                                  std::shared_ptr<pkt::core::ServiceContainer> services);
     ~InvalidActionHandler() = default;
 
     // Main error handling methods
@@ -38,10 +47,12 @@ class InvalidActionHandler
 
   private:
     void executeAutoFold(unsigned playerId);
+    void ensureServicesInitialized() const;
 
     const GameEvents& myEvents;
     ErrorMessageProvider myErrorMessageProvider;
     AutoFoldCallback myAutoFoldCallback;
+    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices;
 
     // Error handling state
     std::map<unsigned, int> myInvalidActionCounts; // Track invalid actions per player

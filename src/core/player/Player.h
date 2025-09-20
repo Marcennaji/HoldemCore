@@ -19,6 +19,7 @@
 #include "strategy/CurrentHandContext.h"
 
 #include "core/interfaces/HandEvaluationEngine.h"
+#include "core/services/ServiceContainer.h"
 
 #include <array>
 #include <assert.h>
@@ -41,6 +42,7 @@ class Player
 {
   public:
     Player(const GameEvents&, int id, std::string name, int cash);
+    Player(const GameEvents&, std::shared_ptr<ServiceContainer> services, int id, std::string name, int cash);
     virtual ~Player() = default;
 
     // ========================================
@@ -83,8 +85,9 @@ class Player
     // Context Access & Management
     // ========================================
     CurrentHandContext& getCurrentHandContext() { return *myCurrentHandContext; }
-    void updateCurrentHandContext(const GameState gameState, Hand&);
+    void updateCurrentHandContext(Hand&);
     void resetForNewHand(const Hand& hand);
+    void processAction(const PlayerAction& action, Hand& hand);
 
     // ========================================
     // State Delegates (Delegate to myCurrentHandContext)
@@ -145,9 +148,12 @@ class Player
     std::unique_ptr<RangeEstimator> myRangeEstimator;
 
   private:
+    void ensureServicesInitialized() const;
+
     std::map<int, float> evaluateOpponentsStrengths() const;
     const HandSimulationStats computeHandSimulation() const;
     std::unique_ptr<PlayerStrategy> myStrategy;
     std::unique_ptr<PlayerStatisticsUpdater> myStatisticsUpdater;
+    mutable std::shared_ptr<ServiceContainer> myServices; // Injected service container
 };
 } // namespace pkt::core::player

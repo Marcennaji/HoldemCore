@@ -1,6 +1,6 @@
 
 #include "PreflopRangeCalculator.h"
-#include <core/services/GlobalServices.h>
+#include <core/services/ServiceContainer.h>
 #include "CurrentHandContext.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/player/Helpers.h"
@@ -10,6 +10,19 @@
 namespace pkt::core::player
 {
 using namespace std;
+
+PreflopRangeCalculator::PreflopRangeCalculator(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer)
+    : myServices(serviceContainer)
+{
+}
+
+void PreflopRangeCalculator::ensureServicesInitialized() const
+{
+    if (!myServices)
+    {
+        myServices = std::make_shared<pkt::core::AppServiceContainer>();
+    }
+}
 
 void PreflopRangeCalculator::initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange)
 {
@@ -90,6 +103,8 @@ void PreflopRangeCalculator::initializeRanges(const int utgHeadsUpRange, const i
 
 float PreflopRangeCalculator::calculatePreflopCallingRange(const CurrentHandContext& ctx) const
 {
+    ensureServicesInitialized();
+
     const int nbRaises = ctx.commonContext.bettingContext.preflopRaisesNumber;
     const int nbCalls = ctx.commonContext.bettingContext.preflopCallsNumber;
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
@@ -103,7 +118,7 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(const CurrentHandCont
 
     float callingRange = getRange(myPosition, nbPlayers);
 
-    GlobalServices::instance().logger().verbose("Initial calling range : " + std::to_string(callingRange));
+    myServices->logger().verbose("Initial calling range : " + std::to_string(callingRange));
 
     // Handle no raises and no calls
     if (nbRaises == 0 && nbCalls == 0 && myPosition != Button && myPosition != SmallBlind)
@@ -156,9 +171,10 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(const CurrentHandCont
 }
 float PreflopRangeCalculator::adjustCallForLimpers(float callingRange) const
 {
-    GlobalServices::instance().logger().verbose(
-        "1 or more players have limped, but nobody has raised. Adjusting callingRange : " +
-        std::to_string(callingRange) + " * 1.2 = " + std::to_string(callingRange * 1.2));
+    ensureServicesInitialized();
+
+    myServices->logger().verbose("1 or more players have limped, but nobody has raised. Adjusting callingRange : " +
+                                 std::to_string(callingRange) + " * 1.2 = " + std::to_string(callingRange * 1.2));
     return callingRange * 1.2;
 }
 
@@ -174,7 +190,7 @@ float PreflopRangeCalculator::clampCallingRange(float callingRange) const
         callingRange = 100;
     }
 
-    GlobalServices::instance().logger().verbose("calling range : " + std::to_string(callingRange) + "%");
+    myServices->logger().verbose("calling range : " + std::to_string(callingRange) + "%");
     return callingRange;
 }
 
@@ -217,6 +233,8 @@ float PreflopRangeCalculator::adjustCallForRaiserStats(float callingRange, const
                                                        int nbRaises, int nbPlayers, PlayerPosition myPosition,
                                                        int nbActingPlayers) const
 {
+    ensureServicesInitialized();
+
     if ((myPosition == Button || myPosition == Cutoff) && nbActingPlayers > 5)
     {
         callingRange = raiserStats.getPreflopRaise() * (nbPlayers > 3 ? 0.7f : 0.9f);
@@ -239,7 +257,7 @@ float PreflopRangeCalculator::adjustCallForRaiserStats(float callingRange, const
         callingRange = raiserStats.getPreflop4Bet() * 0.5f;
     }
 
-    GlobalServices::instance().logger().verbose(
+    myServices->logger().verbose(
         "PreflopRangeCalculator adjusting callingRange to the last raiser's stats, value is now " +
         std::to_string(callingRange));
     return callingRange;
@@ -247,6 +265,8 @@ float PreflopRangeCalculator::adjustCallForRaiserStats(float callingRange, const
 
 float PreflopRangeCalculator::adjustCallForNoStats(float callingRange, int nbRaises) const
 {
+    ensureServicesInitialized();
+
     if (nbRaises == 2)
     {
         callingRange /= 2;
@@ -260,8 +280,7 @@ float PreflopRangeCalculator::adjustCallForNoStats(float callingRange, int nbRai
         callingRange /= 4;
     }
 
-    GlobalServices::instance().logger().verbose("No stats available, callingRange value is now " +
-                                                std::to_string(callingRange));
+    myServices->logger().verbose("No stats available, callingRange value is now " + std::to_string(callingRange));
     return callingRange;
 }
 
@@ -269,6 +288,7 @@ float PreflopRangeCalculator::adjustCallForBigBet(float callingRange, int potOdd
                                                   int highestBetAmountOrigin, int myTotalBetAmount,
                                                   int smallBlind) const
 {
+    ensureServicesInitialized();
 
     const int highestBetAmount = std::min(myCash, highestBetAmountOrigin);
 
@@ -296,9 +316,8 @@ float PreflopRangeCalculator::adjustCallForBigBet(float callingRange, int potOdd
         callingRange *= 0.1f;
     }
 
-    GlobalServices::instance().logger().verbose("Pot odd is " + std::to_string(potOdd) +
-                                                " : adjusting callingRange, value is now " +
-                                                std::to_string(callingRange));
+    myServices->logger().verbose("Pot odd is " + std::to_string(potOdd) + " : adjusting callingRange, value is now " +
+                                 std::to_string(callingRange));
     return callingRange;
 }
 
@@ -329,6 +348,8 @@ bool PreflopRangeCalculator::shouldCallForAllIn(const CurrentHandContext& ctx, i
 
 float PreflopRangeCalculator::calculatePreflopRaisingRange(const CurrentHandContext& ctx) const
 {
+    ensureServicesInitialized();
+
     const int nbRaises = ctx.commonContext.bettingContext.preflopRaisesNumber;
     const int nbCalls = ctx.commonContext.bettingContext.preflopCallsNumber;
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
@@ -336,7 +357,7 @@ float PreflopRangeCalculator::calculatePreflopRaisingRange(const CurrentHandCont
 
     float raisingRange = getRange(myPosition, nbPlayers) * 0.8;
 
-    GlobalServices::instance().logger().verbose("Initial raising range : " + std::to_string(raisingRange));
+    myServices->logger().verbose("Initial raising range : " + std::to_string(raisingRange));
 
     if (nbRaises == 0 && nbCalls > 1 && nbPlayers > 3)
     {
@@ -359,9 +380,10 @@ float PreflopRangeCalculator::calculatePreflopRaisingRange(const CurrentHandCont
 }
 float PreflopRangeCalculator::adjustRaiseForLimpers(float raisingRange) const
 {
-    GlobalServices::instance().logger().verbose(
-        "2 or more players have limped, but nobody has raised : tightening raising range to " +
-        std::to_string(raisingRange * 0.7));
+    ensureServicesInitialized();
+
+    myServices->logger().verbose("2 or more players have limped, but nobody has raised : tightening raising range to " +
+                                 std::to_string(raisingRange * 0.7));
     return raisingRange * 0.7;
 }
 
@@ -406,6 +428,8 @@ float PreflopRangeCalculator::adjustRaiseForRaiser(const CurrentHandContext& ctx
 float PreflopRangeCalculator::adjustRaiseForRaiserStats(const PreflopStatistics& raiserStats, float raisingRange,
                                                         int nbRaises, int nbPlayers) const
 {
+    ensureServicesInitialized();
+
     if (nbRaises == 1)
     {
         raisingRange = std::min(raisingRange, raiserStats.getPreflopRaise() * (nbPlayers > 3 ? 0.5f : 0.7f));
@@ -423,13 +447,15 @@ float PreflopRangeCalculator::adjustRaiseForRaiserStats(const PreflopStatistics&
         raisingRange = 0; // Raise with aces only
     }
 
-    GlobalServices::instance().logger().verbose("Adjusting raising range based on raiser stats, value is now " +
-                                                std::to_string(raisingRange));
+    myServices->logger().verbose("Adjusting raising range based on raiser stats, value is now " +
+                                 std::to_string(raisingRange));
 
     return raisingRange;
 }
 float PreflopRangeCalculator::adjustRaiseForNoRaiserStats(float raisingRange, int nbRaises) const
 {
+    ensureServicesInitialized();
+
     if (nbRaises == 1)
     {
         raisingRange = 2; // 3-bet with top 2%
@@ -439,14 +465,16 @@ float PreflopRangeCalculator::adjustRaiseForNoRaiserStats(float raisingRange, in
         raisingRange = 0; // 4-bet with aces only
     }
 
-    GlobalServices::instance().logger().verbose("No stats available for raiser, adjusting raising range to " +
-                                                std::to_string(raisingRange));
+    myServices->logger().verbose("No stats available for raiser, adjusting raising range to " +
+                                 std::to_string(raisingRange));
 
     return raisingRange;
 }
 float PreflopRangeCalculator::adjustRaiseForNoRaiser(const CurrentHandContext& ctx, float raisingRange,
                                                      bool canBluff) const
 {
+    ensureServicesInitialized();
+
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
     const PlayerPosition myPosition = ctx.personalContext.position;
 
@@ -454,12 +482,12 @@ float PreflopRangeCalculator::adjustRaiseForNoRaiser(const CurrentHandContext& c
         (myPosition == SmallBlind || myPosition == Button || myPosition == Cutoff) && canBluff)
     {
         int rand = 0;
-        GlobalServices::instance().randomizer().getRand(1, 3, 1, &rand);
+        myServices->randomizer().getRand(1, 3, 1, &rand);
         if (rand == 2)
         {
             raisingRange = 100;
 
-            GlobalServices::instance().logger().verbose("Trying to steal blinds, setting raising range to 100");
+            myServices->logger().verbose("Trying to steal blinds, setting raising range to 100");
         }
     }
 
@@ -467,6 +495,8 @@ float PreflopRangeCalculator::adjustRaiseForNoRaiser(const CurrentHandContext& c
 }
 float PreflopRangeCalculator::adjustRaiseForStack(const CurrentHandContext& ctx, float raisingRange) const
 {
+    ensureServicesInitialized();
+
     const int myM = ctx.personalContext.m;
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
     const int nbRaises = ctx.commonContext.bettingContext.preflopRaisesNumber;
@@ -497,14 +527,16 @@ float PreflopRangeCalculator::adjustRaiseForStack(const CurrentHandContext& ctx,
         }
         raisingRange = std::max(f, raisingRange);
 
-        GlobalServices::instance().logger().verbose("Hands left: " + std::to_string(handsLeft) +
-                                                    ", minimum raising range set to " + std::to_string(f));
+        myServices->logger().verbose("Hands left: " + std::to_string(handsLeft) + ", minimum raising range set to " +
+                                     std::to_string(f));
     }
 
     return raisingRange;
 }
 float PreflopRangeCalculator::clampRaiseRange(float raisingRange) const
 {
+    ensureServicesInitialized();
+
     raisingRange = std::ceil(raisingRange);
     if (raisingRange < 0)
     {
@@ -515,7 +547,7 @@ float PreflopRangeCalculator::clampRaiseRange(float raisingRange) const
         raisingRange = 100;
     }
 
-    GlobalServices::instance().logger().verbose("Final raising range: " + std::to_string(raisingRange) + "%");
+    myServices->logger().verbose("Final raising range: " + std::to_string(raisingRange) + "%");
 
     return raisingRange;
 }
@@ -523,6 +555,8 @@ float PreflopRangeCalculator::adjustRaiseForBigBet(float raisingRange, int potOd
                                                    int highestBetAmountOrigin, int myTotalBetAmount,
                                                    int smallBlind) const
 {
+    ensureServicesInitialized();
+
     const int highestBetAmount = std::min(myCash, highestBetAmountOrigin);
 
     if (potOdd <= 70 && highestBetAmount > smallBlind * 20 &&
@@ -549,7 +583,7 @@ float PreflopRangeCalculator::adjustRaiseForBigBet(float raisingRange, int potOd
         raisingRange = std::min(1.0f, raisingRange * 0.2f);
     }
 
-    GlobalServices::instance().logger().verbose("Adjusted raising range for big bet: " + std::to_string(raisingRange));
+    myServices->logger().verbose("Adjusted raising range for big bet: " + std::to_string(raisingRange));
 
     return raisingRange;
 }

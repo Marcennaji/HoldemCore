@@ -1,10 +1,15 @@
 #include "SqlitePlayersStatisticsStoreTest.h"
 #include "common/DeterministicStrategy.h"
 #include "common/EngineTest.h"
+#include "common/FakeRandomizer.h"
+#include "core/engine/EngineDefs.h"
 #include "core/engine/state/PreflopState.h"
 #include "core/interfaces/persistence/NullPlayersStatisticsStore.h"
 #include "core/player/Helpers.h"
-#include "core/services/GlobalServices.h"
+#include "core/services/PokerServices.h"
+#include "core/services/ServiceContainer.h"
+#include "infra/ConsoleLogger.h"
+#include "infra/eval/PsimHandEvaluationEngine.h"
 #include "infra/persistence/SqliteDb.h"
 
 #include <memory>
@@ -19,23 +24,42 @@ namespace pkt::test
 
 void SqlitePlayersStatisticsStoreTest::SetUp()
 {
-    EngineTest::SetUp();
+    // First do the base setup to initialize game data and other essentials
+    gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
+    gameData.startMoney = 1000;
+    gameData.firstSmallBlind = 10;
+    gameData.tableProfile = TableProfile::RandomOpponents;
+
+    // Create a ServiceContainer with the test database
     auto db = std::make_unique<pkt::infra::SqliteDb>(":memory:");
-    auto& services = pkt::core::GlobalServices::instance();
     auto store = std::make_unique<pkt::infra::SqlitePlayersStatisticsStore>(std::move(db));
-    services.setPlayersStatisticsStore(std::move(store));
+
+    myTestServices = std::make_shared<pkt::core::AppServiceContainer>();
+    myTestServices->setPlayersStatisticsStore(std::move(store));
+
+    // Set up other services similar to EngineTest but in our ServiceContainer
+    auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
+    logger->setLogLevel(pkt::core::LogLevel::Info);
+    myTestServices->setLogger(std::move(logger));
+    myTestServices->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>(myTestServices));
+    auto randomizer = std::make_unique<FakeRandomizer>();
+    randomizer->values = {3, 5, 7};
+    myTestServices->setRandomizer(std::move(randomizer));
+
+    // Create the factory with our test services
+    auto pokerServices = std::make_shared<pkt::core::PokerServices>(myTestServices);
+    myFactory = std::make_unique<EngineFactory>(myEvents, pokerServices);
 }
 
 void SqlitePlayersStatisticsStoreTest::TearDown()
 {
-
-    auto& services = pkt::core::GlobalServices::instance();
-    services.setPlayersStatisticsStore(std::make_unique<NullPlayersStatisticsStore>());
+    myTestServices.reset();
+    EngineTest::TearDown();
 }
 
 TEST_F(SqlitePlayersStatisticsStoreTest, SaveAndLoadStatistics)
 {
-    auto& store = pkt::core::GlobalServices::instance().playersStatisticsStore();
+    auto& store = myTestServices->playersStatisticsStore();
     int nbPlayers = 3;
     initializeHandWithPlayers(nbPlayers, gameData);
 
@@ -74,7 +98,7 @@ TEST_F(SqlitePlayersStatisticsStoreTest, SaveAndLoadStatistics)
     EXPECT_EQ(sbStats[nbPlayers].preflopStatistics.folds, 1);
 
     auto bbStats = store.loadPlayerStatistics(playerBb->getName());
-    EXPECT_EQ(bbStats[nbPlayers].preflopStatistics.hands, 1);
+    EXPECT_EQ(bbStats[nbPlayers].preflopStatistics.hands, 0); // Big blind did not act
 }
 
 } // namespace pkt::test

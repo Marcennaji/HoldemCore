@@ -3,7 +3,6 @@
 #include "core/engine/state/PostRiverState.h"
 #include "core/engine/state/PreflopState.h"
 #include "core/player/Helpers.h"
-#include "core/services/GlobalServices.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;
@@ -25,7 +24,7 @@ void PostRiverStateTest::TearDown()
 
 void PostRiverStateTest::logTestMessage(const std::string& message)
 {
-    GlobalServices::instance().logger().info("PostRiverStateTest: " + message);
+    getLogger().info("PostRiverStateTest: " + message);
 }
 
 TEST_F(PostRiverStateTest, TerminalStateNoActionsAllowed)

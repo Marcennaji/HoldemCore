@@ -11,6 +11,7 @@
 namespace pkt::core
 {
 class Session;
+class ServiceContainer;
 } // namespace pkt::core
 
 namespace pkt::ui::qtwidgets
@@ -22,12 +23,14 @@ class GuiAppController
 {
   public:
     GuiAppController(const QString& appPath);
+    GuiAppController(const QString& appPath, std::shared_ptr<pkt::core::ServiceContainer> services);
     ~GuiAppController();
 
     StartWindow* createMainWindow();
 
   private:
     QString myAppDataPath;
+    std::shared_ptr<pkt::core::ServiceContainer> myServices;
     std::unique_ptr<PokerTableWindow> myPokerTableWindow;
     std::unique_ptr<pkt::core::Session> mySession;
     pkt::core::GameEvents myEvents;

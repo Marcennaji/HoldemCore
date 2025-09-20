@@ -4,7 +4,6 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/utils/Helpers.h"
 #include "core/player/Helpers.h"
-#include "core/services/GlobalServices.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;
@@ -16,7 +15,7 @@ namespace pkt::test
 
 void ActionsPreflopTest::logTestMessage(const std::string& message) const
 {
-    GlobalServices::instance().logger().verbose("ActionsPreflopTest : " + message);
+    getLogger().info("ActionsPreflopTest : " + message);
 }
 
 void ActionsPreflopTest::SetUp()
@@ -472,7 +471,7 @@ TEST_F(ActionsPreflopTest, IntegrationInvalidActionsAreRejected)
 
 void ActionsPostflopTest::logTestMessage(const std::string& message) const
 {
-    GlobalServices::instance().logger().verbose("ActionsPostflopTest : " + message);
+    getLogger().info("ActionsPostflopTest : " + message);
 }
 
 void ActionsPostflopTest::SetUp()

@@ -4,7 +4,7 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/player/Helpers.h"
 #include "core/player/Player.h"
-#include "core/services/GlobalServices.h"
+#include "core/services/ServiceContainer.h"
 
 namespace pkt::core
 {
@@ -14,9 +14,23 @@ PostRiverState::PostRiverState(const GameEvents& events) : myEvents(events)
 {
 }
 
+PostRiverState::PostRiverState(const GameEvents& events, std::shared_ptr<pkt::core::ServiceContainer> services)
+    : myEvents(events), myServices(std::move(services))
+{
+}
+
+void PostRiverState::ensureServicesInitialized() const
+{
+    if (!myServices)
+    {
+        myServices = std::make_shared<pkt::core::AppServiceContainer>();
+    }
+}
+
 void PostRiverState::enter(Hand& hand)
 {
-    GlobalServices::instance().logger().info("Post-River");
+    ensureServicesInitialized();
+    myServices->logger().info("Post-River");
 
     for (auto& player : *hand.getActingPlayersList())
     {

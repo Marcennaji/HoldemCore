@@ -7,7 +7,7 @@
 
 #include <core/engine/EngineDefs.h>
 #include <core/engine/game/Game.h>
-#include "core/services/GlobalServices.h"
+#include "core/services/ServiceContainer.h"
 
 #include <core/engine/model/GameData.h>
 
@@ -31,6 +31,32 @@ StartWindow::StartWindow(const QString& appDataPath, PokerTableWindow* tableWind
 
     show();
 }
+
+StartWindow::StartWindow(const QString& appDataPath, PokerTableWindow* tableWindow, Session* session,
+                         std::shared_ptr<pkt::core::ServiceContainer> services, QWidget* parent)
+    : QMainWindow(parent), myAppDataPath(appDataPath), myPokerTableWindow(tableWindow), mySession(session),
+      myServices(std::move(services))
+{
+    setupUi(this);
+    // myPokerTableWindow->setStartWindow(this);
+    setWindowTitle(QString(tr("PokerTraining %1").arg(POKERTRAINING_BETA_RELEASE_STRING)));
+    setWindowIcon(QIcon(myAppDataPath + "gfx/gui/misc/windowicon.png"));
+    setStatusBar(nullptr);
+    installEventFilter(this);
+
+    connect(pushButtonStartGame, &QPushButton::clicked, this, &StartWindow::startNewGame);
+
+    show();
+}
+
+void StartWindow::ensureServicesInitialized()
+{
+    if (!myServices)
+    {
+        myServices = std::make_shared<pkt::core::AppServiceContainer>();
+    }
+}
+
 StartWindow::~StartWindow()
 {
 }
@@ -61,7 +87,8 @@ void StartWindow::startNewGame()
     int tmpDealerPos = 0;
     startData.numberOfPlayers = gameData.maxNumberOfPlayers;
 
-    GlobalServices::instance().randomizer().getRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
+    ensureServicesInitialized();
+    myServices->randomizer().getRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
     startData.startDealerPlayerId = static_cast<unsigned>(tmpDealerPos);
 
     mySession->startGame(gameData, startData);

@@ -134,10 +134,10 @@ void ActionApplier::setLastRaiserForCurrentRound(Hand& hand, unsigned playerId)
 
 void ActionApplier::finalizeAction(Hand& hand, player::Player& player, const PlayerAction& actionForHistory)
 {
-    player.setAction(hand.getStateManager()->getCurrentState(), actionForHistory);
-
     // Record action in hand-level chronological history
     hand.getBettingActions()->recordPlayerAction(hand.getStateManager()->getGameState(), actionForHistory);
+
+    player.processAction(actionForHistory, hand);
 
     updateActingPlayersList(hand.getActingPlayersListMutable());
 

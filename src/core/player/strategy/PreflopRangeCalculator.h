@@ -2,6 +2,7 @@
 
 #include <core/engine/model/PlayerPosition.h>
 #include <core/player/PlayerStatistics.h>
+#include <core/services/ServiceContainer.h>
 
 #include <vector>
 
@@ -13,6 +14,7 @@ class PreflopRangeCalculator
 {
   public:
     PreflopRangeCalculator() = default;
+    explicit PreflopRangeCalculator(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
     float calculatePreflopCallingRange(const CurrentHandContext& ctx) const;
     float calculatePreflopRaisingRange(const CurrentHandContext& ctx) const;
 
@@ -56,6 +58,10 @@ class PreflopRangeCalculator
     float adjustRaiseForBigBet(float raisingRange, int potOdd, int myCash, int highestBetAmount, int myTotalBetAmount,
                                int smallBlind) const;
     float clampRaiseRange(float raisingRange) const;
+
+  private:
+    void ensureServicesInitialized() const;
+    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices; // Injected service container
 };
 
 } // namespace pkt::core::player

@@ -6,7 +6,7 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/utils/Helpers.h"
 #include "core/player/Player.h"
-#include "core/services/GlobalServices.h"
+#include "core/services/ServiceContainer.h"
 
 namespace pkt::core
 {
@@ -16,9 +16,23 @@ TurnState::TurnState(const GameEvents& events) : myEvents(events)
 {
 }
 
+TurnState::TurnState(const GameEvents& events, std::shared_ptr<pkt::core::ServiceContainer> services)
+    : myEvents(events), myServices(std::move(services))
+{
+}
+
+void TurnState::ensureServicesInitialized() const
+{
+    if (!myServices)
+    {
+        myServices = std::make_shared<pkt::core::AppServiceContainer>();
+    }
+}
+
 void TurnState::enter(Hand& hand)
 {
-    GlobalServices::instance().logger().info("Turn");
+    ensureServicesInitialized();
+    myServices->logger().info("Turn");
 
     for (auto& player : *hand.getActingPlayersList())
     {
@@ -55,11 +69,6 @@ void TurnState::enter(Hand& hand)
 
 void TurnState::exit(Hand& hand)
 {
-    for (auto& player : *hand.getSeatsList())
-    {
-        player->updateCurrentHandContext(GameState::Turn, hand);
-        player->getStatisticsUpdater()->updateTurnStatistics(player->getCurrentHandContext());
-    }
 }
 
 bool TurnState::isActionAllowed(const Hand& hand, const PlayerAction action) const
@@ -69,7 +78,7 @@ bool TurnState::isActionAllowed(const Hand& hand, const PlayerAction action) con
 
 void TurnState::promptPlayerAction(Hand& hand, Player& player)
 {
-    player.updateCurrentHandContext(Turn, hand);
+    player.updateCurrentHandContext(hand);
     PlayerAction action = player.decideAction(player.getCurrentHandContext());
 
     hand.handlePlayerAction(action);

@@ -6,7 +6,6 @@
 #include "core/player/Helpers.h"
 #include "core/player/Player.h"
 #include "core/player/strategy/HumanStrategy.h"
-#include "core/services/GlobalServices.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;

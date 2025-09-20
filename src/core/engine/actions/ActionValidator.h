@@ -7,6 +7,11 @@
 #include <memory>
 #include <string>
 
+namespace pkt::core
+{
+class ServiceContainer;
+} // namespace pkt::core
+
 namespace pkt::core::player
 {
 class Player;
@@ -28,6 +33,7 @@ class ActionValidator
 {
   public:
     ActionValidator() = default;
+    explicit ActionValidator(std::shared_ptr<pkt::core::ServiceContainer> services);
     ~ActionValidator() = default;
 
     // Main validation method - migrated from Helpers.cpp
@@ -48,6 +54,10 @@ class ActionValidator
 
     bool isActionAmountValid(const PlayerAction& action, const BettingActions& bettingActions, int smallBlind,
                              const GameState gameState, const std::shared_ptr<pkt::core::player::Player>& player) const;
+
+  private:
+    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices;
+    void ensureServicesInitialized() const;
 };
 
 } // namespace pkt::core

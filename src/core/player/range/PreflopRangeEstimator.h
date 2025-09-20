@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <core/services/ServiceContainer.h>
+
+#include <memory>
 #include <string>
 #include <vector>
 namespace pkt::core
@@ -21,6 +24,7 @@ class PreflopRangeEstimator
 {
   public:
     PreflopRangeEstimator(int playerId);
+    explicit PreflopRangeEstimator(int playerId, std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
 
     std::string computeEstimatedPreflopRange(const CurrentHandContext& ctx);
 
@@ -58,6 +62,10 @@ class PreflopRangeEstimator
     float handleSingleRaiseRange(const CurrentHandContext& ctx, const float currentRange) const;
     float handleThreeBetRange(const CurrentHandContext& ctx, int opponentRaises, const float currentRange) const;
     float handleFourBetOrMoreRange(const CurrentHandContext& ctx, int opponentRaises, const float currentRange) const;
+
+  private:
+    void ensureServicesInitialized() const;
+    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices; // Injected service container
 
     int myPlayerId;
 };
