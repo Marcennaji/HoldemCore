@@ -26,7 +26,6 @@ class StartWindow : public QMainWindow, public Ui::StartWindow
   public:
     StartWindow(PokerTableWindow* tableWindow, pkt::core::Session* session, QWidget* parent = nullptr);
 
-    /// Constructor with ServiceContainer dependency injection
     StartWindow(PokerTableWindow* tableWindow, pkt::core::Session* session,
                 std::shared_ptr<pkt::core::ServiceContainer> services, QWidget* parent = nullptr);
 
@@ -39,7 +38,6 @@ class StartWindow : public QMainWindow, public Ui::StartWindow
         return mySession;
     }
 
-    //	void keyPressEvent( QKeyEvent *);
     bool eventFilter(QObject* obj, QEvent* event);
 
   signals:
@@ -52,10 +50,8 @@ class StartWindow : public QMainWindow, public Ui::StartWindow
     std::shared_ptr<PokerTableWindow> myPokerTableWindow;
     pkt::core::Session* mySession;
 
-    /// Ensures services are initialized (lazy initialization)
     void ensureServicesInitialized();
 
-    /// ServiceContainer for dependency injection
     std::shared_ptr<pkt::core::ServiceContainer> myServices;
 };
 

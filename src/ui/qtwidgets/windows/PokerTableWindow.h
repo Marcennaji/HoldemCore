@@ -13,8 +13,10 @@
 #include <QPixmap>
 #include <array>
 #include <memory>
+#include <vector>
 
 #include "core/engine/model/GameState.h"
+#include "core/engine/model/GameData.h"
 #include "core/engine/cards/Card.h"
 #include "core/player/Player.h"
 #include "core/session/Session.h"
@@ -32,6 +34,9 @@ class PokerTableWindow : public QWidget
 
   public:
     explicit PokerTableWindow(pkt::core::Session* session, QWidget* parent = nullptr);
+    
+    // Initialize with GameData after it becomes available
+    void initializeWithGameData(const pkt::core::GameData& gameData);
     ~PokerTableWindow() override = default;
 
     // Public interface for updating UI components
@@ -45,6 +50,9 @@ class PokerTableWindow : public QWidget
     void showErrorMessage(const QString& message);
     void setAvailableActions(const std::vector<pkt::core::ActionType>& actions);
     void enablePlayerInput(bool enabled);
+    
+    // Hand completion and delay functionality
+    void onHandCompleted();
 
   signals:
     void playerActionRequested();
@@ -54,16 +62,19 @@ class PokerTableWindow : public QWidget
     void callClicked();
     void checkClicked();
     void allInClicked();
+    void nextHandRequested();  // Signal emitted when user clicks Next Hand button
 
   private slots:
     void onBetAmountChanged(int amount);
     void onRaiseAction();
+    void onNextHandClicked();  // Slot for Next Hand button click
 
   private:
     void setupUi();
     void connectSignals();
     void createGameInfoArea();
     void createPlayerAreas();
+    void createHumanPlayerArea();
     void createBoardArea();
     void createActionButtons();
     void createBettingControls();
@@ -87,7 +98,7 @@ class PokerTableWindow : public QWidget
     QLabel* m_gamePhaseLabel;
     QLabel* m_statusLabel;
     
-    // Player areas (up to 9 players)
+    // Player areas (dynamic number based on GameData, excluding human player)
     struct PlayerUIComponents {
         QGroupBox* playerGroup;
         QLabel* nameLabel;
@@ -96,7 +107,17 @@ class PokerTableWindow : public QWidget
         QLabel* holeCard1;
         QLabel* holeCard2;
     };
-    std::array<PlayerUIComponents, 9> m_playerComponents;
+    std::vector<PlayerUIComponents> m_playerComponents;
+    int m_maxPlayers;
+    
+    // Human player area (displayed separately at bottom)
+    QGroupBox* m_humanPlayerGroup;
+    QHBoxLayout* m_humanPlayerLayout;
+    QLabel* m_humanNameLabel;
+    QLabel* m_humanChipsLabel;
+    QLabel* m_humanStatusLabel;
+    QLabel* m_humanHoleCard1;
+    QLabel* m_humanHoleCard2;
     
     // Board area
     QGroupBox* m_boardGroup;
@@ -119,5 +140,8 @@ class PokerTableWindow : public QWidget
     QSlider* m_betSlider;
     QSpinBox* m_betSpinBox;
     QLabel* m_betAmountLabel;
+    
+    // Next hand control
+    QPushButton* m_nextHandButton;
 };
 } // namespace pkt::ui::qtwidgets

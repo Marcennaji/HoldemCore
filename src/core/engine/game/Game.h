@@ -7,6 +7,7 @@
 #include <core/player/typedefs.h>
 #include "EngineDefs.h"
 #include "model/GameData.h"
+#include "model/PlayerAction.h"
 #include "model/StartData.h"
 
 #include <list>
@@ -31,6 +32,7 @@ class Game
     ~Game() = default;
 
     void startNewHand();
+    void handlePlayerAction(const PlayerAction& action);
 
   private:
     void findNextDealer();

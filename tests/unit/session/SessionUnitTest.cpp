@@ -6,6 +6,9 @@
 #include <core/engine/model/StartData.h>
 #include <core/services/ServiceContainer.h>
 #include <core/session/Session.h>
+#include <core/player/Player.h>
+#include <core/player/strategy/HumanStrategy.h>
+#include <core/player/strategy/LooseAggressiveBotStrategy.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <memory>
@@ -31,6 +34,7 @@ class SessionTestHelper : public Session
     using Session::ensureServiceContainerInitialized;
     using Session::fireGameInitializedEvent;
     using Session::validateGameParameters;
+    using Session::validatePlayerConfiguration;
 };
 
 class SessionUnitTest : public ::testing::Test
@@ -260,4 +264,111 @@ TEST_F(SessionUnitTest, EnsureEngineFactoryInitializedWithExistingFactoryDoesNot
     testData.numberOfPlayers = 2;
     testData.startDealerPlayerId = 0;
     EXPECT_NO_THROW(testSession.createBoard(testData)) << "Should still work after calling ensure";
+}
+
+// Tests for validatePlayerConfiguration
+TEST_F(SessionUnitTest, ValidatePlayerConfigurationWithValidMixedPlayersSucceeds)
+{
+    SessionTestHelper session(events);
+    
+    // Create a valid player list: 1 human (ID 0) + 2 bots (IDs 1,2)
+    auto playersList = std::make_shared<std::list<std::shared_ptr<player::Player>>>();
+    
+    // Create human player with ID 0
+    auto humanPlayer = std::make_shared<player::Player>(events, 0, "Human", 1000);
+    auto humanStrategy = std::make_unique<player::HumanStrategy>(events);
+    humanPlayer->setStrategy(std::move(humanStrategy));
+    playersList->push_back(humanPlayer);
+    
+    // Create bot players with IDs 1 and 2
+    for (int i = 1; i <= 2; ++i) {
+        auto botPlayer = std::make_shared<player::Player>(events, i, "Bot_" + std::to_string(i), 1000);
+        auto botStrategy = std::make_unique<player::LooseAggressiveBotStrategy>();
+        botPlayer->setStrategy(std::move(botStrategy));
+        playersList->push_back(botPlayer);
+    }
+    
+    // Should not throw
+    EXPECT_NO_THROW(session.validatePlayerConfiguration(playersList));
+}
+
+TEST_F(SessionUnitTest, ValidatePlayerConfigurationWithEmptyListThrows)
+{
+    SessionTestHelper session(events);
+    
+    auto emptyPlayersList = std::make_shared<std::list<std::shared_ptr<player::Player>>>();
+    
+    EXPECT_THROW(session.validatePlayerConfiguration(emptyPlayersList), std::runtime_error);
+}
+
+TEST_F(SessionUnitTest, ValidatePlayerConfigurationWithNullListThrows)
+{
+    SessionTestHelper session(events);
+    
+    pkt::core::player::PlayerList nullPlayersList = nullptr;
+    
+    EXPECT_THROW(session.validatePlayerConfiguration(nullPlayersList), std::runtime_error);
+}
+
+TEST_F(SessionUnitTest, ValidatePlayerConfigurationWithNoHumanPlayerThrows)
+{
+    SessionTestHelper session(events);
+    
+    // Create a list with only bot players
+    auto playersList = std::make_shared<std::list<std::shared_ptr<player::Player>>>();
+    
+    for (int i = 0; i < 3; ++i) {
+        auto botPlayer = std::make_shared<player::Player>(events, i, "Bot_" + std::to_string(i), 1000);
+        auto botStrategy = std::make_unique<player::LooseAggressiveBotStrategy>();
+        botPlayer->setStrategy(std::move(botStrategy));
+        playersList->push_back(botPlayer);
+    }
+    
+    EXPECT_THROW(session.validatePlayerConfiguration(playersList), std::runtime_error);
+}
+
+TEST_F(SessionUnitTest, ValidatePlayerConfigurationWithMultipleHumanPlayersThrows)
+{
+    SessionTestHelper session(events);
+    
+    // Create a list with 2 human players and 1 bot
+    auto playersList = std::make_shared<std::list<std::shared_ptr<player::Player>>>();
+    
+    // Create 2 human players
+    for (int i = 0; i < 2; ++i) {
+        auto humanPlayer = std::make_shared<player::Player>(events, i, "Human_" + std::to_string(i), 1000);
+        auto humanStrategy = std::make_unique<player::HumanStrategy>(events);
+        humanPlayer->setStrategy(std::move(humanStrategy));
+        playersList->push_back(humanPlayer);
+    }
+    
+    // Create 1 bot player
+    auto botPlayer = std::make_shared<player::Player>(events, 2, "Bot_2", 1000);
+    auto botStrategy = std::make_unique<player::LooseAggressiveBotStrategy>();
+    botPlayer->setStrategy(std::move(botStrategy));
+    playersList->push_back(botPlayer);
+    
+    EXPECT_THROW(session.validatePlayerConfiguration(playersList), std::runtime_error);
+}
+
+TEST_F(SessionUnitTest, ValidatePlayerConfigurationWithHumanPlayerNotIdZeroThrows)
+{
+    SessionTestHelper session(events);
+    
+    // Create a list with human player having ID 1 instead of 0
+    auto playersList = std::make_shared<std::list<std::shared_ptr<player::Player>>>();
+    
+    // Create bot player with ID 0
+    auto botPlayer = std::make_shared<player::Player>(events, 0, "Bot_0", 1000);
+    auto botStrategy = std::make_unique<player::LooseAggressiveBotStrategy>();
+    botPlayer->setStrategy(std::move(botStrategy));
+    playersList->push_back(botPlayer);
+    
+    // Create human player with ID 1 (wrong!)
+    auto humanPlayer = std::make_shared<player::Player>(events, 1, "Human", 1000);
+    auto humanStrategy = std::make_unique<player::HumanStrategy>(events);
+    humanPlayer->setStrategy(std::move(humanStrategy));
+    playersList->push_back(humanPlayer);
+    
+    EXPECT_THROW(session.validatePlayerConfiguration(playersList), std::runtime_error);
 }

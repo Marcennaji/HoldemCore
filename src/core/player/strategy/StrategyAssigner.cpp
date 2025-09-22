@@ -12,7 +12,7 @@ StrategyAssigner::StrategyAssigner(TableProfile profile, int botCount) : myProfi
 {
 }
 
-std::unique_ptr<BotStrategy> StrategyAssigner::chooseStrategyFor(int botIndex)
+std::unique_ptr<BotStrategy> StrategyAssigner::chooseBotStrategyFor(int index)
 {
     int rand = std::rand() % 12;
 

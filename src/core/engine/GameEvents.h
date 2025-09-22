@@ -10,6 +10,10 @@
 
 namespace pkt::core
 {
+namespace player
+{
+class HumanStrategy;
+}
 
 struct GameEvents
 {
@@ -28,6 +32,12 @@ struct GameEvents
     // Error handling events
     std::function<void(unsigned playerId, PlayerAction invalidAction, std::string reason)> onInvalidPlayerAction;
     std::function<void(std::string errorMessage)> onEngineError;
+
+    // Human strategy registration for direct GUI communication
+    std::function<void(player::HumanStrategy*)> onHumanStrategyWaiting;
+    
+    // Event processing for responsive UI during strategy decisions (framework-agnostic)
+    mutable std::function<void()> onProcessEvents;
 
     void clear()
     {

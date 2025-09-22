@@ -3,7 +3,7 @@
 // Licensed under the MIT License — see LICENSE file for details.
 #include "StartWindow.h"
 
-#include <ui/qtwidgets/poker_ui/PokerTableWindow.h>
+#include <ui/qtwidgets/windows/PokerTableWindow.h>
 
 #include <core/engine/EngineDefs.h>
 #include <core/engine/game/Game.h>
@@ -22,7 +22,7 @@ StartWindow::StartWindow(PokerTableWindow* tableWindow, Session* session, QWidge
 {
     setupUi(this);
     // myPokerTableWindow->setStartWindow(this);
-    setWindowTitle(QString(tr("HoldemCore %1").arg(HoldemCore_BETA_RELEASE_STRING)));
+    setWindowTitle(QString(tr("HoldemCore %1").arg(HOLDEM_CORE__BETA_RELEASE_STRING)));
     // setWindowIcon(QIcon(":/icons/windowicon.png")); // TODO: Add icon to resources
     setStatusBar(nullptr);
     installEventFilter(this);
@@ -38,7 +38,7 @@ StartWindow::StartWindow(PokerTableWindow* tableWindow, Session* session,
 {
     setupUi(this);
     // myPokerTableWindow->setStartWindow(this);
-    setWindowTitle(QString(tr("HoldemCore %1").arg(HoldemCore_BETA_RELEASE_STRING)));
+    setWindowTitle(QString(tr("HoldemCore %1").arg(HOLDEM_CORE__BETA_RELEASE_STRING)));
     // setWindowIcon(QIcon(":/icons/windowicon.png")); // TODO: Add icon to resources
     setStatusBar(nullptr);
     installEventFilter(this);
@@ -91,6 +91,9 @@ void StartWindow::startNewGame()
     startData.startDealerPlayerId = static_cast<unsigned>(tmpDealerPos);
 
     mySession->startGame(gameData, startData);
+    
+    // Initialize PokerTableWindow with the GameData
+    myPokerTableWindow->initializeWithGameData(gameData);
 }
 
 bool StartWindow::eventFilter(QObject* obj, QEvent* event)

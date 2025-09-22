@@ -72,4 +72,11 @@ void Game::findNextDealer()
         throw Exception(__FILE__, __LINE__, EngineError::NextDealerNotFound);
 }
 
+void Game::handlePlayerAction(const PlayerAction& action)
+{
+    if (myCurrentHand) {
+        myCurrentHand->handlePlayerAction(action);
+    }
+}
+
 } // namespace pkt::core

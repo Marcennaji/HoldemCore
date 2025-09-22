@@ -3,8 +3,8 @@
 #include <core/services/ServiceContainer.h>
 #include <core/session/Session.h>
 #include <infra/persistence/SqliteDb.h>
-#include <ui/qtwidgets/poker_ui/PokerTableWindow.h>
-#include <ui/qtwidgets/startwindow/StartWindow.h>
+#include <ui/qtwidgets/windows/PokerTableWindow.h>
+#include <ui/qtwidgets/windows/StartWindow.h>
 
 #include "GuiBridgeWidgets.h"
 namespace pkt::ui::qtwidgets
@@ -31,7 +31,6 @@ GuiAppController::GuiAppController(std::shared_ptr<pkt::core::ServiceContainer> 
 
 StartWindow* GuiAppController::createMainWindow()
 {
-    // TODO: Add window icon to Qt resources
     if (myServices)
     {
         return new StartWindow(myPokerTableWindow.get(), mySession.get(), myServices, nullptr);

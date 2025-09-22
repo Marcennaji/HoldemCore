@@ -12,7 +12,7 @@ class StrategyAssigner
   public:
     StrategyAssigner(TableProfile profile, int botCount);
 
-    std::unique_ptr<BotStrategy> chooseStrategyFor(int botIndex);
+    std::unique_ptr<BotStrategy> chooseBotStrategyFor(int botIndex);
 
   private:
     TableProfile myProfile;

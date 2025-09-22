@@ -11,6 +11,10 @@ class PokerTableWindow;
 namespace pkt::core
 {
 class Session;
+namespace player
+{
+class HumanStrategy;
+}
 }
 
 namespace pkt::ui::qtwidgets
@@ -36,6 +40,7 @@ class GuiBridgeWidgets : public QObject
     void onPlayerBet(int amount);
     void onPlayerRaise(int amount);
     void onPlayerAllIn();
+    void onNextHandRequested();
 
   private:
     // Event handlers for GameEvents - these will be connected to the game engine events
@@ -53,6 +58,9 @@ class GuiBridgeWidgets : public QObject
 
     PokerTableWindow* myTableWindow = nullptr;
     pkt::core::Session* mySession = nullptr;
+    
+    // Track the human strategy that's currently waiting for input
+    pkt::core::player::HumanStrategy* myCurrentHumanStrategy = nullptr;
 };
 
 } // namespace pkt::ui::qtwidgets

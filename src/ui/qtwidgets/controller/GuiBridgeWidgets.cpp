@@ -1,10 +1,14 @@
 #include "GuiBridgeWidgets.h"
 #include "core/engine/GameEvents.h"
+#include "core/engine/model/PlayerAction.h"
 #include "core/session/Session.h"
-#include "ui/qtwidgets/poker_ui/PokerTableWindow.h"
+#include "core/player/strategy/HumanStrategy.h"
+#include "ui/qtwidgets/windows/PokerTableWindow.h"
 
 #include <QString>
 #include <QDebug>
+#include <QCoreApplication>
+#include <QEventLoop>
 
 using namespace pkt::core;
 
@@ -26,6 +30,7 @@ void GuiBridgeWidgets::connectSignalsFromUi()
     connect(myTableWindow, &PokerTableWindow::betClicked, this, &GuiBridgeWidgets::onPlayerBet);
     connect(myTableWindow, &PokerTableWindow::raiseClicked, this, &GuiBridgeWidgets::onPlayerRaise);
     connect(myTableWindow, &PokerTableWindow::allInClicked, this, &GuiBridgeWidgets::onPlayerAllIn);
+    connect(myTableWindow, &PokerTableWindow::nextHandRequested, this, &GuiBridgeWidgets::onNextHandRequested);
 }
 
 void GuiBridgeWidgets::connectEventsToUi(pkt::core::GameEvents& events)
@@ -75,52 +80,99 @@ void GuiBridgeWidgets::connectEventsToUi(pkt::core::GameEvents& events)
     events.onEngineError = [this](std::string errorMessage) {
         this->handleEngineError(errorMessage);
     };
+    
+    events.onHumanStrategyWaiting = [this](pkt::core::player::HumanStrategy* strategy) {
+        myCurrentHumanStrategy = strategy;
+    };
+    
+    events.onProcessEvents = []() {
+        // Qt-specific implementation: Process Qt events to keep GUI responsive
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 1);
+    };
 }
 
 // User action handlers (UI → Game Engine)
 void GuiBridgeWidgets::onPlayerFold()
 {
     qDebug() << "Player clicked Fold";
-    // TODO: Send fold action to game engine through session
-    // PlayerAction action{playerId, ActionType::Fold, 0};
-    // mySession->handlePlayerAction(action);
+    PlayerAction action{0, ActionType::Fold, 0}; // Human player is always ID 0
+    if (myCurrentHumanStrategy) {
+        myCurrentHumanStrategy->setPlayerAction(action);
+        myCurrentHumanStrategy = nullptr; // Clear after use
+    }
 }
 
 void GuiBridgeWidgets::onPlayerCall()
 {
     qDebug() << "Player clicked Call";
-    // TODO: Send call action to game engine
+    PlayerAction action{0, ActionType::Call, 0}; 
+    if (myCurrentHumanStrategy) {
+        myCurrentHumanStrategy->setPlayerAction(action);
+        myCurrentHumanStrategy = nullptr; // Clear after use
+    }
 }
 
 void GuiBridgeWidgets::onPlayerCheck()
 {
     qDebug() << "Player clicked Check";
-    // TODO: Send check action to game engine
+    PlayerAction action{0, ActionType::Check, 0}; 
+    if (myCurrentHumanStrategy) {
+        myCurrentHumanStrategy->setPlayerAction(action);
+        myCurrentHumanStrategy = nullptr; // Clear after use
+    }
 }
 
 void GuiBridgeWidgets::onPlayerBet(int amount)
 {
     qDebug() << "Player clicked Bet with amount:" << amount;
-    // TODO: Send bet action to game engine
+    PlayerAction action{0, ActionType::Bet, amount}; 
+    if (myCurrentHumanStrategy) {
+        myCurrentHumanStrategy->setPlayerAction(action);
+        myCurrentHumanStrategy = nullptr; // Clear after use
+    }
 }
 
 void GuiBridgeWidgets::onPlayerRaise(int amount)
 {
     qDebug() << "Player clicked Raise with amount:" << amount;
-    // TODO: Send raise action to game engine
+    PlayerAction action{0, ActionType::Raise, amount}; 
+    if (myCurrentHumanStrategy) {
+        myCurrentHumanStrategy->setPlayerAction(action);
+        myCurrentHumanStrategy = nullptr; // Clear after use
+    }
 }
 
 void GuiBridgeWidgets::onPlayerAllIn()
 {
     qDebug() << "Player clicked All-In";
-    // TODO: Send all-in action to game engine
+    PlayerAction action{0, ActionType::Allin, 0}; 
+    if (myCurrentHumanStrategy) {
+        myCurrentHumanStrategy->setPlayerAction(action);
+        myCurrentHumanStrategy = nullptr; // Clear after use
+    }
+}
+
+void GuiBridgeWidgets::onNextHandRequested()
+{
+    qDebug() << "Next hand requested by user";
+    
+    // Update UI status
+    myTableWindow->updatePlayerStatus(-1, "Starting next hand...");
+    myTableWindow->updateGamePhase(pkt::core::GameState::None);
+    
+    // Request the session to start a new hand
+    mySession->startNewHand();
 }
 
 // Game event handlers (Game Engine → UI)
 void GuiBridgeWidgets::handleGameInitialized(int gameSpeed)
 {
     qDebug() << "Game initialized with speed:" << gameSpeed;
+    
+    // Reset the UI for a new game
     myTableWindow->updatePlayerStatus(-1, "Game Started");
+    myTableWindow->refreshPot(0); // Reset pot to 0
+    myTableWindow->updateGamePhase(pkt::core::GameState::Preflop);
     myTableWindow->enablePlayerInput(false); // Wait for cards to be dealt
 }
 
@@ -136,6 +188,9 @@ void GuiBridgeWidgets::handleHandCompleted(std::list<unsigned> winnerIds, int to
     
     myTableWindow->updatePlayerStatus(-1, winnerText);
     myTableWindow->enablePlayerInput(false);
+    
+    // Show the Next Hand button when hand is completed
+    myTableWindow->onHandCompleted();
 }
 
 void GuiBridgeWidgets::handlePlayerChipsUpdated(unsigned playerId, int newChips)
@@ -147,7 +202,15 @@ void GuiBridgeWidgets::handlePlayerChipsUpdated(unsigned playerId, int newChips)
 void GuiBridgeWidgets::handleBettingRoundStarted(pkt::core::GameState gameState)
 {
     qDebug() << "Betting round started. Game state:" << static_cast<int>(gameState);
+    
+    // Update the game phase display
     myTableWindow->updateGamePhase(gameState);
+    
+    // Clear previous round status messages
+    myTableWindow->updatePlayerStatus(-1, "New betting round started");
+    
+    // Disable input until it's specifically requested
+    myTableWindow->enablePlayerInput(false);
 }
 
 void GuiBridgeWidgets::handlePotUpdated(int newPotAmount)
@@ -160,7 +223,7 @@ void GuiBridgeWidgets::handlePlayerActed(pkt::core::PlayerAction action)
 {
     qDebug() << "Player" << action.playerId << "acted:" << static_cast<int>(action.type) << "Amount:" << action.amount;
     
-    QString actionText = QString("Player %1: %2").arg(action.playerId).arg(actionTypeToString(action.type));
+    QString actionText = QString("Player %1: %2").arg(action.playerId).arg(QString::fromUtf8(actionTypeToString(action.type)));
     if (action.amount > 0) {
         actionText += QString(" ($%1)").arg(action.amount);
     }
@@ -172,11 +235,20 @@ void GuiBridgeWidgets::handleAwaitingHumanInput(unsigned playerId, std::vector<p
 {
     qDebug() << "Awaiting input from player:" << playerId << "Valid actions count:" << validActions.size();
     
-    // Enable UI for human player input
+    // Set available actions first
     myTableWindow->setAvailableActions(validActions);
+    
+    // Enable UI for human player input
     myTableWindow->enablePlayerInput(true);
     
-    QString actionText = QString("Player %1's turn").arg(playerId);
+    // Create a helpful status message showing available actions
+    QString actionText = QString("Player %1's turn - Available: ").arg(playerId);
+    QStringList actionStrings;
+    for (const auto& action : validActions) {
+        actionStrings << QString::fromUtf8(actionTypeToString(action));
+    }
+    actionText += actionStrings.join(", ");
+    
     myTableWindow->updatePlayerStatus(playerId, actionText);
 }
 
@@ -185,13 +257,13 @@ void GuiBridgeWidgets::handleHoleCardsDealt(unsigned playerId, pkt::core::HoleCa
     qDebug() << "Hole cards dealt to player:" << playerId;
     
     // Show cards for human player (assuming player 0 is human for now)
-    // TODO: Determine which player is the human player
+    // TODO: Determine which player is the human player from session/game config
     if (playerId == 0) {
         myTableWindow->showHoleCards(playerId, holeCards);
+        myTableWindow->updatePlayerStatus(playerId, "Your cards dealt - Good luck!");
+    } else {
+        myTableWindow->updatePlayerStatus(playerId, "Cards dealt");
     }
-    
-    QString statusText = "Cards dealt";
-    myTableWindow->updatePlayerStatus(playerId, statusText);
 }
 
 void GuiBridgeWidgets::handleBoardCardsDealt(pkt::core::BoardCards boardCards)
