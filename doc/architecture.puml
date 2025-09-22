@@ -1,5 +1,5 @@
 @startuml
-title PokerTraining – Hexagonal Architecture with Dependency Injection
+title HoldemCore – Hexagonal Architecture with Dependency Injection
 
 skinparam packageStyle rectangle
 skinparam shadowing false

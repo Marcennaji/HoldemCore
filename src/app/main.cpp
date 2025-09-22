@@ -1,4 +1,4 @@
-// PokerTraining — Texas Hold'em simulator
+// HoldemCore — Texas Hold'em simulator
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
@@ -35,7 +35,7 @@ int main(int argc, char** argv)
     auto services = std::make_shared<pkt::core::AppServiceContainer>();
     services->setLogger(std::make_unique<pkt::infra::ConsoleLogger>());
     services->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>(services));
-    auto db = std::make_unique<pkt::infra::SqliteDb>(dirs.logDir + string("/pokerTraining.db"));
+    auto db = std::make_unique<pkt::infra::SqliteDb>(dirs.logDir + string("/HoldemCore.db"));
     services->setPlayersStatisticsStore(std::make_unique<pkt::infra::SqlitePlayersStatisticsStore>(std::move(db)));
 
     GuiAppController controller(QString::fromStdString(dirs.appDataDir), services);

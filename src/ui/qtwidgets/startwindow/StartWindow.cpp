@@ -1,4 +1,4 @@
-// PokerTraining — Texas Hold'em simulator
+// HoldemCore — Texas Hold'em simulator
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 #include "StartWindow.h"
@@ -22,7 +22,7 @@ StartWindow::StartWindow(const QString& appDataPath, PokerTableWindow* tableWind
 {
     setupUi(this);
     // myPokerTableWindow->setStartWindow(this);
-    setWindowTitle(QString(tr("PokerTraining %1").arg(POKERTRAINING_BETA_RELEASE_STRING)));
+    setWindowTitle(QString(tr("HoldemCore %1").arg(HoldemCore_BETA_RELEASE_STRING)));
     setWindowIcon(QIcon(myAppDataPath + "gfx/gui/misc/windowicon.png"));
     setStatusBar(nullptr);
     installEventFilter(this);
@@ -39,7 +39,7 @@ StartWindow::StartWindow(const QString& appDataPath, PokerTableWindow* tableWind
 {
     setupUi(this);
     // myPokerTableWindow->setStartWindow(this);
-    setWindowTitle(QString(tr("PokerTraining %1").arg(POKERTRAINING_BETA_RELEASE_STRING)));
+    setWindowTitle(QString(tr("HoldemCore %1").arg(HoldemCore_BETA_RELEASE_STRING)));
     setWindowIcon(QIcon(myAppDataPath + "gfx/gui/misc/windowicon.png"));
     setStatusBar(nullptr);
     installEventFilter(this);

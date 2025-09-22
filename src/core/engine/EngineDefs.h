@@ -1,4 +1,4 @@
-// PokerTraining — Texas Hold'em simulator
+// HoldemCore — Texas Hold'em simulator
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
@@ -7,6 +7,6 @@
 #define MIN_NUMBER_OF_PLAYERS 2
 #define MAX_NUMBER_OF_PLAYERS 10
 
-#define POKERTRAINING_BETA_RELEASE_STRING "1.5.0"
+#define HoldemCore_BETA_RELEASE_STRING "1.5.0"
 
 #define MIN_HANDS_STATISTICS_ACCURATE 30

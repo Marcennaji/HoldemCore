@@ -1,4 +1,4 @@
-# PokerTraining
+# HoldemCore
 
 **Production-Grade C++ Architecture Showcase**  
 Texas Hold'em poker simulation engine demonstrating modern software engineering practices: hexagonal architecture, dependency injection, comprehensive testing, and cross-platform design.
@@ -34,8 +34,8 @@ This project demonstrates **enterprise-level software engineering** through a co
 
 ### Build & Test (unit tests + end-to-end tests)
 ```bash
-git clone https://github.com/Marcennaji/PokerTraining.git
-cd PokerTraining
+git clone https://github.com/Marcennaji/HoldemCore.git
+cd HoldemCore
 cmake --preset debug-widgets
 cmake --build build/debug-widgets
 .\build\debug-widgets\tests\unit_tests.exe

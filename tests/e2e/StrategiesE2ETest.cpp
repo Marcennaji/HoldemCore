@@ -1,4 +1,4 @@
-// PokerTraining — E2E test for all 4 Bot Strategies
+// HoldemCore — E2E test for all 4 Bot Strategies
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 

@@ -1,4 +1,4 @@
-// PokerTraining — Unit tests for Session
+// HoldemCore — Unit tests for Session
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 

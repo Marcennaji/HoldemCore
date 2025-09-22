@@ -1,4 +1,4 @@
-// PokerTraining — E2E tests for Session (Simplified)
+// HoldemCore — E2E tests for Session (Simplified)
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 

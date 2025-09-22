@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<PokerTraining>
+<HoldemCore>
   <TableStyle>
      <StyleDescription value="default table design" />
      <StyleMaintainerName value="Marc Ennaji" />
-     <StyleMaintainerEMail value="webmaster@pokertraining.net" />
+     <StyleMaintainerEMail value="webmaster@HoldemCore.net" />
      <StyleCreateDate value="31.01.2011" />
-     <PokerTrainingStyleFileVersion value="3" />
+     <HoldemCoreStyleFileVersion value="3" />
      <Preview value="preview.png" />
      <IfFixedWindowSize value="1" />
      <FixedWindowWidth value="1024" />
@@ -129,4 +129,4 @@
      <PlayerInfoHintTextColor value="FFFF00" />
      <ChatLogTextSize value="11" />
   </TableStyle>
-</PokerTraining>
+</HoldemCore>

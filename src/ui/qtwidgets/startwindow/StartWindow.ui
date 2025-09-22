@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>PokerTraining</string>
+   <string>HoldemCore</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
@@ -280,7 +280,7 @@
           <string>Start game</string>
          </property>
          <property name="icon">
-          <iconset resource="resources/pokertraining.qrc">
+          <iconset resource="resources/HoldemCore.qrc">
            <normaloff>:/gfx/swbuttonlocalgame.png</normaloff>:/gfx/swbuttonlocalgame.png</iconset>
          </property>
          <property name="iconSize">
@@ -309,7 +309,7 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionStartGame">
    <property name="icon">
-    <iconset resource="resources/pokertraining.qrc">
+    <iconset resource="resources/HoldemCore.qrc">
      <normaloff>:/gfx/swbuttonlocalgame.png</normaloff>:/gfx/swbuttonlocalgame.png</iconset>
    </property>
    <property name="text">
@@ -319,30 +319,30 @@
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="actionAboutPokerTraining">
+  <action name="actionAboutHoldemCore">
    <property name="icon">
-    <iconset resource="resources/pokertraining.qrc">
+    <iconset resource="resources/HoldemCore.qrc">
      <normaloff>:/gfx/system_help_64.png</normaloff>:/gfx/system_help_64.png</iconset>
    </property>
    <property name="text">
-    <string>About PokerTraining</string>
+    <string>About HoldemCore</string>
    </property>
    <property name="toolTip">
-    <string>About PokerTraining</string>
+    <string>About HoldemCore</string>
    </property>
   </action>
-  <action name="actionConfigurePokerTraining">
+  <action name="actionConfigureHoldemCore">
    <property name="icon">
-    <iconset resource="resources/pokertraining.qrc">
+    <iconset resource="resources/HoldemCore.qrc">
      <normaloff>:/gfx/systemsettings.png</normaloff>:/gfx/systemsettings.png</iconset>
    </property>
    <property name="text">
-    <string>Configure PokerTraining ...</string>
+    <string>Configure HoldemCore ...</string>
    </property>
   </action>
   <action name="actionQuit">
    <property name="icon">
-    <iconset resource="resources/pokertraining.qrc">
+    <iconset resource="resources/HoldemCore.qrc">
      <normaloff>:/gfx/application_exit.png</normaloff>:/gfx/application_exit.png</iconset>
    </property>
    <property name="text">
@@ -352,14 +352,14 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="actionAbout_Pokertraining">
+  <action name="actionAbout_HoldemCore">
    <property name="text">
-    <string>About Pokertraining</string>
+    <string>About HoldemCore</string>
    </property>
   </action>
  </widget>
  <resources>
-  <include location="resources/pokertraining.qrc"/>
+  <include location="resources/HoldemCore.qrc"/>
  </resources>
  <connections>
   <connection>

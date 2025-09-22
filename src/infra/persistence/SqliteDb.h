@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <string>
 
-#define SQL_LOG_FILE "pokerTraining.db"
+#define SQL_LOG_FILE "HoldemCore.db"
 
 struct sqlite3;
 
