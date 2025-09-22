@@ -17,6 +17,11 @@ file(GLOB_RECURSE UI_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/*.ui
 )
 
+# Qt Resource files
+file(GLOB_RECURSE RESOURCE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/resources/*.qrc
+)
+
 # Generate .h and .cpp files from .ui files
 qt_wrap_ui(UI_GENERATED_FILES ${UI_FILES})
 
@@ -26,7 +31,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 # Create a static library
-add_library(qtwidgets STATIC ${LIB_SOURCES} ${INCLUDE_HEADERS} ${UI_GENERATED_FILES})
+add_library(qtwidgets STATIC ${LIB_SOURCES} ${INCLUDE_HEADERS} ${UI_GENERATED_FILES} ${RESOURCE_FILES})
 
 # Include directories
 target_include_directories(qtwidgets PUBLIC
