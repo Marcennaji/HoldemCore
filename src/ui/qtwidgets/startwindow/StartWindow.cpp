@@ -17,13 +17,13 @@ using namespace pkt::core;
 namespace pkt::ui::qtwidgets
 {
 
-StartWindow::StartWindow(const QString& appDataPath, PokerTableWindow* tableWindow, Session* session, QWidget* parent)
-    : QMainWindow(parent), myAppDataPath(appDataPath), myPokerTableWindow(tableWindow), mySession(session)
+StartWindow::StartWindow(PokerTableWindow* tableWindow, Session* session, QWidget* parent)
+    : QMainWindow(parent), myPokerTableWindow(tableWindow), mySession(session)
 {
     setupUi(this);
     // myPokerTableWindow->setStartWindow(this);
     setWindowTitle(QString(tr("HoldemCore %1").arg(HoldemCore_BETA_RELEASE_STRING)));
-    setWindowIcon(QIcon(myAppDataPath + "gfx/gui/misc/windowicon.png"));
+    // setWindowIcon(QIcon(":/icons/windowicon.png")); // TODO: Add icon to resources
     setStatusBar(nullptr);
     installEventFilter(this);
 
@@ -32,15 +32,14 @@ StartWindow::StartWindow(const QString& appDataPath, PokerTableWindow* tableWind
     show();
 }
 
-StartWindow::StartWindow(const QString& appDataPath, PokerTableWindow* tableWindow, Session* session,
+StartWindow::StartWindow(PokerTableWindow* tableWindow, Session* session,
                          std::shared_ptr<pkt::core::ServiceContainer> services, QWidget* parent)
-    : QMainWindow(parent), myAppDataPath(appDataPath), myPokerTableWindow(tableWindow), mySession(session),
-      myServices(std::move(services))
+    : QMainWindow(parent), myPokerTableWindow(tableWindow), mySession(session), myServices(std::move(services))
 {
     setupUi(this);
     // myPokerTableWindow->setStartWindow(this);
     setWindowTitle(QString(tr("HoldemCore %1").arg(HoldemCore_BETA_RELEASE_STRING)));
-    setWindowIcon(QIcon(myAppDataPath + "gfx/gui/misc/windowicon.png"));
+    // setWindowIcon(QIcon(":/icons/windowicon.png")); // TODO: Add icon to resources
     setStatusBar(nullptr);
     installEventFilter(this);
 

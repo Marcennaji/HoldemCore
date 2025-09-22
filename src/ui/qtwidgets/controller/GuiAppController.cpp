@@ -10,7 +10,7 @@
 namespace pkt::ui::qtwidgets
 {
 
-GuiAppController::GuiAppController(const QString& app) : myAppDataPath(app)
+GuiAppController::GuiAppController()
 {
     mySession = std::make_unique<pkt::core::Session>(myEvents);
     myPokerTableWindow = std::make_unique<PokerTableWindow>(mySession.get());
@@ -19,8 +19,8 @@ GuiAppController::GuiAppController(const QString& app) : myAppDataPath(app)
     myBridge->connectEventsToUi(myEvents);
 }
 
-GuiAppController::GuiAppController(const QString& app, std::shared_ptr<pkt::core::ServiceContainer> services)
-    : myAppDataPath(app), myServices(std::move(services))
+GuiAppController::GuiAppController(std::shared_ptr<pkt::core::ServiceContainer> services)
+    : myServices(std::move(services))
 {
     mySession = std::make_unique<pkt::core::Session>(myEvents, myServices);
     myPokerTableWindow = std::make_unique<PokerTableWindow>(mySession.get());
@@ -31,13 +31,14 @@ GuiAppController::GuiAppController(const QString& app, std::shared_ptr<pkt::core
 
 StartWindow* GuiAppController::createMainWindow()
 {
+    // TODO: Add window icon to Qt resources
     if (myServices)
     {
-        return new StartWindow(myAppDataPath, myPokerTableWindow.get(), mySession.get(), myServices, nullptr);
+        return new StartWindow(myPokerTableWindow.get(), mySession.get(), myServices, nullptr);
     }
     else
     {
-        return new StartWindow(myAppDataPath, myPokerTableWindow.get(), mySession.get(), nullptr);
+        return new StartWindow(myPokerTableWindow.get(), mySession.get(), nullptr);
     }
 }
 

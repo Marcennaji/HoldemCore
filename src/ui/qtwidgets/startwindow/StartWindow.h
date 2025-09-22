@@ -24,12 +24,11 @@ class StartWindow : public QMainWindow, public Ui::StartWindow
 {
     Q_OBJECT
   public:
-    StartWindow(const QString& appDataPath, PokerTableWindow* tableWindow, pkt::core::Session* session,
-                QWidget* parent);
+    StartWindow(PokerTableWindow* tableWindow, pkt::core::Session* session, QWidget* parent = nullptr);
 
     /// Constructor with ServiceContainer dependency injection
-    StartWindow(const QString& appDataPath, PokerTableWindow* tableWindow, pkt::core::Session* session,
-                std::shared_ptr<pkt::core::ServiceContainer> services, QWidget* parent);
+    StartWindow(PokerTableWindow* tableWindow, pkt::core::Session* session,
+                std::shared_ptr<pkt::core::ServiceContainer> services, QWidget* parent = nullptr);
 
     ~StartWindow();
 
@@ -50,8 +49,6 @@ class StartWindow : public QMainWindow, public Ui::StartWindow
     void startNewGame();
 
   private:
-    QString myAppDataPath;
-
     std::shared_ptr<PokerTableWindow> myPokerTableWindow;
     pkt::core::Session* mySession;
 
