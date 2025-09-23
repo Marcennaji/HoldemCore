@@ -51,6 +51,15 @@ class PokerTableWindow : public QWidget
     void setAvailableActions(const std::vector<pkt::core::ActionType>& actions);
     void enablePlayerInput(bool enabled);
     
+    // Player state indicators
+    void setActivePlayer(int playerId);
+    void setDealerPosition(int playerId);
+    void clearPlayerHighlights();
+    void updatePlayerStateIndicators();
+    
+    // Hand management
+    void resetForNewHand();
+    
     // Hand completion and delay functionality
     void onHandCompleted();
 
@@ -69,15 +78,22 @@ class PokerTableWindow : public QWidget
     void onRaiseAction();
     void onNextHandClicked();  // Slot for Next Hand button click
 
+  protected:
+    void resizeEvent(QResizeEvent* event) override;
+    void showEvent(QShowEvent* event) override;
+
   private:
     void setupUi();
     void connectSignals();
-    void createGameInfoArea();
     void createPlayerAreas();
-    void createHumanPlayerArea();
-    void createBoardArea();
     void createActionButtons();
     void createBettingControls();
+    
+    // Circular table layout helpers
+    void positionPlayersInCircle();
+    QPoint calculateCircularPosition(int playerIndex, int totalPlayers, const QPoint& center, int radius);
+    void createCenterArea();
+    void positionCenterArea();
     
     // Card visualization helpers
     QPixmap getCardPixmap(const pkt::core::Card& card) const;
@@ -91,38 +107,28 @@ class PokerTableWindow : public QWidget
     QVBoxLayout* m_mainLayout;
     QGridLayout* m_tableLayout;
     
-    // Game info area
-    QGroupBox* m_gameInfoGroup;
-    QHBoxLayout* m_gameInfoLayout;
-    QLabel* m_potLabel;
-    QLabel* m_gamePhaseLabel;
-    QLabel* m_statusLabel;
-    
-    // Player areas (dynamic number based on GameData, excluding human player)
+    // Player areas (all players including human in circular layout)
     struct PlayerUIComponents {
         QGroupBox* playerGroup;
         QLabel* nameLabel;
         QLabel* chipsLabel;
-        QLabel* statusLabel;
         QLabel* holeCard1;
         QLabel* holeCard2;
+        QLabel* dealerButton;  // Dealer button indicator
+        bool isHuman;  // True for human player (index 0)
     };
     std::vector<PlayerUIComponents> m_playerComponents;
     int m_maxPlayers;
     
-    // Human player area (displayed separately at bottom)
-    QGroupBox* m_humanPlayerGroup;
-    QHBoxLayout* m_humanPlayerLayout;
-    QLabel* m_humanNameLabel;
-    QLabel* m_humanChipsLabel;
-    QLabel* m_humanStatusLabel;
-    QLabel* m_humanHoleCard1;
-    QLabel* m_humanHoleCard2;
+    // Player state tracking
+    int m_activePlayerId;   // Currently active player (-1 if none)
+    int m_dealerPosition;   // Current dealer position (-1 if none)
     
-    // Board area
-    QGroupBox* m_boardGroup;
-    QHBoxLayout* m_boardLayout;
-    std::array<QLabel*, 5> m_boardCardLabels;
+    // Center area for pot, phase, and community cards
+    QGroupBox* m_centerArea;
+    QLabel* m_potLabel;
+    QLabel* m_roundStateLabel;
+    std::array<QLabel*, 5> m_communityCards;
 
     // Action controls
     QGroupBox* m_actionGroup;

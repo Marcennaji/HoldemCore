@@ -3,6 +3,8 @@
 // Licensed under the MIT License — see LICENSE file for details.
 
 #include <chrono>
+#include <thread>
+#include <algorithm>
 #include <core/engine/EngineFactory.h>
 #include <core/engine/model/GameData.h>
 #include <core/engine/model/StartData.h>

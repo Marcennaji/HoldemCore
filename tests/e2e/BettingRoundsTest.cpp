@@ -5,6 +5,9 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/utils/Helpers.h"
 #include "core/player/Helpers.h"
+#include "core/engine/game/Game.h"
+#include <chrono>
+#include <thread>
 
 using namespace pkt::core;
 using namespace pkt::core::player;
@@ -76,7 +79,8 @@ void BettingRoundsTest::checkStateTransitions()
         bool validTransition = (prev == Preflop && (curr == Flop || curr == PostRiver)) ||
                                (prev == Flop && (curr == Turn || curr == PostRiver)) ||
                                (prev == Turn && (curr == River || curr == PostRiver)) ||
-                               (prev == River && curr == PostRiver);
+                               (prev == River && curr == PostRiver) ||
+                               (prev == PostRiver && curr == Preflop); // if multi-hands scenario
 
         EXPECT_TRUE(validTransition) << "Invalid transition from " << gameStateToString(prev) << " to "
                                      << gameStateToString(curr);
@@ -1176,6 +1180,66 @@ TEST_F(BettingRoundsTest, HeadsUpEndsImmediatelyOnFold)
         }
     }
     EXPECT_EQ(foldCount, 1) << "Should have exactly one fold action (SB) in heads-up scenario";
+}
+
+// REGRESSION TEST: Fix for ActingPlayersList bug in consecutive hands
+// This test verifies that Game::startNewHand() properly resets ActingPlayersList
+TEST_F(BettingRoundsTest, ConsecutiveHandsWorkCorrectly_RegressionTest)
+{
+    logTestMessage("Testing consecutive hands regression - ActingPlayersList reset");
+
+    gameData.startMoney = 2000;
+    gameData.firstSmallBlind = 10;
+    
+    // Track hand completions
+    int handsCompleted = 0;
+    myEvents.onHandCompleted = [&handsCompleted](std::list<unsigned> winnerIds, int totalPot) {
+        handsCompleted++;
+    };
+
+    // Initialize first hand with 3 players
+    initializeHandWithPlayers(3, gameData);
+
+    // Run first hand to completion
+    myHand->runGameLoop();
+    EXPECT_EQ(handsCompleted, 1) << "First hand should complete";
+    
+    // Record first hand state sequence
+    size_t firstHandStates = stateSequence.size();
+    ASSERT_GT(firstHandStates, 0) << "First hand should generate game states";
+    
+    // CRITICAL TEST: Create Game and call startNewHand() twice
+    // The bug was that the second call would hang due to empty ActingPlayersList
+    StartData startData;
+    startData.startDealerPlayerId = 0;
+    startData.numberOfPlayers = 3;
+    
+    // Create Game instance to test consecutive hands
+    auto game = std::make_unique<Game>(myEvents, myFactory, myBoard, mySeatsList, 
+                                      0, gameData, startData);
+    
+    try {
+        // First startNewHand() - should work
+        game->startNewHand();
+        
+        // Wait briefly for processing
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        
+        // REGRESSION TEST: Second startNewHand() - the bug was here
+        // Before the fix, this would hang because ActingPlayersList was empty
+        game->startNewHand();
+        
+        // Wait briefly for processing
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        
+        // If we reach here, the bug is fixed - both calls succeeded without hanging
+        SUCCEED() << "REGRESSION PASSED: Both startNewHand() calls succeeded without hanging";
+        
+    } catch (const std::exception& e) {
+        FAIL() << "Regression test failed with exception: " << e.what();
+    }
+    
+    logTestMessage("Consecutive hands regression test passed - ActingPlayersList bug fixed");
 }
 
 } // namespace pkt::test

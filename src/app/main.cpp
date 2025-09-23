@@ -59,6 +59,7 @@ int main(int argc, char** argv)
     services->setPlayersStatisticsStore(std::make_unique<pkt::infra::SqlitePlayersStatisticsStore>(std::move(db)));
 
     // Display development warning
+    if (false)
     QMessageBox::warning(nullptr, "Development Notice", 
                         "Welcome to HoldemCore!\n\n"
                         "The core poker engine is fully functional, but the Qt user interface "

@@ -156,6 +156,9 @@ void GuiBridgeWidgets::onNextHandRequested()
 {
     qDebug() << "Next hand requested by user";
     
+    // Reset the UI immediately for the new hand
+    myTableWindow->resetForNewHand();
+    
     // Update UI status
     myTableWindow->updatePlayerStatus(-1, "Starting next hand...");
     myTableWindow->updateGamePhase(pkt::core::GameState::None);
@@ -168,6 +171,9 @@ void GuiBridgeWidgets::onNextHandRequested()
 void GuiBridgeWidgets::handleGameInitialized(int gameSpeed)
 {
     qDebug() << "Game initialized with speed:" << gameSpeed;
+    
+    // Reset the UI for a new hand
+    myTableWindow->resetForNewHand();
     
     // Reset the UI for a new game
     myTableWindow->updatePlayerStatus(-1, "Game Started");

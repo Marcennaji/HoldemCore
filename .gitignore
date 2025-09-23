@@ -45,3 +45,4 @@ src/ui/qtwidgets/styles
 # cppdepend analysis
 CppDependOut
 *.cdproj
+bash.exe.stackdump

@@ -37,6 +37,14 @@ Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
 
 void Game::startNewHand()
 {
+    // Reset the board to preflop state (clear all community cards)
+    myCurrentBoard->setBoardCards(BoardCards());
+    
+    // CRITICAL FIX: Reset acting players list for the new hand
+    // The acting players list gets modified during gameplay (players fold/go all-in)
+    // We need to reset it to include all seated players for each new hand
+    myActingPlayersList = std::make_shared<std::list<std::shared_ptr<Player>>>(*mySeatsList);
+    
     myCurrentHand = myEngineFactory->createHand(myEngineFactory, myCurrentBoard, mySeatsList, myActingPlayersList,
                                                 myGameData, myStartData);
     findNextDealer();
