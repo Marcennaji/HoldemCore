@@ -8,9 +8,12 @@
 #include "Pot.h"
 #include "core/player/Player.h"
 #include "hand/Hand.h"
+#include "hand/HandEvaluator.h"
+#include "core/engine/cards/CardUtilities.h"
 #include "model/EngineError.h"
 
 #include <algorithm>
+#include <iostream>
 
 namespace pkt::core
 {
@@ -41,6 +44,27 @@ void Board::distributePot(Hand& hand)
     for (auto& player : *hand.getSeatsList())
     {
         totalPot += player->getCurrentHandActions().getHandTotalBetAmount();
+    }
+    // Recompute each player's rank with the final board to ensure correct showdown comparison
+    const auto& bc = getBoardCards();
+    if (bc.getNumCards() == 5)
+    {
+        std::cout << "[INFO] Showdown — final board: \"" << bc.toString() << "\"" << std::endl;
+        for (auto& player : *hand.getSeatsList())
+        {
+            int cards[7];
+            for (int i = 0; i < 5; ++i)
+            {
+                cards[i] = bc.getCard(i).getIndex();
+            }
+            const auto& hc = player->getHoleCards();
+            cards[5] = hc.card1.getIndex();
+            cards[6] = hc.card2.getIndex();
+            const std::string handStr = pkt::core::CardUtilities::getCardStringValue(cards, 7);
+            player->setHandRanking(pkt::core::HandEvaluator::evaluateHand(handStr.c_str()));
+            std::cout << "[INFO] Player " << player->getId() << " showdown hand: \"" << hc.toString()
+                      << "\" rank=" << player->getHandRanking() << std::endl;
+        }
     }
     Pot pot(totalPot, mySeatsList, myDealerPlayerId);
     pot.distribute();

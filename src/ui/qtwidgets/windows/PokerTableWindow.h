@@ -15,6 +15,7 @@
 #include <array>
 #include <memory>
 #include <vector>
+#include <list>
 
 #include "core/engine/model/GameState.h"
 #include "core/engine/model/GameData.h"
@@ -52,11 +53,15 @@ class PokerTableWindow : public QWidget
   // Robust, structured updates (preferred)
   void showPlayerAction(int playerId, pkt::core::ActionType action, int amount);
   void showPlayerTurn(int playerId);
+  // Clear a single player's action label (used to clear human just before their turn)
+  void clearPlayerActionLabel(int playerId);
     void showErrorMessage(const QString& message);
     void setAvailableActions(const std::vector<pkt::core::ActionType>& actions);
     void enablePlayerInput(bool enabled);
   // Reset bet controls (slider/spin) to default after an action
   void resetBetControls();
+  // Show winners overlay label(s)
+  void showWinners(const std::list<unsigned>& winnerIds, int totalPot);
     
     // Player state indicators
     void setActivePlayer(int playerId);
@@ -73,6 +78,13 @@ class PokerTableWindow : public QWidget
     
     // Hand completion and delay functionality
     void onHandCompleted();
+
+    // Cache and reveal helpers
+    void cacheHoleCards(int seat, const pkt::core::HoleCards& holeCards);
+    void setReachedShowdown(bool reached);
+    
+  // Track whether the full board to river was dealt (useful to infer showdown)
+  inline bool sawRiver() const { return m_sawRiver; }
 
   signals:
     void playerActionRequested();
@@ -99,6 +111,8 @@ class PokerTableWindow : public QWidget
     void createPlayerAreas();
     void createActionButtons();
     void createBettingControls();
+    // Compute the vertical space reserved at the bottom for controls
+    int reservedBottomHeight() const;
     // Styling helpers (avoid duplication)
     QString defaultPlayerGroupStyle() const;
     QString activePlayerGroupStyle() const;
@@ -120,20 +134,21 @@ class PokerTableWindow : public QWidget
     pkt::core::Session* m_session;
     
     // Main layout
-    QVBoxLayout* m_mainLayout;
-    QGridLayout* m_tableLayout;
+  QVBoxLayout* m_mainLayout = nullptr;
+  QGridLayout* m_tableLayout = nullptr;
     
     // Player areas (all players including human in circular layout)
     struct PlayerUIComponents {
-        QGroupBox* playerGroup;
-        QLabel* holeCard1;
-        QLabel* holeCard2;
-        QLabel* dealerButton;  // Dealer button indicator
-    QLabel* currentActionLabel; // Prominent action text
-    QGraphicsOpacityEffect* card1OpacityEffect;
-    QGraphicsOpacityEffect* card2OpacityEffect;
+    QGroupBox* playerGroup = nullptr;
+    QLabel* holeCard1 = nullptr;
+    QLabel* holeCard2 = nullptr;
+    QLabel* dealerButton = nullptr;  // Dealer button indicator
+    QLabel* currentActionLabel = nullptr; // Prominent action text
+    QLabel* winnerLabel = nullptr; // Winner badge shown at hand end
+    QGraphicsOpacityEffect* card1OpacityEffect = nullptr;
+    QGraphicsOpacityEffect* card2OpacityEffect = nullptr;
     bool isFolded = false;
-        bool isHuman;  // True for human player (index 0)
+    bool isHuman = false;  // True for human player (index 0)
     };
     std::vector<PlayerUIComponents> m_playerComponents;
     int m_maxPlayers;
@@ -143,32 +158,37 @@ class PokerTableWindow : public QWidget
     int m_dealerPosition;   // Current dealer position (-1 if none)
     
     // Center area for pot, phase, and community cards
-    QGroupBox* m_centerArea;
-    QLabel* m_potLabel;
-    QLabel* m_roundStateLabel;
-    std::array<QLabel*, 5> m_communityCards;
+  QGroupBox* m_centerArea = nullptr;
+  QLabel* m_potLabel = nullptr;
+  QLabel* m_roundStateLabel = nullptr;
+  std::array<QLabel*, 5> m_communityCards{};
 
     // Action controls
-    QGroupBox* m_actionGroup;
-    QHBoxLayout* m_actionLayout;
-    QPushButton* m_foldButton;
-    QPushButton* m_callButton;
-    QPushButton* m_checkButton;
-    QPushButton* m_betButton;
-    QPushButton* m_raiseButton;
-    QPushButton* m_allInButton;
+  QGroupBox* m_actionGroup = nullptr;
+  QHBoxLayout* m_actionLayout = nullptr;
+  QPushButton* m_foldButton = nullptr;
+  QPushButton* m_callButton = nullptr;
+  QPushButton* m_checkButton = nullptr;
+  QPushButton* m_betButton = nullptr;
+  QPushButton* m_raiseButton = nullptr;
+  QPushButton* m_allInButton = nullptr;
     
     // Betting controls
-    QGroupBox* m_bettingGroup;
-    QHBoxLayout* m_bettingLayout;
-    QSlider* m_betSlider;
-    QSpinBox* m_betSpinBox;
-    QLabel* m_betAmountLabel;
+  QGroupBox* m_bettingGroup = nullptr;
+  QHBoxLayout* m_bettingLayout = nullptr;
+  QSlider* m_betSlider = nullptr;
+  QSpinBox* m_betSpinBox = nullptr;
+  QLabel* m_betAmountLabel = nullptr;
     
     // Next hand control
-    QPushButton* m_nextHandButton;
+  QPushButton* m_nextHandButton = nullptr;
     
   // Helpers
   void applyFoldVisual(int seat, bool folded);
+
+    // Cached state for showdown reveal
+    std::vector<pkt::core::HoleCards> m_cachedHoleCards;
+    bool m_reachedShowdown = false;
+  bool m_sawRiver = false;
 };
 } // namespace pkt::ui::qtwidgets

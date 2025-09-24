@@ -13,6 +13,7 @@
 #include <QShowEvent>
 #include <QDebug>
 #include <cmath>
+#include <algorithm>
 
 namespace pkt::ui::qtwidgets
 {
@@ -41,6 +42,7 @@ PokerTableWindow::PokerTableWindow(pkt::core::Session* session, QWidget* parent)
     
     // Initialize player components vector for ALL players (including human)
     m_playerComponents.resize(m_maxPlayers); // Include human player
+    m_cachedHoleCards.resize(m_maxPlayers);  // Cache dealt cards per player
     
     setWindowTitle("Poker Table - HoldemCore");
     setMinimumSize(800, 600);
@@ -78,7 +80,9 @@ void PokerTableWindow::initializeWithGameData(const pkt::core::GameData& gameDat
         
         // Resize and recreate ALL player components (including human player)
         m_playerComponents.clear();
-        m_playerComponents.resize(m_maxPlayers); // Include human player
+    m_playerComponents.resize(m_maxPlayers); // Include human player
+    m_cachedHoleCards.clear();
+    m_cachedHoleCards.resize(m_maxPlayers);
         
         // Recreate UI with new player count
         createPlayerAreas();
@@ -193,9 +197,9 @@ void PokerTableWindow::createPlayerAreas()
         player.holeCard1 = new QLabel(this);
         player.holeCard2 = new QLabel(this);
 
-        // Unified card styling and size for all players
-        player.holeCard1->setFixedSize(55, 77); // Same size for all players
-        player.holeCard2->setFixedSize(55, 77);
+    // Unified card styling and size for all players (scaled with reduced group height)
+    player.holeCard1->setFixedSize(50, 70);
+    player.holeCard2->setFixedSize(50, 70);
         QString cardStyle = 
             "QLabel {"
             "  border: 1px solid #ced4da;"
@@ -229,6 +233,21 @@ void PokerTableWindow::createPlayerAreas()
         player.currentActionLabel->setAlignment(Qt::AlignCenter);
     player.currentActionLabel->setStyleSheet(currentActionLabelStyleBase());
 
+        // Winner badge label (hidden by default)
+        player.winnerLabel = new QLabel("WINNER", this);
+        player.winnerLabel->setAlignment(Qt::AlignCenter);
+        player.winnerLabel->setStyleSheet(
+            "QLabel {"
+            "  color: #155724;"
+            "  background: rgba(212, 237, 218, 0.95);"
+            "  border: 1px solid #c3e6cb;"
+            "  border-radius: 6px;"
+            "  font-weight: 800;"
+            "  padding: 2px 4px;"
+            "}"
+        );
+        player.winnerLabel->setVisible(false);
+
         // Create dealer button indicator
         player.dealerButton = new QLabel("D", this);
         player.dealerButton->setFixedSize(25, 25);
@@ -247,11 +266,12 @@ void PokerTableWindow::createPlayerAreas()
         player.dealerButton->setVisible(false); // Initially hidden
 
         layout->addLayout(cardLayout);
-        layout->addWidget(player.currentActionLabel);
+    layout->addWidget(player.currentActionLabel);
+    layout->addWidget(player.winnerLabel);
         layout->addWidget(player.dealerButton);
 
     player.playerGroup->setVisible(true);
-    player.playerGroup->setFixedSize(120, 170); // Slightly taller to fit action label
+    player.playerGroup->setFixedSize(120, 136); // 80% of 170
     }
 }
 
@@ -633,6 +653,8 @@ void PokerTableWindow::showHoleCards(int seat, const pkt::core::HoleCards& holeC
     if (holeCards.isValid() && !playerUI.isFolded) {
         playerUI.holeCard1->setPixmap(getCardPixmap(holeCards.card1));
         playerUI.holeCard2->setPixmap(getCardPixmap(holeCards.card2));
+        // Cache for potential showdown reveal
+        cacheHoleCards(seat, holeCards);
     } else {
         playerUI.holeCard1->setPixmap(getCardBackPixmap());
         playerUI.holeCard2->setPixmap(getCardBackPixmap());
@@ -668,6 +690,8 @@ void PokerTableWindow::showBoardCards(const pkt::core::BoardCards& boardCards)
         // River
         m_communityCards[4]->setPixmap(getCardPixmap(boardCards.river));
         m_communityCards[4]->setVisible(true);
+        // We definitely saw the river; use this to infer showdown in case events arrive quickly
+        m_sawRiver = true;
     }
 }
 
@@ -692,6 +716,7 @@ void PokerTableWindow::updateGamePhase(pkt::core::GameState gameState)
             break;
         case pkt::core::GameState::PostRiver:
             phaseText = "Showdown";
+            setReachedShowdown(true);
             break;
     }
     
@@ -707,6 +732,15 @@ void PokerTableWindow::clearActionLabelsForNewRound()
         if (p.currentActionLabel) {
             p.currentActionLabel->clear();
         }
+    }
+}
+
+void PokerTableWindow::clearPlayerActionLabel(int playerId)
+{
+    if (playerId < 0 || playerId >= m_maxPlayers) return;
+    auto& ui = m_playerComponents[playerId];
+    if (ui.currentActionLabel) {
+        ui.currentActionLabel->clear();
     }
 }
 
@@ -830,10 +864,8 @@ void PokerTableWindow::showPlayerTurn(int playerId)
 {
     if (playerId < 0 || playerId >= m_maxPlayers) return;
     auto& ui = m_playerComponents[playerId];
-    if (ui.currentActionLabel) {
-        ui.currentActionLabel->setText("YOUR TURN");
-        ui.currentActionLabel->setStyleSheet(currentActionLabelStyleFor("YOUR TURN"));
-    }
+    // Do NOT overwrite the player's last action during the betting round.
+    // We only indicate turn via highlighting to keep last action visible.
     setActivePlayer(playerId);
 }
 
@@ -868,9 +900,22 @@ void PokerTableWindow::resetForNewHand()
             player.holeCard1->setPixmap(getCardBackPixmap());
             player.holeCard2->setPixmap(getCardBackPixmap());
         }
-        // Clear action and fold visuals
-        if (player.currentActionLabel) player.currentActionLabel->clear();
+    // Preserve last action label until the next betting round starts.
+    // clearActionLabelsForNewRound() will clear them on GameState change.
+        if (player.winnerLabel) {
+            player.winnerLabel->clear();
+            player.winnerLabel->setVisible(false);
+        }
         applyFoldVisual(i, false);
+    }
+
+    // Reset showdown flags and caches
+    m_reachedShowdown = false;
+    m_sawRiver = false;
+    if (!m_cachedHoleCards.empty()) {
+        for (auto& hc : m_cachedHoleCards) {
+            hc.reset();
+        }
     }
     
     // Clear player highlights
@@ -894,6 +939,46 @@ void PokerTableWindow::resetForNewHand()
     enablePlayerInput(true);
 }
 
+void PokerTableWindow::showWinners(const std::list<unsigned>& winnerIds, int totalPot)
+{
+    // Show a winner badge over each winner's area. If multiple, display all.
+    const bool isSplit = winnerIds.size() > 1;
+    for (unsigned id : winnerIds) {
+        if (id < m_playerComponents.size()) {
+            auto& player = m_playerComponents[id];
+            if (player.winnerLabel) {
+                if (isSplit) {
+                    // Avoid implying the full pot went to each; indicate split
+                    player.winnerLabel->setText("WINNER (split)");
+                } else {
+                    player.winnerLabel->setText(QString("WINNER +$%1").arg(totalPot));
+                }
+                player.winnerLabel->setVisible(true);
+            }
+            // If we reached showdown (not everyone folded), reveal the winner's hole cards
+            if ((m_reachedShowdown || m_sawRiver || isSplit) && id < m_cachedHoleCards.size()) {
+                const auto& hc = m_cachedHoleCards[id];
+                if (hc.isValid()) {
+                    showHoleCards(static_cast<int>(id), hc);
+                }
+            }
+        }
+    }
+
+    // At showdown, reveal hole cards for every player who did not fold (not only winners)
+    if (m_reachedShowdown || m_sawRiver) {
+        for (int i = 0; i < m_maxPlayers; ++i) {
+            if (i < static_cast<int>(m_playerComponents.size()) && i < static_cast<int>(m_cachedHoleCards.size())) {
+                auto& ui = m_playerComponents[i];
+                const auto& hc = m_cachedHoleCards[static_cast<size_t>(i)];
+                if (!ui.isFolded && hc.isValid()) {
+                    showHoleCards(i, hc);
+                }
+            }
+        }
+    }
+}
+
 void PokerTableWindow::applyFoldVisual(int seat, bool folded)
 {
     if (seat < 0 || seat >= m_maxPlayers) return;
@@ -911,9 +996,49 @@ void PokerTableWindow::applyFoldVisual(int seat, bool folded)
 
 void PokerTableWindow::positionPlayersInCircle()
 {
-    // Get the window center and calculate circle radius
-    QPoint center(width() / 2, height() / 2);
-    int radius = std::min(width(), height()) / 3; // Leave room for the center and margins
+    // Compute using full height for a larger circle, and then clamp center Y so bottom stays above controls
+    const int bottomReserve = reservedBottomHeight();
+    const int fullHeight = height();
+    QPoint center(width() / 2, fullHeight / 2);
+
+    // Player widget half-height and half-width
+    const int widgetHalfH = 136 / 2;
+    const int widgetHalfW = 120 / 2;
+
+    // Clearance from the center area (community cards) in both axes
+    const int centerHalfH = m_centerArea ? (m_centerArea->height() / 2) : 90;
+    const int centerHalfW = m_centerArea ? (m_centerArea->width() / 2) : 180;
+    const int minVerticalRadius = centerHalfH + widgetHalfH + 32;
+    const int minHorizontalRadius = centerHalfW + widgetHalfW + 32;
+
+    // Edge margins
+    const int edgeMargin = 16;
+
+    // Maximum radius constrained by available width/height (full height for larger circle)
+    const int maxRadiusByHeight = std::max(0, fullHeight / 2 - widgetHalfH - edgeMargin);
+    const int maxRadiusByWidth = std::max(0, width() / 2 - widgetHalfW - edgeMargin);
+    int radius = std::min({ maxRadiusByHeight, maxRadiusByWidth });
+
+    // Ensure minimal clearance from center area
+    const int desiredMin = std::max(minVerticalRadius, minHorizontalRadius);
+    radius = std::max(radius, desiredMin);
+
+    // Hard cap to avoid off-screen placement
+    const int hardCap = std::min(width(), fullHeight) / 2 - std::max(widgetHalfH, widgetHalfW) - edgeMargin;
+    radius = std::min(radius, std::max(0, hardCap));
+
+    // Reduce the radius to 90% of current while respecting minimum clearance
+    const double radiusScale = 0.90;
+    radius = static_cast<int>(std::round(radius * radiusScale));
+    if (radius < desiredMin) radius = desiredMin;
+
+    // Clamp center Y so bottom-most player stays above the reserved controls area (with extra padding)
+    const int bottomExtraPadding = 32; // Additional breathing room above action controls
+    const int allowedBottom = fullHeight - bottomReserve - edgeMargin - bottomExtraPadding; // y for bottom edge of player widget
+    const int maxCy = allowedBottom - radius - widgetHalfH;             // cy + radius + widgetHalfH <= allowedBottom
+    const int minCy = edgeMargin + radius + widgetHalfH;                // top-most player not clipped
+    int cy = std::clamp(center.y(), minCy, std::max(minCy, maxCy));
+    center.setY(cy);
 
     // Position all player areas in a circle
     for (int i = 0; i < m_maxPlayers; ++i) {
@@ -948,7 +1073,7 @@ QPoint PokerTableWindow::calculateCircularPosition(int playerIndex, int totalPla
     
     // Adjust for widget size (center the widget on the calculated point)
     int widgetWidth = 120;  // Fixed size from createPlayerAreas
-    int widgetHeight = 160;
+    int widgetHeight = 136; // Match created height (80% of previous)
     
     x -= widgetWidth / 2;
     y -= widgetHeight / 2;
@@ -1004,10 +1129,10 @@ void PokerTableWindow::createCenterArea()
     
     // Clean community cards layout with elegant styling
     auto communityLayout = new QHBoxLayout();
-    communityLayout->setSpacing(8); // Clean spacing between cards
+    communityLayout->setSpacing(4); // Tighter spacing between cards to reduce overall width
     for (int i = 0; i < 5; ++i) {
         m_communityCards[i] = new QLabel(this);
-        m_communityCards[i]->setFixedSize(55, 77); // Smaller card size
+        m_communityCards[i]->setFixedSize(50, 70); // Slightly smaller cards to save space
         m_communityCards[i]->setScaledContents(true);
         m_communityCards[i]->setStyleSheet(
             "QLabel {"
@@ -1035,7 +1160,7 @@ void PokerTableWindow::createCenterArea()
     centerLayout->addLayout(communityLayout);
     
     // Set container size for positioning
-    m_centerArea->setFixedSize(380, 200); // Clean, proportional size
+    m_centerArea->setFixedSize(360, 180); // Smaller footprint to avoid overlap with side players
     
     // Position it properly in the resizeEvent or when the window is shown
     positionCenterArea();
@@ -1044,10 +1169,28 @@ void PokerTableWindow::createCenterArea()
 void PokerTableWindow::positionCenterArea()
 {
     if (m_centerArea) {
+        const int bottomReserve = reservedBottomHeight();
+        const int effectiveHeight = std::max(0, height() - bottomReserve);
         int centerX = (width() - m_centerArea->width()) / 2;
-        int centerY = (height() - m_centerArea->height()) / 2;
+        int centerY = (effectiveHeight - m_centerArea->height()) / 2;
         m_centerArea->move(centerX, centerY);
+        // Ensure the center area (and community cards) render above players if close
+        m_centerArea->raise();
     }
+}
+
+void PokerTableWindow::cacheHoleCards(int seat, const pkt::core::HoleCards& holeCards)
+{
+    if (seat < 0 || seat >= m_maxPlayers) return;
+    if (static_cast<size_t>(seat) >= m_cachedHoleCards.size()) {
+        m_cachedHoleCards.resize(m_maxPlayers);
+    }
+    m_cachedHoleCards[static_cast<size_t>(seat)] = holeCards;
+}
+
+void PokerTableWindow::setReachedShowdown(bool reached)
+{
+    m_reachedShowdown = reached;
 }
 
 void PokerTableWindow::resizeEvent(QResizeEvent* event)
@@ -1066,6 +1209,18 @@ void PokerTableWindow::showEvent(QShowEvent* event)
     // Position elements when window is first shown (now we have proper size)
     positionPlayersInCircle();
     positionCenterArea();
+}
+
+int PokerTableWindow::reservedBottomHeight() const
+{
+    // Reserve enough vertical space to fit: action group, betting group, and next hand button rows.
+    // If widgets exist, use their size hints; otherwise fall back to conservative defaults.
+    int actionH = m_actionGroup ? m_actionGroup->sizeHint().height() : 70;
+    int bettingH = m_bettingGroup ? m_bettingGroup->sizeHint().height() : 60;
+    int nextHandH = m_nextHandButton ? (m_nextHandButton->sizeHint().height() + 12) : 40;
+    // Include some padding and layout spacing
+    int padding = 24; // extra gap between human cards and controls
+    return actionH + bettingH + nextHandH + padding;
 }
 
 // Player state indicator implementations

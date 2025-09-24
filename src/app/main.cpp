@@ -58,12 +58,6 @@ int main(int argc, char** argv)
     auto db = std::make_unique<pkt::infra::SqliteDb>(getDatabasePath());
     services->setPlayersStatisticsStore(std::make_unique<pkt::infra::SqlitePlayersStatisticsStore>(std::move(db)));
 
-    // Display development warning
-    QMessageBox::warning(nullptr, "Development Notice", 
-                        "Welcome to HoldemCore!\n\n"
-                        "The core poker engine is fully functional, but the Qt user interface "
-                        "is currently under active development and may not be fully usable yet.");
-
     GuiAppController controller(services);
     auto* mainWindow = controller.createMainWindow();
     mainWindow->show();

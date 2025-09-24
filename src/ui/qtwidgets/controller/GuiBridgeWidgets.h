@@ -61,6 +61,12 @@ class GuiBridgeWidgets : public QObject
     
     // Track the human strategy that's currently waiting for input
     pkt::core::player::HumanStrategy* myCurrentHumanStrategy = nullptr;
+
+  // Game speed for UI pacing (higher = faster; used to compute delay between bot actions)
+  int m_gameSpeed = 1;
+
+  // Compute UI delay in milliseconds based on m_gameSpeed (range: 500ms..3000ms)
+  int computeDelayMsForBots() const;
 };
 
 } // namespace pkt::ui::qtwidgets

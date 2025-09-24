@@ -7,15 +7,16 @@
 #include "core/interfaces/NullHandEvaluationEngine.h"
 #include "core/interfaces/persistence/NullPlayersStatisticsStore.h"
 #include "infra/ConsoleLogger.h"
+#include "infra/eval/PsimHandEvaluationEngine.h"
 
 namespace pkt::core
 {
 
 AppServiceContainer::AppServiceContainer()
-    : myLogger(std::make_unique<pkt::infra::ConsoleLogger>()),
-      myPlayersStatisticsStore(std::make_unique<NullPlayersStatisticsStore>()),
-      myRandomizer(std::make_unique<DefaultRandomizer>()),
-      myHandEvaluationEngine(std::make_unique<NullHandEvaluationEngine>())
+        : myLogger(std::make_unique<pkt::infra::ConsoleLogger>()),
+            myPlayersStatisticsStore(std::make_unique<NullPlayersStatisticsStore>()),
+            myRandomizer(std::make_unique<DefaultRandomizer>()),
+            myHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>())
 {
 }
 

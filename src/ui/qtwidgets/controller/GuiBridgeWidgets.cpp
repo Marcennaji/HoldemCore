@@ -9,6 +9,9 @@
 #include <QDebug>
 #include <QCoreApplication>
 #include <QEventLoop>
+#include <QElapsedTimer>
+#include <QThread>
+#include <QTimer>
 
 using namespace pkt::core;
 
@@ -171,6 +174,7 @@ void GuiBridgeWidgets::onNextHandRequested()
 void GuiBridgeWidgets::handleGameInitialized(int gameSpeed)
 {
     qDebug() << "Game initialized with speed:" << gameSpeed;
+    m_gameSpeed = gameSpeed;
     
     // Reset the UI for a new hand
     myTableWindow->resetForNewHand();
@@ -193,6 +197,8 @@ void GuiBridgeWidgets::handleHandCompleted(std::list<unsigned> winnerIds, int to
     winnerText += QString("- Pot: $%1").arg(totalPot);
     
     myTableWindow->updatePlayerStatus(-1, winnerText);
+    // Also show winner badge(s) over the winner area(s)
+    myTableWindow->showWinners(winnerIds, totalPot);
     myTableWindow->enablePlayerInput(false);
     
     // Show the Next Hand button when hand is completed
@@ -237,6 +243,20 @@ void GuiBridgeWidgets::handlePlayerActed(pkt::core::PlayerAction action)
     if (action.type == ActionType::PostSmallBlind) {
         myTableWindow->setDealerFromSmallBlind(static_cast<int>(action.playerId));
     }
+
+    // Insert a small, responsive delay between bot actions based on game speed.
+    // Human actions (playerId == 0) should not be artificially delayed.
+    if (action.playerId != 0) {
+        const int delayMs = computeDelayMsForBots();
+        if (delayMs > 0) {
+            QElapsedTimer timer;
+            timer.start();
+            while (timer.elapsed() < delayMs) {
+                QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+                QThread::msleep(10);
+            }
+        }
+    }
 }
 
 void GuiBridgeWidgets::handleAwaitingHumanInput(unsigned playerId, std::vector<pkt::core::ActionType> validActions)
@@ -249,24 +269,31 @@ void GuiBridgeWidgets::handleAwaitingHumanInput(unsigned playerId, std::vector<p
     // Enable UI for human player input
     myTableWindow->enablePlayerInput(true);
     
+    // Clear human's last action label just before their turn to avoid confusion
+    if (playerId == 0) {
+        myTableWindow->clearPlayerActionLabel(0);
+    }
+
     // Structured turn update
     myTableWindow->showPlayerTurn(static_cast<int>(playerId));
 }
 
 void GuiBridgeWidgets::handleHoleCardsDealt(unsigned playerId, pkt::core::HoleCards holeCards)
 {
-    qDebug() << "Hole cards dealt to player:" << playerId;
+    qDebug() << "Hole cards dealt to player " << playerId << "are" << holeCards.toString();
     
     // Show cards for human player (assuming player 0 is human for now)
     // TODO: Determine which player is the human player from session/game config
     if (playerId == 0) {
         myTableWindow->showHoleCards(playerId, holeCards);
     }
+    // Cache everyone’s hole cards for potential showdown reveal
+    myTableWindow->cacheHoleCards(static_cast<int>(playerId), holeCards);
 }
 
 void GuiBridgeWidgets::handleBoardCardsDealt(pkt::core::BoardCards boardCards)
 {
-    qDebug() << "Board cards dealt. Number of cards:" << boardCards.numCards;
+    qDebug() << "Board cards dealt are: " << boardCards.toString();
     myTableWindow->showBoardCards(boardCards);
 }
 
@@ -282,6 +309,29 @@ void GuiBridgeWidgets::handleEngineError(std::string errorMessage)
 {
     qDebug() << "Engine error:" << QString::fromStdString(errorMessage);
     myTableWindow->showErrorMessage(QString::fromStdString(errorMessage));
+}
+
+int GuiBridgeWidgets::computeDelayMsForBots() const
+{
+    // Normalize m_gameSpeed to a reasonable range [1..10] if out of bounds
+    int speed = m_gameSpeed <= 0 ? 1 : m_gameSpeed;
+    if (speed > 50) speed = 50; // clamp to avoid zero or negative delays
+
+    // Higher gameSpeed => faster pacing (shorter delay)
+    // Map speed in [1..10] to delay in [3000..500] ms inversely (clamped)
+    const int minDelay = 500;  // 0.5s
+    const int maxDelay = 3000; // 3.0s
+
+    // If speed is large (e.g., 10), delay should be near minDelay.
+    // Use a simple inverse proportion: delay = maxDelay - (speed-1) * step
+    const int maxSpeedForScale = 10;
+    int s = speed;
+    if (s > maxSpeedForScale) s = maxSpeedForScale;
+    const int step = (maxDelay - minDelay) / (maxSpeedForScale - 1); // divide range into 9 steps
+    int delay = maxDelay - (s - 1) * step;
+    if (delay < minDelay) delay = minDelay;
+    if (delay > maxDelay) delay = maxDelay;
+    return delay;
 }
 
 } // namespace pkt::ui::qtwidgets
