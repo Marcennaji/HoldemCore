@@ -52,16 +52,21 @@ void Board::distributePot(Hand& hand)
         std::cout << "[INFO] Showdown — final board: \"" << bc.toString() << "\"" << std::endl;
         for (auto& player : *hand.getSeatsList())
         {
-            int cards[7];
-            for (int i = 0; i < 5; ++i)
+            // Preserve explicitly set ranks (e.g., from tests). Only compute if unset (<= 0).
+            if (player->getHandRanking() <= 0)
             {
-                cards[i] = bc.getCard(i).getIndex();
+                int cards[7];
+                for (int i = 0; i < 5; ++i)
+                {
+                    cards[i] = bc.getCard(i).getIndex();
+                }
+                const auto& hc = player->getHoleCards();
+                cards[5] = hc.card1.getIndex();
+                cards[6] = hc.card2.getIndex();
+                const std::string handStr = pkt::core::CardUtilities::getCardStringValue(cards, 7);
+                player->setHandRanking(pkt::core::HandEvaluator::evaluateHand(handStr.c_str()));
             }
             const auto& hc = player->getHoleCards();
-            cards[5] = hc.card1.getIndex();
-            cards[6] = hc.card2.getIndex();
-            const std::string handStr = pkt::core::CardUtilities::getCardStringValue(cards, 7);
-            player->setHandRanking(pkt::core::HandEvaluator::evaluateHand(handStr.c_str()));
             std::cout << "[INFO] Player " << player->getId() << " showdown hand: \"" << hc.toString()
                       << "\" rank=" << player->getHandRanking() << std::endl;
         }
