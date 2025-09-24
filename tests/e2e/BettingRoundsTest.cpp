@@ -1260,4 +1260,140 @@ TEST_F(BettingRoundsTest, ConsecutiveHandsWorkCorrectly_RegressionTest)
     logTestMessage("Consecutive hands regression test passed");
 }
 
+// Edge case: Button folds preflop. On the flop, the first actor must be the first active
+// player to the left of the dealer seat (normally the Small Blind if not folded), and
+// MUST NOT default to the front of the actingPlayers list.
+TEST_F(BettingRoundsTest, PostflopFirstActorSkipsFoldedButton_SixPlayers)
+{
+    logTestMessage("Testing postflop first actor when Button folds preflop (6 players)");
+
+    initializeHandWithPlayers(6, gameData);
+
+    // Seat mapping used by EngineTest helpers:
+    // 0 = Dealer(Button), 1 = SB, 2 = BB, 3 = UTG, 4 = MP, 5 = CO
+    auto playerDealer = getPlayerById(myActingPlayersList, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 1);
+    auto playerBb = getPlayerById(myActingPlayersList, 2);
+    auto playerUtg = getPlayerById(myActingPlayersList, 3);
+    auto playerMp = getPlayerById(myActingPlayersList, 4);
+    auto playerCo = getPlayerById(myActingPlayersList, 5);
+
+    // Configure deterministic preflop actions to reach the flop with Button folded
+    // Preflop order (after blinds posted): UTG(3), MP(4), CO(5), BTN(0), SB(1), BB(2)
+    auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    dealerStrategy->setLastAction(GameState::Preflop, {playerDealer->getId(), ActionType::Fold});
+    playerDealer->setStrategy(std::move(dealerStrategy));
+
+    auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Call});
+    // Also define postflop passive actions to let the hand proceed
+    sbStrategy->setLastAction(GameState::Flop, {playerSb->getId(), ActionType::Check});
+    sbStrategy->setLastAction(GameState::Turn, {playerSb->getId(), ActionType::Check});
+    sbStrategy->setLastAction(GameState::River, {playerSb->getId(), ActionType::Check});
+    playerSb->setStrategy(std::move(sbStrategy));
+
+    auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    bbStrategy->setLastAction(GameState::Preflop, {playerBb->getId(), ActionType::Check});
+    bbStrategy->setLastAction(GameState::Flop, {playerBb->getId(), ActionType::Check});
+    bbStrategy->setLastAction(GameState::Turn, {playerBb->getId(), ActionType::Check});
+    bbStrategy->setLastAction(GameState::River, {playerBb->getId(), ActionType::Check});
+    playerBb->setStrategy(std::move(bbStrategy));
+
+    auto utgStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    utgStrategy->setLastAction(GameState::Preflop, {playerUtg->getId(), ActionType::Call});
+    utgStrategy->setLastAction(GameState::Flop, {playerUtg->getId(), ActionType::Check});
+    playerUtg->setStrategy(std::move(utgStrategy));
+
+    auto mpStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    mpStrategy->setLastAction(GameState::Preflop, {playerMp->getId(), ActionType::Call});
+    mpStrategy->setLastAction(GameState::Flop, {playerMp->getId(), ActionType::Check});
+    playerMp->setStrategy(std::move(mpStrategy));
+
+    auto coStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    coStrategy->setLastAction(GameState::Preflop, {playerCo->getId(), ActionType::Call});
+    coStrategy->setLastAction(GameState::Flop, {playerCo->getId(), ActionType::Check});
+    playerCo->setStrategy(std::move(coStrategy));
+
+    myHand->runGameLoop();
+
+    // Extract flop round from hand history and check the first actor
+    const auto& handHistory = myHand->getHandActionHistory();
+    auto flopRound = std::find_if(handHistory.begin(), handHistory.end(),
+                                  [](const auto& round) { return round.round == GameState::Flop; });
+
+    ASSERT_NE(flopRound, handHistory.end()) << "Should have reached flop round";
+    ASSERT_FALSE(flopRound->actions.empty()) << "Flop round should have actions";
+
+    unsigned firstActorId = flopRound->actions.front().first;
+
+    // EXPECTATION: The first actor postflop should be the first active seat to the left of the dealer.
+    // With dealer folded and SB still active, that should be SB (id=1).
+    EXPECT_EQ(firstActorId, playerSb->getId())
+        << "Postflop should start from Small Blind when Button folded preflop";
+
+    // As an extra guard: ensure it's not incorrectly starting from UTG (common bug when using actingPlayers.front())
+    EXPECT_NE(firstActorId, playerUtg->getId())
+        << "Postflop must not start from UTG when Button folded";
+}
+
+// Variant: Button and Small Blind both fold preflop. Postflop first actor should skip them and be the Big Blind.
+TEST_F(BettingRoundsTest, PostflopFirstActorSkipsFoldedButtonAndSmallBlind)
+{
+    logTestMessage("Testing postflop first actor when Button and SB fold preflop (6 players)");
+
+    initializeHandWithPlayers(6, gameData);
+
+    auto playerDealer = getPlayerById(myActingPlayersList, 0);
+    auto playerSb = getPlayerById(myActingPlayersList, 1);
+    auto playerBb = getPlayerById(myActingPlayersList, 2);
+    auto playerUtg = getPlayerById(myActingPlayersList, 3);
+    auto playerMp = getPlayerById(myActingPlayersList, 4);
+    auto playerCo = getPlayerById(myActingPlayersList, 5);
+
+    // Button folds preflop
+    auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    dealerStrategy->setLastAction(GameState::Preflop, {playerDealer->getId(), ActionType::Fold});
+    playerDealer->setStrategy(std::move(dealerStrategy));
+
+    // Small Blind also folds preflop
+    auto sbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    sbStrategy->setLastAction(GameState::Preflop, {playerSb->getId(), ActionType::Fold});
+    playerSb->setStrategy(std::move(sbStrategy));
+
+    // Others continue to reach flop
+    auto bbStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    bbStrategy->setLastAction(GameState::Preflop, {playerBb->getId(), ActionType::Check});
+    bbStrategy->setLastAction(GameState::Flop, {playerBb->getId(), ActionType::Check});
+    playerBb->setStrategy(std::move(bbStrategy));
+
+    auto utgStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    utgStrategy->setLastAction(GameState::Preflop, {playerUtg->getId(), ActionType::Call});
+    utgStrategy->setLastAction(GameState::Flop, {playerUtg->getId(), ActionType::Check});
+    playerUtg->setStrategy(std::move(utgStrategy));
+
+    auto mpStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    mpStrategy->setLastAction(GameState::Preflop, {playerMp->getId(), ActionType::Call});
+    mpStrategy->setLastAction(GameState::Flop, {playerMp->getId(), ActionType::Check});
+    playerMp->setStrategy(std::move(mpStrategy));
+
+    auto coStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
+    coStrategy->setLastAction(GameState::Preflop, {playerCo->getId(), ActionType::Call});
+    coStrategy->setLastAction(GameState::Flop, {playerCo->getId(), ActionType::Check});
+    playerCo->setStrategy(std::move(coStrategy));
+
+    myHand->runGameLoop();
+
+    const auto& handHistory = myHand->getHandActionHistory();
+    auto flopRound = std::find_if(handHistory.begin(), handHistory.end(),
+                                  [](const auto& round) { return round.round == GameState::Flop; });
+    ASSERT_NE(flopRound, handHistory.end()) << "Should have reached flop round";
+    ASSERT_FALSE(flopRound->actions.empty()) << "Flop round should have actions";
+
+    unsigned firstActorId = flopRound->actions.front().first;
+    EXPECT_EQ(firstActorId, playerBb->getId())
+        << "Postflop should start from Big Blind when Button and SB folded preflop";
+    EXPECT_NE(firstActorId, playerUtg->getId())
+        << "Postflop must not start from UTG when Button and SB folded";
+}
+
 } // namespace pkt::test

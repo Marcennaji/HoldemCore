@@ -13,7 +13,7 @@ This project demonstrates **enterprise-level software engineering** through a co
 
 - **Hexagonal Architecture** with strict separation of concerns
 - **Dependency Injection** eliminating all singleton anti-patterns  
-- **376+ automated tests** ensuring reliability and maintainability
+- **~400 automated tests on the core engine**, ensuring reliability and maintainability
 - **Cross-platform compatibility** (Windows, Linux, macOS)
 - **Multiple UI frameworks** supported through clean abstractions
 - **Continuous refactoring** - ongoing modernization and architectural improvements
@@ -117,7 +117,7 @@ player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 - **FSM for betting rounds**: Preflop → Flop → Turn → River → PostRiver
 
 ### 6. **Comprehensive Testing Strategy**
-- **376+ automated tests** (unit + integration + end-to-end)
+- **~400 automated tests on the core engine** (unit + integration + end-to-end)
 - **TDD approach** with GoogleTest framework
 - **Architecture compliance tests** validating hexagonal principles
 - **Mock services** for isolated component testing
