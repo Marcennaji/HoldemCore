@@ -227,14 +227,9 @@ void GuiBridgeWidgets::handlePotUpdated(int newPotAmount)
 
 void GuiBridgeWidgets::handlePlayerActed(pkt::core::PlayerAction action)
 {
-    qDebug() << "Player" << action.playerId << "acted:" << static_cast<int>(action.type) << "Amount:" << action.amount;
+    qDebug() << "Player" << action.playerId << "acted:" << actionTypeToString(action.type) << ", amount:" << action.amount;
     
-    QString actionText = QString("Player %1: %2").arg(action.playerId).arg(QString::fromUtf8(actionTypeToString(action.type)));
-    if (action.amount > 0) {
-        actionText += QString(" ($%1)").arg(action.amount);
-    }
-    
-    myTableWindow->updatePlayerStatus(action.playerId, actionText);
+    myTableWindow->showPlayerAction(action.playerId, action.type, action.amount);
 }
 
 void GuiBridgeWidgets::handleAwaitingHumanInput(unsigned playerId, std::vector<pkt::core::ActionType> validActions)
@@ -247,15 +242,8 @@ void GuiBridgeWidgets::handleAwaitingHumanInput(unsigned playerId, std::vector<p
     // Enable UI for human player input
     myTableWindow->enablePlayerInput(true);
     
-    // Create a helpful status message showing available actions
-    QString actionText = QString("Player %1's turn - Available: ").arg(playerId);
-    QStringList actionStrings;
-    for (const auto& action : validActions) {
-        actionStrings << QString::fromUtf8(actionTypeToString(action));
-    }
-    actionText += actionStrings.join(", ");
-    
-    myTableWindow->updatePlayerStatus(playerId, actionText);
+    // Structured turn update
+    myTableWindow->showPlayerTurn(static_cast<int>(playerId));
 }
 
 void GuiBridgeWidgets::handleHoleCardsDealt(unsigned playerId, pkt::core::HoleCards holeCards)
@@ -266,9 +254,6 @@ void GuiBridgeWidgets::handleHoleCardsDealt(unsigned playerId, pkt::core::HoleCa
     // TODO: Determine which player is the human player from session/game config
     if (playerId == 0) {
         myTableWindow->showHoleCards(playerId, holeCards);
-        myTableWindow->updatePlayerStatus(playerId, "Your cards dealt - Good luck!");
-    } else {
-        myTableWindow->updatePlayerStatus(playerId, "Cards dealt");
     }
 }
 

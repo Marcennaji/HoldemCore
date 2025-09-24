@@ -11,11 +11,24 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 # --- Collect test sources ---
-file(GLOB_RECURSE UNIT_TEST_SOURCES "unit/*.cpp")
-file(GLOB_RECURSE UNIT_TEST_HEADERS "unit/*.h")
+# Allow tests to live in nested subfolders (e.g., unit/engine/...).
+file(GLOB_RECURSE UNIT_TEST_SOURCES
+    "unit/*.cpp"
+    "unit/**/*.cpp"
+)
+file(GLOB_RECURSE UNIT_TEST_HEADERS
+    "unit/*.h"
+    "unit/**/*.h"
+)
 
-file(GLOB_RECURSE E2E_TEST_SOURCES "e2e/*.cpp")
-file(GLOB_RECURSE E2E_TEST_HEADERS "e2e/*.h")
+file(GLOB_RECURSE E2E_TEST_SOURCES
+    "e2e/*.cpp"
+    "e2e/**/*.cpp"
+)
+file(GLOB_RECURSE E2E_TEST_HEADERS
+    "e2e/*.h"
+    "e2e/**/*.h"
+)
 
 file(GLOB_RECURSE COMMON_SOURCES "common/*.cpp")
 file(GLOB_RECURSE COMMON_HEADERS "common/*.h")

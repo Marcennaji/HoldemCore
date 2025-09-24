@@ -8,6 +8,7 @@
 #include <QSpinBox>
 #include <QPixmap>
 #include <QMessageBox>
+#include <QRegularExpression>
 #include <QPoint>
 #include <QShowEvent>
 #include <QDebug>
@@ -48,11 +49,6 @@ PokerTableWindow::PokerTableWindow(pkt::core::Session* session, QWidget* parent)
     try {
         setupUi();
         connectSignals();
-        
-        // Demo: Show player state indicators (remove this in production)
-        // Activate demo to showcase the new features:
-        setDealerPosition(2);  // Set dealer at position 2
-        setActivePlayer(0);    // Highlight human player as active
         
         // Community cards start hidden (will be shown when dealt)
         for (int i = 0; i < 5; ++i) {
@@ -188,56 +184,11 @@ void PokerTableWindow::createPlayerAreas()
         
         QString playerName = player.isHuman ? "You" : QString("Bot %1").arg(i);
         player.playerGroup = new QGroupBox(playerName, this);
-        
-        // Unified styling for all players
-        player.playerGroup->setStyleSheet(
-            "QGroupBox {"
-            "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-            "    stop: 0 #f8f9fa, stop: 0.5 #e9ecef, stop: 1 #dee2e6);"
-            "  border: 1px solid #ced4da;"
-            "  border-radius: 8px;"
-            "  margin-top: 8px;"
-            "  color: #495057;"
-            "  font-weight: 500;"
-            "  font-size: 12px;"
-            "}"
-            "QGroupBox:title {"
-            "  subcontrol-origin: margin;"
-            "  left: 8px;"
-            "  padding: 0 4px 0 4px;"
-            "}"
-        );
-        
+        player.playerGroup->setStyleSheet(defaultPlayerGroupStyle());
+
         auto layout = new QVBoxLayout(player.playerGroup);
 
-        player.nameLabel = new QLabel(player.isHuman ? "You" : "Empty", this);
-        player.chipsLabel = new QLabel("$0", this);
-
-        // Unified label styling for all players
-        player.nameLabel->setStyleSheet(
-            "QLabel {"
-            "  color: #495057;"
-            "  font-size: 13px;"
-            "  font-weight: 500;"
-            "  background-color: rgba(248, 249, 250, 200);"
-            "  border: 1px solid #dee2e6;"
-            "  border-radius: 4px;"
-            "  padding: 3px;"
-            "}"
-        );
-        player.chipsLabel->setStyleSheet(
-            "QLabel {"
-            "  color: #495057;"
-            "  font-size: 12px;"
-            "  font-weight: 500;"
-            "  background-color: rgba(248, 249, 250, 180);"
-            "  border: 1px solid #dee2e6;"
-            "  border-radius: 4px;"
-            "  padding: 3px;"
-            "}"
-        );
-
-        // Hole cards in horizontal layout - larger for human player
+        // Hole cards in horizontal layout
         auto cardLayout = new QHBoxLayout();
         player.holeCard1 = new QLabel(this);
         player.holeCard2 = new QLabel(this);
@@ -262,8 +213,21 @@ void PokerTableWindow::createPlayerAreas()
         player.holeCard1->setPixmap(getCardBackPixmap());
         player.holeCard2->setPixmap(getCardBackPixmap());
 
+        // Prepare opacity effects for fold visualization
+        player.card1OpacityEffect = new QGraphicsOpacityEffect(this);
+        player.card2OpacityEffect = new QGraphicsOpacityEffect(this);
+        player.card1OpacityEffect->setOpacity(1.0);
+        player.card2OpacityEffect->setOpacity(1.0);
+        player.holeCard1->setGraphicsEffect(player.card1OpacityEffect);
+        player.holeCard2->setGraphicsEffect(player.card2OpacityEffect);
+
         cardLayout->addWidget(player.holeCard1);
         cardLayout->addWidget(player.holeCard2);
+
+        // Prominent current action label
+        player.currentActionLabel = new QLabel("", this);
+        player.currentActionLabel->setAlignment(Qt::AlignCenter);
+    player.currentActionLabel->setStyleSheet(currentActionLabelStyleBase());
 
         // Create dealer button indicator
         player.dealerButton = new QLabel("D", this);
@@ -282,13 +246,12 @@ void PokerTableWindow::createPlayerAreas()
         );
         player.dealerButton->setVisible(false); // Initially hidden
 
-        layout->addWidget(player.nameLabel);
-        layout->addWidget(player.chipsLabel);
         layout->addLayout(cardLayout);
+        layout->addWidget(player.currentActionLabel);
         layout->addWidget(player.dealerButton);
 
-        player.playerGroup->setVisible(true);
-        player.playerGroup->setFixedSize(120, 160); // Fixed size for circular positioning
+    player.playerGroup->setVisible(true);
+    player.playerGroup->setFixedSize(120, 170); // Slightly taller to fit action label
     }
 }
 
@@ -405,6 +368,76 @@ void PokerTableWindow::createActionButtons()
     m_actionLayout->addWidget(m_betButton);
     m_actionLayout->addWidget(m_raiseButton);
     m_actionLayout->addWidget(m_allInButton);
+}
+
+// Unified style helpers
+QString PokerTableWindow::defaultPlayerGroupStyle() const {
+    return QString(
+        "QGroupBox {"
+        "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
+        "    stop: 0 #f8f9fa, stop: 0.5 #e9ecef, stop: 1 #dee2e6);"
+        "  border: 1px solid #ced4da;"
+        "  border-radius: 8px;"
+        "  margin-top: 8px;"
+        "  color: #495057;"
+        "  font-weight: 500;"
+        "  font-size: 12px;"
+        "}"
+        "QGroupBox:title {"
+        "  subcontrol-origin: margin;"
+        "  left: 8px;"
+        "  padding: 0 4px 0 4px;"
+        "}"
+    );
+}
+
+QString PokerTableWindow::activePlayerGroupStyle() const {
+    return QString(
+        "QGroupBox {"
+        "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
+        "    stop: 0 #ffffff, stop: 0.5 #f0f0f0, stop: 1 #e8e8e8);"
+        "  border: 3px solid #ff6b35;"
+        "  border-radius: 12px;"
+        "  margin-top: 8px;"
+        "  color: #4a4a4a;"
+        "  font-weight: bold;"
+        "}"
+        "QGroupBox:title {"
+        "  subcontrol-origin: margin;"
+        "  left: 8px;"
+        "  padding: 0 4px 0 4px;"
+        "  color: #8b0000;"
+        "  font-weight: bold;"
+        "}"
+    );
+}
+
+QString PokerTableWindow::currentActionLabelStyleBase() const {
+    return QString(
+        "QLabel {"
+        "  color: #1f3044;"
+        "  font-size: 14px;"
+        "  font-weight: 700;"
+        "  border: 1px solid #cbd5e1;"
+        "  border-radius: 6px;"
+        "  background: rgba(255,255,255,0.9);"
+        "  padding: 4px 6px;"
+        "}"
+    );
+}
+
+QString PokerTableWindow::currentActionLabelStyleFor(const QString& action) const {
+    QString base = currentActionLabelStyleBase();
+    if (action.compare("FOLD", Qt::CaseInsensitive) == 0) {
+        return base + " QLabel { color: #b00020; border-color: #f5c2c7; background: #fde7ea; }";
+    }
+    if (action.compare("CALL", Qt::CaseInsensitive) == 0 || action.compare("CHECK", Qt::CaseInsensitive) == 0) {
+        return base + " QLabel { color: #1b5e20; border-color: #c8e6c9; background: #e8f5e9; }";
+    }
+    if (action.compare("BET", Qt::CaseInsensitive) == 0 || action.compare("RAISE", Qt::CaseInsensitive) == 0 || action.contains("ALL", Qt::CaseInsensitive)) {
+        return base + " QLabel { color: #0d47a1; border-color: #bbdefb; background: #e3f2fd; }";
+    }
+    return base;
 }
 
 void PokerTableWindow::createBettingControls()
@@ -625,19 +658,16 @@ void PokerTableWindow::refreshPlayer(int seat, const pkt::core::player::Player& 
     
     // All players (including human at seat 0) are now in m_playerComponents
     auto& playerUI = m_playerComponents[seat];
-    
-    playerUI.nameLabel->setText(QString::fromStdString(player.getName()));
-    playerUI.chipsLabel->setText(QString("$%1").arg(player.getCash()));
-    
+
     // Show player area
     playerUI.playerGroup->setVisible(true);
     
-    // Set appropriate title based on whether it's human or bot
-    if (playerUI.isHuman) {
-        playerUI.playerGroup->setTitle(QString("You - %1").arg(QString::fromStdString(player.getName())));
-    } else {
-        playerUI.playerGroup->setTitle(QString("Bot %1 - %2").arg(seat).arg(QString::fromStdString(player.getName())));
-    }
+    // Title contains name and cash
+    QString prefix = playerUI.isHuman ? "You" : QString("Bot %1").arg(seat);
+    playerUI.playerGroup->setTitle(QString("%1 — %2 ($%3)")
+        .arg(prefix)
+        .arg(QString::fromStdString(player.getName()))
+        .arg(player.getCash()));
 }
 
 void PokerTableWindow::showHoleCards(int seat, const pkt::core::HoleCards& holeCards)
@@ -647,7 +677,7 @@ void PokerTableWindow::showHoleCards(int seat, const pkt::core::HoleCards& holeC
     // All players (including human at seat 0) are now in m_playerComponents
     auto& playerUI = m_playerComponents[seat];
     
-    if (holeCards.isValid()) {
+    if (holeCards.isValid() && !playerUI.isFolded) {
         playerUI.holeCard1->setPixmap(getCardPixmap(holeCards.card1));
         playerUI.holeCard2->setPixmap(getCardPixmap(holeCards.card2));
     } else {
@@ -720,27 +750,12 @@ void PokerTableWindow::updateGamePhase(pkt::core::GameState gameState)
 
 void PokerTableWindow::updatePlayerStatus(int playerId, const QString& status)
 {
+    // We no longer parse player-specific statuses by string; controller calls structured APIs.
+    // Keep this as a no-op for playerId >= 0 to avoid false positives from free-form text.
     if (playerId == -1) {
-        // General game status - no longer used with cleaner UI
-        return;
+        return; // general game status ignored in this UI variant
     }
-    
-    if (playerId < 0 || playerId >= m_maxPlayers) {
-        return;
-    }
-    
-    // Auto-highlight active player based on status (visual feedback without clutter)
-    if (status.contains("turn", Qt::CaseInsensitive) || 
-        status.contains("action", Qt::CaseInsensitive) ||
-        status.contains("betting", Qt::CaseInsensitive)) {
-        setActivePlayer(playerId);
-    } else if (status.contains("fold", Qt::CaseInsensitive) ||
-               status.contains("sitting out", Qt::CaseInsensitive)) {
-        // Player is no longer active
-        if (m_activePlayerId == playerId) {
-            clearPlayerHighlights();
-        }
-    }
+    return;
 }
 
 void PokerTableWindow::showErrorMessage(const QString& message)
@@ -805,6 +820,61 @@ void PokerTableWindow::enablePlayerInput(bool enabled)
     }
 }
 
+// Structured UI updates (no string parsing)
+void PokerTableWindow::showPlayerAction(int playerId, pkt::core::ActionType action, int amount)
+{
+    if (playerId < 0 || playerId >= m_maxPlayers) return;
+    auto& ui = m_playerComponents[playerId];
+
+    QString text;
+    switch (action) {
+        case pkt::core::ActionType::Fold:
+            text = "FOLD";
+            applyFoldVisual(playerId, true);
+            break;
+        case pkt::core::ActionType::Check:
+            text = "CHECK";
+            break;
+        case pkt::core::ActionType::Call:
+            text = "CALL";
+            break;
+        case pkt::core::ActionType::Bet:
+            text = amount > 0 ? QString("BET %1").arg(amount) : "BET";
+            break;
+        case pkt::core::ActionType::Raise:
+            text = amount > 0 ? QString("RAISE %1").arg(amount) : "RAISE";
+            break;
+        case pkt::core::ActionType::Allin:
+            text = "ALL-IN";
+            break;
+        case pkt::core::ActionType::PostSmallBlind:
+            text = amount > 0 ? QString("SB %1").arg(amount) : "SB";
+            break;
+        case pkt::core::ActionType::PostBigBlind:
+            text = amount > 0 ? QString("BB %1").arg(amount) : "BB";
+            break;
+        default:
+            text = QString::fromUtf8(actionTypeToString(action)).toUpper();
+            break;
+    }
+
+    if (ui.currentActionLabel) {
+        ui.currentActionLabel->setText(text);
+        ui.currentActionLabel->setStyleSheet(currentActionLabelStyleFor(text));
+    }
+}
+
+void PokerTableWindow::showPlayerTurn(int playerId)
+{
+    if (playerId < 0 || playerId >= m_maxPlayers) return;
+    auto& ui = m_playerComponents[playerId];
+    if (ui.currentActionLabel) {
+        ui.currentActionLabel->setText("YOUR TURN");
+        ui.currentActionLabel->setStyleSheet(currentActionLabelStyleFor("YOUR TURN"));
+    }
+    setActivePlayer(playerId);
+}
+
 void PokerTableWindow::onHandCompleted()
 {
     // Show the Next Hand button when a hand is completed
@@ -830,11 +900,15 @@ void PokerTableWindow::resetForNewHand()
     showBoardCards(emptyBoard);
     
     // Reset all player hole cards to card backs
-    for (auto& player : m_playerComponents) {
+    for (int i = 0; i < static_cast<int>(m_playerComponents.size()); ++i) {
+        auto& player = m_playerComponents[i];
         if (player.holeCard1 && player.holeCard2) {
             player.holeCard1->setPixmap(getCardBackPixmap());
             player.holeCard2->setPixmap(getCardBackPixmap());
         }
+        // Clear action and fold visuals
+        if (player.currentActionLabel) player.currentActionLabel->clear();
+        applyFoldVisual(i, false);
     }
     
     // Clear player highlights
@@ -848,6 +922,21 @@ void PokerTableWindow::resetForNewHand()
     
     // Enable player input for new hand
     enablePlayerInput(true);
+}
+
+void PokerTableWindow::applyFoldVisual(int seat, bool folded)
+{
+    if (seat < 0 || seat >= m_maxPlayers) return;
+    auto& p = m_playerComponents[seat];
+    p.isFolded = folded;
+    if (p.card1OpacityEffect && p.card2OpacityEffect) {
+        p.card1OpacityEffect->setOpacity(folded ? 0.35 : 1.0);
+        p.card2OpacityEffect->setOpacity(folded ? 0.35 : 1.0);
+    }
+    if (folded) {
+        if (p.holeCard1) p.holeCard1->setPixmap(getCardBackPixmap());
+        if (p.holeCard2) p.holeCard2->setPixmap(getCardBackPixmap());
+    }
 }
 
 void PokerTableWindow::positionPlayersInCircle()
@@ -1021,47 +1110,8 @@ void PokerTableWindow::setActivePlayer(int playerId)
     if (playerId >= 0 && playerId < static_cast<int>(m_playerComponents.size())) {
         auto& player = m_playerComponents[playerId];
         if (player.playerGroup) {
-            // Apply active player styling with animated border effect
-            QString activeStyle;
-            if (player.isHuman) {
-                activeStyle = 
-                    "QGroupBox {"
-                    "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-                    "    stop: 0 #ffed4e, stop: 0.3 #ffd700, stop: 1 #ffb347);"
-                    "  border: 4px solid #ff6b35;"
-                    "  border-radius: 18px;"
-                    "  margin-top: 12px;"
-                    "  color: #8b4513;"
-                    "  font-weight: bold;"
-                    "  font-size: 14px;"
-                    "}"
-                    "QGroupBox:title {"
-                    "  subcontrol-origin: margin;"
-                    "  left: 12px;"
-                    "  padding: 0 8px 0 8px;"
-                    "  color: #8b0000;"
-                    "  font-weight: bold;"
-                    "}";
-            } else {
-                activeStyle = 
-                    "QGroupBox {"
-                    "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-                    "    stop: 0 #ffffff, stop: 0.5 #f0f0f0, stop: 1 #e8e8e8);"
-                    "  border: 4px solid #ff6b35;"
-                    "  border-radius: 15px;"
-                    "  margin-top: 10px;"
-                    "  color: #4a4a4a;"
-                    "  font-weight: bold;"
-                    "}"
-                    "QGroupBox:title {"
-                    "  subcontrol-origin: margin;"
-                    "  left: 10px;"
-                    "  padding: 0 5px 0 5px;"
-                    "  color: #8b0000;"
-                    "  font-weight: bold;"
-                    "}";
-            }
-            player.playerGroup->setStyleSheet(activeStyle);
+            // Apply unified active player styling
+            player.playerGroup->setStyleSheet(activePlayerGroupStyle());
         }
     }
 }
@@ -1092,44 +1142,8 @@ void PokerTableWindow::clearPlayerHighlights()
     for (size_t i = 0; i < m_playerComponents.size(); ++i) {
         auto& player = m_playerComponents[i];
         if (player.playerGroup) {
-            // Restore original styling
-            if (player.isHuman) {
-                player.playerGroup->setStyleSheet(
-                    "QGroupBox {"
-                    "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-                    "    stop: 0 #ffd700, stop: 0.3 #ffed4e, stop: 1 #e6c200);"
-                    "  border: 3px solid #b8860b;"
-                    "  border-radius: 15px;"
-                    "  margin-top: 12px;"
-                    "  color: #8b4513;"
-                    "  font-weight: bold;"
-                    "  font-size: 14px;"
-                    "}"
-                    "QGroupBox:title {"
-                    "  subcontrol-origin: margin;"
-                    "  left: 12px;"
-                    "  padding: 0 8px 0 8px;"
-                    "  color: #654321;"
-                    "}"
-                );
-            } else {
-                player.playerGroup->setStyleSheet(
-                    "QGroupBox {"
-                    "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-                    "    stop: 0 #f5f5f5, stop: 0.5 #e0e0e0, stop: 1 #d0d0d0);"
-                    "  border: 2px solid #a0a0a0;"
-                    "  border-radius: 12px;"
-                    "  margin-top: 10px;"
-                    "  color: #4a4a4a;"
-                    "  font-weight: normal;"
-                    "}"
-                    "QGroupBox:title {"
-                    "  subcontrol-origin: margin;"
-                    "  left: 10px;"
-                    "  padding: 0 5px 0 5px;"
-                    "}"
-                );
-            }
+            // Restore unified default styling
+            player.playerGroup->setStyleSheet(defaultPlayerGroupStyle());
         }
     }
     

@@ -29,17 +29,28 @@ bool PositionManager::hasPosition(PlayerPosition position, const PlayerList& act
 
 int PositionManager::playerDistanceCircularOffset(int fromId, int toId, const PlayerList& players)
 {
-    int distance = 0;
-    bool found = false;
+    // Compute index of fromId (dealer) and toId in the seating order
+    int fromIndex = -1;
+    int toIndex = -1;
+    int idx = 0;
     for (auto& p : *players)
     {
         if (p->getId() == fromId)
-            found = true;
-        else if (found)
-            distance++;
+            fromIndex = idx;
         if (p->getId() == toId)
-            break;
+            toIndex = idx;
+        ++idx;
     }
+
+    // Fallback if not found (shouldn't happen in valid games)
+    if (fromIndex < 0 || toIndex < 0)
+        return 0;
+
+    // Distance moving clockwise (increasing indices) from fromIndex to toIndex with wrap-around
+    const int n = idx; // number of players
+    int distance = toIndex - fromIndex;
+    if (distance < 0)
+        distance += n;
     return distance;
 }
 

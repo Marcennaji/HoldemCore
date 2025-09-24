@@ -96,6 +96,13 @@ void PreflopState::logStateInfo(Hand& hand)
     IDebuggableState::logStateInfo(hand);
     myServices->logger().info("Blinds: SB=" + std::to_string(mySmallBlind) +
                               ", BB=" + std::to_string(2 * mySmallBlind));
+    // Log dealer and positions to help diagnose acting order
+    myServices->logger().info("Dealer: Player " + std::to_string(hand.getDealerPlayerId()));
+    for (const auto& player : *hand.getSeatsList()) {
+        myServices->logger().info(
+            "Player " + std::to_string(player->getId()) + " (" + player->getName() + ") position=" +
+            positionToString(player->getPosition()));
+    }
     logHoleCards(hand);
 }
 

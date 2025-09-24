@@ -11,6 +11,7 @@
 #include <QGroupBox>
 #include <QWidget>
 #include <QPixmap>
+#include <QGraphicsOpacityEffect>
 #include <array>
 #include <memory>
 #include <vector>
@@ -18,6 +19,7 @@
 #include "core/engine/model/GameState.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/cards/Card.h"
+#include "core/engine/model/PlayerAction.h"
 #include "core/player/Player.h"
 #include "core/session/Session.h"
 
@@ -47,6 +49,9 @@ class PokerTableWindow : public QWidget
     void showBoardCards(const pkt::core::BoardCards& boardCards);
     void updateGamePhase(pkt::core::GameState gameState);
     void updatePlayerStatus(int playerId, const QString& status);
+  // Robust, structured updates (preferred)
+  void showPlayerAction(int playerId, pkt::core::ActionType action, int amount);
+  void showPlayerTurn(int playerId);
     void showErrorMessage(const QString& message);
     void setAvailableActions(const std::vector<pkt::core::ActionType>& actions);
     void enablePlayerInput(bool enabled);
@@ -88,6 +93,11 @@ class PokerTableWindow : public QWidget
     void createPlayerAreas();
     void createActionButtons();
     void createBettingControls();
+    // Styling helpers (avoid duplication)
+    QString defaultPlayerGroupStyle() const;
+    QString activePlayerGroupStyle() const;
+    QString currentActionLabelStyleBase() const;
+    QString currentActionLabelStyleFor(const QString& action) const;
     
     // Circular table layout helpers
     void positionPlayersInCircle();
@@ -110,11 +120,13 @@ class PokerTableWindow : public QWidget
     // Player areas (all players including human in circular layout)
     struct PlayerUIComponents {
         QGroupBox* playerGroup;
-        QLabel* nameLabel;
-        QLabel* chipsLabel;
         QLabel* holeCard1;
         QLabel* holeCard2;
         QLabel* dealerButton;  // Dealer button indicator
+    QLabel* currentActionLabel; // Prominent action text
+    QGraphicsOpacityEffect* card1OpacityEffect;
+    QGraphicsOpacityEffect* card2OpacityEffect;
+    bool isFolded = false;
         bool isHuman;  // True for human player (index 0)
     };
     std::vector<PlayerUIComponents> m_playerComponents;
@@ -149,5 +161,8 @@ class PokerTableWindow : public QWidget
     
     // Next hand control
     QPushButton* m_nextHandButton;
+    
+  // Helpers
+  void applyFoldVisual(int seat, bool folded);
 };
 } // namespace pkt::ui::qtwidgets
