@@ -282,85 +282,38 @@ void PokerTableWindow::createActionButtons()
     m_raiseButton = new QPushButton("Raise", this);
     m_allInButton = new QPushButton("All-In", this);
 
-    // Poker-themed button styles
-    QString btnStyle =
+    // Unified, sober light style for all action buttons
+    QString unifiedBtnStyle =
         "QPushButton {"
         "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-        "    stop: 0 #f0f0f0, stop: 0.3 #e0e0e0, stop: 1 #c0c0c0);"
-        "  border: 2px solid #8b6914;"
+        "    stop: 0 #ffffff, stop: 1 #f1f3f5);"
+        "  border: 1.5px solid #ced4da;"
         "  border-radius: 8px;"
         "  padding: 10px 16px;"
-        "  color: #2c1810;"
+        "  color: #343a40;"
         "  font-size: 14px;"
-        "  font-weight: bold;"
-        "  min-width: 80px;"
-        "  box-shadow: 0 2px 4px rgba(0,0,0,0.3);"
+        "  font-weight: 600;"
+        "  min-width: 84px;"
         "}"
         "QPushButton:hover {"
-        "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-        "    stop: 0 #ffd700, stop: 0.3 #ffed4e, stop: 1 #e6c200);"
-        "  border: 2px solid #b8860b;"
+        "  background: #f8f9fa;"
+        "  border-color: #adb5bd;"
         "}"
         "QPushButton:pressed {"
-        "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-        "    stop: 0 #e6c200, stop: 1 #ffd700);"
-        "  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);"
+        "  background: #e9ecef;"
         "}"
         "QPushButton:disabled {"
-        "  background-color: #d0d0d0;"
-        "  color: #888;"
-        "  border: 2px solid #a0a0a0;"
-        "  box-shadow: none;"
+        "  background: #f1f3f5;"
+        "  color: #a1a1a1;"
+        "  border-color: #e9ecef;"
         "}";
 
-    m_foldButton->setStyleSheet(
-        "QPushButton {"
-        "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-        "    stop: 0 #ff6b6b, stop: 0.3 #ff5252, stop: 1 #d32f2f);"
-        "  border: 2px solid #8b0000;"
-        "  border-radius: 8px;"
-        "  padding: 10px 16px;"
-        "  color: white;"
-        "  font-size: 14px;"
-        "  font-weight: bold;"
-        "  min-width: 80px;"
-        "}"
-        "QPushButton:hover {"
-        "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-        "    stop: 0 #ff8a80, stop: 1 #ff5252);"
-        "}"
-        "QPushButton:disabled {"
-        "  background-color: #d0d0d0;"
-        "  color: #888;"
-        "  border: 2px solid #a0a0a0;"
-        "}"
-    );
-    m_callButton->setStyleSheet(btnStyle);
-    m_checkButton->setStyleSheet(btnStyle);
-    m_betButton->setStyleSheet(btnStyle);
-    m_raiseButton->setStyleSheet(btnStyle);
-    m_allInButton->setStyleSheet(
-        "QPushButton {"
-        "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-        "    stop: 0 #4caf50, stop: 0.3 #45a049, stop: 1 #2e7d32);"
-        "  border: 2px solid #1b5e20;"
-        "  border-radius: 8px;"
-        "  padding: 10px 16px;"
-        "  color: white;"
-        "  font-size: 14px;"
-        "  font-weight: bold;"
-        "  min-width: 80px;"
-        "}"
-        "QPushButton:hover {"
-        "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-        "    stop: 0 #66bb6a, stop: 1 #4caf50);"
-        "}"
-        "QPushButton:disabled {"
-        "  background-color: #d0d0d0;"
-        "  color: #888;"
-        "  border: 2px solid #a0a0a0;"
-        "}"
-    );
+    m_foldButton->setStyleSheet(unifiedBtnStyle);
+    m_callButton->setStyleSheet(unifiedBtnStyle);
+    m_checkButton->setStyleSheet(unifiedBtnStyle);
+    m_betButton->setStyleSheet(unifiedBtnStyle);
+    m_raiseButton->setStyleSheet(unifiedBtnStyle);
+    m_allInButton->setStyleSheet(unifiedBtnStyle);
 
     m_actionLayout->addWidget(m_foldButton);
     m_actionLayout->addWidget(m_callButton);
@@ -464,7 +417,7 @@ void PokerTableWindow::createBettingControls()
     m_betSlider = new QSlider(Qt::Horizontal, this);
     m_betSpinBox = new QSpinBox(this);
 
-    m_betAmountLabel->setStyleSheet("color: #3a7ca5; font-size: 14px;");
+    m_betAmountLabel->setStyleSheet("color: #495057; font-size: 14px;");
 
     m_betSlider->setMinimum(0);
     m_betSlider->setMaximum(1000);
@@ -484,54 +437,47 @@ void PokerTableWindow::createBettingControls()
     m_bettingGroup->setMaximumWidth(350);  // Limit betting area width
     m_bettingGroup->setEnabled(false);
 
-    // Enhanced betting controls styling
+    // Enhanced betting controls styling (sober, light)
     QString sliderStyle = 
         "QSlider::groove:horizontal {"
-        "  border: 2px solid #8b4513;"
-        "  height: 12px;"
-        "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-        "    stop: 0 #654321, stop: 1 #3e2723);"
-        "  border-radius: 6px;"
+        "  border: 1px solid #ced4da;"
+        "  height: 10px;"
+        "  background: #f1f3f5;"
+        "  border-radius: 5px;"
         "}"
         "QSlider::handle:horizontal {"
-        "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-        "    stop: 0 #ffd700, stop: 1 #b8860b);"
-        "  border: 2px solid #8b6914;"
-        "  width: 24px;"
-        "  margin: -8px 0;"
-        "  border-radius: 12px;"
+        "  background: #adb5bd;"
+        "  border: 1px solid #868e96;"
+        "  width: 18px;"
+        "  margin: -6px 0;"
+        "  border-radius: 9px;"
         "}"
         "QSlider::handle:horizontal:hover {"
-        "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-        "    stop: 0 #ffed4a, stop: 1 #daa520);"
+        "  background: #868e96;"
         "}";
-    
+
     QString spinBoxStyle = 
         "QSpinBox {"
-        "  background-color: #2c1810;"
-        "  border: 2px solid #8b4513;"
+        "  background-color: #ffffff;"
+        "  border: 1px solid #ced4da;"
         "  border-radius: 6px;"
         "  padding: 6px;"
-        "  color: #ffd700;"
+        "  color: #343a40;"
         "  font-size: 14px;"
-        "  font-weight: bold;"
         "  min-width: 100px;"
         "}"
         "QSpinBox:focus {"
-        "  border: 2px solid #ffd700;"
-        "  background-color: #3d2415;"
+        "  border: 1px solid #adb5bd;"
         "}"
         "QSpinBox::up-button, QSpinBox::down-button {"
-        "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-        "    stop: 0 #8b4513, stop: 1 #654321);"
-        "  border: 1px solid #654321;"
-        "  width: 20px;"
+        "  background: #f1f3f5;"
+        "  border: 1px solid #ced4da;"
+        "  width: 18px;"
         "}"
         "QSpinBox::up-button:hover, QSpinBox::down-button:hover {"
-        "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-        "    stop: 0 #a0522d, stop: 1 #8b4513);"
+        "  background: #e9ecef;"
         "}";
-    
+
     m_betSlider->setStyleSheet(sliderStyle);
     m_betSpinBox->setStyleSheet(spinBoxStyle);
 }
@@ -544,6 +490,11 @@ void PokerTableWindow::connectSignals()
     connect(m_callButton, &QPushButton::clicked, this, &PokerTableWindow::callClicked);
     connect(m_checkButton, &QPushButton::clicked, this, &PokerTableWindow::checkClicked);
     connect(m_allInButton, &QPushButton::clicked, this, &PokerTableWindow::allInClicked);
+    // Also reset bet controls after any action click
+    connect(m_foldButton, &QPushButton::clicked, this, [this]() { resetBetControls(); });
+    connect(m_callButton, &QPushButton::clicked, this, [this]() { resetBetControls(); });
+    connect(m_checkButton, &QPushButton::clicked, this, [this]() { resetBetControls(); });
+    connect(m_allInButton, &QPushButton::clicked, this, [this]() { resetBetControls(); });
     
     // Connect bet/raise buttons to onRaiseAction slot
     connect(m_betButton, &QPushButton::clicked, this, &PokerTableWindow::onRaiseAction);
@@ -586,6 +537,8 @@ void PokerTableWindow::onRaiseAction()
     } else {
         emit raiseClicked(amount);
     }
+    // Reset the betting controls after action
+    resetBetControls();
 }
 
 void PokerTableWindow::onNextHandClicked()
@@ -745,6 +698,15 @@ void PokerTableWindow::updateGamePhase(pkt::core::GameState gameState)
     // Update the center area round state
     if (m_roundStateLabel) {
         m_roundStateLabel->setText(QString("Phase: %1").arg(phaseText));
+    }
+}
+
+void PokerTableWindow::clearActionLabelsForNewRound()
+{
+    for (auto& p : m_playerComponents) {
+        if (p.currentActionLabel) {
+            p.currentActionLabel->clear();
+        }
     }
 }
 
@@ -914,6 +876,14 @@ void PokerTableWindow::resetForNewHand()
     // Clear player highlights
     clearPlayerHighlights();
     
+    // Hide dealer indicator until blinds are posted for the new hand
+    for (auto& player : m_playerComponents) {
+        if (player.dealerButton) {
+            player.dealerButton->setVisible(false);
+        }
+    }
+    m_dealerPosition = -1;
+
     // Reset pot display
     refreshPot(0);
     
@@ -1134,6 +1104,26 @@ void PokerTableWindow::setDealerPosition(int playerId)
             player.dealerButton->setVisible(true);
         }
     }
+}
+
+void PokerTableWindow::setDealerFromSmallBlind(int smallBlindId)
+{
+    if (smallBlindId < 0 || smallBlindId >= m_maxPlayers) return;
+    // Heads-up: Button is also Small Blind
+    int dealerId = smallBlindId;
+    if (m_maxPlayers > 2) {
+        // 3+ players: Dealer is immediately to the right of Small Blind (previous seat modulo N)
+        dealerId = smallBlindId - 1;
+        if (dealerId < 0) dealerId = m_maxPlayers - 1;
+    }
+    setDealerPosition(dealerId);
+}
+
+void PokerTableWindow::resetBetControls()
+{
+    if (m_betSlider) m_betSlider->setValue(0);
+    if (m_betSpinBox) m_betSpinBox->setValue(0);
+    if (m_betAmountLabel) m_betAmountLabel->setText("Amount: $0");
 }
 
 void PokerTableWindow::clearPlayerHighlights()

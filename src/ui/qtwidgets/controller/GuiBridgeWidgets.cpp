@@ -207,10 +207,12 @@ void GuiBridgeWidgets::handlePlayerChipsUpdated(unsigned playerId, int newChips)
 
 void GuiBridgeWidgets::handleBettingRoundStarted(pkt::core::GameState gameState)
 {
-    qDebug() << "Betting round started. Game state:" << static_cast<int>(gameState);
+    qDebug() << "Betting round started. Game state: " << gameStateToString(gameState);
     
     // Update the game phase display
     myTableWindow->updateGamePhase(gameState);
+    // Clear previous players' action labels so each round shows only current actions
+    myTableWindow->clearActionLabelsForNewRound();
     
     // Clear previous round status messages
     myTableWindow->updatePlayerStatus(-1, "New betting round started");
@@ -230,6 +232,11 @@ void GuiBridgeWidgets::handlePlayerActed(pkt::core::PlayerAction action)
     qDebug() << "Player" << action.playerId << "acted:" << actionTypeToString(action.type) << ", amount:" << action.amount;
     
     myTableWindow->showPlayerAction(action.playerId, action.type, action.amount);
+
+    // Maintain dealer indicator: infer dealer from SB post event once per hand
+    if (action.type == ActionType::PostSmallBlind) {
+        myTableWindow->setDealerFromSmallBlind(static_cast<int>(action.playerId));
+    }
 }
 
 void GuiBridgeWidgets::handleAwaitingHumanInput(unsigned playerId, std::vector<pkt::core::ActionType> validActions)

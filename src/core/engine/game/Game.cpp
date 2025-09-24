@@ -44,10 +44,19 @@ void Game::startNewHand()
     // The acting players list gets modified during gameplay (players fold/go all-in)
     // We need to reset it to include all seated players for each new hand
     myActingPlayersList = std::make_shared<std::list<std::shared_ptr<Player>>>(*mySeatsList);
-    
+
+    // Determine dealer for THIS hand before creating the Hand.
+    // For the very first hand, use the dealer provided at Game construction.
+    // For subsequent hands, rotate to the next eligible dealer first.
+    if (myCurrentHand) {
+        findNextDealer();
+    }
+
+    StartData handStart = myStartData;
+    handStart.startDealerPlayerId = myDealerPlayerId;
+
     myCurrentHand = myEngineFactory->createHand(myEngineFactory, myCurrentBoard, mySeatsList, myActingPlayersList,
-                                                myGameData, myStartData);
-    findNextDealer();
+                                                myGameData, handStart);
     myCurrentHand->initialize();
     myCurrentHand->runGameLoop();
 }
@@ -55,21 +64,19 @@ void Game::startNewHand()
 void Game::findNextDealer()
 {
     bool nextDealerFound = false;
-    auto dealerPos = getPlayerListIteratorById(myCurrentHand->getSeatsList(), myDealerPlayerId);
+    // Work off the stable seats list; dealer must be among seated players
+    auto dealerPos = getPlayerListIteratorById(mySeatsList, myDealerPlayerId);
 
-    // Current dealer must exist in the seats list
-    if (dealerPos == myCurrentHand->getSeatsList()->end())
+    if (dealerPos == mySeatsList->end())
         throw Exception(__FILE__, __LINE__, EngineError::DealerNotFound);
 
-    for (size_t i = 0; i < mySeatsList->size(); ++i)
-    {
+    for (size_t i = 0; i < mySeatsList->size(); ++i) {
         ++dealerPos;
-        if (dealerPos == myCurrentHand->getSeatsList()->end())
-            dealerPos = myCurrentHand->getSeatsList()->begin();
+        if (dealerPos == mySeatsList->end())
+            dealerPos = mySeatsList->begin();
 
-        auto playerIt = getPlayerListIteratorById(myCurrentHand->getSeatsList(), (*dealerPos)->getId());
-        if (playerIt != myCurrentHand->getSeatsList()->end())
-        {
+        auto playerIt = getPlayerListIteratorById(mySeatsList, (*dealerPos)->getId());
+        if (playerIt != mySeatsList->end()) {
             myDealerPlayerId = (*playerIt)->getId();
             nextDealerFound = true;
             break;

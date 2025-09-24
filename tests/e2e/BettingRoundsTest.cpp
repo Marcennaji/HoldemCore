@@ -6,8 +6,6 @@
 #include "core/engine/utils/Helpers.h"
 #include "core/player/Helpers.h"
 #include "core/engine/game/Game.h"
-#include <chrono>
-#include <thread>
 
 using namespace pkt::core;
 using namespace pkt::core::player;
@@ -1186,7 +1184,7 @@ TEST_F(BettingRoundsTest, HeadsUpEndsImmediatelyOnFold)
 // This test verifies that Game::startNewHand() properly resets ActingPlayersList
 TEST_F(BettingRoundsTest, ConsecutiveHandsWorkCorrectly_RegressionTest)
 {
-    logTestMessage("Testing consecutive hands regression - ActingPlayersList reset");
+    logTestMessage("Testing consecutive hands regression - ActingPlayersList reset and players rotation");
 
     gameData.startMoney = 2000;
     gameData.firstSmallBlind = 10;
@@ -1217,13 +1215,25 @@ TEST_F(BettingRoundsTest, ConsecutiveHandsWorkCorrectly_RegressionTest)
     // Create Game instance to test consecutive hands
     auto game = std::make_unique<Game>(myEvents, myFactory, myBoard, mySeatsList, 
                                       0, gameData, startData);
+
+    // Also verify dealer rotation across consecutive hands.
+    // Capture the dealer for each hand from the PostSmallBlind event.
+    std::vector<unsigned> dealersPerHand;
+    const auto playersCount = static_cast<unsigned>(mySeatsList->size());
+    myEvents.onPlayerActed = [&dealersPerHand, playersCount](PlayerAction action) {
+        if (action.type == ActionType::PostSmallBlind) {
+            // For 3+ players: dealer is to the right of SB => (sb - 1) mod N
+            // Heads-up (N==2): SB is also Button; formula still yields correct result.
+            unsigned sb = action.playerId;
+            unsigned dealer = (sb + playersCount - 1) % playersCount;
+            dealersPerHand.push_back(dealer);
+        }
+    };
     
     try {
         // First startNewHand() - should work
         game->startNewHand();
-        
-        // Wait briefly for processing
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
         
         // REGRESSION TEST: Second startNewHand() - the bug was here
         // Before the fix, this would hang because ActingPlayersList was empty
@@ -1232,14 +1242,22 @@ TEST_F(BettingRoundsTest, ConsecutiveHandsWorkCorrectly_RegressionTest)
         // Wait briefly for processing
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
         
-        // If we reach here, the bug is fixed - both calls succeeded without hanging
-        SUCCEED() << "REGRESSION PASSED: Both startNewHand() calls succeeded without hanging";
+        // Verify we observed at least two hands and that dealer rotated
+        ASSERT_GE(dealersPerHand.size(), 2u)
+            << "Should have observed at least two PostSmallBlind events (one per hand)";
+
+        // With startDealerPlayerId = 0 and three players, dealers should be 0 then 1
+        EXPECT_EQ(dealersPerHand[0], 0u) << "First hand dealer should be player 0";
+        EXPECT_EQ(dealersPerHand[1], 1u) << "Second hand dealer should rotate to player 1";
+
+        // If we reach here, both startNewHand() calls succeeded and rotation worked
+        SUCCEED() << "REGRESSION PASSED: Consecutive hands ran and dealer rotated correctly";
         
     } catch (const std::exception& e) {
         FAIL() << "Regression test failed with exception: " << e.what();
     }
     
-    logTestMessage("Consecutive hands regression test passed - ActingPlayersList bug fixed");
+    logTestMessage("Consecutive hands regression test passed");
 }
 
 } // namespace pkt::test

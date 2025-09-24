@@ -55,12 +55,18 @@ class PokerTableWindow : public QWidget
     void showErrorMessage(const QString& message);
     void setAvailableActions(const std::vector<pkt::core::ActionType>& actions);
     void enablePlayerInput(bool enabled);
+  // Reset bet controls (slider/spin) to default after an action
+  void resetBetControls();
     
     // Player state indicators
     void setActivePlayer(int playerId);
     void setDealerPosition(int playerId);
+  // Convenience: compute dealer from small blind id (dealer is left of SB)
+  void setDealerFromSmallBlind(int smallBlindId);
     void clearPlayerHighlights();
     void updatePlayerStateIndicators();
+  // Clear all players' action labels at new betting round
+  void clearActionLabelsForNewRound();
     
     // Hand management
     void resetForNewHand();

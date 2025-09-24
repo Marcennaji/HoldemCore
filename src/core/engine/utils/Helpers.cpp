@@ -102,22 +102,33 @@ std::vector<ActionType> getValidActionsForPlayer(const PlayerList& actingPlayers
 std::shared_ptr<player::Player> getFirstPlayerToActPostFlop(const Hand& hand)
 {
     auto actingPlayers = hand.getActingPlayersList();
+    auto seats = hand.getSeatsList();
 
-    if (actingPlayers->empty())
+    if (actingPlayers->empty() || seats->empty())
         return nullptr;
 
-    for (auto it = actingPlayers->begin(); it != actingPlayers->end(); ++it)
-    {
-        if ((*it)->getPosition() == PlayerPosition::Button || (*it)->getPosition() == PlayerPosition::ButtonSmallBlind)
-        {
-            auto nextIt = std::next(it);
-            if (nextIt == actingPlayers->end())
-                nextIt = actingPlayers->begin();
+    // Determine the first active player to the left of the dealer, wrapping around.
+    unsigned dealerId = hand.getDealerPlayerId();
+    auto dealerIt = getPlayerListIteratorById(seats, dealerId);
 
-            return *nextIt;
-        }
+    // If we can't find the dealer in seats (shouldn't happen), fallback to first active player
+    if (dealerIt == seats->end())
+        return actingPlayers->front();
+
+    auto it = dealerIt;
+    for (size_t i = 0; i < seats->size(); ++i)
+    {
+        ++it;
+        if (it == seats->end())
+            it = seats->begin();
+
+        // Is this seated player still active (i.e., present in actingPlayers)?
+        auto activeIt = getPlayerListIteratorById(actingPlayers, (*it)->getId());
+        if (activeIt != actingPlayers->end())
+            return *activeIt;
     }
 
+    // Fallback: return first active player
     return actingPlayers->front();
 }
 
