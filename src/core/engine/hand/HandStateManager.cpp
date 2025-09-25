@@ -36,7 +36,8 @@ void HandStateManager::ensureServicesInitialized() const
 
 void HandStateManager::initializeState(Hand& hand)
 {
-    myCurrentState = std::make_unique<PreflopState>(myEvents, mySmallBlind, myDealerPlayerId);
+    // Pass services to PreflopState to maintain DI consistency and avoid local instantiation
+    myCurrentState = std::make_unique<PreflopState>(myEvents, mySmallBlind, myDealerPlayerId, myServices);
     myCurrentState->enter(hand);
 }
 

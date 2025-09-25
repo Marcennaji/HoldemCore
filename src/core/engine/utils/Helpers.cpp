@@ -179,8 +179,11 @@ std::unique_ptr<pkt::core::IHandState> computeBettingRoundNextState(pkt::core::H
 
 bool isRoundComplete(const Hand& hand)
 {
-    auto services = std::make_shared<pkt::core::AppServiceContainer>();
-    return isRoundComplete(hand, services);
+    // Prefer using the same services as the hand/state manager when possible to keep logging/config consistent.
+    // Fallback to a shared AppServiceContainer instance only if not available.
+    static std::shared_ptr<pkt::core::ServiceContainer> s_defaultServices =
+        std::make_shared<pkt::core::AppServiceContainer>();
+    return isRoundComplete(hand, s_defaultServices);
 }
 
 bool isRoundComplete(const Hand& hand, std::shared_ptr<pkt::core::ServiceContainer> services)

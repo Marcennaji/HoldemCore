@@ -15,6 +15,8 @@ class PreflopRangeCalculator
   public:
     PreflopRangeCalculator() = default;
     explicit PreflopRangeCalculator(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
+    // Allow wiring services after default construction when owned by BotStrategyBase
+    void setServices(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer) { myServices = serviceContainer; }
     float calculatePreflopCallingRange(const CurrentHandContext& ctx) const;
     float calculatePreflopRaisingRange(const CurrentHandContext& ctx) const;
 

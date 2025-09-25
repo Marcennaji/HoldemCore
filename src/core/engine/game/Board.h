@@ -7,6 +7,7 @@
 #include "core/engine/cards/Card.h"
 #include "core/interfaces/IBoard.h"
 #include "core/player/typedefs.h"
+#include "core/services/ServiceContainer.h"
 
 #include <iostream>
 #include <memory>
@@ -26,6 +27,7 @@ class Board : public IBoard
 {
   public:
     Board(unsigned dealerPosition, const GameEvents& events);
+    Board(unsigned dealerPosition, const GameEvents& events, std::shared_ptr<ServiceContainer> services);
     ~Board();
 
     void setSeatsList(pkt::core::player::PlayerList seats) override;
@@ -59,6 +61,7 @@ class Board : public IBoard
     void setPlayerNeedToShowCards(const std::list<unsigned>& p) override;
 
   private:
+    void ensureServicesInitialized() const;
   private:
     const GameEvents& myEvents;
     pkt::core::player::PlayerList mySeatsList;
@@ -73,6 +76,7 @@ class Board : public IBoard
     unsigned myDealerPlayerId;
     bool myAllInCondition{false};
     unsigned myLastActionPlayerId{0};
+  mutable std::shared_ptr<ServiceContainer> myServices;
 };
 
 } // namespace pkt::core

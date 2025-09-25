@@ -24,7 +24,9 @@ void RiverState::ensureServicesInitialized() const
 {
     if (!myServices)
     {
-        myServices = std::make_shared<pkt::core::AppServiceContainer>();
+        static std::shared_ptr<pkt::core::ServiceContainer> defaultServices =
+            std::make_shared<pkt::core::AppServiceContainer>();
+        myServices = defaultServices;
     }
 }
 

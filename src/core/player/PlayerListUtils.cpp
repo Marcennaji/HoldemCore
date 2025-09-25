@@ -33,8 +33,10 @@ PlayerListIterator PlayerListUtils::getPlayerListIteratorById(PlayerList& list, 
 
 void PlayerListUtils::updateActingPlayersList(PlayerList& myActingPlayersList)
 {
-    auto services = std::make_shared<pkt::core::AppServiceContainer>();
-    updateActingPlayersList(myActingPlayersList, services);
+    // Use a shared default services instance instead of creating a new container on each call.
+    static std::shared_ptr<pkt::core::ServiceContainer> s_defaultServices =
+        std::make_shared<pkt::core::AppServiceContainer>();
+    updateActingPlayersList(myActingPlayersList, s_defaultServices);
 }
 
 void PlayerListUtils::updateActingPlayersList(PlayerList& myActingPlayersList,

@@ -13,19 +13,32 @@
 #include "model/EngineError.h"
 
 #include <algorithm>
-#include <iostream>
 
 namespace pkt::core
 {
 using namespace pkt::core::player;
 
-Board::Board(unsigned dp, const GameEvents& events) : myDealerPlayerId(dp), myEvents(events)
+Board::Board(unsigned dp, const GameEvents& events) : myDealerPlayerId(dp), myEvents(events), myServices(nullptr)
 {
     myBoardCards.reset(); // Initialize with invalid cards
 }
 
 Board::~Board()
 {
+}
+
+Board::Board(unsigned dp, const GameEvents& events, std::shared_ptr<ServiceContainer> services)
+    : myDealerPlayerId(dp), myEvents(events), myServices(services)
+{
+    myBoardCards.reset();
+}
+
+void Board::ensureServicesInitialized() const
+{
+    if (!myServices)
+    {
+        myServices = std::make_shared<AppServiceContainer>();
+    }
 }
 
 void Board::setSeatsList(PlayerList seats)
@@ -49,7 +62,8 @@ void Board::distributePot(Hand& hand)
     const auto& bc = getBoardCards();
     if (bc.getNumCards() == 5)
     {
-        std::cout << "[INFO] Showdown — final board: \"" << bc.toString() << "\"" << std::endl;
+        ensureServicesInitialized();
+        myServices->logger().info(std::string("Showdown — final board: \"") + bc.toString() + "\"");
         for (auto& player : *hand.getSeatsList())
         {
             // Preserve explicitly set ranks (e.g., from tests). Only compute if unset (<= 0).
@@ -64,14 +78,18 @@ void Board::distributePot(Hand& hand)
                 cards[5] = hc.card1.getIndex();
                 cards[6] = hc.card2.getIndex();
                 const std::string handStr = pkt::core::CardUtilities::getCardStringValue(cards, 7);
-                player->setHandRanking(pkt::core::HandEvaluator::evaluateHand(handStr.c_str()));
+                // Use injected services to evaluate the hand instead of creating a new container
+                player->setHandRanking(pkt::core::HandEvaluator::evaluateHand(handStr.c_str(), myServices));
             }
             const auto& hc = player->getHoleCards();
-            std::cout << "[INFO] Player " << player->getId() << " showdown hand: \"" << hc.toString()
-                      << "\" rank=" << player->getHandRanking() << std::endl;
+            myServices->logger().info(
+                std::string("Player ") + std::to_string(player->getId()) +
+                " showdown hand: \"" + hc.toString() + "\" rank=" + std::to_string(player->getHandRanking())
+            );
         }
     }
-    Pot pot(totalPot, mySeatsList, myDealerPlayerId);
+    // Pass services to Pot to keep DI consistent and avoid creating a new container inside Pot
+    Pot pot(totalPot, mySeatsList, myDealerPlayerId, myServices);
     pot.distribute();
     myWinners = pot.getWinners();
 

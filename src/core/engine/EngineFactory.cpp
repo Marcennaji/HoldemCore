@@ -43,6 +43,7 @@ std::shared_ptr<Hand> EngineFactory::createHand(std::shared_ptr<EngineFactory> f
 
 std::shared_ptr<IBoard> EngineFactory::createBoard(unsigned dealerPosition)
 {
-    return std::make_shared<Board>(dealerPosition, myEvents);
+    ensureServicesInitialized();
+    return std::make_shared<Board>(dealerPosition, myEvents, myServices);
 }
 } // namespace pkt::core

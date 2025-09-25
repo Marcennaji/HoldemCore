@@ -18,13 +18,22 @@ BotStrategyBase::BotStrategyBase()
 BotStrategyBase::BotStrategyBase(std::shared_ptr<pkt::core::ServiceContainer> services) : myServices(services)
 {
     // Constructor with services injection
+    // Also ensure our PreflopRangeCalculator uses the same injected services
+    if (myServices && myPreflopRangeCalculator)
+    {
+        // Replace the default-constructed calculator with one bound to injected services
+        myPreflopRangeCalculator = std::make_unique<PreflopRangeCalculator>(myServices);
+    }
 }
 
 void BotStrategyBase::ensureServicesInitialized() const
 {
     if (!myServices)
     {
-        myServices = std::make_shared<pkt::core::AppServiceContainer>();
+        // Use a shared default container to avoid repeated allocations and to keep a consistent default
+        static std::shared_ptr<pkt::core::ServiceContainer> defaultServices =
+            std::make_shared<pkt::core::AppServiceContainer>();
+        myServices = defaultServices;
     }
 }
 

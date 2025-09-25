@@ -187,7 +187,8 @@ void Hand::dealHoleCards(size_t cardsArrayIndex)
 
         // Evaluate hand using legacy string-based system
         string humanReadableHand = CardUtilities::getCardStringValue(tempPlayerAndBoardArray, 7);
-        (*it)->setHandRanking(HandEvaluator::evaluateHand(humanReadableHand.c_str()));
+    // Prefer using existing services to avoid creating a new container inside HandEvaluator
+    (*it)->setHandRanking(HandEvaluator::evaluateHand(humanReadableHand.c_str(), myServices));
     }
 }
 

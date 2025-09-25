@@ -18,7 +18,9 @@ class IDebuggableState
 
     virtual void logStateInfo(Hand& hand)
     {
-        auto services = std::make_shared<pkt::core::AppServiceContainer>();
+    static std::shared_ptr<pkt::core::ServiceContainer> defaultServices =
+      std::make_shared<pkt::core::AppServiceContainer>();
+    auto services = defaultServices;
         logStateInfo(hand, services);
     }
 

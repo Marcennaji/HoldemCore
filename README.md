@@ -12,14 +12,14 @@ Texas Hold'em poker simulation engine demonstrating modern software engineering 
 This project demonstrates **enterprise-level software engineering** through a complete poker simulation engine:
 
 - **Hexagonal Architecture** with strict separation of concerns
-- **Dependency Injection** eliminating all singleton anti-patterns  
-- **~400 automated tests on the core engine**, ensuring reliability and maintainability
+- **Dependency Injection** 
+- **~500 automated tests on the core engine**, ensuring reliability and maintainability
 - **Cross-platform compatibility** (Windows, Linux, macOS)
 - **Multiple UI frameworks** supported through clean abstractions
 - **Continuous refactoring** - ongoing modernization and architectural improvements
 
 ### Technical Complexity
-- **✨ Complex domain modeling**: poker rules, betting rounds, hand evaluation
+- **✨ Complex domain modeling**: poker rules, betting rounds, players'ranges re-evaluation at each action
 - **🧠 AI strategy framework**: pluggable bot behaviors with range estimation
 - **🔄 State machine design**: robust game flow management
 - **📊 Statistical analysis**: player behavior tracking and persistence
@@ -32,7 +32,7 @@ This project demonstrates **enterprise-level software engineering** through a co
 - C++20 compatible compiler
 - Qt 6.x (optional, only for GUI)
 
-### Build & Test (unit tests + end-to-end tests)
+### Build & Test the core engine (unit tests + end-to-end tests)
 ```bash
 git clone https://github.com/Marcennaji/HoldemCore.git
 cd HoldemCore
@@ -73,7 +73,6 @@ Freelance Software Engineer | C++ Expert | Experienced Python Developer | Softwa
 
 
 **2. Dependency Injection Container**
-- Zero singleton patterns
 - Testable service boundaries  
 - Configurable service implementations
 - Mock-friendly architecture
@@ -117,7 +116,7 @@ player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 - **FSM for betting rounds**: Preflop → Flop → Turn → River → PostRiver
 
 ### 6. **Comprehensive Testing Strategy**
-- **~400 automated tests on the core engine** (unit + integration + end-to-end)
+- **~500 automated tests on the core engine** (unit + integration + end-to-end)
 - **TDD approach** with GoogleTest framework
 - **Architecture compliance tests** validating hexagonal principles
 - **Mock services** for isolated component testing
@@ -141,7 +140,7 @@ player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 - **Event-driven Architecture** (callback-based communication)
 
 **Cross-Platform Support:**
-- **Qt 6** (desktop UI framework)
+- **Qt 6** (Qt Widgets and Qt QML)
 - **SQLite** (embedded database)
 - **Standard C++** (portable business logic)
 
@@ -158,7 +157,8 @@ player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 - Still some important refactoring ongoing
 
 **UI & Integration (Q4 2025)**
-- Complete Qt Widgets table interface
+- Complete Qt Widgets table interface (ongoing)
+- Qt QML table interface
 - WebSocket API for remote clients
 - REST API for game state queries
 
@@ -170,18 +170,15 @@ player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 
 ## 📈 Project Metrics
 
-- **📝 19,000+ lines** of modern C++ code
-- **⚙️ 376+ tests** with high coverage
-- **📚 50+ classes** with clear responsibilities
-- **� Zero singleton** anti-patterns
-- **✅ 100% dependency injection** compliance
-- **🎯 Multi-platform** compatibility
+- **19,000+ lines** of modern C++ code
+- **~500 tests** with high coverage
+- **50+ classes** with clear responsibilities
 
 ---
 
 ## 📚 Dependencies & Licensing
 
-**Third-Party Components:**
+**Third-Party Components (easily switched if needed):**
 - [psim](https://github.com/christophschmalhofer/poker/tree/master/XPokerEval/XPokerEval.PokerSim) - Hand evaluation engine
 - [SQLite3](https://www.sqlite.org/) - Embedded database  
 - [GoogleTest](https://github.com/google/googletest) - Testing framework

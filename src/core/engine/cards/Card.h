@@ -410,8 +410,9 @@ class Deck
     /// Shuffle the deck using random number generator
     void shuffle()
     {
-        auto services = std::make_shared<pkt::core::AppServiceContainer>();
-        shuffle(services);
+        static std::shared_ptr<pkt::core::ServiceContainer> defaultServices =
+            std::make_shared<pkt::core::AppServiceContainer>();
+        shuffle(defaultServices);
     }
 
     /// Shuffle the deck using ServiceContainer
