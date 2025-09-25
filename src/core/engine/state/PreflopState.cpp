@@ -170,8 +170,9 @@ void PreflopState::setBlinds(Hand& hand)
             if (player->getCash() < blindAmount)
             {
                 // Player doesn't have enough cash to post the blind, goes all-in
-                player->addBetAmount(player->getCash());
-                blindAction = {player->getId(), ActionType::Allin, player->getCash()};
+                const int remaining = player->getCash();
+                player->addBetAmount(remaining);
+                blindAction = {player->getId(), ActionType::Allin, remaining};
                 player->setAction(*this, blindAction);
             }
             else

@@ -142,10 +142,26 @@ std::unique_ptr<pkt::core::IHandState> computeBettingRoundNextState(pkt::core::H
         return std::make_unique<pkt::core::PostRiverState>(events);
     }
 
-    // If all remaining players are all-in (no one can act further), go directly to showdown
+    // If all remaining players are all-in (no one can act further), we should still
+    // deal out the remaining community cards to reach a full 5-card board, then
+    // proceed to showdown. Decide the next state based on currentState.
     if (hand.getActingPlayersList()->empty() && hand.getPlayersInHandList()->size() >= 1)
     {
-        return std::make_unique<pkt::core::PostRiverState>(events);
+        // Inform board that showdown is due to all-in; affects reveal ordering later.
+        hand.getBoard().setAllInCondition(true);
+
+        switch (currentState)
+        {
+        case pkt::core::GameState::Preflop:
+            return std::make_unique<pkt::core::FlopState>(events);
+        case pkt::core::GameState::Flop:
+            return std::make_unique<pkt::core::TurnState>(events);
+        case pkt::core::GameState::Turn:
+            return std::make_unique<pkt::core::RiverState>(events);
+        case pkt::core::GameState::River:
+        default:
+            return std::make_unique<pkt::core::PostRiverState>(events);
+        }
     }
 
     // If round is complete, check if we can continue betting

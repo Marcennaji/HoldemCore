@@ -62,8 +62,11 @@ void ActionApplier::applyCallAction(Hand& hand, player::Player& player, PlayerAc
     // If this call uses all remaining cash, treat it as an all-in
     if (amountToCall == player.getCash())
     {
+        // Mark as all-in for history/display purposes, but do not set cash to 0 here;
+        // updateBetAndPot will subtract the amount once. Setting cash to 0 beforehand
+        // would cause a double-debit (0 - amount) leading to negative chips and an
+        // incorrect extra onPlayerChipsUpdated event.
         actionForHistory.type = ActionType::Allin;
-        player.setCash(0);
     }
 
     actionForHistory.amount = amountToCall; // store the actual call amount
@@ -96,7 +99,8 @@ void ActionApplier::applyAllinAction(Hand& hand, player::Player& player, PlayerA
     actionForHistory.amount = allinIncrement; // store only the increment in history
 
     updateBetAndPot(hand, player, allinIncrement);
-    player.setCash(0);
+    // No need to setCash(0) explicitly here; after subtracting all remaining cash,
+    // player.getCash() is already 0 and updateBetAndPot emitted the update event.
 
     if (allinIncrement > currentHighest)
     {
