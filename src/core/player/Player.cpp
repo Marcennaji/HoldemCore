@@ -23,7 +23,10 @@ using namespace std;
 
 Player::Player(const GameEvents& events, int id, std::string name, int cash) : myID(id), myName(name), myEvents(events)
 {
-    myRangeEstimator = std::make_unique<RangeEstimator>(myID);
+    // Ensure service container exists for components that depend on it
+    ensureServicesInitialized();
+
+    myRangeEstimator = std::make_unique<RangeEstimator>(myID, myServices);
     myCurrentHandContext = std::make_unique<CurrentHandContext>();
     myStatisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(myServices);
     myStatisticsUpdater->loadStatistics(name);
@@ -393,7 +396,18 @@ std::map<int, float> Player::evaluateOpponentsStrengths() const
 bool Player::isInVeryLooseMode(const int nbPlayers) const
 {
     // very loose mode = plays very often preflop (last actions in stack are mostly raises/calls/allins)
-    PlayerStatistics stats = myStatisticsUpdater->getStatistics(nbPlayers);
+    ensureServicesInitialized();
+    if (!myStatisticsUpdater)
+    {
+        // Lazily create if not present (defensive against future refactors)
+        const_cast<Player*>(this)->myStatisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(myServices);
+    }
+    int clampedPlayers = nbPlayers;
+    if (clampedPlayers < 0)
+        clampedPlayers = 0;
+    if (clampedPlayers > MAX_NUMBER_OF_PLAYERS)
+        clampedPlayers = MAX_NUMBER_OF_PLAYERS;
+    PlayerStatistics stats = myStatisticsUpdater->getStatistics(clampedPlayers);
 
     PreflopStatistics preflop = stats.preflopStatistics;
 

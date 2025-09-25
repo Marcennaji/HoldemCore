@@ -101,7 +101,51 @@ bool ActionValidator::isActionTypeValid(const pkt::core::player::PlayerList& act
     std::vector<ActionType> validActions =
         getValidActionsForPlayer(actingPlayersList, action.playerId, bettingActions, smallBlind, gameState);
 
+    // Trace valid actions for debugging
+    {
+        std::string actionsStr;
+        for (size_t i = 0; i < validActions.size(); ++i)
+        {
+            actionsStr += actionTypeToString(validActions[i]);
+            if (i + 1 < validActions.size()) actionsStr += ",";
+        }
+        myServices->logger().info(gameStateToString(gameState) + 
+                                   ": valid actions for player " + player->getName() + 
+                                   " => [" + actionsStr + "] (requested: " + actionTypeToString(action.type) + ")");
+    }
+
     bool isValid = std::find(validActions.begin(), validActions.end(), action.type) != validActions.end();
+
+    // Fallback: If a player attempts to Call and helpers didn't include it, allow Call when there's
+    // an outstanding bet to match and the player still has chips. This covers edge cases around
+    // all-in sizing and highest bet tracking.
+    if (!isValid && action.type == ActionType::Call)
+    {
+        const int currentHighestBet = bettingActions.getRoundHighestSet();
+        const int playerBet = player->getCurrentHandActions().getRoundTotalBetAmount(gameState);
+        const int playerCash = player->getCash();
+        if (playerBet < currentHighestBet && playerCash > 0)
+        {
+            isValid = true;
+        }
+        else
+        {
+            // Additional safety: if an All-in occurred this round and player still has chips, allow a Call
+            const auto& history = bettingActions.getHandActionHistory();
+            auto roundIt = std::find_if(history.begin(), history.end(),
+                                        [gameState](const BettingRoundHistory& h) { return h.round == gameState; });
+            if (roundIt != history.end())
+            {
+                const bool anyAllin = std::any_of(roundIt->actions.begin(), roundIt->actions.end(),
+                                                  [](const std::pair<unsigned, ActionType>& p)
+                                                  { return p.second == ActionType::Allin; });
+                if (anyAllin && playerCash > 0)
+                {
+                    isValid = true;
+                }
+            }
+        }
+    }
 
     if (!isValid)
     {

@@ -53,7 +53,33 @@ void ActionApplier::apply(Hand& hand, const PlayerAction& action)
 void ActionApplier::applyCallAction(Hand& hand, player::Player& player, PlayerAction& actionForHistory,
                                     int currentHighest, int playerBet)
 {
-    int amountToCall = currentHighest - playerBet;
+    // Derive an effective highest bet to call. In some edge cases (e.g., an all-in shove),
+    // the round highest may not have been updated yet OR the game may have advanced to
+    // PostRiver to fast-forward streets. In those cases, compute from both round totals and
+    // hand totals and use the larger required amount.
+    int derivedHighestRound = currentHighest;
+    const auto state = hand.getStateManager()->getGameState();
+
+    int playerRoundBet = playerBet;
+    int playerHandTotal = player.getCurrentHandActions().getHandTotalBetAmount();
+
+    int derivedHighestHand = 0;
+
+    for (const auto& p : *hand.getSeatsList())
+    {
+        // Highest absolute committed this round (for regular call sizing in-round)
+        derivedHighestRound = std::max(derivedHighestRound, p->getCurrentHandActions().getRoundTotalBetAmount(state));
+        // Highest absolute committed to the hand (covers fast-forwarded all-in scenarios)
+        derivedHighestHand = std::max(derivedHighestHand, p->getCurrentHandActions().getHandTotalBetAmount());
+    }
+
+    int amountToCallRound = std::max(0, derivedHighestRound - playerRoundBet);
+    int amountToCallHand = std::max(0, derivedHighestHand - playerHandTotal);
+
+    // Prefer the larger of the two so we never undercall in fast-forwarded all-in cases.
+    int amountToCall = std::max(amountToCallRound, amountToCallHand);
+
+    // Clamp to player's available cash (call can be an all-in for the caller)
     if (player.getCash() < amountToCall)
     {
         amountToCall = player.getCash();
@@ -95,16 +121,24 @@ void ActionApplier::applyBetAction(Hand& hand, player::Player& player, const Pla
 void ActionApplier::applyAllinAction(Hand& hand, player::Player& player, PlayerAction& actionForHistory,
                                      int currentHighest)
 {
+    // The increment equals all remaining cash; the absolute "to" amount is previous bet + increment.
+    const auto state = hand.getStateManager()->getGameState();
+    int playerRoundBetBefore = player.getCurrentHandActions().getRoundTotalBetAmount(state);
     int allinIncrement = player.getCash();    // The increment is all remaining cash
     actionForHistory.amount = allinIncrement; // store only the increment in history
 
+    // Compute player's absolute total committed for this round after the shove (pre-history update)
+    int playerBetAfter = playerRoundBetBefore + allinIncrement;
+
+    // Apply the increment to the player's bet and pot
     updateBetAndPot(hand, player, allinIncrement);
     // No need to setCash(0) explicitly here; after subtracting all remaining cash,
     // player.getCash() is already 0 and updateBetAndPot emitted the update event.
 
-    if (allinIncrement > currentHighest)
+    // If this all-in increases the absolute highest "to" amount, update it accordingly
+    if (playerBetAfter > currentHighest)
     {
-        hand.getBettingActions()->updateRoundHighestSet(allinIncrement);
+        hand.getBettingActions()->updateRoundHighestSet(playerBetAfter);
         setLastRaiserForCurrentRound(hand, player.getId());
     }
 }

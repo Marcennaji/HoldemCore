@@ -13,7 +13,12 @@ PlayerStatisticsUpdater::PlayerStatisticsUpdater(std::shared_ptr<pkt::core::Serv
 
 const PlayerStatistics& PlayerStatisticsUpdater::getStatistics(const int nbPlayers) const
 {
-    return myStatistics[nbPlayers];
+    int clamped = nbPlayers;
+    if (clamped < 0)
+        clamped = 0;
+    if (clamped > MAX_NUMBER_OF_PLAYERS)
+        clamped = MAX_NUMBER_OF_PLAYERS;
+    return myStatistics[clamped];
 }
 void PlayerStatisticsUpdater::resetPlayerStatistics()
 {

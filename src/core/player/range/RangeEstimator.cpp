@@ -184,8 +184,11 @@ void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(const CurrentHan
 
     PreflopStatistics preflop = ctx.personalContext.statistics.preflopStatistics;
 
-    // if no raise and the BB checks :
-    if (ctx.personalContext.actions.currentHandActions.getActions(GameState::Preflop).back().type == ActionType::Check)
+    // if no raise and the BB checks : guard against empty action list before accessing back()
+    {
+        const auto& preActions =
+            ctx.personalContext.actions.currentHandActions.getActions(GameState::Preflop);
+        if (!preActions.empty() && preActions.back().type == ActionType::Check)
     {
 
         if (preflop.hands >= MIN_HANDS_STATISTICS_ACCURATE)
@@ -198,6 +201,7 @@ void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(const CurrentHan
             setEstimatedRange(RangeRefiner::deduceRange(getEstimatedRange(),
                                                         getStringRange(nbPlayers, getStandardRaisingRange(nbPlayers))));
         }
+    }
     }
 
     if (getEstimatedRange() == "")
@@ -345,7 +349,14 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(const CurrentHandCo
             myServices->handEvaluationEngine().analyzeHand(stringHand, ctx.commonContext.stringBoard);
 
         bool removeHand = false;
-        ActionType myAction = ctx.personalContext.actions.currentHandActions.getActions(GameState::Turn).back().type;
+        const auto& turnActions =
+            ctx.personalContext.actions.currentHandActions.getActions(GameState::Turn);
+        if (turnActions.empty())
+        {
+            // no turn action, so we can't remove any hand
+            return;
+        }
+        ActionType myAction = turnActions.back().type;
 
         if (myAction == ActionType::Call)
         {
@@ -411,7 +422,7 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(const CurrentHandC
     const string originalEstimatedRange = getEstimatedRange();
     string unplausibleRanges;
 
-    myServices->logger().verbose("\tPlausible range on rivepostFlopFlags, before update :\t" + getEstimatedRange());
+    myServices->logger().verbose("\tPlausible range on river, before update :\t" + getEstimatedRange());
 
     // update my unplausible hands (unplausible to my opponents eyes), given what I did on river
 
@@ -438,28 +449,31 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(const CurrentHandC
             myServices->handEvaluationEngine().analyzeHand(stringHand, ctx.commonContext.stringBoard);
 
         bool removeHand = false;
-
-        if (ctx.personalContext.actions.currentHandActions.getActions(GameState::River).back().type == ActionType::Call)
+        const auto& riverActions =
+            ctx.personalContext.actions.currentHandActions.getActions(GameState::River);
+        if (riverActions.empty())
+        {
+            // no river action, so we can't remove any hand
+            return;
+        }
+        const ActionType lastRiverAction = riverActions.back().type;
+        if (lastRiverAction == ActionType::Call)
         {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverCall(postFlopFlags, ctx);
         }
-        else if (ctx.personalContext.actions.currentHandActions.getActions(GameState::River).back().type ==
-                 ActionType::Check)
+        else if (lastRiverAction == ActionType::Check)
         {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverCheck(postFlopFlags, ctx);
         }
-        else if (ctx.personalContext.actions.currentHandActions.getActions(GameState::River).back().type ==
-                 ActionType::Raise)
+        else if (lastRiverAction == ActionType::Raise)
         {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverRaise(postFlopFlags, ctx);
         }
-        else if (ctx.personalContext.actions.currentHandActions.getActions(GameState::River).back().type ==
-                 ActionType::Bet)
+        else if (lastRiverAction == ActionType::Bet)
         {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverBet(postFlopFlags, ctx);
         }
-        else if (ctx.personalContext.actions.currentHandActions.getActions(GameState::River).back().type ==
-                 ActionType::Allin)
+        else if (lastRiverAction == ActionType::Allin)
         {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenRiverAllin(postFlopFlags, ctx);
         }

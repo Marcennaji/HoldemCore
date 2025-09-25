@@ -329,7 +329,7 @@ bool PreflopRangeCalculator::shouldAdjustCallForLooseRaiser(const CurrentHandCon
     std::shared_ptr<Player> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
     const PlayerPosition myPosition = ctx.personalContext.position;
 
-    return lastRaiser->isInVeryLooseMode(ctx.commonContext.playersContext.nbPlayers) &&
+    return lastRaiser && lastRaiser->isInVeryLooseMode(ctx.commonContext.playersContext.nbPlayers) &&
            (myPosition >= Late || myPosition == SmallBlind || myPosition == BigBlind) && nbCalls == 0 && nbRaises == 1;
 }
 
@@ -344,7 +344,7 @@ bool PreflopRangeCalculator::shouldCallForAllIn(const CurrentHandContext& ctx, i
     const PlayerPosition myPosition = ctx.personalContext.position;
 
     return ctx.personalContext.m > 10 && potOdd <= 20 && nbRaises < 2 &&
-           lastRaiser->getLastAction().type == ActionType::Allin &&
+        lastRaiser && lastRaiser->getLastAction().type == ActionType::Allin &&
            (myPosition >= Late || myPosition == SmallBlind || myPosition == BigBlind);
 }
 

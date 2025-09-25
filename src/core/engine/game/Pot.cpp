@@ -38,17 +38,36 @@ void Pot::distribute()
     while (hasRemainingChips(remaining))
     {
         unsigned level = nextLevelAmount(remaining);
+        // Eligible winners are non-folded players who have contributed at least "level".
         auto eligible = eligibleContributors(contributions, level);
+        // Contributors to the pot at this level include ALL players (folded or not) whose
+        // remaining contribution is at least "level". Their chips are in the pot even if
+        // they cannot win it.
+        size_t contributorsCount = 0;
+        for (size_t idx = 0; idx < contributions.size(); ++idx)
+        {
+            if (contributions[idx] >= level)
+                ++contributorsCount;
+        }
 
-        if (eligible.empty())
+        if (contributorsCount == 0)
             break;
 
-        int potLevel = static_cast<int>(eligible.size() * level);
+        int potLevel = static_cast<int>(contributorsCount * level);
         if (potLevel > myTotal)
         {
             myServices->logger().info("Pot level " + std::to_string(potLevel) +
                                       " exceeds total available chips : " + std::to_string(myTotal));
             potLevel = myTotal;
+        }
+
+        // If no non-folded player is eligible to win this pot (e.g., only folders contributed
+        // to this level), then there is no one to award; stop and let finalizeDistribution
+        // split the remaining total among already-determined winners (or non-folded players as
+        // a last resort). This prevents incorrectly fabricating a winner for this level.
+        if (eligible.empty())
+        {
+            break;
         }
 
         auto winners = determineWinners(eligible, level);

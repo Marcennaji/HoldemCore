@@ -179,7 +179,8 @@ std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(co
     }
 
     // Adjust range for loose/aggressive mode
-    if (ctx.commonContext.playersContext.preflopLastRaiser->isInVeryLooseMode(nbPlayers))
+    if (ctx.commonContext.playersContext.preflopLastRaiser &&
+        ctx.commonContext.playersContext.preflopLastRaiser->isInVeryLooseMode(nbPlayers))
     {
         if (range < 40)
         {

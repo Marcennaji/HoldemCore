@@ -66,6 +66,12 @@ class GuiBridgeWidgets : public QObject
   // Game speed for UI pacing (higher = faster; used to compute delay between bot actions)
   int m_gameSpeed = 1;
 
+  // Track human player's last known chips to enforce auto-fold at 0
+  int m_humanChips = -1;
+
+  // Helper: auto-fold human if out of chips
+  void autoFoldHumanIfBroke();
+
   // Compute UI delay in milliseconds based on m_gameSpeed (range: 500ms..3000ms)
   int computeDelayMsForBots() const;
 };

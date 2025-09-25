@@ -300,17 +300,16 @@ void PokerTableWindow::createPlayerAreas()
 
         // Create dealer button indicator (kept outside the player's layout so we can overlay on the border)
         player.dealerButton = new QLabel("D", this);
-        player.dealerButton->setFixedSize(25, 25);
+        player.dealerButton->setFixedSize(18, 18);
         player.dealerButton->setAlignment(Qt::AlignCenter);
         player.dealerButton->setStyleSheet(
             "QLabel {"
-            "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-            "    stop: 0 #ffd700, stop: 1 #daa520);"
-            "  border: 2px solid #8b6914;"
-            "  border-radius: 12px;"
-            "  color: #000000;"
-            "  font-weight: bold;"
-            "  font-size: 12px;"
+            "  background: rgba(255, 215, 0, 0.85);"
+            "  border: 1px solid #b8860b;"
+            "  border-radius: 9px;"
+            "  color: #202020;"
+            "  font-weight: 600;"
+            "  font-size: 10px;"
             "}"
         );
         player.dealerButton->setVisible(false); // Initially hidden
@@ -1266,7 +1265,7 @@ void PokerTableWindow::positionCenterArea()
 
 void PokerTableWindow::positionDealerButtons()
 {
-    // Place the dealer "D" badge at the top-right corner, centered on the QGroupBox border
+    // Place the dealer "D" badge at the bottom-right corner, slightly overlapping the QGroupBox border
     for (auto& p : m_playerComponents) {
         if (!p.playerGroup || !p.dealerButton || !p.dealerButton->isVisible()) continue;
         const QWidget* g = p.playerGroup;
@@ -1274,8 +1273,9 @@ void PokerTableWindow::positionDealerButtons()
         const QPoint groupTopLeft = g->pos();
         const int badgeW = p.dealerButton->width();
         const int badgeH = p.dealerButton->height();
-        const int x = groupTopLeft.x() + g->width() - badgeW / 2; // overlap half outside to sit on border
-        const int y = groupTopLeft.y() - badgeH / 2;               // half above to sit on border line
+        // Bottom-right corner with a small overlap
+        const int x = groupTopLeft.x() + g->width() - badgeW + 4;  // overlap 4px outside on X
+        const int y = groupTopLeft.y() + g->height() - badgeH + 4; // overlap 4px outside on Y
         p.dealerButton->move(x, y);
         p.dealerButton->raise();
     }

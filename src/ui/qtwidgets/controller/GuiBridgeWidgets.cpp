@@ -223,6 +223,14 @@ void GuiBridgeWidgets::handlePlayerChipsUpdated(unsigned playerId, int newChips)
     if (myTableWindow) {
         myTableWindow->updatePlayerCash(playerId, newChips);
     }
+
+    // Track human chips and enforce auto-fold at 0
+    if (playerId == 0) {
+        m_humanChips = newChips;
+        if (m_humanChips <= 0) {
+            autoFoldHumanIfBroke();
+        }
+    }
 }
 
 void GuiBridgeWidgets::handleBettingRoundStarted(pkt::core::GameState gameState)
@@ -281,6 +289,11 @@ void GuiBridgeWidgets::handleAwaitingHumanInput(unsigned playerId, std::vector<p
     myTableWindow->setAvailableActions(validActions);
     
     // Enable UI for human player input
+    // If human has 0 chips, auto-fold and do not enable input
+    if (playerId == 0 && m_humanChips == 0) {
+        autoFoldHumanIfBroke();
+        return;
+    }
     myTableWindow->enablePlayerInput(true);
     
     // Clear human's last action label just before their turn to avoid confusion
@@ -290,6 +303,18 @@ void GuiBridgeWidgets::handleAwaitingHumanInput(unsigned playerId, std::vector<p
 
     // Structured turn update
     myTableWindow->showPlayerTurn(static_cast<int>(playerId));
+}
+
+void GuiBridgeWidgets::autoFoldHumanIfBroke()
+{
+    if (m_humanChips != 0) return; // only trigger at exactly 0
+    // Disable input and submit a Fold action automatically
+    if (myTableWindow) myTableWindow->enablePlayerInput(false);
+    PlayerAction action{0, ActionType::Fold, 0};
+    if (myCurrentHumanStrategy) {
+        myCurrentHumanStrategy->setPlayerAction(action);
+        myCurrentHumanStrategy = nullptr;
+    }
 }
 
 void GuiBridgeWidgets::handleHoleCardsDealt(unsigned playerId, pkt::core::HoleCards holeCards)
