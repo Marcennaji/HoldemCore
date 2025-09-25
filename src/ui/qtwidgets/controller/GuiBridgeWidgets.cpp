@@ -75,6 +75,10 @@ void GuiBridgeWidgets::connectEventsToUi(pkt::core::GameEvents& events)
     events.onBoardCardsDealt = [this](BoardCards boardCards) {
         this->handleBoardCardsDealt(boardCards);
     };
+
+    events.onShowdownRevealOrder = [this](std::vector<unsigned> revealOrder) {
+        this->handleShowdownRevealOrder(revealOrder);
+    };
     
     events.onInvalidPlayerAction = [this](unsigned playerId, PlayerAction invalidAction, std::string reason) {
         this->handleInvalidPlayerAction(playerId, invalidAction, reason);
@@ -184,6 +188,13 @@ void GuiBridgeWidgets::handleGameInitialized(int gameSpeed)
     myTableWindow->refreshPot(0); // Reset pot to 0
     myTableWindow->updateGamePhase(pkt::core::GameState::Preflop);
     myTableWindow->enablePlayerInput(false); // Wait for cards to be dealt
+}
+
+void GuiBridgeWidgets::handleShowdownRevealOrder(const std::vector<unsigned>& revealOrder)
+{
+    if (!myTableWindow) return;
+    // Reveal each player's cached hole cards in the provided order
+    myTableWindow->revealShowdownOrder(revealOrder);
 }
 
 void GuiBridgeWidgets::handleHandCompleted(std::list<unsigned> winnerIds, int totalPot)

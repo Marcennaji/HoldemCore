@@ -46,6 +46,7 @@ class GuiBridgeWidgets : public QObject
     // Event handlers for GameEvents - these will be connected to the game engine events
     void handleGameInitialized(int gameSpeed);
     void handleHandCompleted(std::list<unsigned> winnerIds, int totalPot);
+    void handleShowdownRevealOrder(const std::vector<unsigned>& revealOrder);
     void handlePlayerChipsUpdated(unsigned playerId, int newChips);
     void handleBettingRoundStarted(pkt::core::GameState gameState);
     void handlePotUpdated(int newPotAmount);

@@ -171,24 +171,16 @@ void Hand::dealHoleCards(size_t cardsArrayIndex)
             myEvents.onHoleCardsDealt((*it)->getId(), holeCards);
         }
 
-        // Create 7-card array for hand evaluation (2 hole + 5 board)
-        int tempPlayerAndBoardArray[7];
-
-        // Get board cards for evaluation
+        // Build evaluator string with correct ordering: HOLE cards first, then current BOARD cards.
+        // Avoid including invalid board placeholders at preflop to prevent identical ranks.
         BoardCards boardCards = myBoard->getBoardCards();
-        for (int boardIndex = 0; boardIndex < 5; boardIndex++)
+        std::string humanReadableHand = holeCardList[0].toString() + std::string(" ") + holeCardList[1].toString();
+        if (boardCards.getNumCards() > 0)
         {
-            tempPlayerAndBoardArray[boardIndex] = boardCards.getCard(boardIndex).getIndex();
+            humanReadableHand += std::string(" ") + boardCards.toString();
         }
-
-        // Add hole cards
-        tempPlayerAndBoardArray[5] = holeCardList[0].getIndex();
-        tempPlayerAndBoardArray[6] = holeCardList[1].getIndex();
-
-        // Evaluate hand using legacy string-based system
-        string humanReadableHand = CardUtilities::getCardStringValue(tempPlayerAndBoardArray, 7);
-    // Prefer using existing services to avoid creating a new container inside HandEvaluator
-    (*it)->setHandRanking(HandEvaluator::evaluateHand(humanReadableHand.c_str(), myServices));
+        // Prefer using existing services to avoid creating a new container inside HandEvaluator
+        (*it)->setHandRanking(HandEvaluator::evaluateHand(humanReadableHand.c_str(), myServices));
     }
 }
 

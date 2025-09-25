@@ -51,14 +51,13 @@ class Board : public IBoard
 
     void distributePot() override { throw std::runtime_error("distributePot is deprecated"); }
 
-    void distributePot(Hand& hand) override;
-    void determinePlayerNeedToShowCards() override;
+  void distributePot(Hand& hand) override;
+  void determineShowdownRevealOrder() override;
 
     std::list<unsigned> getWinners() const override;
     void setWinners(const std::list<unsigned>& w) override;
 
-    std::list<unsigned> getPlayerNeedToShowCards() const override;
-    void setPlayerNeedToShowCards(const std::list<unsigned>& p) override;
+  std::vector<unsigned> getShowdownRevealOrder() const override { return myShowdownRevealOrder; }
 
   private:
     void ensureServicesInitialized() const;
@@ -68,7 +67,7 @@ class Board : public IBoard
     pkt::core::player::PlayerList myActingPlayersList;
 
     std::list<unsigned> myWinners;
-    std::list<unsigned> myPlayerNeedToShowCards;
+  std::vector<unsigned> myShowdownRevealOrder; // ordered, deduplicated, preserves reveal sequence
 
     BoardCards myBoardCards;
     int myPot{0};

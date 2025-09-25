@@ -12,6 +12,8 @@
 #include <QPoint>
 #include <QShowEvent>
 #include <QDebug>
+#include <QCoreApplication>
+#include <QEventLoop>
 #include <cmath>
 #include <algorithm>
 
@@ -965,17 +967,21 @@ void PokerTableWindow::showWinners(const std::list<unsigned>& winnerIds, int tot
         }
     }
 
-    // At showdown, reveal hole cards for every player who did not fold (not only winners)
-    if (m_reachedShowdown || m_sawRiver) {
-        for (int i = 0; i < m_maxPlayers; ++i) {
-            if (i < static_cast<int>(m_playerComponents.size()) && i < static_cast<int>(m_cachedHoleCards.size())) {
-                auto& ui = m_playerComponents[i];
-                const auto& hc = m_cachedHoleCards[static_cast<size_t>(i)];
-                if (!ui.isFolded && hc.isValid()) {
-                    showHoleCards(i, hc);
-                }
+}
+
+void PokerTableWindow::revealShowdownOrder(const std::vector<unsigned>& revealOrder)
+{
+    // Reveal strictly according to engine-provided order. Use cached hole cards.
+    for (unsigned id : revealOrder) {
+        if (id < m_playerComponents.size() && id < m_cachedHoleCards.size()) {
+            auto& ui = m_playerComponents[id];
+            const auto& hc = m_cachedHoleCards[id];
+            if (!ui.isFolded && hc.isValid()) {
+                showHoleCards(static_cast<int>(id), hc);
             }
         }
+        // slight UI pacing to make reveal readable
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 1);
     }
 }
 

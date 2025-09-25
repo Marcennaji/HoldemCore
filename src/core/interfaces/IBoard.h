@@ -42,13 +42,14 @@ class IBoard
 
     virtual void distributePot() = 0;
     virtual void distributePot(Hand& hand) { throw std::runtime_error("Not implemented"); }
-    virtual void determinePlayerNeedToShowCards() = 0;
+  // Compute the ordered list of player IDs who must reveal at showdown (domain logic)
+  virtual void determineShowdownRevealOrder() = 0;
 
     virtual std::list<unsigned> getWinners() const = 0;
     virtual void setWinners(const ::std::list<unsigned>& winners) = 0;
 
-    virtual std::list<unsigned> getPlayerNeedToShowCards() const = 0;
-    virtual void setPlayerNeedToShowCards(const ::std::list<unsigned>& playerNeedToShowCards) = 0;
+  // Ordered vector accessor for UI consumption
+  virtual std::vector<unsigned> getShowdownRevealOrder() const = 0;
 };
 
 } // namespace pkt::core

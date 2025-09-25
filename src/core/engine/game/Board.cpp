@@ -13,6 +13,7 @@
 #include "model/EngineError.h"
 
 #include <algorithm>
+#include <unordered_set>
 
 namespace pkt::core
 {
@@ -63,32 +64,28 @@ void Board::distributePot(Hand& hand)
     if (bc.getNumCards() == 5)
     {
         ensureServicesInitialized();
-        myServices->logger().info(std::string("Showdown — final board: \"") + bc.toString() + "\"");
+        // Use ASCII hyphen to avoid mojibake on Windows consoles
+        myServices->logger().info(std::string("Showdown - final board: \"") + bc.toString() + "\"");
         for (auto& player : *hand.getSeatsList())
         {
-            // Preserve explicitly set ranks (e.g., from tests). Only compute if unset (<= 0).
-            if (player->getHandRanking() <= 0)
+            const auto& hc = player->getHoleCards();
+            // In real games, hole cards are valid; recompute to ensure final ranks.
+            // In unit tests that preset ranks, hole cards may be invalid; skip recompute to respect presets.
+            if (hc.isValid())
             {
-                int cards[7];
-                for (int i = 0; i < 5; ++i)
-                {
-                    cards[i] = bc.getCard(i).getIndex();
-                }
-                const auto& hc = player->getHoleCards();
-                cards[5] = hc.card1.getIndex();
-                cards[6] = hc.card2.getIndex();
-                const std::string handStr = pkt::core::CardUtilities::getCardStringValue(cards, 7);
-                // Use injected services to evaluate the hand instead of creating a new container
+                // Build evaluator string strictly as: HOLE then BOARD (e.g., "Ah Ad 2c 7d 9h 4s 3c").
+                std::string handStr = hc.toString() + std::string(" ") + bc.toString();
+                // Extra diagnostic log to verify ordering at runtime.
+                myServices->logger().info(std::string("[debug] Recompute showdown with: \"") + handStr + "\"");
                 player->setHandRanking(pkt::core::HandEvaluator::evaluateHand(handStr.c_str(), myServices));
             }
-            const auto& hc = player->getHoleCards();
             myServices->logger().info(
                 std::string("Player ") + std::to_string(player->getId()) +
-                " showdown hand: \"" + hc.toString() + "\" rank=" + std::to_string(player->getHandRanking())
+                " showdown hand: \"" + player->getHoleCards().toString() + "\" rank=" + std::to_string(player->getHandRanking())
             );
         }
     }
-    // Pass services to Pot to keep DI consistent and avoid creating a new container inside Pot
+
     Pot pot(totalPot, mySeatsList, myDealerPlayerId, myServices);
     pot.distribute();
     myWinners = pot.getWinners();
@@ -97,141 +94,123 @@ void Board::distributePot(Hand& hand)
         myEvents.onHandCompleted(myWinners, totalPot);
 }
 
-void Board::determinePlayerNeedToShowCards()
+// Helper methods for showdown reveal logic encapsulated in this translation unit
+namespace {
+    inline bool isNonFolded(const pkt::core::player::Player& p) {
+        return p.getLastAction().type != pkt::core::ActionType::Fold;
+    }
+
+    inline int contribution(const pkt::core::player::Player& p) {
+        return p.getCashAtHandStart() - p.getCash();
+    }
+
+    using Level = std::pair<int,int>; // (handRank, maxContributionAtLevel)
+
+    // Update "levels" with a candidate (rank, contrib) and decide whether they must reveal per domain rules.
+    // Returns true if candidate must reveal and mutates levels accordingly.
+    bool processCandidateLevels(std::list<Level>& levels, int rank, int contrib) {
+        if (levels.empty()) {
+            levels.emplace_back(rank, contrib);
+            return true;
+        }
+        for (auto it = levels.begin(); it != levels.end(); ++it) {
+            const bool higherRank = rank > it->first;
+            const bool equalRank = rank == it->first;
+
+            if (higherRank) {
+                auto next = it; ++next;
+                if (next == levels.end()) {
+                    // Higher than the last known level → reveal, create a new top level.
+                    levels.emplace_back(rank, contrib);
+                    return true;
+                }
+                // Otherwise, a higher rank exists before a stronger top level; continue scanning.
+                continue;
+            }
+
+            if (equalRank) {
+                auto next = it; ++next;
+                // Reveal if this equals the current level and either there is no stricter next level,
+                // or the contribution exceeds the next level's threshold.
+                if (next == levels.end() || contrib > next->second) {
+                    if (contrib > it->second) it->second = contrib; // raise current level threshold
+                    return true;
+                }
+                return false;
+            }
+
+            // Lower rank: reveal only if contribution exceeds the current level's threshold;
+            // insert a new level before current.
+            if (contrib > it->second) {
+                levels.insert(it, Level{rank, contrib});
+                return true;
+            }
+            // Otherwise, no reveal; lower rank with insufficient contribution.
+            return false;
+        }
+        return false;
+    }
+
+    // Advance iterator circularly by one within [begin,end)
+    template <typename It, typename C>
+    inline void advanceCircular(It& it, const C& cont) {
+        ++it; if (it == cont->end()) it = cont->begin();
+    }
+}
+
+void Board::determineShowdownRevealOrder()
 {
+    myShowdownRevealOrder.clear();
+    std::unordered_set<unsigned> seen; // maintain order uniqueness
 
-    myPlayerNeedToShowCards.clear();
+    auto appendReveal = [&](unsigned id) {
+        if (!seen.count(id)) { myShowdownRevealOrder.push_back(id); seen.insert(id); }
+    };
 
-    // in All In Condition everybody have to show the cards
+    // All-in condition: everyone who didn't fold reveals, in seat order
     if (myAllInCondition)
     {
-        for (auto itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
-        {
-            if ((*itC)->getLastAction().type != ActionType::Fold)
-            {
-                myPlayerNeedToShowCards.push_back((*itC)->getId());
-            }
+        for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it) {
+            if (isNonFolded(**it)) appendReveal((*it)->getId());
         }
+        return;
     }
 
-    else
-    {
-
-        // all winners have to show their cards
-
-        std::list<std::pair<int, int>> level;
-
-        PlayerListConstIterator lastActionPlayerIt;
-        PlayerListConstIterator itC;
-
-        // search lastActionPlayer
-        for (itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
-        {
-            if ((*itC)->getId() == myLastActionPlayerId && (*itC)->getLastAction().type != ActionType::Fold)
-            {
-                lastActionPlayerIt = itC;
-                break;
-            }
+    // Find the last acting player who didn't fold; fallback to first non-folder
+    PlayerListConstIterator lastIt = mySeatsList->end();
+    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it) {
+        if ((*it)->getId() == myLastActionPlayerId && isNonFolded(**it)) { lastIt = it; break; }
+    }
+    if (lastIt == mySeatsList->end()) {
+        for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it) {
+            if (isNonFolded(**it)) { lastIt = it; break; }
         }
-
-        if (itC == mySeatsList->end())
-        {
-            for (itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
-            {
-                if ((*itC)->getLastAction().type != ActionType::Fold)
-                {
-                    lastActionPlayerIt = itC;
-                    break;
-                }
-            }
-        }
-
-        // the player who has done the last action has to show his cards first
-        myPlayerNeedToShowCards.push_back((*lastActionPlayerIt)->getId());
-
-        std::pair<int, int> levelTmp;
-        // get position and cardsValue of the player who show his cards first
-        levelTmp.first = (*lastActionPlayerIt)->getHandRanking();
-        levelTmp.second = (*lastActionPlayerIt)->getCashAtHandStart() - (*lastActionPlayerIt)->getCash();
-
-        level.push_back(levelTmp);
-
-        std::list<std::pair<int, int>>::iterator levelIt;
-        std::list<std::pair<int, int>>::iterator nextLevelIt;
-
-        itC = lastActionPlayerIt;
-        ++itC;
-
-        for (unsigned i = 0; i < mySeatsList->size(); i++)
-        {
-
-            if (itC == mySeatsList->end())
-            {
-                itC = mySeatsList->begin();
-            }
-
-            if ((*itC)->getLastAction().type != ActionType::Fold)
-            {
-
-                for (levelIt = level.begin(); levelIt != level.end(); ++levelIt)
-                {
-                    if ((*itC)->getHandRanking() > (*levelIt).first)
-                    {
-                        nextLevelIt = levelIt;
-                        ++nextLevelIt;
-                        if (nextLevelIt == level.end())
-                        {
-                            myPlayerNeedToShowCards.push_back((*itC)->getId());
-                            levelTmp.first = (*itC)->getHandRanking();
-                            levelTmp.second = (*itC)->getCashAtHandStart() - (*itC)->getCash();
-                            level.push_back(levelTmp);
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        if ((*itC)->getHandRanking() == (*levelIt).first)
-                        {
-                            nextLevelIt = levelIt;
-                            ++nextLevelIt;
-
-                            if (nextLevelIt == level.end() ||
-                                (*itC)->getCashAtHandStart() - (*itC)->getCash() > (*nextLevelIt).second)
-                            {
-                                myPlayerNeedToShowCards.push_back((*itC)->getId());
-                                if ((*itC)->getCashAtHandStart() - (*itC)->getCash() > (*levelIt).second)
-                                {
-                                    (*levelIt).second = (*itC)->getCashAtHandStart() - (*itC)->getCash();
-                                }
-                            }
-                            break;
-                        }
-                        else
-                        {
-                            if ((*itC)->getCashAtHandStart() - (*itC)->getCash() > (*levelIt).second)
-                            {
-                                myPlayerNeedToShowCards.push_back((*itC)->getId());
-                                levelTmp.first = (*itC)->getHandRanking();
-                                levelTmp.second = (*itC)->getCashAtHandStart() - (*itC)->getCash();
-
-                                level.insert(levelIt, levelTmp);
-
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            ++itC;
-        }
-
-        level.clear();
+    }
+    if (lastIt == mySeatsList->end()) {
+        // No players to reveal (all folded?)
+        return;
     }
 
-    // sort and unique the list
-    myPlayerNeedToShowCards.sort();
-    myPlayerNeedToShowCards.unique();
+    // First reveal is the last actor
+    appendReveal((*lastIt)->getId());
+
+    // Initialize levels with the last actor's rank and contribution
+    std::list<Level> levels;
+    levels.emplace_back((*lastIt)->getHandRanking(), contribution(**lastIt));
+
+    // Iterate circularly over the table, starting after last actor, up to N players
+    auto it = lastIt; advanceCircular(it, mySeatsList);
+    const unsigned n = static_cast<unsigned>(mySeatsList->size());
+    for (unsigned k = 0; k < n; ++k) {
+        if (isNonFolded(**it)) {
+            const int rank = (*it)->getHandRanking();
+            const int contrib = contribution(**it);
+            if (processCandidateLevels(levels, rank, contrib)) {
+                appendReveal((*it)->getId());
+            }
+        }
+        advanceCircular(it, mySeatsList);
+    }
 }
 
 void Board::setBoardCards(const BoardCards& boardCards)
@@ -262,14 +241,7 @@ void Board::setWinners(const std::list<unsigned>& w)
     myWinners = w;
 }
 
-std::list<unsigned> Board::getPlayerNeedToShowCards() const
-{
-    return myPlayerNeedToShowCards;
-}
-void Board::setPlayerNeedToShowCards(const std::list<unsigned>& p)
-{
-    myPlayerNeedToShowCards = p;
-}
+ 
 int Board::getPot(const Hand& hand) const
 {
     int totalPot = 0;

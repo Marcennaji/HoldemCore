@@ -39,6 +39,9 @@ struct GameEvents
     // Event processing for responsive UI during strategy decisions (framework-agnostic)
     mutable std::function<void()> onProcessEvents;
 
+    // Showdown reveal order: ordered list of player IDs who must reveal, in exact sequence
+    std::function<void(std::vector<unsigned> revealOrder)> onShowdownRevealOrder;
+
     void clear()
     {
         *this = GameEvents(); // reset all handlers

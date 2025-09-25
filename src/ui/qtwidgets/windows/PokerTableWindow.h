@@ -62,6 +62,8 @@ class PokerTableWindow : public QWidget
   void resetBetControls();
   // Show winners overlay label(s)
   void showWinners(const std::list<unsigned>& winnerIds, int totalPot);
+  // Reveal hole cards at showdown in the exact order provided by the engine
+  void revealShowdownOrder(const std::vector<unsigned>& revealOrder);
     
     // Player state indicators
     void setActivePlayer(int playerId);

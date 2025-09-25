@@ -41,7 +41,13 @@ void PostRiverState::enter(Hand& hand)
 
     hand.getBoard().distributePot(hand);
 
-    hand.getBoard().determinePlayerNeedToShowCards();
+    // Compute the exact showdown reveal sequence (engine domain logic)
+    hand.getBoard().determineShowdownRevealOrder();
+    if (myEvents.onShowdownRevealOrder)
+    {
+        auto order = hand.getBoard().getShowdownRevealOrder();
+        myEvents.onShowdownRevealOrder(order);
+    }
 
     if (myEvents.onBettingRoundStarted)
         myEvents.onBettingRoundStarted(PostRiver);
