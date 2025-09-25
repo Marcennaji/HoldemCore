@@ -219,7 +219,10 @@ void GuiBridgeWidgets::handleHandCompleted(std::list<unsigned> winnerIds, int to
 void GuiBridgeWidgets::handlePlayerChipsUpdated(unsigned playerId, int newChips)
 {
     qDebug() << "Player" << playerId << "chips updated to:" << newChips;
-    // The refreshPlayer method will be called separately with full player data
+    // Update the player's displayed stack immediately
+    if (myTableWindow) {
+        myTableWindow->updatePlayerCash(playerId, newChips);
+    }
 }
 
 void GuiBridgeWidgets::handleBettingRoundStarted(pkt::core::GameState gameState)

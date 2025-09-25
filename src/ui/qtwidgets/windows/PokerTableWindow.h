@@ -50,6 +50,8 @@ class PokerTableWindow : public QWidget
     void showBoardCards(const pkt::core::BoardCards& boardCards);
     void updateGamePhase(pkt::core::GameState gameState);
     void updatePlayerStatus(int playerId, const QString& status);
+  // Update only the stack amount for a player (used by onPlayerChipsUpdated)
+  void updatePlayerCash(unsigned playerId, int newChips);
   // Robust, structured updates (preferred)
   void showPlayerAction(int playerId, pkt::core::ActionType action, int amount);
   void showPlayerTurn(int playerId);

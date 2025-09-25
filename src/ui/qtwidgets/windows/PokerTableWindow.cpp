@@ -194,7 +194,7 @@ void PokerTableWindow::createPlayerAreas()
 
         auto layout = new QVBoxLayout(player.playerGroup);
 
-        // Hole cards in horizontal layout
+    // Hole cards in horizontal layout
         auto cardLayout = new QHBoxLayout();
         player.holeCard1 = new QLabel(this);
         player.holeCard2 = new QLabel(this);
@@ -649,12 +649,23 @@ void PokerTableWindow::refreshPlayer(int seat, const pkt::core::player::Player& 
     // Show player area
     playerUI.playerGroup->setVisible(true);
     
-    // Title contains name and cash
+    // Title contains name and chips near the name line: e.g., "Bot1  chips = 125"
     QString prefix = playerUI.isHuman ? "You" : QString("Bot %1").arg(seat);
-    playerUI.playerGroup->setTitle(QString("%1 — %2 ($%3)")
-        .arg(prefix)
-        .arg(QString::fromStdString(player.getName()))
+    const QString displayName = QString("%1").arg(playerUI.isHuman ? prefix : prefix);
+    playerUI.playerGroup->setTitle(QString("%1  chips = %2")
+        .arg(displayName)
         .arg(player.getCash()));
+
+
+}
+
+void PokerTableWindow::updatePlayerCash(unsigned playerId, int newChips)
+{
+    if (playerId >= m_playerComponents.size()) return;
+    auto& ui = m_playerComponents[playerId];
+    if (!ui.playerGroup) return;
+    const QString prefix = ui.isHuman ? "You" : QString("Bot %1").arg(playerId);
+    ui.playerGroup->setTitle(QString("%1  chips = %2").arg(prefix).arg(newChips));
 }
 
 void PokerTableWindow::showHoleCards(int seat, const pkt::core::HoleCards& holeCards)
@@ -873,6 +884,10 @@ void PokerTableWindow::showPlayerAction(int playerId, pkt::core::ActionType acti
         ui.currentActionLabel->setText(text);
         ui.currentActionLabel->setStyleSheet(currentActionLabelStyleFor(text));
     }
+
+    // Also refresh cash after an action (amount may be relevant depending on action type)
+    // The authoritative cash is in the Player model; expect controller to call refreshPlayer as state changes.
+    // As a fallback, if bet/raise/all-in, we can force a UI refresh from session if provided, otherwise do nothing here.
 }
 
 void PokerTableWindow::showPlayerTurn(int playerId)
