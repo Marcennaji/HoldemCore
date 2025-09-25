@@ -126,6 +126,7 @@ class PokerTableWindow : public QWidget
     QPoint calculateCircularPosition(int playerIndex, int totalPlayers, const QPoint& center, int radius);
     void createCenterArea();
     void positionCenterArea();
+  void positionDealerButtons();
     
     // Card visualization helpers
     QPixmap getCardPixmap(const pkt::core::Card& card) const;

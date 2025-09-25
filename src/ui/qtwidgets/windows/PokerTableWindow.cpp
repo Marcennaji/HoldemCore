@@ -250,7 +250,7 @@ void PokerTableWindow::createPlayerAreas()
         );
         player.winnerLabel->setVisible(false);
 
-        // Create dealer button indicator
+        // Create dealer button indicator (kept outside the player's layout so we can overlay on the border)
         player.dealerButton = new QLabel("D", this);
         player.dealerButton->setFixedSize(25, 25);
         player.dealerButton->setAlignment(Qt::AlignCenter);
@@ -270,7 +270,7 @@ void PokerTableWindow::createPlayerAreas()
         layout->addLayout(cardLayout);
     layout->addWidget(player.currentActionLabel);
     layout->addWidget(player.winnerLabel);
-        layout->addWidget(player.dealerButton);
+        // Note: Do NOT add dealerButton to the layout; we position it overlaying the group border.
 
     player.playerGroup->setVisible(true);
     player.playerGroup->setFixedSize(120, 136); // 80% of 170
@@ -403,8 +403,20 @@ QString PokerTableWindow::currentActionLabelStyleBase() const {
 
 QString PokerTableWindow::currentActionLabelStyleFor(const QString& action) const {
     QString base = currentActionLabelStyleBase();
-    if (action.compare("FOLD", Qt::CaseInsensitive) == 0) {
-        return base + " QLabel { color: #b00020; border-color: #f5c2c7; background: #fde7ea; }";
+    // For folds, keep neutral styling but make it italic and not bold
+    if (action.compare("folded", Qt::CaseInsensitive) == 0 || action.compare("FOLD", Qt::CaseInsensitive) == 0) {
+        return QString(
+            "QLabel {"
+            "  color: #1f3044;"
+            "  font-size: 14px;"
+            "  font-style: italic;"
+            "  font-weight: 400;"
+            "  border: 1px solid #cbd5e1;"
+            "  border-radius: 6px;"
+            "  background: rgba(255,255,255,0.9);"
+            "  padding: 4px 6px;"
+            "}"
+        );
     }
     if (action.compare("CALL", Qt::CaseInsensitive) == 0 || action.compare("CHECK", Qt::CaseInsensitive) == 0) {
         return base + " QLabel { color: #1b5e20; border-color: #c8e6c9; background: #e8f5e9; }";
@@ -731,7 +743,8 @@ void PokerTableWindow::updateGamePhase(pkt::core::GameState gameState)
 void PokerTableWindow::clearActionLabelsForNewRound()
 {
     for (auto& p : m_playerComponents) {
-        if (p.currentActionLabel) {
+        // Keep 'folded' text visible across rounds; clear others
+        if (p.currentActionLabel && !p.isFolded) {
             p.currentActionLabel->clear();
         }
     }
@@ -827,7 +840,7 @@ void PokerTableWindow::showPlayerAction(int playerId, pkt::core::ActionType acti
     QString text;
     switch (action) {
         case pkt::core::ActionType::Fold:
-            text = "FOLD";
+            text = "folded";
             applyFoldVisual(playerId, true);
             break;
         case pkt::core::ActionType::Check:
@@ -1056,6 +1069,9 @@ void PokerTableWindow::positionPlayersInCircle()
         player.playerGroup->show(); // Ensure widget is visible
         player.playerGroup->raise(); // Bring to front
     }
+
+    // After moving player groups, reposition dealer badges to sit on the border
+    positionDealerButtons();
 }
 
 QPoint PokerTableWindow::calculateCircularPosition(int playerIndex, int totalPlayers, const QPoint& center, int radius)
@@ -1185,6 +1201,23 @@ void PokerTableWindow::positionCenterArea()
     }
 }
 
+void PokerTableWindow::positionDealerButtons()
+{
+    // Place the dealer "D" badge at the top-right corner, centered on the QGroupBox border
+    for (auto& p : m_playerComponents) {
+        if (!p.playerGroup || !p.dealerButton || !p.dealerButton->isVisible()) continue;
+        const QWidget* g = p.playerGroup;
+        // Coordinates relative to parent (PokerTableWindow), since dealerButton parent is this
+        const QPoint groupTopLeft = g->pos();
+        const int badgeW = p.dealerButton->width();
+        const int badgeH = p.dealerButton->height();
+        const int x = groupTopLeft.x() + g->width() - badgeW / 2; // overlap half outside to sit on border
+        const int y = groupTopLeft.y() - badgeH / 2;               // half above to sit on border line
+        p.dealerButton->move(x, y);
+        p.dealerButton->raise();
+    }
+}
+
 void PokerTableWindow::cacheHoleCards(int seat, const pkt::core::HoleCards& holeCards)
 {
     if (seat < 0 || seat >= m_maxPlayers) return;
@@ -1206,6 +1239,7 @@ void PokerTableWindow::resizeEvent(QResizeEvent* event)
     // Reposition all elements when window is resized
     positionPlayersInCircle();
     positionCenterArea();
+    positionDealerButtons();
 }
 
 void PokerTableWindow::showEvent(QShowEvent* event)
@@ -1215,6 +1249,7 @@ void PokerTableWindow::showEvent(QShowEvent* event)
     // Position elements when window is first shown (now we have proper size)
     positionPlayersInCircle();
     positionCenterArea();
+    positionDealerButtons();
 }
 
 int PokerTableWindow::reservedBottomHeight() const
@@ -1263,6 +1298,8 @@ void PokerTableWindow::setDealerPosition(int playerId)
         auto& player = m_playerComponents[playerId];
         if (player.dealerButton) {
             player.dealerButton->setVisible(true);
+            // Immediately position it over the border
+            positionDealerButtons();
         }
     }
 }
