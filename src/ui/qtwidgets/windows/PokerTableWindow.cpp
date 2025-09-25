@@ -11,6 +11,7 @@
 #include <QRegularExpression>
 #include <QPoint>
 #include <QShowEvent>
+#include <QCloseEvent>
 #include <QDebug>
 #include <QCoreApplication>
 #include <QEventLoop>
@@ -74,9 +75,50 @@ void PokerTableWindow::initializeWithGameData(const pkt::core::GameData& gameDat
         
         // Clear existing player components
         for (auto& component : m_playerComponents) {
+            // Unset graphics effects to avoid double-deletion when labels are destroyed
+            if (component.holeCard1) {
+                component.holeCard1->setGraphicsEffect(nullptr);
+                component.card1OpacityEffect = nullptr; // Ownership transfers to label; null our pointer
+            }
+            if (component.holeCard2) {
+                component.holeCard2->setGraphicsEffect(nullptr);
+                component.card2OpacityEffect = nullptr;
+            }
+
+            // Delete dealer button (created as child of this)
+            if (component.dealerButton) {
+                component.dealerButton->setParent(nullptr);
+                delete component.dealerButton;
+                component.dealerButton = nullptr;
+            }
+
+            // Delete labels (children will clean up their effects)
+            if (component.holeCard1) {
+                component.holeCard1->setParent(nullptr);
+                delete component.holeCard1;
+                component.holeCard1 = nullptr;
+            }
+            if (component.holeCard2) {
+                component.holeCard2->setParent(nullptr);
+                delete component.holeCard2;
+                component.holeCard2 = nullptr;
+            }
+            if (component.currentActionLabel) {
+                component.currentActionLabel->setParent(nullptr);
+                delete component.currentActionLabel;
+                component.currentActionLabel = nullptr;
+            }
+            if (component.winnerLabel) {
+                component.winnerLabel->setParent(nullptr);
+                delete component.winnerLabel;
+                component.winnerLabel = nullptr;
+            }
+
+            // Finally delete the player group
             if (component.playerGroup) {
                 component.playerGroup->setParent(nullptr);
                 delete component.playerGroup;
+                component.playerGroup = nullptr;
             }
         }
         
@@ -174,9 +216,15 @@ void PokerTableWindow::setupUi()
 
     this->resize(1200, 800);
 
-    this->show();
-    this->raise();
-    this->activateWindow();
+    // Do not show the window here; caller controls visibility to avoid flicker
+}
+
+void PokerTableWindow::closeEvent(QCloseEvent* event)
+{
+    // Prevent widget destruction; hide and notify controller/StartWindow
+    event->accept();
+    this->hide();
+    emit windowClosed();
 }
 
 void PokerTableWindow::createPlayerAreas()
@@ -196,8 +244,8 @@ void PokerTableWindow::createPlayerAreas()
 
     // Hole cards in horizontal layout
         auto cardLayout = new QHBoxLayout();
-        player.holeCard1 = new QLabel(this);
-        player.holeCard2 = new QLabel(this);
+        player.holeCard1 = new QLabel(player.playerGroup);
+        player.holeCard2 = new QLabel(player.playerGroup);
 
     // Unified card styling and size for all players (scaled with reduced group height)
     player.holeCard1->setFixedSize(50, 70);
@@ -231,12 +279,12 @@ void PokerTableWindow::createPlayerAreas()
         cardLayout->addWidget(player.holeCard2);
 
         // Prominent current action label
-        player.currentActionLabel = new QLabel("", this);
+        player.currentActionLabel = new QLabel("", player.playerGroup);
         player.currentActionLabel->setAlignment(Qt::AlignCenter);
     player.currentActionLabel->setStyleSheet(currentActionLabelStyleBase());
 
         // Winner badge label (hidden by default)
-        player.winnerLabel = new QLabel("WINNER", this);
+    player.winnerLabel = new QLabel("WINNER", player.playerGroup);
         player.winnerLabel->setAlignment(Qt::AlignCenter);
         player.winnerLabel->setStyleSheet(
             "QLabel {"

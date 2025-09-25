@@ -25,10 +25,17 @@ StartWindow::StartWindow(PokerTableWindow* tableWindow, Session* session, QWidge
     setWindowTitle(QString(tr("HoldemCore %1").arg(HOLDEM_CORE__BETA_RELEASE_STRING)));
     // setWindowIcon(QIcon(":/icons/windowicon.png")); // TODO: Add icon to resources
     setStatusBar(nullptr);
-    installEventFilter(this);
+    // Ensure table window starts hidden until a game is started
+    if (myPokerTableWindow) myPokerTableWindow->hide();
 
     connect(pushButtonStartGame, &QPushButton::clicked, this, &StartWindow::startNewGame);
 
+    // When the table window is closed, return to StartWindow
+    if (myPokerTableWindow) {
+        connect(myPokerTableWindow, &PokerTableWindow::windowClosed, this, [this]() {
+            this->show();
+        });
+    }
     show();
 }
 
@@ -41,10 +48,17 @@ StartWindow::StartWindow(PokerTableWindow* tableWindow, Session* session,
     setWindowTitle(QString(tr("HoldemCore %1").arg(HOLDEM_CORE__BETA_RELEASE_STRING)));
     // setWindowIcon(QIcon(":/icons/windowicon.png")); // TODO: Add icon to resources
     setStatusBar(nullptr);
-    installEventFilter(this);
+    // Ensure table window starts hidden until a game is started
+    if (myPokerTableWindow) myPokerTableWindow->hide();
 
     connect(pushButtonStartGame, &QPushButton::clicked, this, &StartWindow::startNewGame);
 
+    // When the table window is closed, return to StartWindow
+    if (myPokerTableWindow) {
+        connect(myPokerTableWindow, &PokerTableWindow::windowClosed, this, [this]() {
+            this->show();
+        });
+    }
     show();
 }
 
@@ -62,10 +76,7 @@ StartWindow::~StartWindow()
 
 void StartWindow::startNewGame()
 {
-
     this->hide();
-
-    myPokerTableWindow->show();
 
     GameData gameData;
 
@@ -90,24 +101,20 @@ void StartWindow::startNewGame()
     myServices->randomizer().getRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
     startData.startDealerPlayerId = static_cast<unsigned>(tmpDealerPos);
 
+    // Initialize PokerTableWindow with the GameData BEFORE showing it
+    if (myPokerTableWindow) {
+        myPokerTableWindow->initializeWithGameData(gameData);
+        myPokerTableWindow->show();
+        myPokerTableWindow->raise();
+        myPokerTableWindow->activateWindow();
+    }
+
     mySession->startGame(gameData, startData);
-    
-    // Initialize PokerTableWindow with the GameData
-    myPokerTableWindow->initializeWithGameData(gameData);
 }
 
 bool StartWindow::eventFilter(QObject* obj, QEvent* event)
 {
-    if (event->type() == QEvent::Close)
-    {
-        event->ignore();
-
-        return QMainWindow::eventFilter(obj, event);
-    }
-    else
-    {
-        // pass the event on to the parent class
-        return QMainWindow::eventFilter(obj, event);
-    }
+    // Use default behavior; allow StartWindow to close the app normally
+    return QMainWindow::eventFilter(obj, event);
 }
 } // namespace pkt::ui::qtwidgets

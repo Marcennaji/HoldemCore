@@ -33,11 +33,15 @@ StartWindow* GuiAppController::createMainWindow()
 {
     if (myServices)
     {
-        return new StartWindow(myPokerTableWindow.get(), mySession.get(), myServices, nullptr);
+        auto* w = new StartWindow(myPokerTableWindow.get(), mySession.get(), myServices, nullptr);
+        if (myPokerTableWindow) myPokerTableWindow->hide();
+        return w;
     }
     else
     {
-        return new StartWindow(myPokerTableWindow.get(), mySession.get(), nullptr);
+        auto* w = new StartWindow(myPokerTableWindow.get(), mySession.get(), nullptr);
+        if (myPokerTableWindow) myPokerTableWindow->hide();
+        return w;
     }
 }
 

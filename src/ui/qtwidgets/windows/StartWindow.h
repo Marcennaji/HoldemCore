@@ -47,7 +47,7 @@ class StartWindow : public QMainWindow, public Ui::StartWindow
     void startNewGame();
 
   private:
-    std::shared_ptr<PokerTableWindow> myPokerTableWindow;
+  PokerTableWindow* myPokerTableWindow{nullptr};
     pkt::core::Session* mySession;
 
     void ensureServicesInitialized();

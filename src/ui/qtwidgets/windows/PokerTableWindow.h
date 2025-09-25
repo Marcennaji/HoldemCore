@@ -99,6 +99,7 @@ class PokerTableWindow : public QWidget
     void checkClicked();
     void allInClicked();
     void nextHandRequested();  // Signal emitted when user clicks Next Hand button
+  void windowClosed();       // Emitted when the table window is closed by the user
 
   private slots:
     void onBetAmountChanged(int amount);
@@ -108,6 +109,7 @@ class PokerTableWindow : public QWidget
   protected:
     void resizeEvent(QResizeEvent* event) override;
     void showEvent(QShowEvent* event) override;
+    void closeEvent(QCloseEvent* event) override;
 
   private:
     void setupUi();
