@@ -47,8 +47,8 @@ int main(int argc, char** argv)
     
     // Set application metadata for QStandardPaths
     QCoreApplication::setApplicationName("HoldemCore");
-    QCoreApplication::setOrganizationName("PokerTraining");
-    QCoreApplication::setApplicationVersion("1.0");
+    QCoreApplication::setOrganizationName("M87 Dev");
+    QCoreApplication::setApplicationVersion("0.9");
 
     auto services = std::make_shared<pkt::core::AppServiceContainer>();
     

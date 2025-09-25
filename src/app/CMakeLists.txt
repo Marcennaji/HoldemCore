@@ -1,15 +1,15 @@
 find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui)
 
-add_executable(HoldemCore
-    main.cpp
+add_executable(QtHoldemCore
+    main_desktop_app_qt.cpp
 )
 
-target_include_directories(HoldemCore PUBLIC
+target_include_directories(QtHoldemCore PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src
 )
 
-target_link_libraries(HoldemCore
+target_link_libraries(QtHoldemCore
     core_session
     infra
     qtwidgets
