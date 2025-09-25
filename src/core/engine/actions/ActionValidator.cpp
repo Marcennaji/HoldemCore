@@ -58,6 +58,44 @@ bool ActionValidator::validatePlayerAction(const pkt::core::player::PlayerList& 
     return true;
 }
 
+bool ActionValidator::validatePlayerActionWithReason(const pkt::core::player::PlayerList& actingPlayersList,
+                                                    const PlayerAction& action, const BettingActions& bettingActions,
+                                                    int smallBlind, const GameState gameState,
+                                                    std::string& outReason) const
+{
+    ensureServicesInitialized();
+
+    auto player = pkt::core::player::getPlayerById(actingPlayersList, action.playerId);
+    if (!player)
+    {
+        outReason = "Player not found in active players list";
+        myServices->logger().error(gameStateToString(gameState) + ": player with id " +
+                                   std::to_string(action.playerId) + " not found in actingPlayersList");
+        return false;
+    }
+
+    // Validate consecutive actions
+    if (!isConsecutiveActionAllowed(bettingActions, action, gameState, &outReason))
+    {
+        return false;
+    }
+
+    // Validate action type
+    if (!isActionTypeValid(actingPlayersList, action, bettingActions, smallBlind, gameState, player, &outReason))
+    {
+        return false;
+    }
+
+    // Validate action amount
+    if (!isActionAmountValid(action, bettingActions, smallBlind, gameState, player, &outReason))
+    {
+        return false;
+    }
+
+    outReason.clear();
+    return true;
+}
+
 // Static helper for backwards compatibility
 bool ActionValidator::validate(const pkt::core::player::PlayerList& actingPlayersList, const PlayerAction& action,
                                const BettingActions& bettingActions, int smallBlind, const GameState gameState)
@@ -67,7 +105,7 @@ bool ActionValidator::validate(const pkt::core::player::PlayerList& actingPlayer
 }
 
 bool ActionValidator::isConsecutiveActionAllowed(const BettingActions& bettingActions, const PlayerAction& action,
-                                                 const GameState gameState) const
+                                                 const GameState gameState, std::string* outReason) const
 {
     ensureServicesInitialized();
 
@@ -76,13 +114,24 @@ bool ActionValidator::isConsecutiveActionAllowed(const BettingActions& bettingAc
     {
         if (round.round == gameState && !round.actions.empty())
         {
-            // Get the last action in this round
-            const auto& lastAction = round.actions.back();
-            if (lastAction.first == action.playerId)
+            // Find the last voluntary action (exclude blind posts)
+            std::pair<unsigned, ActionType> lastVoluntary = {static_cast<unsigned>(-1), ActionType::None};
+            for (auto it = round.actions.rbegin(); it != round.actions.rend(); ++it)
             {
-                myServices->logger().error(gameStateToString(gameState) + ": Player " +
-                                           std::to_string(action.playerId) +
-                                           " cannot act twice consecutively in the same round");
+                if (it->second == ActionType::PostSmallBlind || it->second == ActionType::PostBigBlind)
+                    continue; // ignore automatic blind posts
+                lastVoluntary = *it;
+                break;
+            }
+
+            // If the last voluntary action was by the same player, reject consecutive action
+            if (lastVoluntary.second != ActionType::None && lastVoluntary.first == static_cast<unsigned>(action.playerId))
+            {
+                std::string msg = "Cannot act twice consecutively in the same round: last voluntary was " +
+                                  std::string(actionTypeToString(lastVoluntary.second)) + " by player " +
+                                  std::to_string(action.playerId);
+                if (outReason) *outReason = msg;
+                myServices->logger().error(gameStateToString(gameState) + ": " + msg);
                 return false;
             }
             break;
@@ -94,7 +143,8 @@ bool ActionValidator::isConsecutiveActionAllowed(const BettingActions& bettingAc
 bool ActionValidator::isActionTypeValid(const pkt::core::player::PlayerList& actingPlayersList,
                                         const PlayerAction& action, const BettingActions& bettingActions,
                                         int smallBlind, const GameState gameState,
-                                        const std::shared_ptr<pkt::core::player::Player>& player) const
+                                        const std::shared_ptr<pkt::core::player::Player>& player,
+                                        std::string* outReason) const
 {
     ensureServicesInitialized();
 
@@ -149,6 +199,8 @@ bool ActionValidator::isActionTypeValid(const pkt::core::player::PlayerList& act
 
     if (!isValid)
     {
+    std::string msg = std::string("Invalid action type: ") + actionTypeToString(action.type);
+        if (outReason) *outReason = msg;
         myServices->logger().error(gameStateToString(gameState) + ": Invalid action type for player " +
                                    player->getName() + " : " + actionTypeToString(action.type));
     }
@@ -158,7 +210,8 @@ bool ActionValidator::isActionTypeValid(const pkt::core::player::PlayerList& act
 
 bool ActionValidator::isActionAmountValid(const PlayerAction& action, const BettingActions& bettingActions,
                                           int smallBlind, const GameState gameState,
-                                          const std::shared_ptr<pkt::core::player::Player>& player) const
+                                          const std::shared_ptr<pkt::core::player::Player>& player,
+                                          std::string* outReason) const
 {
     ensureServicesInitialized();
 
@@ -206,6 +259,25 @@ bool ActionValidator::isActionAmountValid(const PlayerAction& action, const Bett
 
     if (!isValid)
     {
+    std::string msg = std::string("Invalid amount for ") + actionTypeToString(action.type) +
+                          ": amount=" + std::to_string(action.amount);
+        switch (action.type)
+        {
+        case ActionType::Check:
+            msg += ", expected amount=0";
+            break;
+        case ActionType::Raise:
+        {
+            const int currentHighestBet = bettingActions.getRoundHighestSet();
+            int minRaise = bettingActions.getMinRaise(smallBlind);
+            msg += ", needs to be >= currentHighest(" + std::to_string(currentHighestBet) + ") + minRaise(" +
+                   std::to_string(minRaise) + ") and within player's cash";
+            break;
+        }
+        default:
+            break;
+        }
+        if (outReason) *outReason = msg;
         myServices->logger().error(gameStateToString(gameState) + ": Invalid action amount for player " +
                                    std::to_string(action.playerId) + " : " + actionTypeToString(action.type) +
                                    " with amount = " + std::to_string(action.amount));

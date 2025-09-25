@@ -40,20 +40,27 @@ class ActionValidator
     bool validatePlayerAction(const pkt::core::player::PlayerList& actingPlayersList, const PlayerAction& action,
                               const BettingActions& bettingActions, int smallBlind, const GameState gameState) const;
 
+    // Validation that provides a human-readable reason on failure
+    bool validatePlayerActionWithReason(const pkt::core::player::PlayerList& actingPlayersList,
+                                        const PlayerAction& action, const BettingActions& bettingActions,
+                                        int smallBlind, const GameState gameState, std::string& outReason) const;
+
     // Static helper for backwards compatibility with existing code
     static bool validate(const pkt::core::player::PlayerList& actingPlayersList, const PlayerAction& action,
                          const BettingActions& bettingActions, int smallBlind, const GameState gameState);
 
     // Validation helper methods - migrated from Helpers.cpp
     bool isConsecutiveActionAllowed(const BettingActions& bettingActions, const PlayerAction& action,
-                                    const GameState gameState) const;
+                                    const GameState gameState, std::string* outReason = nullptr) const;
 
     bool isActionTypeValid(const pkt::core::player::PlayerList& actingPlayersList, const PlayerAction& action,
                            const BettingActions& bettingActions, int smallBlind, const GameState gameState,
-                           const std::shared_ptr<pkt::core::player::Player>& player) const;
+                           const std::shared_ptr<pkt::core::player::Player>& player,
+                           std::string* outReason = nullptr) const;
 
     bool isActionAmountValid(const PlayerAction& action, const BettingActions& bettingActions, int smallBlind,
-                             const GameState gameState, const std::shared_ptr<pkt::core::player::Player>& player) const;
+                             const GameState gameState, const std::shared_ptr<pkt::core::player::Player>& player,
+                             std::string* outReason = nullptr) const;
 
   private:
     mutable std::shared_ptr<pkt::core::ServiceContainer> myServices;

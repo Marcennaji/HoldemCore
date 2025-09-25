@@ -338,11 +338,14 @@ std::string Hand::getActionValidationError(const PlayerAction& action) const
         return "It's not this player's turn to act";
     }
 
-    // Use the comprehensive ActionValidator
-    if (!myActionValidator->validatePlayerAction(myActingPlayersList, action, *getBettingActions(), mySmallBlind,
-                                                 myStateManager->getGameState()))
+    // Use the comprehensive ActionValidator with a detailed reason
     {
-        return "Action validation failed.";
+        std::string reason;
+        if (!myActionValidator->validatePlayerActionWithReason(myActingPlayersList, action, *getBettingActions(),
+                                                               mySmallBlind, myStateManager->getGameState(), reason))
+        {
+            return reason.empty() ? std::string("Action validation failed.") : reason;
+        }
     }
 
     return ""; // Empty string means action is valid
