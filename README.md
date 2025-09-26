@@ -19,10 +19,10 @@ This project demonstrates **enterprise-level software engineering** through a co
 - **Continuous refactoring** - ongoing modernization and architectural improvements
 
 ### Technical Complexity
-- **✨ Complex domain modeling**: poker rules, betting rounds, players'ranges re-evaluation at each action
-- **🧠 AI strategy framework**: pluggable bot behaviors with range estimation
-- **🔄 State machine design**: robust game flow management
-- **📊 Statistical analysis**: player behavior tracking and persistence
+- **Complex domain modeling**: poker rules, betting rounds, players'ranges re-evaluation at each action
+- **AI strategy framework**: pluggable bot behaviors with range estimation
+- **State machine design**: robust game flow management
+- **Statistical analysis**: player behavior tracking and persistence
 
 ---
 ## 🚀 Quick Start
@@ -58,7 +58,7 @@ Senior Software Engineer | C++ specialist | Experienced Python Developer | Softw
 - Cross-Platform Development 
 - Test-Driven Development 
 
-� **Currently available for freelance collaborations and full-time positions**
+**Currently available for freelance collaborations and full-time positions**
 
 ---
 
@@ -71,7 +71,6 @@ Senior Software Engineer | C++ specialist | Experienced Python Developer | Softw
 ![Hexagonal Architecture Diagram](doc/architecture.png)
 
 *Hexagonal architecture with dependency injection - visual representation of component interactions and service flow*
-
 
 **2. Dependency Injection Container**
 - Testable service boundaries  
@@ -103,17 +102,17 @@ player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 ```
 
 **Engineering Benefits:**
-- ⚙️ **Runtime strategy switching** based on game conditions
-- 🧪 **Isolated unit testing** of individual strategies  
-- 🔌 **Plugin architecture** for easy strategy development
-- 📈 **Template method pattern** with shared base logic
+- **Runtime strategy switching** based on game conditions
+- **Isolated unit testing** of individual strategies  
+- **Plugin architecture** for easy strategy development
+- **Template method pattern** with shared base logic
 
 ### 5. **Advanced Game Logic**
 - **Range estimation algorithms** for opponent modeling
 - **Monte Carlo simulations** for equity calculations  
 - **Statistical analysis** with persistent player profiles
 - **Complex state management** across betting rounds
-- Statistics persistence and range pruning
+- **Statistics persistence and range pruning**
 - **FSM for betting rounds**: Preflop → Flop → Turn → River → PostRiver
 
 ### 6. **Comprehensive Testing Strategy**
@@ -122,9 +121,25 @@ player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 - **Architecture compliance tests** validating hexagonal principles
 - **Mock services** for isolated component testing
 - **Event-driven testing** with MockUI validation
-- **Performance benchmarks** for critical algorithms
 
 ---
+## 🎮 User Interface
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="doc/start%20game.png" alt="Starting a new game" width="100%">
+      <p align="center"><em>Game Configuration Window</em></p>
+    </td>
+    <td width="50%">
+      <img src="doc/poker%20table.png" alt="Poker Table Interface" width="100%">
+      <p align="center"><em>Poker Table Interface</em></p>
+    </td>
+  </tr>
+</table>
+
+*Qt Widgets version (coming soon: Qt Quick/QML version)*
+
 
 ## 🔧 Technical Stack
 
@@ -154,12 +169,8 @@ player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 ---
 ## � Development Roadmap
 
-**Ongoing**
-- Architecture validation and improvements, continuous refactoring on the engine
-- Qt Widgets user interface (desktop app version) is currently being tested
-
-**UI & Integration (Q4 2025)**
 - Develop a Qt Quick (QML) GUI, for mobile version
+- explore the possibility of plugging a machine learning-based bot AI
 
 ---
 
@@ -172,6 +183,11 @@ player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 ---
 
 ## 📚 Dependencies & Licensing
+
+**UI Framework (Optional):**
+- [Qt 6](https://www.qt.io/) - Cross-platform application framework (Qt Widgets and Qt QML)
+  
+  *Note: The core engine is UI-agnostic. Qt is only required for the provided desktop interface. Developers can integrate any UI framework through the clean hexagonal architecture.*
 
 **Third-Party Components (easily switched if needed):**
 - [psim](https://github.com/christophschmalhofer/poker/tree/master/XPokerEval/XPokerEval.PokerSim) - Hand evaluation engine

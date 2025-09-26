@@ -49,7 +49,7 @@ PokerTableWindow::PokerTableWindow(pkt::core::Session* session, QWidget* parent)
     m_cachedHoleCards.resize(m_maxPlayers);  // Cache dealt cards per player
 
     setWindowTitle("Poker Table - HoldemCore");
-    setMinimumSize(800, 600);
+    setFixedSize(1200, 900); // Increased window size to prevent overlap between human cards and action buttons
 
     // Add try-catch around UI setup to catch any crashes
     try
@@ -371,13 +371,13 @@ void PokerTableWindow::createActionButtons()
     QString unifiedBtnStyle = "QPushButton {"
                               "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
                               "    stop: 0 #ffffff, stop: 1 #f1f3f5);"
-                              "  border: 1.5px solid #ced4da;"
-                              "  border-radius: 8px;"
-                              "  padding: 10px 16px;"
-                              "  color: #343a40;"
+                              "  border: 2px solid #dee2e6;"
+                              "  border-radius: 10px;"
+                              "  padding: 12px 18px;"
+                              "  color: #2c3e50;"
                               "  font-size: 14px;"
                               "  font-weight: 600;"
-                              "  min-width: 84px;"
+                              "  min-width: 88px;"
                               "}"
                               "QPushButton:hover {"
                               "  background: #f8f9fa;"
@@ -412,12 +412,12 @@ QString PokerTableWindow::defaultPlayerGroupStyle() const
 {
     return QString("QGroupBox {"
                    "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-                   "    stop: 0 #f8f9fa, stop: 0.5 #e9ecef, stop: 1 #dee2e6);"
-                   "  border: 1px solid #ced4da;"
-                   "  border-radius: 8px;"
+                   "    stop: 0 #ffffff, stop: 0.5 #f8f9fa, stop: 1 #e9ecef);"
+                   "  border: 2px solid #dee2e6;"
+                   "  border-radius: 10px;"
                    "  margin-top: 8px;"
                    "  color: #495057;"
-                   "  font-weight: 500;"
+                   "  font-weight: 600;"
                    "  font-size: 12px;"
                    "}"
                    "QGroupBox:title {"
@@ -431,18 +431,18 @@ QString PokerTableWindow::activePlayerGroupStyle() const
 {
     return QString("QGroupBox {"
                    "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-                   "    stop: 0 #ffffff, stop: 0.5 #f0f0f0, stop: 1 #e8e8e8);"
-                   "  border: 3px solid #ff6b35;"
+                   "    stop: 0 #e8f4fd, stop: 0.5 #e3f2fd, stop: 1 #bbdefb);"
+                   "  border: 3px solid #1976d2;"
                    "  border-radius: 12px;"
                    "  margin-top: 8px;"
-                   "  color: #4a4a4a;"
+                   "  color: #0d47a1;"
                    "  font-weight: bold;"
                    "}"
                    "QGroupBox:title {"
                    "  subcontrol-origin: margin;"
                    "  left: 8px;"
                    "  padding: 0 4px 0 4px;"
-                   "  color: #8b0000;"
+                   "  color: #0d47a1;"
                    "  font-weight: bold;"
                    "}");
 }
@@ -1247,39 +1247,44 @@ void PokerTableWindow::createCenterArea()
     // Create center area as invisible container (no background, no border)
     m_centerArea = new QGroupBox(this);
     m_centerArea->setStyleSheet("QGroupBox {"
-                                "  background: transparent;"
-                                "  border: none;"
+                                "  background: qradialgradient(cx: 0.5, cy: 0.5, radius: 1, "
+                                "    stop: 0 rgba(255,255,255,0.8), stop: 0.7 rgba(248,249,250,0.6), stop: 1 rgba(233,236,239,0.4));"
+                                "  border: 1px solid rgba(206,212,218,0.3);"
+                                "  border-radius: 12px;"
                                 "  margin: 0px;"
-                                "  padding: 0px;"
+                                "  padding: 8px;"
                                 "}");
 
     auto centerLayout = new QVBoxLayout(m_centerArea);
-    centerLayout->setContentsMargins(0, 0, 0, 0); // No margins for clean appearance
+    centerLayout->setContentsMargins(8, 8, 8, 8); // Add some internal margins for better spacing
 
     // Clean pot information display - text only
     m_potLabel = new QLabel("Pot: $0", this);
     m_potLabel->setAlignment(Qt::AlignCenter);
     m_potLabel->setStyleSheet("QLabel {"
-                              "  color: #343a40;"
-                              "  font-size: 22px;"
-                              "  font-weight: 600;"
+                              "  color: #2c3e50;"
+                              "  font-size: 24px;"
+                              "  font-weight: 700;"
                               "  margin: 0px;"
-                              "  background: transparent;"
-                              "  border: none;"
-                              "  padding: 8px;"
+                              "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
+                              "    stop: 0 rgba(255,255,255,0.9), stop: 1 rgba(248,249,250,0.8));"
+                              "  border: 1px solid rgba(206,212,218,0.5);"
+                              "  border-radius: 6px;"
+                              "  padding: 10px 16px;"
                               "}");
 
     // Clean round state display - text only
     m_roundStateLabel = new QLabel("Waiting for players...", this);
     m_roundStateLabel->setAlignment(Qt::AlignCenter);
     m_roundStateLabel->setStyleSheet("QLabel {"
-                                     "  color: #495057;"
-                                     "  font-size: 14px;"
-                                     "  font-weight: 500;"
+                                     "  color: #6c757d;"
+                                     "  font-size: 15px;"
+                                     "  font-weight: 600;"
                                      "  margin: 0px;"
-                                     "  background: transparent;"
-                                     "  border: none;"
-                                     "  padding: 4px;"
+                                     "  background: rgba(248,249,250,0.7);"
+                                     "  border: 1px solid rgba(206,212,218,0.3);"
+                                     "  border-radius: 4px;"
+                                     "  padding: 6px 12px;"
                                      "}");
 
     // Clean community cards layout with elegant styling
@@ -1291,12 +1296,12 @@ void PokerTableWindow::createCenterArea()
         m_communityCards[i]->setFixedSize(50, 70); // Slightly smaller cards to save space
         m_communityCards[i]->setScaledContents(true);
         m_communityCards[i]->setStyleSheet("QLabel {"
-                                           "  border: 1px solid #ced4da;"
-                                           "  border-radius: 6px;"
+                                           "  border: 2px solid #dee2e6;"
+                                           "  border-radius: 8px;"
                                            "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-                                           "    stop: 0 #ffffff, stop: 1 #f8f9fa);"
+                                           "    stop: 0 #ffffff, stop: 0.5 #fefefe, stop: 1 #f8f9fa);"
                                            "  margin: 0px;"
-                                           "  padding: 1px;"
+                                           "  padding: 2px;"
                                            "}");
         m_communityCards[i]->setPixmap(getCardBackPixmap());
         m_communityCards[i]->setVisible(true); // Make visible for demo
@@ -1313,8 +1318,8 @@ void PokerTableWindow::createCenterArea()
     centerLayout->addSpacing(12);
     centerLayout->addLayout(communityLayout);
 
-    // Set container size for positioning
-    m_centerArea->setFixedSize(360, 180); // Smaller footprint to avoid overlap with side players
+    // Set container size for positioning - increased height to fully show community cards
+    m_centerArea->setFixedSize(360, 220); // Increased height from 180 to 220 to show full community cards
 
     // Position it properly in the resizeEvent or when the window is shown
     positionCenterArea();
@@ -1327,7 +1332,17 @@ void PokerTableWindow::positionCenterArea()
         const int bottomReserve = reservedBottomHeight();
         const int effectiveHeight = std::max(0, height() - bottomReserve);
         int centerX = (width() - m_centerArea->width()) / 2;
-        int centerY = (effectiveHeight - m_centerArea->height()) / 2;
+        
+        // Move the center area lower in the window by adding an offset
+        // Instead of centering it vertically, position it at about 60% down from the top
+        int baseY = (effectiveHeight - m_centerArea->height()) / 2;
+        int lowerOffset = effectiveHeight / 8; // Move down by 1/8 of the effective height
+        int centerY = baseY + lowerOffset;
+        
+        // Ensure it doesn't go too low and overlap with the bottom controls
+        int maxY = effectiveHeight - m_centerArea->height() - 20; // 20px margin from bottom
+        centerY = std::min(centerY, maxY);
+        
         m_centerArea->move(centerX, centerY);
         // Ensure the center area (and community cards) render above players if close
         m_centerArea->raise();
@@ -1374,7 +1389,8 @@ void PokerTableWindow::resizeEvent(QResizeEvent* event)
 {
     QWidget::resizeEvent(event);
 
-    // Reposition all elements when window is resized
+    // Since window size is now fixed, repositioning should be consistent
+    // Keep the repositioning logic for showEvent compatibility
     positionPlayersInCircle();
     positionCenterArea();
     positionDealerButtons();

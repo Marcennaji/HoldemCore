@@ -440,8 +440,20 @@ void Hand::filterPlayersWithInsufficientCash()
         if (playerCash <= 0)
         {
             myServices->logger().info("Player " + (*it)->getName() + " (ID: " + 
-                std::to_string((*it)->getId()) + ") removed from hand - insufficient cash: " + 
+                std::to_string((*it)->getId()) + ") auto-folded due to insufficient cash: " + 
                 std::to_string(playerCash));
+            
+            // Create a fold action to notify the UI that this player is folded
+            PlayerAction autoFoldAction;
+            autoFoldAction.playerId = (*it)->getId();
+            autoFoldAction.type = ActionType::Fold;
+            autoFoldAction.amount = 0;
+            
+            // Fire the player action event to notify UI that this player folded
+            if (myEvents.onPlayerActed)
+            {
+                myEvents.onPlayerActed(autoFoldAction);
+            }
                 
             it = myActingPlayersList->erase(it);
         }
