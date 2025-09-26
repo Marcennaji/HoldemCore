@@ -82,6 +82,9 @@ class Hand : public IHandLifecycle, public IHandPlayerAction, public HandPlayers
     void handleAutoFold(unsigned playerId);
     void processValidAction(const PlayerAction& action);
     void ensureServicesInitialized() const;
+    
+    // Cash validation methods
+    void filterPlayersWithInsufficientCash();
 
     std::shared_ptr<EngineFactory> myFactory;
     const GameEvents& myEvents;

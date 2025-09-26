@@ -55,6 +55,7 @@ void Board::distributePot(Hand& hand)
 {
     int totalPot = 0;
 
+    // Calculate total pot from all players at the table (including those who folded after contributing)
     for (auto& player : *hand.getSeatsList())
     {
         totalPot += player->getCurrentHandActions().getHandTotalBetAmount();
@@ -66,7 +67,8 @@ void Board::distributePot(Hand& hand)
         ensureServicesInitialized();
         // Use ASCII hyphen to avoid mojibake on Windows consoles
         myServices->logger().info(std::string("Showdown - final board: \"") + bc.toString() + "\"");
-        for (auto& player : *hand.getSeatsList())
+        // Only evaluate hands for players who actually participated in the hand
+        for (auto& player : *hand.getActingPlayersList())
         {
             const auto& hc = player->getHoleCards();
             // In real games, hole cards are valid; recompute to ensure final ranks.
@@ -86,7 +88,9 @@ void Board::distributePot(Hand& hand)
         }
     }
 
-    Pot pot(totalPot, mySeatsList, myDealerPlayerId, myServices);
+    // Use seats list for pot distribution (includes folded players who contributed)
+    // but only evaluate hands for acting players (non-folded players who can win)
+    Pot pot(totalPot, hand.getSeatsList(), myDealerPlayerId, myServices);
     pot.distribute();
     myWinners = pot.getWinners();
 

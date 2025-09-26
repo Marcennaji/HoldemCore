@@ -104,6 +104,9 @@ void Hand::initialize()
     // Initialize deck but don't deal cards yet - wait until runGameLoop() to match legacy timing
     initAndShuffleDeck();
 
+    // Remove players with insufficient cash before dealing cards
+    filterPlayersWithInsufficientCash();
+
     for (auto player = mySeatsList->begin(); player != mySeatsList->end(); ++player)
     {
         (*player)->resetForNewHand(*this);
@@ -150,12 +153,12 @@ void Hand::initAndShuffleDeck()
 void Hand::dealHoleCards(size_t cardsArrayIndex)
 {
     // Validate that there are enough cards in the deck
-    if (!myDeckManager->hasEnoughCards(0, mySeatsList->size())) // 0 board cards here since already dealt
+    if (!myDeckManager->hasEnoughCards(0, myActingPlayersList->size())) // Use acting players list size
     {
         throw std::runtime_error("Not enough cards in the deck to deal hole cards to all players.");
     }
 
-    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
+    for (auto it = myActingPlayersList->begin(); it != myActingPlayersList->end(); ++it)
     {
         // Deal 2 hole cards for this player
         std::vector<Card> holeCardList = myDeckManager->dealCards(2);
@@ -420,6 +423,36 @@ void Hand::processValidAction(const PlayerAction& action)
         // Re-throw critical errors
         throw;
     }
+}
+
+void Hand::filterPlayersWithInsufficientCash()
+{
+    ensureServicesInitialized();
+    
+    // Remove players from acting players list who cannot afford minimum participation
+    // Cards will only be dealt to players in the acting list, so this is sufficient
+    auto it = myActingPlayersList->begin();
+    while (it != myActingPlayersList->end())
+    {
+        const int playerCash = (*it)->getCash();
+        
+        // Players with zero cash cannot participate at all
+        if (playerCash <= 0)
+        {
+            myServices->logger().info("Player " + (*it)->getName() + " (ID: " + 
+                std::to_string((*it)->getId()) + ") removed from hand - insufficient cash: " + 
+                std::to_string(playerCash));
+                
+            it = myActingPlayersList->erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+    
+    // Log the number of players remaining for the hand
+    myServices->logger().debug("Hand will proceed with " + std::to_string(myActingPlayersList->size()) + " players");
 }
 
 } // namespace pkt::core

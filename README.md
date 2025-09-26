@@ -47,7 +47,8 @@ cmake --build build/debug-widgets
 ## 👨‍💻 About the Engineer
 
 **Marc Ennaji** 
-Freelance Software Engineer | C++ Expert | Experienced Python Developer | Software Architecture & Refactoring  
+
+Senior Software Engineer | C++ specialist | Experienced Python Developer | Software Architecture & Refactoring  
 [LinkedIn](https://www.linkedin.com/in/marcennaji/) 
 
 ### Core Expertise
@@ -153,17 +154,12 @@ player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 ---
 ## � Development Roadmap
 
-**Architecture (Ongoing)**
+**Ongoing**
 - Architecture validation and improvements, continuous refactoring on the engine
-- prototyping a Qt Widgets and a Qt Quick (QML) user interfaces
+- Qt Widgets user interface (desktop app version) is currently being tested
 
 **UI & Integration (Q4 2025)**
-- Complete Qt Widgets table interface 
-- Complete Qt QML table interface
-
-**Advanced Features (2026)**
-- Flutter mobile/web clients
-- Machine learning integration for advanced bot strategies
+- Develop a Qt Quick (QML) GUI, for mobile version
 
 ---
 
