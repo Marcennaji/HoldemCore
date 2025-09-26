@@ -357,9 +357,9 @@ int GuiBridgeWidgets::computeDelayMsForBots() const
     if (speed > 50) speed = 50; // clamp to avoid zero or negative delays
 
     // Higher gameSpeed => faster pacing (shorter delay)
-    // Map speed in [1..10] to delay in [3000..500] ms inversely (clamped)
-    const int minDelay = 500;  // 0.5s
-    const int maxDelay = 3000; // 3.0s
+    // Map speed in [1..10] to delay in [2000..100] ms inversely (clamped)
+    const int minDelay = 100;  // 0.1s
+    const int maxDelay = 2000; // 2.0s
 
     // If speed is large (e.g., 10), delay should be near minDelay.
     // Use a simple inverse proportion: delay = maxDelay - (speed-1) * step

@@ -106,7 +106,7 @@ std::vector<ActionType> getValidActionsForPlayer(const PlayerList& actingPlayers
             actionsStr += actionTypeToString(validActions[i]);
             if (i + 1 < validActions.size()) actionsStr += ",";
         }
-        s_defaultServices->logger().info(
+        s_defaultServices->logger().debug(
             "valid actions for player " + player->getName() + " on " + gameStateToString(gameState) +
             ": highest=" + std::to_string(currentHighestBet) + ", bet=" + std::to_string(playerBet) +
             ", cash=" + std::to_string(playerCash) + " => [" + actionsStr + "]");
@@ -159,65 +159,65 @@ std::unique_ptr<pkt::core::IHandState> computeBettingRoundNextState(pkt::core::H
     }
 
     // If all remaining players are all-in (no one can act further), we should still
-    // deal out the remaining community cards to reach a full 5-card board, then
-    // proceed to showdown. Decide the next state based on currentState.
+    // progress through the normal betting round states to show card progression,
+    // but deal the appropriate cards for the next state and skip betting actions.
     if (hand.getActingPlayersList()->empty() && hand.getPlayersInHandList()->size() >= 1)
     {
         // Inform board that showdown is due to all-in; affects reveal ordering later.
         hand.getBoard().setAllInCondition(true);
 
-        // Immediately deal out all remaining community cards so the board is complete,
-        // then proceed directly to PostRiver (showdown). This avoids pausing in
-        // intermediate Turn/River states when no actions are possible.
-        BoardCards board = hand.getBoard().getBoardCards();
-        const size_t n = board.getNumCards();
-
-        if (n < 3)
+        // Determine next state and deal appropriate cards based on current state
+        switch (currentState)
         {
-            // Deal missing flop cards (should only happen for preflop all-in)
-            auto flopCards = hand.dealCardsFromDeck(3 - n);
-            if (n == 0)
+        case pkt::core::GameState::Preflop:
+        {
+            // Deal flop cards
+            BoardCards board = hand.getBoard().getBoardCards();
+            if (board.getNumCards() == 0)
             {
+                auto flopCards = hand.dealCardsFromDeck(3);
                 BoardCards flopBoard(flopCards[0], flopCards[1], flopCards[2]);
                 hand.getBoard().setBoardCards(flopBoard);
                 if (events.onBoardCardsDealt) events.onBoardCardsDealt(flopBoard);
-                board = flopBoard;
             }
-            else if (n == 1)
-            {
-                // Not a standard state, but handle defensively
-                // Build from scratch using placeholders is complex; skip as this state shouldn't occur
-            }
-            else if (n == 2)
-            {
-                // Same as above; not expected
-            }
+            return std::make_unique<pkt::core::FlopState>(events);
         }
-
-        // If we have exactly flop, deal turn
-        if (board.getNumCards() == 3)
+        case pkt::core::GameState::Flop:
         {
-            auto turnCards = hand.dealCardsFromDeck(1);
-            BoardCards turnBoard = board;
-            turnBoard.dealTurn(turnCards[0]);
-            hand.getBoard().setBoardCards(turnBoard);
-            if (events.onBoardCardsDealt) events.onBoardCardsDealt(turnBoard);
-            board = turnBoard;
+            // Deal turn card
+            BoardCards board = hand.getBoard().getBoardCards();
+            if (board.getNumCards() == 3)
+            {
+                auto turnCards = hand.dealCardsFromDeck(1);
+                BoardCards turnBoard = board;
+                turnBoard.dealTurn(turnCards[0]);
+                hand.getBoard().setBoardCards(turnBoard);
+                if (events.onBoardCardsDealt) events.onBoardCardsDealt(turnBoard);
+            }
+            return std::make_unique<pkt::core::TurnState>(events);
         }
-
-        // If we have exactly turn, deal river
-        if (board.getNumCards() == 4)
+        case pkt::core::GameState::Turn:
         {
-            auto riverCards = hand.dealCardsFromDeck(1);
-            BoardCards riverBoard = board;
-            riverBoard.dealRiver(riverCards[0]);
-            hand.getBoard().setBoardCards(riverBoard);
-            if (events.onBoardCardsDealt) events.onBoardCardsDealt(riverBoard);
-            board = riverBoard;
+            // Deal river card
+            BoardCards board = hand.getBoard().getBoardCards();
+            if (board.getNumCards() == 4)
+            {
+                auto riverCards = hand.dealCardsFromDeck(1);
+                BoardCards riverBoard = board;
+                riverBoard.dealRiver(riverCards[0]);
+                hand.getBoard().setBoardCards(riverBoard);
+                if (events.onBoardCardsDealt) events.onBoardCardsDealt(riverBoard);
+            }
+            return std::make_unique<pkt::core::RiverState>(events);
         }
-
-        // Board is complete; go straight to showdown
-        return std::make_unique<pkt::core::PostRiverState>(events);
+        case pkt::core::GameState::River:
+        {
+            // All cards dealt, proceed to showdown
+            return std::make_unique<pkt::core::PostRiverState>(events);
+        }
+        default:
+            return std::make_unique<pkt::core::PostRiverState>(events);
+        }
     }
 
     // If round is complete, check if we can continue betting

@@ -238,8 +238,8 @@ TEST_F(FlopStateTest, AllInCallScenarioOnFlop)
 
     myHand->handlePlayerAction({playerBb->getId(), ActionType::Call});
 
-    // Both players should be committed, round should advance to PostRiver
-    EXPECT_EQ(myLastGameState, PostRiver);
+    // Both players are all-in, but should advance to Turn first (not skip directly to PostRiver)
+    EXPECT_EQ(myLastGameState, Turn);
 }
 
 TEST_F(FlopStateTest, BetFoldScenarioOnFlop)

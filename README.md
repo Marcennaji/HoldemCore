@@ -154,13 +154,12 @@ player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 ## � Development Roadmap
 
 **Architecture (Ongoing)**
-- Still some important refactoring ongoing
+- Architecture validation and improvements, continuous refactoring on the engine
+- prototyping a Qt Widgets and a Qt Quick (QML) user interfaces
 
 **UI & Integration (Q4 2025)**
-- Complete Qt Widgets table interface (ongoing)
-- Qt QML table interface
-- WebSocket API for remote clients
-- REST API for game state queries
+- Complete Qt Widgets table interface 
+- Complete Qt QML table interface
 
 **Advanced Features (2026)**
 - Flutter mobile/web clients

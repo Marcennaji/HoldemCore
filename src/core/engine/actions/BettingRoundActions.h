@@ -7,6 +7,7 @@
 #include "core/player/typedefs.h"
 
 #include <vector>
+#include <memory>
 
 namespace pkt::core
 {
@@ -23,12 +24,12 @@ class BettingRoundActions
     std::vector<PlayerPosition> getRaisersPositions();
     std::vector<PlayerPosition> getCallersPositions();
 
-    int getLastRaiserId();
-    void setLastRaiserId(int id);
+    std::shared_ptr<pkt::core::player::Player> getLastRaiser();
+    void setLastRaiser(std::shared_ptr<pkt::core::player::Player> player);
 
   protected:
     GameState myGameState;
-    int myLastRaiserId = -1;
+    std::shared_ptr<pkt::core::player::Player> myLastRaiser = nullptr;
 
     const pkt::core::player::PlayerList& mySeatsList;
     const pkt::core::player::PlayerList& myActingPlayersList;

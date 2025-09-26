@@ -267,8 +267,8 @@ TEST_F(TurnStateTest, AllInCallScenarioOnTurn)
 
     myHand->handlePlayerAction({playerBb->getId(), ActionType::Call});
 
-    // Both players should be allin, round should advance
-    EXPECT_EQ(myLastGameState, PostRiver);
+    // Both players are all-in, but should advance to River first (not skip directly to PostRiver)
+    EXPECT_EQ(myLastGameState, River);
 }
 
 TEST_F(TurnStateTest, BetFoldScenarioOnTurn)

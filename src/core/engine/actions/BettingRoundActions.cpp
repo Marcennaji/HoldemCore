@@ -3,6 +3,7 @@
 #include "../hand/Hand.h"
 #include "core/player/Player.h"
 #include "core/player/typedefs.h"
+#include "core/engine/model/PlayerAction.h"
 
 namespace pkt::core
 {
@@ -74,14 +75,43 @@ int BettingRoundActions::getBetsOrRaisesNumber()
     return bets;
 }
 
-int BettingRoundActions::getLastRaiserId()
+std::shared_ptr<pkt::core::player::Player> BettingRoundActions::getLastRaiser()
 {
-    return myLastRaiserId;
+    // If we have a stored last raiser, return it
+    if (myLastRaiser)
+    {
+        return myLastRaiser;
+    }
+
+    // If no stored last raiser but there are raises, find the last raiser dynamically
+    // This ensures consistency when raises exist but lastRaiser wasn't properly set
+    std::shared_ptr<pkt::core::player::Player> lastRaiser = nullptr;
+    
+    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
+    {
+        auto& actions = (*it)->getCurrentHandActions().getActions(myGameState);
+
+        for (auto itAction = actions.begin(); itAction != actions.end(); itAction++)
+        {
+            if (itAction->type == ActionType::Raise || itAction->type == ActionType::Allin)
+            {
+                lastRaiser = *it;
+            }
+        }
+    }
+
+    // Cache the found last raiser to avoid recalculation
+    if (lastRaiser)
+    {
+        myLastRaiser = lastRaiser;
+    }
+
+    return lastRaiser;
 }
 
-void BettingRoundActions::setLastRaiserId(int id)
+void BettingRoundActions::setLastRaiser(std::shared_ptr<pkt::core::player::Player> player)
 {
-    myLastRaiserId = id;
+    myLastRaiser = player;
 }
 
 } // namespace pkt::core

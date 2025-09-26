@@ -151,19 +151,25 @@ void ActionApplier::updateBetAndPot(Hand& hand, player::Player& player, int amou
 
 void ActionApplier::setLastRaiserForCurrentRound(Hand& hand, unsigned playerId)
 {
+    auto player = getPlayerById(hand.getSeatsList(), playerId);
+    if (!player)
+    {
+        return; // Player not found, ignore
+    }
+
     switch (hand.getStateManager()->getGameState())
     {
     case GameState::Preflop:
-        hand.getBettingActions()->getPreflop().setLastRaiserId(playerId);
+        hand.getBettingActions()->getPreflop().setLastRaiser(player);
         break;
     case GameState::Flop:
-        hand.getBettingActions()->getFlop().setLastRaiserId(playerId);
+        hand.getBettingActions()->getFlop().setLastRaiser(player);
         break;
     case GameState::Turn:
-        hand.getBettingActions()->getTurn().setLastRaiserId(playerId);
+        hand.getBettingActions()->getTurn().setLastRaiser(player);
         break;
     case GameState::River:
-        hand.getBettingActions()->getRiver().setLastRaiserId(playerId);
+        hand.getBettingActions()->getRiver().setLastRaiser(player);
         break;
     default:
         break;

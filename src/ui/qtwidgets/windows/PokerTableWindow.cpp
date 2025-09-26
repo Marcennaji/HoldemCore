@@ -624,8 +624,10 @@ void PokerTableWindow::onRaiseAction()
 
 void PokerTableWindow::onNextHandClicked()
 {
-    // Hide the Next Hand button and emit signal to start next hand
+    // Hide the Next Hand button and show action buttons
     m_nextHandButton->setVisible(false);
+    m_actionGroup->setVisible(true);
+    m_bettingGroup->setVisible(true);
     // m_statusLabel->setText("Starting next hand...");
     // m_statusLabel->setStyleSheet("color: #2d8659;");
     
@@ -951,8 +953,9 @@ void PokerTableWindow::onHandCompleted()
     // Show the Next Hand button when a hand is completed
     m_nextHandButton->setVisible(true);
     
-    // Disable action buttons during hand completion
-    enablePlayerInput(false);
+    // Hide action buttons during hand completion
+    m_actionGroup->setVisible(false);
+    m_bettingGroup->setVisible(false);
     
     // Update status to indicate hand is complete
     // m_statusLabel->setText("Hand completed! Click 'Next Hand' to continue.");
@@ -965,6 +968,10 @@ void PokerTableWindow::resetForNewHand()
     
     // Hide the Next Hand button
     m_nextHandButton->setVisible(false);
+    
+    // Show action buttons for the new hand
+    m_actionGroup->setVisible(true);
+    m_bettingGroup->setVisible(true);
     
     // Explicitly clear board cards using the same method as game events
     pkt::core::BoardCards emptyBoard; // Default constructor creates preflop state (0 cards)
@@ -1028,7 +1035,7 @@ void PokerTableWindow::showWinners(const std::list<unsigned>& winnerIds, int tot
                     // Avoid implying the full pot went to each; indicate split
                     player.winnerLabel->setText("WINNER (split)");
                 } else {
-                    player.winnerLabel->setText(QString("WINNER +$%1").arg(totalPot));
+                    player.winnerLabel->setText(QString("WINNER +%1").arg(totalPot));
                 }
                 player.winnerLabel->setVisible(true);
             }

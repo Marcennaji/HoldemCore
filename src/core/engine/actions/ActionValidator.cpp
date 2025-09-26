@@ -159,7 +159,7 @@ bool ActionValidator::isActionTypeValid(const pkt::core::player::PlayerList& act
             actionsStr += actionTypeToString(validActions[i]);
             if (i + 1 < validActions.size()) actionsStr += ",";
         }
-        myServices->logger().info(gameStateToString(gameState) + 
+        myServices->logger().debug(gameStateToString(gameState) + 
                                    ": valid actions for player " + player->getName() + 
                                    " => [" + actionsStr + "] (requested: " + actionTypeToString(action.type) + ")");
     }
@@ -270,8 +270,7 @@ bool ActionValidator::isActionAmountValid(const PlayerAction& action, const Bett
         {
             const int currentHighestBet = bettingActions.getRoundHighestSet();
             int minRaise = bettingActions.getMinRaise(smallBlind);
-            msg += ", needs to be >= currentHighest(" + std::to_string(currentHighestBet) + ") + minRaise(" +
-                   std::to_string(minRaise) + ") and within player's cash";
+            msg += ": It needs to be >= " + std::to_string(currentHighestBet + minRaise) + ", and within player's cash";
             break;
         }
         default:

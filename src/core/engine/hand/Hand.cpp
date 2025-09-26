@@ -109,7 +109,7 @@ void Hand::initialize()
         (*player)->resetForNewHand(*this);
     }
 
-    getBettingActions()->getPreflop().setLastRaiserId(-1);
+    getBettingActions()->getPreflop().setLastRaiser(nullptr);
 
     myStateManager->initializeState(*this);
 }
@@ -220,15 +220,19 @@ HandCommonContext Hand::updateHandCommonContext()
     handContext.smallBlind = mySmallBlind;
 
     handContext.playersContext.actingPlayersList = getActingPlayersList();
-    handContext.playersContext.lastVPIPPlayer = getPlayerById(getSeatsList(), getBettingActions()->getLastRaiserId());
+    
+    // Get last VPIP player - keep existing logic for now since BettingActions::getLastRaiserId() is more complex
+    int lastVPIPPlayerId = getBettingActions()->getLastRaiserId();
+    handContext.playersContext.lastVPIPPlayer = 
+        (lastVPIPPlayerId != -1) ? getPlayerById(getSeatsList(), lastVPIPPlayerId) : nullptr;
+        
     handContext.playersContext.callersPositions = myBettingActions->getCallersPositions();
     handContext.playersContext.raisersPositions = myBettingActions->getRaisersPositions();
-    handContext.playersContext.preflopLastRaiser =
-        getPlayerById(getSeatsList(), getBettingActions()->getPreflop().getLastRaiserId());
-    handContext.playersContext.turnLastRaiser =
-        getPlayerById(getSeatsList(), getBettingActions()->getTurn().getLastRaiserId());
-    handContext.playersContext.flopLastRaiser =
-        getPlayerById(getSeatsList(), getBettingActions()->getFlop().getLastRaiserId());
+    
+    // Directly assign last raiser pointers - they're already validated by the BettingRoundActions
+    handContext.playersContext.preflopLastRaiser = getBettingActions()->getPreflop().getLastRaiser();
+    handContext.playersContext.flopLastRaiser = getBettingActions()->getFlop().getLastRaiser();
+    handContext.playersContext.turnLastRaiser = getBettingActions()->getTurn().getLastRaiser();
 
     handContext.bettingContext.pot = myBoard->getPot(*this);
     // handContext.bettingContext.potOdd = getPotOdd();
