@@ -58,6 +58,9 @@ class PokerTableWindow : public QWidget
   // Clear a single player's action label (used to clear human just before their turn)
   void clearPlayerActionLabel(int playerId);
     void showErrorMessage(const QString& message);
+    
+    // Game data access
+    int getStartMoney() const { return m_startMoney; }
     void setAvailableActions(const std::vector<pkt::core::ActionType>& actions);
     void enablePlayerInput(bool enabled);
   // Reset bet controls (slider/spin) to default after an action
@@ -159,6 +162,7 @@ class PokerTableWindow : public QWidget
     };
     std::vector<PlayerUIComponents> m_playerComponents;
     int m_maxPlayers;
+    int m_startMoney; // Starting cash amount for current game
     
     // Player state tracking
     int m_activePlayerId;   // Currently active player (-1 if none)

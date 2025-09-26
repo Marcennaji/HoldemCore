@@ -60,5 +60,8 @@ class BotStrategyBase : public virtual BotStrategy
     bool shouldPotControlOnTurn(const CurrentHandContext&, int bigBlind) const;
 
     void logPotControl() const;
+
+    // Cash constraint validation helper - uses existing ActionValidator infrastructure
+    pkt::core::PlayerAction validateAndAdjustAction(pkt::core::PlayerAction desiredAction, const CurrentHandContext& ctx) const;
 };
 } // namespace pkt::core::player

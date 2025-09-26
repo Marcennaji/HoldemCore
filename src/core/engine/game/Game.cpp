@@ -40,9 +40,6 @@ void Game::startNewHand()
     // Reset the board to preflop state (clear all community cards)
     myCurrentBoard->setBoardCards(BoardCards());
     
-    // CRITICAL FIX: Reset acting players list for the new hand
-    // The acting players list gets modified during gameplay (players fold/go all-in)
-    // We need to reset it to include all seated players for each new hand
     myActingPlayersList = std::make_shared<std::list<std::shared_ptr<Player>>>(*mySeatsList);
 
     // Determine dealer for THIS hand before creating the Hand.

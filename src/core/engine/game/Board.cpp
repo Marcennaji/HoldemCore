@@ -76,7 +76,7 @@ void Board::distributePot(Hand& hand)
                 // Build evaluator string strictly as: HOLE then BOARD (e.g., "Ah Ad 2c 7d 9h 4s 3c").
                 std::string handStr = hc.toString() + std::string(" ") + bc.toString();
                 // Extra diagnostic log to verify ordering at runtime.
-                myServices->logger().info(std::string("[debug] Recompute showdown with: \"") + handStr + "\"");
+                myServices->logger().debug(std::string("Recompute showdown with: \"") + handStr + "\"");
                 player->setHandRanking(pkt::core::HandEvaluator::evaluateHand(handStr.c_str(), myServices));
             }
             myServices->logger().info(

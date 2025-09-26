@@ -180,6 +180,13 @@ void GuiBridgeWidgets::handleGameInitialized(int gameSpeed)
     qDebug() << "Game initialized with speed:" << gameSpeed;
     m_gameSpeed = gameSpeed;
     
+    if (myTableWindow) {
+        m_humanChips = myTableWindow->getStartMoney();
+        qDebug() << "Reset human chips tracking to start money:" << m_humanChips;
+    } else {
+        m_humanChips = -1; // Fallback if table window not available
+    }
+    
     // Reset the UI for a new hand
     myTableWindow->resetForNewHand();
     
@@ -358,8 +365,8 @@ int GuiBridgeWidgets::computeDelayMsForBots() const
 
     // Higher gameSpeed => faster pacing (shorter delay)
     // Map speed in [1..10] to delay in [2000..100] ms inversely (clamped)
-    const int minDelay = 100;  // 0.1s
-    const int maxDelay = 2000; // 2.0s
+    const int minDelay = 10;  
+    const int maxDelay = 2000; 
 
     // If speed is large (e.g., 10), delay should be near minDelay.
     // Use a simple inverse proportion: delay = maxDelay - (speed-1) * step
