@@ -102,16 +102,13 @@ bool TurnPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopAnaly
         ctx.commonContext.bettingContext.flopBetsOrRaisesNumber > 0 &&
         ctx.personalContext.actions.currentHandActions.getActions(GameState::Turn).back().type == ActionType::Call &&
         !ctx.personalContext.actions.flopIsAggressor &&
-        !(ctx.personalContext.statistics.getWentToShowDown() > 30 &&
-          ctx.personalContext.statistics.riverStatistics.hands > MIN_HANDS_STATISTICS_ACCURATE))
+        !PlausibilityHelpers::isModeratelyLoosePlayer(ctx))
     {
 
-        if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight ||
-              testedHand.isFlush || testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads ||
-              testedHand.isStFlush || testedHand.flushOuts >= 8 || testedHand.straightOuts >= 8))
+        if (!(PlausibilityHelpers::hasPremiumHand(testedHand) || PlausibilityHelpers::hasGoodDraw(testedHand)))
         {
 
-            if (testedHand.isNoPair || (testedHand.isOnePair && testedHand.isFullHousePossible))
+            if (testedHand.isNoPair || PlausibilityHelpers::hasWeakPairOnPairedBoard(testedHand))
             {
                 return true;
             }
@@ -131,17 +128,13 @@ bool TurnPlausibilityChecker::isUnplausibleHandGivenTurnCall(const PostFlopAnaly
     // the player called a raise on turn, and is not loose : he has at least a top pair or a good draw
     if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber > 1 &&
         ctx.personalContext.actions.currentHandActions.getActions(GameState::Turn).back().type == ActionType::Call &&
-        !(ctx.personalContext.statistics.getWentToShowDown() > 35 &&
-          ctx.personalContext.statistics.riverStatistics.hands > MIN_HANDS_STATISTICS_ACCURATE))
+        !PlausibilityHelpers::isLoosePlayer(ctx))
     {
 
-        if (!((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight ||
-              testedHand.isFlush || testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads ||
-              testedHand.isStFlush || testedHand.isOverCards || testedHand.isFlushDrawPossible ||
-              testedHand.flushOuts >= 8 || testedHand.straightOuts >= 8))
+        if (!(PlausibilityHelpers::hasCallingWorthyHand(testedHand)))
         {
 
-            if (testedHand.isNoPair || (testedHand.isOnePair && testedHand.isFullHousePossible))
+            if (testedHand.isNoPair || PlausibilityHelpers::hasWeakPairOnPairedBoard(testedHand))
             {
                 return true;
             }
@@ -182,10 +175,7 @@ bool TurnPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopAnal
     // if nobody has bet the flop, he should at least have a top pair
     if (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber == 0)
     {
-
-        if (testedHand.isTopPair || testedHand.isOverPair ||
-            (testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight || testedHand.isFlush ||
-            testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads || testedHand.isStFlush)
+        if (PlausibilityHelpers::hasRaiseWorthyHandAfterAction(testedHand))
         {
             return false;
         }
@@ -197,10 +187,7 @@ bool TurnPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopAnal
     // if he was not the agressor on flop, and an other player has bet the flop, then he should have at least a top pair
     if (!ctx.personalContext.actions.flopIsAggressor && ctx.commonContext.bettingContext.flopBetsOrRaisesNumber > 0)
     {
-
-        if (testedHand.isTopPair || testedHand.isOverPair ||
-            (testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight || testedHand.isFlush ||
-            testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads || testedHand.isStFlush)
+        if (PlausibilityHelpers::hasRaiseWorthyHandAfterAction(testedHand))
         {
             return false;
         }
@@ -211,8 +198,7 @@ bool TurnPlausibilityChecker::isUnplausibleHandGivenTurnRaise(const PostFlopAnal
     }
     // the player has raised twice the turn, and is not a maniac player : he should have at least two pairs
     if (ctx.personalContext.actions.currentHandActions.getActionsNumber(GameState::Turn, ActionType::Raise) == 2 &&
-        !((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight || testedHand.isFlush ||
-          testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads || testedHand.isStFlush))
+        !PlausibilityHelpers::hasPremiumHand(testedHand))
     {
         return true;
     }
@@ -257,8 +243,7 @@ bool TurnPlausibilityChecker::isUnplausibleHandGivenTurnAllin(const PostFlopAnal
 
     // the player has raised twice the turn, and is not a maniac player : he should have at least two pairs
     if (ctx.personalContext.actions.currentHandActions.getActionsNumber(GameState::Turn, ActionType::Raise) == 2 &&
-        !((testedHand.isTwoPair && !testedHand.isFullHousePossible) || testedHand.isStraight || testedHand.isFlush ||
-          testedHand.isFullHouse || testedHand.isTrips || testedHand.isQuads || testedHand.isStFlush))
+        !PlausibilityHelpers::hasPremiumHand(testedHand))
     {
         return true;
     }

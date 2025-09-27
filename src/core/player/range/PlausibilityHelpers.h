@@ -28,6 +28,13 @@ class PlausibilityHelpers
     static bool hasWeakHand(const PostFlopAnalysisFlags& hand);
     static bool hasTopPairOrBetter(const PostFlopAnalysisFlags& hand);
     static bool hasTwoPairOrBetter(const PostFlopAnalysisFlags& hand);
+    
+    // Additional hand strength helpers
+    static bool hasPremiumHand(const PostFlopAnalysisFlags& hand);
+    static bool hasGoodDraw(const PostFlopAnalysisFlags& hand);
+    static bool hasCallingWorthyHand(const PostFlopAnalysisFlags& hand);
+    static bool hasRaiseWorthyHandAfterAction(const PostFlopAnalysisFlags& hand);
+    static bool hasWeakPairOnPairedBoard(const PostFlopAnalysisFlags& hand);
 
     // Board texture helpers
     static bool isDangerousBoard(const PostFlopAnalysisFlags& hand);
@@ -36,6 +43,8 @@ class PlausibilityHelpers
     // Statistics helpers
     static bool hasInsufficientStatistics(const CurrentHandContext& ctx);
     static bool isPassivePlayer(const CurrentHandContext& ctx);
+    static bool isLoosePlayer(const CurrentHandContext& ctx);
+    static bool isModeratelyLoosePlayer(const CurrentHandContext& ctx);
 
     // Betting round specific helpers
     static bool isAggressiveOnRound(const CurrentHandContext& ctx, const std::string& round);

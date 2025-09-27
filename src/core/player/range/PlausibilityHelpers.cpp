@@ -72,6 +72,35 @@ bool PlausibilityHelpers::hasTwoPairOrBetter(const PostFlopAnalysisFlags& hand)
            hand.isTrips || hand.isQuads || hand.isStFlush;
 }
 
+bool PlausibilityHelpers::hasPremiumHand(const PostFlopAnalysisFlags& hand)
+{
+    // This is the exact pattern that appears multiple times in TurnPlausibilityChecker
+    return (hand.isTwoPair && !hand.isFullHousePossible) || hand.isStraight || hand.isFlush || hand.isFullHouse ||
+           hand.isTrips || hand.isQuads || hand.isStFlush;
+}
+
+bool PlausibilityHelpers::hasGoodDraw(const PostFlopAnalysisFlags& hand)
+{
+    return hand.flushOuts >= 8 || hand.straightOuts >= 8;
+}
+
+bool PlausibilityHelpers::hasCallingWorthyHand(const PostFlopAnalysisFlags& hand)
+{
+    // Combination of premium hands, good draws, and some marginal hands
+    return hasPremiumHand(hand) || hasGoodDraw(hand) || hand.isOverCards || hand.isFlushDrawPossible;
+}
+
+bool PlausibilityHelpers::hasRaiseWorthyHandAfterAction(const PostFlopAnalysisFlags& hand)
+{
+    // Hands that justify raising when there was previous betting action
+    return hand.isTopPair || hand.isOverPair || hasPremiumHand(hand);
+}
+
+bool PlausibilityHelpers::hasWeakPairOnPairedBoard(const PostFlopAnalysisFlags& hand)
+{
+    return hand.isOnePair && hand.isFullHousePossible;
+}
+
 // Board texture helpers
 
 bool PlausibilityHelpers::isDangerousBoard(const PostFlopAnalysisFlags& hand)
@@ -99,6 +128,21 @@ bool PlausibilityHelpers::isPassivePlayer(const CurrentHandContext& ctx)
     const auto& flop = ctx.personalContext.statistics.flopStatistics;
     return flop.getAgressionFactor() < 2 && flop.getAgressionFrequency() < 30 &&
            flop.hands > MIN_HANDS_STATISTICS_ACCURATE;
+}
+
+bool PlausibilityHelpers::isLoosePlayer(const CurrentHandContext& ctx)
+{
+    // Check if player has loose showdown tendencies (goes to showdown frequently)
+    // Uses the higher threshold variant (35%) as seen in TurnPlausibilityChecker
+    return ctx.personalContext.statistics.getWentToShowDown() > 35 &&
+           ctx.personalContext.statistics.riverStatistics.hands > MIN_HANDS_STATISTICS_ACCURATE;
+}
+
+bool PlausibilityHelpers::isModeratelyLoosePlayer(const CurrentHandContext& ctx)
+{
+    // Check if player has moderately loose showdown tendencies (30% threshold)
+    return ctx.personalContext.statistics.getWentToShowDown() > 30 &&
+           ctx.personalContext.statistics.riverStatistics.hands > MIN_HANDS_STATISTICS_ACCURATE;
 }
 
 // Betting round specific helpers
