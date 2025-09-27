@@ -45,38 +45,31 @@ PlayerAction BotStrategyBase::decidePreflop(const CurrentHandContext& ctx)
     PlayerAction resultingAction;
     resultingAction.playerId = ctx.personalContext.id;
 
-    bool shouldCall = preflopShouldCall(ctx);         // should at least call, and maybe raise
-    resultingAction.amount = preflopShouldRaise(ctx); // amount > 0 if decide to raise
+    // Strategy methods now handle cash constraints internally
+    bool shouldCall = preflopShouldCall(ctx);
+    int raiseAmount = preflopShouldRaise(ctx);
 
-    if (resultingAction.amount > 0)
+    if (raiseAmount > 0)
     {
-        shouldCall = false;
+        resultingAction.type = ActionType::Raise;
+        resultingAction.amount = raiseAmount;
     }
-
-    // if last to speak, a hand not good enough to raise, and nobody has raised : I check
-    if (ctx.commonContext.bettingContext.preflopRaisesNumber == 0 && resultingAction.amount == 0 &&
-        ctx.personalContext.position == PlayerPosition::BigBlind)
+    else if (shouldCall)
     {
+        resultingAction.type = ActionType::Call;
+    }
+    else if (ctx.commonContext.bettingContext.preflopRaisesNumber == 0 && 
+             ctx.personalContext.position == PlayerPosition::BigBlind)
+    {
+        // If last to speak, hand not good enough to raise/call, and nobody has raised: check
         resultingAction.type = ActionType::Check;
     }
     else
     {
-        if (shouldCall)
-        {
-            resultingAction.type = ActionType::Call;
-        }
-        else if (resultingAction.amount > 0)
-        {
-            resultingAction.type = ActionType::Raise;
-        }
-        else
-        {
-            resultingAction.type = ActionType::Fold;
-        }
+        resultingAction.type = ActionType::Fold;
     }
     
-    // Validate and adjust the action based on cash constraints using existing ActionValidator
-    return validateAndAdjustAction(resultingAction, ctx);
+    return resultingAction;
 }
 PlayerAction BotStrategyBase::decideFlop(const CurrentHandContext& ctx)
 {
@@ -84,44 +77,32 @@ PlayerAction BotStrategyBase::decideFlop(const CurrentHandContext& ctx)
     PlayerAction resultingAction;
     resultingAction.playerId = ctx.personalContext.id;
 
-    int betAmount = 0;
-    int raiseAmount = 0;
-    bool shouldCall = false;
-
     if (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber == 0)
     {
-        betAmount = flopShouldBet(ctx);
-    }
-    else
-    {
-        shouldCall = flopShouldCall(ctx);
-        raiseAmount = flopShouldRaise(ctx);
-    }
-
-    if (raiseAmount)
-    {
-        shouldCall = false;
-    }
-
-    if (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber == 0 && !raiseAmount && !betAmount)
-    {
-        resultingAction.type = ActionType::Check;
-    }
-    else
-    {
-        if (betAmount)
+        // No bets yet - decide whether to bet or check
+        int betAmount = flopShouldBet(ctx);
+        if (betAmount > 0)
         {
             resultingAction.type = ActionType::Bet;
             resultingAction.amount = betAmount;
         }
-        else if (shouldCall)
+        else
         {
-            resultingAction.type = ActionType::Call;
+            resultingAction.type = ActionType::Check;
         }
-        else if (raiseAmount)
+    }
+    else
+    {
+        // There are bets/raises - decide whether to call, raise, or fold
+        int raiseAmount = flopShouldRaise(ctx);
+        if (raiseAmount > 0)
         {
             resultingAction.type = ActionType::Raise;
             resultingAction.amount = raiseAmount;
+        }
+        else if (flopShouldCall(ctx))
+        {
+            resultingAction.type = ActionType::Call;
         }
         else
         {
@@ -129,8 +110,7 @@ PlayerAction BotStrategyBase::decideFlop(const CurrentHandContext& ctx)
         }
     }
 
-    // Validate and adjust the action based on cash constraints using existing ActionValidator
-    return validateAndAdjustAction(resultingAction, ctx);
+    return resultingAction;
 }
 PlayerAction BotStrategyBase::decideTurn(const CurrentHandContext& ctx)
 {
@@ -138,44 +118,32 @@ PlayerAction BotStrategyBase::decideTurn(const CurrentHandContext& ctx)
     PlayerAction resultingAction;
     resultingAction.playerId = ctx.personalContext.id;
 
-    int betAmount = 0;
-    int raiseAmount = 0;
-    bool shouldCall = false;
-
     if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber == 0)
     {
-        betAmount = turnShouldBet(ctx);
-    }
-    else
-    {
-        shouldCall = turnShouldCall(ctx);
-        raiseAmount = turnShouldRaise(ctx);
-    }
-
-    if (raiseAmount)
-    {
-        shouldCall = false;
-    }
-
-    if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber == 0 && !raiseAmount && !betAmount)
-    {
-        resultingAction.type = ActionType::Check;
-    }
-    else
-    {
-        if (betAmount)
+        // No bets yet - decide whether to bet or check
+        int betAmount = turnShouldBet(ctx);
+        if (betAmount > 0)
         {
             resultingAction.type = ActionType::Bet;
             resultingAction.amount = betAmount;
         }
-        else if (shouldCall)
+        else
         {
-            resultingAction.type = ActionType::Call;
+            resultingAction.type = ActionType::Check;
         }
-        else if (raiseAmount)
+    }
+    else
+    {
+        // There are bets/raises - decide whether to call, raise, or fold
+        int raiseAmount = turnShouldRaise(ctx);
+        if (raiseAmount > 0)
         {
             resultingAction.type = ActionType::Raise;
             resultingAction.amount = raiseAmount;
+        }
+        else if (turnShouldCall(ctx))
+        {
+            resultingAction.type = ActionType::Call;
         }
         else
         {
@@ -183,8 +151,7 @@ PlayerAction BotStrategyBase::decideTurn(const CurrentHandContext& ctx)
         }
     }
     
-    // Validate and adjust the action based on cash constraints using existing ActionValidator
-    return validateAndAdjustAction(resultingAction, ctx);
+    return resultingAction;
 }
 PlayerAction BotStrategyBase::decideRiver(const CurrentHandContext& ctx)
 {
@@ -192,44 +159,32 @@ PlayerAction BotStrategyBase::decideRiver(const CurrentHandContext& ctx)
     PlayerAction resultingAction;
     resultingAction.playerId = ctx.personalContext.id;
 
-    int betAmount = 0;
-    int raiseAmount = 0;
-    bool shouldCall = false;
-
     if (ctx.commonContext.bettingContext.riverBetsOrRaisesNumber == 0)
     {
-        betAmount = riverShouldBet(ctx);
-    }
-    else
-    {
-        shouldCall = riverShouldCall(ctx);
-        raiseAmount = riverShouldRaise(ctx);
-    }
-
-    if (raiseAmount)
-    {
-        shouldCall = false;
-    }
-
-    if (ctx.commonContext.bettingContext.riverBetsOrRaisesNumber == 0 && !raiseAmount && !betAmount)
-    {
-        resultingAction.type = ActionType::Check;
-    }
-    else
-    {
-        if (betAmount)
+        // No bets yet - decide whether to bet or check
+        int betAmount = riverShouldBet(ctx);
+        if (betAmount > 0)
         {
             resultingAction.type = ActionType::Bet;
             resultingAction.amount = betAmount;
         }
-        else if (shouldCall)
+        else
         {
-            resultingAction.type = ActionType::Call;
+            resultingAction.type = ActionType::Check;
         }
-        else if (raiseAmount)
+    }
+    else
+    {
+        // There are bets/raises - decide whether to call, raise, or fold
+        int raiseAmount = riverShouldRaise(ctx);
+        if (raiseAmount > 0)
         {
             resultingAction.type = ActionType::Raise;
             resultingAction.amount = raiseAmount;
+        }
+        else if (riverShouldCall(ctx))
+        {
+            resultingAction.type = ActionType::Call;
         }
         else
         {
@@ -237,8 +192,7 @@ PlayerAction BotStrategyBase::decideRiver(const CurrentHandContext& ctx)
         }
     }
     
-    // Validate and adjust the action based on cash constraints using existing ActionValidator
-    return validateAndAdjustAction(resultingAction, ctx);
+    return resultingAction;
 }
 bool BotStrategyBase::shouldPotControl(const CurrentHandContext& ctx)
 {
@@ -466,96 +420,22 @@ bool BotStrategyBase::isPossibleToBluff(const CurrentHandContext& ctx) const
     return true;
 }
 
-pkt::core::PlayerAction BotStrategyBase::validateAndAdjustAction(pkt::core::PlayerAction desiredAction, const CurrentHandContext& ctx) const
+bool BotStrategyBase::canAffordToCall(const CurrentHandContext& ctx) const
 {
-    ensureServicesInitialized();
-    
-    // Validate basic cash constraints directly from context
-    const int availableCash = ctx.personalContext.cash;
-    
-    switch (desiredAction.type)
-    {
-        case pkt::core::ActionType::Fold:
-        case pkt::core::ActionType::Check:
-            // These actions are safe regarding cash
-            return desiredAction;
-            
-        case pkt::core::ActionType::Call:
-        {
-            // Calculate how much cash is needed to call
-            const int currentPlayerBet = ctx.personalContext.actions.currentHandActions.getRoundTotalBetAmount(ctx.commonContext.gameState);
-            const int callAmount = ctx.commonContext.bettingContext.highestBetAmount - currentPlayerBet;
-            
-            if (callAmount > availableCash)
-            {
-                if (availableCash > 0)
-                {
-                    // Convert to all-in if we can't afford the full call
-                    desiredAction.type = pkt::core::ActionType::Allin;
-                    desiredAction.amount = currentPlayerBet + availableCash;
-                }
-                else
-                {
-                    // No cash available - must fold
-                    desiredAction.type = pkt::core::ActionType::Fold;
-                    desiredAction.amount = 0;
-                }
-            }
- 
-            return desiredAction;
-        }
-            
-        case pkt::core::ActionType::Bet:
-            if (desiredAction.amount > availableCash)
-            {
-                if (availableCash > 0)
-                {
-                    // Convert to all-in
-                    desiredAction.type = pkt::core::ActionType::Allin;
-                    desiredAction.amount = availableCash;
-                }
-                else
-                {
-                    // No cash available - convert to check or fold
-                    desiredAction.type = pkt::core::ActionType::Fold;
-                    desiredAction.amount = 0;
-                }
-            }
-            break;
-            
-        case pkt::core::ActionType::Raise:
-        {
-            const int currentPlayerBet = ctx.personalContext.actions.currentHandActions.getRoundTotalBetAmount(ctx.commonContext.gameState);
-            const int extraCashRequired = desiredAction.amount - currentPlayerBet;
-            
-            if (extraCashRequired > availableCash)
-            {
-                if (availableCash > 0)
-                {
-                    // Convert to all-in with maximum affordable amount
-                    desiredAction.type = pkt::core::ActionType::Allin;
-                    desiredAction.amount = currentPlayerBet + availableCash;
-                }
-                else
-                {
-                    // No cash available - convert to call or fold
-                    desiredAction.type = pkt::core::ActionType::Fold;
-                    desiredAction.amount = 0;
-                }
-            }
-            break;
-        }
-        
-        case pkt::core::ActionType::Allin:
-            // All-in should use all available cash
-            desiredAction.amount = availableCash;
-            break;
-            
-        default:
-            // Unknown action type - return as-is
-            break;
-    }
-    
-    return desiredAction;
+    const int callAmount = getCallAmount(ctx);
+    return ctx.personalContext.cash >= callAmount;
+}
+
+bool BotStrategyBase::canAffordToRaise(const CurrentHandContext& ctx, int raiseAmount) const
+{
+    const int currentPlayerBet = ctx.personalContext.actions.currentHandActions.getRoundTotalBetAmount(ctx.commonContext.gameState);
+    const int extraCashRequired = raiseAmount - currentPlayerBet;
+    return ctx.personalContext.cash >= extraCashRequired;
+}
+
+int BotStrategyBase::getCallAmount(const CurrentHandContext& ctx) const
+{
+    const int currentPlayerBet = ctx.personalContext.actions.currentHandActions.getRoundTotalBetAmount(ctx.commonContext.gameState);
+    return ctx.commonContext.bettingContext.highestBetAmount - currentPlayerBet;
 }
 } // namespace pkt::core::player

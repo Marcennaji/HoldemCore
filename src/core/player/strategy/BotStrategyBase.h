@@ -29,7 +29,7 @@ class BotStrategyBase : public virtual BotStrategy
     bool myShouldCall;
     bool myShouldRaise;
 
-    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices; // Injected service container
+    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices; 
 
   private:
     virtual bool preflopShouldCall(const CurrentHandContext& ctx) = 0;
@@ -61,7 +61,8 @@ class BotStrategyBase : public virtual BotStrategy
 
     void logPotControl() const;
 
-    // Cash constraint validation helper - uses existing ActionValidator infrastructure
-    pkt::core::PlayerAction validateAndAdjustAction(pkt::core::PlayerAction desiredAction, const CurrentHandContext& ctx) const;
+    bool canAffordToCall(const CurrentHandContext& ctx) const;
+    bool canAffordToRaise(const CurrentHandContext& ctx, int raiseAmount) const;
+    int getCallAmount(const CurrentHandContext& ctx) const;
 };
 } // namespace pkt::core::player

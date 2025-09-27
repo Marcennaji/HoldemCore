@@ -4,6 +4,7 @@
 
 #include "PositionManager.h"
 #include "core/player/Player.h"
+#include <vector>
 
 using namespace pkt::core::player;
 
@@ -56,102 +57,29 @@ int PositionManager::playerDistanceCircularOffset(int fromId, int toId, const Pl
 
 PlayerPosition PositionManager::computePlayerPositionFromOffset(int offset, int nbPlayers)
 {
-    // Dealer always at 0
-    switch (nbPlayers)
+    // Define position mappings for each table size
+    static const std::vector<std::vector<PlayerPosition>> positionMaps = {
+        {}, // 0 players (unused)
+        {}, // 1 player (unused)
+        {ButtonSmallBlind, BigBlind}, // 2 players
+        {Button, SmallBlind, BigBlind}, // 3 players
+        {Button, SmallBlind, BigBlind, UnderTheGun}, // 4 players
+        {Button, SmallBlind, BigBlind, UnderTheGun, Cutoff}, // 5 players
+        {Button, SmallBlind, BigBlind, UnderTheGun, Middle, Cutoff}, // 6 players
+        {Button, SmallBlind, BigBlind, UnderTheGun, Middle, Cutoff, Late}, // 7 players
+        {Button, SmallBlind, BigBlind, UnderTheGun, UnderTheGunPlusOne, Middle, Cutoff, Late}, // 8 players
+        {Button, SmallBlind, BigBlind, UnderTheGun, UnderTheGunPlusOne, UnderTheGunPlusTwo, Middle, Cutoff, Late}, // 9 players
+        {Button, SmallBlind, BigBlind, UnderTheGun, UnderTheGunPlusOne, UnderTheGunPlusTwo, Middle, MiddlePlusOne, Cutoff, Late} // 10 players
+    };
+
+    // Handle specific table sizes with predefined mappings
+    if (nbPlayers >= 2 && nbPlayers <= 10 && offset >= 0 && offset < nbPlayers)
     {
-    case 2:
-        return offset == 0 ? ButtonSmallBlind : BigBlind;
-    case 3:
-        return (offset == 0) ? Button : (offset == 1 ? SmallBlind : BigBlind);
-    case 4:
-        return (offset == 0) ? Button : (offset == 1 ? SmallBlind : (offset == 2 ? BigBlind : UnderTheGun));
-    case 5:
-        if (offset == 0)
-            return Button;
-        if (offset == 1)
-            return SmallBlind;
-        if (offset == 2)
-            return BigBlind;
-        if (offset == 3)
-            return UnderTheGun;
-        return Cutoff;
-    case 6:
-        if (offset == 0)
-            return Button;
-        if (offset == 1)
-            return SmallBlind;
-        if (offset == 2)
-            return BigBlind;
-        if (offset == 3)
-            return UnderTheGun;
-        if (offset == 4)
-            return Middle;
-        return Cutoff;
-    case 7:
-        if (offset == 0)
-            return Button;
-        if (offset == 1)
-            return SmallBlind;
-        if (offset == 2)
-            return BigBlind;
-        if (offset == 3)
-            return UnderTheGun;
-        if (offset == 4)
-            return Middle;
-        if (offset == 5)
-            return Cutoff;
-        return Late;
-    case 8:
-        if (offset == 0)
-            return Button;
-        if (offset == 1)
-            return SmallBlind;
-        if (offset == 2)
-            return BigBlind;
-        if (offset == 3)
-            return UnderTheGun;
-        if (offset == 4)
-            return UnderTheGunPlusOne;
-        if (offset == 5)
-            return Middle;
-        if (offset == 6)
-            return Cutoff;
-        return Late;
-    case 9:
-        if (offset == 0)
-            return Button;
-        if (offset == 1)
-            return SmallBlind;
-        if (offset == 2)
-            return BigBlind;
-        if (offset == 3)
-            return UnderTheGun;
-        if (offset == 4)
-            return UnderTheGunPlusOne;
-        if (offset == 5)
-            return UnderTheGunPlusTwo;
-        if (offset == 6)
-            return Middle;
-        if (offset == 7)
-            return Cutoff;
-        return Late;
-    default:
-        if (offset == 0)
-            return Button;
-        if (offset == 1)
-            return SmallBlind;
-        if (offset == 2)
-            return BigBlind;
-        if (offset == 3)
-            return UnderTheGun;
-        if (offset <= 5)
-            return UnderTheGunPlusOne;
-        if (offset <= 7)
-            return Middle;
-        if (offset == nbPlayers - 2)
-            return Cutoff;
-        return Late;
+        return positionMaps[nbPlayers][offset];
     }
+
+    // Fallback
+    return Unknown;
 }
 
 } // namespace pkt::core::player::position
