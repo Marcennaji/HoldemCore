@@ -1,5 +1,7 @@
 # HoldemCore
 
+**🌐 Language / Langue:** [English](README.md) | [Français](README_fr.md)
+
 **Production-Grade C++ Architecture Showcase**  
 Texas Hold'em poker simulation engine demonstrating modern software engineering practices: hexagonal architecture, dependency injection, comprehensive testing, and cross-platform design.
 
