@@ -35,6 +35,9 @@ class PlausibilityHelpers
     static bool hasCallingWorthyHand(const PostFlopAnalysisFlags& hand);
     static bool hasRaiseWorthyHandAfterAction(const PostFlopAnalysisFlags& hand);
     static bool hasWeakPairOnPairedBoard(const PostFlopAnalysisFlags& hand);
+    static bool hasDecentMadeHand(const PostFlopAnalysisFlags& hand);
+    static bool hasVeryWeakHand(const PostFlopAnalysisFlags& hand);
+    static bool hasWeakUnpairedHand(const PostFlopAnalysisFlags& hand);
     
     // River-specific hand strength helpers
     static bool hasStrongHandExcludingTwoPair(const PostFlopAnalysisFlags& hand);
@@ -43,6 +46,8 @@ class PlausibilityHelpers
     // Board texture helpers
     static bool isDangerousBoard(const PostFlopAnalysisFlags& hand);
     static bool isPairedBoard(const PostFlopAnalysisFlags& hand);
+    static bool isVeryDangerousBoard(const PostFlopAnalysisFlags& hand);
+    static bool isUnpairedBoard(const PostFlopAnalysisFlags& hand);
 
     // Statistics helpers
     static bool hasInsufficientStatistics(const CurrentHandContext& ctx);

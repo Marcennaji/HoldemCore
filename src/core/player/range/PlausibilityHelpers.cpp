@@ -113,6 +113,24 @@ bool PlausibilityHelpers::hasVeryStrongHand(const PostFlopAnalysisFlags& hand)
     return hand.isStraight || hand.isFlush || hand.isFullHouse || hand.isQuads || hand.isStFlush;
 }
 
+bool PlausibilityHelpers::hasDecentMadeHand(const PostFlopAnalysisFlags& hand)
+{
+    // Decent made hands that can be played aggressively on flop
+    return hand.isTopPair || hand.isOverPair || hand.isTwoPair || hand.isTrips;
+}
+
+bool PlausibilityHelpers::hasVeryWeakHand(const PostFlopAnalysisFlags& hand)
+{
+    // Very weak hands including no pair and weak pairs on paired boards
+    return hand.isNoPair || (hand.isOnePair && hand.isFullHousePossible);
+}
+
+bool PlausibilityHelpers::hasWeakUnpairedHand(const PostFlopAnalysisFlags& hand)
+{
+    // Weak hands on unpaired boards: no pair or weak one pair
+    return hand.isNoPair || (hand.isOnePair && !hand.isFullHousePossible && !hand.isTopPair && !hand.isOverPair);
+}
+
 // Board texture helpers
 
 bool PlausibilityHelpers::isDangerousBoard(const PostFlopAnalysisFlags& hand)
@@ -125,6 +143,17 @@ bool PlausibilityHelpers::isPairedBoard(const PostFlopAnalysisFlags& hand)
     // For now, we'll use isFullHousePossible as an indicator that the board might be paired
     // since full house is only possible with a paired board
     return hand.isFullHousePossible;
+}
+
+bool PlausibilityHelpers::isVeryDangerousBoard(const PostFlopAnalysisFlags& hand)
+{
+    // Board has both flush and straight draw possibilities (very coordinated)
+    return hand.isFlushDrawPossible && hand.isStraightDrawPossible;
+}
+
+bool PlausibilityHelpers::isUnpairedBoard(const PostFlopAnalysisFlags& hand)
+{
+    return !hand.isFullHousePossible;
 }
 
 // Statistics helpers

@@ -19,38 +19,38 @@ bool FlopPlausibilityChecker::isUnplausibleHandGivenFlopCheck(const PostFlopAnal
     // the player is in position, he didn't bet on flop, he is not usually passive, and everybody checked on flop :
 
     if (bHavePosition &&
-        !(agressionFactor < 2 && agressionFrequency < 30 && flop.hands > MIN_HANDS_STATISTICS_ACCURATE) &&
+        !PlausibilityHelpers::isPassivePlayer(ctx) &&
         (testedHand.usesFirst || testedHand.usesSecond))
     {
 
         // woudn't slow play a medium hand on a dangerous board
-        if (!testedHand.isFullHousePossible &&
+        if (PlausibilityHelpers::isUnpairedBoard(testedHand) &&
             ((testedHand.isMiddlePair && !testedHand.isFullHousePossible &&
               ctx.commonContext.playersContext.actingPlayersList->size() < 4) ||
              testedHand.isTopPair || testedHand.isOverPair ||
              (testedHand.isTwoPair && !testedHand.isFullHousePossible)) &&
-            testedHand.isFlushDrawPossible && testedHand.isStraightDrawPossible)
+            PlausibilityHelpers::isVeryDangerousBoard(testedHand))
         {
             return true;
         }
 
         // on a non-paired board, he would'nt slow play a straigth, a set or 2 pairs, if a flush draw is possible
-        if (!testedHand.isFullHousePossible && (testedHand.isTrips || testedHand.isStraight || testedHand.isTwoPair) &&
+        if (PlausibilityHelpers::isUnpairedBoard(testedHand) && (testedHand.isTrips || testedHand.isStraight || testedHand.isTwoPair) &&
             testedHand.isFlushDrawPossible)
         {
             return true;
         }
 
         // wouldn't be passive with a decent hand, on position, if more than 1 opponent
-        if (!testedHand.isFullHousePossible &&
-            (testedHand.isTopPair || testedHand.isOverPair || testedHand.isTwoPair || testedHand.isTrips) &&
+        if (PlausibilityHelpers::isUnpairedBoard(testedHand) &&
+            PlausibilityHelpers::hasDecentMadeHand(testedHand) &&
             ctx.commonContext.playersContext.actingPlayersList->size() > 2)
         {
             return true;
         }
 
         // on a paired board, he wouldn't check if he has a pocket overpair
-        if (testedHand.isFullHousePossible && testedHand.isOverPair)
+        if (PlausibilityHelpers::isPairedBoard(testedHand) && testedHand.isOverPair)
         {
             return true;
         }
@@ -89,7 +89,7 @@ bool FlopPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopAnalys
         }
 
         // Weak hands (no pair, weak pairs, pairs on paired board) shouldn't donk bet
-        if (testedHand.isNoPair || (testedHand.isOnePair && testedHand.isFullHousePossible) ||
+        if (PlausibilityHelpers::hasVeryWeakHand(testedHand) ||
             (testedHand.isOnePair && !testedHand.isMiddlePair && !testedHand.isTopPair && !testedHand.isOverPair))
         {
             return true;
@@ -121,7 +121,7 @@ bool FlopPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopAnalys
         if (testedHand.isOnePair)
         {
             // Pairs on paired board are questionable
-            if (testedHand.isFullHousePossible)
+            if (PlausibilityHelpers::isPairedBoard(testedHand))
             {
                 return true;
             }
@@ -149,7 +149,7 @@ bool FlopPlausibilityChecker::isUnplausibleHandGivenFlopBet(const PostFlopAnalys
         if (testedHand.isOnePair)
         {
             // Pairs on paired board are questionable
-            if (testedHand.isFullHousePossible)
+            if (PlausibilityHelpers::isPairedBoard(testedHand))
             {
                 return true;
             }
@@ -256,8 +256,7 @@ bool FlopPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopAnal
         }
 
         // Weak hands shouldn't check-raise
-        if (testedHand.isNoPair || (testedHand.isOnePair && !testedHand.isFullHousePossible && !testedHand.isTopPair &&
-                                    !testedHand.isOverPair))
+        if (PlausibilityHelpers::hasWeakUnpairedHand(testedHand))
         {
             return true;
         }
@@ -273,7 +272,7 @@ bool FlopPlausibilityChecker::isUnplausibleHandGivenFlopRaise(const PostFlopAnal
         }
 
         // Very weak hands shouldn't raise
-        if (testedHand.isNoPair || (testedHand.isOnePair && testedHand.isFullHousePossible) ||
+        if (PlausibilityHelpers::hasVeryWeakHand(testedHand) ||
             (testedHand.isOnePair && !testedHand.isTopPair && !testedHand.isOverPair))
         {
             return true;
@@ -322,7 +321,7 @@ bool FlopPlausibilityChecker::isUnplausibleHandGivenFlopAllin(const PostFlopAnal
     }
 
     // Very weak hands shouldn't go all-in
-    if (testedHand.isNoPair || (testedHand.isOnePair && testedHand.isFullHousePossible) ||
+    if (PlausibilityHelpers::hasVeryWeakHand(testedHand) ||
         (testedHand.isOnePair && !testedHand.isTopPair && !testedHand.isOverPair))
     {
         return true;
