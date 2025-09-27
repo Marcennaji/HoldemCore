@@ -16,7 +16,7 @@ target_include_directories(infra
             )
 
 # Link infra to third party libs
-target_link_libraries(infra PRIVATE psim tiny sqlite)
+target_link_libraries(infra PRIVATE psim sqlite)
 
 # Link infra to engine so it can use engine interfaces
 target_link_libraries(infra PUBLIC engine)

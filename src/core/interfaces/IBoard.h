@@ -41,9 +41,9 @@ class IBoard
 
     virtual std::list<unsigned> getWinners() const = 0;
     virtual void setWinners(const ::std::list<unsigned>& winners) = 0;
-
-  // Ordered vector accessor for UI consumption
-  virtual std::vector<unsigned> getShowdownRevealOrder() const = 0;
+  
+    // Ordered vector accessor for UI consumption
+    virtual std::vector<unsigned> getShowdownRevealOrder() const = 0;
 };
 
 } // namespace pkt::core

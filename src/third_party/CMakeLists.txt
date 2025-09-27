@@ -5,7 +5,6 @@ include_directories(
 )
 
 # Add subdirectories for each module
-add_subdirectory(tiny)
 add_subdirectory(sqlite3)
 add_subdirectory(poker-eval)
 add_subdirectory(psim)
