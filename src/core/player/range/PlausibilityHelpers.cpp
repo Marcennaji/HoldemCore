@@ -101,6 +101,18 @@ bool PlausibilityHelpers::hasWeakPairOnPairedBoard(const PostFlopAnalysisFlags& 
     return hand.isOnePair && hand.isFullHousePossible;
 }
 
+bool PlausibilityHelpers::hasStrongHandExcludingTwoPair(const PostFlopAnalysisFlags& hand)
+{
+    // Strong hands but excluding two pair (common pattern in river play)
+    return hand.isStraight || hand.isFlush || hand.isFullHouse || hand.isTrips || hand.isQuads || hand.isStFlush;
+}
+
+bool PlausibilityHelpers::hasVeryStrongHand(const PostFlopAnalysisFlags& hand)
+{
+    // Very strong hands that justify aggressive river play (excludes trips)
+    return hand.isStraight || hand.isFlush || hand.isFullHouse || hand.isQuads || hand.isStFlush;
+}
+
 // Board texture helpers
 
 bool PlausibilityHelpers::isDangerousBoard(const PostFlopAnalysisFlags& hand)
@@ -168,6 +180,23 @@ bool PlausibilityHelpers::isAggressiveOnRound(const CurrentHandContext& ctx, con
                river.hands > MIN_HANDS_STATISTICS_ACCURATE;
     }
     return false;
+}
+
+bool PlausibilityHelpers::isAggressiveOnRiver(const CurrentHandContext& ctx)
+{
+    const auto& river = ctx.personalContext.statistics.riverStatistics;
+    return river.getAgressionFactor() > 3 && river.getAgressionFrequency() > 50 &&
+           river.hands > MIN_HANDS_STATISTICS_ACCURATE;
+}
+
+bool PlausibilityHelpers::isOutOfPositionInMultiwayWithPriorAction(const CurrentHandContext& ctx)
+{
+    return !ctx.personalContext.hasPosition && 
+           ctx.commonContext.playersContext.actingPlayersList->size() > 2 &&
+           ((ctx.commonContext.bettingContext.flopBetsOrRaisesNumber > 1 &&
+             !ctx.personalContext.actions.flopIsAggressor) ||
+            (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber > 1 && 
+             !ctx.personalContext.actions.turnIsAggressor));
 }
 
 } // namespace pkt::core::player

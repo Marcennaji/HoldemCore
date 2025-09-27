@@ -35,6 +35,10 @@ class PlausibilityHelpers
     static bool hasCallingWorthyHand(const PostFlopAnalysisFlags& hand);
     static bool hasRaiseWorthyHandAfterAction(const PostFlopAnalysisFlags& hand);
     static bool hasWeakPairOnPairedBoard(const PostFlopAnalysisFlags& hand);
+    
+    // River-specific hand strength helpers
+    static bool hasStrongHandExcludingTwoPair(const PostFlopAnalysisFlags& hand);
+    static bool hasVeryStrongHand(const PostFlopAnalysisFlags& hand);
 
     // Board texture helpers
     static bool isDangerousBoard(const PostFlopAnalysisFlags& hand);
@@ -48,6 +52,8 @@ class PlausibilityHelpers
 
     // Betting round specific helpers
     static bool isAggressiveOnRound(const CurrentHandContext& ctx, const std::string& round);
+    static bool isAggressiveOnRiver(const CurrentHandContext& ctx);
+    static bool isOutOfPositionInMultiwayWithPriorAction(const CurrentHandContext& ctx);
 };
 
 } // namespace pkt::core::player
