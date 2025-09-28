@@ -2,29 +2,29 @@
 
 **🌐 Language / Langue:** [English](README.md) | [Français](README_fr.md)
 
-**Production-Grade C++ Architecture Showcase**  
-Texas Hold'em poker simulation engine demonstrating modern software engineering practices: hexagonal architecture, dependency injection, comprehensive testing, and cross-platform design.
+**Portfolio Project: Modern C++ Architecture**
 
-> **Portfolio Notice**: This repository is maintained as a demonstration of production-grade C++ engineering. Issues and PRs are welcome but the roadmap follows the author's priorities.
+Texas Hold'em simulation engine applying modern software engineering practices: hexagonal architecture, TDD and CI/CD, SOLID principles, and cross-platform design.
+
+> **Portfolio Notice**: This repository is maintained as a demonstration of C++ engineering. Issues and PRs are welcome but the roadmap follows the author's priorities.
 
 ---
 
-## 🎯 Engineering Showcase
+## 🎯 Project Showcase
 
-This project demonstrates **enterprise-level software engineering** through a complete poker simulation engine:
+Texas Hold'em simulation engine demonstrating advanced software architecture through:
 
 - **Hexagonal Architecture** with strict separation of concerns
-- **Dependency Injection** 
-- **~500 automated tests on the core engine**, ensuring reliability and maintainability
+- **Dependency Injection** container pattern
+- **Comprehensive test suite** ensuring reliability
 - **Cross-platform compatibility** (Windows, Linux, macOS)
 - **Multiple UI frameworks** supported through clean abstractions
-- **Continuous refactoring** - ongoing modernization and architectural improvements
 
-### Technical Complexity
-- **Complex domain modeling**: poker rules, betting rounds, players'ranges re-evaluation at each action
-- **AI strategy framework**: pluggable bot behaviors with range estimation
+### Key Features
+- **Complex domain modeling**: poker rules, betting rounds, player range evaluation
+- **AI strategy framework**: pluggable bot behaviors with statistical analysis
 - **State machine design**: robust game flow management
-- **Statistical analysis**: player behavior tracking and persistence
+- **Player behavior tracking** with database persistence
 
 ---
 ## 🚀 Quick Start
@@ -34,7 +34,7 @@ This project demonstrates **enterprise-level software engineering** through a co
 - C++20 compatible compiler
 - Qt 6.x (optional, only for GUI)
 
-### Build & Test the core engine (unit tests + end-to-end tests)
+### Build & Test
 ```bash
 git clone https://github.com/Marcennaji/HoldemCore.git
 cd HoldemCore
@@ -46,44 +46,34 @@ cmake --build build/debug-widgets
 
 ---
 
-## 👨‍💻 About the Engineer
+## 👨‍💻 About
 
-**Marc Ennaji** 
-
-Senior Software Engineer | C++ specialist | Experienced Python Developer | Software Architecture & Refactoring  
+**Marc Ennaji** - Senior Software Engineer  
 [LinkedIn](https://www.linkedin.com/in/marcennaji/) 
 
-### Core Expertise
-- Modern C++ 
-- Software Architecture 
-- Legacy Modernization 
-- Cross-Platform Development 
-- Test-Driven Development 
+### Expertise
+- Modern C++ Development
+- Software Architecture & Design
+- Legacy System Modernization
+- Test-Driven Development
 
-**Currently available for freelance collaborations and full-time positions**
+*Available for collaborations and opportunities*
 
 ---
 
 ## 🏠 Architecture Overview
 
-### Core Engineering Principles
+### Architecture Principles
 
-**1. Hexagonal Architecture (Ports & Adapters)**
+**Hexagonal Architecture (Ports & Adapters)**
 
 ![Hexagonal Architecture Diagram](doc/architecture.png)
 
-*Hexagonal architecture with dependency injection - visual representation of component interactions and service flow*
-
-**2. Dependency Injection Container**
-- Testable service boundaries  
-- Configurable service implementations
-- Mock-friendly architecture
-
-**3. Domain-Rich Architecture**
-- Rich domain models (Player, Hand, Board, Strategy)
-- Complex business logic encapsulation
-- Event-driven communication via function callbacks
-- Clear separation between domain and infrastructure
+**Key Design Elements:**
+- Dependency injection for testable boundaries
+- Rich domain models with clear separation
+- Event-driven communication
+- Strategy pattern for pluggable AI behaviors
 
 ### 4. **Strategy Pattern Implementation**
 
@@ -103,26 +93,21 @@ Player player(events, "BotName");
 player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 ```
 
-**Engineering Benefits:**
-- **Runtime strategy switching** based on game conditions
-- **Isolated unit testing** of individual strategies  
-- **Plugin architecture** for easy strategy development
-- **Template method pattern** with shared base logic
+**Benefits:**
+- Runtime strategy switching
+- Isolated unit testing
+- Plugin architecture for extensibility
 
-### 5. **Advanced Game Logic**
-- **Range estimation algorithms** for opponent modeling
+### 5. **Game Engine Features**
+- **Range estimation** for opponent modeling
 - **Monte Carlo simulations** for equity calculations  
 - **Statistical analysis** with persistent player profiles
-- **Complex state management** across betting rounds
-- **Statistics persistence and range pruning**
-- **FSM for betting rounds**: Preflop → Flop → Turn → River → PostRiver
+- **State machine** managing betting rounds (Preflop → Flop → Turn → River)
 
-### 6. **Comprehensive Testing Strategy**
-- **~500 automated tests on the core engine** (unit + integration + end-to-end)
+### 6. **Testing Strategy**
+- **Comprehensive automated testing** (unit + integration + end-to-end)
 - **TDD approach** with GoogleTest framework
-- **Architecture compliance tests** validating hexagonal principles
 - **Mock services** for isolated component testing
-- **Event-driven testing** with MockUI validation
 
 ---
 ## 🎮 User Interface
@@ -146,27 +131,20 @@ player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 ## 🔧 Technical Stack
 
 **Core Technologies:**
-- **C++20** (modern features, concepts, ranges, coroutines)
-- **CMake** (cross-platform build system with presets)
-- **GoogleTest** (comprehensive testing framework)
+- **C++20** with modern language features
+- **CMake** for cross-platform builds
+- **GoogleTest** testing framework
 
 **Architecture Patterns:**
-- **Hexagonal Architecture** (ports & adapters)
-- **Dependency Injection** (service container pattern)
-- **Strategy Pattern** (pluggable AI behaviors)
-- **State Machine** (game flow management)
-- **Event-driven Architecture** (callback-based communication)
+- Hexagonal Architecture, Dependency Injection
+- Strategy Pattern, State Machine
+- Event-driven Architecture
 
-**Cross-Platform Support:**
-- **Qt 6** (Qt Widgets and Qt QML)
-- **SQLite** (embedded database)
-- **Standard C++** (portable business logic)
+**Platform Support:**
+- **Qt 6** (Widgets and QML)
+- **SQLite** embedded database
+- **Cross-platform** standard C++
 
-**Development Practices:**
-- **Clean Code** principles
-- **SOLID** design principles  
-- **Test-Driven Development**
-- **Continuous Integration** ready
 
 ---
 ## � Development Roadmap
@@ -176,11 +154,9 @@ player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 
 ---
 
-## 📈 Project Metrics
+## 📈 Project Scale
 
-- **19,000+ lines** of modern C++ code
-- **~500 tests** with high coverage
-- **50+ classes** with clear responsibilities
+**19,000+ lines** of modern C++ • **Comprehensive test coverage** • **50+ classes**
 
 ---
 

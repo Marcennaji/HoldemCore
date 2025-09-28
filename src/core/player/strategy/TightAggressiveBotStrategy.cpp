@@ -9,6 +9,7 @@
 #include <core/engine/model/Ranges.h>
 #include <core/player/Helpers.h>
 #include <core/player/strategy/CurrentHandContext.h>
+#include <core/player/strategy/PokerMath.h>  // Phase 1-4 utilities
 #include "Exception.h"
 
 #include <fstream>
@@ -46,7 +47,7 @@ TightAggressiveBotStrategy::TightAggressiveBotStrategy(std::shared_ptr<pkt::core
 
 TightAggressiveBotStrategy::~TightAggressiveBotStrategy() = default;
 
-bool TightAggressiveBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
+bool TightAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
 {
     float callingRange = getPreflopRangeCalculator()->calculatePreflopCallingRange(ctx);
     if (callingRange == -1)
@@ -122,7 +123,7 @@ bool TightAggressiveBotStrategy::preflopShouldCall(const CurrentHandContext& ctx
     return isCardsInRange(ctx.personalContext.holeCards, stringCallingRange);
 }
 
-int TightAggressiveBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
+int TightAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
 {
     float raisingRange = getPreflopRangeCalculator()->calculatePreflopRaisingRange(ctx);
 
@@ -229,7 +230,7 @@ int TightAggressiveBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx
         if (rand <= 1)
         {
             myServices->logger().verbose("\t\twon't raise, to hide the hand strength");
-            myShouldCall = true;
+            myCouldCall = true;
             return 0;
         }
     }
@@ -237,7 +238,7 @@ int TightAggressiveBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx
     return computePreflopRaiseAmount(ctx);
 }
 
-int TightAggressiveBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
+int TightAggressiveBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber > 0)
@@ -265,7 +266,7 @@ int TightAggressiveBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
                 myServices->randomizer().getRand(1, 2, 1, &rand);
                 if (rand == 1)
                 {
-                    return ctx.commonContext.bettingContext.pot * 0.6;
+                    return PokerMath::calculateValueBetSize(ctx);  // Was: pot * 0.6
                 }
             }
 
@@ -274,11 +275,11 @@ int TightAggressiveBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
                  ctx.personalContext.postFlopAnalysisFlags.isStraight) &&
                 ctx.personalContext.postFlopAnalysisFlags.isFlushDrawPossible)
             {
-                return ctx.commonContext.bettingContext.pot * 0.6;
+                return PokerMath::calculateValueBetSize(ctx);  // Was: pot * 0.6
             }
 
             // if the flop is dry, try to get the pot
-            if (ctx.commonContext.playersContext.nbPlayers < 3 && isPossibleToBluff(ctx) &&
+            if (!PokerMath::tooManyOpponents(ctx, 3) && isPossibleToBluff(ctx) &&  // Was: nbPlayers < 3
                 getBoardCardsHigherThan(ctx.commonContext.stringBoard, "Jh") < 2 &&
                 getBoardCardsHigherThan(ctx.commonContext.stringBoard, "Kh") == 0 &&
                 !ctx.personalContext.postFlopAnalysisFlags.isFlushDrawPossible)
@@ -288,7 +289,7 @@ int TightAggressiveBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
                 myServices->randomizer().getRand(1, 3, 1, &rand);
                 if (rand == 1)
                 {
-                    return ctx.commonContext.bettingContext.pot * 0.6;
+                    return PokerMath::calculateBluffBetSize(ctx);  // Was: pot * 0.6 (bluff on dry board)
                 }
             }
         }
@@ -326,7 +327,7 @@ int TightAggressiveBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
 
             if (ctx.commonContext.playersContext.actingPlayersList->size() < 4)
             {
-                return ctx.commonContext.bettingContext.pot * 0.6;
+                return PokerMath::calculateValueBetSize(ctx);  // Was: pot * 0.6
             }
             else
             {
@@ -340,7 +341,7 @@ int TightAggressiveBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
         {
             if (ctx.commonContext.playersContext.actingPlayersList->size() < 4)
             {
-                return ctx.commonContext.bettingContext.pot * 0.6;
+                return PokerMath::calculateValueBetSize(ctx);
             }
             else
             {
@@ -374,7 +375,7 @@ int TightAggressiveBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
 
     return 0;
 }
-bool TightAggressiveBotStrategy::flopShouldCall(const CurrentHandContext& ctx)
+bool TightAggressiveBotStrategy::flopCouldCall(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber == 0)
@@ -406,7 +407,7 @@ bool TightAggressiveBotStrategy::flopShouldCall(const CurrentHandContext& ctx)
     return true;
 }
 
-int TightAggressiveBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
+int TightAggressiveBotStrategy::flopCouldRaise(const CurrentHandContext& ctx)
 {
 
     const int nbRaises = ctx.commonContext.bettingContext.flopBetsOrRaisesNumber;
@@ -444,7 +445,7 @@ int TightAggressiveBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
     if ((isDrawingProbOk(ctx.personalContext.postFlopAnalysisFlags, ctx.commonContext.bettingContext.potOdd) ||
          ctx.personalContext.hasPosition) &&
         ctx.commonContext.playersContext.actingPlayersList->size() == 2 &&
-        !(ctx.personalContext.myHandSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd) &&
+        !PokerMath::hasInsufficientEquityForCall(ctx) &&
         isPossibleToBluff(ctx) && nbRaises < 2)
     {
 
@@ -456,7 +457,7 @@ int TightAggressiveBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
         }
     }
 
-    if (ctx.personalContext.myHandSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd)
+    if (PokerMath::hasInsufficientEquityForCall(ctx))
     {
 
         if (ctx.commonContext.bettingContext.potOdd < 30 &&
@@ -487,7 +488,7 @@ int TightAggressiveBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
     return 0;
 }
 
-int TightAggressiveBotStrategy::turnShouldBet(const CurrentHandContext& ctx)
+int TightAggressiveBotStrategy::turnCouldBet(const CurrentHandContext& ctx)
 {
 
     const int pot = ctx.commonContext.bettingContext.pot + ctx.commonContext.bettingContext.sets;
@@ -565,7 +566,7 @@ int TightAggressiveBotStrategy::turnShouldBet(const CurrentHandContext& ctx)
     return 0;
 }
 
-bool TightAggressiveBotStrategy::turnShouldCall(const CurrentHandContext& ctx)
+bool TightAggressiveBotStrategy::turnCouldCall(const CurrentHandContext& ctx)
 {
     if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber == 0)
     {
@@ -644,7 +645,7 @@ bool TightAggressiveBotStrategy::turnShouldCall(const CurrentHandContext& ctx)
     return true;
 }
 
-int TightAggressiveBotStrategy::turnShouldRaise(const CurrentHandContext& ctx)
+int TightAggressiveBotStrategy::turnCouldRaise(const CurrentHandContext& ctx)
 {
     if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber == 0)
     {
@@ -705,7 +706,7 @@ int TightAggressiveBotStrategy::turnShouldRaise(const CurrentHandContext& ctx)
     return 0;
 }
 
-int TightAggressiveBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
+int TightAggressiveBotStrategy::riverCouldBet(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.bettingContext.riverBetsOrRaisesNumber > 0)
@@ -799,7 +800,7 @@ int TightAggressiveBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
     return 0;
 }
 
-bool TightAggressiveBotStrategy::riverShouldCall(const CurrentHandContext& ctx)
+bool TightAggressiveBotStrategy::riverCouldCall(const CurrentHandContext& ctx)
 {
 
     const int nbRaises = ctx.commonContext.bettingContext.riverBetsOrRaisesNumber;
@@ -898,7 +899,7 @@ bool TightAggressiveBotStrategy::riverShouldCall(const CurrentHandContext& ctx)
     return true;
 }
 
-int TightAggressiveBotStrategy::riverShouldRaise(const CurrentHandContext& ctx)
+int TightAggressiveBotStrategy::riverCouldRaise(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.bettingContext.riverBetsOrRaisesNumber == 0)

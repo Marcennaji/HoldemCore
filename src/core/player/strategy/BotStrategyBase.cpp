@@ -6,6 +6,7 @@
 #include <core/player/Helpers.h>
 #include "CurrentHandContext.h"
 #include "core/player/Player.h"
+#include "PokerMath.h"  // Phase 3: Include utilities for preflop calculations
 
 using namespace std;
 
@@ -46,15 +47,15 @@ PlayerAction BotStrategyBase::decidePreflop(const CurrentHandContext& ctx)
     resultingAction.playerId = ctx.personalContext.id;
 
     // Strategy methods now handle cash constraints internally
-    bool shouldCall = preflopShouldCall(ctx);
-    int raiseAmount = preflopShouldRaise(ctx);
+    bool couldCall = preflopCouldCall(ctx);
+    int raiseAmount = preflopCouldRaise(ctx);
 
     if (raiseAmount > 0)
     {
         resultingAction.type = ActionType::Raise;
         resultingAction.amount = raiseAmount;
     }
-    else if (shouldCall)
+    else if (couldCall)
     {
         resultingAction.type = ActionType::Call;
     }
@@ -80,7 +81,7 @@ PlayerAction BotStrategyBase::decideFlop(const CurrentHandContext& ctx)
     if (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber == 0)
     {
         // No bets yet - decide whether to bet or check
-        int betAmount = flopShouldBet(ctx);
+        int betAmount = flopCouldBet(ctx);
         if (betAmount > 0)
         {
             resultingAction.type = ActionType::Bet;
@@ -94,13 +95,13 @@ PlayerAction BotStrategyBase::decideFlop(const CurrentHandContext& ctx)
     else
     {
         // There are bets/raises - decide whether to call, raise, or fold
-        int raiseAmount = flopShouldRaise(ctx);
+        int raiseAmount = flopCouldRaise(ctx);
         if (raiseAmount > 0)
         {
             resultingAction.type = ActionType::Raise;
             resultingAction.amount = raiseAmount;
         }
-        else if (flopShouldCall(ctx))
+        else if (flopCouldCall(ctx))
         {
             resultingAction.type = ActionType::Call;
         }
@@ -121,7 +122,7 @@ PlayerAction BotStrategyBase::decideTurn(const CurrentHandContext& ctx)
     if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber == 0)
     {
         // No bets yet - decide whether to bet or check
-        int betAmount = turnShouldBet(ctx);
+        int betAmount = turnCouldBet(ctx);
         if (betAmount > 0)
         {
             resultingAction.type = ActionType::Bet;
@@ -135,13 +136,13 @@ PlayerAction BotStrategyBase::decideTurn(const CurrentHandContext& ctx)
     else
     {
         // There are bets/raises - decide whether to call, raise, or fold
-        int raiseAmount = turnShouldRaise(ctx);
+        int raiseAmount = turnCouldRaise(ctx);
         if (raiseAmount > 0)
         {
             resultingAction.type = ActionType::Raise;
             resultingAction.amount = raiseAmount;
         }
-        else if (turnShouldCall(ctx))
+        else if (turnCouldCall(ctx))
         {
             resultingAction.type = ActionType::Call;
         }
@@ -162,7 +163,7 @@ PlayerAction BotStrategyBase::decideRiver(const CurrentHandContext& ctx)
     if (ctx.commonContext.bettingContext.riverBetsOrRaisesNumber == 0)
     {
         // No bets yet - decide whether to bet or check
-        int betAmount = riverShouldBet(ctx);
+        int betAmount = riverCouldBet(ctx);
         if (betAmount > 0)
         {
             resultingAction.type = ActionType::Bet;
@@ -176,13 +177,13 @@ PlayerAction BotStrategyBase::decideRiver(const CurrentHandContext& ctx)
     else
     {
         // There are bets/raises - decide whether to call, raise, or fold
-        int raiseAmount = riverShouldRaise(ctx);
+        int raiseAmount = riverCouldRaise(ctx);
         if (raiseAmount > 0)
         {
             resultingAction.type = ActionType::Raise;
             resultingAction.amount = raiseAmount;
         }
-        else if (riverShouldCall(ctx))
+        else if (riverCouldCall(ctx))
         {
             resultingAction.type = ActionType::Call;
         }
@@ -278,10 +279,12 @@ int BotStrategyBase::computePreflopRaiseAmount(const CurrentHandContext& ctx)
 
 int BotStrategyBase::computeFirstRaiseAmount(const CurrentHandContext& ctx, int bigBlind) const
 {
-    int raiseAmount = (ctx.personalContext.m > 8 ? 2 * bigBlind : 1.5 * bigBlind);
-
-    adjustRaiseForPosition(ctx, raiseAmount, bigBlind);
-    adjustRaiseForLimpers(ctx, raiseAmount, bigBlind);
+    // Phase 3: Use PokerMath utilities for cleaner, centralized logic
+    float baseRaise = PokerMath::calculateStandardOpenRaise(ctx);
+    float positionAdjustment = PokerMath::getPositionRaiseAdjustment(ctx);
+    float limperAdjustment = PokerMath::getLimperRaiseAdjustment(ctx);
+    
+    int raiseAmount = static_cast<int>(baseRaise + positionAdjustment + limperAdjustment);
 
     return finalizeRaiseAmount(ctx, raiseAmount);
 }
@@ -330,17 +333,16 @@ int BotStrategyBase::computeReRaiseAmount(const CurrentHandContext& ctx, int big
 
 int BotStrategyBase::computeThreeBetAmount(const CurrentHandContext& ctx, int totalPot) const
 {
+    // Phase 3: Use PokerMath utilities for centralized 3-bet sizing
     assert(ctx.commonContext.playersContext.preflopLastRaiser != nullptr);
-    return totalPot * (ctx.personalContext.position > ctx.commonContext.playersContext.preflopLastRaiser->getPosition()
-                           ? 1.2
-                           : 1.4);
+    return static_cast<int>(PokerMath::calculate3BetSize(ctx));
 }
 
 int BotStrategyBase::computeFourBetOrMoreAmount(const CurrentHandContext& ctx, int totalPot) const
 {
+    // Phase 3: Use PokerMath utilities for centralized 4-bet+ sizing
     assert(ctx.commonContext.playersContext.preflopLastRaiser != nullptr);
-    return totalPot *
-           (ctx.personalContext.position > ctx.commonContext.playersContext.preflopLastRaiser->getPosition() ? 1 : 1.2);
+    return static_cast<int>(PokerMath::calculate4BetPlusSize(ctx));
 }
 
 int BotStrategyBase::finalizeRaiseAmount(const CurrentHandContext& ctx, int raiseAmount) const

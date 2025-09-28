@@ -46,8 +46,8 @@ class PreflopRangeCalculator
     float adjustCallForBigBet(float callingRange, int potOdd, int myCash, int highestBetAmount, int myTotalBetAmount,
                               int smallBlind) const;
     bool shouldAdjustCallForLooseRaiser(const CurrentHandContext& ctx, int nbCalls, int nbRaises) const;
-    bool shouldCallForGoodOdds(int potOdd, int myM, PlayerPosition myPosition) const;
-    bool shouldCallForAllIn(const CurrentHandContext& ctx, int potOdd, int nbRaises) const;
+    bool couldCallForGoodOdds(int potOdd, int myM, PlayerPosition myPosition) const;
+    bool couldCallForAllIn(const CurrentHandContext& ctx, int potOdd, int nbRaises) const;
 
     // Raising range helper methods
     float adjustRaiseForLimpers(float raisingRange) const;

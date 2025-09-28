@@ -19,19 +19,19 @@ class TightAggressiveBotStrategy : public BotStrategyBase
     ~TightAggressiveBotStrategy();
 
   private:
-    virtual bool preflopShouldCall(const CurrentHandContext& ctx);
-    virtual bool flopShouldCall(const CurrentHandContext& ctx);
-    virtual bool turnShouldCall(const CurrentHandContext& ctx);
-    virtual bool riverShouldCall(const CurrentHandContext& ctx);
+    virtual bool preflopCouldCall(const CurrentHandContext& ctx);
+    virtual bool flopCouldCall(const CurrentHandContext& ctx);
+    virtual bool turnCouldCall(const CurrentHandContext& ctx);
+    virtual bool riverCouldCall(const CurrentHandContext& ctx);
 
-    virtual int preflopShouldRaise(const CurrentHandContext& ctx);
-    virtual int flopShouldRaise(const CurrentHandContext& ctx);
-    virtual int turnShouldRaise(const CurrentHandContext& ctx);
-    virtual int riverShouldRaise(const CurrentHandContext& ctx);
+    virtual int preflopCouldRaise(const CurrentHandContext& ctx);
+    virtual int flopCouldRaise(const CurrentHandContext& ctx);
+    virtual int turnCouldRaise(const CurrentHandContext& ctx);
+    virtual int riverCouldRaise(const CurrentHandContext& ctx);
 
-    virtual int flopShouldBet(const CurrentHandContext& ctx);
-    virtual int turnShouldBet(const CurrentHandContext& ctx);
-    virtual int riverShouldBet(const CurrentHandContext& ctx);
+    virtual int flopCouldBet(const CurrentHandContext& ctx);
+    virtual int turnCouldBet(const CurrentHandContext& ctx);
+    virtual int riverCouldBet(const CurrentHandContext& ctx);
 };
 
 } // namespace pkt::core::player

@@ -9,6 +9,7 @@
 #include <core/engine/model/Ranges.h>
 #include <core/player/Helpers.h>
 #include <core/player/strategy/CurrentHandContext.h>
+#include <core/player/strategy/PokerMath.h>
 #include "Exception.h"
 
 #include <fstream>
@@ -41,7 +42,7 @@ UltraTightBotStrategy::UltraTightBotStrategy(std::shared_ptr<ServiceContainer> s
 
 UltraTightBotStrategy::~UltraTightBotStrategy() = default;
 
-bool UltraTightBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
+bool UltraTightBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
 {
     float callingRange = getPreflopRangeCalculator()->calculatePreflopCallingRange(ctx);
     if (callingRange == -1)
@@ -117,7 +118,7 @@ bool UltraTightBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
     return isCardsInRange(ctx.personalContext.holeCards, stringCallingRange);
 }
 
-int UltraTightBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
+int UltraTightBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
 {
     float raisingRange = getPreflopRangeCalculator()->calculatePreflopRaisingRange(ctx);
 
@@ -223,7 +224,7 @@ int UltraTightBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
         if (rand == 1)
         {
             myServices->logger().verbose("\t\twon't raise, to hide the hand strength");
-            myShouldCall = true;
+            myCouldCall = true;
             return 0;
         }
     }
@@ -231,7 +232,7 @@ int UltraTightBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
     return computePreflopRaiseAmount(ctx);
 }
 
-int UltraTightBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
+int UltraTightBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber > 0)
@@ -264,7 +265,7 @@ int UltraTightBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
                 myServices->randomizer().getRand(1, 2, 1, &rand);
                 if (rand == 1)
                 {
-                    return ctx.commonContext.bettingContext.pot * 0.6;
+                    return PokerMath::calculateValueBetSize(ctx);  // Was: pot * 0.6
                 }
             }
 
@@ -273,11 +274,11 @@ int UltraTightBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
                  ctx.personalContext.postFlopAnalysisFlags.isStraight) &&
                 ctx.personalContext.postFlopAnalysisFlags.isFlushDrawPossible)
             {
-                return ctx.commonContext.bettingContext.pot * 0.6;
+                return PokerMath::calculateValueBetSize(ctx);  // Was: pot * 0.6
             }
 
             // if the flop is dry, try to get the pot
-            if (ctx.commonContext.playersContext.nbPlayers < 3 && isPossibleToBluff(ctx) &&
+            if (!PokerMath::tooManyOpponents(ctx, 3) && isPossibleToBluff(ctx) &&  // Was: nbPlayers < 3
                 getBoardCardsHigherThan(ctx.commonContext.stringBoard, "Jh") < 2 &&
                 getBoardCardsHigherThan(ctx.commonContext.stringBoard, "Kh") == 0 &&
                 !ctx.personalContext.postFlopAnalysisFlags.isFlushDrawPossible)
@@ -287,7 +288,7 @@ int UltraTightBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
                 myServices->randomizer().getRand(1, 4, 1, &rand);
                 if (rand == 1)
                 {
-                    return ctx.commonContext.bettingContext.pot * 0.6;
+                    return PokerMath::calculateBluffBetSize(ctx);  // Was: pot * 0.6 (bluff on dry board)
                 }
             }
         }
@@ -319,7 +320,7 @@ int UltraTightBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
 
             if (ctx.commonContext.playersContext.actingPlayersList->size() < 4)
             {
-                return ctx.commonContext.bettingContext.pot * 0.6;
+                return PokerMath::calculateValueBetSize(ctx);
             }
             else
             {
@@ -333,7 +334,7 @@ int UltraTightBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
         {
             if (ctx.commonContext.playersContext.actingPlayersList->size() < 4)
             {
-                return ctx.commonContext.bettingContext.pot * 0.6;
+                return PokerMath::calculateValueBetSize(ctx);
             }
             else
             {
@@ -362,38 +363,40 @@ int UltraTightBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
                 ctx.commonContext.playersContext.actingPlayersList->size() < 4 &&
                 ctx.personalContext.cash > ctx.commonContext.bettingContext.pot * 5 && isPossibleToBluff(ctx))
             {
-                return ctx.commonContext.bettingContext.pot * 0.6;
+                return PokerMath::calculateValueBetSize(ctx);
             }
         }
     }
 
     return 0;
 }
-bool UltraTightBotStrategy::flopShouldCall(const CurrentHandContext& ctx)
+bool UltraTightBotStrategy::flopCouldCall(const CurrentHandContext& ctx)
 {
-
     if (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber == 0)
     {
         return false;
     }
 
+    // Always call with good drawing odds
     if (isDrawingProbOk(ctx.personalContext.postFlopAnalysisFlags, ctx.commonContext.bettingContext.potOdd))
     {
         return true;
     }
 
-    if (ctx.personalContext.myHandSimulation.winRanged >= 0.95 && ctx.personalContext.myHandSimulation.win > 0.5)
+    // Always call with very strong equity (replaces magic number 0.95)
+    if (PokerMath::hasVeryStrongEquity(ctx, PokerMath::VERY_STRONG_EQUITY_THRESHOLD))
     {
         return true;
     }
 
-    if (ctx.personalContext.myHandSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd &&
-        ctx.personalContext.myHandSimulation.win < 0.95)
+    // Fold if equity is insufficient for pot odds
+    if (PokerMath::hasInsufficientEquityForCall(ctx) && ctx.personalContext.myHandSimulation.win < 0.95)
     {
         return false;
     }
 
-    if (ctx.personalContext.myHandSimulation.winRanged < 0.25 && ctx.personalContext.myHandSimulation.win < 0.3)
+    // Fold with very weak equity 
+    if (PokerMath::hasWeakEquity(ctx, PokerMath::WEAK_EQUITY_THRESHOLD) && ctx.personalContext.myHandSimulation.win < 0.3)
     {
         return false;
     }
@@ -401,7 +404,7 @@ bool UltraTightBotStrategy::flopShouldCall(const CurrentHandContext& ctx)
     return true;
 }
 
-int UltraTightBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
+int UltraTightBotStrategy::flopCouldRaise(const CurrentHandContext& ctx)
 {
 
     const int nbRaises = ctx.commonContext.bettingContext.flopBetsOrRaisesNumber;
@@ -439,7 +442,7 @@ int UltraTightBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
     if ((isDrawingProbOk(ctx.personalContext.postFlopAnalysisFlags, ctx.commonContext.bettingContext.potOdd) ||
          ctx.personalContext.hasPosition) &&
         ctx.commonContext.playersContext.actingPlayersList->size() == 2 &&
-        !(ctx.personalContext.myHandSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd) &&
+        !PokerMath::hasInsufficientEquityForCall(ctx) &&
         isPossibleToBluff(ctx) && nbRaises < 2)
     {
 
@@ -451,7 +454,7 @@ int UltraTightBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
         }
     }
 
-    if (ctx.personalContext.myHandSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd)
+    if (PokerMath::hasInsufficientEquityForCall(ctx))
     {
 
         if (ctx.commonContext.bettingContext.potOdd < 30 &&
@@ -482,7 +485,7 @@ int UltraTightBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
     return 0;
 }
 
-int UltraTightBotStrategy::turnShouldBet(const CurrentHandContext& ctx)
+int UltraTightBotStrategy::turnCouldBet(const CurrentHandContext& ctx)
 {
 
     const int pot = ctx.commonContext.bettingContext.pot + ctx.commonContext.bettingContext.sets;
@@ -512,7 +515,7 @@ int UltraTightBotStrategy::turnShouldBet(const CurrentHandContext& ctx)
         myServices->randomizer().getRand(1, 3, 1, &rand);
         if (rand == 1)
         {
-            return pot * 0.6;
+            return PokerMath::calculateValueBetSize(ctx);
         }
     }
 
@@ -531,7 +534,7 @@ int UltraTightBotStrategy::turnShouldBet(const CurrentHandContext& ctx)
     if (ctx.personalContext.myHandSimulation.winRanged > 0.6 && ctx.personalContext.myHandSimulation.win > 0.7 &&
         ctx.personalContext.hasPosition)
     {
-        return pot * 0.6;
+        return PokerMath::calculateValueBetSize(ctx);
     }
 
     if (getDrawingProbability(ctx.personalContext.postFlopAnalysisFlags) > 20 && !ctx.personalContext.hasPosition)
@@ -540,7 +543,7 @@ int UltraTightBotStrategy::turnShouldBet(const CurrentHandContext& ctx)
         myServices->randomizer().getRand(1, 5, 1, &rand);
         if (rand == 1)
         {
-            return pot * 0.6;
+            return PokerMath::calculateValueBetSize(ctx);
         }
     }
     else
@@ -552,7 +555,7 @@ int UltraTightBotStrategy::turnShouldBet(const CurrentHandContext& ctx)
             myServices->randomizer().getRand(1, 3, 1, &rand);
             if (rand == 2)
             {
-                return pot * 0.6;
+                return PokerMath::calculateValueBetSize(ctx);
             }
         }
     }
@@ -560,7 +563,7 @@ int UltraTightBotStrategy::turnShouldBet(const CurrentHandContext& ctx)
     return 0;
 }
 
-bool UltraTightBotStrategy::turnShouldCall(const CurrentHandContext& ctx)
+bool UltraTightBotStrategy::turnCouldCall(const CurrentHandContext& ctx)
 {
     if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber == 0)
     {
@@ -572,23 +575,11 @@ bool UltraTightBotStrategy::turnShouldCall(const CurrentHandContext& ctx)
         return true;
     }
 
-    TurnStatistics raiserStats = ctx.commonContext.playersContext.turnLastRaiser->getStatisticsUpdater()
-                                     ->getStatistics(ctx.commonContext.playersContext.nbPlayers)
-                                     .turnStatistics;
+    // Phase 4: Use PokerMath utilities for opponent analysis
+    auto turnRaiser = ctx.commonContext.playersContext.turnLastRaiser;
 
-    // if not enough hands, then try to use the statistics collected for (nbPlayers + 1), they should be more accurate
-    if (raiserStats.hands < MIN_HANDS_STATISTICS_ACCURATE && ctx.commonContext.playersContext.nbPlayers < 10 &&
-        ctx.commonContext.playersContext.turnLastRaiser->getStatisticsUpdater()
-                ->getStatistics(ctx.commonContext.playersContext.nbPlayers + 1)
-                .turnStatistics.hands > MIN_HANDS_STATISTICS_ACCURATE)
-    {
-
-        raiserStats = ctx.commonContext.playersContext.turnLastRaiser->getStatisticsUpdater()
-                          ->getStatistics(ctx.commonContext.playersContext.nbPlayers + 1)
-                          .turnStatistics;
-    }
-
-    if (ctx.personalContext.myHandSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd &&
+    // Equity vs pot odds check using Phase 1 utilities
+    if (PokerMath::hasInsufficientEquityForCall(ctx) &&
         ctx.personalContext.myHandSimulation.winRanged < 0.94 && ctx.personalContext.myHandSimulation.win < 0.95)
     {
         return false;
@@ -597,11 +588,12 @@ bool UltraTightBotStrategy::turnShouldCall(const CurrentHandContext& ctx)
     if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber == 2 &&
         ctx.personalContext.myHandSimulation.winRanged < 0.8 && ctx.personalContext.myHandSimulation.win < 0.9)
     {
-        if (raiserStats.hands <= MIN_HANDS_STATISTICS_ACCURATE)
+        // Phase 4: Clean opponent reliability and tightness checks
+        if (!PokerMath::hasReliableOpponentStats(ctx, turnRaiser))
         {
             return false;
         }
-        if (raiserStats.getAgressionFrequency() < 20)
+        if (PokerMath::isOpponentTight(ctx, PokerMath::TIGHT_OPPONENT_AGGRESSION_THRESHOLD, turnRaiser))
         {
             return false;
         }
@@ -609,25 +601,28 @@ bool UltraTightBotStrategy::turnShouldCall(const CurrentHandContext& ctx)
     if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber > 2 &&
         ctx.personalContext.myHandSimulation.winRanged < 0.9 && ctx.personalContext.myHandSimulation.win < 0.95)
     {
-        if (raiserStats.hands <= MIN_HANDS_STATISTICS_ACCURATE)
+        // Phase 4: Clean opponent reliability and tightness checks
+        if (!PokerMath::hasReliableOpponentStats(ctx, turnRaiser))
         {
             return false;
         }
-        if (raiserStats.getAgressionFrequency() < 20)
+        if (PokerMath::isOpponentTight(ctx, PokerMath::TIGHT_OPPONENT_AGGRESSION_THRESHOLD, turnRaiser))
         {
             return false;
         }
     }
 
     if (ctx.personalContext.myHandSimulation.winRanged < 0.6 && ctx.personalContext.myHandSimulation.win < 0.95 &&
-        (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber > 0 || raiserStats.getAgressionFrequency() < 30))
+        (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber > 0 || 
+         PokerMath::isOpponentPassive(ctx, PokerMath::PASSIVE_OPPONENT_AGGRESSION_THRESHOLD, turnRaiser)))
     {
         return false;
     }
 
     if (!ctx.personalContext.actions.preflopIsAggressor && !ctx.personalContext.actions.flopIsAggressor &&
         ctx.personalContext.myHandSimulation.winRanged < 0.8 && ctx.personalContext.myHandSimulation.win < 0.95 &&
-        raiserStats.getAgressionFrequency() < 30 && !ctx.personalContext.hasPosition)
+        PokerMath::isOpponentPassive(ctx, PokerMath::PASSIVE_OPPONENT_AGGRESSION_THRESHOLD, turnRaiser) && 
+        !ctx.personalContext.hasPosition)
     {
         return false;
     }
@@ -640,7 +635,7 @@ bool UltraTightBotStrategy::turnShouldCall(const CurrentHandContext& ctx)
     return true;
 }
 
-int UltraTightBotStrategy::turnShouldRaise(const CurrentHandContext& ctx)
+int UltraTightBotStrategy::turnCouldRaise(const CurrentHandContext& ctx)
 {
     if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber == 0)
     {
@@ -676,10 +671,10 @@ int UltraTightBotStrategy::turnShouldRaise(const CurrentHandContext& ctx)
     if (ctx.personalContext.myHandSimulation.win == 1 || (ctx.personalContext.myHandSimulation.winRanged == 1 &&
                                                           ctx.commonContext.bettingContext.turnBetsOrRaisesNumber < 3))
     {
-        return ctx.commonContext.bettingContext.pot * 0.6;
+        return PokerMath::calculateValueBetSize(ctx);
     }
 
-    if (ctx.personalContext.myHandSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd &&
+    if (PokerMath::hasInsufficientEquityForCall(ctx) &&
         ctx.personalContext.myHandSimulation.winRanged < 0.94)
     {
         return 0;
@@ -690,18 +685,18 @@ int UltraTightBotStrategy::turnShouldRaise(const CurrentHandContext& ctx)
         ctx.commonContext.bettingContext.flopBetsOrRaisesNumber < 2)
     {
 
-        return ctx.commonContext.bettingContext.pot * 0.6;
+        return PokerMath::calculateValueBetSize(ctx);
     }
     if (ctx.personalContext.myHandSimulation.winRanged > 0.94 && ctx.personalContext.myHandSimulation.win > 0.94 &&
         ctx.commonContext.bettingContext.turnBetsOrRaisesNumber < 4)
     {
-        return ctx.commonContext.bettingContext.pot * 0.6;
+        return PokerMath::calculateValueBetSize(ctx);
     }
 
     return 0;
 }
 
-int UltraTightBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
+int UltraTightBotStrategy::riverCouldBet(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.bettingContext.riverBetsOrRaisesNumber > 0)
@@ -736,7 +731,7 @@ int UltraTightBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
             myServices->randomizer().getRand(1, 4, 1, &rand);
             if (rand == 1)
             {
-                return ctx.commonContext.bettingContext.pot * 0.8;
+                return PokerMath::calculateBluffBetSize(ctx);
             }
         }
     }
@@ -788,7 +783,7 @@ int UltraTightBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
     return 0;
 }
 
-bool UltraTightBotStrategy::riverShouldCall(const CurrentHandContext& ctx)
+bool UltraTightBotStrategy::riverCouldCall(const CurrentHandContext& ctx)
 {
 
     const int nbRaises = ctx.commonContext.bettingContext.riverBetsOrRaisesNumber;
@@ -813,7 +808,7 @@ bool UltraTightBotStrategy::riverShouldCall(const CurrentHandContext& ctx)
                           .riverStatistics;
     }
 
-    if (ctx.personalContext.myHandSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd &&
+    if (PokerMath::hasInsufficientEquityForCall(ctx) &&
         ctx.personalContext.myHandSimulation.winRanged < 0.9 && ctx.personalContext.myHandSimulation.winSd < .97)
     {
         if (raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getAgressionFrequency() < 40)
@@ -899,7 +894,7 @@ bool UltraTightBotStrategy::riverShouldCall(const CurrentHandContext& ctx)
     return true;
 }
 
-int UltraTightBotStrategy::riverShouldRaise(const CurrentHandContext& ctx)
+int UltraTightBotStrategy::riverCouldRaise(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.bettingContext.riverBetsOrRaisesNumber == 0)
@@ -911,14 +906,14 @@ int UltraTightBotStrategy::riverShouldRaise(const CurrentHandContext& ctx)
     if (ctx.commonContext.bettingContext.riverBetsOrRaisesNumber < 3 &&
         ctx.personalContext.myHandSimulation.winRanged > .98 && ctx.personalContext.myHandSimulation.winSd > 0.9)
     {
-        return ctx.commonContext.bettingContext.pot * 0.6;
+        return PokerMath::calculateValueBetSize(ctx);
     }
 
     if (ctx.commonContext.bettingContext.riverBetsOrRaisesNumber < 2 &&
         ctx.personalContext.myHandSimulation.winRanged * 100 > ctx.commonContext.bettingContext.potOdd &&
         ctx.personalContext.myHandSimulation.winRanged > 0.9 && ctx.personalContext.myHandSimulation.winSd > 0.9)
     {
-        return ctx.commonContext.bettingContext.pot * 0.6;
+        return PokerMath::calculateValueBetSize(ctx);
     }
 
     return 0;

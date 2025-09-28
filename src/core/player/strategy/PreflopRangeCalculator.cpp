@@ -158,13 +158,13 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(const CurrentHandCont
     }
 
     // Adjust for good odds
-    if (shouldCallForGoodOdds(potOdd, myM, myPosition))
+    if (couldCallForGoodOdds(potOdd, myM, myPosition))
     {
         callingRange = 40.0f;
     }
 
     // Adjust for all-in raiser
-    if (shouldCallForAllIn(ctx, potOdd, nbRaises))
+    if (couldCallForAllIn(ctx, potOdd, nbRaises))
     {
         callingRange = 100.0f;
     }
@@ -333,12 +333,12 @@ bool PreflopRangeCalculator::shouldAdjustCallForLooseRaiser(const CurrentHandCon
            (myPosition >= Late || myPosition == SmallBlind || myPosition == BigBlind) && nbCalls == 0 && nbRaises == 1;
 }
 
-bool PreflopRangeCalculator::shouldCallForGoodOdds(int potOdd, int myM, PlayerPosition myPosition) const
+bool PreflopRangeCalculator::couldCallForGoodOdds(int potOdd, int myM, PlayerPosition myPosition) const
 {
     return potOdd <= 30 && myM > 15 && (myPosition >= Late || myPosition == SmallBlind || myPosition == BigBlind);
 }
 
-bool PreflopRangeCalculator::shouldCallForAllIn(const CurrentHandContext& ctx, int potOdd, int nbRaises) const
+bool PreflopRangeCalculator::couldCallForAllIn(const CurrentHandContext& ctx, int potOdd, int nbRaises) const
 {
     std::shared_ptr<Player> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
     const PlayerPosition myPosition = ctx.personalContext.position;

@@ -26,25 +26,25 @@ class BotStrategyBase : public virtual BotStrategy
     int computePreflopRaiseAmount(const CurrentHandContext&);
     bool shouldPotControl(const CurrentHandContext&);
     bool isPossibleToBluff(const CurrentHandContext& ctx) const;
-    bool myShouldCall;
-    bool myShouldRaise;
+    bool myCouldCall;
+    bool myCouldRaise;
 
     mutable std::shared_ptr<pkt::core::ServiceContainer> myServices; 
 
   private:
-    virtual bool preflopShouldCall(const CurrentHandContext& ctx) = 0;
-    virtual bool flopShouldCall(const CurrentHandContext& ctx) = 0;
-    virtual bool turnShouldCall(const CurrentHandContext& ctx) = 0;
-    virtual bool riverShouldCall(const CurrentHandContext& ctx) = 0;
+    virtual bool preflopCouldCall(const CurrentHandContext& ctx) = 0;
+    virtual bool flopCouldCall(const CurrentHandContext& ctx) = 0;
+    virtual bool turnCouldCall(const CurrentHandContext& ctx) = 0;
+    virtual bool riverCouldCall(const CurrentHandContext& ctx) = 0;
 
-    virtual int preflopShouldRaise(const CurrentHandContext& ctx) = 0;
-    virtual int flopShouldRaise(const CurrentHandContext& ctx) = 0;
-    virtual int turnShouldRaise(const CurrentHandContext& ctx) = 0;
-    virtual int riverShouldRaise(const CurrentHandContext& ctx) = 0;
+    virtual int preflopCouldRaise(const CurrentHandContext& ctx) = 0;
+    virtual int flopCouldRaise(const CurrentHandContext& ctx) = 0;
+    virtual int turnCouldRaise(const CurrentHandContext& ctx) = 0;
+    virtual int riverCouldRaise(const CurrentHandContext& ctx) = 0;
 
-    virtual int flopShouldBet(const CurrentHandContext& ctx) = 0;
-    virtual int turnShouldBet(const CurrentHandContext& ctx) = 0;
-    virtual int riverShouldBet(const CurrentHandContext& ctx) = 0;
+    virtual int flopCouldBet(const CurrentHandContext& ctx) = 0;
+    virtual int turnCouldBet(const CurrentHandContext& ctx) = 0;
+    virtual int riverCouldBet(const CurrentHandContext& ctx) = 0;
 
     int computeFirstRaiseAmount(const CurrentHandContext&, int bigBlind) const;
     void adjustRaiseForPosition(const CurrentHandContext&, int& raiseAmount, int bigBlind) const;

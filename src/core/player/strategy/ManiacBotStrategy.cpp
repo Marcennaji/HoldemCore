@@ -9,6 +9,7 @@
 #include <core/engine/model/Ranges.h>
 #include <core/player/Helpers.h>
 #include <core/player/strategy/CurrentHandContext.h>
+#include <core/player/strategy/PokerMath.h>  // Phase 1-4 utilities
 #include "Exception.h"
 
 #include <fstream>
@@ -41,7 +42,7 @@ ManiacBotStrategy::ManiacBotStrategy(std::shared_ptr<pkt::core::ServiceContainer
 
 ManiacBotStrategy::~ManiacBotStrategy() = default;
 
-bool ManiacBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
+bool ManiacBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
 {
     float callingRange = getPreflopRangeCalculator()->calculatePreflopCallingRange(ctx);
     if (callingRange == -1)
@@ -135,7 +136,7 @@ bool ManiacBotStrategy::preflopShouldCall(const CurrentHandContext& ctx)
     return isCardsInRange(ctx.personalContext.holeCards, stringCallingRange);
 }
 
-int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
+int ManiacBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
 {
     float raisingRange = getPreflopRangeCalculator()->calculatePreflopRaisingRange(ctx);
 
@@ -283,7 +284,7 @@ int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
         if (rand == 1)
         {
             myServices->logger().verbose("\t\twon't raise, to hide the hand strength");
-            myShouldCall = true;
+            myCouldCall = true;
             return 0;
         }
     }
@@ -291,7 +292,7 @@ int ManiacBotStrategy::preflopShouldRaise(const CurrentHandContext& ctx)
     return computePreflopRaiseAmount(ctx);
 }
 
-int ManiacBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
+int ManiacBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber > 0)
@@ -318,7 +319,7 @@ int ManiacBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
                 myServices->randomizer().getRand(1, 2, 1, &rand);
                 if (rand == 1)
                 {
-                    return ctx.commonContext.bettingContext.pot * 0.6;
+                    return PokerMath::calculateValueBetSize(ctx);  // Was: pot * 0.6
                 }
             }
 
@@ -327,7 +328,7 @@ int ManiacBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
                  ctx.personalContext.postFlopAnalysisFlags.isStraight) &&
                 ctx.personalContext.postFlopAnalysisFlags.isFlushDrawPossible)
             {
-                return ctx.commonContext.bettingContext.pot * 0.6;
+                return PokerMath::calculateValueBetSize(ctx);
             }
 
             // if the flop is dry, try to get the pot
@@ -341,7 +342,7 @@ int ManiacBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
                 myServices->randomizer().getRand(1, 2, 1, &rand);
                 if (rand == 1)
                 {
-                    return ctx.commonContext.bettingContext.pot * 0.6;
+                    return PokerMath::calculateValueBetSize(ctx);
                 }
             }
         }
@@ -360,7 +361,7 @@ int ManiacBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
         // always bet if my hand will lose a lot of its value on next betting rounds
         if (ctx.personalContext.myHandSimulation.winRanged - ctx.personalContext.myHandSimulation.winSd > 0.1)
         {
-            return ctx.commonContext.bettingContext.pot * 0.8;
+            return PokerMath::calculateBluffBetSize(ctx);  // Was: pot * 0.8 (maniac aggressive)
         }
 
         // if no raise preflop, or if more than 1 opponent
@@ -370,7 +371,7 @@ int ManiacBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
 
             if (ctx.commonContext.playersContext.actingPlayersList->size() < 4)
             {
-                return ctx.commonContext.bettingContext.pot * 0.8;
+                return PokerMath::calculateBluffBetSize(ctx);
             }
             else
             {
@@ -382,7 +383,7 @@ int ManiacBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
         if (ctx.commonContext.bettingContext.preflopRaisesNumber > 0 &&
             ctx.commonContext.playersContext.preflopLastRaiser->getId() == ctx.personalContext.id)
         {
-            return ctx.commonContext.bettingContext.pot * 0.8;
+            return PokerMath::calculateBluffBetSize(ctx);
         }
     }
     else
@@ -405,14 +406,14 @@ int ManiacBotStrategy::flopShouldBet(const CurrentHandContext& ctx)
         {
             if (ctx.personalContext.myHandSimulation.winRanged > 0.15 && ctx.personalContext.myHandSimulation.win > 0.3)
             {
-                return ctx.commonContext.bettingContext.pot * 0.8;
+                return PokerMath::calculateBluffBetSize(ctx);
             }
         }
     }
 
     return 0;
 }
-bool ManiacBotStrategy::flopShouldCall(const CurrentHandContext& ctx)
+bool ManiacBotStrategy::flopCouldCall(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber == 0)
@@ -430,8 +431,7 @@ bool ManiacBotStrategy::flopShouldCall(const CurrentHandContext& ctx)
         return true;
     }
 
-    if (ctx.personalContext.myHandSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd * 0.8 &&
-        ctx.personalContext.myHandSimulation.win < 0.9)
+    if (PokerMath::hasInsufficientEquityForCall(ctx, 0.8) && ctx.personalContext.myHandSimulation.win < 0.9)
     {
         return false;
     }
@@ -444,7 +444,7 @@ bool ManiacBotStrategy::flopShouldCall(const CurrentHandContext& ctx)
     return true;
 }
 
-int ManiacBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
+int ManiacBotStrategy::flopCouldRaise(const CurrentHandContext& ctx)
 {
 
     const int nbRaises = ctx.commonContext.bettingContext.flopBetsOrRaisesNumber;
@@ -491,7 +491,7 @@ int ManiacBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
     if ((isDrawingProbOk(ctx.personalContext.postFlopAnalysisFlags, ctx.commonContext.bettingContext.potOdd) ||
          ctx.personalContext.hasPosition) &&
         ctx.commonContext.playersContext.actingPlayersList->size() == 2 &&
-        !(ctx.personalContext.myHandSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd) &&
+        !PokerMath::hasInsufficientEquityForCall(ctx) &&
         isPossibleToBluff(ctx) && nbRaises < 2)
     {
 
@@ -517,7 +517,7 @@ int ManiacBotStrategy::flopShouldRaise(const CurrentHandContext& ctx)
     return 0;
 }
 
-int ManiacBotStrategy::turnShouldBet(const CurrentHandContext& ctx)
+int ManiacBotStrategy::turnCouldBet(const CurrentHandContext& ctx)
 {
 
     const int pot = ctx.commonContext.bettingContext.pot + ctx.commonContext.bettingContext.sets;
@@ -541,7 +541,7 @@ int ManiacBotStrategy::turnShouldBet(const CurrentHandContext& ctx)
 
     if (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber == 0 && ctx.personalContext.hasPosition)
     {
-        return pot * 0.8;
+        return PokerMath::calculateBluffBetSize(ctx);
     }
 
     if (ctx.personalContext.myHandSimulation.winRanged < 0.3 && ctx.personalContext.myHandSimulation.win < 0.9 &&
@@ -553,26 +553,26 @@ int ManiacBotStrategy::turnShouldBet(const CurrentHandContext& ctx)
     if (ctx.personalContext.myHandSimulation.winRanged > 0.4 && ctx.personalContext.myHandSimulation.win > 0.5 &&
         ctx.personalContext.hasPosition)
     {
-        return pot * 0.8;
+        return PokerMath::calculateBluffBetSize(ctx);
     }
 
     if (getDrawingProbability(ctx.personalContext.postFlopAnalysisFlags) > 15 && !ctx.personalContext.hasPosition)
     {
-        return pot * 0.8;
+        return PokerMath::calculateBluffBetSize(ctx);
     }
     else
     {
         // no draw, not a good hand, but last to speak and nobody has bet
         if (ctx.personalContext.hasPosition && isPossibleToBluff(ctx))
         {
-            return pot * 0.8;
+            return PokerMath::calculateBluffBetSize(ctx);
         }
     }
 
     return 0;
 }
 
-bool ManiacBotStrategy::turnShouldCall(const CurrentHandContext& ctx)
+bool ManiacBotStrategy::turnCouldCall(const CurrentHandContext& ctx)
 {
     if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber == 0)
     {
@@ -601,7 +601,7 @@ bool ManiacBotStrategy::turnShouldCall(const CurrentHandContext& ctx)
                           .turnStatistics;
     }
 
-    if (ctx.personalContext.myHandSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd &&
+    if (PokerMath::hasInsufficientEquityForCall(ctx) &&
         ctx.personalContext.myHandSimulation.winRanged < 0.94)
     {
         return false;
@@ -614,7 +614,7 @@ bool ManiacBotStrategy::turnShouldCall(const CurrentHandContext& ctx)
         {
             return false;
         }
-        if (raiserStats.getAgressionFrequency() < 20)
+        if (PokerMath::isOpponentTight(ctx, 20.0f, ctx.commonContext.playersContext.turnLastRaiser))
         {
             return false;
         }
@@ -626,7 +626,7 @@ bool ManiacBotStrategy::turnShouldCall(const CurrentHandContext& ctx)
         {
             return false;
         }
-        if (raiserStats.getAgressionFrequency() < 20)
+        if (PokerMath::isOpponentTight(ctx, 20.0f, ctx.commonContext.playersContext.turnLastRaiser))
         {
             return false;
         }
@@ -653,7 +653,7 @@ bool ManiacBotStrategy::turnShouldCall(const CurrentHandContext& ctx)
     return true;
 }
 
-int ManiacBotStrategy::turnShouldRaise(const CurrentHandContext& ctx)
+int ManiacBotStrategy::turnCouldRaise(const CurrentHandContext& ctx)
 {
     if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber == 0)
     {
@@ -683,22 +683,16 @@ int ManiacBotStrategy::turnShouldRaise(const CurrentHandContext& ctx)
     if (ctx.personalContext.myHandSimulation.win == 1 || (ctx.personalContext.myHandSimulation.winRanged == 1 &&
                                                           ctx.commonContext.bettingContext.turnBetsOrRaisesNumber < 3))
     {
-        return ctx.commonContext.bettingContext.pot * 0.6;
-    }
-
-    if (ctx.personalContext.myHandSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd &&
-        ctx.personalContext.myHandSimulation.winRanged < 0.94)
-    {
-        return 0;
+        return PokerMath::calculateValueBetSize(ctx);
     }
 
     if (ctx.personalContext.myHandSimulation.win == 1 || (ctx.personalContext.myHandSimulation.winRanged == 1 &&
                                                           ctx.commonContext.bettingContext.turnBetsOrRaisesNumber < 3))
     {
-        return ctx.commonContext.bettingContext.pot * 0.6;
+        return PokerMath::calculateValueBetSize(ctx);
     }
 
-    if (ctx.personalContext.myHandSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd &&
+    if (PokerMath::hasInsufficientEquityForCall(ctx) &&
         ctx.personalContext.myHandSimulation.winRanged < 0.94)
     {
         return 0;
@@ -709,19 +703,19 @@ int ManiacBotStrategy::turnShouldRaise(const CurrentHandContext& ctx)
         ctx.commonContext.bettingContext.flopBetsOrRaisesNumber < 2 &&
         ctx.commonContext.playersContext.actingPlayersList->size() < 3)
     {
-        return ctx.commonContext.bettingContext.pot * 0.6;
+        return PokerMath::calculateValueBetSize(ctx);
     }
 
     if (ctx.personalContext.myHandSimulation.winRanged > 0.9 && ctx.personalContext.myHandSimulation.win > 0.9 &&
         ctx.commonContext.bettingContext.turnBetsOrRaisesNumber < 4)
     {
-        return ctx.commonContext.bettingContext.pot * 0.6;
+        return PokerMath::calculateValueBetSize(ctx);
     }
 
     return 0;
 }
 
-int ManiacBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
+int ManiacBotStrategy::riverCouldBet(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.bettingContext.riverBetsOrRaisesNumber > 0)
@@ -754,7 +748,7 @@ int ManiacBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
             myServices->randomizer().getRand(1, 4, 1, &rand);
             if (rand == 1)
             {
-                return ctx.commonContext.bettingContext.pot * 0.8;
+                return PokerMath::calculateBluffBetSize(ctx);
             }
         }
     }
@@ -787,7 +781,7 @@ int ManiacBotStrategy::riverShouldBet(const CurrentHandContext& ctx)
     return 0;
 }
 
-bool ManiacBotStrategy::riverShouldCall(const CurrentHandContext& ctx)
+bool ManiacBotStrategy::riverCouldCall(const CurrentHandContext& ctx)
 {
     const int nbRaises = ctx.commonContext.bettingContext.riverBetsOrRaisesNumber;
 
@@ -801,7 +795,7 @@ bool ManiacBotStrategy::riverShouldCall(const CurrentHandContext& ctx)
         return true;
     }
 
-    if (ctx.personalContext.myHandSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd)
+    if (PokerMath::hasInsufficientEquityForCall(ctx))
     {
         return false;
     }
@@ -824,7 +818,7 @@ bool ManiacBotStrategy::riverShouldCall(const CurrentHandContext& ctx)
     return true;
 }
 
-int ManiacBotStrategy::riverShouldRaise(const CurrentHandContext& ctx)
+int ManiacBotStrategy::riverCouldRaise(const CurrentHandContext& ctx)
 {
 
     if (ctx.commonContext.bettingContext.riverBetsOrRaisesNumber == 0)
@@ -843,7 +837,7 @@ int ManiacBotStrategy::riverShouldRaise(const CurrentHandContext& ctx)
         ctx.personalContext.myHandSimulation.winRanged * 100 > ctx.commonContext.bettingContext.potOdd &&
         ctx.personalContext.myHandSimulation.winRanged > 0.9)
     {
-        return ctx.commonContext.bettingContext.pot * 0.6;
+        return PokerMath::calculateValueBetSize(ctx);
     }
 
     return 0;
