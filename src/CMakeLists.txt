@@ -14,6 +14,6 @@ add_subdirectory(infra)
 add_subdirectory(ui)
 add_subdirectory(third_party)
 
-if(USE_WIDGETS)
+if(USE_WIDGETS OR USE_QML)
     add_subdirectory(app)
 endif()

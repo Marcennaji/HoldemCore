@@ -5,13 +5,12 @@
         "minor": 21,
         "patch": 0
     },
+
     "configurePresets": [
         {
-            "name": "debug-widgets",
-            "displayName": "Debug (Widgets UI)",
-            "description": "Builds the Qt Widgets version with debug symbols and no QML",
+            "name": "base-widgets-debug",
+            "hidden": true,
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/debug-widgets",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "USE_WIDGETS": "ON",
@@ -20,11 +19,19 @@
             }
         },
         {
-            "name": "debug-qml",
-            "displayName": "Debug (QML UI - Hot Reload)",
-            "description": "Builds the QML version using source-based loading (hot reload)",
+            "name": "base-widgets-release",
+            "hidden": true,
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/debug-qml",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "USE_WIDGETS": "ON",
+                "USE_QML": "OFF"
+            }
+        },
+        {
+            "name": "base-qml-debug",
+            "hidden": true,
+            "generator": "Ninja",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "USE_WIDGETS": "OFF",
@@ -33,46 +40,59 @@
             }
         },
         {
-            "name": "release-widgets",
-            "displayName": "Release (Widgets UI)",
-            "description": "Builds the Qt Widgets version optimized for release",
+            "name": "base-qml-release",
+            "hidden": true,
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/release-widgets",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "USE_WIDGETS": "ON",
-                "USE_QML": "OFF"
-            }
-        },
-        {
-            "name": "release-qml",
-            "displayName": "Release (QML UI - QRC bundled)",
-            "description": "Builds the QML version with QML files embedded via qrc",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/release-qml",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "USE_WIDGETS": "OFF",
                 "USE_QML": "ON"
             }
+        },
+        {
+            "name": "vscode-debug-widgets",
+            "displayName": "VSCode Debug (Widgets)",
+            "inherits": "base-widgets-debug",
+            "binaryDir": "${sourceDir}/build/vscode/debug-widgets"
+        },
+        {
+            "name": "vscode-release-widgets",
+            "displayName": "VSCode Release (Widgets)",
+            "inherits": "base-widgets-release",
+            "binaryDir": "${sourceDir}/build/vscode/release-widgets"
+        },
+        {
+            "name": "qtcreator-debug-widgets",
+            "displayName": "QtCreator Debug (Widgets)",
+            "inherits": "base-widgets-debug",
+            "binaryDir": "${sourceDir}/build/qtcreator/debug-widgets"
+        },
+        {
+            "name": "qtcreator-release-widgets",
+            "displayName": "QtCreator Release (Widgets)",
+            "inherits": "base-widgets-release",
+            "binaryDir": "${sourceDir}/build/qtcreator/release-widgets"
+        },
+        {
+            "name": "qtcreator-debug-qml",
+            "displayName": "QtCreator Debug (QML)",
+            "inherits": "base-qml-debug",
+            "binaryDir": "${sourceDir}/build/qtcreator/debug-qml"
+        },
+        {
+            "name": "qtcreator-release-qml",
+            "displayName": "QtCreator Release (QML)",
+            "inherits": "base-qml-release",
+            "binaryDir": "${sourceDir}/build/qtcreator/release-qml"
         }
     ],
+
     "buildPresets": [
-        {
-            "name": "build-debug-widgets",
-            "configurePreset": "debug-widgets"
-        },
-        {
-            "name": "build-release-widgets",
-            "configurePreset": "release-widgets"
-        },
-        {
-            "name": "build-debug-qml",
-            "configurePreset": "debug-qml"
-        },
-        {
-            "name": "build-release-qml",
-            "configurePreset": "release-qml"
-        }
+        { "name": "build-vscode-debug-widgets",     "configurePreset": "vscode-debug-widgets" },
+        { "name": "build-vscode-release-widgets",   "configurePreset": "vscode-release-widgets" },
+        { "name": "build-qtcreator-debug-widgets",  "configurePreset": "qtcreator-debug-widgets" },
+        { "name": "build-qtcreator-release-widgets","configurePreset": "qtcreator-release-widgets" },
+        { "name": "build-qtcreator-debug-qml",      "configurePreset": "qtcreator-debug-qml" },
+        { "name": "build-qtcreator-release-qml",    "configurePreset": "qtcreator-release-qml" }
     ]
 }
