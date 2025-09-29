@@ -386,4 +386,87 @@ bool PokerMath::getStreetStatistics(const CurrentHandContext& ctx, std::shared_p
     return false;  // No reliable statistics available
 }
 
+// ========================================
+// Randomization and Probability Utilities (Phase 5)
+// ========================================
+
+bool PokerMath::shouldPerformAction(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer, float probabilityPercent)
+{
+    // Convert percentage to 1-N range for getRand compatibility
+    if (probabilityPercent <= 0.0f) return false;
+    if (probabilityPercent >= 100.0f) return true;
+    
+    int range = static_cast<int>(100.0f / probabilityPercent);
+    int rand = 0;
+    // Access randomizer through service container like existing strategies do
+    serviceContainer->randomizer().getRand(1, range, 1, &rand);
+    return rand == 1;
+}
+
+bool PokerMath::shouldTakeAction(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer, float probability)
+{
+    return shouldPerformAction(serviceContainer, probability * 100.0f);
+}
+
+float PokerMath::getRandomBetMultiplier(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer, float minMultiplier, float maxMultiplier)
+{
+    // Common pattern: myServices->randomizer().getRand(40, 80, 1, &rand); float coeff = rand / 100.0f;
+    int minPercent = static_cast<int>(minMultiplier * 100);
+    int maxPercent = static_cast<int>(maxMultiplier * 100);
+    int rand = 0;
+    serviceContainer->randomizer().getRand(minPercent, maxPercent, 1, &rand);
+    return static_cast<float>(rand) / 100.0f;
+}
+
+bool PokerMath::shouldDefendAgainst3Bet(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer)
+{
+    // LAG pattern: getRand(1, 3) == 1 for defending against 3-bet bluffs
+    return shouldPerformAction(serviceContainer, DEFEND_3BET_PROBABILITY);
+}
+
+bool PokerMath::shouldAddSpeculativeHand(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer)
+{
+    // Pattern: getRand(1, 4) == 1 for adding speculative hands to range
+    return shouldPerformAction(serviceContainer, SPECULATIVE_HAND_PROBABILITY);
+}
+
+bool PokerMath::shouldBluffFrequently(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer)
+{
+    // Pattern: getRand(1, 2) == 1 for 50% bluff frequency
+    return shouldPerformAction(serviceContainer, FREQUENT_BLUFF_PROBABILITY);
+}
+
+bool PokerMath::shouldBluffOccasionally(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer)
+{
+    // Pattern: getRand(1, 4) == 1 for 25% bluff frequency  
+    return shouldPerformAction(serviceContainer, OCCASIONAL_BLUFF_PROBABILITY);
+}
+
+bool PokerMath::shouldBluffRarely(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer)
+{
+    // Pattern: getRand(1, 7) == 1 for ~14% bluff frequency
+    return shouldPerformAction(serviceContainer, RARE_BLUFF_PROBABILITY);
+}
+
+bool PokerMath::shouldSlowPlay(const CurrentHandContext& ctx, std::shared_ptr<pkt::core::ServiceContainer> serviceContainer)
+{
+    // Pattern: getRand(1, 4) == 1 with very strong hand for slow playing
+    if (!hasVeryStrongEquity(ctx, 0.98f)) return false;
+    return shouldPerformAction(serviceContainer, SLOWPLAY_PROBABILITY);
+}
+
+bool PokerMath::shouldHideHandStrength(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer)
+{
+    // Pattern: getRand(1, 6) == 1 for hiding hand strength by calling instead of raising
+    return shouldPerformAction(serviceContainer, HIDE_STRENGTH_PROBABILITY);
+}
+
+int PokerMath::getRandomUTGRange(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer, int minRange, int maxRange)
+{
+    // Strategy-dependent UTG range randomization
+    int utgRange = 0;
+    serviceContainer->randomizer().getRand(minRange, maxRange, 1, &utgRange);
+    return utgRange;
+}
+
 } // namespace pkt::core::player

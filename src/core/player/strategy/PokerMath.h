@@ -6,6 +6,11 @@
 
 #include <memory>  // For std::shared_ptr
 
+// Forward declare ServiceContainer to avoid circular dependencies
+namespace pkt::core {
+    class ServiceContainer;
+}
+
 namespace pkt::core::player
 {
 // Forward declarations
@@ -179,6 +184,67 @@ public:
     static bool getStreetStatistics(const CurrentHandContext& ctx, std::shared_ptr<Player> opponent, float& aggression, int& hands);
 
     // ========================================
+    // Randomization and Probability Utilities (Phase 5)
+    // ========================================
+    
+    /**
+     * Generic probability check - replaces getRand(1, X) == Y patterns
+     * @param serviceContainer Service container for randomizer access  
+     * @param probabilityPercent Probability as percentage (e.g., 50 for 50% chance)
+     */
+    static bool shouldPerformAction(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer, float probabilityPercent);
+    
+    /**
+     * Check if should perform action based on specific odds (like 1 in 6 chance)
+     * Common pattern: getRand(1, N) == 1 -> shouldTakeAction(1.0f/N)
+     */
+    static bool shouldTakeAction(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer, float probability);
+    
+    /**
+     * Get random bet coefficient for dynamic sizing
+     * Common pattern: getRand(40, 80) / 100 -> getRandomBetMultiplier(0.4f, 0.8f)
+     */
+    static float getRandomBetMultiplier(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer, float minMultiplier = 0.4f, float maxMultiplier = 0.8f);
+    
+    /**
+     * Check if should defend against 3-bet based on hand type and strategy
+     * Common LAG pattern: getRand(1, 3) == 1 for 33% chance
+     */
+    static bool shouldDefendAgainst3Bet(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
+    
+    /**
+     * Check if should add speculative hands to range
+     * Common pattern: getRand(1, 4) == 1 for 25% chance  
+     */
+    static bool shouldAddSpeculativeHand(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
+    
+    /**
+     * Check if should bluff in specific situations
+     * Common patterns: getRand(1, 2) == 1 for 50%, getRand(1, 4) == 1 for 25%
+     */
+    static bool shouldBluffFrequently(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);  // 50% chance
+    static bool shouldBluffOccasionally(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer); // 25% chance
+    static bool shouldBluffRarely(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);       // ~15% chance
+    
+    /**
+     * Check if should slowplay very strong hand
+     * Common pattern: getRand(1, 4) == 1 with strong equity conditions
+     */
+    static bool shouldSlowPlay(const CurrentHandContext& ctx, std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
+    
+    /**
+     * Check if should hide hand strength by calling instead of raising
+     * Common pattern: getRand(1, 6) == 1 for ~17% chance
+     */
+    static bool shouldHideHandStrength(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
+    
+    /**
+     * Get random range multiplier for UTG position (strategy-dependent)
+     * Replaces specific getRand patterns for starting range calculation
+     */
+    static int getRandomUTGRange(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer, int minRange, int maxRange);
+
+    // ========================================
     // Constants (formerly magic numbers)
     // ========================================
     
@@ -212,6 +278,20 @@ public:
     static constexpr float TIGHT_OPPONENT_AGGRESSION_THRESHOLD = 20.0f;   // Below this = tight
     static constexpr float PASSIVE_OPPONENT_AGGRESSION_THRESHOLD = 30.0f; // Below this = passive 
     static constexpr int FALLBACK_PLAYER_COUNT_THRESHOLD = 10;             // Use +1 fallback when < 10 players
+    
+    // Randomization probability thresholds (Phase 5)
+    static constexpr float DEFEND_3BET_PROBABILITY = 33.33f;       // 1 in 3 chance (getRand(1,3) == 1)
+    static constexpr float SPECULATIVE_HAND_PROBABILITY = 25.0f;   // 1 in 4 chance (getRand(1,4) == 1) 
+    static constexpr float FREQUENT_BLUFF_PROBABILITY = 50.0f;     // 1 in 2 chance (getRand(1,2) == 1)
+    static constexpr float OCCASIONAL_BLUFF_PROBABILITY = 25.0f;   // 1 in 4 chance (getRand(1,4) == 1)
+    static constexpr float RARE_BLUFF_PROBABILITY = 14.29f;        // 1 in 7 chance (getRand(1,7) == 1)
+    static constexpr float SLOWPLAY_PROBABILITY = 25.0f;           // 1 in 4 chance (getRand(1,4) == 1)
+    static constexpr float HIDE_STRENGTH_PROBABILITY = 16.67f;     // 1 in 6 chance (getRand(1,6) == 1)
+    
+    // Default bet multiplier ranges for coefficient randomization
+    static constexpr float MIN_BET_MULTIPLIER = 0.4f;              // 40% of pot
+    static constexpr float MAX_BET_MULTIPLIER = 0.8f;              // 80% of pot
+    static constexpr float MANIAC_MAX_BET_MULTIPLIER = 0.9f;       // 90% of pot for maniac strategy
 };
 
 } // namespace pkt::core::player

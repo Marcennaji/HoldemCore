@@ -117,9 +117,7 @@ bool ManiacBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
         !ctx.commonContext.bettingContext.isPreflopBigBet)
     {
 
-        int rand = 0;
-        myServices->randomizer().getRand(1, 3, 1, &rand);
-        if (rand == 1)
+        if (PokerMath::shouldDefendAgainst3Bet(myServices))
         {
 
             stringCallingRange += HIGH_SUITED_CONNECTORS;
@@ -218,9 +216,7 @@ int ManiacBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
                         raiserStats.getPreflopCallthreeBetsFrequency() < 30)
                     {
 
-                        int rand = 0;
-                        myServices->randomizer().getRand(1, 3, 1, &rand);
-                        if (rand == 1)
+                        if (PokerMath::shouldDefendAgainst3Bet(myServices))
                         {
                             speculativeHandedAdded = true;
                             myServices->logger().verbose(
@@ -251,9 +247,7 @@ int ManiacBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
 
             if (isPossibleToBluff(ctx) && ctx.personalContext.position > Late && raiserStats.getPreflop3Bet() > 8)
             {
-                int rand = 0;
-                myServices->randomizer().getRand(1, 5, 1, &rand);
-                if (rand == 1)
+                if (PokerMath::shouldPerformAction(myServices, 20.0f))
                 {
                     speculativeHandedAdded = true;
                     myServices->logger().verbose(
@@ -279,9 +273,7 @@ int ManiacBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
                        RangeEstimator::getStringRange(ctx.commonContext.playersContext.nbPlayers, 4)))
     {
 
-        int rand = 0;
-        myServices->randomizer().getRand(1, 10, 1, &rand);
-        if (rand == 1)
+        if (PokerMath::shouldPerformAction(myServices, 10.0f))
         {
             myServices->logger().verbose("\t\twon't raise, to hide the hand strength");
             myCouldCall = true;
@@ -315,9 +307,7 @@ int ManiacBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
 
             if (getDrawingProbability(ctx.personalContext.postFlopAnalysisFlags) > 25)
             {
-                int rand = 0;
-                myServices->randomizer().getRand(1, 2, 1, &rand);
-                if (rand == 1)
+                if (PokerMath::shouldBluffFrequently(myServices))
                 {
                     return PokerMath::calculateValueBetSize(ctx);  // Was: pot * 0.6
                 }
@@ -338,9 +328,7 @@ int ManiacBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
                 !ctx.personalContext.postFlopAnalysisFlags.isFlushDrawPossible)
             {
 
-                int rand = 0;
-                myServices->randomizer().getRand(1, 2, 1, &rand);
-                if (rand == 1)
+                if (PokerMath::shouldBluffFrequently(myServices))
                 {
                     return PokerMath::calculateValueBetSize(ctx);
                 }
@@ -753,9 +741,7 @@ int ManiacBotStrategy::riverCouldBet(const CurrentHandContext& ctx)
         }
     }
 
-    int rand = 0;
-    myServices->randomizer().getRand(40, 90, 1, &rand);
-    float coeff = (float) rand / (float) 100;
+    float coeff = PokerMath::getRandomBetMultiplier(myServices, 0.4f, PokerMath::MANIAC_MAX_BET_MULTIPLIER);
 
     if (ctx.personalContext.myHandSimulation.winSd > .9 ||
         (ctx.personalContext.hasPosition && ctx.personalContext.myHandSimulation.winSd > .85))
