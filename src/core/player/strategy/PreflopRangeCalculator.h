@@ -13,7 +13,7 @@ struct CurrentHandContext;
 class PreflopRangeCalculator
 {
   public:
-    PreflopRangeCalculator() = default;
+    PreflopRangeCalculator();
     explicit PreflopRangeCalculator(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
     // Allow wiring services after default construction when owned by BotStrategyBase
     void setServices(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer) { myServices = serviceContainer; }

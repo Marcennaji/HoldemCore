@@ -1,0 +1,40 @@
+@echo off
+REM Visual Studio Environment Setup for HoldemCore
+REM This script initializes MSVC environment and launches Visual Studio with Qt support
+REM TEMPLATE FILE - Copy this to launch_visual_studio_with_qt.bat and customize for your system
+
+echo.
+echo =================================================================
+echo Visual Studio Qt Environment Setup
+echo =================================================================
+
+REM TODO: Adjust this path for your Visual Studio installation
+call "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
+
+if %ERRORLEVEL% neq 0 (
+    echo ERROR: Failed to initialize MSVC environment
+    echo Make sure Visual Studio Build Tools 2022 is installed
+    echo Or adjust the path above to match your installation
+    pause
+    exit /b 1
+)
+
+REM TODO: Adjust this path for your Qt installation
+set QT_ROOT=C:\Qt\6.9.2
+set CMAKE_PREFIX_PATH=%QT_ROOT%\msvc2022_64
+
+echo MSVC environment initialized ✓
+echo Qt path: %CMAKE_PREFIX_PATH%
+echo.
+
+REM TODO: Adjust this path for your Visual Studio installation
+echo Launching Visual Studio with MSVC + Qt environment...
+start "" "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\devenv.exe" .
+
+REM Alternative paths for different Visual Studio editions:
+REM Professional: "C:\Program Files\Microsoft Visual Studio\2022\Professional\Common7\IDE\devenv.exe"
+REM Enterprise: "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.exe" 
+REM Build Tools only: Use Qt Creator or VS Code instead
+
+echo Visual Studio launched. You can close this window.
+timeout /t 3 >nul

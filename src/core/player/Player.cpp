@@ -12,6 +12,7 @@
 #include <core/interfaces/persistence/PlayersStatisticsStore.h>
 #include <core/player/range/RangeParser.h>
 #include <core/player/strategy/CurrentHandContext.h>
+#include <core/player/strategy/PreflopRangeCalculator.h>
 #include "Helpers.h"
 
 #include <sstream>
@@ -471,7 +472,9 @@ void Player::updateCurrentHandContext(Hand& currentHand)
 
 float Player::calculatePreflopCallingRange(const CurrentHandContext& ctx) const
 {
-    return myRangeEstimator->getStandardCallingRange(ctx.commonContext.playersContext.actingPlayersList->size());
+    ensureServicesInitialized();
+    PreflopRangeCalculator calculator(myServices);
+    return calculator.calculatePreflopCallingRange(ctx);
 }
 
 void Player::resetForNewHand(const Hand& hand)

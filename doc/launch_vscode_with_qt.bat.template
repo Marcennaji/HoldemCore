@@ -1,0 +1,48 @@
+@echo off
+REM HoldemCore Development Environment Setup for VS Code
+REM TEMPLATE FILE - Copy this to launch_vscode_with_qt.bat and customize for your system
+
+REM TODO: Adjust this path for your Qt installation
+set QT_ROOT=C:\Qt\6.9.2
+
+REM Choose Qt compiler toolchain - options:
+REM   - msvc2022_64 (for MSVC compiler compatibility)
+REM   - llvm-mingw_64 (for Clang/MinGW compatibility)  
+REM   - mingw_64 (for MinGW compiler)
+set QT_TOOLCHAIN=msvc2022_64
+
+REM Set CMAKE_PREFIX_PATH to point to Qt installation
+set CMAKE_PREFIX_PATH=%QT_ROOT%\%QT_TOOLCHAIN%
+
+REM Display environment info
+echo.
+echo =================================================================
+echo HoldemCore Development Environment Setup
+echo =================================================================
+echo Qt Root: %QT_ROOT%
+echo Qt Toolchain: %QT_TOOLCHAIN%
+echo CMAKE_PREFIX_PATH: %CMAKE_PREFIX_PATH%
+echo.
+
+REM Verify Qt installation exists
+if not exist "%CMAKE_PREFIX_PATH%" (
+    echo ERROR: Qt installation not found at %CMAKE_PREFIX_PATH%
+    echo Please check your Qt installation path and toolchain selection.
+    echo Edit this file and adjust QT_ROOT and QT_TOOLCHAIN variables.
+    echo.
+    echo Available toolchains should be in:
+    dir /b "%QT_ROOT%" 2>nul
+    echo.
+    pause
+    exit /b 1
+)
+
+echo Qt installation verified ✓
+echo.
+
+REM Launch VS Code with the environment
+echo Launching VS Code with Qt environment...
+code .
+
+REM Keep window open briefly to show any error messages
+timeout /t 2 >nul

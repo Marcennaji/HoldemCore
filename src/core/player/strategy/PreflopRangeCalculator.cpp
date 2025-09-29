@@ -11,9 +11,17 @@ namespace pkt::core::player
 {
 using namespace std;
 
+PreflopRangeCalculator::PreflopRangeCalculator()
+{
+    // Initialize with default ranges to prevent crashes
+    initializeRanges(45, 8); // Default tight-aggressive ranges for 8-player table
+}
+
 PreflopRangeCalculator::PreflopRangeCalculator(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer)
     : myServices(serviceContainer)
 {
+    // Initialize with default ranges to prevent crashes
+    initializeRanges(45, 8); // Default tight-aggressive ranges for 8-player table
 }
 
 void PreflopRangeCalculator::ensureServicesInitialized() const

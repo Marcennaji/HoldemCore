@@ -18,14 +18,6 @@
 #include <QStandardPaths>
 #include <QDir>
 
-#include <chrono>
-#include <cstdlib>
-#include <ctime>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <sstream>
-
 using namespace std;
 using namespace pkt::ui::qtqml;
 
@@ -38,9 +30,6 @@ std::string getDatabasePath()
 
 int main(int argc, char** argv)
 {
-    // Initialize Qt resources
-    Q_INIT_RESOURCE(qml);
-    
     QGuiApplication app(argc, argv);
     
     // Set application metadata for QStandardPaths

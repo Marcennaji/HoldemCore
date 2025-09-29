@@ -9,6 +9,9 @@ file(GLOB_RECURSE INFRA_SOURCES
 # Add the infra library
 add_library(infra ${INFRA_SOURCES})
 
+# Ensure threading support for platforms that require it (e.g., MinGW)
+find_package(Threads REQUIRED)
+
 # Include directories for infra
 target_include_directories(infra 
             PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
@@ -16,7 +19,7 @@ target_include_directories(infra
             )
 
 # Link infra to third party libs
-target_link_libraries(infra PRIVATE psim sqlite)
+target_link_libraries(infra PRIVATE psim sqlite Threads::Threads)
 
 # Link infra to engine so it can use engine interfaces
 target_link_libraries(infra PUBLIC engine)

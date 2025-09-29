@@ -7,7 +7,7 @@
 namespace pkt::core::player
 {
 
-PlayerAction HumanStrategy::decideAction(const CurrentHandContext& ctx)
+pkt::core::PlayerAction HumanStrategy::decideAction(const CurrentHandContext& ctx)
 {
     // Get valid actions from the context
     const std::vector<ActionType>& validActions = ctx.commonContext.validActions;

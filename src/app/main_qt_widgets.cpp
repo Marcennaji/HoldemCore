@@ -10,6 +10,7 @@
 
 #include <ui/qtwidgets/controller/GuiAppController.h>
 #include <ui/qtwidgets/windows/StartWindow.h>
+#include <ui/qtwidgets/theme/ThemeManager.h>
 
 #include <QString>
 #include <QtCore>
@@ -18,14 +19,6 @@
 #include <QtWidgets/QMessageBox>
 #include <QStandardPaths>
 #include <QDir>
-
-#include <chrono>
-#include <cstdlib>
-#include <ctime>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <sstream>
 
 using namespace std;
 using namespace pkt::ui::qtwidgets;
@@ -40,12 +33,12 @@ std::string getDatabasePath()
 
 int main(int argc, char** argv)
 {
-    // Initialize Qt resources
     Q_INIT_RESOURCE(cards);
     
     QApplication app(argc, argv);
     
-    // Set application metadata for QStandardPaths
+    pkt::ui::qtwidgets::ThemeManager::applyLightTheme(app);
+    
     QCoreApplication::setApplicationName("HoldemCore");
     QCoreApplication::setOrganizationName("M87 Dev");
     QCoreApplication::setApplicationVersion("0.9");

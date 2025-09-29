@@ -9,3 +9,7 @@ add_library(sqlite STATIC ${sqlite_SOURCES})
 
 # Include directories for the sqlite module
 target_include_directories(sqlite PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Some toolchains (e.g., MinGW) need explicit pthread linkage when sqlite is used with threading in clients
+find_package(Threads REQUIRED)
+target_link_libraries(sqlite PUBLIC Threads::Threads)

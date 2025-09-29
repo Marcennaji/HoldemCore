@@ -46,3 +46,20 @@ src/ui/qtwidgets/styles
 CppDependOut
 *.cdproj
 bash.exe.stackdump
+
+# Qt Creator files
+CMakeLists.txt.user*
+*.user
+
+# Visual Studio files
+.vs
+
+# IDE launcher scripts (system-specific)
+launch_vscode_with_qt.bat
+launch_qtcreator_with_msvc.bat
+launch_visual_studio_with_qt.bat
+
+# User-specific environment files
+.env
+.env.local
+*.local.bat

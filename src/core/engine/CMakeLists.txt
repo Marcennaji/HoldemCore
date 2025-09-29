@@ -23,4 +23,4 @@ target_include_directories(engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src
 )
 
-target_link_libraries(engine PUBLIC core player actions hand cards game utils state)
+target_link_libraries(engine PUBLIC core actions hand cards game utils state probability)

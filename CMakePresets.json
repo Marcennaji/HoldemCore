@@ -25,7 +25,8 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "USE_WIDGETS": "ON",
-                "USE_QML": "OFF"
+                "USE_QML": "OFF",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
             }
         },
         {
@@ -46,53 +47,172 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "USE_WIDGETS": "OFF",
-                "USE_QML": "ON"
+                "USE_QML": "ON",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
             }
         },
+        {
+            "name": "base-widgets-debug-msbuild",
+            "hidden": true,
+            "generator": "Visual Studio 17 2022",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "USE_WIDGETS": "ON",
+                "USE_QML": "OFF",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        },
+
+ 
         {
             "name": "vscode-debug-widgets",
             "displayName": "VSCode Debug (Widgets)",
             "inherits": "base-widgets-debug",
-            "binaryDir": "${sourceDir}/build/vscode/debug-widgets"
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang-cl",
+                "CMAKE_CXX_COMPILER": "clang-cl"
+            },
+            "binaryDir": "${sourceDir}/build/vscode/clang/debug-widgets"
         },
         {
             "name": "vscode-release-widgets",
             "displayName": "VSCode Release (Widgets)",
             "inherits": "base-widgets-release",
-            "binaryDir": "${sourceDir}/build/vscode/release-widgets"
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang-cl",
+                "CMAKE_CXX_COMPILER": "clang-cl"
+            },
+            "binaryDir": "${sourceDir}/build/vscode/clang/release-widgets"
         },
+        {
+            "name": "vscode-debug-qml",
+            "displayName": "VSCode Debug (QML)",
+            "inherits": "base-qml-debug",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang-cl",
+                "CMAKE_CXX_COMPILER": "clang-cl"
+            },
+            "binaryDir": "${sourceDir}/build/vscode/clang/debug-qml"
+        },
+        {
+            "name": "vscode-release-qml",
+            "displayName": "VSCode Release (QML)",
+            "inherits": "base-qml-release",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang-cl",
+                "CMAKE_CXX_COMPILER": "clang-cl"
+            },
+            "binaryDir": "${sourceDir}/build/vscode/clang/release-qml"
+        },
+
+
         {
             "name": "qtcreator-debug-widgets",
             "displayName": "QtCreator Debug (Widgets)",
             "inherits": "base-widgets-debug",
-            "binaryDir": "${sourceDir}/build/qtcreator/debug-widgets"
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl",
+                "CMAKE_CXX_COMPILER": "cl"
+            },
+            "binaryDir": "${sourceDir}/build/qtcreator/msvc/debug-widgets"
         },
         {
             "name": "qtcreator-release-widgets",
             "displayName": "QtCreator Release (Widgets)",
             "inherits": "base-widgets-release",
-            "binaryDir": "${sourceDir}/build/qtcreator/release-widgets"
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl",
+                "CMAKE_CXX_COMPILER": "cl"
+            },
+            "binaryDir": "${sourceDir}/build/qtcreator/msvc/release-widgets"
         },
         {
             "name": "qtcreator-debug-qml",
             "displayName": "QtCreator Debug (QML)",
             "inherits": "base-qml-debug",
-            "binaryDir": "${sourceDir}/build/qtcreator/debug-qml"
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl",
+                "CMAKE_CXX_COMPILER": "cl"
+            },
+            "binaryDir": "${sourceDir}/build/qtcreator/msvc/debug-qml"
         },
         {
             "name": "qtcreator-release-qml",
             "displayName": "QtCreator Release (QML)",
             "inherits": "base-qml-release",
-            "binaryDir": "${sourceDir}/build/qtcreator/release-qml"
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl",
+                "CMAKE_CXX_COMPILER": "cl"
+            },
+            "binaryDir": "${sourceDir}/build/qtcreator/msvc/release-qml"
+        },
+
+ 
+        {
+            "name": "visualstudio-debug-widgets",
+            "displayName": "Visual Studio Debug (Widgets)",
+            "inherits": "base-widgets-debug",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl",
+                "CMAKE_CXX_COMPILER": "cl"
+            },
+            "binaryDir": "${sourceDir}/build/visualstudio/msvc/debug-widgets"
+        },
+        {
+            "name": "visualstudio-release-widgets",
+            "displayName": "Visual Studio Release (Widgets)",
+            "inherits": "base-widgets-release",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl",
+                "CMAKE_CXX_COMPILER": "cl"
+            },
+            "binaryDir": "${sourceDir}/build/visualstudio/msvc/release-widgets"
+        },
+        {
+            "name": "visualstudio-debug-qml",
+            "displayName": "Visual Studio Debug (QML)",
+            "inherits": "base-qml-debug",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl",
+                "CMAKE_CXX_COMPILER": "cl"
+            },
+            "binaryDir": "${sourceDir}/build/visualstudio/msvc/debug-qml"
+        },
+        {
+            "name": "visualstudio-release-qml",
+            "displayName": "Visual Studio Release (QML)",
+            "inherits": "base-qml-release",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl",
+                "CMAKE_CXX_COMPILER": "cl"
+            },
+            "binaryDir": "${sourceDir}/build/visualstudio/msvc/release-qml"
+        },
+        {
+            "name": "visualstudio-debug-widgets-msbuild",
+            "displayName": "Visual Studio Debug (Widgets) - MSBuild",
+            "inherits": "base-widgets-debug-msbuild",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl",
+                "CMAKE_CXX_COMPILER": "cl"
+            },
+            "binaryDir": "${sourceDir}/build/visualstudio/msbuild/debug-widgets"
         }
     ],
 
     "buildPresets": [
         { "name": "build-vscode-debug-widgets",     "configurePreset": "vscode-debug-widgets" },
         { "name": "build-vscode-release-widgets",   "configurePreset": "vscode-release-widgets" },
+        { "name": "build-vscode-debug-qml",         "configurePreset": "vscode-debug-qml" },
+        { "name": "build-vscode-release-qml",       "configurePreset": "vscode-release-qml" },
         { "name": "build-qtcreator-debug-widgets",  "configurePreset": "qtcreator-debug-widgets" },
         { "name": "build-qtcreator-release-widgets","configurePreset": "qtcreator-release-widgets" },
         { "name": "build-qtcreator-debug-qml",      "configurePreset": "qtcreator-debug-qml" },
-        { "name": "build-qtcreator-release-qml",    "configurePreset": "qtcreator-release-qml" }
+        { "name": "build-qtcreator-release-qml",    "configurePreset": "qtcreator-release-qml" },
+        { "name": "build-visualstudio-debug-widgets",  "configurePreset": "visualstudio-debug-widgets" },
+        { "name": "build-visualstudio-release-widgets","configurePreset": "visualstudio-release-widgets" },
+        { "name": "build-visualstudio-debug-qml",      "configurePreset": "visualstudio-debug-qml" },
+        { "name": "build-visualstudio-release-qml",    "configurePreset": "visualstudio-release-qml" },
+        { "name": "build-visualstudio-debug-widgets-msbuild", "configurePreset": "visualstudio-debug-widgets-msbuild" }
     ]
 }

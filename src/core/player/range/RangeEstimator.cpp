@@ -32,22 +32,22 @@ RangeEstimator::RangeEstimator(int playerId, std::shared_ptr<pkt::core::ServiceC
     assert(myPlayerId >= 0);
     myPreflopRangeEstimator = make_unique<PreflopRangeEstimator>(myPlayerId, myServices);
 }
-void RangeEstimator::updateUnplausibleRanges(GameState state, const CurrentHandContext& ctx)
+void RangeEstimator::updateUnplausibleRanges(pkt::core::GameState state, const CurrentHandContext& ctx)
 {
     ensureServicesInitialized();
 
     switch (state)
     {
-    case GameState::Preflop:
+    case pkt::core::GameState::Preflop:
         updateUnplausibleRangesGivenPreflopActions(ctx);
         break;
-    case GameState::Flop:
+    case pkt::core::GameState::Flop:
         updateUnplausibleRangesGivenFlopActions(ctx);
         break;
-    case GameState::Turn:
+    case pkt::core::GameState::Turn:
         updateUnplausibleRangesGivenTurnActions(ctx);
         break;
-    case GameState::River:
+    case pkt::core::GameState::River:
         updateUnplausibleRangesGivenRiverActions(ctx);
         break;
     default:

@@ -11,7 +11,7 @@
 
 namespace pkt::core::player
 {
-class CurrentHandContext;
+struct CurrentHandContext;
 
 class PlayerStatisticsUpdater
 {

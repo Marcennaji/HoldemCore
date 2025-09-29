@@ -1,0 +1,34 @@
+@echo off
+REM Qt Creator MSVC Environment Setup Script
+REM TEMPLATE FILE - Copy this to launch_qtcreator_with_msvc.bat and customize for your system
+
+echo.
+echo =================================================================
+echo Qt Creator MSVC Environment Setup
+echo =================================================================
+
+REM TODO: Adjust this path for your Visual Studio installation
+call "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
+
+if %ERRORLEVEL% neq 0 (
+    echo ERROR: Failed to initialize MSVC environment
+    echo Make sure Visual Studio Build Tools 2022 is installed
+    echo Or adjust the path above to match your installation
+    pause
+    exit /b 1
+)
+
+REM TODO: Adjust this path for your Qt installation
+set QT_ROOT=C:\Qt\6.9.2
+set CMAKE_PREFIX_PATH=%QT_ROOT%\msvc2022_64
+
+echo MSVC environment initialized ✓
+echo Qt path: %CMAKE_PREFIX_PATH%
+echo.
+
+REM TODO: Adjust this path for your Qt Creator installation
+echo Launching Qt Creator with MSVC environment...
+start "" "C:\Qt\Tools\QtCreator\bin\qtcreator.exe"
+
+echo Qt Creator launched. You can close this window.
+timeout /t 3 >nul

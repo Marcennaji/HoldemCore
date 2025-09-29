@@ -1,6 +1,3 @@
-# Specify the Qt installation path
-set(CMAKE_PREFIX_PATH "C:/Qt/6.5.3/msvc2019_64/lib/cmake")
-
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Sql)
 
 # Collect all source files in the directory

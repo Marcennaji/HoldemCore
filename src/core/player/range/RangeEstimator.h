@@ -40,8 +40,8 @@ class RangeEstimator
     void setEstimatedRange(const std::string& range);
     std::string getEstimatedRange() const;
 
-    void computeEstimatedPreflopRange(const CurrentHandContext&);
-    void updateUnplausibleRanges(GameState, const CurrentHandContext&);
+  void computeEstimatedPreflopRange(const CurrentHandContext&);
+  void updateUnplausibleRanges(pkt::core::GameState, const CurrentHandContext&);
     static int getStandardRaisingRange(int nbPlayers);
     static int getStandardCallingRange(int nbPlayers);
 

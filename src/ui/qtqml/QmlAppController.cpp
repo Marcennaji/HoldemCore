@@ -22,23 +22,19 @@ QmlAppController::QmlAppController(std::shared_ptr<pkt::core::AppServiceContaine
 
 bool QmlAppController::initializeAndShow()
 {
-    // Load the main QML file
-    const QUrl qmlFile(QStringLiteral("qrc:/qt/qml/qtqml/main.qml"));
-    
-    // Handle QML loading errors
+    // Best practice with Qt 6: load via module + type name defined by qt_add_qml_module
     QObject::connect(m_engine.get(), &QQmlApplicationEngine::objectCreationFailed,
                      [](const QUrl &url) {
                          qWarning() << "Failed to load QML file:" << url;
                      });
 
-    m_engine->load(qmlFile);
-    
-    // Check if the QML file was loaded successfully
+    // Module URI is 'qtqml' (see qt_add_qml_module), main file is 'main.qml'
+    m_engine->loadFromModule("qtqml", "main");
+
     if (m_engine->rootObjects().isEmpty()) {
         qWarning() << "Failed to create root QML object";
         return false;
     }
-
     return true;
 }
 

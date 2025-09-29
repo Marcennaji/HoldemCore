@@ -7,14 +7,14 @@
 namespace pkt::core::player
 {
 
-class CurrentHandContext;
+struct CurrentHandContext;
 
 class PlayerStrategy
 {
   public:
     virtual ~PlayerStrategy() = default;
 
-    virtual PlayerAction decideAction(const CurrentHandContext& ctx) = 0;
+    virtual pkt::core::PlayerAction decideAction(const CurrentHandContext& ctx) = 0;
 };
 
 } // namespace pkt::core::player
