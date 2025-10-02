@@ -11,8 +11,8 @@
 #include <vector>
 namespace pkt::core
 {
-class IHand;
-class ILogger;
+
+class Logger;
 
 } // namespace pkt::core
 

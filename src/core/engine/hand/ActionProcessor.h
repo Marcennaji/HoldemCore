@@ -8,15 +8,15 @@
 namespace pkt::core
 {
 class Hand;
-class IHandState;
+class HandState;
 
-class IActionProcessor
+class HandActionProcessor
 {
   public:
-    virtual ~IActionProcessor() = default;
+    virtual ~HandActionProcessor() = default;
 
     virtual void promptPlayerAction(Hand& hand, player::Player& player) = 0;
-    virtual std::unique_ptr<IHandState> computeNextState(Hand& hand) = 0;
+    virtual std::unique_ptr<HandState> computeNextState(Hand& hand) = 0;
     virtual bool isActionAllowed(const Hand& hand, PlayerAction action) const = 0;
 
     virtual std::shared_ptr<player::Player> getNextPlayerToAct(const Hand& hand) const = 0;

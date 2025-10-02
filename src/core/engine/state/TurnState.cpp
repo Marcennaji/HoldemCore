@@ -86,7 +86,7 @@ void TurnState::promptPlayerAction(Hand& hand, Player& player)
     hand.handlePlayerAction(action);
 }
 
-std::unique_ptr<IHandState> TurnState::computeNextState(Hand& hand)
+std::unique_ptr<HandState> TurnState::computeNextState(Hand& hand)
 {
     return computeBettingRoundNextState(hand, myEvents, Turn);
 }

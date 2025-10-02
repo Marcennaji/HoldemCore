@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include "core/interfaces/ILogger.h"
+#include "core/interfaces/Logger.h"
 
 namespace pkt::core
 {
 
-class NullLogger : public ILogger
+class NullLogger : public Logger
 {
   public:
     virtual void setLogLevel(LogLevel level) override {}

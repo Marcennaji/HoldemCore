@@ -26,7 +26,7 @@
 
 namespace pkt::core
 {
-class IBoard;
+class Board;
 } // namespace pkt::core
 
 namespace pkt::ui::qtwidgets

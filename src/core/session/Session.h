@@ -13,7 +13,7 @@
 #include <core/player/MixedPlayerFactory.h>
 #include <core/player/typedefs.h>
 #include "core/engine/GameEvents.h"
-#include "core/interfaces/IBoard.h"
+#include "core/engine/game/Board.h"
 #include "core/services/ServiceContainer.h"
 
 namespace pkt::core
@@ -24,7 +24,7 @@ namespace player
 {
 class StrategyAssigner;
 }
-class IBoard;
+class Board;
 
 class Session
 {
@@ -55,7 +55,7 @@ class Session
     virtual std::unique_ptr<player::MixedPlayerFactory>
     createPlayerFactory(const GameEvents& events, player::StrategyAssigner* strategyAssigner);
 
-    virtual std::shared_ptr<IBoard> createBoard(const StartData& startData);
+    virtual std::shared_ptr<Board> createBoard(const StartData& startData);
 
     // Helper methods for startGame refactoring (protected for testing)
     void validateGameParameters(const GameData& gameData, const StartData& startData);
@@ -73,7 +73,7 @@ class Session
         std::unique_ptr<player::StrategyAssigner> strategyAssigner;
         std::unique_ptr<player::MixedPlayerFactory> playerFactory;
         pkt::core::player::PlayerList playersList;
-        std::shared_ptr<IBoard> board;
+        std::shared_ptr<Board> board;
     };
 
     GameComponents createGameComponents(const GameData& gameData, const StartData& startData);

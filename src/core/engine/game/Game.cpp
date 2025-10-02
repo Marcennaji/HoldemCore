@@ -18,7 +18,7 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
+Game::Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<Board> board,
            PlayerList seatsList, unsigned dealerId, const GameData& gameData, const StartData& startData)
     : myEngineFactory(factory), myEvents(events), myCurrentBoard(board), mySeatsList(seatsList),
       myDealerPlayerId(dealerId), myGameData(gameData), myStartData(startData)

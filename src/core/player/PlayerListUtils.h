@@ -9,7 +9,7 @@
 
 namespace pkt::core
 {
-class ILogger;
+class Logger;
 class ServiceContainer;
 } // namespace pkt::core
 
@@ -65,7 +65,7 @@ class PlayerListUtils
      * @param actingPlayersList List to update (modified in place)
      * @param logger Logger to use for verbose output
      */
-    static void updateActingPlayersList(PlayerList& actingPlayersList, pkt::core::ILogger& logger);
+    static void updateActingPlayersList(PlayerList& actingPlayersList, pkt::core::Logger& logger);
 };
 
 } // namespace pkt::core::player

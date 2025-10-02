@@ -87,7 +87,7 @@ void PreflopState::promptPlayerAction(Hand& hand, Player& player)
     hand.handlePlayerAction(action);
 }
 
-std::unique_ptr<IHandState> PreflopState::computeNextState(Hand& hand)
+std::unique_ptr<HandState> PreflopState::computeNextState(Hand& hand)
 {
     return computeBettingRoundNextState(hand, myEvents, Preflop);
 }
@@ -95,7 +95,7 @@ std::unique_ptr<IHandState> PreflopState::computeNextState(Hand& hand)
 void PreflopState::logStateInfo(Hand& hand)
 {
     ensureServicesInitialized();
-    IDebuggableState::logStateInfo(hand);
+    HandDebuggableState::logStateInfo(hand);
     myServices->logger().info("Blinds: SB=" + std::to_string(mySmallBlind) +
                               ", BB=" + std::to_string(2 * mySmallBlind));
     // Log dealer and positions to help diagnose acting order

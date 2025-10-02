@@ -9,7 +9,7 @@ ApplicationWindow {
     visible: true
     title: qsTr("HoldemCore - QML Edition")
 
-    color: "#0F4C3A" // Dark green poker table color
+    color: '#97ada7' 
 
     header: ToolBar {
         RowLayout {

@@ -15,12 +15,12 @@ class BoardCardTest : public EngineTest
 
   public:
     bool cardsAreUniqueAndValid(const std::shared_ptr<pkt::core::Hand>& hand,
-                                const std::shared_ptr<pkt::core::IBoard>& board,
+                                const std::shared_ptr<pkt::core::Board>& board,
                                 const pkt::core::player::PlayerList& players);
 };
 
 bool BoardCardTest::cardsAreUniqueAndValid(const std::shared_ptr<pkt::core::Hand>& hand,
-                                           const std::shared_ptr<pkt::core::IBoard>& board,
+                                           const std::shared_ptr<pkt::core::Board>& board,
                                            const pkt::core::player::PlayerList& players)
 {
     std::vector<int> allCards;

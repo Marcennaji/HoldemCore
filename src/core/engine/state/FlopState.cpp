@@ -67,7 +67,7 @@ void FlopState::promptPlayerAction(Hand& hand, Player& player)
     hand.handlePlayerAction(action);
 }
 
-std::unique_ptr<IHandState> FlopState::computeNextState(Hand& hand)
+std::unique_ptr<HandState> FlopState::computeNextState(Hand& hand)
 {
     return computeBettingRoundNextState(hand, myEvents, Flop);
 }

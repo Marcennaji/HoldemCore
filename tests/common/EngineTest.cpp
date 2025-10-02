@@ -89,7 +89,7 @@ bool EngineTest::isPlayerStillActive(unsigned id) const
     return false;
 }
 
-pkt::core::ILogger& EngineTest::getLogger() const
+pkt::core::Logger& EngineTest::getLogger() const
 {
     return myServices->logger();
 }

@@ -9,7 +9,7 @@
 #include "core/engine/hand/Hand.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
-#include "core/interfaces/IBoard.h"
+#include "core/engine/game/Board.h"
 #include "core/player/Player.h"
 #include "core/services/PokerServices.h"
 
@@ -30,11 +30,11 @@ class EngineFactory
 
     ~EngineFactory();
 
-    virtual std::shared_ptr<Hand> createHand(std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
+    virtual std::shared_ptr<Hand> createHand(std::shared_ptr<EngineFactory> f, std::shared_ptr<Board> b,
                                              pkt::core::player::PlayerList seats,
                                              pkt::core::player::PlayerList actingPlayers, GameData, StartData);
 
-    virtual std::shared_ptr<IBoard> createBoard(unsigned dealerPosition);
+    virtual std::shared_ptr<Board> createBoard(unsigned dealerPosition);
 
   private:
     const GameEvents& myEvents;

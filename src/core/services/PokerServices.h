@@ -21,10 +21,10 @@ class PokerServices : public ServiceContainer
     explicit PokerServices(std::shared_ptr<ServiceContainer> baseContainer);
 
     // Inherited service accessors
-    ILogger& logger() override;
+    Logger& logger() override;
     PlayersStatisticsStore& playersStatisticsStore() override;
     HandEvaluationEngine& handEvaluationEngine() override;
-    IRandomizer& randomizer() override;
+    Randomizer& randomizer() override;
 
   private:
     std::shared_ptr<ServiceContainer> myBaseContainer;

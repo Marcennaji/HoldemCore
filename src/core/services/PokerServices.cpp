@@ -11,7 +11,7 @@ PokerServices::PokerServices(std::shared_ptr<ServiceContainer> baseContainer) : 
 {
 }
 
-ILogger& PokerServices::logger()
+Logger& PokerServices::logger()
 {
     return myBaseContainer->logger();
 }
@@ -26,7 +26,7 @@ HandEvaluationEngine& PokerServices::handEvaluationEngine()
     return myBaseContainer->handEvaluationEngine();
 }
 
-IRandomizer& PokerServices::randomizer()
+Randomizer& PokerServices::randomizer()
 {
     return myBaseContainer->randomizer();
 }

@@ -1,7 +1,7 @@
 #pragma once
-#include "core/interfaces/hand/IActionProcessor.h"
-#include "core/interfaces/hand/IDebuggableState.h"
-#include "core/interfaces/hand/IHandState.h"
+#include "core/engine/hand/ActionProcessor.h"
+#include "core/engine/hand/DebuggableState.h"
+#include "core/engine/hand/HandState.h"
 
 #include <memory>
 
@@ -19,7 +19,7 @@ namespace pkt::core
 {
 class GameEvents;
 
-class PostRiverState : public IHandState, public IActionProcessor, public IDebuggableState
+class PostRiverState : public HandState, public HandActionProcessor, public HandDebuggableState
 {
   public:
     explicit PostRiverState(const GameEvents& events);
@@ -27,7 +27,7 @@ class PostRiverState : public IHandState, public IActionProcessor, public IDebug
 
     void enter(Hand&) override;
     void exit(Hand&) override;
-    std::unique_ptr<IHandState> computeNextState(Hand& hand) override;
+    std::unique_ptr<HandState> computeNextState(Hand& hand) override;
 
     bool isActionAllowed(const Hand&, const PlayerAction) const override;
     bool isTerminal() const override { return true; }

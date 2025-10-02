@@ -519,7 +519,7 @@ void Player::setPosition(const Hand& hand)
     assert(position != Unknown);
 }
 
-void Player::setAction(IHandState& state, const PlayerAction& action)
+void Player::setAction(HandState& state, const PlayerAction& action)
 {
     if (action.type != ActionType::None)
     {

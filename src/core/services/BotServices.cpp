@@ -11,7 +11,7 @@ BotServices::BotServices(std::shared_ptr<ServiceContainer> baseContainer) : myBa
 {
 }
 
-ILogger& BotServices::logger()
+Logger& BotServices::logger()
 {
     return myBaseContainer->logger();
 }
@@ -26,7 +26,7 @@ HandEvaluationEngine& BotServices::handEvaluationEngine()
     return myBaseContainer->handEvaluationEngine();
 }
 
-IRandomizer& BotServices::randomizer()
+Randomizer& BotServices::randomizer()
 {
     return myBaseContainer->randomizer();
 }

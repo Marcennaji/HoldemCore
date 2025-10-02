@@ -2,8 +2,8 @@
 #include "GameEvents.h"
 #include "Hand.h"
 #include "core/engine/state/PreflopState.h"
-#include "core/interfaces/hand/IActionProcessor.h"
-#include "core/interfaces/hand/IHandState.h"
+#include "core/engine/hand/ActionProcessor.h"
+#include "core/engine/hand/HandState.h"
 #include "core/services/ServiceContainer.h"
 
 #include <cassert>
@@ -50,7 +50,7 @@ void HandStateManager::runGameLoop(Hand& hand)
     {
         iterationCount++;
 
-        if (auto* processor = dynamic_cast<IActionProcessor*>(myCurrentState.get()))
+        if (auto* processor = dynamic_cast<HandActionProcessor*>(myCurrentState.get()))
         {
             auto nextPlayer = processor->getNextPlayerToAct(hand);
             if (nextPlayer)
@@ -125,18 +125,18 @@ GameState HandStateManager::getGameState() const
     return myCurrentState ? myCurrentState->getGameState() : GameState::PostRiver;
 }
 
-IActionProcessor* HandStateManager::getActionProcessor() const
+HandActionProcessor* HandStateManager::getActionProcessor() const
 {
-    return dynamic_cast<IActionProcessor*>(myCurrentState.get());
+    return dynamic_cast<HandActionProcessor*>(myCurrentState.get());
 }
 
-IHandState& HandStateManager::getCurrentState() const
+HandState& HandStateManager::getCurrentState() const
 {
     assert(myCurrentState);
     return *myCurrentState;
 }
 
-void HandStateManager::transitionState(Hand& hand, std::unique_ptr<IHandState> newState)
+void HandStateManager::transitionState(Hand& hand, std::unique_ptr<HandState> newState)
 {
     if (myCurrentState)
     {

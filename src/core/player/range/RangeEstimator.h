@@ -18,7 +18,7 @@ struct PostFlopAnalysisFlags;
 
 namespace pkt::core
 {
-class IHand;
+
 
 struct PreflopStatistics;
 struct FlopStatistics;

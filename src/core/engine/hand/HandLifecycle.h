@@ -3,10 +3,10 @@
 namespace pkt::core
 {
 
-class IHandLifecycle
+class HandLifecycle
 {
   public:
-    virtual ~IHandLifecycle() = default;
+    virtual ~HandLifecycle() = default;
     virtual void initialize() = 0;
     virtual void runGameLoop() = 0;
     virtual void end() = 0;

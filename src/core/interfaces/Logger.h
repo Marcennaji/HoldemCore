@@ -16,10 +16,10 @@ enum class LogLevel
     Debug
 };
 
-class ILogger
+class Logger
 {
   public:
-    virtual ~ILogger() = default;
+    virtual ~Logger() = default;
     virtual void setLogLevel(LogLevel level) = 0;
     virtual void error(const std::string& msg) = 0;
     virtual void info(const std::string& msg) = 0;

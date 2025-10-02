@@ -5,7 +5,7 @@
 #pragma once
 #include <memory>
 #include "core/engine/model/TableProfile.h"
-#include "core/interfaces/ILogger.h"
+#include "core/interfaces/Logger.h"
 #include "core/player/Player.h"
 
 namespace pkt::core::player

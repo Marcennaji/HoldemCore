@@ -20,7 +20,7 @@ AppServiceContainer::AppServiceContainer()
 {
 }
 
-ILogger& AppServiceContainer::logger()
+Logger& AppServiceContainer::logger()
 {
     return *myLogger;
 }
@@ -35,7 +35,7 @@ HandEvaluationEngine& AppServiceContainer::handEvaluationEngine()
     return *myHandEvaluationEngine;
 }
 
-IRandomizer& AppServiceContainer::randomizer()
+Randomizer& AppServiceContainer::randomizer()
 {
     return *myRandomizer;
 }

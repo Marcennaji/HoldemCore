@@ -33,7 +33,7 @@ void EngineFactory::ensureServicesInitialized()
     }
 }
 
-std::shared_ptr<Hand> EngineFactory::createHand(std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard> b,
+std::shared_ptr<Hand> EngineFactory::createHand(std::shared_ptr<EngineFactory> f, std::shared_ptr<Board> b,
                                                 pkt::core::player::PlayerList seats,
                                                 pkt::core::player::PlayerList actingPlayers, GameData gd, StartData sd)
 {
@@ -41,7 +41,7 @@ std::shared_ptr<Hand> EngineFactory::createHand(std::shared_ptr<EngineFactory> f
     return std::make_shared<Hand>(myEvents, f, b, seats, actingPlayers, gd, sd, myServices);
 }
 
-std::shared_ptr<IBoard> EngineFactory::createBoard(unsigned dealerPosition)
+std::shared_ptr<Board> EngineFactory::createBoard(unsigned dealerPosition)
 {
     ensureServicesInitialized();
     return std::make_shared<Board>(dealerPosition, myEvents, myServices);

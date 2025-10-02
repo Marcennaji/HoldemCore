@@ -9,10 +9,10 @@ namespace pkt::core
 
 class Hand;
 
-class IHandState
+class HandState
 {
   public:
-    virtual ~IHandState() = default;
+    virtual ~HandState() = default;
 
     virtual void enter(Hand& hand) = 0;
     virtual void exit(Hand& hand) = 0;

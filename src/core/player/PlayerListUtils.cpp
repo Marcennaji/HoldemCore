@@ -5,7 +5,7 @@
 #include "PlayerListUtils.h"
 #include "Player.h"
 #include "core/engine/model/PlayerAction.h"
-#include "core/interfaces/ILogger.h"
+#include "core/interfaces/Logger.h"
 #include "core/services/ServiceContainer.h"
 
 #include <algorithm>
@@ -45,7 +45,7 @@ void PlayerListUtils::updateActingPlayersList(PlayerList& myActingPlayersList,
     updateActingPlayersList(myActingPlayersList, services->logger());
 }
 
-void PlayerListUtils::updateActingPlayersList(PlayerList& myActingPlayersList, pkt::core::ILogger& logger)
+void PlayerListUtils::updateActingPlayersList(PlayerList& myActingPlayersList, pkt::core::Logger& logger)
 {
     logger.verbose("Updating myActingPlayersList...");
 

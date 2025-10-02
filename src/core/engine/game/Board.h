@@ -5,7 +5,7 @@
 
 #include "core/engine/GameEvents.h"
 #include "core/engine/cards/Card.h"
-#include "core/interfaces/IBoard.h"
+#include "core/engine/game/Board.h"
 #include "core/player/typedefs.h"
 #include "core/services/ServiceContainer.h"
 
@@ -23,33 +23,33 @@ namespace pkt::core
 
 class Hand;
 
-class Board : public IBoard
+class Board 
 {
   public:
     Board(unsigned dealerPosition, const GameEvents& events);
     Board(unsigned dealerPosition, const GameEvents& events, std::shared_ptr<ServiceContainer> services);
     ~Board();
 
-    void setSeatsList(pkt::core::player::PlayerList seats) override;
-    void setActingPlayersList(pkt::core::player::PlayerList actingPlayers) override;
+    void setSeatsList(pkt::core::player::PlayerList seats);
+    void setActingPlayersList(pkt::core::player::PlayerList actingPlayers);
 
     // Modern BoardCards interface (preferred for new code)
-    void setBoardCards(const BoardCards& boardCards) override;
-    const BoardCards& getBoardCards() const override;
+    void setBoardCards(const BoardCards& boardCards);
+    const BoardCards& getBoardCards() const;
 
-    void setAllInCondition(bool theValue) override;
-    void setLastActionPlayerId(unsigned theValue) override;
+    void setAllInCondition(bool theValue);
+    void setLastActionPlayerId(unsigned theValue);
 
-    int getPot(const Hand& hand) const override;
-    int getSets(const Hand& hand) const override;
+    int getPot(const Hand& hand) const;
+    int getSets(const Hand& hand) const;
 
-    void distributePot(Hand& hand) override;
-    void determineShowdownRevealOrder() override;
+    void distributePot(Hand& hand);
+    void determineShowdownRevealOrder();
 
-    std::list<unsigned> getWinners() const override;
-    void setWinners(const std::list<unsigned>& w) override;
+    std::list<unsigned> getWinners() const;
+    void setWinners(const std::list<unsigned>& w);
 
-    std::vector<unsigned> getShowdownRevealOrder() const override { return myShowdownRevealOrder; }
+    std::vector<unsigned> getShowdownRevealOrder() const { return myShowdownRevealOrder; }
 
   private:
     void ensureServicesInitialized() const;

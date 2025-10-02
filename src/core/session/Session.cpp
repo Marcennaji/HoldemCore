@@ -69,7 +69,7 @@ std::unique_ptr<player::MixedPlayerFactory> Session::createPlayerFactory(const G
     return std::make_unique<player::MixedPlayerFactory>(events, strategyAssigner);
 }
 
-std::shared_ptr<IBoard> Session::createBoard(const StartData& startData)
+std::shared_ptr<Board> Session::createBoard(const StartData& startData)
 {
     if (!myEngineFactory)
         throw std::runtime_error("EngineFactory not initialized");

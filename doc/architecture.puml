@@ -74,7 +74,7 @@ Session -[#red]-> EngineFactory : creates with services
 
 ' Infrastructure Adapters
 Infra -[#orange]-> Ports : implements
-ConsoleLogger -[#orange]-> Ports : ILogger
+ConsoleLogger -[#orange]-> Ports : Logger
 SqliteStore -[#orange]-> Ports : PlayersStatisticsStore
 PsimEngine -[#orange]-> Ports : HandEvaluationEngine
 SqliteStore -[#orange]-> SqliteDb : uses

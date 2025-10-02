@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "core/interfaces/ILogger.h"
+#include "core/interfaces/Logger.h"
 
 #include <iostream>
 #include <string>
@@ -12,7 +12,7 @@
 namespace pkt::infra
 {
 
-class ConsoleLogger : public pkt::core::ILogger
+class ConsoleLogger : public pkt::core::Logger
 {
   public:
     explicit ConsoleLogger();

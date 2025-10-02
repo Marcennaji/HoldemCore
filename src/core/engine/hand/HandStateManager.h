@@ -13,8 +13,8 @@ namespace pkt::core
 {
 
 class Hand;
-class IHandState;
-class IActionProcessor;
+class HandState;
+class HandActionProcessor;
 struct GameEvents;
 
 /**
@@ -45,19 +45,19 @@ class HandStateManager
     // State queries
     bool isTerminal() const;
     GameState getGameState() const;
-    IActionProcessor* getActionProcessor() const;
-    IHandState& getCurrentState() const;
+    HandActionProcessor* getActionProcessor() const;
+    HandState& getCurrentState() const;
 
     // Force state transition (used after player actions)
     void transitionToNextState(Hand& hand);
 
   private:
-    void transitionState(Hand& hand, std::unique_ptr<IHandState> newState);
+    void transitionState(Hand& hand, std::unique_ptr<HandState> newState);
     void checkAndHandleTerminalState(Hand& hand);
     void ensureServicesInitialized() const;
 
     const GameEvents& myEvents;
-    std::unique_ptr<IHandState> myCurrentState;
+    std::unique_ptr<HandState> myCurrentState;
     GameLoopErrorCallback myErrorCallback;
     mutable std::shared_ptr<pkt::core::ServiceContainer> myServices;
 

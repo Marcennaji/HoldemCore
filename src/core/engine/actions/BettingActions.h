@@ -3,7 +3,7 @@
 #include "BettingRoundActions.h"
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/model/PlayerPosition.h"
-#include "core/interfaces/hand/IHandState.h"
+#include "core/engine/hand/HandState.h"
 #include "core/player/typedefs.h"
 
 #include <optional>

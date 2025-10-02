@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include "core/interfaces/IRandomizer.h"
+#include "core/interfaces/Randomizer.h"
 
 namespace pkt::core
 {
 
-class DefaultRandomizer : public pkt::core::IRandomizer
+class DefaultRandomizer : public pkt::core::Randomizer
 {
   public:
     void getRand(int minValue, int maxValue, unsigned count, int* out) override;

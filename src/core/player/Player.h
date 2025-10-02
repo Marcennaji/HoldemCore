@@ -31,7 +31,7 @@
 namespace pkt::core
 {
 class Hand;
-class IHandState;
+class HandState;
 
 } // namespace pkt::core
 
@@ -115,7 +115,7 @@ class Player
     const PostFlopAnalysisFlags getPostFlopAnalysisFlags() const;
 
     // Actions & gameplay
-    void setAction(IHandState& state, const PlayerAction& action);
+    void setAction(HandState& state, const PlayerAction& action);
     PlayerAction getLastAction() const;
     const CurrentHandActions& getCurrentHandActions() const;
     void resetCurrentHandActions();

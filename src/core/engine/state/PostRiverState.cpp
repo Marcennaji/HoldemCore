@@ -64,7 +64,7 @@ void PostRiverState::exit(Hand& hand)
     }
 }
 
-std::unique_ptr<IHandState> PostRiverState::computeNextState(Hand& /*hand*/)
+std::unique_ptr<HandState> PostRiverState::computeNextState(Hand& /*hand*/)
 {
     // PostRiver is terminal — no next state.
     return nullptr;

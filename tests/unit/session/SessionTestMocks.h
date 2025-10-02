@@ -5,7 +5,7 @@
 #pragma once
 
 #include <core/engine/EngineFactory.h>
-#include <core/interfaces/IBoard.h>
+#include <core/engine/game/Board.h>
 #include <core/session/Session.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

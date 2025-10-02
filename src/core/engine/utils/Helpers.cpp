@@ -148,7 +148,7 @@ std::shared_ptr<player::Player> getFirstPlayerToActPostFlop(const Hand& hand)
     return actingPlayers->front();
 }
 
-std::unique_ptr<pkt::core::IHandState> computeBettingRoundNextState(pkt::core::Hand& hand,
+std::unique_ptr<pkt::core::HandState> computeBettingRoundNextState(pkt::core::Hand& hand,
                                                                     const pkt::core::GameEvents& events,
                                                                     pkt::core::GameState currentState)
 {

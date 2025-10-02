@@ -2,7 +2,7 @@
 
 #include "core/engine/hand/Hand.h"
 #include "core/engine/model/GameState.h"
-#include "core/interfaces/IBoard.h"
+#include "core/engine/game/Board.h"
 #include "core/services/ServiceContainer.h"
 
 namespace pkt::core
@@ -11,10 +11,10 @@ namespace pkt::core
 class Hand;
 class ServiceContainer;
 
-class IDebuggableState
+class HandDebuggableState
 {
   public:
-    virtual ~IDebuggableState() = default;
+    virtual ~HandDebuggableState() = default;
 
     virtual void logStateInfo(Hand& hand)
     {

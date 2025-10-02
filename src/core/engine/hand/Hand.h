@@ -11,36 +11,36 @@
 #include "core/engine/hand/HandStateManager.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
-#include "core/interfaces/hand/IActionProcessor.h"
-#include "core/interfaces/hand/IDeckDealer.h"
-#include "core/interfaces/hand/IHandLifecycle.h"
-#include "core/interfaces/hand/IHandPlayerAction.h"
-#include "core/interfaces/hand/IHandState.h"
+#include "core/engine/hand/ActionProcessor.h"
+#include "core/engine/hand/DeckDealer.h"
+#include "core/engine/hand/HandLifecycle.h"
+#include "core/engine/hand/HandPlayerAction.h"
+#include "core/engine/hand/HandState.h"
 #include "core/services/PokerServices.h"
 #include "strategy/CurrentHandContext.h"
 
 namespace pkt::core
 {
 
-class IHandState;
+class HandState;
 class EngineFactory;
-class IBoard;
+class Board;
 
-class Hand : public IHandLifecycle, public IHandPlayerAction, public HandPlayersState, public IDeckDealer
+class Hand : public HandLifecycle, public HandPlayerAction, public HandPlayersState, public DeckDealer
 {
   public:
-    Hand(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard>,
+    Hand(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<Board>,
          pkt::core::player::PlayerList seats, pkt::core::player::PlayerList actingPlayers, GameData gameData,
          StartData startData);
 
     // Constructor with PokerServices for dependency injection
-    Hand(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<IBoard>,
+    Hand(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<Board>,
          pkt::core::player::PlayerList seats, pkt::core::player::PlayerList actingPlayers, GameData gameData,
          StartData startData, std::shared_ptr<PokerServices> services);
 
     ~Hand();
 
-    IActionProcessor* getActionProcessor() const;
+    HandActionProcessor* getActionProcessor() const;
     void handlePlayerAction(PlayerAction action) override;
     void initialize() override;
     void runGameLoop() override;
@@ -58,9 +58,9 @@ class Hand : public IHandLifecycle, public IHandPlayerAction, public HandPlayers
     int getPotOdd(const int playerCash, const int playerSet) const;
     float getM(int cash) const;
     int getSmallBlind() const;
-    IHandState& getState() { return myStateManager->getCurrentState(); }
+    HandState& getState() { return myStateManager->getCurrentState(); }
     GameState getGameState() const { return myStateManager->getGameState(); }
-    IBoard& getBoard() { return *myBoard; }
+    Board& getBoard() { return *myBoard; }
 
     // Accessor methods for ActionApplier
     HandStateManager* getStateManager() const { return myStateManager.get(); }
@@ -88,7 +88,7 @@ class Hand : public IHandLifecycle, public IHandPlayerAction, public HandPlayers
 
     std::shared_ptr<EngineFactory> myFactory;
     const GameEvents& myEvents;
-    std::shared_ptr<IBoard> myBoard;
+    std::shared_ptr<Board> myBoard;
     mutable std::shared_ptr<PokerServices> myServices; // Injected service container
     std::unique_ptr<HandStateManager> myStateManager;
     std::unique_ptr<DeckManager> myDeckManager;

@@ -1,7 +1,7 @@
 #pragma once
-#include "core/interfaces/hand/IActionProcessor.h"
-#include "core/interfaces/hand/IDebuggableState.h"
-#include "core/interfaces/hand/IHandState.h"
+#include "core/engine/hand/ActionProcessor.h"
+#include "core/engine/hand/DebuggableState.h"
+#include "core/engine/hand/HandState.h"
 
 #include <memory>
 
@@ -20,7 +20,7 @@ namespace pkt::core
 
 class GameEvents;
 
-class PreflopState : public IHandState, public IActionProcessor, public IDebuggableState
+class PreflopState : public HandState, public HandActionProcessor, public HandDebuggableState
 {
   public:
     PreflopState(const GameEvents& events, const int smallBlind, unsigned dealerPlayerId);
@@ -29,7 +29,7 @@ class PreflopState : public IHandState, public IActionProcessor, public IDebugga
 
     void enter(Hand&) override;
     void exit(Hand&) override;
-    std::unique_ptr<IHandState> computeNextState(Hand& hand) override;
+    std::unique_ptr<HandState> computeNextState(Hand& hand) override;
 
     bool isActionAllowed(const Hand&, const PlayerAction) const override;
 

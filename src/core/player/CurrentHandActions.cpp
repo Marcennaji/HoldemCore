@@ -133,7 +133,7 @@ void CurrentHandActions::writeActionsToLog() const
     writeActionsToLog(myServices->logger());
 }
 
-void CurrentHandActions::writeActionsToLog(ILogger& logger) const
+void CurrentHandActions::writeActionsToLog(Logger& logger) const
 {
     for (const auto& [state, actions] : myActionsByState)
     {

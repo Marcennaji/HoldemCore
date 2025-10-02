@@ -4,7 +4,7 @@
 #include <core/services/ServiceContainer.h>
 #include "core/engine/model/GameState.h"
 #include "core/engine/model/PlayerAction.h"
-#include "core/interfaces/ILogger.h"
+#include "core/interfaces/Logger.h"
 
 #include <map>
 #include <memory>
@@ -34,7 +34,7 @@ class CurrentHandActions
     PlayerAction getLastAction() const { return myLastAction; }
 
     void writeActionsToLog() const;
-    void writeActionsToLog(ILogger& logger) const;
+    void writeActionsToLog(Logger& logger) const;
 
   private:
     void ensureServicesInitialized() const;

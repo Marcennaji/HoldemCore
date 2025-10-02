@@ -19,13 +19,13 @@ namespace pkt::core
 
 struct GameEvents;
 class Hand;
-class IBoard;
+class Board;
 class EngineFactory;
 
 class Game
 {
   public:
-    Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
+    Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<Board> board,
          pkt::core::player::PlayerList seatsList, unsigned dealerId, const GameData& gameData,
          const StartData& startData);
 
@@ -41,7 +41,7 @@ class Game
     std::shared_ptr<EngineFactory> myEngineFactory;
     const GameEvents& myEvents;
     std::shared_ptr<Hand> myCurrentHand;
-    std::shared_ptr<IBoard> myCurrentBoard;
+    std::shared_ptr<Board> myCurrentBoard;
 
     pkt::core::player::PlayerList mySeatsList;
     pkt::core::player::PlayerList myActingPlayersList;

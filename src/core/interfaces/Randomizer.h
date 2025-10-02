@@ -2,10 +2,10 @@
 
 namespace pkt::core
 {
-class IRandomizer
+class Randomizer
 {
   public:
     virtual void getRand(int minValue, int maxValue, unsigned count, int* out) = 0;
-    virtual ~IRandomizer() = default;
+    virtual ~Randomizer() = default;
 };
 } // namespace pkt::core

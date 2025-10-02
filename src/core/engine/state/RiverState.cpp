@@ -86,7 +86,7 @@ void RiverState::promptPlayerAction(Hand& hand, Player& player)
     hand.handlePlayerAction(action);
 }
 
-std::unique_ptr<IHandState> RiverState::computeNextState(Hand& hand)
+std::unique_ptr<HandState> RiverState::computeNextState(Hand& hand)
 {
     return computeBettingRoundNextState(hand, myEvents, River);
 }

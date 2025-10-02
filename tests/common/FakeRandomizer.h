@@ -1,12 +1,12 @@
 #pragma once
 
-#include "core/interfaces/IRandomizer.h"
+#include "core/interfaces/Randomizer.h"
 
 #include <vector>
 
 namespace pkt::test
 {
-class FakeRandomizer : public pkt::core::IRandomizer
+class FakeRandomizer : public pkt::core::Randomizer
 {
   public:
     std::vector<int> values;

@@ -4,10 +4,10 @@
 
 namespace pkt::core
 {
-class IHandPlayerAction
+class HandPlayerAction
 {
   public:
-    virtual ~IHandPlayerAction() = default;
+    virtual ~HandPlayerAction() = default;
     virtual void handlePlayerAction(PlayerAction action) = 0;
 };
 } // namespace pkt::core

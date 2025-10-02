@@ -22,7 +22,7 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
+Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<Board> board,
            PlayerList seats, PlayerList actingPlayers, GameData gameData, StartData startData)
     : HandPlayersState(seats, actingPlayers), myEvents(events), myFactory(factory), myBoard(board), myServices(nullptr),
       myDeckManager(std::make_unique<DeckManager>()), myActionValidator(std::make_unique<ActionValidator>()),
@@ -39,7 +39,7 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
     auto errorProvider = [this](const PlayerAction& action) -> std::string { return getActionValidationError(action); };
 }
 
-Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<IBoard> board,
+Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<Board> board,
            PlayerList seats, PlayerList actingPlayers, GameData gameData, StartData startData,
            std::shared_ptr<PokerServices> services)
     : HandPlayersState(seats, actingPlayers), myEvents(events), myFactory(factory), myBoard(board),
@@ -302,7 +302,7 @@ int Hand::getPotOdd(const int playerCash, const int playerSet) const
     return odd;
 }
 
-IActionProcessor* Hand::getActionProcessor() const
+HandActionProcessor* Hand::getActionProcessor() const
 {
     return myStateManager->getActionProcessor();
 }
