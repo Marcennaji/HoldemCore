@@ -34,7 +34,7 @@ public:
     
     /**
      * Check if hand equity justifies calling given pot odds
-     * Common pattern: ctx.personalContext.myHandSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd
+     * Common pattern: ctx.personalContext.m_handSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd
      */
     static bool hasInsufficientEquityForCall(const CurrentHandContext& ctx, float equityMultiplier = 1.0f);
     

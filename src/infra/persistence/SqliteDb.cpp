@@ -8,29 +8,29 @@ namespace pkt::infra
 
 SqliteDb::SqliteDb(const std::filesystem::path& file)
 {
-    int rc = sqlite3_open(file.string().c_str(), &myDb);
+    int rc = sqlite3_open(file.string().c_str(), &m_db);
     if (rc != SQLITE_OK)
     {
-        std::string msg = sqlite3_errmsg(myDb);
-        sqlite3_close(myDb);
-        myDb = nullptr;
+        std::string msg = sqlite3_errmsg(m_db);
+        sqlite3_close(m_db);
+        m_db = nullptr;
         throw std::runtime_error("Failed to open SQLite database: " + msg);
     }
 }
 
 SqliteDb::~SqliteDb()
 {
-    if (myDb)
+    if (m_db)
     {
-        sqlite3_close(myDb);
-        myDb = nullptr;
+        sqlite3_close(m_db);
+        m_db = nullptr;
     }
 }
 
 void SqliteDb::exec(const std::string& sql)
 {
     char* errMsg = nullptr;
-    int rc = sqlite3_exec(myDb, sql.c_str(), nullptr, nullptr, &errMsg);
+    int rc = sqlite3_exec(m_db, sql.c_str(), nullptr, nullptr, &errMsg);
     if (rc != SQLITE_OK)
     {
         std::string msg = errMsg ? errMsg : "Unknown SQLite error";
@@ -42,10 +42,10 @@ void SqliteDb::exec(const std::string& sql)
 std::unique_ptr<SqliteStatement> SqliteDb::prepare(const std::string& sql)
 {
     sqlite3_stmt* stmt = nullptr;
-    int rc = sqlite3_prepare_v2(myDb, sql.c_str(), -1, &stmt, nullptr);
+    int rc = sqlite3_prepare_v2(m_db, sql.c_str(), -1, &stmt, nullptr);
     if (rc != SQLITE_OK)
     {
-        throw std::runtime_error("SQLite prepare failed: " + std::string(sqlite3_errmsg(myDb)));
+        throw std::runtime_error("SQLite prepare failed: " + std::string(sqlite3_errmsg(m_db)));
     }
     return std::make_unique<SqliteStatement>(stmt);
 }

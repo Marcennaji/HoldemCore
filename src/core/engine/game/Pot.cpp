@@ -8,21 +8,21 @@ namespace pkt::core
 {
 
 Pot::Pot(unsigned total, pkt::core::player::PlayerList seats, unsigned dealerId)
-    : myTotal(total), mySeats(std::move(seats)), myDealerId(dealerId)
+    : m_total(total), m_seats(std::move(seats)), m_dealerId(dealerId)
 {
 }
 
 Pot::Pot(unsigned total, pkt::core::player::PlayerList seats, unsigned dealerId,
          std::shared_ptr<ServiceContainer> serviceContainer)
-    : myTotal(total), mySeats(std::move(seats)), myDealerId(dealerId), myServices(serviceContainer)
+    : m_total(total), m_seats(std::move(seats)), m_dealerId(dealerId), m_services(serviceContainer)
 {
 }
 
 void Pot::ensureServicesInitialized() const
 {
-    if (!myServices)
+    if (!m_services)
     {
-        myServices = std::make_shared<AppServiceContainer>();
+        m_services = std::make_shared<AppServiceContainer>();
     }
 }
 
@@ -30,7 +30,7 @@ void Pot::distribute()
 {
     ensureServicesInitialized();
 
-    myWinners.clear();
+    m_winners.clear();
     std::vector<unsigned> contributions = initializePlayerContributions();
     std::vector<unsigned> remaining = contributions;
     std::sort(remaining.begin(), remaining.end());
@@ -54,11 +54,11 @@ void Pot::distribute()
             break;
 
         int potLevel = static_cast<int>(contributorsCount * level);
-        if (potLevel > myTotal)
+        if (potLevel > m_total)
         {
-            myServices->logger().info("Pot level " + std::to_string(potLevel) +
-                                      " exceeds total available chips : " + std::to_string(myTotal));
-            potLevel = myTotal;
+            m_services->logger().info("Pot level " + std::to_string(potLevel) +
+                                      " exceeds total available chips : " + std::to_string(m_total));
+            potLevel = m_total;
         }
 
         // If no non-folded player is eligible to win this pot (e.g., only folders contributed
@@ -84,19 +84,19 @@ void Pot::distribute()
         remaining = contributions;
         std::sort(remaining.begin(), remaining.end());
 
-        myTotal -= potLevel;
+        m_total -= potLevel;
     }
 
     finalizeDistribution();
 
-    myWinners.sort();
-    myWinners.unique();
+    m_winners.sort();
+    m_winners.unique();
 }
 
 std::vector<unsigned> Pot::initializePlayerContributions()
 {
     std::vector<unsigned> result;
-    for (const auto& p : *mySeats)
+    for (const auto& p : *m_seats)
     {
         unsigned contributed = p->getCashAtHandStart() - p->getCash();
         result.push_back(contributed);
@@ -122,7 +122,7 @@ std::vector<size_t> Pot::eligibleContributors(const std::vector<unsigned>& contr
 {
     std::vector<size_t> result;
     size_t index = 0;
-    for (const auto& p : *mySeats)
+    for (const auto& p : *m_seats)
     {
         if (p->getLastAction().type != ActionType::Fold && contributions[index] >= level)
             result.push_back(index);
@@ -136,7 +136,7 @@ std::vector<size_t> Pot::determineWinners(const std::vector<size_t>& eligible, u
     int bestRank = 0;
     for (size_t i : eligible)
     {
-        auto it = std::next(mySeats->begin(), i);
+        auto it = std::next(m_seats->begin(), i);
         if ((*it)->getHandRanking() > bestRank)
             bestRank = (*it)->getHandRanking();
     }
@@ -144,7 +144,7 @@ std::vector<size_t> Pot::determineWinners(const std::vector<size_t>& eligible, u
     std::vector<size_t> winners;
     for (size_t i : eligible)
     {
-        auto it = std::next(mySeats->begin(), i);
+        auto it = std::next(m_seats->begin(), i);
         if ((*it)->getHandRanking() == bestRank)
             winners.push_back(i);
     }
@@ -156,10 +156,10 @@ void Pot::awardBaseShare(const std::vector<size_t>& winners, int share)
 {
     for (size_t i : winners)
     {
-        auto it = std::next(mySeats->begin(), i);
+        auto it = std::next(m_seats->begin(), i);
         (*it)->setCash((*it)->getCash() + share);
         (*it)->setLastMoneyWon((*it)->getLastMoneyWon() + share);
-        myWinners.push_back((*it)->getId());
+        m_winners.push_back((*it)->getId());
     }
 }
 
@@ -178,26 +178,26 @@ void Pot::awardRemainder(const std::vector<size_t>& winners, int remainder)
 
 std::shared_ptr<player::Player> Pot::resolveRemainderReceiver(const std::vector<size_t>& winnerIndexes) const
 {
-    if (winnerIndexes.empty() || !mySeats || mySeats->empty())
+    if (winnerIndexes.empty() || !m_seats || m_seats->empty())
         return nullptr;
 
     // Find the dealer in the seats list
-    auto dealerIt = std::find_if(mySeats->begin(), mySeats->end(),
-                                 [this](const std::shared_ptr<player::Player>& p) { return p->getId() == myDealerId; });
+    auto dealerIt = std::find_if(m_seats->begin(), m_seats->end(),
+                                 [this](const std::shared_ptr<player::Player>& p) { return p->getId() == m_dealerId; });
 
     // If dealer not found, fallback to first winner
-    if (dealerIt == mySeats->end())
-        return *std::next(mySeats->begin(), winnerIndexes.front());
+    if (dealerIt == m_seats->end())
+        return *std::next(m_seats->begin(), winnerIndexes.front());
 
     // Start iterating clockwise from dealer
     auto it = dealerIt;
-    for (size_t i = 0; i < mySeats->size(); ++i)
+    for (size_t i = 0; i < m_seats->size(); ++i)
     {
         ++it;
-        if (it == mySeats->end())
-            it = mySeats->begin();
+        if (it == m_seats->end())
+            it = m_seats->begin();
 
-        size_t currentIndex = std::distance(mySeats->begin(), it);
+        size_t currentIndex = std::distance(m_seats->begin(), it);
         if (std::find(winnerIndexes.begin(), winnerIndexes.end(), currentIndex) != winnerIndexes.end())
         {
             return *it;
@@ -205,7 +205,7 @@ std::shared_ptr<player::Player> Pot::resolveRemainderReceiver(const std::vector<
     }
 
     // Fallback: just return first winner
-    return *std::next(mySeats->begin(), winnerIndexes.front());
+    return *std::next(m_seats->begin(), winnerIndexes.front());
 }
 
 void Pot::reduceContributions(std::vector<unsigned>& c, unsigned level)
@@ -216,18 +216,18 @@ void Pot::reduceContributions(std::vector<unsigned>& c, unsigned level)
 
 void Pot::finalizeDistribution()
 {
-    if (myTotal == 0 || !mySeats || mySeats->empty())
+    if (m_total == 0 || !m_seats || m_seats->empty())
         return;
 
     // Create a unique set of winner IDs
-    std::list<unsigned> uniqueWinners = myWinners;
+    std::list<unsigned> uniqueWinners = m_winners;
     uniqueWinners.sort();
     uniqueWinners.unique();
 
     // Fallback: if no winners, pick all non-folded players
     if (uniqueWinners.empty())
     {
-        for (const auto& player : *mySeats)
+        for (const auto& player : *m_seats)
         {
             if (player->getLastAction().type != ActionType::Fold)
                 uniqueWinners.push_back(player->getId());
@@ -240,14 +240,14 @@ void Pot::finalizeDistribution()
         return;
 
     const int numWinners = static_cast<int>(uniqueWinners.size());
-    const int baseShare = myTotal / numWinners;
-    int remainder = myTotal % numWinners;
+    const int baseShare = m_total / numWinners;
+    int remainder = m_total % numWinners;
 
     // Distribute base share to each winner
     for (unsigned id : uniqueWinners)
     {
-        auto it = getPlayerListIteratorById(mySeats, id);
-        if (it != mySeats->end())
+        auto it = getPlayerListIteratorById(m_seats, id);
+        if (it != m_seats->end())
         {
             (*it)->setCash((*it)->getCash() + baseShare);
             (*it)->setLastMoneyWon((*it)->getLastMoneyWon() + baseShare);
@@ -265,7 +265,7 @@ void Pot::finalizeDistribution()
         }
     }
 
-    myTotal = 0;
+    m_total = 0;
 }
 
 std::vector<size_t> Pot::indexesOf(const std::list<unsigned>& ids)
@@ -275,7 +275,7 @@ std::vector<size_t> Pot::indexesOf(const std::list<unsigned>& ids)
     for (unsigned id : ids)
     {
         size_t index = 0;
-        for (auto it = mySeats->begin(); it != mySeats->end(); ++it, ++index)
+        for (auto it = m_seats->begin(); it != m_seats->end(); ++it, ++index)
         {
             if ((*it)->getId() == id)
             {

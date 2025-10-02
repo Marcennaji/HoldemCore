@@ -16,7 +16,7 @@ class ConsoleLogger : public pkt::core::Logger
 {
   public:
     explicit ConsoleLogger();
-    void setLogLevel(pkt::core::LogLevel level) override { myLogLevel = level; }
+    void setLogLevel(pkt::core::LogLevel level) override { m_logLevel = level; }
     void error(const std::string& msg) override;
     void info(const std::string& msg) override;
     void verbose(const std::string& msg) override;

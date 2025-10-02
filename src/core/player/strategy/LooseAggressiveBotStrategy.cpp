@@ -26,7 +26,7 @@ LooseAggressiveBotStrategy::LooseAggressiveBotStrategy()
 {
     // initialize utg starting range, in a full table
     ensureServicesInitialized();
-    int utgFullTableRange = PokerMath::getRandomUTGRange(myServices, 13, 15);
+    int utgFullTableRange = PokerMath::getRandomUTGRange(m_services, 13, 15);
     initializeRanges(48, utgFullTableRange);
 }
 
@@ -35,7 +35,7 @@ LooseAggressiveBotStrategy::LooseAggressiveBotStrategy(std::shared_ptr<pkt::core
 {
 
     // initialize utg starting range, in a full table
-    int utgFullTableRange = PokerMath::getRandomUTGRange(myServices, 13, 15);
+    int utgFullTableRange = PokerMath::getRandomUTGRange(m_services, 13, 15);
     initializeRanges(48, utgFullTableRange);
 }
 
@@ -75,7 +75,7 @@ bool LooseAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
     if (ctx.commonContext.bettingContext.preflopRaisesNumber < 3)
     {
 
-        myServices->logger().verbose("\t\tLAG adding high pairs to the initial calling range.");
+        m_services->logger().verbose("\t\tLAG adding high pairs to the initial calling range.");
         stringCallingRange += HIGH_PAIRS;
     }
 
@@ -87,7 +87,7 @@ bool LooseAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
         !ctx.commonContext.bettingContext.isPreflopBigBet)
     {
 
-        myServices->logger().verbose(
+        m_services->logger().verbose(
             "\t\tLAG adding high suited connectors, high suited aces and pairs to the initial calling range.");
         stringCallingRange += HIGH_SUITED_CONNECTORS;
         stringCallingRange += HIGH_SUITED_ACES;
@@ -101,7 +101,7 @@ bool LooseAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
             stringCallingRange += SUITED_CONNECTORS;
             stringCallingRange += SUITED_ONE_GAPED;
             stringCallingRange += SUITED_TWO_GAPED;
-            myServices->logger().verbose(
+            m_services->logger().verbose(
                 "\t\tLAG adding suited connectors, suited one-gaped and suited two-gaped to the initial "
                 "calling range.");
         }
@@ -117,19 +117,19 @@ bool LooseAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
         !ctx.commonContext.bettingContext.isPreflopBigBet)
     {
 
-        if (PokerMath::shouldDefendAgainst3Bet(myServices))
+        if (PokerMath::shouldDefendAgainst3Bet(m_services))
         {
 
             stringCallingRange += HIGH_SUITED_CONNECTORS;
             stringCallingRange += HIGH_SUITED_ACES;
             stringCallingRange += PAIRS;
 
-            myServices->logger().verbose(
+            m_services->logger().verbose(
                 "\t\tLAG defending against 3-bet : adding high suited connectors, high suited aces and pairs to "
                 "the initial calling range.");
         }
     }
-    myServices->logger().verbose("\t\tLAG final calling range : " + stringCallingRange);
+    m_services->logger().verbose("\t\tLAG final calling range : " + stringCallingRange);
 
     return isCardsInRange(ctx.personalContext.holeCards, stringCallingRange);
 }
@@ -171,7 +171,7 @@ int LooseAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
 
     stringRaisingRange = rangesString[(int) raisingRange];
 
-    myServices->logger().verbose("Raising range : " + stringRaisingRange);
+    m_services->logger().verbose("Raising range : " + stringRaisingRange);
 
     // determine when to 3-bet without a real hand
     bool speculativeHandedAdded = false;
@@ -198,7 +198,7 @@ int LooseAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
             {
 
                 speculativeHandedAdded = true;
-                myServices->logger().verbose("\t\tLAG trying to steal this bet");
+                m_services->logger().verbose("\t\tLAG trying to steal this bet");
             }
             else
             {
@@ -208,7 +208,7 @@ int LooseAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
                 {
 
                     speculativeHandedAdded = true;
-                    myServices->logger().verbose("\t\tLAG adding this speculative hand to our initial raising range");
+                    m_services->logger().verbose("\t\tLAG adding this speculative hand to our initial raising range");
                 }
                 else
                 {
@@ -216,10 +216,10 @@ int LooseAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
                         raiserStats.getPreflopCallthreeBetsFrequency() < 30)
                     {
 
-                        if (PokerMath::shouldAddSpeculativeHand(myServices))
+                        if (PokerMath::shouldAddSpeculativeHand(m_services))
                         {
                             speculativeHandedAdded = true;
-                            myServices->logger().verbose("\t\tLAG adding this junk hand to our initial raising range");
+                            m_services->logger().verbose("\t\tLAG adding this junk hand to our initial raising range");
                         }
                     }
                 }
@@ -251,7 +251,7 @@ int LooseAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
             {
 
                 speculativeHandedAdded = true;
-                myServices->logger().verbose("\t\tLAG adding this speculative hand to our initial raising range");
+                m_services->logger().verbose("\t\tLAG adding this speculative hand to our initial raising range");
             }
         }
     }
@@ -272,10 +272,10 @@ int LooseAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
                        RangeEstimator::getStringRange(ctx.commonContext.playersContext.nbPlayers, 4)))
     {
 
-        if (PokerMath::shouldHideHandStrength(myServices))
+        if (PokerMath::shouldHideHandStrength(m_services))
         {
-            myServices->logger().verbose("\t\twon't raise, to hide the hand strength");
-            myCouldCall = true;
+            m_services->logger().verbose("\t\twon't raise, to hide the hand strength");
+            m_couldCall = true;
             return 0;
         }
     }
@@ -301,7 +301,7 @@ int LooseAggressiveBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
 
             if (getDrawingProbability(ctx.personalContext.postFlopAnalysisFlags) > 25)
             {
-                if (PokerMath::shouldBluffFrequently(myServices))
+                if (PokerMath::shouldBluffFrequently(m_services))
                 {
                     return PokerMath::calculateValueBetSize(ctx);
                 }
@@ -322,7 +322,7 @@ int LooseAggressiveBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
                 !ctx.personalContext.postFlopAnalysisFlags.isFlushDrawPossible)
             {
 
-                if (PokerMath::shouldBluffFrequently(myServices))
+                if (PokerMath::shouldBluffFrequently(m_services))
                 {
                     return PokerMath::calculateBluffBetSize(ctx);
                 }
@@ -337,17 +337,17 @@ int LooseAggressiveBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
     }
 
     // if pretty good hand
-    if ((ctx.personalContext.myHandSimulation.winRanged > 0.5 || ctx.personalContext.myHandSimulation.win > 0.9) &&
-        ctx.personalContext.myHandSimulation.win > 0.5)
+    if ((ctx.personalContext.m_handSimulation.winRanged > 0.5 || ctx.personalContext.m_handSimulation.win > 0.9) &&
+        ctx.personalContext.m_handSimulation.win > 0.5)
     {
 
         // always bet if my hand will lose a lot of its value on next betting rounds
-        if (ctx.personalContext.myHandSimulation.winRanged - ctx.personalContext.myHandSimulation.winSd > 0.1)
+        if (ctx.personalContext.m_handSimulation.winRanged - ctx.personalContext.m_handSimulation.winSd > 0.1)
         {
             return ctx.commonContext.bettingContext.pot;
         }
 
-        if (PokerMath::shouldBluffRarely(myServices) && !ctx.personalContext.hasPosition)
+        if (PokerMath::shouldBluffRarely(m_services) && !ctx.personalContext.hasPosition)
         {
             return 0; // may check-raise or check-call
         }
@@ -402,7 +402,7 @@ int LooseAggressiveBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
             ctx.personalContext.cash > ctx.commonContext.bettingContext.pot * 4 && isPossibleToBluff(ctx))
         {
 
-            if (ctx.personalContext.myHandSimulation.winRanged > 0.2)
+            if (ctx.personalContext.m_handSimulation.winRanged > 0.2)
             {
 
                 return PokerMath::calculateBluffBetSize(ctx);
@@ -425,18 +425,18 @@ bool LooseAggressiveBotStrategy::flopCouldCall(const CurrentHandContext& ctx)
         return true;
     }
 
-    if (ctx.personalContext.myHandSimulation.winRanged == 1 && ctx.personalContext.myHandSimulation.win > 0.5)
+    if (ctx.personalContext.m_handSimulation.winRanged == 1 && ctx.personalContext.m_handSimulation.win > 0.5)
     {
         return true;
     }
 
     if (PokerMath::hasInsufficientEquityForCall(ctx, 0.9f) &&
-        ctx.personalContext.myHandSimulation.win < 0.92)
+        ctx.personalContext.m_handSimulation.win < 0.92)
     {
         return false;
     }
 
-    if (ctx.personalContext.myHandSimulation.winRanged < 0.25 && ctx.personalContext.myHandSimulation.win < 0.9)
+    if (ctx.personalContext.m_handSimulation.winRanged < 0.25 && ctx.personalContext.m_handSimulation.win < 0.9)
     {
         return false;
     }
@@ -457,20 +457,20 @@ int LooseAggressiveBotStrategy::flopCouldRaise(const CurrentHandContext& ctx)
         }
     }
 
-    // if (nbRaises == 1 && myFlopHandSimulation.win < 0.90)
+    // if (nbRaises == 1 && m_flopHandSimulation.win < 0.90)
     // return false;
 
-    if (nbRaises == 2 && ctx.personalContext.myHandSimulation.win < 0.95)
+    if (nbRaises == 2 && ctx.personalContext.m_handSimulation.win < 0.95)
     {
         return 0;
     }
 
-    if (nbRaises == 3 && ctx.personalContext.myHandSimulation.win < 0.98)
+    if (nbRaises == 3 && ctx.personalContext.m_handSimulation.win < 0.98)
     {
         return 0;
     }
 
-    if (nbRaises > 3 && ctx.personalContext.myHandSimulation.win != 1)
+    if (nbRaises > 3 && ctx.personalContext.m_handSimulation.win != 1)
     {
         return 0;
     }
@@ -478,11 +478,11 @@ int LooseAggressiveBotStrategy::flopCouldRaise(const CurrentHandContext& ctx)
     if ((isDrawingProbOk(ctx.personalContext.postFlopAnalysisFlags, ctx.commonContext.bettingContext.potOdd) ||
          ctx.personalContext.hasPosition) &&
         ctx.commonContext.playersContext.actingPlayersList->size() == 2 &&
-        !(ctx.personalContext.myHandSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd) &&
+        !(ctx.personalContext.m_handSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd) &&
         isPossibleToBluff(ctx) && nbRaises < 2)
     {
 
-        if (PokerMath::shouldBluffOccasionally(myServices))
+        if (PokerMath::shouldBluffOccasionally(m_services))
         {
             return ctx.commonContext.bettingContext.pot;
         }
@@ -495,8 +495,8 @@ int LooseAggressiveBotStrategy::flopCouldRaise(const CurrentHandContext& ctx)
             ctx.commonContext.playersContext.actingPlayersList->size() < 4)
         {
 
-            if (PokerMath::shouldAddSpeculativeHand(myServices) && ctx.personalContext.myHandSimulation.winRanged > 0.3 &&
-                ctx.personalContext.myHandSimulation.win > 0.5)
+            if (PokerMath::shouldAddSpeculativeHand(m_services) && ctx.personalContext.m_handSimulation.winRanged > 0.3 &&
+                ctx.personalContext.m_handSimulation.win > 0.5)
             {
                 return ctx.commonContext.bettingContext.pot;
                 ;
@@ -505,12 +505,12 @@ int LooseAggressiveBotStrategy::flopCouldRaise(const CurrentHandContext& ctx)
         return 0;
     }
 
-    if (ctx.personalContext.myHandSimulation.winRanged > 0.85 && ctx.personalContext.myHandSimulation.win > 0.5 &&
+    if (ctx.personalContext.m_handSimulation.winRanged > 0.85 && ctx.personalContext.m_handSimulation.win > 0.5 &&
         nbRaises < 3)
     {
         return ctx.commonContext.bettingContext.pot;
     }
-    if (ctx.personalContext.myHandSimulation.winRanged > 0.7 && ctx.personalContext.myHandSimulation.win > 0.5 &&
+    if (ctx.personalContext.m_handSimulation.winRanged > 0.7 && ctx.personalContext.m_handSimulation.win > 0.5 &&
         nbRaises < 2)
     {
         return ctx.commonContext.bettingContext.pot;
@@ -534,7 +534,7 @@ int LooseAggressiveBotStrategy::turnCouldBet(const CurrentHandContext& ctx)
     }
 
     if (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber > 1 && !ctx.personalContext.actions.flopIsAggressor &&
-        ctx.personalContext.myHandSimulation.winRanged < 0.8 && ctx.personalContext.myHandSimulation.win < 0.9)
+        ctx.personalContext.m_handSimulation.winRanged < 0.8 && ctx.personalContext.m_handSimulation.win < 0.9)
     {
         return 0;
     }
@@ -546,13 +546,13 @@ int LooseAggressiveBotStrategy::turnCouldBet(const CurrentHandContext& ctx)
         return PokerMath::calculateValueBetSize(ctx);
     }
 
-    if (ctx.personalContext.myHandSimulation.winRanged < 0.5 && ctx.personalContext.myHandSimulation.win < 0.9 &&
+    if (ctx.personalContext.m_handSimulation.winRanged < 0.5 && ctx.personalContext.m_handSimulation.win < 0.9 &&
         !ctx.personalContext.hasPosition)
     {
         return 0;
     }
 
-    if (ctx.personalContext.myHandSimulation.winRanged > 0.5 && ctx.personalContext.myHandSimulation.win > 0.5 &&
+    if (ctx.personalContext.m_handSimulation.winRanged > 0.5 && ctx.personalContext.m_handSimulation.win > 0.5 &&
         ctx.personalContext.hasPosition)
     {
         return PokerMath::calculateValueBetSize(ctx);
@@ -560,7 +560,7 @@ int LooseAggressiveBotStrategy::turnCouldBet(const CurrentHandContext& ctx)
 
     if (getDrawingProbability(ctx.personalContext.postFlopAnalysisFlags) > 20 && !ctx.personalContext.hasPosition)
     {
-        if (PokerMath::shouldBluffFrequently(myServices))
+        if (PokerMath::shouldBluffFrequently(m_services))
         {
             return PokerMath::calculateValueBetSize(ctx);
         }
@@ -570,7 +570,7 @@ int LooseAggressiveBotStrategy::turnCouldBet(const CurrentHandContext& ctx)
         // no draw, not a good hand, but last to speak and nobody has bet
         if (ctx.personalContext.hasPosition && isPossibleToBluff(ctx))
         {
-            if (PokerMath::shouldBluffFrequently(myServices))
+            if (PokerMath::shouldBluffFrequently(m_services))
             {
                 return PokerMath::calculateBluffBetSize(ctx);
             }
@@ -608,13 +608,13 @@ bool LooseAggressiveBotStrategy::turnCouldCall(const CurrentHandContext& ctx)
     }
 
     if (PokerMath::hasInsufficientEquityForCall(ctx) &&
-        ctx.personalContext.myHandSimulation.winRanged < 0.94)
+        ctx.personalContext.m_handSimulation.winRanged < 0.94)
     {
         return false;
     }
 
     if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber == 2 &&
-        ctx.personalContext.myHandSimulation.winRanged < 0.8 && ctx.personalContext.myHandSimulation.win < 0.9)
+        ctx.personalContext.m_handSimulation.winRanged < 0.8 && ctx.personalContext.m_handSimulation.win < 0.9)
     {
         if (raiserStats.hands <= MIN_HANDS_STATISTICS_ACCURATE)
         {
@@ -626,7 +626,7 @@ bool LooseAggressiveBotStrategy::turnCouldCall(const CurrentHandContext& ctx)
         }
     }
     if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber > 2 &&
-        ctx.personalContext.myHandSimulation.winRanged < 0.9 && ctx.personalContext.myHandSimulation.win < 0.9)
+        ctx.personalContext.m_handSimulation.winRanged < 0.9 && ctx.personalContext.m_handSimulation.win < 0.9)
     {
         if (raiserStats.hands <= MIN_HANDS_STATISTICS_ACCURATE)
         {
@@ -638,20 +638,20 @@ bool LooseAggressiveBotStrategy::turnCouldCall(const CurrentHandContext& ctx)
         }
     }
 
-    if (ctx.personalContext.myHandSimulation.winRanged < 0.6 && ctx.personalContext.myHandSimulation.win < 0.9 &&
+    if (ctx.personalContext.m_handSimulation.winRanged < 0.6 && ctx.personalContext.m_handSimulation.win < 0.9 &&
         (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber > 0 || PokerMath::isOpponentPassive(ctx, 30.0f, ctx.commonContext.playersContext.turnLastRaiser)))
     {
         return false;
     }
 
     if (!ctx.personalContext.actions.preflopIsAggressor && !ctx.personalContext.actions.flopIsAggressor &&
-        ctx.personalContext.myHandSimulation.winRanged < 0.8 && ctx.personalContext.myHandSimulation.win < 0.9 &&
+        ctx.personalContext.m_handSimulation.winRanged < 0.8 && ctx.personalContext.m_handSimulation.win < 0.9 &&
         PokerMath::isOpponentPassive(ctx, 30.0f, ctx.commonContext.playersContext.turnLastRaiser) && !ctx.personalContext.hasPosition)
     {
         return false;
     }
 
-    if (ctx.personalContext.myHandSimulation.winRanged < 0.25 && ctx.personalContext.myHandSimulation.win < 0.9)
+    if (ctx.personalContext.m_handSimulation.winRanged < 0.25 && ctx.personalContext.m_handSimulation.win < 0.9)
     {
         return false;
     }
@@ -669,45 +669,45 @@ int LooseAggressiveBotStrategy::turnCouldRaise(const CurrentHandContext& ctx)
         }
     }
 
-    if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber == 2 && ctx.personalContext.myHandSimulation.win < 0.95)
+    if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber == 2 && ctx.personalContext.m_handSimulation.win < 0.95)
     {
         return 0;
     }
 
-    if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber > 2 && ctx.personalContext.myHandSimulation.win != 1)
+    if (ctx.commonContext.bettingContext.turnBetsOrRaisesNumber > 2 && ctx.personalContext.m_handSimulation.win != 1)
     {
         return 0;
     }
 
-    if (ctx.personalContext.myHandSimulation.winRanged > 0.98 && ctx.personalContext.myHandSimulation.win > 0.98 &&
-        ctx.personalContext.myHandSimulation.winSd > 0.9)
+    if (ctx.personalContext.m_handSimulation.winRanged > 0.98 && ctx.personalContext.m_handSimulation.win > 0.98 &&
+        ctx.personalContext.m_handSimulation.winSd > 0.9)
     {
-        if (PokerMath::shouldAddSpeculativeHand(myServices))
+        if (PokerMath::shouldAddSpeculativeHand(m_services))
         {
             return 0; // very strong hand, slow play, just call
         }
     }
 
-    if (ctx.personalContext.myHandSimulation.win == 1 || (ctx.personalContext.myHandSimulation.winRanged == 1 &&
+    if (ctx.personalContext.m_handSimulation.win == 1 || (ctx.personalContext.m_handSimulation.winRanged == 1 &&
                                                           ctx.commonContext.bettingContext.turnBetsOrRaisesNumber < 3))
     {
         return PokerMath::calculateValueBetSize(ctx);
     }
 
     if (PokerMath::hasInsufficientEquityForCall(ctx) &&
-        ctx.personalContext.myHandSimulation.winRanged < 0.94)
+        ctx.personalContext.m_handSimulation.winRanged < 0.94)
     {
         return 0;
     }
 
-    if (ctx.personalContext.myHandSimulation.winRanged > 0.7 && ctx.personalContext.myHandSimulation.win > 0.7 &&
+    if (ctx.personalContext.m_handSimulation.winRanged > 0.7 && ctx.personalContext.m_handSimulation.win > 0.7 &&
         ctx.commonContext.bettingContext.turnBetsOrRaisesNumber == 1 &&
         ctx.commonContext.bettingContext.flopBetsOrRaisesNumber < 2)
     {
 
         return PokerMath::calculateValueBetSize(ctx);
     }
-    if (ctx.personalContext.myHandSimulation.winRanged > 0.94 && ctx.personalContext.myHandSimulation.win > 0.94 &&
+    if (ctx.personalContext.m_handSimulation.winRanged > 0.94 && ctx.personalContext.m_handSimulation.win > 0.94 &&
         ctx.commonContext.bettingContext.turnBetsOrRaisesNumber < 4)
     {
         return PokerMath::calculateValueBetSize(ctx);
@@ -716,11 +716,11 @@ int LooseAggressiveBotStrategy::turnCouldRaise(const CurrentHandContext& ctx)
     if ((isDrawingProbOk(ctx.personalContext.postFlopAnalysisFlags, ctx.commonContext.bettingContext.potOdd) ||
          ctx.personalContext.hasPosition) &&
         ctx.commonContext.playersContext.actingPlayersList->size() == 2 &&
-        !(ctx.personalContext.myHandSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd) &&
+        !(ctx.personalContext.m_handSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd) &&
         isPossibleToBluff(ctx) && ctx.commonContext.bettingContext.turnBetsOrRaisesNumber < 2)
     {
 
-        if (PokerMath::shouldAddSpeculativeHand(myServices))
+        if (PokerMath::shouldAddSpeculativeHand(m_services))
         {
             return PokerMath::calculateValueBetSize(ctx);
         }
@@ -737,10 +737,10 @@ int LooseAggressiveBotStrategy::riverCouldBet(const CurrentHandContext& ctx)
     }
 
     // blocking bet if my chances to win are weak, but not ridiculous
-    if (!ctx.personalContext.hasPosition && ctx.personalContext.myHandSimulation.winRanged < 0.7 &&
-        ctx.personalContext.myHandSimulation.winRanged > 0.4 && ctx.personalContext.myHandSimulation.winSd > 0.5)
+    if (!ctx.personalContext.hasPosition && ctx.personalContext.m_handSimulation.winRanged < 0.7 &&
+        ctx.personalContext.m_handSimulation.winRanged > 0.4 && ctx.personalContext.m_handSimulation.winSd > 0.5)
     {
-        if (PokerMath::shouldBluffFrequently(myServices))
+        if (PokerMath::shouldBluffFrequently(m_services))
         {
             return PokerMath::calculateBlockingBetSize(ctx);
         }
@@ -750,33 +750,33 @@ int LooseAggressiveBotStrategy::riverCouldBet(const CurrentHandContext& ctx)
     if (ctx.personalContext.actions.turnIsAggressor)
     {
 
-        if (ctx.personalContext.myHandSimulation.winRanged < .15 && ctx.personalContext.myHandSimulation.winSd > 0.3 &&
+        if (ctx.personalContext.m_handSimulation.winRanged < .15 && ctx.personalContext.m_handSimulation.winSd > 0.3 &&
             ctx.commonContext.playersContext.actingPlayersList->size() < 4 &&
             ctx.personalContext.cash >= ctx.commonContext.bettingContext.pot && isPossibleToBluff(ctx))
         {
 
-            if (PokerMath::shouldAddSpeculativeHand(myServices))
+            if (PokerMath::shouldAddSpeculativeHand(m_services))
             {
                 return PokerMath::calculateBluffBetSize(ctx);
             }
         }
     }
 
-    float coeff = PokerMath::getRandomBetMultiplier(myServices);
+    float coeff = PokerMath::getRandomBetMultiplier(m_services);
 
-    if (ctx.personalContext.myHandSimulation.winSd > .94 ||
-        (ctx.personalContext.hasPosition && ctx.personalContext.myHandSimulation.winSd > .9))
+    if (ctx.personalContext.m_handSimulation.winSd > .94 ||
+        (ctx.personalContext.hasPosition && ctx.personalContext.m_handSimulation.winSd > .9))
     {
-        if (!PokerMath::shouldSlowPlay(ctx, myServices) || ctx.personalContext.hasPosition)
+        if (!PokerMath::shouldSlowPlay(ctx, m_services) || ctx.personalContext.hasPosition)
         {
             return ctx.commonContext.bettingContext.pot * coeff;
         }
     }
-    if (ctx.personalContext.myHandSimulation.winSd > 0.5 &&
-        (ctx.personalContext.myHandSimulation.winRanged > .8 ||
-         (ctx.personalContext.hasPosition && ctx.personalContext.myHandSimulation.winRanged > .7)))
+    if (ctx.personalContext.m_handSimulation.winSd > 0.5 &&
+        (ctx.personalContext.m_handSimulation.winRanged > .8 ||
+         (ctx.personalContext.hasPosition && ctx.personalContext.m_handSimulation.winRanged > .7)))
     {
-        if (PokerMath::shouldBluffOccasionally(myServices) || ctx.personalContext.hasPosition)
+        if (PokerMath::shouldBluffOccasionally(m_services) || ctx.personalContext.hasPosition)
         {
             return ctx.commonContext.bettingContext.pot * coeff;
         }
@@ -808,25 +808,25 @@ bool LooseAggressiveBotStrategy::riverCouldCall(const CurrentHandContext& ctx)
                           .riverStatistics;
     }
 
-    if (ctx.personalContext.myHandSimulation.win > .95)
+    if (ctx.personalContext.m_handSimulation.win > .95)
     {
         return true;
     }
 
     if (PokerMath::hasInsufficientEquityForCall(ctx) &&
-        ctx.personalContext.myHandSimulation.winSd < 0.97)
+        ctx.personalContext.m_handSimulation.winSd < 0.97)
     {
         return false;
     }
 
-    if (ctx.personalContext.myHandSimulation.winRanged < .3 && ctx.personalContext.myHandSimulation.winSd < 0.97)
+    if (ctx.personalContext.m_handSimulation.winRanged < .3 && ctx.personalContext.m_handSimulation.winSd < 0.97)
     {
         return false;
     }
 
     // if hazardous call may cost me my stack, don't call even with good odds
-    if (ctx.commonContext.bettingContext.potOdd > 10 && ctx.personalContext.myHandSimulation.winRanged < .5 &&
-        ctx.personalContext.myHandSimulation.winSd < 0.97 &&
+    if (ctx.commonContext.bettingContext.potOdd > 10 && ctx.personalContext.m_handSimulation.winRanged < .5 &&
+        ctx.personalContext.m_handSimulation.winSd < 0.97 &&
         ctx.commonContext.bettingContext.highestBetAmount >=
             ctx.personalContext.cash + ctx.personalContext.totalBetAmount &&
         ctx.personalContext.m > 8)
@@ -843,7 +843,7 @@ bool LooseAggressiveBotStrategy::riverCouldCall(const CurrentHandContext& ctx)
     // assume that if there was more than 1 player to play after the raiser and he is not a maniac, he shouldn't bluff
     // TODO
     /*if (ctx.commonContext.playersContext.actingPlayersList->size() > 2 &&
-    ctx.personalContext.myHandSimulation.winRanged < .6 && ctx.personalContext.myHandSimulation.winSd < 0.97 &&
+    ctx.personalContext.m_handSimulation.winRanged < .6 && ctx.personalContext.m_handSimulation.winSd < 0.97 &&
         (raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getAgressionFactor() < 4 &&
          raiserStats.getAgressionFrequency() < 50))
     {
@@ -864,7 +864,7 @@ bool LooseAggressiveBotStrategy::riverCouldCall(const CurrentHandContext& ctx)
     }*/
 
     if (raiserStats.hands <= MIN_HANDS_STATISTICS_ACCURATE &&
-        ctx.commonContext.bettingContext.potOdd * 1.5 > ctx.personalContext.myHandSimulation.winRanged * 100)
+        ctx.commonContext.bettingContext.potOdd * 1.5 > ctx.personalContext.m_handSimulation.winRanged * 100)
     {
         return false;
     }
@@ -882,14 +882,14 @@ int LooseAggressiveBotStrategy::riverCouldRaise(const CurrentHandContext& ctx)
 
     //  TODO : analyze previous actions, and determine if we must bet for value, without the nuts
     if (ctx.commonContext.bettingContext.riverBetsOrRaisesNumber < 3 &&
-        ctx.personalContext.myHandSimulation.winRanged > .98 && ctx.personalContext.myHandSimulation.winSd > 0.5)
+        ctx.personalContext.m_handSimulation.winRanged > .98 && ctx.personalContext.m_handSimulation.winSd > 0.5)
     {
         return PokerMath::calculateBluffBetSize(ctx);
     }
 
     if (ctx.commonContext.bettingContext.riverBetsOrRaisesNumber < 2 &&
-        ctx.personalContext.myHandSimulation.winRanged * 100 > ctx.commonContext.bettingContext.potOdd &&
-        ctx.personalContext.myHandSimulation.winRanged > 0.9 && ctx.personalContext.myHandSimulation.winSd > 0.5)
+        ctx.personalContext.m_handSimulation.winRanged * 100 > ctx.commonContext.bettingContext.potOdd &&
+        ctx.personalContext.m_handSimulation.winRanged > 0.9 && ctx.personalContext.m_handSimulation.winSd > 0.5)
     {
         return PokerMath::calculateValueBetSize(ctx);
     }

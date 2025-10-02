@@ -17,10 +17,10 @@ class NullPlayersStatisticsStore : public PlayersStatisticsStore
 {
   public:
     NullPlayersStatisticsStore()
-        : myNullPlayerStatistics{pkt::core::player::PlayerStatistics()} // Initialize with default PlayerStatistics
+        : m_nullPlayerStatistics{pkt::core::player::PlayerStatistics()} // Initialize with default PlayerStatistics
     {
         // Ensure all PlayerStatistics are reset to zero
-        for (auto& stats : myNullPlayerStatistics)
+        for (auto& stats : m_nullPlayerStatistics)
         {
             stats.reset();
         }
@@ -30,12 +30,12 @@ class NullPlayersStatisticsStore : public PlayersStatisticsStore
     virtual std::array<pkt::core::player::PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1>
     loadPlayerStatistics(const std::string& playerName) override
     {
-        return myNullPlayerStatistics;
+        return m_nullPlayerStatistics;
     }
 
     virtual void savePlayersStatistics(pkt::core::player::PlayerList) override {}
 
   private:
-    std::array<pkt::core::player::PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> myNullPlayerStatistics;
+    std::array<pkt::core::player::PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> m_nullPlayerStatistics;
 };
 } //  namespace pkt::core

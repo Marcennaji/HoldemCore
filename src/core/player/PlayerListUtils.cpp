@@ -31,64 +31,64 @@ PlayerListIterator PlayerListUtils::getPlayerListIteratorById(PlayerList& list, 
                         [id](const std::shared_ptr<Player>& p) { return p->getId() == id; });
 }
 
-void PlayerListUtils::updateActingPlayersList(PlayerList& myActingPlayersList)
+void PlayerListUtils::updateActingPlayersList(PlayerList& m_actingPlayersList)
 {
     // Use a shared default services instance instead of creating a new container on each call.
     static std::shared_ptr<pkt::core::ServiceContainer> s_defaultServices =
         std::make_shared<pkt::core::AppServiceContainer>();
-    updateActingPlayersList(myActingPlayersList, s_defaultServices);
+    updateActingPlayersList(m_actingPlayersList, s_defaultServices);
 }
 
-void PlayerListUtils::updateActingPlayersList(PlayerList& myActingPlayersList,
+void PlayerListUtils::updateActingPlayersList(PlayerList& m_actingPlayersList,
                                               std::shared_ptr<pkt::core::ServiceContainer> services)
 {
-    updateActingPlayersList(myActingPlayersList, services->logger());
+    updateActingPlayersList(m_actingPlayersList, services->logger());
 }
 
-void PlayerListUtils::updateActingPlayersList(PlayerList& myActingPlayersList, pkt::core::Logger& logger)
+void PlayerListUtils::updateActingPlayersList(PlayerList& m_actingPlayersList, pkt::core::Logger& logger)
 {
-    logger.verbose("Updating myActingPlayersList...");
+    logger.verbose("Updating m_actingPlayersList...");
 
     PlayerListIterator it, it1;
 
-    for (it = myActingPlayersList->begin(); it != myActingPlayersList->end();)
+    for (it = m_actingPlayersList->begin(); it != m_actingPlayersList->end();)
     {
         logger.verbose("Checking player: " + (*it)->getName() +
                        ", action: " + actionTypeToString((*it)->getLastAction().type));
 
         if ((*it)->getLastAction().type == ActionType::Fold || (*it)->getLastAction().type == ActionType::Allin)
         {
-            logger.verbose("Removing player: " + (*it)->getName() + " from myActingPlayersList due to action: " +
+            logger.verbose("Removing player: " + (*it)->getName() + " from m_actingPlayersList due to action: " +
                            actionTypeToString((*it)->getLastAction().type));
 
-            it = myActingPlayersList->erase(it);
+            it = m_actingPlayersList->erase(it);
 
-            if (!myActingPlayersList->empty())
+            if (!m_actingPlayersList->empty())
             {
-                logger.verbose("myActingPlayersList is not empty after removal. Updating current player's turn.");
+                logger.verbose("m_actingPlayersList is not empty after removal. Updating current player's turn.");
 
                 it1 = it;
-                if (it1 == myActingPlayersList->begin())
+                if (it1 == m_actingPlayersList->begin())
                 {
                     logger.verbose("Iterator points to the beginning of the list. Wrapping around to the end.");
-                    it1 = myActingPlayersList->end();
+                    it1 = m_actingPlayersList->end();
                 }
                 --it1;
             }
             else
             {
-                logger.verbose("myActingPlayersList is now empty after removal.");
+                logger.verbose("m_actingPlayersList is now empty after removal.");
             }
         }
         else
         {
             logger.verbose("Player: " + (*it)->getName() +
-                           " remains in myActingPlayersList. Moving to the next player.");
+                           " remains in m_actingPlayersList. Moving to the next player.");
             ++it;
         }
     }
 
-    logger.verbose("Finished updating myActingPlayersList.");
+    logger.verbose("Finished updating m_actingPlayersList.");
 }
 
 } // namespace pkt::core::player

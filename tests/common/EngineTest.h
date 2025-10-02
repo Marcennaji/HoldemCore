@@ -31,21 +31,21 @@ class EngineTest : public ::testing::Test
     pkt::core::Logger& getLogger() const;
     std::shared_ptr<pkt::core::ServiceContainer> getServices() const;
 
-    pkt::core::GameEvents myEvents;
-    std::shared_ptr<pkt::core::EngineFactory> myFactory;
-    std::shared_ptr<pkt::core::Hand> myHand;
-    std::shared_ptr<pkt::core::Board> myBoard;
+    pkt::core::GameEvents m_events;
+    std::shared_ptr<pkt::core::EngineFactory> m_factory;
+    std::shared_ptr<pkt::core::Hand> m_hand;
+    std::shared_ptr<pkt::core::Board> m_board;
 
-    std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::Player>>> mySeatsList;
-    std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::Player>>> myActingPlayersList;
-    pkt::core::GameState myLastGameState = pkt::core::None;
+    std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::Player>>> m_seatsList;
+    std::shared_ptr<std::list<std::shared_ptr<pkt::core::player::Player>>> m_actingPlayersList;
+    pkt::core::GameState m_lastGameState = pkt::core::None;
 
     pkt::core::GameData gameData;
 
   private:
     void createPlayersLists(size_t playerCount);
 
-    std::shared_ptr<pkt::core::AppServiceContainer> myServices; // Store services for logger access
+    std::shared_ptr<pkt::core::AppServiceContainer> m_services; // Store services for logger access
     const int startDealerPlayerId{0}; // Starting dealer player ID, can be set to any valid player ID
 };
 } // namespace pkt::test

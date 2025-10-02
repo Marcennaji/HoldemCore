@@ -22,82 +22,82 @@ namespace pkt::core::player
 
 using namespace std;
 
-Player::Player(const GameEvents& events, int id, std::string name, int cash) : myID(id), myName(name), myEvents(events)
+Player::Player(const GameEvents& events, int id, std::string name, int cash) : m_id(id), m_name(name), m_events(events)
 {
     // Ensure service container exists for components that depend on it
     ensureServicesInitialized();
 
-    myRangeEstimator = std::make_unique<RangeEstimator>(myID, myServices);
-    myCurrentHandContext = std::make_unique<CurrentHandContext>();
-    myStatisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(myServices);
-    myStatisticsUpdater->loadStatistics(name);
+    m_rangeEstimator = std::make_unique<RangeEstimator>(m_id, m_services);
+    m_currentHandContext = std::make_unique<CurrentHandContext>();
+    m_statisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(m_services);
+    m_statisticsUpdater->loadStatistics(name);
 
     // Initialize cash in context
-    myCurrentHandContext->personalContext.cash = cash;
+    m_currentHandContext->personalContext.cash = cash;
     // Initialize with invalid cards - this will be set via context when needed
 }
 
 Player::Player(const GameEvents& events, std::shared_ptr<ServiceContainer> services, int id, std::string name, int cash)
-    : myID(id), myName(name), myEvents(events), myServices(services)
+    : m_id(id), m_name(name), m_events(events), m_services(services)
 {
-    myRangeEstimator = std::make_unique<RangeEstimator>(myID, myServices);
-    myCurrentHandContext = std::make_unique<CurrentHandContext>();
-    myStatisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(myServices);
-    myStatisticsUpdater->loadStatistics(name);
+    m_rangeEstimator = std::make_unique<RangeEstimator>(m_id, m_services);
+    m_currentHandContext = std::make_unique<CurrentHandContext>();
+    m_statisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(m_services);
+    m_statisticsUpdater->loadStatistics(name);
 
     // Initialize cash in context
-    myCurrentHandContext->personalContext.cash = cash;
+    m_currentHandContext->personalContext.cash = cash;
     // Initialize with invalid cards - this will be set via context when needed
 }
 
 void Player::ensureServicesInitialized() const
 {
-    if (!myServices)
+    if (!m_services)
     {
-        myServices = std::make_shared<AppServiceContainer>();
+        m_services = std::make_shared<AppServiceContainer>();
     }
 }
 
 const PlayerPosition Player::getPosition() const
 {
-    if (myCurrentHandContext)
+    if (m_currentHandContext)
     {
-        return myCurrentHandContext->personalContext.position;
+        return m_currentHandContext->personalContext.position;
     }
     return PlayerPosition::Unknown; // Default when no context
 }
 
 int Player::getId() const
 {
-    return myID;
+    return m_id;
 }
 const CurrentHandActions& Player::getCurrentHandActions() const
 {
-    return myCurrentHandContext->personalContext.actions.currentHandActions;
+    return m_currentHandContext->personalContext.actions.currentHandActions;
 }
 
 std::string Player::getName() const
 {
-    return myName;
+    return m_name;
 }
 
 void Player::setCash(int theValue)
 {
     // Update context if it exists
-    if (myCurrentHandContext)
+    if (m_currentHandContext)
     {
-        myCurrentHandContext->personalContext.cash = theValue;
+        m_currentHandContext->personalContext.cash = theValue;
     }
-    if (myEvents.onPlayerChipsUpdated)
+    if (m_events.onPlayerChipsUpdated)
     {
-        myEvents.onPlayerChipsUpdated(myID, theValue);
+        m_events.onPlayerChipsUpdated(m_id, theValue);
     }
 }
 int Player::getCash() const
 {
-    if (myCurrentHandContext)
+    if (m_currentHandContext)
     {
-        return myCurrentHandContext->personalContext.cash;
+        return m_currentHandContext->personalContext.cash;
     }
     return 0; // Default when no context
 }
@@ -105,13 +105,13 @@ int Player::getCash() const
 void Player::addBetAmount(int theValue)
 {
     // Update context directly
-    if (myCurrentHandContext)
+    if (m_currentHandContext)
     {
-        myCurrentHandContext->personalContext.cash -= theValue;
+        m_currentHandContext->personalContext.cash -= theValue;
     }
-    if (myEvents.onPlayerChipsUpdated)
+    if (m_events.onPlayerChipsUpdated)
     {
-        myEvents.onPlayerChipsUpdated(myID, getCash());
+        m_events.onPlayerChipsUpdated(m_id, getCash());
     }
 }
 
@@ -122,75 +122,75 @@ PlayerAction Player::getLastAction() const
 
 void Player::resetCurrentHandActions()
 {
-    myCurrentHandContext->personalContext.actions.currentHandActions.reset();
+    m_currentHandContext->personalContext.actions.currentHandActions.reset();
 }
 
 const HoleCards& Player::getHoleCards() const
 {
-    return myCurrentHandContext->personalContext.holeCards;
+    return m_currentHandContext->personalContext.holeCards;
 }
 
 void Player::setHandRanking(int theValue)
 {
-    if (myCurrentHandContext)
+    if (m_currentHandContext)
     {
-        myCurrentHandContext->personalContext.handRanking = theValue;
+        m_currentHandContext->personalContext.handRanking = theValue;
     }
 }
 int Player::getHandRanking() const
 {
-    if (myCurrentHandContext)
+    if (m_currentHandContext)
     {
-        return myCurrentHandContext->personalContext.handRanking;
+        return m_currentHandContext->personalContext.handRanking;
     }
     return 0; // Default when no context
 }
 
 void Player::setCashAtHandStart(int theValue)
 {
-    if (myCurrentHandContext)
+    if (m_currentHandContext)
     {
-        myCurrentHandContext->personalContext.cashAtHandStart = theValue;
+        m_currentHandContext->personalContext.cashAtHandStart = theValue;
     }
 }
 int Player::getCashAtHandStart() const
 {
-    if (myCurrentHandContext)
+    if (m_currentHandContext)
     {
-        return myCurrentHandContext->personalContext.cashAtHandStart;
+        return m_currentHandContext->personalContext.cashAtHandStart;
     }
     return 0; // Default when no context
 }
 
 void Player::setLastMoneyWon(int theValue)
 {
-    if (myCurrentHandContext)
+    if (m_currentHandContext)
     {
-        myCurrentHandContext->personalContext.lastMoneyWon = theValue;
+        m_currentHandContext->personalContext.lastMoneyWon = theValue;
     }
 }
 int Player::getLastMoneyWon() const
 {
-    if (myCurrentHandContext)
+    if (m_currentHandContext)
     {
-        return myCurrentHandContext->personalContext.lastMoneyWon;
+        return m_currentHandContext->personalContext.lastMoneyWon;
     }
     return 0; // Default when no context
 }
 
 void Player::setHoleCards(const HoleCards& cards)
 {
-    if (myCurrentHandContext)
+    if (m_currentHandContext)
     {
-        myCurrentHandContext->personalContext.holeCards = cards;
+        m_currentHandContext->personalContext.holeCards = cards;
     }
 }
 
 void Player::setHoleCards(const Card& card1, const Card& card2)
 {
-    if (myCurrentHandContext)
+    if (m_currentHandContext)
     {
-        myCurrentHandContext->personalContext.holeCards = HoleCards(card1, card2);
+        m_currentHandContext->personalContext.holeCards = HoleCards(card1, card2);
     }
 }
 
@@ -202,15 +202,15 @@ std::string Player::getCardsValueString() const
 const HandSimulationStats Player::computeHandSimulation() const
 {
 #if (False)
-    const int nbOpponents = mySeatsList->size() - 1;
+    const int nbOpponents = m_seatsList->size() - 1;
     // evaluate my strength against my opponents's guessed ranges :
     float maxOpponentsStrengths = getMaxOpponentsStrengths();
     ensureServicesInitialized();
-    return myServices->handEvaluationEngine().simulateHandEquity(getCardsValueString(), getStringBoard(), nbOpponents,
+    return m_services->handEvaluationEngine().simulateHandEquity(getCardsValueString(), getStringBoard(), nbOpponents,
                                                                  maxOpponentsStrengths);
 #else
     ensureServicesInitialized();
-    return myServices->handEvaluationEngine().simulateHandEquity("As 6d", "", 2, 0.5);
+    return m_services->handEvaluationEngine().simulateHandEquity("As 6d", "", 2, 0.5);
 #endif
 }
 
@@ -292,19 +292,19 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 #if (false)
     float result = 0;
 
-    auto opponent = *getPlayerListIteratorById(myCurrentHandContext->commonContext.mySeatsList, opponentId);
+    auto opponent = *getPlayerListIteratorById(m_currentHandContext->commonContext.m_seatsList, opponentId);
 
     assert(getHandRanking() > 0);
 
     // compute winning hands % against my rank
     int nbWinningHands = 0;
 
-    if (opponent->myRangeEstimator->getEstimatedRange().size() == 0)
+    if (opponent->m_rangeEstimator->getEstimatedRange().size() == 0)
     {
-        opponent->getRangeEstimator()->computeEstimatedPreflopRange(*myCurrentHandContext);
+        opponent->getRangeEstimator()->computeEstimatedPreflopRange(*m_currentHandContext);
     }
 
-    vector<std::string> ranges = RangeParser::getRangeAtomicValues(opponent->myRangeEstimator->getEstimatedRange());
+    vector<std::string> ranges = RangeParser::getRangeAtomicValues(opponent->m_rangeEstimator->getEstimatedRange());
 
     vector<std::string> newRanges;
 
@@ -314,7 +314,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
         if ((*i).size() != 4)
         {
             ensureServicesInitialized();
-            myServices->logger().error("invalid hand : " + (*i));
+            m_services->logger().error("invalid hand : " + (*i));
             continue;
         }
         string s1 = (*i).substr(0, 2);
@@ -327,7 +327,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
         }
 
         // delete hands that can't exist, given the player's cards (if they are supposed to be known)
-        if (opponentId != myID)
+        if (opponentId != m_id)
         {
             const std::string card1Str = getHoleCards().card1.toString();
             const std::string card2Str = getHoleCards().card2.toString();
@@ -348,7 +348,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
     for (vector<std::string>::const_iterator i = newRanges.begin(); i != newRanges.end(); i++)
     {
         ensureServicesInitialized();
-        const int rank = myServices->handEvaluationEngine().rankHand(((*i) + board).c_str());
+        const int rank = m_services->handEvaluationEngine().rankHand(((*i) + board).c_str());
         if (rank > getHandRanking())
         {
             nbWinningHands++;
@@ -357,7 +357,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
     if (ranges.size() == 0)
     {
         ensureServicesInitialized();
-        myServices->logger().error("no ranges for opponent " + std::to_string(opponentId));
+        m_services->logger().error("no ranges for opponent " + std::to_string(opponentId));
         return 0;
     }
     assert(nbWinningHands / ranges.size() <= 1.0);
@@ -372,13 +372,13 @@ std::map<int, float> Player::evaluateOpponentsStrengths() const
 
     map<int, float> result;
 #if (False)
-    PlayerList players = mySeatsList;
-    const int nbPlayers = mySeatsList->size();
+    PlayerList players = m_seatsList;
+    const int nbPlayers = m_seatsList->size();
 
     for (PlayerListIterator it = players->begin(); it != players->end(); ++it)
     {
 
-        if ((*it)->getId() == myID || (*it)->getLastAction().type == ActionType::Fold ||
+        if ((*it)->getId() == m_id || (*it)->getLastAction().type == ActionType::Fold ||
             (*it)->getLastAction().type == ActionType::None)
         {
             continue;
@@ -398,17 +398,17 @@ bool Player::isInVeryLooseMode(const int nbPlayers) const
 {
     // very loose mode = plays very often preflop (last actions in stack are mostly raises/calls/allins)
     ensureServicesInitialized();
-    if (!myStatisticsUpdater)
+    if (!m_statisticsUpdater)
     {
         // Lazily create if not present (defensive against future refactors)
-        const_cast<Player*>(this)->myStatisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(myServices);
+        const_cast<Player*>(this)->m_statisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(m_services);
     }
     int clampedPlayers = nbPlayers;
     if (clampedPlayers < 0)
         clampedPlayers = 0;
     if (clampedPlayers > MAX_NUMBER_OF_PLAYERS)
         clampedPlayers = MAX_NUMBER_OF_PLAYERS;
-    PlayerStatistics stats = myStatisticsUpdater->getStatistics(clampedPlayers);
+    PlayerStatistics stats = m_statisticsUpdater->getStatistics(clampedPlayers);
 
     PreflopStatistics preflop = stats.preflopStatistics;
 
@@ -427,59 +427,59 @@ bool Player::isInVeryLooseMode(const int nbPlayers) const
 void Player::updateCurrentHandContext(Hand& currentHand)
 {
     // common context
-    myCurrentHandContext->commonContext = currentHand.updateHandCommonContext();
+    m_currentHandContext->commonContext = currentHand.updateHandCommonContext();
 
     // Calculate valid actions for this specific player
-    myCurrentHandContext->commonContext.validActions = pkt::core::getValidActionsForPlayer(currentHand, myID);
+    m_currentHandContext->commonContext.validActions = pkt::core::getValidActionsForPlayer(currentHand, m_id);
 
     // Player-specific, visible from the opponents :
-    myCurrentHandContext->personalContext.totalBetAmount =
-        myCurrentHandContext->personalContext.actions.currentHandActions.getHandTotalBetAmount();
-    myCurrentHandContext->personalContext.m = static_cast<int>(currentHand.getM(getCash()));
-    myCurrentHandContext->personalContext.hasPosition = hasPosition(getPosition(), currentHand.getActingPlayersList());
+    m_currentHandContext->personalContext.totalBetAmount =
+        m_currentHandContext->personalContext.actions.currentHandActions.getHandTotalBetAmount();
+    m_currentHandContext->personalContext.m = static_cast<int>(currentHand.getM(getCash()));
+    m_currentHandContext->personalContext.hasPosition = hasPosition(getPosition(), currentHand.getActingPlayersList());
 
-    if (myCurrentHandContext->commonContext.playersContext.preflopLastRaiser)
+    if (m_currentHandContext->commonContext.playersContext.preflopLastRaiser)
     {
-        myCurrentHandContext->personalContext.actions.preflopIsAggressor =
-            myCurrentHandContext->commonContext.gameState == Preflop &&
-            myCurrentHandContext->commonContext.playersContext.preflopLastRaiser->getId() == myID;
+        m_currentHandContext->personalContext.actions.preflopIsAggressor =
+            m_currentHandContext->commonContext.gameState == Preflop &&
+            m_currentHandContext->commonContext.playersContext.preflopLastRaiser->getId() == m_id;
     }
-    if (myCurrentHandContext->commonContext.playersContext.flopLastRaiser)
+    if (m_currentHandContext->commonContext.playersContext.flopLastRaiser)
     {
-        myCurrentHandContext->personalContext.actions.flopIsAggressor =
-            myCurrentHandContext->commonContext.gameState == Flop &&
-            myCurrentHandContext->commonContext.playersContext.flopLastRaiser->getId() == myID;
+        m_currentHandContext->personalContext.actions.flopIsAggressor =
+            m_currentHandContext->commonContext.gameState == Flop &&
+            m_currentHandContext->commonContext.playersContext.flopLastRaiser->getId() == m_id;
     }
-    if (myCurrentHandContext->commonContext.playersContext.turnLastRaiser)
+    if (m_currentHandContext->commonContext.playersContext.turnLastRaiser)
     {
-        myCurrentHandContext->personalContext.actions.turnIsAggressor =
-            myCurrentHandContext->commonContext.gameState == Turn &&
-            myCurrentHandContext->commonContext.playersContext.turnLastRaiser->getId() == myID;
+        m_currentHandContext->personalContext.actions.turnIsAggressor =
+            m_currentHandContext->commonContext.gameState == Turn &&
+            m_currentHandContext->commonContext.playersContext.turnLastRaiser->getId() == m_id;
     }
 
-    myCurrentHandContext->personalContext.statistics =
-        myStatisticsUpdater->getStatistics(myCurrentHandContext->commonContext.playersContext.nbPlayers);
-    myCurrentHandContext->personalContext.id = myID;
-    myCurrentHandContext->personalContext.actions.isInVeryLooseMode =
-        isInVeryLooseMode(myCurrentHandContext->commonContext.playersContext.nbPlayers);
+    m_currentHandContext->personalContext.statistics =
+        m_statisticsUpdater->getStatistics(m_currentHandContext->commonContext.playersContext.nbPlayers);
+    m_currentHandContext->personalContext.id = m_id;
+    m_currentHandContext->personalContext.actions.isInVeryLooseMode =
+        isInVeryLooseMode(m_currentHandContext->commonContext.playersContext.nbPlayers);
 
     // player specific, hidden from the opponents :
-    myCurrentHandContext->personalContext.preflopCallingRange = calculatePreflopCallingRange(*myCurrentHandContext);
+    m_currentHandContext->personalContext.preflopCallingRange = calculatePreflopCallingRange(*m_currentHandContext);
     // guess what the opponents might have and evaluate our strength, given our hole cards and the board cards (if any)
-    myCurrentHandContext->personalContext.myHandSimulation = computeHandSimulation();
-    myCurrentHandContext->personalContext.postFlopAnalysisFlags = getPostFlopAnalysisFlags();
+    m_currentHandContext->personalContext.m_handSimulation = computeHandSimulation();
+    m_currentHandContext->personalContext.postFlopAnalysisFlags = getPostFlopAnalysisFlags();
 }
 
 float Player::calculatePreflopCallingRange(const CurrentHandContext& ctx) const
 {
     ensureServicesInitialized();
-    PreflopRangeCalculator calculator(myServices);
+    PreflopRangeCalculator calculator(m_services);
     return calculator.calculatePreflopCallingRange(ctx);
 }
 
 void Player::resetForNewHand(const Hand& hand)
 {
-    myCurrentHandContext->personalContext.actions.currentHandActions.reset();
+    m_currentHandContext->personalContext.actions.currentHandActions.reset();
     setCashAtHandStart(getCash());
     setPosition(hand);
     getRangeEstimator()->setEstimatedRange("");
@@ -494,10 +494,10 @@ void Player::processAction(const PlayerAction& action, Hand& hand)
 const PostFlopAnalysisFlags Player::getPostFlopAnalysisFlags() const
 {
     std::string stringHand = getCardsValueString();
-    std::string stringBoard = myCurrentHandContext->commonContext.stringBoard;
+    std::string stringBoard = m_currentHandContext->commonContext.stringBoard;
 
     ensureServicesInitialized();
-    return myServices->handEvaluationEngine().analyzeHand(getCardsValueString(), stringBoard);
+    return m_services->handEvaluationEngine().analyzeHand(getCardsValueString(), stringBoard);
 }
 
 void Player::setPosition(const Hand& hand)
@@ -507,13 +507,13 @@ void Player::setPosition(const Hand& hand)
     const int nbPlayers = players->size();
 
     // Compute relative offset clockwise from dealer
-    int offset = playerDistanceCircularOffset(dealerId, myID, players);
+    int offset = playerDistanceCircularOffset(dealerId, m_id, players);
     PlayerPosition position = computePlayerPositionFromOffset(offset, nbPlayers);
 
     // Update context only
-    if (myCurrentHandContext)
+    if (m_currentHandContext)
     {
-        myCurrentHandContext->personalContext.position = position;
+        m_currentHandContext->personalContext.position = position;
     }
 
     assert(position != Unknown);
@@ -524,15 +524,15 @@ void Player::setAction(HandState& state, const PlayerAction& action)
     if (action.type != ActionType::None)
     {
         ensureServicesInitialized();
-        myServices->logger().info(myName + " " + std::string(actionTypeToString(action.type)) +
+        m_services->logger().info(m_name + " " + std::string(actionTypeToString(action.type)) +
                                   (action.amount ? " " + std::to_string(action.amount) : ""));
     }
-    myCurrentHandContext->personalContext.actions.currentHandActions.addAction(state.getGameState(), action);
+    m_currentHandContext->personalContext.actions.currentHandActions.addAction(state.getGameState(), action);
 }
 
 const PlayerStatistics& Player::getStatistics(const int nbPlayers) const
 {
-    return myStatisticsUpdater->getStatistics(nbPlayers);
+    return m_statisticsUpdater->getStatistics(nbPlayers);
 }
 
 } // namespace pkt::core::player

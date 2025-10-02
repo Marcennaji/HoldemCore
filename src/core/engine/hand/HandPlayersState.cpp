@@ -7,10 +7,10 @@ using namespace std;
 using namespace pkt::core::player;
 
 HandPlayersState::HandPlayersState(PlayerList seats, PlayerList actingPlayers)
-    : mySeatsList(seats), myActingPlayersList(actingPlayers)
+    : m_seatsList(seats), m_actingPlayersList(actingPlayers)
 
 {
-    myBettingActions = make_shared<BettingActions>(mySeatsList, myActingPlayersList);
+    m_bettingActions = make_shared<BettingActions>(m_seatsList, m_actingPlayersList);
 }
 
 } // namespace pkt::core

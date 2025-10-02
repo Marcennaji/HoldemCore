@@ -13,7 +13,7 @@ class HumanStrategy : public PlayerStrategy
 {
   public:
     HumanStrategy(const pkt::core::GameEvents& events)  // Back to const since onProcessEvents is mutable
-        : myEvents(events)
+        : m_events(events)
     {
     }
 
@@ -26,10 +26,10 @@ class HumanStrategy : public PlayerStrategy
     void setPlayerAction(const pkt::core::PlayerAction& action);
 
   private:
-    const pkt::core::GameEvents& myEvents;  // Back to const
+    const pkt::core::GameEvents& m_events;  // Back to const
 
     // Promise/future for bridging async UI with synchronous strategy interface
-    std::unique_ptr<std::promise<pkt::core::PlayerAction>> myActionPromise;
+    std::unique_ptr<std::promise<pkt::core::PlayerAction>> m_actionPromise;
 };
 
 } // namespace pkt::core::player

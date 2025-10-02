@@ -11,14 +11,14 @@ namespace pkt::core
 using namespace pkt::core::player;
 
 BettingActions::BettingActions(PlayerList& seats, PlayerList& actingPlayers)
-    : mySeatsList(seats), myActingPlayersList(actingPlayers), myPreflop(GameState::Preflop, seats, actingPlayers),
-      myFlop(GameState::Flop, seats, actingPlayers), myTurn(GameState::Turn, seats, actingPlayers),
-      myRiver(GameState::River, seats, actingPlayers)
+    : m_seatsList(seats), m_actingPlayersList(actingPlayers), m_preflop(GameState::Preflop, seats, actingPlayers),
+      m_flop(GameState::Flop, seats, actingPlayers), m_turn(GameState::Turn, seats, actingPlayers),
+      m_river(GameState::River, seats, actingPlayers)
 {
 }
 int BettingActions::getMinRaise(int smallBlind) const
 {
-    if (!myLastRaiserId.has_value())
+    if (!m_lastRaiserId.has_value())
     {
         // No raise yet: minimum raise is usually the big blind (preflop) or small blind
         return smallBlind;
@@ -26,9 +26,9 @@ int BettingActions::getMinRaise(int smallBlind) const
 
     // Compute previous raise amount
     int lastRaiserTotal = 0;
-    for (auto player = myActingPlayersList->begin(); player != myActingPlayersList->end(); ++player)
+    for (auto player = m_actingPlayersList->begin(); player != m_actingPlayersList->end(); ++player)
     {
-        if ((*player)->getId() == myLastRaiserId.value())
+        if ((*player)->getId() == m_lastRaiserId.value())
         {
             PlayerAction lastAction = (*player)->getCurrentHandActions().getLastAction();
             assert(lastAction.type == ActionType::Raise || lastAction.type == ActionType::Allin);
@@ -37,7 +37,7 @@ int BettingActions::getMinRaise(int smallBlind) const
         }
     }
 
-    int prevHighest = myRoundHighestSet;
+    int prevHighest = m_roundHighestSet;
     int prevRaise = prevHighest - lastRaiserTotal;
 
     return prevRaise;
@@ -45,19 +45,19 @@ int BettingActions::getMinRaise(int smallBlind) const
 
 int BettingActions::getRoundHighestSet() const
 {
-    return myRoundHighestSet;
+    return m_roundHighestSet;
 }
 
 void BettingActions::updateRoundHighestSet(int amount)
 {
-    if (amount > myRoundHighestSet)
-        myRoundHighestSet = amount;
+    if (amount > m_roundHighestSet)
+        m_roundHighestSet = amount;
 }
 
 void BettingActions::setLastActionPlayerId(int theValue)
 {
-    myLastActionPlayerId = theValue;
-    // myBoard->setLastActionPlayerId(theValue);
+    m_lastActionPlayerId = theValue;
+    // m_board->setLastActionPlayerId(theValue);
 }
 
 std::vector<PlayerPosition> BettingActions::getRaisersPositions()
@@ -65,7 +65,7 @@ std::vector<PlayerPosition> BettingActions::getRaisersPositions()
 
     std::vector<PlayerPosition> positions;
 
-    for (auto itC = mySeatsList->begin(); itC != mySeatsList->end(); ++itC)
+    for (auto itC = m_seatsList->begin(); itC != m_seatsList->end(); ++itC)
     { // note that all in players are not "running" any more
 
         if ((*itC)->getLastAction().type == ActionType::Raise || (*itC)->getLastAction().type == ActionType::Allin)
@@ -81,7 +81,7 @@ std::vector<PlayerPosition> BettingActions::getCallersPositions()
 
     std::vector<PlayerPosition> positions;
 
-    for (auto itC = myActingPlayersList->begin(); itC != myActingPlayersList->end(); ++itC)
+    for (auto itC = m_actingPlayersList->begin(); itC != m_actingPlayersList->end(); ++itC)
     {
 
         if ((*itC)->getLastAction().type == ActionType::Call)
@@ -94,9 +94,9 @@ std::vector<PlayerPosition> BettingActions::getCallersPositions()
 int BettingActions::getLastRaiserId()
 {
 
-    auto lastRaiser = mySeatsList->end();
+    auto lastRaiser = m_seatsList->end();
 
-    auto players = mySeatsList;
+    auto players = m_seatsList;
 
     for (auto it = players->begin(); it != players->end(); ++it)
     {
@@ -104,7 +104,7 @@ int BettingActions::getLastRaiserId()
         if ((*it)->getLastAction().type == ActionType::Raise || (*it)->getLastAction().type == ActionType::Allin)
         {
 
-            if (lastRaiser != mySeatsList->end())
+            if (lastRaiser != m_seatsList->end())
             {
                 if ((*lastRaiser)->getPosition() < (*it)->getPosition())
                 {
@@ -117,7 +117,7 @@ int BettingActions::getLastRaiserId()
             }
         }
     }
-    if (lastRaiser != mySeatsList->end())
+    if (lastRaiser != m_seatsList->end())
     {
         return (*lastRaiser)->getId();
     }
@@ -132,7 +132,7 @@ int BettingActions::getLastRaiserId()
             lastRaiser = it;
         }
     }
-    if (lastRaiser != mySeatsList->end())
+    if (lastRaiser != m_seatsList->end())
     {
         return (*lastRaiser)->getId();
     }
@@ -145,12 +145,12 @@ int BettingActions::getLastRaiserId()
 void BettingActions::recordPlayerAction(GameState round, const pkt::core::PlayerAction& action)
 {
     // Find or create entry for this round
-    auto it = std::find_if(myHandActionHistory.begin(), myHandActionHistory.end(),
+    auto it = std::find_if(m_handActionHistory.begin(), m_handActionHistory.end(),
                            [round](const pkt::core::BettingRoundHistory& h) { return h.round == round; });
 
-    if (it == myHandActionHistory.end())
+    if (it == m_handActionHistory.end())
     {
-        myHandActionHistory.push_back({round, {{action.playerId, action.type}}});
+        m_handActionHistory.push_back({round, {{action.playerId, action.type}}});
     }
     else
     {

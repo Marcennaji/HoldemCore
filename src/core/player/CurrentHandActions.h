@@ -23,7 +23,7 @@ class CurrentHandActions
     void reset();
 
     void addAction(const GameState& state, const PlayerAction& action);
-    const std::vector<PlayerAction>& getActions(const GameState& state) const { return myActionsByState.at(state); }
+    const std::vector<PlayerAction>& getActions(const GameState& state) const { return m_actionsByState.at(state); }
 
     int getActionsNumber(const GameState& state, const ActionType& actionType) const;
 
@@ -31,17 +31,17 @@ class CurrentHandActions
     int getRoundTotalBetAmount(const GameState& state) const;
     int getHandTotalBetAmount() const;
 
-    PlayerAction getLastAction() const { return myLastAction; }
+    PlayerAction getLastAction() const { return m_lastAction; }
 
     void writeActionsToLog() const;
     void writeActionsToLog(Logger& logger) const;
 
   private:
     void ensureServicesInitialized() const;
-    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices; // Injected service container
+    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services; // Injected service container
 
-    std::map<GameState, std::vector<PlayerAction>> myActionsByState;
-    PlayerAction myLastAction{-1, ActionType::None, 0};
+    std::map<GameState, std::vector<PlayerAction>> m_actionsByState;
+    PlayerAction m_lastAction{-1, ActionType::None, 0};
 };
 
 } // namespace pkt::core::player

@@ -56,7 +56,7 @@ TEST_F(EngineTest, FirstToActPreflopIsLeftOfBigBlind)
 
     // After initialize (before run loop), positions should be set in Player::resetForNewHand
     // Find BB and its left neighbor in acting order
-    auto acting = myHand->getActingPlayersList();
+    auto acting = m_hand->getActingPlayersList();
     auto bbIt = std::find_if(acting->begin(), acting->end(), [](const std::shared_ptr<Player>& p){
         return p->getPosition() == PlayerPosition::BigBlind;
     });
@@ -68,7 +68,7 @@ TEST_F(EngineTest, FirstToActPreflopIsLeftOfBigBlind)
     auto expectedFirst = *nextIt;
 
     // Query engine helper for next to act at start of preflop
-    auto nextToAct = getNextPlayerToActInRound(*myHand, GameState::Preflop);
+    auto nextToAct = getNextPlayerToActInRound(*m_hand, GameState::Preflop);
     ASSERT_NE(nextToAct, nullptr);
 
     EXPECT_EQ(nextToAct->getId(), expectedFirst->getId())

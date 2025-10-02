@@ -8,7 +8,7 @@
 namespace pkt::core::player
 {
 
-StrategyAssigner::StrategyAssigner(TableProfile profile, int botCount) : myProfile(profile), myMaxPerType(botCount / 3)
+StrategyAssigner::StrategyAssigner(TableProfile profile, int botCount) : m_profile(profile), m_maxPerType(botCount / 3)
 {
 }
 
@@ -16,7 +16,7 @@ std::unique_ptr<BotStrategy> StrategyAssigner::chooseBotStrategyFor(int index)
 {
     int rand = std::rand() % 12;
 
-    if (myProfile == TightAgressiveOpponents)
+    if (m_profile == TightAgressiveOpponents)
     {
         if (rand % 2 == 0)
         {
@@ -28,7 +28,7 @@ std::unique_ptr<BotStrategy> StrategyAssigner::chooseBotStrategyFor(int index)
         }
     }
 
-    if (myProfile == LargeAgressiveOpponents)
+    if (m_profile == LargeAgressiveOpponents)
     {
         if (rand % 2 == 0)
         {
@@ -41,19 +41,19 @@ std::unique_ptr<BotStrategy> StrategyAssigner::chooseBotStrategyFor(int index)
     }
 
     // RandomOpponents profile
-    if (rand < 3 && myCountManiac++ < myMaxPerType)
+    if (rand < 3 && m_countManiac++ < m_maxPerType)
     {
         return std::make_unique<ManiacBotStrategy>();
     }
-    if (rand < 5 && myCountUltraTight++ < myMaxPerType)
+    if (rand < 5 && m_countUltraTight++ < m_maxPerType)
     {
         return std::make_unique<UltraTightBotStrategy>();
     }
-    if (rand < 9 && myCountLoose++ < myMaxPerType)
+    if (rand < 9 && m_countLoose++ < m_maxPerType)
     {
         return std::make_unique<LooseAggressiveBotStrategy>();
     }
-    if (myCountTight++ < myMaxPerType)
+    if (m_countTight++ < m_maxPerType)
     {
         return std::make_unique<TightAggressiveBotStrategy>();
     }

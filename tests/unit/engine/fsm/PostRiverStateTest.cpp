@@ -13,8 +13,8 @@ namespace pkt::test
 void PostRiverStateTest::SetUp()
 {
     EngineTest::SetUp();
-    myEvents.clear();
-    myEvents.onBettingRoundStarted = [&](GameState state) { myLastGameState = state; };
+    m_events.clear();
+    m_events.onBettingRoundStarted = [&](GameState state) { m_lastGameState = state; };
 }
 
 void PostRiverStateTest::TearDown()
@@ -33,27 +33,27 @@ TEST_F(PostRiverStateTest, TerminalStateNoActionsAllowed)
 
     initializeHandWithPlayers(2, gameData);
 
-    auto playerSb = getPlayerById(myActingPlayersList, 0);
-    auto playerBb = getPlayerById(myActingPlayersList, 1);
+    auto playerSb = getPlayerById(m_actingPlayersList, 0);
+    auto playerBb = getPlayerById(m_actingPlayersList, 1);
 
     // Reach PostRiver
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, PostRiver);
+    EXPECT_EQ(m_lastGameState, PostRiver);
 
     // Verify state is terminal
-    EXPECT_TRUE(myHand->getState().isTerminal());
+    EXPECT_TRUE(m_hand->getState().isTerminal());
 
     // Verify no further actions are allowed
-    EXPECT_FALSE(myHand->getActionProcessor()->isActionAllowed(*myHand, {playerSb->getId(), ActionType::Call}));
-    EXPECT_FALSE(myHand->getActionProcessor()->isActionAllowed(*myHand, {playerBb->getId(), ActionType::Raise, 200}));
+    EXPECT_FALSE(m_hand->getActionProcessor()->isActionAllowed(*m_hand, {playerSb->getId(), ActionType::Call}));
+    EXPECT_FALSE(m_hand->getActionProcessor()->isActionAllowed(*m_hand, {playerBb->getId(), ActionType::Raise, 200}));
 }
 
 TEST_F(PostRiverStateTest, ShowdownSingleWinner)
@@ -62,27 +62,27 @@ TEST_F(PostRiverStateTest, ShowdownSingleWinner)
 
     initializeHandWithPlayers(2, gameData);
 
-    auto playerSb = getPlayerById(myActingPlayersList, 0);
-    auto playerBb = getPlayerById(myActingPlayersList, 1);
+    auto playerSb = getPlayerById(m_actingPlayersList, 0);
+    auto playerBb = getPlayerById(m_actingPlayersList, 1);
 
     // Set different hand rankings (higher = better)
     playerSb->setHandRanking(1000); // Lower ranking
     playerBb->setHandRanking(2000); // Higher ranking (winner)
 
     // Both players check to showdown
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, PostRiver);
+    EXPECT_EQ(m_lastGameState, PostRiver);
 
     // Verify BigBlind player is the winner
-    auto winners = myHand->getBoard().getWinners();
+    auto winners = m_hand->getBoard().getWinners();
     EXPECT_EQ(winners.size(), 1);
     EXPECT_TRUE(std::find(winners.begin(), winners.end(), playerBb->getId()) != winners.end());
 }
@@ -93,27 +93,27 @@ TEST_F(PostRiverStateTest, ShowdownTiedHands)
 
     initializeHandWithPlayers(2, gameData);
 
-    auto playerSb = getPlayerById(myActingPlayersList, 0);
-    auto playerBb = getPlayerById(myActingPlayersList, 1);
+    auto playerSb = getPlayerById(m_actingPlayersList, 0);
+    auto playerBb = getPlayerById(m_actingPlayersList, 1);
 
     // Set identical hand rankings
     playerSb->setHandRanking(1500);
     playerBb->setHandRanking(1500); // Same ranking (tie)
 
     // Both players check to showdown
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, PostRiver);
+    EXPECT_EQ(m_lastGameState, PostRiver);
 
     // Verify both players are winners
-    auto winners = myHand->getBoard().getWinners();
+    auto winners = m_hand->getBoard().getWinners();
     EXPECT_EQ(winners.size(), 2);
     EXPECT_TRUE(std::find(winners.begin(), winners.end(), playerSb->getId()) != winners.end());
     EXPECT_TRUE(std::find(winners.begin(), winners.end(), playerBb->getId()) != winners.end());
@@ -125,8 +125,8 @@ TEST_F(PostRiverStateTest, PotDistributionSingleWinner)
 
     initializeHandWithPlayers(2, gameData);
 
-    auto playerSb = getPlayerById(myActingPlayersList, 0);
-    auto playerBb = getPlayerById(myActingPlayersList, 1);
+    auto playerSb = getPlayerById(m_actingPlayersList, 0);
+    auto playerBb = getPlayerById(m_actingPlayersList, 1);
 
     // Set hand rankings
     playerSb->setHandRanking(1000); // Loser
@@ -137,16 +137,16 @@ TEST_F(PostRiverStateTest, PotDistributionSingleWinner)
     int trueCashBb = 1000; // From gameData.startMoney
 
     // Both players bet and call to showdown
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 200});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 200});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, PostRiver);
+    EXPECT_EQ(m_lastGameState, PostRiver);
 
     // Verify winner gets the pot (should get back their bet plus opponent's bet plus blinds)
     // Total pot calculation from actual contributions:
@@ -164,8 +164,8 @@ TEST_F(PostRiverStateTest, SplitPotDistribution)
 
     initializeHandWithPlayers(2, gameData);
 
-    auto playerSb = getPlayerById(myActingPlayersList, 0);
-    auto playerBb = getPlayerById(myActingPlayersList, 1);
+    auto playerSb = getPlayerById(m_actingPlayersList, 0);
+    auto playerBb = getPlayerById(m_actingPlayersList, 1);
 
     // Set identical hand rankings
     playerSb->setHandRanking(1500);
@@ -176,16 +176,16 @@ TEST_F(PostRiverStateTest, SplitPotDistribution)
     int trueCashBb = 1000; // From gameData.startMoney
 
     // Both players bet equally to showdown
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 200});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 200});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, PostRiver);
+    EXPECT_EQ(m_lastGameState, PostRiver);
 
     // Verify pot is split equally (both get their money back)
     EXPECT_EQ(playerSb->getCash(), trueCashSb);
@@ -198,8 +198,8 @@ TEST_F(PostRiverStateTest, AllInPlayerWinsEntirePot)
 
     initializeHandWithPlayers(2, gameData);
 
-    auto playerSb = getPlayerById(myActingPlayersList, 0);
-    auto playerBb = getPlayerById(myActingPlayersList, 1);
+    auto playerSb = getPlayerById(m_actingPlayersList, 0);
+    auto playerBb = getPlayerById(m_actingPlayersList, 1);
 
     // Set up all-in scenario - reduce one player's cash AFTER blinds are posted
     // SB has already posted 10, so they have 990 remaining
@@ -214,12 +214,12 @@ TEST_F(PostRiverStateTest, AllInPlayerWinsEntirePot)
     int cashBbBeforeAllin = playerBb->getCash(); // Should be 980 (after posting BB)
 
     // SB goes all-in, BB calls
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Allin, 260}); // All remaining cash after preflop call
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Allin, 260}); // All remaining cash after preflop call
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Call});
 
-    EXPECT_EQ(myLastGameState, PostRiver);
+    EXPECT_EQ(m_lastGameState, PostRiver);
 
     // Calculate expected results:
     // SB contributed: 10 (small blind) + 10 (call preflop) + 260 (all-in on flop) = 280 total
@@ -237,9 +237,9 @@ TEST_F(PostRiverStateTest, FoldedPlayerExcludedFromPot)
 
     initializeHandWithPlayers(3, gameData);
 
-    auto playerDealer = getPlayerById(myActingPlayersList, 0);
-    auto playerSb = getPlayerById(myActingPlayersList, 1);
-    auto playerBb = getPlayerById(myActingPlayersList, 2);
+    auto playerDealer = getPlayerById(m_actingPlayersList, 0);
+    auto playerSb = getPlayerById(m_actingPlayersList, 1);
+    auto playerBb = getPlayerById(m_actingPlayersList, 2);
 
     // Set hand rankings - folded player has best hand but shouldn't win
     playerDealer->setHandRanking(3000); // Best hand but will fold
@@ -252,20 +252,20 @@ TEST_F(PostRiverStateTest, FoldedPlayerExcludedFromPot)
     int trueCashBb = 1000;     // From gameData.startMoney
 
     // Dealer folds, SB and BB go to showdown
-    myHand->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 200});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 200});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, PostRiver);
+    EXPECT_EQ(m_lastGameState, PostRiver);
 
     // Verify only BB wins (folded player doesn't get pot despite best hand)
-    auto winners = myHand->getBoard().getWinners();
+    auto winners = m_hand->getBoard().getWinners();
     EXPECT_TRUE(std::find(winners.begin(), winners.end(), playerBb->getId()) != winners.end());
     EXPECT_TRUE(std::find(winners.begin(), winners.end(), playerDealer->getId()) == winners.end());
 
@@ -285,9 +285,9 @@ TEST_F(PostRiverStateTest, MultiplePlayersComplexShowdown)
 
     initializeHandWithPlayers(3, gameData);
 
-    auto playerDealer = getPlayerById(myActingPlayersList, 0);
-    auto playerSb = getPlayerById(myActingPlayersList, 1);
-    auto playerBb = getPlayerById(myActingPlayersList, 2);
+    auto playerDealer = getPlayerById(m_actingPlayersList, 0);
+    auto playerSb = getPlayerById(m_actingPlayersList, 1);
+    auto playerBb = getPlayerById(m_actingPlayersList, 2);
 
     // Set different hand rankings
     playerDealer->setHandRanking(1000); // Lowest
@@ -295,23 +295,23 @@ TEST_F(PostRiverStateTest, MultiplePlayersComplexShowdown)
     playerBb->setHandRanking(2000);     // Highest (winner)
 
     // All players call and go to showdown
-    myHand->handlePlayerAction({playerDealer->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerDealer->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerDealer->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerDealer->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealer->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealer->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealer->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealer->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, PostRiver);
+    EXPECT_EQ(m_lastGameState, PostRiver);
 
     // Verify BB player (highest hand) wins
-    auto winners = myHand->getBoard().getWinners();
+    auto winners = m_hand->getBoard().getWinners();
     EXPECT_EQ(winners.size(), 1);
     EXPECT_TRUE(std::find(winners.begin(), winners.end(), playerBb->getId()) != winners.end());
 }
@@ -322,22 +322,22 @@ TEST_F(PostRiverStateTest, NoNextStateFromPostRiver)
 
     initializeHandWithPlayers(2, gameData);
 
-    auto playerSb = getPlayerById(myActingPlayersList, 0);
-    auto playerBb = getPlayerById(myActingPlayersList, 1);
+    auto playerSb = getPlayerById(m_actingPlayersList, 0);
+    auto playerBb = getPlayerById(m_actingPlayersList, 1);
 
     // Reach PostRiver
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, PostRiver);
+    EXPECT_EQ(m_lastGameState, PostRiver);
 
-    auto nextState = myHand->getActionProcessor()->computeNextState(*myHand);
+    auto nextState = m_hand->getActionProcessor()->computeNextState(*m_hand);
     EXPECT_EQ(nextState, nullptr);
 }
 
@@ -347,31 +347,31 @@ TEST_F(PostRiverStateTest, PotCollectionBeforeDistribution)
 
     initializeHandWithPlayers(2, gameData);
 
-    auto playerSb = getPlayerById(myActingPlayersList, 0);
-    auto playerBb = getPlayerById(myActingPlayersList, 1);
+    auto playerSb = getPlayerById(m_actingPlayersList, 0);
+    auto playerBb = getPlayerById(m_actingPlayersList, 1);
 
     // Make some bets during the hand
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 100});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 100});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Call});
 
     // Check current pot and sets before reaching PostRiver
-    int potBeforeRiver = myHand->getBoard().getPot(*myHand);
-    int setsBeforeRiver = myHand->getBoard().getSets(*myHand);
+    int potBeforeRiver = m_hand->getBoard().getPot(*m_hand);
+    int setsBeforeRiver = m_hand->getBoard().getSets(*m_hand);
 
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, PostRiver);
+    EXPECT_EQ(m_lastGameState, PostRiver);
 
     // After pot distribution in PostRiver state:
     // 1. The pot should be 0 (money has been distributed to winners)
     // 2. Sets should be 0 (any remaining sets were added to pot before distribution)
-    EXPECT_EQ(myHand->getBoard().getPot(*myHand), 0) << "Pot should be 0 after distribution";
-    EXPECT_EQ(myHand->getBoard().getSets(*myHand), 0) << "Sets should be 0 after collection";
+    EXPECT_EQ(m_hand->getBoard().getPot(*m_hand), 0) << "Pot should be 0 after distribution";
+    EXPECT_EQ(m_hand->getBoard().getSets(*m_hand), 0) << "Sets should be 0 after collection";
 
     // Verify that money was actually distributed (pot wasn't just lost)
     // Total pot before distribution should have been: potBeforeRiver + setsBeforeRiver
@@ -388,20 +388,20 @@ TEST_F(PostRiverStateTest, PlayersSetToNoneInPostRiver)
 
     initializeHandWithPlayers(2, gameData);
 
-    auto playerSb = getPlayerById(myActingPlayersList, 0);
-    auto playerBb = getPlayerById(myActingPlayersList, 1);
+    auto playerSb = getPlayerById(m_actingPlayersList, 0);
+    auto playerBb = getPlayerById(m_actingPlayersList, 1);
 
     // Set players to different actions initially
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 100});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 100});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, PostRiver);
+    EXPECT_EQ(m_lastGameState, PostRiver);
 
     // Verify all players are set to ActionType::None
     EXPECT_EQ(playerSb->getLastAction().type, ActionType::None);
@@ -414,8 +414,8 @@ TEST_F(PostRiverStateTest, PotClearedAfterDistribution)
 
     initializeHandWithPlayers(2, gameData);
 
-    auto playerSb = getPlayerById(myActingPlayersList, 0);
-    auto playerBb = getPlayerById(myActingPlayersList, 1);
+    auto playerSb = getPlayerById(m_actingPlayersList, 0);
+    auto playerBb = getPlayerById(m_actingPlayersList, 1);
 
     // Set hand rankings to ensure deterministic winner
     playerSb->setHandRanking(1000); // Loser
@@ -426,23 +426,23 @@ TEST_F(PostRiverStateTest, PotClearedAfterDistribution)
     int initialCashBb = playerBb->getCashAtHandStart();
 
     // Create a substantial pot
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 300});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 300});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, PostRiver);
+    EXPECT_EQ(m_lastGameState, PostRiver);
 
     // After PostRiver state is complete:
     // 1. Pot should be 0 (cleared after distribution)
-    EXPECT_EQ(myHand->getBoard().getPot(*myHand), 0);
+    EXPECT_EQ(m_hand->getBoard().getPot(*m_hand), 0);
 
     // 2. Sets should be 0 (cleared after collection)
-    EXPECT_EQ(myHand->getBoard().getSets(*myHand), 0);
+    EXPECT_EQ(m_hand->getBoard().getSets(*m_hand), 0);
 
     // 3. Money should have been properly distributed to winner
     // Let's calculate the net change for each player (more robust than absolute values)
@@ -468,8 +468,8 @@ TEST_F(PostRiverStateTest, EmptyPotShowdown)
 
     initializeHandWithPlayers(2, gameData);
 
-    auto playerSb = getPlayerById(myActingPlayersList, 0);
-    auto playerBb = getPlayerById(myActingPlayersList, 1);
+    auto playerSb = getPlayerById(m_actingPlayersList, 0);
+    auto playerBb = getPlayerById(m_actingPlayersList, 1);
 
     // Set hand rankings
     playerSb->setHandRanking(1000);
@@ -480,19 +480,19 @@ TEST_F(PostRiverStateTest, EmptyPotShowdown)
     int initialCashBb = gameData.startMoney; // 1000
 
     // Both players check through all streets (no betting)
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, PostRiver);
+    EXPECT_EQ(m_lastGameState, PostRiver);
 
     // Verify winner is still determined even with no side pot
-    auto winners = myHand->getBoard().getWinners();
+    auto winners = m_hand->getBoard().getWinners();
     EXPECT_TRUE(std::find(winners.begin(), winners.end(), playerBb->getId()) != winners.end());
 
     // Verify no money changes hands except blinds - SB lost 20, BB won 20 (net effect)

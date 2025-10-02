@@ -7,28 +7,28 @@
 namespace pkt::core
 {
 
-BotServices::BotServices(std::shared_ptr<ServiceContainer> baseContainer) : myBaseContainer(baseContainer)
+BotServices::BotServices(std::shared_ptr<ServiceContainer> baseContainer) : m_baseContainer(baseContainer)
 {
 }
 
 Logger& BotServices::logger()
 {
-    return myBaseContainer->logger();
+    return m_baseContainer->logger();
 }
 
 PlayersStatisticsStore& BotServices::playersStatisticsStore()
 {
-    return myBaseContainer->playersStatisticsStore();
+    return m_baseContainer->playersStatisticsStore();
 }
 
 HandEvaluationEngine& BotServices::handEvaluationEngine()
 {
-    return myBaseContainer->handEvaluationEngine();
+    return m_baseContainer->handEvaluationEngine();
 }
 
 Randomizer& BotServices::randomizer()
 {
-    return myBaseContainer->randomizer();
+    return m_baseContainer->randomizer();
 }
 
 } // namespace pkt::core

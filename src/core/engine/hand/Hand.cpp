@@ -24,16 +24,16 @@ using namespace pkt::core::player;
 
 Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<Board> board,
            PlayerList seats, PlayerList actingPlayers, GameData gameData, StartData startData)
-    : HandPlayersState(seats, actingPlayers), myEvents(events), myFactory(factory), myBoard(board), myServices(nullptr),
-      myDeckManager(std::make_unique<DeckManager>()), myActionValidator(std::make_unique<ActionValidator>()),
-      myStartQuantityPlayers(startData.numberOfPlayers), mySmallBlind(gameData.firstSmallBlind),
-      myStartCash(gameData.startMoney)
+    : HandPlayersState(seats, actingPlayers), m_events(events), m_factory(factory), m_board(board), m_services(nullptr),
+      m_deckManager(std::make_unique<DeckManager>()), m_actionValidator(std::make_unique<ActionValidator>()),
+      m_startQuantityPlayers(startData.numberOfPlayers), m_smallBlind(gameData.firstSmallBlind),
+      m_startCash(gameData.startMoney)
 {
-    mySeatsList = seats;
-    myActingPlayersList = actingPlayers;
-    myDealerPlayerId = startData.startDealerPlayerId;
-    mySmallBlindPlayerId = startData.startDealerPlayerId;
-    myBigBlindPlayerId = startData.startDealerPlayerId;
+    m_seatsList = seats;
+    m_actingPlayersList = actingPlayers;
+    m_dealerPlayerId = startData.startDealerPlayerId;
+    m_smallBlindPlayerId = startData.startDealerPlayerId;
+    m_bigBlindPlayerId = startData.startDealerPlayerId;
 
     // Create InvalidActionHandler with callbacks
     auto errorProvider = [this](const PlayerAction& action) -> std::string { return getActionValidationError(action); };
@@ -42,40 +42,40 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
 Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<Board> board,
            PlayerList seats, PlayerList actingPlayers, GameData gameData, StartData startData,
            std::shared_ptr<PokerServices> services)
-    : HandPlayersState(seats, actingPlayers), myEvents(events), myFactory(factory), myBoard(board),
-      myServices(services), myDeckManager(std::make_unique<DeckManager>()),
-      myActionValidator(std::make_unique<ActionValidator>()), myStartQuantityPlayers(startData.numberOfPlayers),
-      mySmallBlind(gameData.firstSmallBlind), myStartCash(gameData.startMoney)
+    : HandPlayersState(seats, actingPlayers), m_events(events), m_factory(factory), m_board(board),
+      m_services(services), m_deckManager(std::make_unique<DeckManager>()),
+      m_actionValidator(std::make_unique<ActionValidator>()), m_startQuantityPlayers(startData.numberOfPlayers),
+      m_smallBlind(gameData.firstSmallBlind), m_startCash(gameData.startMoney)
 {
-    mySeatsList = seats;
-    myActingPlayersList = actingPlayers;
-    myDealerPlayerId = startData.startDealerPlayerId;
-    mySmallBlindPlayerId = startData.startDealerPlayerId;
-    myBigBlindPlayerId = startData.startDealerPlayerId;
+    m_seatsList = seats;
+    m_actingPlayersList = actingPlayers;
+    m_dealerPlayerId = startData.startDealerPlayerId;
+    m_smallBlindPlayerId = startData.startDealerPlayerId;
+    m_bigBlindPlayerId = startData.startDealerPlayerId;
 
     // Create InvalidActionHandler with callbacks
     auto errorProvider = [this](const PlayerAction& action) -> std::string { return getActionValidationError(action); };
 
     auto autoFoldCallback = [this](unsigned playerId) { handleAutoFold(playerId); };
 
-    myInvalidActionHandler = std::make_unique<InvalidActionHandler>(myEvents, errorProvider, autoFoldCallback);
+    m_invalidActionHandler = std::make_unique<InvalidActionHandler>(m_events, errorProvider, autoFoldCallback);
 
     // Create HandStateManager with error callback for game loop issues
     auto gameLoopErrorCallback = [this](const std::string& error)
     {
-        if (myEvents.onEngineError)
+        if (m_events.onEngineError)
         {
-            myEvents.onEngineError(error);
+            m_events.onEngineError(error);
         }
     };
-    myStateManager = std::make_unique<HandStateManager>(myEvents, mySmallBlind, startData.startDealerPlayerId,
+    m_stateManager = std::make_unique<HandStateManager>(m_events, m_smallBlind, startData.startDealerPlayerId,
                                                         gameLoopErrorCallback);
 
-    if (mySmallBlind <= 0)
+    if (m_smallBlind <= 0)
     {
         throw std::invalid_argument("Hand: smallBlind must be > 0");
     }
-    if (myDealerPlayerId == static_cast<unsigned>(-1))
+    if (m_dealerPlayerId == static_cast<unsigned>(-1))
     {
         throw std::invalid_argument("Hand: dealerPlayerId is invalid");
     }
@@ -89,17 +89,17 @@ Hand::~Hand() = default;
 
 void Hand::ensureServicesInitialized() const
 {
-    if (!myServices)
+    if (!m_services)
     {
         auto baseContainer = std::make_shared<AppServiceContainer>();
-        myServices = std::make_shared<PokerServices>(baseContainer);
+        m_services = std::make_shared<PokerServices>(baseContainer);
     }
 }
 
 void Hand::initialize()
 {
     ensureServicesInitialized();
-    myServices->logger().info("\n----------------------  New hand ----------------------------\n");
+    m_services->logger().info("\n----------------------  New hand ----------------------------\n");
 
     // Initialize deck but don't deal cards yet - wait until runGameLoop() to match legacy timing
     initAndShuffleDeck();
@@ -107,20 +107,20 @@ void Hand::initialize()
     // Remove players with insufficient cash before dealing cards
     filterPlayersWithInsufficientCash();
 
-    for (auto player = mySeatsList->begin(); player != mySeatsList->end(); ++player)
+    for (auto player = m_seatsList->begin(); player != m_seatsList->end(); ++player)
     {
         (*player)->resetForNewHand(*this);
     }
 
     getBettingActions()->getPreflop().setLastRaiser(nullptr);
 
-    myStateManager->initializeState(*this);
+    m_stateManager->initializeState(*this);
 }
 
 void Hand::end()
 {
     ensureServicesInitialized();
-    myServices->playersStatisticsStore().savePlayersStatistics(mySeatsList);
+    m_services->playersStatisticsStore().savePlayersStatistics(m_seatsList);
 }
 
 void Hand::runGameLoop()
@@ -129,7 +129,7 @@ void Hand::runGameLoop()
     dealHoleCards(0); // Pass 0 as index, since no board cards dealt yet
 
     // Delegate game loop management to HandStateManager
-    myStateManager->runGameLoop(*this);
+    m_stateManager->runGameLoop(*this);
 }
 
 void Hand::handlePlayerAction(PlayerAction action)
@@ -139,7 +139,7 @@ void Hand::handlePlayerAction(PlayerAction action)
     // If there's no processor, it means the game state doesn't accept actions
     if (!processor || !processor->isActionAllowed(*this, action))
     {
-        myInvalidActionHandler->handleInvalidAction(action);
+        m_invalidActionHandler->handleInvalidAction(action);
         return;
     }
 
@@ -147,21 +147,21 @@ void Hand::handlePlayerAction(PlayerAction action)
 }
 void Hand::initAndShuffleDeck()
 {
-    myDeckManager->initializeAndShuffle();
+    m_deckManager->initializeAndShuffle();
 }
 
 void Hand::dealHoleCards(size_t cardsArrayIndex)
 {
     // Validate that there are enough cards in the deck
-    if (!myDeckManager->hasEnoughCards(0, myActingPlayersList->size())) // Use acting players list size
+    if (!m_deckManager->hasEnoughCards(0, m_actingPlayersList->size())) // Use acting players list size
     {
         throw std::runtime_error("Not enough cards in the deck to deal hole cards to all players.");
     }
 
-    for (auto it = myActingPlayersList->begin(); it != myActingPlayersList->end(); ++it)
+    for (auto it = m_actingPlayersList->begin(); it != m_actingPlayersList->end(); ++it)
     {
         // Deal 2 hole cards for this player
-        std::vector<Card> holeCardList = myDeckManager->dealCards(2);
+        std::vector<Card> holeCardList = m_deckManager->dealCards(2);
 
         // Create HoleCards from the dealt cards
         HoleCards holeCards(holeCardList[0], holeCardList[1]);
@@ -169,28 +169,28 @@ void Hand::dealHoleCards(size_t cardsArrayIndex)
         (*it)->setHoleCards(holeCards);
 
         // Fire event for UI to know hole cards were dealt
-        if (myEvents.onHoleCardsDealt)
+        if (m_events.onHoleCardsDealt)
         {
-            myEvents.onHoleCardsDealt((*it)->getId(), holeCards);
+            m_events.onHoleCardsDealt((*it)->getId(), holeCards);
         }
 
         // Build evaluator string with correct ordering: HOLE cards first, then current BOARD cards.
         // Avoid including invalid board placeholders at preflop to prevent identical ranks.
-        BoardCards boardCards = myBoard->getBoardCards();
+        BoardCards boardCards = m_board->getBoardCards();
         std::string humanReadableHand = holeCardList[0].toString() + std::string(" ") + holeCardList[1].toString();
         if (boardCards.getNumCards() > 0)
         {
             humanReadableHand += std::string(" ") + boardCards.toString();
         }
         // Prefer using existing services to avoid creating a new container inside HandEvaluator
-        (*it)->setHandRanking(HandEvaluator::evaluateHand(humanReadableHand.c_str(), myServices));
+        (*it)->setHandRanking(HandEvaluator::evaluateHand(humanReadableHand.c_str(), m_services));
     }
 }
 
 size_t Hand::dealBoardCards()
 {
     // Deal 5 cards for the board (flop, turn, river)
-    std::vector<Card> boardCardList = myDeckManager->dealCards(5);
+    std::vector<Card> boardCardList = m_deckManager->dealCards(5);
 
     // Create BoardCards and progressively deal them
     BoardCards boardCards;
@@ -204,23 +204,23 @@ size_t Hand::dealBoardCards()
     // Deal river (5th card)
     boardCards.dealRiver(boardCardList[4]);
 
-    myBoard->setBoardCards(boardCards);
+    m_board->setBoardCards(boardCards);
 
     return 5; // Number of cards dealt
 }
 
 std::vector<Card> Hand::dealCardsFromDeck(int numCards)
 {
-    return myDeckManager->dealCards(numCards);
+    return m_deckManager->dealCards(numCards);
 }
 
 HandCommonContext Hand::updateHandCommonContext()
 {
     // general (and shared) game state
     HandCommonContext handContext;
-    handContext.gameState = myStateManager->getGameState();
+    handContext.gameState = m_stateManager->getGameState();
     handContext.stringBoard = getStringBoard();
-    handContext.smallBlind = mySmallBlind;
+    handContext.smallBlind = m_smallBlind;
 
     handContext.playersContext.actingPlayersList = getActingPlayersList();
     
@@ -229,17 +229,17 @@ HandCommonContext Hand::updateHandCommonContext()
     handContext.playersContext.lastVPIPPlayer = 
         (lastVPIPPlayerId != -1) ? getPlayerById(getSeatsList(), lastVPIPPlayerId) : nullptr;
         
-    handContext.playersContext.callersPositions = myBettingActions->getCallersPositions();
-    handContext.playersContext.raisersPositions = myBettingActions->getRaisersPositions();
+    handContext.playersContext.callersPositions = m_bettingActions->getCallersPositions();
+    handContext.playersContext.raisersPositions = m_bettingActions->getRaisersPositions();
     
     // Directly assign last raiser pointers - they're already validated by the BettingRoundActions
     handContext.playersContext.preflopLastRaiser = getBettingActions()->getPreflop().getLastRaiser();
     handContext.playersContext.flopLastRaiser = getBettingActions()->getFlop().getLastRaiser();
     handContext.playersContext.turnLastRaiser = getBettingActions()->getTurn().getLastRaiser();
 
-    handContext.bettingContext.pot = myBoard->getPot(*this);
+    handContext.bettingContext.pot = m_board->getPot(*this);
     // handContext.bettingContext.potOdd = getPotOdd();
-    handContext.bettingContext.sets = myBoard->getSets(*this);
+    handContext.bettingContext.sets = m_board->getSets(*this);
     handContext.bettingContext.highestBetAmount = getBettingActions()->getRoundHighestSet();
     handContext.bettingContext.preflopRaisesNumber = getBettingActions()->getPreflop().getRaisesNumber();
     handContext.bettingContext.preflopCallsNumber = getBettingActions()->getPreflop().getCallsNumber();
@@ -253,7 +253,7 @@ HandCommonContext Hand::updateHandCommonContext()
 }
 float Hand::getM(int cash) const
 {
-    int blinds = mySmallBlind + (mySmallBlind * 2);
+    int blinds = m_smallBlind + (m_smallBlind * 2);
     if (blinds > 0 && cash > 0)
     {
         return (float) cash / blinds;
@@ -265,7 +265,7 @@ float Hand::getM(int cash) const
 }
 std::string Hand::getStringBoard() const
 {
-    const BoardCards& boardCards = myBoard->getBoardCards();
+    const BoardCards& boardCards = m_board->getBoardCards();
 
     // Use modern BoardCards toString but adjust for legacy format compatibility
     std::string boardString = boardCards.toString();
@@ -283,20 +283,20 @@ int Hand::getPotOdd(const int playerCash, const int playerSet) const
 {
     const int highestBetAmount = min(playerCash, getBettingActions()->getRoundHighestSet());
 
-    int pot = myBoard->getPot(*this) + myBoard->getSets(*this);
+    int pot = m_board->getPot(*this) + m_board->getSets(*this);
 
     if (pot == 0)
     { // shouldn't happen, but...
         ensureServicesInitialized();
-        myServices->logger().error("Pot = " + std::to_string(myBoard->getPot(*this)) + " + " +
-                                   std::to_string(myBoard->getSets(*this)) + " = " + std::to_string(pot));
+        m_services->logger().error("Pot = " + std::to_string(m_board->getPot(*this)) + " + " +
+                                   std::to_string(m_board->getSets(*this)) + " = " + std::to_string(pot));
         return 0;
     }
 
     int odd = (highestBetAmount - playerSet) * 100 / pot;
     if (odd < 0)
     {
-        odd = -odd; // happens if myTotalBetAmount > highestBetAmount
+        odd = -odd; // happens if m_totalBetAmount > highestBetAmount
     }
 
     return odd;
@@ -304,35 +304,35 @@ int Hand::getPotOdd(const int playerCash, const int playerSet) const
 
 HandActionProcessor* Hand::getActionProcessor() const
 {
-    return myStateManager->getActionProcessor();
+    return m_stateManager->getActionProcessor();
 }
 
 int Hand::getSmallBlind() const
 {
-    return mySmallBlind;
+    return m_smallBlind;
 }
 void Hand::fireOnPotUpdated() const
 {
-    if (myEvents.onPotUpdated)
+    if (m_events.onPotUpdated)
     {
-        myEvents.onPotUpdated(myBoard->getPot(*this));
+        m_events.onPotUpdated(m_board->getPot(*this));
     }
 }
 
 std::string Hand::getActionValidationError(const PlayerAction& action) const
 {
-    if (myStateManager->isTerminal())
+    if (m_stateManager->isTerminal())
     {
         return "Game state is terminal";
     }
 
-    auto* processor = myStateManager->getActionProcessor();
+    auto* processor = m_stateManager->getActionProcessor();
     if (!processor)
     {
         return "Current game state does not accept player actions";
     }
 
-    auto player = getPlayerById(myActingPlayersList, action.playerId);
+    auto player = getPlayerById(m_actingPlayersList, action.playerId);
     if (!player)
     {
         return "Player not found in active players list";
@@ -348,8 +348,8 @@ std::string Hand::getActionValidationError(const PlayerAction& action) const
     // Use the comprehensive ActionValidator with a detailed reason
     {
         std::string reason;
-        if (!myActionValidator->validatePlayerActionWithReason(myActingPlayersList, action, *getBettingActions(),
-                                                               mySmallBlind, myStateManager->getGameState(), reason))
+        if (!m_actionValidator->validatePlayerActionWithReason(m_actingPlayersList, action, *getBettingActions(),
+                                                               m_smallBlind, m_stateManager->getGameState(), reason))
         {
             return reason.empty() ? std::string("Action validation failed.") : reason;
         }
@@ -370,17 +370,17 @@ PlayerAction Hand::getDefaultActionForPlayer(unsigned playerId) const
 void Hand::handleAutoFold(unsigned playerId)
 {
     ensureServicesInitialized();
-    myServices->logger().error("Player " + std::to_string(playerId) +
+    m_services->logger().error("Player " + std::to_string(playerId) +
                                " exceeded maximum invalid actions, auto-folding");
 
     // If the game state is terminal, don't try to process any actions
-    if (myStateManager->isTerminal())
+    if (m_stateManager->isTerminal())
     {
-        myServices->logger().error("Cannot auto-fold player " + std::to_string(playerId) + " - game state is terminal");
+        m_services->logger().error("Cannot auto-fold player " + std::to_string(playerId) + " - game state is terminal");
 
-        if (myEvents.onEngineError)
+        if (m_events.onEngineError)
         {
-            myEvents.onEngineError("Player " + std::to_string(playerId) +
+            m_events.onEngineError("Player " + std::to_string(playerId) +
                                    " attempted action in terminal state - no auto-fold processed");
         }
         return;
@@ -389,9 +389,9 @@ void Hand::handleAutoFold(unsigned playerId)
     // Create a fold action as default
     PlayerAction autoFoldAction = getDefaultActionForPlayer(playerId);
 
-    if (myEvents.onEngineError)
+    if (m_events.onEngineError)
     {
-        myEvents.onEngineError("Player " + std::to_string(playerId) + " auto-folded due to repeated invalid actions");
+        m_events.onEngineError("Player " + std::to_string(playerId) + " auto-folded due to repeated invalid actions");
     }
 
     // Recursively call with the auto-fold action
@@ -403,22 +403,22 @@ void Hand::processValidAction(const PlayerAction& action)
     try
     {
         // Reset invalid action count on successful action
-        myInvalidActionHandler->resetInvalidActionCount(action.playerId);
+        m_invalidActionHandler->resetInvalidActionCount(action.playerId);
 
         ActionApplier::apply(*this, action);
 
         // Delegate state transition to HandStateManager
-        myStateManager->transitionToNextState(*this);
+        m_stateManager->transitionToNextState(*this);
     }
     catch (const std::exception& e)
     {
-        if (myEvents.onEngineError)
+        if (m_events.onEngineError)
         {
-            myEvents.onEngineError("Error processing player action: " + std::string(e.what()));
+            m_events.onEngineError("Error processing player action: " + std::string(e.what()));
         }
 
         ensureServicesInitialized();
-        myServices->logger().error("Error in handlePlayerAction: " + std::string(e.what()));
+        m_services->logger().error("Error in handlePlayerAction: " + std::string(e.what()));
 
         // Re-throw critical errors
         throw;
@@ -431,15 +431,15 @@ void Hand::filterPlayersWithInsufficientCash()
     
     // Remove players from acting players list who cannot afford minimum participation
     // Cards will only be dealt to players in the acting list, so this is sufficient
-    auto it = myActingPlayersList->begin();
-    while (it != myActingPlayersList->end())
+    auto it = m_actingPlayersList->begin();
+    while (it != m_actingPlayersList->end())
     {
         const int playerCash = (*it)->getCash();
         
         // Players with zero cash cannot participate at all
         if (playerCash <= 0)
         {
-            myServices->logger().info("Player " + (*it)->getName() + " (ID: " + 
+            m_services->logger().info("Player " + (*it)->getName() + " (ID: " + 
                 std::to_string((*it)->getId()) + ") auto-folded due to insufficient cash: " + 
                 std::to_string(playerCash));
             
@@ -450,12 +450,12 @@ void Hand::filterPlayersWithInsufficientCash()
             autoFoldAction.amount = 0;
             
             // Fire the player action event to notify UI that this player folded
-            if (myEvents.onPlayerActed)
+            if (m_events.onPlayerActed)
             {
-                myEvents.onPlayerActed(autoFoldAction);
+                m_events.onPlayerActed(autoFoldAction);
             }
                 
-            it = myActingPlayersList->erase(it);
+            it = m_actingPlayersList->erase(it);
         }
         else
         {
@@ -464,7 +464,7 @@ void Hand::filterPlayersWithInsufficientCash()
     }
     
     // Log the number of players remaining for the hand
-    myServices->logger().debug("Hand will proceed with " + std::to_string(myActingPlayersList->size()) + " players");
+    m_services->logger().debug("Hand will proceed with " + std::to_string(m_actingPlayersList->size()) + " players");
 }
 
 } // namespace pkt::core

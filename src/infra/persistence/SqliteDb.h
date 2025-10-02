@@ -22,7 +22,7 @@ class SqliteDb
     std::unique_ptr<SqliteStatement> prepare(const std::string& sql);
 
   private:
-    sqlite3* myDb{nullptr};
+    sqlite3* m_db{nullptr};
 };
 
 } // namespace pkt::infra

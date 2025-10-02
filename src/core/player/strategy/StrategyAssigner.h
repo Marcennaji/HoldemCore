@@ -15,12 +15,12 @@ class StrategyAssigner
     std::unique_ptr<BotStrategy> chooseBotStrategyFor(int botIndex);
 
   private:
-    TableProfile myProfile;
-    int myCountManiac = 0;
-    int myCountLoose = 0;
-    int myCountTight = 0;
-    int myCountUltraTight = 0;
-    int myMaxPerType;
+    TableProfile m_profile;
+    int m_countManiac = 0;
+    int m_countLoose = 0;
+    int m_countTight = 0;
+    int m_countUltraTight = 0;
+    int m_maxPerType;
 };
 
 } // namespace pkt::core::player

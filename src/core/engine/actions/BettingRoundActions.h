@@ -28,11 +28,11 @@ class BettingRoundActions
     void setLastRaiser(std::shared_ptr<pkt::core::player::Player> player);
 
   protected:
-    GameState myGameState;
-    std::shared_ptr<pkt::core::player::Player> myLastRaiser = nullptr;
+    GameState m_gameState;
+    std::shared_ptr<pkt::core::player::Player> m_lastRaiser = nullptr;
 
-    const pkt::core::player::PlayerList& mySeatsList;
-    const pkt::core::player::PlayerList& myActingPlayersList;
+    const pkt::core::player::PlayerList& m_seatsList;
+    const pkt::core::player::PlayerList& m_actingPlayersList;
 };
 
 } // namespace pkt::core

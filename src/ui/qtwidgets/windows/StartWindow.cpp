@@ -18,14 +18,14 @@ namespace pkt::ui::qtwidgets
 {
 
 StartWindow::StartWindow(PokerTableWindow* tableWindow, Session* session, QWidget* parent)
-    : QMainWindow(parent), myPokerTableWindow(tableWindow), mySession(session)
+    : QMainWindow(parent), m_pokerTableWindow(tableWindow), m_session(session)
 {
     setWindowTitle(QString(tr("HoldemCore %1").arg(HOLDEM_CORE__BETA_RELEASE_STRING)));
     setStatusBar(nullptr);
     setFixedSize(520, 400);
     
     // Ensure table window starts hidden until a game is started
-    if (myPokerTableWindow) myPokerTableWindow->hide();
+    if (m_pokerTableWindow) m_pokerTableWindow->hide();
 
     createInterface();
     applyConsistentStyling();
@@ -33,8 +33,8 @@ StartWindow::StartWindow(PokerTableWindow* tableWindow, Session* session, QWidge
     connect(m_startGameButton, &QPushButton::clicked, this, &StartWindow::startNewGame);
 
     // When the table window is closed, return to StartWindow
-    if (myPokerTableWindow) {
-        connect(myPokerTableWindow, &PokerTableWindow::windowClosed, this, [this]() {
+    if (m_pokerTableWindow) {
+        connect(m_pokerTableWindow, &PokerTableWindow::windowClosed, this, [this]() {
             this->show();
         });
     }
@@ -43,14 +43,14 @@ StartWindow::StartWindow(PokerTableWindow* tableWindow, Session* session, QWidge
 
 StartWindow::StartWindow(PokerTableWindow* tableWindow, Session* session,
                          std::shared_ptr<pkt::core::ServiceContainer> services, QWidget* parent)
-    : QMainWindow(parent), myPokerTableWindow(tableWindow), mySession(session), myServices(std::move(services))
+    : QMainWindow(parent), m_pokerTableWindow(tableWindow), m_session(session), m_services(std::move(services))
 {
     setWindowTitle(QString(tr("HoldemCore %1").arg(HOLDEM_CORE__BETA_RELEASE_STRING)));
     setStatusBar(nullptr);
     setFixedSize(520, 400);
     
     // Ensure table window starts hidden until a game is started
-    if (myPokerTableWindow) myPokerTableWindow->hide();
+    if (m_pokerTableWindow) m_pokerTableWindow->hide();
 
     createInterface();
     applyConsistentStyling();
@@ -58,8 +58,8 @@ StartWindow::StartWindow(PokerTableWindow* tableWindow, Session* session,
     connect(m_startGameButton, &QPushButton::clicked, this, &StartWindow::startNewGame);
 
     // When the table window is closed, return to StartWindow
-    if (myPokerTableWindow) {
-        connect(myPokerTableWindow, &PokerTableWindow::windowClosed, this, [this]() {
+    if (m_pokerTableWindow) {
+        connect(m_pokerTableWindow, &PokerTableWindow::windowClosed, this, [this]() {
             this->show();
         });
     }
@@ -349,9 +349,9 @@ void StartWindow::applyConsistentStyling()
 
 void StartWindow::ensureServicesInitialized()
 {
-    if (!myServices)
+    if (!m_services)
     {
-        myServices = std::make_shared<pkt::core::AppServiceContainer>();
+        m_services = std::make_shared<pkt::core::AppServiceContainer>();
     }
 }
 
@@ -383,18 +383,18 @@ void StartWindow::startNewGame()
     startData.numberOfPlayers = gameData.maxNumberOfPlayers;
 
     ensureServicesInitialized();
-    myServices->randomizer().getRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
+    m_services->randomizer().getRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
     startData.startDealerPlayerId = static_cast<unsigned>(tmpDealerPos);
 
     // Initialize PokerTableWindow with the GameData BEFORE showing it
-    if (myPokerTableWindow) {
-        myPokerTableWindow->initializeWithGameData(gameData);
-        myPokerTableWindow->show();
-        myPokerTableWindow->raise();
-        myPokerTableWindow->activateWindow();
+    if (m_pokerTableWindow) {
+        m_pokerTableWindow->initializeWithGameData(gameData);
+        m_pokerTableWindow->show();
+        m_pokerTableWindow->raise();
+        m_pokerTableWindow->activateWindow();
     }
 
-    mySession->startGame(gameData, startData);
+    m_session->startGame(gameData, startData);
 }
 
 bool StartWindow::eventFilter(QObject* obj, QEvent* event)

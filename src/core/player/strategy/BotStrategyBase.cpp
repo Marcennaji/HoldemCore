@@ -18,25 +18,25 @@ BotStrategyBase::BotStrategyBase()
     // Default constructor - services will be initialized lazily
 }
 
-BotStrategyBase::BotStrategyBase(std::shared_ptr<pkt::core::ServiceContainer> services) : myServices(services)
+BotStrategyBase::BotStrategyBase(std::shared_ptr<pkt::core::ServiceContainer> services) : m_services(services)
 {
     // Constructor with services injection
     // Also ensure our PreflopRangeCalculator uses the same injected services
-    if (myServices && myPreflopRangeCalculator)
+    if (m_services && m_preflopRangeCalculator)
     {
         // Replace the default-constructed calculator with one bound to injected services
-        myPreflopRangeCalculator = std::make_unique<PreflopRangeCalculator>(myServices);
+        m_preflopRangeCalculator = std::make_unique<PreflopRangeCalculator>(m_services);
     }
 }
 
 void BotStrategyBase::ensureServicesInitialized() const
 {
-    if (!myServices)
+    if (!m_services)
     {
         // Use a shared default container to avoid repeated allocations and to keep a consistent default
         static std::shared_ptr<pkt::core::ServiceContainer> defaultServices =
             std::make_shared<pkt::core::AppServiceContainer>();
-        myServices = defaultServices;
+        m_services = defaultServices;
     }
 }
 
@@ -262,7 +262,7 @@ bool BotStrategyBase::shouldPotControlOnTurn(const CurrentHandContext& ctx, int 
 void BotStrategyBase::logPotControl() const
 {
     ensureServicesInitialized();
-    myServices->logger().verbose("\t\tShould control pot");
+    m_services->logger().verbose("\t\tShould control pot");
 }
 
 int BotStrategyBase::computePreflopRaiseAmount(const CurrentHandContext& ctx)
@@ -368,7 +368,7 @@ bool BotStrategyBase::isPossibleToBluff(const CurrentHandContext& ctx) const
     if (players == nullptr)
     {
         ensureServicesInitialized();
-        myServices->logger().info("BotStrategyBase::isPossibleToBluff() is not compatible with legacy (non FSM) code");
+        m_services->logger().info("BotStrategyBase::isPossibleToBluff() is not compatible with legacy (non FSM) code");
         return false; // TODO remove this after FSM migration is complete
     }
 

@@ -18,7 +18,7 @@ class DefaultPlayerFactory : public IPlayerFactory
     std::shared_ptr<Player> createPlayer(int id, TableProfile profile, int startMoney) override;
 
   private:
-    const GameEvents& myEvents;
-    StrategyAssigner* myStrategyAssigner;
+    const GameEvents& m_events;
+    StrategyAssigner* m_strategyAssigner;
 };
 } // namespace pkt::core::player

@@ -20,17 +20,17 @@ namespace pkt::test
 
 void EngineTest::SetUp()
 {
-    myServices = std::make_shared<pkt::core::AppServiceContainer>();
+    m_services = std::make_shared<pkt::core::AppServiceContainer>();
     auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
     logger->setLogLevel(pkt::core::LogLevel::Info);
-    myServices->setLogger(std::move(logger));
-    myServices->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>());
+    m_services->setLogger(std::move(logger));
+    m_services->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>());
     auto randomizer = std::make_unique<FakeRandomizer>();
     randomizer->values = {3, 5, 7};
-    myServices->setRandomizer(std::move(randomizer));
+    m_services->setRandomizer(std::move(randomizer));
 
-    auto pokerServices = std::make_shared<pkt::core::PokerServices>(myServices);
-    myFactory = std::make_unique<EngineFactory>(myEvents, pokerServices);
+    auto pokerServices = std::make_shared<pkt::core::PokerServices>(m_services);
+    m_factory = std::make_unique<EngineFactory>(m_events, pokerServices);
 
     gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
     gameData.startMoney = 1000;
@@ -44,44 +44,44 @@ void EngineTest::TearDown()
 
 void EngineTest::createPlayersLists(size_t playerCount)
 {
-    mySeatsList = std::make_shared<std::list<std::shared_ptr<Player>>>();
+    m_seatsList = std::make_shared<std::list<std::shared_ptr<Player>>>();
     for (size_t i = 0; i < playerCount; ++i)
     {
-        auto player = std::make_shared<DummyPlayer>(i, myEvents);
-        mySeatsList->push_back(player);
+        auto player = std::make_shared<DummyPlayer>(i, m_events);
+        m_seatsList->push_back(player);
     }
 
-    myActingPlayersList = std::make_shared<std::list<std::shared_ptr<Player>>>();
-    for (const auto& player : *mySeatsList)
+    m_actingPlayersList = std::make_shared<std::list<std::shared_ptr<Player>>>();
+    for (const auto& player : *m_seatsList)
     {
-        myActingPlayersList->push_back(player);
+        m_actingPlayersList->push_back(player);
     }
 }
 void EngineTest::initializeHandWithPlayers(size_t activePlayerCount, GameData gameData)
 {
     createPlayersLists(activePlayerCount);
-    myBoard = myFactory->createBoard(startDealerPlayerId);
-    myBoard->setSeatsList(mySeatsList);
-    myBoard->setActingPlayersList(myActingPlayersList);
+    m_board = m_factory->createBoard(startDealerPlayerId);
+    m_board->setSeatsList(m_seatsList);
+    m_board->setActingPlayersList(m_actingPlayersList);
 
     StartData startData;
     startData.startDealerPlayerId = startDealerPlayerId;
     startData.numberOfPlayers = static_cast<int>(activePlayerCount);
 
-    myHand = myFactory->createHand(myFactory, myBoard, mySeatsList, myActingPlayersList, gameData, startData);
+    m_hand = m_factory->createHand(m_factory, m_board, m_seatsList, m_actingPlayersList, gameData, startData);
 
-    myHand->initialize();
+    m_hand->initialize();
 }
 void EngineTest::checkPostRiverConditions()
 {
 
-    EXPECT_EQ(myHand->getGameState(), PostRiver);
-    EXPECT_EQ(myHand->getBoard().getPot(*myHand), 0); // Pot should be reset to 0
+    EXPECT_EQ(m_hand->getGameState(), PostRiver);
+    EXPECT_EQ(m_hand->getBoard().getPot(*m_hand), 0); // Pot should be reset to 0
 }
 
 bool EngineTest::isPlayerStillActive(unsigned id) const
 {
-    for (const auto& p : *myHand->getActingPlayersList())
+    for (const auto& p : *m_hand->getActingPlayersList())
     {
         if (p->getId() == id)
             return true;
@@ -91,12 +91,12 @@ bool EngineTest::isPlayerStillActive(unsigned id) const
 
 pkt::core::Logger& EngineTest::getLogger() const
 {
-    return myServices->logger();
+    return m_services->logger();
 }
 
 std::shared_ptr<pkt::core::ServiceContainer> EngineTest::getServices() const
 {
-    return myServices;
+    return m_services;
 }
 
 } // namespace pkt::test

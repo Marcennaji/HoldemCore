@@ -32,9 +32,9 @@ class PlayerStatisticsUpdater
     void updateFlopStatistics(const CurrentHandContext& ctx);
     void updateTurnStatistics(const CurrentHandContext& ctx);
     void updateRiverStatistics(const CurrentHandContext& ctx);
-    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices; // Injected service container
+    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services; // Injected service container
 
-    std::array<pkt::core::player::PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> myStatistics;
+    std::array<pkt::core::player::PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> m_statistics;
 };
 
 } // namespace pkt::core::player

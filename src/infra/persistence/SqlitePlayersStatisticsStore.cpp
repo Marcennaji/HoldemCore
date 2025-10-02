@@ -12,15 +12,15 @@ namespace pkt::infra
 using namespace pkt::core;
 using namespace pkt::core::player;
 
-SqlitePlayersStatisticsStore::SqlitePlayersStatisticsStore(std::unique_ptr<SqliteDb> db) : myDb(std::move(db))
+SqlitePlayersStatisticsStore::SqlitePlayersStatisticsStore(std::unique_ptr<SqliteDb> db) : m_db(std::move(db))
 {
-    if (!myDb)
+    if (!m_db)
     {
         throw std::invalid_argument("SqlitePlayersStatisticsStore requires a valid SqliteDb");
     }
 
     // Ensure schema exists
-    myDb->exec(R"SQL(
+    m_db->exec(R"SQL(
         CREATE TABLE IF NOT EXISTS PlayersStatistics (
             strategy_name TEXT NOT NULL,
             nb_players INTEGER NOT NULL,
@@ -74,7 +74,7 @@ SqlitePlayersStatisticsStore::~SqlitePlayersStatisticsStore() = default;
 void SqlitePlayersStatisticsStore::initializeStrategyStatistics(const std::string& playerName, const int nbPlayers)
 {
     // Insert if not exists
-    auto stmt = myDb->prepare("INSERT OR IGNORE INTO PlayersStatistics("
+    auto stmt = m_db->prepare("INSERT OR IGNORE INTO PlayersStatistics("
                               "strategy_name, nb_players,"
                               "pf_hands,pf_checks,pf_calls,pf_raises,pf_threeBets,pf_callthreeBets,pf_"
                               "callthreeBetsOpportunities,pf_fourBets,pf_folds,pf_limps,"
@@ -107,7 +107,7 @@ void SqlitePlayersStatisticsStore::savePlayersStatistics(PlayerList seatsList)
 
         initializeStrategyStatistics(player->getName(), nbPlayers);
 
-        auto stmt = myDb->prepare(
+        auto stmt = m_db->prepare(
             "UPDATE PlayersStatistics SET "
             "pf_hands=?3,pf_checks=?4,pf_calls=?5,pf_raises=?6,pf_threeBets=?7,pf_callthreeBets=?8,"
             "pf_callthreeBetsOpportunities=?9,pf_fourBets=?10,pf_folds=?11,pf_limps=?12,"
@@ -178,7 +178,7 @@ SqlitePlayersStatisticsStore::loadPlayerStatistics(const std::string& playerName
 
     std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> results{};
 
-    auto stmt = myDb->prepare("SELECT nb_players,"
+    auto stmt = m_db->prepare("SELECT nb_players,"
                               "pf_hands,pf_checks,pf_calls,pf_raises,pf_threeBets,pf_callthreeBets,pf_"
                               "callthreeBetsOpportunities,pf_fourBets,pf_folds,pf_limps,"
                               "f_hands,f_checks,f_bets,f_calls,f_raises,f_threeBets,f_fourBets,f_folds,f_"

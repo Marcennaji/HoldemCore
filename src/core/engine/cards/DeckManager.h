@@ -26,7 +26,7 @@ class DeckManager
     void resetDealPosition();
 
   private:
-    Deck myDeck;
+    Deck m_deck;
 };
 
 } // namespace pkt::core

@@ -10,29 +10,29 @@ namespace pkt::core
 {
 using namespace pkt::core::player;
 
-PostRiverState::PostRiverState(const GameEvents& events) : myEvents(events)
+PostRiverState::PostRiverState(const GameEvents& events) : m_events(events)
 {
 }
 
 PostRiverState::PostRiverState(const GameEvents& events, std::shared_ptr<pkt::core::ServiceContainer> services)
-    : myEvents(events), myServices(std::move(services))
+    : m_events(events), m_services(std::move(services))
 {
 }
 
 void PostRiverState::ensureServicesInitialized() const
 {
-    if (!myServices)
+    if (!m_services)
     {
         static std::shared_ptr<pkt::core::ServiceContainer> defaultServices =
             std::make_shared<pkt::core::AppServiceContainer>();
-        myServices = defaultServices;
+        m_services = defaultServices;
     }
 }
 
 void PostRiverState::enter(Hand& hand)
 {
     ensureServicesInitialized();
-    myServices->logger().info("Post-River");
+    m_services->logger().info("Post-River");
 
     for (auto& player : *hand.getActingPlayersList())
     {
@@ -43,14 +43,14 @@ void PostRiverState::enter(Hand& hand)
 
     // Compute the exact showdown reveal sequence (engine domain logic)
     hand.getBoard().determineShowdownRevealOrder();
-    if (myEvents.onShowdownRevealOrder)
+    if (m_events.onShowdownRevealOrder)
     {
         auto order = hand.getBoard().getShowdownRevealOrder();
-        myEvents.onShowdownRevealOrder(order);
+        m_events.onShowdownRevealOrder(order);
     }
 
-    if (myEvents.onBettingRoundStarted)
-        myEvents.onBettingRoundStarted(PostRiver);
+    if (m_events.onBettingRoundStarted)
+        m_events.onBettingRoundStarted(PostRiver);
 
     logStateInfo(hand);
 }

@@ -49,13 +49,13 @@ class InvalidActionHandler
     void executeAutoFold(unsigned playerId);
     void ensureServicesInitialized() const;
 
-    const GameEvents& myEvents;
-    ErrorMessageProvider myErrorMessageProvider;
-    AutoFoldCallback myAutoFoldCallback;
-    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices;
+    const GameEvents& m_events;
+    ErrorMessageProvider m_errorMessageProvider;
+    AutoFoldCallback m_autoFoldCallback;
+    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services;
 
     // Error handling state
-    std::map<unsigned, int> myInvalidActionCounts; // Track invalid actions per player
+    std::map<unsigned, int> m_invalidActionCounts; // Track invalid actions per player
     static const int MAX_INVALID_ACTIONS = 3;      // Max invalid actions before auto-fold
 };
 

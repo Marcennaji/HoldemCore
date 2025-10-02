@@ -63,7 +63,7 @@ class ActionValidator
                              std::string* outReason = nullptr) const;
 
   private:
-    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices;
+    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services;
     void ensureServicesInitialized() const;
 };
 

@@ -30,17 +30,17 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-Session::Session(const GameEvents& events) : myEvents(events), myEngineFactory(nullptr), myServiceContainer(nullptr)
+Session::Session(const GameEvents& events) : m_events(events), m_engineFactory(nullptr), m_serviceContainer(nullptr)
 {
 }
 
 Session::Session(const GameEvents& events, std::shared_ptr<EngineFactory> engineFactory)
-    : myEvents(events), myEngineFactory(engineFactory), myServiceContainer(nullptr)
+    : m_events(events), m_engineFactory(engineFactory), m_serviceContainer(nullptr)
 {
 }
 
 Session::Session(const GameEvents& events, std::shared_ptr<ServiceContainer> serviceContainer)
-    : myEvents(events), myEngineFactory(nullptr), myServiceContainer(serviceContainer)
+    : m_events(events), m_engineFactory(nullptr), m_serviceContainer(serviceContainer)
 {
 }
 
@@ -71,10 +71,10 @@ std::unique_ptr<player::MixedPlayerFactory> Session::createPlayerFactory(const G
 
 std::shared_ptr<Board> Session::createBoard(const StartData& startData)
 {
-    if (!myEngineFactory)
+    if (!m_engineFactory)
         throw std::runtime_error("EngineFactory not initialized");
 
-    auto board = myEngineFactory->createBoard(startData.startDealerPlayerId);
+    auto board = m_engineFactory->createBoard(startData.startDealerPlayerId);
     return board;
 }
 
@@ -156,25 +156,25 @@ void Session::validateGameParameters(const GameData& gameData, const StartData& 
 
 void Session::fireGameInitializedEvent(int guiSpeed)
 {
-    if (myEvents.onGameInitialized)
+    if (m_events.onGameInitialized)
     {
-        myEvents.onGameInitialized(guiSpeed);
+        m_events.onGameInitialized(guiSpeed);
     }
 }
 
 void Session::ensureEngineFactoryInitialized()
 {
-    if (!myEngineFactory)
+    if (!m_engineFactory)
     {
-        myEngineFactory = std::make_shared<EngineFactory>(myEvents);
+        m_engineFactory = std::make_shared<EngineFactory>(m_events);
     }
 }
 
 void Session::ensureServiceContainerInitialized()
 {
-    if (!myServiceContainer)
+    if (!m_serviceContainer)
     {
-        myServiceContainer = std::make_shared<AppServiceContainer>();
+        m_serviceContainer = std::make_shared<AppServiceContainer>();
     }
 }
 
@@ -184,7 +184,7 @@ Session::GameComponents Session::createGameComponents(const GameData& gameData, 
 
     // Create dependencies using virtual factory methods (testable)
     components.strategyAssigner = createStrategyAssigner(gameData.tableProfile, startData.numberOfPlayers - 1);
-    components.playerFactory = createPlayerFactory(myEvents, components.strategyAssigner.get());
+    components.playerFactory = createPlayerFactory(m_events, components.strategyAssigner.get());
 
     components.playersList = createPlayersList(*components.playerFactory, startData.numberOfPlayers,
                                                gameData.startMoney, gameData.tableProfile);
@@ -202,23 +202,23 @@ Session::GameComponents Session::createGameComponents(const GameData& gameData, 
 
 void Session::initializeGame(GameComponents&& components, const GameData& gameData, const StartData& startData)
 {
-    myCurrentGame = std::make_unique<Game>(myEvents, myEngineFactory, components.board, components.playersList,
+    m_currentGame = std::make_unique<Game>(m_events, m_engineFactory, components.board, components.playersList,
                                            startData.startDealerPlayerId, gameData, startData);
     fireGameInitializedEvent(gameData.guiSpeed);
-    myCurrentGame->startNewHand();
+    m_currentGame->startNewHand();
 }
 
 void Session::handlePlayerAction(const PlayerAction& action)
 {
-    if (myCurrentGame) {
-        myCurrentGame->handlePlayerAction(action);
+    if (m_currentGame) {
+        m_currentGame->handlePlayerAction(action);
     }
 }
 
 void Session::startNewHand()
 {
-    if (myCurrentGame) {
-        myCurrentGame->startNewHand();
+    if (m_currentGame) {
+        m_currentGame->startNewHand();
     }
 }
 

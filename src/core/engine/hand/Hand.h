@@ -58,15 +58,15 @@ class Hand : public HandLifecycle, public HandPlayerAction, public HandPlayersSt
     int getPotOdd(const int playerCash, const int playerSet) const;
     float getM(int cash) const;
     int getSmallBlind() const;
-    HandState& getState() { return myStateManager->getCurrentState(); }
-    GameState getGameState() const { return myStateManager->getGameState(); }
-    Board& getBoard() { return *myBoard; }
+    HandState& getState() { return m_stateManager->getCurrentState(); }
+    GameState getGameState() const { return m_stateManager->getGameState(); }
+    Board& getBoard() { return *m_board; }
 
     // Accessor methods for ActionApplier
-    HandStateManager* getStateManager() const { return myStateManager.get(); }
-    const GameEvents& getEvents() const { return myEvents; }
+    HandStateManager* getStateManager() const { return m_stateManager.get(); }
+    const GameEvents& getEvents() const { return m_events; }
     void fireOnPotUpdated() const;
-    pkt::core::player::PlayerList& getActingPlayersListMutable() { return myActingPlayersList; }
+    pkt::core::player::PlayerList& getActingPlayersListMutable() { return m_actingPlayersList; }
 
     // Hand action history methods (delegates to BettingActions)
     const std::vector<pkt::core::BettingRoundHistory>& getHandActionHistory() const
@@ -86,20 +86,20 @@ class Hand : public HandLifecycle, public HandPlayerAction, public HandPlayersSt
     // Cash validation methods
     void filterPlayersWithInsufficientCash();
 
-    std::shared_ptr<EngineFactory> myFactory;
-    const GameEvents& myEvents;
-    std::shared_ptr<Board> myBoard;
-    mutable std::shared_ptr<PokerServices> myServices; // Injected service container
-    std::unique_ptr<HandStateManager> myStateManager;
-    std::unique_ptr<DeckManager> myDeckManager;
-    std::unique_ptr<ActionValidator> myActionValidator;
-    std::unique_ptr<InvalidActionHandler> myInvalidActionHandler;
-    int myStartQuantityPlayers;
-    int myStartCash;
-    int mySmallBlind;
+    std::shared_ptr<EngineFactory> m_factory;
+    const GameEvents& m_events;
+    std::shared_ptr<Board> m_board;
+    mutable std::shared_ptr<PokerServices> m_services; // Injected service container
+    std::unique_ptr<HandStateManager> m_stateManager;
+    std::unique_ptr<DeckManager> m_deckManager;
+    std::unique_ptr<ActionValidator> m_actionValidator;
+    std::unique_ptr<InvalidActionHandler> m_invalidActionHandler;
+    int m_startQuantityPlayers;
+    int m_startCash;
+    int m_smallBlind;
 
-    bool myAllInCondition{false};
-    bool myCardsShown{false};
+    bool m_allInCondition{false};
+    bool m_cardsShown{false};
 };
 
 } // namespace pkt::core

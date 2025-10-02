@@ -56,10 +56,10 @@ TEST_F(BoardCardTest, DealBoardCardsAndHoleCards_NoOverlap_2Players)
 {
     initializeHandWithPlayers(2, gameData);
 
-    myHand->dealHoleCards(myHand->dealBoardCards());
+    m_hand->dealHoleCards(m_hand->dealBoardCards());
 
     // Verify board cards
-    const BoardCards& boardCards = myHand->getBoard().getBoardCards();
+    const BoardCards& boardCards = m_hand->getBoard().getBoardCards();
     int boardCardsArray[5];
     boardCards.toIntArray(boardCardsArray);
     ASSERT_EQ(sizeof(boardCardsArray) / sizeof(boardCardsArray[0]), 5);
@@ -68,30 +68,30 @@ TEST_F(BoardCardTest, DealBoardCardsAndHoleCards_NoOverlap_2Players)
 TEST_F(BoardCardTest, DealBoardCardsAndHoleCards_NoOverlap_2Players_FullTest)
 {
     initializeHandWithPlayers(2, gameData);
-    myHand->dealHoleCards(myHand->dealBoardCards());
-    ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
+    m_hand->dealHoleCards(m_hand->dealBoardCards());
+    ASSERT_TRUE(cardsAreUniqueAndValid(m_hand, m_board, m_seatsList));
 }
 
 TEST_F(BoardCardTest, DealBoardCardsAndHoleCards_NoOverlap_3Players)
 {
     initializeHandWithPlayers(3, gameData);
-    myHand->dealHoleCards(myHand->dealBoardCards());
-    ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
+    m_hand->dealHoleCards(m_hand->dealBoardCards());
+    ASSERT_TRUE(cardsAreUniqueAndValid(m_hand, m_board, m_seatsList));
 }
 
 TEST_F(BoardCardTest, DealBoardCardsAndHoleCards_NoOverlap_MaxPlayers)
 {
     initializeHandWithPlayers(MAX_NUMBER_OF_PLAYERS, gameData);
-    myHand->dealHoleCards(myHand->dealBoardCards());
-    ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
+    m_hand->dealHoleCards(m_hand->dealBoardCards());
+    ASSERT_TRUE(cardsAreUniqueAndValid(m_hand, m_board, m_seatsList));
 }
 
 TEST_F(BoardCardTest, AllDealtCards_AreWithinValidRange_4Players)
 {
     initializeHandWithPlayers(4, gameData);
-    myHand->dealHoleCards(myHand->dealBoardCards());
+    m_hand->dealHoleCards(m_hand->dealBoardCards());
 
-    const BoardCards& boardCards = myBoard->getBoardCards();
+    const BoardCards& boardCards = m_board->getBoardCards();
     int boardCardsArray[5];
     boardCards.toIntArray(boardCardsArray);
     for (int card : boardCardsArray)
@@ -100,7 +100,7 @@ TEST_F(BoardCardTest, AllDealtCards_AreWithinValidRange_4Players)
         ASSERT_LT(card, 52);
     }
     int cards[2];
-    for (const auto& player : *mySeatsList)
+    for (const auto& player : *m_seatsList)
     {
         HoleCards holeCards = player->getHoleCards();
         ASSERT_GE(holeCards.card1.getIndex(), 0);
@@ -115,8 +115,8 @@ TEST_F(BoardCardTest, DealCards_NoOverlap_OverMultipleRounds)
     for (int i = 0; i < 500; ++i)
     {
         initializeHandWithPlayers(6, gameData);
-        myHand->dealHoleCards(myHand->dealBoardCards());
-        ASSERT_TRUE(cardsAreUniqueAndValid(myHand, myBoard, mySeatsList));
+        m_hand->dealHoleCards(m_hand->dealBoardCards());
+        ASSERT_TRUE(cardsAreUniqueAndValid(m_hand, m_board, m_seatsList));
     }
 }
 

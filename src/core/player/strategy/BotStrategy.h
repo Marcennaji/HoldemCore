@@ -38,15 +38,15 @@ class BotStrategy : public PlayerStrategy
 
     const std::unique_ptr<PreflopRangeCalculator>& getPreflopRangeCalculator() const
     {
-        return myPreflopRangeCalculator;
+        return m_preflopRangeCalculator;
     }
 
   protected:
-    BotStrategy() : myPreflopRangeCalculator(std::make_unique<PreflopRangeCalculator>()) {}
+    BotStrategy() : m_preflopRangeCalculator(std::make_unique<PreflopRangeCalculator>()) {}
 
     void initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange)
     {
-        myPreflopRangeCalculator->initializeRanges(utgHeadsUpRange, utgFullTableRange);
+        m_preflopRangeCalculator->initializeRanges(utgHeadsUpRange, utgFullTableRange);
     }
 
     // bots strategies implementers must override only these methods
@@ -55,7 +55,7 @@ class BotStrategy : public PlayerStrategy
     virtual PlayerAction decideTurn(const CurrentHandContext&) = 0;
     virtual PlayerAction decideRiver(const CurrentHandContext&) = 0;
 
-    std::unique_ptr<PreflopRangeCalculator> myPreflopRangeCalculator;
+    std::unique_ptr<PreflopRangeCalculator> m_preflopRangeCalculator;
 };
 
 } // namespace pkt::core::player

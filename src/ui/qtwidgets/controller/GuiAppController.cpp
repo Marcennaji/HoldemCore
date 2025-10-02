@@ -12,35 +12,35 @@ namespace pkt::ui::qtwidgets
 
 GuiAppController::GuiAppController()
 {
-    mySession = std::make_unique<pkt::core::Session>(myEvents);
-    myPokerTableWindow = std::make_unique<PokerTableWindow>(mySession.get());
-    myBridge = std::make_unique<GuiBridgeWidgets>(mySession.get(), myPokerTableWindow.get());
+    m_session = std::make_unique<pkt::core::Session>(m_events);
+    m_pokerTableWindow = std::make_unique<PokerTableWindow>(m_session.get());
+    m_bridge = std::make_unique<GuiBridgeWidgets>(m_session.get(), m_pokerTableWindow.get());
 
-    myBridge->connectEventsToUi(myEvents);
+    m_bridge->connectEventsToUi(m_events);
 }
 
 GuiAppController::GuiAppController(std::shared_ptr<pkt::core::ServiceContainer> services)
-    : myServices(std::move(services))
+    : m_services(std::move(services))
 {
-    mySession = std::make_unique<pkt::core::Session>(myEvents, myServices);
-    myPokerTableWindow = std::make_unique<PokerTableWindow>(mySession.get());
-    myBridge = std::make_unique<GuiBridgeWidgets>(mySession.get(), myPokerTableWindow.get());
+    m_session = std::make_unique<pkt::core::Session>(m_events, m_services);
+    m_pokerTableWindow = std::make_unique<PokerTableWindow>(m_session.get());
+    m_bridge = std::make_unique<GuiBridgeWidgets>(m_session.get(), m_pokerTableWindow.get());
 
-    myBridge->connectEventsToUi(myEvents);
+    m_bridge->connectEventsToUi(m_events);
 }
 
 StartWindow* GuiAppController::createMainWindow()
 {
-    if (myServices)
+    if (m_services)
     {
-        auto* w = new StartWindow(myPokerTableWindow.get(), mySession.get(), myServices, nullptr);
-        if (myPokerTableWindow) myPokerTableWindow->hide();
+        auto* w = new StartWindow(m_pokerTableWindow.get(), m_session.get(), m_services, nullptr);
+        if (m_pokerTableWindow) m_pokerTableWindow->hide();
         return w;
     }
     else
     {
-        auto* w = new StartWindow(myPokerTableWindow.get(), mySession.get(), nullptr);
-        if (myPokerTableWindow) myPokerTableWindow->hide();
+        auto* w = new StartWindow(m_pokerTableWindow.get(), m_session.get(), nullptr);
+        if (m_pokerTableWindow) m_pokerTableWindow->hide();
         return w;
     }
 }

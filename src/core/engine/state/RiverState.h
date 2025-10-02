@@ -41,8 +41,8 @@ class RiverState : public HandState, public HandActionProcessor, public HandDebu
   private:
     void ensureServicesInitialized() const;
 
-    const GameEvents& myEvents;
-    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices;
+    const GameEvents& m_events;
+    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services;
 };
 
 } // namespace pkt::core

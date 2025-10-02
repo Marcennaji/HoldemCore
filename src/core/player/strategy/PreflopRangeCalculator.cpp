@@ -18,7 +18,7 @@ PreflopRangeCalculator::PreflopRangeCalculator()
 }
 
 PreflopRangeCalculator::PreflopRangeCalculator(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer)
-    : myServices(serviceContainer)
+    : m_services(serviceContainer)
 {
     // Initialize with default ranges to prevent crashes
     initializeRanges(45, 8); // Default tight-aggressive ranges for 8-player table
@@ -26,11 +26,11 @@ PreflopRangeCalculator::PreflopRangeCalculator(std::shared_ptr<pkt::core::Servic
 
 void PreflopRangeCalculator::ensureServicesInitialized() const
 {
-    if (!myServices)
+    if (!m_services)
     {
         static std::shared_ptr<pkt::core::ServiceContainer> defaultServices =
             std::make_shared<pkt::core::AppServiceContainer>();
-        myServices = defaultServices;
+        m_services = defaultServices;
     }
 }
 
@@ -41,73 +41,73 @@ void PreflopRangeCalculator::initializeRanges(const int utgHeadsUpRange, const i
 
     // values are % best hands
 
-    myUtgStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    myUtgStartingRange[2] = utgHeadsUpRange;
-    myUtgStartingRange[3] = utgHeadsUpRange - step;
-    myUtgStartingRange[4] = utgHeadsUpRange - (2 * step);
-    myUtgStartingRange[5] = utgHeadsUpRange - (3 * step);
-    myUtgStartingRange[6] = utgHeadsUpRange - (4 * step);
-    myUtgStartingRange[7] = utgFullTableRange + (3 * step);
-    myUtgStartingRange[8] = utgFullTableRange + (2 * step);
-    myUtgStartingRange[9] = utgFullTableRange + step;
-    myUtgStartingRange[10] = utgFullTableRange;
+    m_utgStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    m_utgStartingRange[2] = utgHeadsUpRange;
+    m_utgStartingRange[3] = utgHeadsUpRange - step;
+    m_utgStartingRange[4] = utgHeadsUpRange - (2 * step);
+    m_utgStartingRange[5] = utgHeadsUpRange - (3 * step);
+    m_utgStartingRange[6] = utgHeadsUpRange - (4 * step);
+    m_utgStartingRange[7] = utgFullTableRange + (3 * step);
+    m_utgStartingRange[8] = utgFullTableRange + (2 * step);
+    m_utgStartingRange[9] = utgFullTableRange + step;
+    m_utgStartingRange[10] = utgFullTableRange;
 
-    assert(myUtgStartingRange[7] < myUtgStartingRange[6]);
+    assert(m_utgStartingRange[7] < m_utgStartingRange[6]);
 
     // we have the UnderTheGun starting ranges. Now, deduce the starting ranges for other positions :
 
-    myUtgPlusOneStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < myUtgPlusOneStartingRange.size(); i++)
+    m_utgPlusOneStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    for (int i = 2; i < m_utgPlusOneStartingRange.size(); i++)
     {
-        myUtgPlusOneStartingRange[i] = min(50, myUtgStartingRange[i] + 1);
+        m_utgPlusOneStartingRange[i] = min(50, m_utgStartingRange[i] + 1);
     }
 
-    myUtgPlusTwoStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < myUtgPlusTwoStartingRange.size(); i++)
+    m_utgPlusTwoStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    for (int i = 2; i < m_utgPlusTwoStartingRange.size(); i++)
     {
-        myUtgPlusTwoStartingRange[i] = min(50, myUtgPlusOneStartingRange[i] + 1);
+        m_utgPlusTwoStartingRange[i] = min(50, m_utgPlusOneStartingRange[i] + 1);
     }
 
-    myMiddleStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < myMiddleStartingRange.size(); i++)
+    m_middleStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    for (int i = 2; i < m_middleStartingRange.size(); i++)
     {
-        myMiddleStartingRange[i] = min(50, myUtgPlusTwoStartingRange[i] + 1);
+        m_middleStartingRange[i] = min(50, m_utgPlusTwoStartingRange[i] + 1);
     }
 
-    myMiddlePlusOneStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < myMiddlePlusOneStartingRange.size(); i++)
+    m_middlePlusOneStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    for (int i = 2; i < m_middlePlusOneStartingRange.size(); i++)
     {
-        myMiddlePlusOneStartingRange[i] = min(50, myMiddleStartingRange[i] + 1);
+        m_middlePlusOneStartingRange[i] = min(50, m_middleStartingRange[i] + 1);
     }
 
-    myLateStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < myLateStartingRange.size(); i++)
+    m_lateStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    for (int i = 2; i < m_lateStartingRange.size(); i++)
     {
-        myLateStartingRange[i] = min(50, myMiddlePlusOneStartingRange[i] + 1);
+        m_lateStartingRange[i] = min(50, m_middlePlusOneStartingRange[i] + 1);
     }
 
-    myCutoffStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < myCutoffStartingRange.size(); i++)
+    m_cutoffStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    for (int i = 2; i < m_cutoffStartingRange.size(); i++)
     {
-        myCutoffStartingRange[i] = min(50, myLateStartingRange[i] + 1);
+        m_cutoffStartingRange[i] = min(50, m_lateStartingRange[i] + 1);
     }
 
-    myButtonStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < myButtonStartingRange.size(); i++)
+    m_buttonStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    for (int i = 2; i < m_buttonStartingRange.size(); i++)
     {
-        myButtonStartingRange[i] = min(50, myCutoffStartingRange[i] + 1);
+        m_buttonStartingRange[i] = min(50, m_cutoffStartingRange[i] + 1);
     }
 
-    mySmallBlindStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < mySmallBlindStartingRange.size(); i++)
+    m_smallBlindStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    for (int i = 2; i < m_smallBlindStartingRange.size(); i++)
     {
-        mySmallBlindStartingRange[i] = myCutoffStartingRange[i];
+        m_smallBlindStartingRange[i] = m_cutoffStartingRange[i];
     }
 
-    myBigBlindStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
-    for (int i = 2; i < myBigBlindStartingRange.size(); i++)
+    m_bigBlindStartingRange.resize(MAX_NUMBER_OF_PLAYERS + 1);
+    for (int i = 2; i < m_bigBlindStartingRange.size(); i++)
     {
-        myBigBlindStartingRange[i] = mySmallBlindStartingRange[i] + 1;
+        m_bigBlindStartingRange[i] = m_smallBlindStartingRange[i] + 1;
     }
 }
 
@@ -118,20 +118,20 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(const CurrentHandCont
     const int nbRaises = ctx.commonContext.bettingContext.preflopRaisesNumber;
     const int nbCalls = ctx.commonContext.bettingContext.preflopCallsNumber;
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
-    const PlayerPosition myPosition = ctx.personalContext.position;
+    const PlayerPosition m_position = ctx.personalContext.position;
     const int potOdd = ctx.commonContext.bettingContext.potOdd;
-    const int myCash = ctx.personalContext.cash;
+    const int m_cash = ctx.personalContext.cash;
     const bool isPreflopBigBet = ctx.commonContext.bettingContext.isPreflopBigBet;
-    const int myTotalBetAmount = ctx.personalContext.totalBetAmount;
+    const int m_totalBetAmount = ctx.personalContext.totalBetAmount;
     const int smallBlind = ctx.commonContext.smallBlind;
-    const int myM = ctx.personalContext.m;
+    const int m_m = ctx.personalContext.m;
 
-    float callingRange = getRange(myPosition, nbPlayers);
+    float callingRange = getRange(m_position, nbPlayers);
 
-    myServices->logger().verbose("Initial calling range : " + std::to_string(callingRange));
+    m_services->logger().verbose("Initial calling range : " + std::to_string(callingRange));
 
     // Handle no raises and no calls
-    if (nbRaises == 0 && nbCalls == 0 && myPosition != Button && myPosition != SmallBlind)
+    if (nbRaises == 0 && nbCalls == 0 && m_position != Button && m_position != SmallBlind)
     {
         return -1; // Never limp unless on button or small blind
     }
@@ -155,8 +155,8 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(const CurrentHandCont
     if (isPreflopBigBet)
     {
         callingRange =
-            adjustCallForBigBet(callingRange, potOdd, myCash, ctx.commonContext.bettingContext.highestBetAmount,
-                                myTotalBetAmount, smallBlind);
+            adjustCallForBigBet(callingRange, potOdd, m_cash, ctx.commonContext.bettingContext.highestBetAmount,
+                                m_totalBetAmount, smallBlind);
     }
 
     // Adjust for loose/aggressive raiser
@@ -166,7 +166,7 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(const CurrentHandCont
     }
 
     // Adjust for good odds
-    if (couldCallForGoodOdds(potOdd, myM, myPosition))
+    if (couldCallForGoodOdds(potOdd, m_m, m_position))
     {
         callingRange = 40.0f;
     }
@@ -183,7 +183,7 @@ float PreflopRangeCalculator::adjustCallForLimpers(float callingRange) const
 {
     ensureServicesInitialized();
 
-    myServices->logger().verbose("1 or more players have limped, but nobody has raised. Adjusting callingRange : " +
+    m_services->logger().verbose("1 or more players have limped, but nobody has raised. Adjusting callingRange : " +
                                  std::to_string(callingRange) + " * 1.2 = " + std::to_string(callingRange * 1.2));
     return callingRange * 1.2;
 }
@@ -200,7 +200,7 @@ float PreflopRangeCalculator::clampCallingRange(float callingRange) const
         callingRange = 100;
     }
 
-    myServices->logger().verbose("calling range : " + std::to_string(callingRange) + "%");
+    m_services->logger().verbose("calling range : " + std::to_string(callingRange) + "%");
     return callingRange;
 }
 
@@ -208,7 +208,7 @@ float PreflopRangeCalculator::adjustCallForRaises(const CurrentHandContext& ctx,
 {
     const int nbRaises = ctx.commonContext.bettingContext.preflopRaisesNumber;
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
-    const PlayerPosition myPosition = ctx.personalContext.position;
+    const PlayerPosition m_position = ctx.personalContext.position;
     const int nbActingPlayers = ctx.commonContext.playersContext.actingPlayersList->size();
     std::shared_ptr<Player> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
     if (!lastRaiser)
@@ -229,7 +229,7 @@ float PreflopRangeCalculator::adjustCallForRaises(const CurrentHandContext& ctx,
     if (raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getPreflopRaise() != 0)
     {
         callingRange =
-            adjustCallForRaiserStats(callingRange, raiserStats, nbRaises, nbPlayers, myPosition, nbActingPlayers);
+            adjustCallForRaiserStats(callingRange, raiserStats, nbRaises, nbPlayers, m_position, nbActingPlayers);
     }
     else
     {
@@ -240,12 +240,12 @@ float PreflopRangeCalculator::adjustCallForRaises(const CurrentHandContext& ctx,
 }
 
 float PreflopRangeCalculator::adjustCallForRaiserStats(float callingRange, const PreflopStatistics& raiserStats,
-                                                       int nbRaises, int nbPlayers, PlayerPosition myPosition,
+                                                       int nbRaises, int nbPlayers, PlayerPosition m_position,
                                                        int nbActingPlayers) const
 {
     ensureServicesInitialized();
 
-    if ((myPosition == Button || myPosition == Cutoff) && nbActingPlayers > 5)
+    if ((m_position == Button || m_position == Cutoff) && nbActingPlayers > 5)
     {
         callingRange = raiserStats.getPreflopRaise() * (nbPlayers > 3 ? 0.7f : 0.9f);
     }
@@ -267,7 +267,7 @@ float PreflopRangeCalculator::adjustCallForRaiserStats(float callingRange, const
         callingRange = raiserStats.getPreflop4Bet() * 0.5f;
     }
 
-    myServices->logger().verbose(
+    m_services->logger().verbose(
         "PreflopRangeCalculator adjusting callingRange to the last raiser's stats, value is now " +
         std::to_string(callingRange));
     return callingRange;
@@ -290,20 +290,20 @@ float PreflopRangeCalculator::adjustCallForNoStats(float callingRange, int nbRai
         callingRange /= 4;
     }
 
-    myServices->logger().verbose("No stats available, callingRange value is now " + std::to_string(callingRange));
+    m_services->logger().verbose("No stats available, callingRange value is now " + std::to_string(callingRange));
     return callingRange;
 }
 
-float PreflopRangeCalculator::adjustCallForBigBet(float callingRange, int potOdd, int myCash,
-                                                  int highestBetAmountOrigin, int myTotalBetAmount,
+float PreflopRangeCalculator::adjustCallForBigBet(float callingRange, int potOdd, int m_cash,
+                                                  int highestBetAmountOrigin, int m_totalBetAmount,
                                                   int smallBlind) const
 {
     ensureServicesInitialized();
 
-    const int highestBetAmount = std::min(myCash, highestBetAmountOrigin);
+    const int highestBetAmount = std::min(m_cash, highestBetAmountOrigin);
 
     if (potOdd <= 70 && highestBetAmount > smallBlind * 20 &&
-        highestBetAmount - myTotalBetAmount > myTotalBetAmount * 6)
+        highestBetAmount - m_totalBetAmount > m_totalBetAmount * 6)
     {
         callingRange = 1.5f;
     }
@@ -326,7 +326,7 @@ float PreflopRangeCalculator::adjustCallForBigBet(float callingRange, int potOdd
         callingRange *= 0.1f;
     }
 
-    myServices->logger().verbose("Pot odd is " + std::to_string(potOdd) + " : adjusting callingRange, value is now " +
+    m_services->logger().verbose("Pot odd is " + std::to_string(potOdd) + " : adjusting callingRange, value is now " +
                                  std::to_string(callingRange));
     return callingRange;
 }
@@ -335,25 +335,25 @@ bool PreflopRangeCalculator::shouldAdjustCallForLooseRaiser(const CurrentHandCon
                                                             int nbRaises) const
 {
     std::shared_ptr<Player> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
-    const PlayerPosition myPosition = ctx.personalContext.position;
+    const PlayerPosition m_position = ctx.personalContext.position;
 
     return lastRaiser && lastRaiser->isInVeryLooseMode(ctx.commonContext.playersContext.nbPlayers) &&
-           (myPosition >= Late || myPosition == SmallBlind || myPosition == BigBlind) && nbCalls == 0 && nbRaises == 1;
+           (m_position >= Late || m_position == SmallBlind || m_position == BigBlind) && nbCalls == 0 && nbRaises == 1;
 }
 
-bool PreflopRangeCalculator::couldCallForGoodOdds(int potOdd, int myM, PlayerPosition myPosition) const
+bool PreflopRangeCalculator::couldCallForGoodOdds(int potOdd, int m_m, PlayerPosition m_position) const
 {
-    return potOdd <= 30 && myM > 15 && (myPosition >= Late || myPosition == SmallBlind || myPosition == BigBlind);
+    return potOdd <= 30 && m_m > 15 && (m_position >= Late || m_position == SmallBlind || m_position == BigBlind);
 }
 
 bool PreflopRangeCalculator::couldCallForAllIn(const CurrentHandContext& ctx, int potOdd, int nbRaises) const
 {
     std::shared_ptr<Player> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
-    const PlayerPosition myPosition = ctx.personalContext.position;
+    const PlayerPosition m_position = ctx.personalContext.position;
 
     return ctx.personalContext.m > 10 && potOdd <= 20 && nbRaises < 2 &&
         lastRaiser && lastRaiser->getLastAction().type == ActionType::Allin &&
-           (myPosition >= Late || myPosition == SmallBlind || myPosition == BigBlind);
+           (m_position >= Late || m_position == SmallBlind || m_position == BigBlind);
 }
 
 float PreflopRangeCalculator::calculatePreflopRaisingRange(const CurrentHandContext& ctx) const
@@ -363,11 +363,11 @@ float PreflopRangeCalculator::calculatePreflopRaisingRange(const CurrentHandCont
     const int nbRaises = ctx.commonContext.bettingContext.preflopRaisesNumber;
     const int nbCalls = ctx.commonContext.bettingContext.preflopCallsNumber;
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
-    const PlayerPosition myPosition = ctx.personalContext.position;
+    const PlayerPosition m_position = ctx.personalContext.position;
 
-    float raisingRange = getRange(myPosition, nbPlayers) * 0.8;
+    float raisingRange = getRange(m_position, nbPlayers) * 0.8;
 
-    myServices->logger().verbose("Initial raising range : " + std::to_string(raisingRange));
+    m_services->logger().verbose("Initial raising range : " + std::to_string(raisingRange));
 
     if (nbRaises == 0 && nbCalls > 1 && nbPlayers > 3)
     {
@@ -392,7 +392,7 @@ float PreflopRangeCalculator::adjustRaiseForLimpers(float raisingRange) const
 {
     ensureServicesInitialized();
 
-    myServices->logger().verbose("2 or more players have limped, but nobody has raised : tightening raising range to " +
+    m_services->logger().verbose("2 or more players have limped, but nobody has raised : tightening raising range to " +
                                  std::to_string(raisingRange * 0.7));
     return raisingRange * 0.7;
 }
@@ -402,8 +402,8 @@ float PreflopRangeCalculator::adjustRaiseForRaiser(const CurrentHandContext& ctx
     const int nbRaises = ctx.commonContext.bettingContext.preflopRaisesNumber;
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
     const int potOdd = ctx.commonContext.bettingContext.potOdd;
-    const int myCash = ctx.personalContext.cash;
-    const int myTotalBetAmount = ctx.personalContext.totalBetAmount;
+    const int m_cash = ctx.personalContext.cash;
+    const int m_totalBetAmount = ctx.personalContext.totalBetAmount;
     const int smallBlind = ctx.commonContext.smallBlind;
     const bool isPreflopBigBet = ctx.commonContext.bettingContext.isPreflopBigBet;
     std::shared_ptr<Player> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
@@ -429,8 +429,8 @@ float PreflopRangeCalculator::adjustRaiseForRaiser(const CurrentHandContext& ctx
     if (isPreflopBigBet)
     {
         raisingRange =
-            adjustRaiseForBigBet(raisingRange, potOdd, myCash, ctx.commonContext.bettingContext.highestBetAmount,
-                                 myTotalBetAmount, smallBlind);
+            adjustRaiseForBigBet(raisingRange, potOdd, m_cash, ctx.commonContext.bettingContext.highestBetAmount,
+                                 m_totalBetAmount, smallBlind);
     }
 
     return raisingRange;
@@ -457,7 +457,7 @@ float PreflopRangeCalculator::adjustRaiseForRaiserStats(const PreflopStatistics&
         raisingRange = 0; // Raise with aces only
     }
 
-    myServices->logger().verbose("Adjusting raising range based on raiser stats, value is now " +
+    m_services->logger().verbose("Adjusting raising range based on raiser stats, value is now " +
                                  std::to_string(raisingRange));
 
     return raisingRange;
@@ -475,7 +475,7 @@ float PreflopRangeCalculator::adjustRaiseForNoRaiserStats(float raisingRange, in
         raisingRange = 0; // 4-bet with aces only
     }
 
-    myServices->logger().verbose("No stats available for raiser, adjusting raising range to " +
+    m_services->logger().verbose("No stats available for raiser, adjusting raising range to " +
                                  std::to_string(raisingRange));
 
     return raisingRange;
@@ -486,18 +486,18 @@ float PreflopRangeCalculator::adjustRaiseForNoRaiser(const CurrentHandContext& c
     ensureServicesInitialized();
 
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
-    const PlayerPosition myPosition = ctx.personalContext.position;
+    const PlayerPosition m_position = ctx.personalContext.position;
 
     if (!isCardsInRange(ctx.personalContext.holeCards, RangeEstimator::getStringRange(nbPlayers, raisingRange)) &&
-        (myPosition == SmallBlind || myPosition == Button || myPosition == Cutoff) && canBluff)
+        (m_position == SmallBlind || m_position == Button || m_position == Cutoff) && canBluff)
     {
         int rand = 0;
-        myServices->randomizer().getRand(1, 3, 1, &rand);
+        m_services->randomizer().getRand(1, 3, 1, &rand);
         if (rand == 2)
         {
             raisingRange = 100;
 
-            myServices->logger().verbose("Trying to steal blinds, setting raising range to 100");
+            m_services->logger().verbose("Trying to steal blinds, setting raising range to 100");
         }
     }
 
@@ -507,7 +507,7 @@ float PreflopRangeCalculator::adjustRaiseForStack(const CurrentHandContext& ctx,
 {
     ensureServicesInitialized();
 
-    const int myM = ctx.personalContext.m;
+    const int m_m = ctx.personalContext.m;
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
     const int nbRaises = ctx.commonContext.bettingContext.preflopRaisesNumber;
 
@@ -522,7 +522,7 @@ float PreflopRangeCalculator::adjustRaiseForStack(const CurrentHandContext& ctx,
                                           15, 15, 15, 15, 15, 14, 14, 14, 13,     /* M = 9 */
                                           13, 12, 11, 10, 9,  8,  7,  6,  5};     /* M = 10 */
 
-    int handsLeft = myM * nbPlayers;
+    int handsLeft = m_m * nbPlayers;
     if (handsLeft < 1)
     {
         handsLeft = 1;
@@ -537,7 +537,7 @@ float PreflopRangeCalculator::adjustRaiseForStack(const CurrentHandContext& ctx,
         }
         raisingRange = std::max(f, raisingRange);
 
-        myServices->logger().verbose("Hands left: " + std::to_string(handsLeft) + ", minimum raising range set to " +
+        m_services->logger().verbose("Hands left: " + std::to_string(handsLeft) + ", minimum raising range set to " +
                                      std::to_string(f));
     }
 
@@ -557,20 +557,20 @@ float PreflopRangeCalculator::clampRaiseRange(float raisingRange) const
         raisingRange = 100;
     }
 
-    myServices->logger().verbose("Final raising range: " + std::to_string(raisingRange) + "%");
+    m_services->logger().verbose("Final raising range: " + std::to_string(raisingRange) + "%");
 
     return raisingRange;
 }
-float PreflopRangeCalculator::adjustRaiseForBigBet(float raisingRange, int potOdd, int myCash,
-                                                   int highestBetAmountOrigin, int myTotalBetAmount,
+float PreflopRangeCalculator::adjustRaiseForBigBet(float raisingRange, int potOdd, int m_cash,
+                                                   int highestBetAmountOrigin, int m_totalBetAmount,
                                                    int smallBlind) const
 {
     ensureServicesInitialized();
 
-    const int highestBetAmount = std::min(myCash, highestBetAmountOrigin);
+    const int highestBetAmount = std::min(m_cash, highestBetAmountOrigin);
 
     if (potOdd <= 70 && highestBetAmount > smallBlind * 20 &&
-        highestBetAmount - myTotalBetAmount > myTotalBetAmount * 6)
+        highestBetAmount - m_totalBetAmount > m_totalBetAmount * 6)
     {
         raisingRange = 1.5f;
     }
@@ -593,7 +593,7 @@ float PreflopRangeCalculator::adjustRaiseForBigBet(float raisingRange, int potOd
         raisingRange = std::min(1.0f, raisingRange * 0.2f);
     }
 
-    myServices->logger().verbose("Adjusted raising range for big bet: " + std::to_string(raisingRange));
+    m_services->logger().verbose("Adjusted raising range for big bet: " + std::to_string(raisingRange));
 
     return raisingRange;
 }
@@ -604,34 +604,34 @@ int PreflopRangeCalculator::getRange(PlayerPosition p, const int nbPlayers) cons
     {
 
     case UnderTheGun:
-        return myUtgStartingRange[nbPlayers];
+        return m_utgStartingRange[nbPlayers];
         break;
     case UnderTheGunPlusOne:
-        return myUtgPlusOneStartingRange[nbPlayers];
+        return m_utgPlusOneStartingRange[nbPlayers];
         break;
     case UnderTheGunPlusTwo:
-        return myUtgPlusTwoStartingRange[nbPlayers];
+        return m_utgPlusTwoStartingRange[nbPlayers];
         break;
     case Middle:
-        return myMiddleStartingRange[nbPlayers];
+        return m_middleStartingRange[nbPlayers];
         break;
     case MiddlePlusOne:
-        return myMiddlePlusOneStartingRange[nbPlayers];
+        return m_middlePlusOneStartingRange[nbPlayers];
         break;
     case Late:
-        return myLateStartingRange[nbPlayers];
+        return m_lateStartingRange[nbPlayers];
         break;
     case Cutoff:
-        return myCutoffStartingRange[nbPlayers];
+        return m_cutoffStartingRange[nbPlayers];
         break;
     case Button:
-        return myButtonStartingRange[nbPlayers];
+        return m_buttonStartingRange[nbPlayers];
         break;
     case SmallBlind:
-        return mySmallBlindStartingRange[nbPlayers];
+        return m_smallBlindStartingRange[nbPlayers];
         break;
     case BigBlind:
-        return myBigBlindStartingRange[nbPlayers];
+        return m_bigBlindStartingRange[nbPlayers];
         break;
     default:
         return 0;

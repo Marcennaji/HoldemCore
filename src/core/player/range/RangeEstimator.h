@@ -55,10 +55,10 @@ class RangeEstimator
     void updateUnplausibleRangesGivenTurnActions(const CurrentHandContext&);
     void updateUnplausibleRangesGivenRiverActions(const CurrentHandContext&);
     void ensureServicesInitialized() const;
-    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices; // Injected service container
+    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services; // Injected service container
 
-    std::unique_ptr<PreflopRangeEstimator> myPreflopRangeEstimator;
-    std::string myEstimatedRange;
-    int myPlayerId;
+    std::unique_ptr<PreflopRangeEstimator> m_preflopRangeEstimator;
+    std::string m_estimatedRange;
+    int m_playerId;
 };
 } // namespace pkt::core::player

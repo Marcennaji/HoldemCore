@@ -11,9 +11,9 @@ using CurrentHandContext = pkt::core::player::CurrentHandContext;
 class DeterministicStrategy : public pkt::core::player::BotStrategy
 {
   public:
-    void setLastAction(pkt::core::GameState state, pkt::core::PlayerAction action) { myActions[state] = action; }
+    void setLastAction(pkt::core::GameState state, pkt::core::PlayerAction action) { m_actions[state] = action; }
 
-    void clear() { myActions.clear(); }
+    void clear() { m_actions.clear(); }
 
   private:
     pkt::core::PlayerAction decidePreflop(const CurrentHandContext& ctx) override
@@ -35,15 +35,15 @@ class DeterministicStrategy : public pkt::core::player::BotStrategy
 
     pkt::core::PlayerAction decideForState(const CurrentHandContext& ctx, pkt::core::GameState state)
     {
-        auto it = myActions.find(state);
-        if (it != myActions.end())
+        auto it = m_actions.find(state);
+        if (it != m_actions.end())
         {
             return it->second;
         }
         return {ctx.personalContext.id, pkt::core::ActionType::None, 0};
     }
 
-    std::unordered_map<pkt::core::GameState, pkt::core::PlayerAction> myActions;
+    std::unordered_map<pkt::core::GameState, pkt::core::PlayerAction> m_actions;
 };
 
 // test strategy that will fire the human input event when asked to decide,
@@ -51,17 +51,17 @@ class DeterministicStrategy : public pkt::core::player::BotStrategy
 class TestHumanEventStrategy : public pkt::test::DeterministicStrategy
 {
   private:
-    const pkt::core::GameEvents& myEvents;
+    const pkt::core::GameEvents& m_events;
 
   public:
-    TestHumanEventStrategy(const pkt::core::GameEvents& events) : myEvents(events) {}
+    TestHumanEventStrategy(const pkt::core::GameEvents& events) : m_events(events) {}
 
     pkt::core::PlayerAction decideAction(const CurrentHandContext& ctx) override
     {
         // Fire the human input event with real valid actions from context
-        if (myEvents.onAwaitingHumanInput)
+        if (m_events.onAwaitingHumanInput)
         {
-            myEvents.onAwaitingHumanInput(ctx.personalContext.id, ctx.commonContext.validActions);
+            m_events.onAwaitingHumanInput(ctx.personalContext.id, ctx.commonContext.validActions);
         }
 
         // Then return a deterministic action to let the test continue

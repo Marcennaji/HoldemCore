@@ -7,7 +7,7 @@
 namespace pkt::core::player
 {
 PlayerStatisticsUpdater::PlayerStatisticsUpdater(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer)
-    : myServices(serviceContainer)
+    : m_services(serviceContainer)
 {
 }
 
@@ -18,14 +18,14 @@ const PlayerStatistics& PlayerStatisticsUpdater::getStatistics(const int nbPlaye
         clamped = 0;
     if (clamped > MAX_NUMBER_OF_PLAYERS)
         clamped = MAX_NUMBER_OF_PLAYERS;
-    return myStatistics[clamped];
+    return m_statistics[clamped];
 }
 void PlayerStatisticsUpdater::resetPlayerStatistics()
 {
 
     for (int i = 0; i <= MAX_NUMBER_OF_PLAYERS; i++)
     {
-        myStatistics[i].reset();
+        m_statistics[i].reset();
     }
 }
 void PlayerStatisticsUpdater::updateStatistics(GameState state, const CurrentHandContext& ctx)
@@ -56,37 +56,37 @@ void PlayerStatisticsUpdater::updatePreflopStatistics(const CurrentHandContext& 
     if (actions.empty())
         return;
 
-    myStatistics[nbPlayers].totalHands++;
-    myStatistics[nbPlayers].preflopStatistics.hands++;
+    m_statistics[nbPlayers].totalHands++;
+    m_statistics[nbPlayers].preflopStatistics.hands++;
 
     for (const auto& action : actions)
     {
         switch (action.type)
         {
         case ActionType::Allin:
-            myStatistics[nbPlayers].preflopStatistics.raises++;
+            m_statistics[nbPlayers].preflopStatistics.raises++;
             break;
         case ActionType::Raise:
-            myStatistics[nbPlayers].preflopStatistics.raises++;
+            m_statistics[nbPlayers].preflopStatistics.raises++;
             break;
         case ActionType::Fold:
-            myStatistics[nbPlayers].preflopStatistics.folds++;
+            m_statistics[nbPlayers].preflopStatistics.folds++;
             break;
         case ActionType::Check:
-            myStatistics[nbPlayers].preflopStatistics.checks++;
+            m_statistics[nbPlayers].preflopStatistics.checks++;
             break;
         case ActionType::Call:
-            myStatistics[nbPlayers].preflopStatistics.calls++;
+            m_statistics[nbPlayers].preflopStatistics.calls++;
             break;
         default:
             break;
         }
 
-        myStatistics[nbPlayers].preflopStatistics.addLastAction(action); // keep track of the last 10 actions
+        m_statistics[nbPlayers].preflopStatistics.addLastAction(action); // keep track of the last 10 actions
 
         if (action.type == ActionType::Call && ctx.commonContext.playersContext.raisersPositions.size() == 0)
         { //
-            myStatistics[nbPlayers].preflopStatistics.limps++;
+            m_statistics[nbPlayers].preflopStatistics.limps++;
         }
 
         int playerRaises = 0;
@@ -104,13 +104,13 @@ void PlayerStatisticsUpdater::updatePreflopStatistics(const CurrentHandContext& 
 
             if (playerRaises == 1 && ctx.commonContext.playersContext.raisersPositions.size() == 2)
             {
-                myStatistics[nbPlayers].preflopStatistics.threeBets++;
+                m_statistics[nbPlayers].preflopStatistics.threeBets++;
             }
 
             if (playerRaises == 2 ||
                 (playerRaises == 1 && ctx.commonContext.playersContext.raisersPositions.size() == 3))
             {
-                myStatistics[nbPlayers].preflopStatistics.fourBets++;
+                m_statistics[nbPlayers].preflopStatistics.fourBets++;
             }
         }
         else
@@ -119,11 +119,11 @@ void PlayerStatisticsUpdater::updatePreflopStatistics(const CurrentHandContext& 
             if (playerRaises == 1)
             {
 
-                myStatistics[nbPlayers].preflopStatistics.callthreeBetsOpportunities++;
+                m_statistics[nbPlayers].preflopStatistics.callthreeBetsOpportunities++;
 
                 if (action.type == ActionType::Call)
                 {
-                    myStatistics[nbPlayers].preflopStatistics.callthreeBets++;
+                    m_statistics[nbPlayers].preflopStatistics.callthreeBets++;
                 }
             }
         }
@@ -136,7 +136,7 @@ void PlayerStatisticsUpdater::updateFlopStatistics(const CurrentHandContext& ctx
     if (actions.empty())
         return;
 
-    myStatistics[nbPlayers].flopStatistics.hands++;
+    m_statistics[nbPlayers].flopStatistics.hands++;
 
     for (const auto& action : actions)
     {
@@ -144,39 +144,39 @@ void PlayerStatisticsUpdater::updateFlopStatistics(const CurrentHandContext& ctx
         switch (action.type)
         {
         case ActionType::Allin:
-            myStatistics[nbPlayers].flopStatistics.raises++;
+            m_statistics[nbPlayers].flopStatistics.raises++;
             break;
         case ActionType::Raise:
-            myStatistics[nbPlayers].flopStatistics.raises++;
+            m_statistics[nbPlayers].flopStatistics.raises++;
             break;
         case ActionType::Fold:
-            myStatistics[nbPlayers].flopStatistics.folds++;
+            m_statistics[nbPlayers].flopStatistics.folds++;
             break;
         case ActionType::Check:
-            myStatistics[nbPlayers].flopStatistics.checks++;
+            m_statistics[nbPlayers].flopStatistics.checks++;
             break;
         case ActionType::Call:
-            myStatistics[nbPlayers].flopStatistics.calls++;
+            m_statistics[nbPlayers].flopStatistics.calls++;
             break;
         case ActionType::Bet:
-            myStatistics[nbPlayers].flopStatistics.bets++;
+            m_statistics[nbPlayers].flopStatistics.bets++;
             break;
         default:
             break;
         }
         if (action.type == ActionType::Raise && ctx.commonContext.playersContext.raisersPositions.size() > 1)
         {
-            myStatistics[nbPlayers].flopStatistics.threeBets++;
+            m_statistics[nbPlayers].flopStatistics.threeBets++;
         }
 
         // continuation bets
         if (ctx.commonContext.playersContext.preflopLastRaiser &&
             ctx.commonContext.playersContext.preflopLastRaiser->getId() == ctx.personalContext.id)
         {
-            myStatistics[nbPlayers].flopStatistics.continuationBetsOpportunities++;
+            m_statistics[nbPlayers].flopStatistics.continuationBetsOpportunities++;
             if (action.type == ActionType::Bet)
             {
-                myStatistics[nbPlayers].flopStatistics.continuationBets++;
+                m_statistics[nbPlayers].flopStatistics.continuationBets++;
             }
         }
     }
@@ -188,36 +188,36 @@ void PlayerStatisticsUpdater::updateTurnStatistics(const CurrentHandContext& ctx
     if (actions.empty())
         return;
 
-    myStatistics[nbPlayers].turnStatistics.hands++;
+    m_statistics[nbPlayers].turnStatistics.hands++;
 
     for (const auto& action : actions)
     {
         switch (action.type)
         {
         case ActionType::Allin:
-            myStatistics[nbPlayers].turnStatistics.raises++;
+            m_statistics[nbPlayers].turnStatistics.raises++;
             break;
         case ActionType::Raise:
-            myStatistics[nbPlayers].turnStatistics.raises++;
+            m_statistics[nbPlayers].turnStatistics.raises++;
             break;
         case ActionType::Fold:
-            myStatistics[nbPlayers].turnStatistics.folds++;
+            m_statistics[nbPlayers].turnStatistics.folds++;
             break;
         case ActionType::Check:
-            myStatistics[nbPlayers].turnStatistics.checks++;
+            m_statistics[nbPlayers].turnStatistics.checks++;
             break;
         case ActionType::Call:
-            myStatistics[nbPlayers].turnStatistics.calls++;
+            m_statistics[nbPlayers].turnStatistics.calls++;
             break;
         case ActionType::Bet:
-            myStatistics[nbPlayers].turnStatistics.bets++;
+            m_statistics[nbPlayers].turnStatistics.bets++;
             break;
         default:
             break;
         }
         if (action.type == ActionType::Raise && ctx.commonContext.playersContext.raisersPositions.size() > 1)
         {
-            myStatistics[nbPlayers].turnStatistics.threeBets++;
+            m_statistics[nbPlayers].turnStatistics.threeBets++;
         }
     }
 }
@@ -228,47 +228,47 @@ void PlayerStatisticsUpdater::updateRiverStatistics(const CurrentHandContext& ct
     if (actions.empty())
         return;
 
-    myStatistics[nbPlayers].riverStatistics.hands++;
+    m_statistics[nbPlayers].riverStatistics.hands++;
 
     for (const auto& action : actions)
     {
         switch (action.type)
         {
         case ActionType::Allin:
-            myStatistics[nbPlayers].riverStatistics.raises++;
+            m_statistics[nbPlayers].riverStatistics.raises++;
             break;
         case ActionType::Raise:
-            myStatistics[nbPlayers].riverStatistics.raises++;
+            m_statistics[nbPlayers].riverStatistics.raises++;
             break;
         case ActionType::Fold:
-            myStatistics[nbPlayers].riverStatistics.folds++;
+            m_statistics[nbPlayers].riverStatistics.folds++;
             break;
         case ActionType::Check:
-            myStatistics[nbPlayers].riverStatistics.checks++;
+            m_statistics[nbPlayers].riverStatistics.checks++;
             break;
         case ActionType::Call:
-            myStatistics[nbPlayers].riverStatistics.calls++;
+            m_statistics[nbPlayers].riverStatistics.calls++;
             break;
         case ActionType::Bet:
-            myStatistics[nbPlayers].riverStatistics.bets++;
+            m_statistics[nbPlayers].riverStatistics.bets++;
             break;
         default:
             break;
         }
         if (action.type == ActionType::Raise && ctx.commonContext.playersContext.raisersPositions.size() > 1)
         {
-            myStatistics[nbPlayers].riverStatistics.threeBets++;
+            m_statistics[nbPlayers].riverStatistics.threeBets++;
         }
     }
 }
 
 void PlayerStatisticsUpdater::ensureServicesInitialized() const
 {
-    if (!myServices)
+    if (!m_services)
     {
         static std::shared_ptr<pkt::core::ServiceContainer> defaultServices =
             std::make_shared<pkt::core::AppServiceContainer>();
-        myServices = defaultServices;
+        m_services = defaultServices;
     }
 }
 
@@ -278,10 +278,10 @@ void PlayerStatisticsUpdater::loadStatistics(const std::string& playerName)
 
     resetPlayerStatistics(); // reset stats to 0
 
-    myStatistics = myServices->playersStatisticsStore().loadPlayerStatistics(playerName);
-    if (myStatistics.empty())
+    m_statistics = m_services->playersStatisticsStore().loadPlayerStatistics(playerName);
+    if (m_statistics.empty())
     {
-        myStatistics.fill(PlayerStatistics());
+        m_statistics.fill(PlayerStatistics());
     }
 }
 

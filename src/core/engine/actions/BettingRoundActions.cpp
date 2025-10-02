@@ -10,7 +10,7 @@ namespace pkt::core
 using namespace pkt::core::player;
 
 BettingRoundActions::BettingRoundActions(GameState gameState, PlayerList& seats, PlayerList& actingPlayers)
-    : myGameState(gameState), mySeatsList(seats), myActingPlayersList(actingPlayers)
+    : m_gameState(gameState), m_seatsList(seats), m_actingPlayersList(actingPlayers)
 {
 }
 
@@ -18,9 +18,9 @@ int BettingRoundActions::getCallsNumber()
 {
     int calls = 0;
 
-    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
+    for (auto it = m_seatsList->begin(); it != m_seatsList->end(); ++it)
     {
-        auto& actions = (*it)->getCurrentHandActions().getActions(myGameState);
+        auto& actions = (*it)->getCurrentHandActions().getActions(m_gameState);
 
         for (auto itAction = actions.begin(); itAction != actions.end(); itAction++)
         {
@@ -37,10 +37,10 @@ int BettingRoundActions::getRaisesNumber()
 
     int raises = 0;
 
-    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
+    for (auto it = m_seatsList->begin(); it != m_seatsList->end(); ++it)
     {
 
-        auto& actions = (*it)->getCurrentHandActions().getActions(myGameState);
+        auto& actions = (*it)->getCurrentHandActions().getActions(m_gameState);
 
         for (auto itAction = actions.begin(); itAction != actions.end(); itAction++)
         {
@@ -58,9 +58,9 @@ int BettingRoundActions::getBetsOrRaisesNumber()
 
     int bets = 0;
 
-    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
+    for (auto it = m_seatsList->begin(); it != m_seatsList->end(); ++it)
     {
-        auto& actions = (*it)->getCurrentHandActions().getActions(myGameState);
+        auto& actions = (*it)->getCurrentHandActions().getActions(m_gameState);
 
         for (auto itAction = actions.begin(); itAction != actions.end(); itAction++)
         {
@@ -78,18 +78,18 @@ int BettingRoundActions::getBetsOrRaisesNumber()
 std::shared_ptr<pkt::core::player::Player> BettingRoundActions::getLastRaiser()
 {
     // If we have a stored last raiser, return it
-    if (myLastRaiser)
+    if (m_lastRaiser)
     {
-        return myLastRaiser;
+        return m_lastRaiser;
     }
 
     // If no stored last raiser but there are raises, find the last raiser dynamically
     // This ensures consistency when raises exist but lastRaiser wasn't properly set
     std::shared_ptr<pkt::core::player::Player> lastRaiser = nullptr;
     
-    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it)
+    for (auto it = m_seatsList->begin(); it != m_seatsList->end(); ++it)
     {
-        auto& actions = (*it)->getCurrentHandActions().getActions(myGameState);
+        auto& actions = (*it)->getCurrentHandActions().getActions(m_gameState);
 
         for (auto itAction = actions.begin(); itAction != actions.end(); itAction++)
         {
@@ -103,7 +103,7 @@ std::shared_ptr<pkt::core::player::Player> BettingRoundActions::getLastRaiser()
     // Cache the found last raiser to avoid recalculation
     if (lastRaiser)
     {
-        myLastRaiser = lastRaiser;
+        m_lastRaiser = lastRaiser;
     }
 
     return lastRaiser;
@@ -111,7 +111,7 @@ std::shared_ptr<pkt::core::player::Player> BettingRoundActions::getLastRaiser()
 
 void BettingRoundActions::setLastRaiser(std::shared_ptr<pkt::core::player::Player> player)
 {
-    myLastRaiser = player;
+    m_lastRaiser = player;
 }
 
 } // namespace pkt::core

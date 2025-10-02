@@ -26,10 +26,10 @@ class BotStrategyBase : public virtual BotStrategy
     int computePreflopRaiseAmount(const CurrentHandContext&);
     bool shouldPotControl(const CurrentHandContext&);
     bool isPossibleToBluff(const CurrentHandContext& ctx) const;
-    bool myCouldCall;
-    bool myCouldRaise;
+    bool m_couldCall;
+    bool m_couldRaise;
 
-    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices; 
+    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services; 
 
   private:
     virtual bool preflopCouldCall(const CurrentHandContext& ctx) = 0;

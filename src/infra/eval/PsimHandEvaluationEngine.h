@@ -38,7 +38,7 @@ class PsimHandEvaluationEngine : public pkt::core::HandEvaluationEngine
     void ensureServicesInitialized();
 
     /// ServiceContainer for dependency injection
-    std::shared_ptr<pkt::core::ServiceContainer> myServices;
+    std::shared_ptr<pkt::core::ServiceContainer> m_services;
 };
 
 } // namespace pkt::infra

@@ -39,11 +39,11 @@ class StartWindow : public QMainWindow
 
     ~StartWindow();
 
-    void setSession(pkt::core::Session* session) { mySession = session; }
+    void setSession(pkt::core::Session* session) { m_session = session; }
     pkt::core::Session* getSession()
     {
-        assert(mySession != nullptr);
-        return mySession;
+        assert(m_session != nullptr);
+        return m_session;
     }
 
     bool eventFilter(QObject* obj, QEvent* event);
@@ -55,8 +55,8 @@ class StartWindow : public QMainWindow
     void startNewGame();
 
   private:
-    PokerTableWindow* myPokerTableWindow{nullptr};
-    pkt::core::Session* mySession;
+    PokerTableWindow* m_pokerTableWindow{nullptr};
+    pkt::core::Session* m_session;
 
     void createInterface();
     void createTableSettings();
@@ -65,7 +65,7 @@ class StartWindow : public QMainWindow
     void applyConsistentStyling();
     void ensureServicesInitialized();
 
-    std::shared_ptr<pkt::core::ServiceContainer> myServices;
+    std::shared_ptr<pkt::core::ServiceContainer> m_services;
     
     // UI Components
     QWidget* m_centralWidget;

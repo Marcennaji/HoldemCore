@@ -15,15 +15,15 @@ PsimHandEvaluationEngine::PsimHandEvaluationEngine()
 }
 
 PsimHandEvaluationEngine::PsimHandEvaluationEngine(std::shared_ptr<pkt::core::ServiceContainer> services)
-    : myServices(std::move(services))
+    : m_services(std::move(services))
 {
 }
 
 void PsimHandEvaluationEngine::ensureServicesInitialized()
 {
-    if (!myServices)
+    if (!m_services)
     {
-        myServices = std::make_shared<pkt::core::AppServiceContainer>();
+        m_services = std::make_shared<pkt::core::AppServiceContainer>();
     }
 }
 
@@ -77,17 +77,17 @@ HandSimulationStats PsimHandEvaluationEngine::simulateHandEquity(const std::stri
     SimResults r;
     const string cards = (hand + " " + board).c_str();
 
-    myServices->logger().verbose("Calling psim for hand equity computing, cards = " + cards +
+    m_services->logger().verbose("Calling psim for hand equity computing, cards = " + cards +
                                  ", nbOpponents = " + to_string(nbOpponents) +
                                  ", maxOpponentsStrengths = " + to_string(maxOpponentsStrengths));
 
-    myServices->logger().verbose("  --> Calling psim for SimulateHand");
+    m_services->logger().verbose("  --> Calling psim for SimulateHand");
 
     SimulateHand(cards.c_str(), &r, 0, 1, 5000);
 
     float win = r.win; // save the value
 
-    myServices->logger().verbose("  --> Calling psim for SimulateHandMulti");
+    m_services->logger().verbose("  --> Calling psim for SimulateHandMulti");
     SimulateHandMulti(cards.c_str(), &r, 1000, 300, nbOpponents);
     r.win = win; // because simulateHandMulti doesn't compute 'win'
     r.winRanged = 0;
@@ -101,7 +101,7 @@ HandSimulationStats PsimHandEvaluationEngine::simulateHandEquity(const std::stri
         r.winRanged = r.win / 4;
     }
     HandSimulationStats stats = convertSimResults(r);
-    myServices->logger().debug("hand equity is computed");
+    m_services->logger().debug("hand equity is computed");
     return stats;
 }
 pkt::core::PostFlopAnalysisFlags PsimHandEvaluationEngine::analyzeHand(const std::string& hand,
@@ -109,13 +109,13 @@ pkt::core::PostFlopAnalysisFlags PsimHandEvaluationEngine::analyzeHand(const std
 {
     ensureServicesInitialized();
 
-    myServices->logger().debug("Calling psim for postflop hand analysis");
+    m_services->logger().debug("Calling psim for postflop hand analysis");
 
     PostFlopState r;
     GetHandState((hand + board).c_str(), &r);
     PostFlopAnalysisFlags flags = convertPostFlopState(r);
 
-    myServices->logger().debug("postflop hand analysis is done");
+    m_services->logger().debug("postflop hand analysis is done");
 
     return flags;
 }

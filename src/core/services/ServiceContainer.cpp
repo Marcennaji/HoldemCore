@@ -13,31 +13,31 @@ namespace pkt::core
 {
 
 AppServiceContainer::AppServiceContainer()
-        : myLogger(std::make_unique<pkt::infra::ConsoleLogger>()),
-            myPlayersStatisticsStore(std::make_unique<NullPlayersStatisticsStore>()),
-            myRandomizer(std::make_unique<DefaultRandomizer>()),
-            myHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>())
+        : m_logger(std::make_unique<pkt::infra::ConsoleLogger>()),
+            m_playersStatisticsStore(std::make_unique<NullPlayersStatisticsStore>()),
+            m_randomizer(std::make_unique<DefaultRandomizer>()),
+            m_handEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>())
 {
 }
 
 Logger& AppServiceContainer::logger()
 {
-    return *myLogger;
+    return *m_logger;
 }
 
 PlayersStatisticsStore& AppServiceContainer::playersStatisticsStore()
 {
-    return *myPlayersStatisticsStore;
+    return *m_playersStatisticsStore;
 }
 
 HandEvaluationEngine& AppServiceContainer::handEvaluationEngine()
 {
-    return *myHandEvaluationEngine;
+    return *m_handEvaluationEngine;
 }
 
 Randomizer& AppServiceContainer::randomizer()
 {
-    return *myRandomizer;
+    return *m_randomizer;
 }
 
 } // namespace pkt::core

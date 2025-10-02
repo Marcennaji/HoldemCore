@@ -38,17 +38,17 @@ class Game
     void findNextDealer();
 
   private:
-    std::shared_ptr<EngineFactory> myEngineFactory;
-    const GameEvents& myEvents;
-    std::shared_ptr<Hand> myCurrentHand;
-    std::shared_ptr<Board> myCurrentBoard;
+    std::shared_ptr<EngineFactory> m_engineFactory;
+    const GameEvents& m_events;
+    std::shared_ptr<Hand> m_currentHand;
+    std::shared_ptr<Board> m_currentBoard;
 
-    pkt::core::player::PlayerList mySeatsList;
-    pkt::core::player::PlayerList myActingPlayersList;
+    pkt::core::player::PlayerList m_seatsList;
+    pkt::core::player::PlayerList m_actingPlayersList;
 
-    unsigned myDealerPlayerId{0};
-    GameData myGameData;
-    StartData myStartData;
+    unsigned m_dealerPlayerId{0};
+    GameData m_gameData;
+    StartData m_startData;
 };
 
 } // namespace pkt::core

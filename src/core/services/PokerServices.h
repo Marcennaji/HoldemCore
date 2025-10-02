@@ -27,7 +27,7 @@ class PokerServices : public ServiceContainer
     Randomizer& randomizer() override;
 
   private:
-    std::shared_ptr<ServiceContainer> myBaseContainer;
+    std::shared_ptr<ServiceContainer> m_baseContainer;
 };
 
 } // namespace pkt::core

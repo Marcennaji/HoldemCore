@@ -57,11 +57,11 @@ class GuiBridgeWidgets : public QObject
     void handleInvalidPlayerAction(unsigned playerId, pkt::core::PlayerAction invalidAction, std::string reason);
     void handleEngineError(std::string errorMessage);
 
-    PokerTableWindow* myTableWindow = nullptr;
-    pkt::core::Session* mySession = nullptr;
+    PokerTableWindow* m_tableWindow = nullptr;
+    pkt::core::Session* m_session = nullptr;
     
     // Track the human strategy that's currently waiting for input
-    pkt::core::player::HumanStrategy* myCurrentHumanStrategy = nullptr;
+    pkt::core::player::HumanStrategy* m_currentHumanStrategy = nullptr;
 
   // Game speed for UI pacing (higher = faster; used to compute delay between bot actions)
   int m_gameSpeed = 1;

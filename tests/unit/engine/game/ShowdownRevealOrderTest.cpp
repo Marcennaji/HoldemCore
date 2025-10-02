@@ -11,7 +11,7 @@ class ShowdownRevealOrderTest : public EngineTest {
 protected:
     void SetUp() override {
         EngineTest::SetUp();
-        myEvents.clear();
+        m_events.clear();
     }
 };
 
@@ -26,11 +26,11 @@ TEST_F(ShowdownRevealOrderTest, NonAllIn_LastActorFirst_ThenByRankAndContributio
     // Arrange: 3 players, we will set ranks and contributions to produce a clear order.
     initializeHandWithPlayers(3, gameData);
 
-    auto& board = myHand->getBoard();
+    auto& board = m_hand->getBoard();
     // Seat/player IDs are 0,1,2 in creation order.
-    auto p0 = getPlayerById(mySeatsList, 0);
-    auto p1 = getPlayerById(mySeatsList, 1);
-    auto p2 = getPlayerById(mySeatsList, 2);
+    auto p0 = getPlayerById(m_seatsList, 0);
+    auto p1 = getPlayerById(m_seatsList, 1);
+    auto p2 = getPlayerById(m_seatsList, 2);
 
     // Last action made by player 1
     board.setLastActionPlayerId(1);
@@ -55,7 +55,7 @@ TEST_F(ShowdownRevealOrderTest, AllIn_RevealsAllNonFoldersInSeatOrder)
 {
     // Arrange: 3 players, all-in condition set; none folded (default last actions are None)
     initializeHandWithPlayers(3, gameData);
-    auto& board = myHand->getBoard();
+    auto& board = m_hand->getBoard();
     board.setAllInCondition(true);
 
     // Act
@@ -71,10 +71,10 @@ TEST_F(ShowdownRevealOrderTest, LowerRankWithoutEnoughContribution_DoesNotReveal
 {
     // Arrange: 3 players, player 1 is last actor and sets the initial level threshold.
     initializeHandWithPlayers(3, gameData);
-    auto& board = myHand->getBoard();
-    auto p0 = getPlayerById(mySeatsList, 0);
-    auto p1 = getPlayerById(mySeatsList, 1);
-    auto p2 = getPlayerById(mySeatsList, 2);
+    auto& board = m_hand->getBoard();
+    auto p0 = getPlayerById(m_seatsList, 0);
+    auto p1 = getPlayerById(m_seatsList, 1);
+    auto p2 = getPlayerById(m_seatsList, 2);
 
     board.setLastActionPlayerId(1);
 

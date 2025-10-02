@@ -29,43 +29,43 @@ void checkActionAmount(const PlayerAction& action, pkt::core::ServiceContainer& 
 
 CurrentHandActions::CurrentHandActions()
 {
-    myActionsByState[GameState::Preflop] = {};
-    myActionsByState[GameState::Flop] = {};
-    myActionsByState[GameState::Turn] = {};
-    myActionsByState[GameState::River] = {};
-    myActionsByState[GameState::PostRiver] = {};
-    myActionsByState[GameState::None] = {};
+    m_actionsByState[GameState::Preflop] = {};
+    m_actionsByState[GameState::Flop] = {};
+    m_actionsByState[GameState::Turn] = {};
+    m_actionsByState[GameState::River] = {};
+    m_actionsByState[GameState::PostRiver] = {};
+    m_actionsByState[GameState::None] = {};
 }
 
 CurrentHandActions::CurrentHandActions(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer)
-    : myServices(serviceContainer)
+    : m_services(serviceContainer)
 {
-    myActionsByState[GameState::Preflop] = {};
-    myActionsByState[GameState::Flop] = {};
-    myActionsByState[GameState::Turn] = {};
-    myActionsByState[GameState::River] = {};
-    myActionsByState[GameState::PostRiver] = {};
-    myActionsByState[GameState::None] = {};
+    m_actionsByState[GameState::Preflop] = {};
+    m_actionsByState[GameState::Flop] = {};
+    m_actionsByState[GameState::Turn] = {};
+    m_actionsByState[GameState::River] = {};
+    m_actionsByState[GameState::PostRiver] = {};
+    m_actionsByState[GameState::None] = {};
 }
 
 void CurrentHandActions::ensureServicesInitialized() const
 {
-    if (!myServices)
+    if (!m_services)
     {
-        myServices = std::make_shared<pkt::core::AppServiceContainer>();
+        m_services = std::make_shared<pkt::core::AppServiceContainer>();
     }
 }
 
 void CurrentHandActions::reset()
 {
-    for (auto& [state, actions] : myActionsByState)
+    for (auto& [state, actions] : m_actionsByState)
         actions.clear();
 }
 
 int CurrentHandActions::getActionsNumber(const GameState& state, const ActionType& actionType) const
 {
     int count = 0;
-    for (const auto& action : myActionsByState.at(state))
+    for (const auto& action : m_actionsByState.at(state))
     {
         if (action.type == actionType)
             count++;
@@ -77,14 +77,14 @@ int CurrentHandActions::getLastBetAmount(const GameState& state) const
 {
     ensureServicesInitialized();
 
-    const auto& actions = myActionsByState.at(state);
+    const auto& actions = m_actionsByState.at(state);
     for (auto action = actions.rbegin(); action != actions.rend(); ++action)
     {
         if (action->type == ActionType::Bet || action->type == ActionType::Raise || action->type == ActionType::Allin)
         {
             if (action->type == ActionType::Bet || action->type == ActionType::Raise)
             {
-                checkActionAmount(*action, *myServices);
+                checkActionAmount(*action, *m_services);
             }
         }
         return action->amount;
@@ -97,11 +97,11 @@ int CurrentHandActions::getRoundTotalBetAmount(const GameState& state) const
     ensureServicesInitialized();
 
     int total = 0;
-    for (const auto& action : myActionsByState.at(state))
+    for (const auto& action : m_actionsByState.at(state))
     {
         if (action.type == ActionType::Bet || action.type == ActionType::Raise)
         {
-            checkActionAmount(action, *myServices);
+            checkActionAmount(action, *m_services);
         }
         total += action.amount;
     }
@@ -114,13 +114,13 @@ int CurrentHandActions::getHandTotalBetAmount() const
     ensureServicesInitialized();
 
     int total = 0;
-    for (const auto& [state, actions] : myActionsByState)
+    for (const auto& [state, actions] : m_actionsByState)
     {
         for (const auto& action : actions)
         {
             if (action.type == ActionType::Bet || action.type == ActionType::Raise)
             {
-                checkActionAmount(action, *myServices);
+                checkActionAmount(action, *m_services);
             }
             total += action.amount;
         }
@@ -130,12 +130,12 @@ int CurrentHandActions::getHandTotalBetAmount() const
 void CurrentHandActions::writeActionsToLog() const
 {
     ensureServicesInitialized();
-    writeActionsToLog(myServices->logger());
+    writeActionsToLog(m_services->logger());
 }
 
 void CurrentHandActions::writeActionsToLog(Logger& logger) const
 {
-    for (const auto& [state, actions] : myActionsByState)
+    for (const auto& [state, actions] : m_actionsByState)
     {
         logger.error("List of player's actions for state: " + gameStateToString(state));
         for (const auto& action : actions)
@@ -148,8 +148,8 @@ void CurrentHandActions::writeActionsToLog(Logger& logger) const
 
 void CurrentHandActions::addAction(const GameState& state, const PlayerAction& action)
 {
-    myActionsByState[state].push_back(action);
-    myLastAction = action;
+    m_actionsByState[state].push_back(action);
+    m_lastAction = action;
 }
 
 } // namespace pkt::core::player

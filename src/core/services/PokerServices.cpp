@@ -7,28 +7,28 @@
 namespace pkt::core
 {
 
-PokerServices::PokerServices(std::shared_ptr<ServiceContainer> baseContainer) : myBaseContainer(baseContainer)
+PokerServices::PokerServices(std::shared_ptr<ServiceContainer> baseContainer) : m_baseContainer(baseContainer)
 {
 }
 
 Logger& PokerServices::logger()
 {
-    return myBaseContainer->logger();
+    return m_baseContainer->logger();
 }
 
 PlayersStatisticsStore& PokerServices::playersStatisticsStore()
 {
-    return myBaseContainer->playersStatisticsStore();
+    return m_baseContainer->playersStatisticsStore();
 }
 
 HandEvaluationEngine& PokerServices::handEvaluationEngine()
 {
-    return myBaseContainer->handEvaluationEngine();
+    return m_baseContainer->handEvaluationEngine();
 }
 
 Randomizer& PokerServices::randomizer()
 {
-    return myBaseContainer->randomizer();
+    return m_baseContainer->randomizer();
 }
 
 } // namespace pkt::core

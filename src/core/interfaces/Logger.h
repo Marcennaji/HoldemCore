@@ -27,7 +27,7 @@ class Logger
     virtual void debug(const std::string& msg) = 0;
 
   protected:
-    LogLevel myLogLevel{LogLevel::Info};
+    LogLevel m_logLevel{LogLevel::Info};
 };
 
 } // namespace pkt::core

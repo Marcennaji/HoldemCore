@@ -79,10 +79,10 @@ class Session
     GameComponents createGameComponents(const GameData& gameData, const StartData& startData);
     void initializeGame(GameComponents&& components, const GameData& gameData, const StartData& startData);
 
-    std::unique_ptr<Game> myCurrentGame;
-    const GameEvents& myEvents;
-    std::shared_ptr<EngineFactory> myEngineFactory;       // Injected or created
-    std::shared_ptr<ServiceContainer> myServiceContainer; // Injected service container
+    std::unique_ptr<Game> m_currentGame;
+    const GameEvents& m_events;
+    std::shared_ptr<EngineFactory> m_engineFactory;       // Injected or created
+    std::shared_ptr<ServiceContainer> m_serviceContainer; // Injected service container
 };
 
 } // namespace pkt::core

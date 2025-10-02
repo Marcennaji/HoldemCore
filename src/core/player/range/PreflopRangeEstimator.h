@@ -65,8 +65,8 @@ class PreflopRangeEstimator
 
   private:
     void ensureServicesInitialized() const;
-    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices; // Injected service container
+    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services; // Injected service container
 
-    int myPlayerId;
+    int m_playerId;
 };
 } // namespace pkt::core::player

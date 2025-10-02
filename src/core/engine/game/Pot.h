@@ -17,13 +17,13 @@ class Pot
                  std::shared_ptr<ServiceContainer> serviceContainer);
 
     void distribute();
-    const std::list<unsigned>& getWinners() const { return myWinners; }
+    const std::list<unsigned>& getWinners() const { return m_winners; }
 
   private:
-    unsigned myTotal;
-    pkt::core::player::PlayerList mySeats;
-    std::list<unsigned> myWinners;
-    unsigned myDealerId;
+    unsigned m_total;
+    pkt::core::player::PlayerList m_seats;
+    std::list<unsigned> m_winners;
+    unsigned m_dealerId;
 
     // Distribution steps
     std::vector<unsigned> initializePlayerContributions();
@@ -40,7 +40,7 @@ class Pot
     std::vector<size_t> indexesOf(const std::list<unsigned>& ids);
     void ensureServicesInitialized() const;
 
-    mutable std::shared_ptr<ServiceContainer> myServices; // Injected service container
+    mutable std::shared_ptr<ServiceContainer> m_services; // Injected service container
 };
 
 } // namespace pkt::core

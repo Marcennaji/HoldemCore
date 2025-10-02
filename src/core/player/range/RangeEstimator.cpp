@@ -20,17 +20,17 @@ namespace pkt::core::player
 
 using namespace std;
 
-RangeEstimator::RangeEstimator(int playerId) : myPlayerId(playerId)
+RangeEstimator::RangeEstimator(int playerId) : m_playerId(playerId)
 {
-    assert(myPlayerId >= 0);
-    myPreflopRangeEstimator = make_unique<PreflopRangeEstimator>(myPlayerId);
+    assert(m_playerId >= 0);
+    m_preflopRangeEstimator = make_unique<PreflopRangeEstimator>(m_playerId);
 }
 
 RangeEstimator::RangeEstimator(int playerId, std::shared_ptr<pkt::core::ServiceContainer> serviceContainer)
-    : myPlayerId(playerId), myServices(serviceContainer)
+    : m_playerId(playerId), m_services(serviceContainer)
 {
-    assert(myPlayerId >= 0);
-    myPreflopRangeEstimator = make_unique<PreflopRangeEstimator>(myPlayerId, myServices);
+    assert(m_playerId >= 0);
+    m_preflopRangeEstimator = make_unique<PreflopRangeEstimator>(m_playerId, m_services);
 }
 void RangeEstimator::updateUnplausibleRanges(pkt::core::GameState state, const CurrentHandContext& ctx)
 {
@@ -57,25 +57,25 @@ void RangeEstimator::updateUnplausibleRanges(pkt::core::GameState state, const C
 
 void RangeEstimator::ensureServicesInitialized() const
 {
-    if (!myServices)
+    if (!m_services)
     {
-        myServices = std::make_shared<pkt::core::AppServiceContainer>();
+        m_services = std::make_shared<pkt::core::AppServiceContainer>();
     }
 }
 
 void RangeEstimator::setEstimatedRange(const std::string& range)
 {
-    myEstimatedRange = range;
+    m_estimatedRange = range;
 }
 
 std::string RangeEstimator::getEstimatedRange() const
 {
-    return myEstimatedRange;
+    return m_estimatedRange;
 }
 
 void RangeEstimator::computeEstimatedPreflopRange(const CurrentHandContext& ctx)
 {
-    setEstimatedRange(myPreflopRangeEstimator->computeEstimatedPreflopRange(ctx));
+    setEstimatedRange(m_preflopRangeEstimator->computeEstimatedPreflopRange(ctx));
 }
 
 string RangeEstimator::getFilledRange(std::vector<string>& ranges, std::vector<float>& rangesValues,
@@ -208,7 +208,7 @@ void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(const CurrentHan
     {
         setEstimatedRange(originalEstimatedRange);
     }
-    myServices->logger().info("\tPlausible range on preflop for player " + std::to_string(ctx.personalContext.id) +
+    m_services->logger().info("\tPlausible range on preflop for player " + std::to_string(ctx.personalContext.id) +
                               " :\t" + getEstimatedRange());
 }
 
@@ -220,7 +220,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(const CurrentHandCo
     const string originalEstimatedRange = getEstimatedRange();
     string unplausibleRanges;
 
-    myServices->logger().verbose("\tPlausible range on flop, before update :\t" + getEstimatedRange());
+    m_services->logger().verbose("\tPlausible range on flop, before update :\t" + getEstimatedRange());
 
     // update my unplausible hands (unplausible to my opponents eyes), given what I did on flop
 
@@ -230,7 +230,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(const CurrentHandCo
 
     if (ctx.personalContext.actions.isInVeryLooseMode)
     {
-        myServices->logger().verbose("\tSeems to be (temporarily ?) on very loose mode : estimated range is\t" +
+        m_services->logger().verbose("\tSeems to be (temporarily ?) on very loose mode : estimated range is\t" +
                                      getEstimatedRange());
         return;
     }
@@ -245,7 +245,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(const CurrentHandCo
 
         std::string stringHand = s1 + " " + s2;
         PostFlopAnalysisFlags postFlopFlags =
-            myServices->handEvaluationEngine().analyzeHand(stringHand, ctx.commonContext.stringBoard);
+            m_services->handEvaluationEngine().analyzeHand(stringHand, ctx.commonContext.stringBoard);
 
         bool removeHand = false;
 
@@ -255,25 +255,25 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(const CurrentHandCo
             return;
         }
 
-        ActionType myAction = ctx.personalContext.actions.currentHandActions.getActions(GameState::Flop).back().type;
+        ActionType m_action = ctx.personalContext.actions.currentHandActions.getActions(GameState::Flop).back().type;
 
-        if (myAction == ActionType::Call)
+        if (m_action == ActionType::Call)
         {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopCall(postFlopFlags, ctx);
         }
-        else if (myAction == ActionType::Check)
+        else if (m_action == ActionType::Check)
         {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopCheck(postFlopFlags, ctx);
         }
-        else if (myAction == ActionType::Raise)
+        else if (m_action == ActionType::Raise)
         {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopRaise(postFlopFlags, ctx);
         }
-        else if (myAction == ActionType::Bet)
+        else if (m_action == ActionType::Bet)
         {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopBet(postFlopFlags, ctx);
         }
-        else if (myAction == ActionType::Allin)
+        else if (m_action == ActionType::Allin)
         {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenFlopAllin(postFlopFlags, ctx);
         }
@@ -299,7 +299,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(const CurrentHandCo
     {
         // keep previous range
 
-        myServices->logger().verbose("\tCan't remove all plausible ranges, keeping last one");
+        m_services->logger().verbose("\tCan't remove all plausible ranges, keeping last one");
 
         setEstimatedRange(originalEstimatedRange);
         unplausibleRanges = "";
@@ -307,7 +307,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(const CurrentHandCo
 
     if (unplausibleRanges != "")
     {
-        myServices->logger().verbose("\tRemoving unplausible hole cards : " + unplausibleRanges);
+        m_services->logger().verbose("\tRemoving unplausible hole cards : " + unplausibleRanges);
     }
 }
 
@@ -322,7 +322,7 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(const CurrentHandCo
     const string originalEstimatedRange = getEstimatedRange();
     string unplausibleRanges;
 
-    myServices->logger().verbose("\tPlausible range on turn, before update :\t" + getEstimatedRange());
+    m_services->logger().verbose("\tPlausible range on turn, before update :\t" + getEstimatedRange());
 
     // update my unplausible hands (unplausible to my opponents eyes), given what I did on turn
 
@@ -331,7 +331,7 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(const CurrentHandCo
 
     if (ctx.personalContext.actions.isInVeryLooseMode)
     {
-        myServices->logger().verbose("\tSeems to be (temporarily ?) on very loose mode : estimated range is\t" +
+        m_services->logger().verbose("\tSeems to be (temporarily ?) on very loose mode : estimated range is\t" +
                                      getEstimatedRange());
         return;
     }
@@ -346,7 +346,7 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(const CurrentHandCo
 
         std::string stringHand = s1 + " " + s2;
         PostFlopAnalysisFlags postFlopFlags =
-            myServices->handEvaluationEngine().analyzeHand(stringHand, ctx.commonContext.stringBoard);
+            m_services->handEvaluationEngine().analyzeHand(stringHand, ctx.commonContext.stringBoard);
 
         bool removeHand = false;
         const auto& turnActions =
@@ -356,25 +356,25 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(const CurrentHandCo
             // no turn action, so we can't remove any hand
             return;
         }
-        ActionType myAction = turnActions.back().type;
+        ActionType m_action = turnActions.back().type;
 
-        if (myAction == ActionType::Call)
+        if (m_action == ActionType::Call)
         {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnCall(postFlopFlags, ctx);
         }
-        else if (myAction == ActionType::Check)
+        else if (m_action == ActionType::Check)
         {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnCheck(postFlopFlags, ctx);
         }
-        else if (myAction == ActionType::Raise)
+        else if (m_action == ActionType::Raise)
         {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnRaise(postFlopFlags, ctx);
         }
-        else if (myAction == ActionType::Bet)
+        else if (m_action == ActionType::Bet)
         {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnBet(postFlopFlags, ctx);
         }
-        else if (myAction == ActionType::Allin)
+        else if (m_action == ActionType::Allin)
         {
             removeHand = HandPlausibilityChecker::isUnplausibleHandGivenTurnAllin(postFlopFlags, ctx);
         }
@@ -400,14 +400,14 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(const CurrentHandCo
     {
         // keep previous range
 
-        myServices->logger().verbose("\tCan't remove all plausible ranges, keeping last one");
+        m_services->logger().verbose("\tCan't remove all plausible ranges, keeping last one");
         setEstimatedRange(originalEstimatedRange);
         unplausibleRanges = "";
     }
 
     if (unplausibleRanges != "")
     {
-        myServices->logger().verbose("\tRemoving unplausible hole cards : " + unplausibleRanges);
+        m_services->logger().verbose("\tRemoving unplausible hole cards : " + unplausibleRanges);
     }
 }
 
@@ -422,7 +422,7 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(const CurrentHandC
     const string originalEstimatedRange = getEstimatedRange();
     string unplausibleRanges;
 
-    myServices->logger().verbose("\tPlausible range on river, before update :\t" + getEstimatedRange());
+    m_services->logger().verbose("\tPlausible range on river, before update :\t" + getEstimatedRange());
 
     // update my unplausible hands (unplausible to my opponents eyes), given what I did on river
 
@@ -432,7 +432,7 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(const CurrentHandC
 
     if (ctx.personalContext.actions.isInVeryLooseMode)
     {
-        myServices->logger().verbose("\tSeems to be on very loose mode : estimated range is\t" + getEstimatedRange());
+        m_services->logger().verbose("\tSeems to be on very loose mode : estimated range is\t" + getEstimatedRange());
         return;
     }
 
@@ -446,7 +446,7 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(const CurrentHandC
 
         std::string stringHand = s1 + " " + s2;
         PostFlopAnalysisFlags postFlopFlags =
-            myServices->handEvaluationEngine().analyzeHand(stringHand, ctx.commonContext.stringBoard);
+            m_services->handEvaluationEngine().analyzeHand(stringHand, ctx.commonContext.stringBoard);
 
         bool removeHand = false;
         const auto& riverActions =
@@ -499,14 +499,14 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(const CurrentHandC
     {
         // keep previous range
 
-        myServices->logger().verbose("\tCan't remove all plausible ranges, keeping last one");
+        m_services->logger().verbose("\tCan't remove all plausible ranges, keeping last one");
         setEstimatedRange(originalEstimatedRange);
         unplausibleRanges = "";
     }
 
     if (unplausibleRanges != "")
     {
-        myServices->logger().verbose("\tRemoving unplausible hole cards : " + unplausibleRanges);
+        m_services->logger().verbose("\tRemoving unplausible hole cards : " + unplausibleRanges);
     }
 }
 

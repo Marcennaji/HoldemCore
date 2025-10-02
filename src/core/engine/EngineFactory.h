@@ -37,8 +37,8 @@ class EngineFactory
     virtual std::shared_ptr<Board> createBoard(unsigned dealerPosition);
 
   private:
-    const GameEvents& myEvents;
-    std::shared_ptr<PokerServices> myServices; // Injected service container
+    const GameEvents& m_events;
+    std::shared_ptr<PokerServices> m_services; // Injected service container
 
     void ensureServicesInitialized();
 };

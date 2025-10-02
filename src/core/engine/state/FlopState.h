@@ -34,7 +34,7 @@ class FlopState : public HandState, public HandActionProcessor, public HandDebug
     void promptPlayerAction(Hand&, player::Player& player) override;
 
   private:
-    const GameEvents& myEvents;
+    const GameEvents& m_events;
 };
 
 } // namespace pkt::core

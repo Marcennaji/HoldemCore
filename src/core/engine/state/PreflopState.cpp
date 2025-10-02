@@ -15,7 +15,7 @@ namespace pkt::core
 using namespace pkt::core::player;
 
 PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsigned dealerPlayerId)
-    : myEvents(events), mySmallBlind(smallBlind), myDealerPlayerId(dealerPlayerId)
+    : m_events(events), m_smallBlind(smallBlind), m_dealerPlayerId(dealerPlayerId)
 {
     if (smallBlind <= 0)
     {
@@ -30,7 +30,7 @@ PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsig
 
 PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsigned dealerPlayerId,
                            std::shared_ptr<pkt::core::ServiceContainer> services)
-    : myEvents(events), mySmallBlind(smallBlind), myDealerPlayerId(dealerPlayerId), myServices(std::move(services))
+    : m_events(events), m_smallBlind(smallBlind), m_dealerPlayerId(dealerPlayerId), m_services(std::move(services))
 {
     if (smallBlind <= 0)
     {
@@ -45,11 +45,11 @@ PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsig
 
 void PreflopState::ensureServicesInitialized() const
 {
-    if (!myServices)
+    if (!m_services)
     {
         static std::shared_ptr<pkt::core::ServiceContainer> defaultServices =
             std::make_shared<pkt::core::AppServiceContainer>();
-        myServices = defaultServices;
+        m_services = defaultServices;
     }
 }
 
@@ -60,11 +60,11 @@ void PreflopState::enter(Hand& hand)
         player->setAction(*this, {player->getId(), ActionType::None});
     }
 
-    hand.getBettingActions()->updateRoundHighestSet(2 * mySmallBlind);
+    hand.getBettingActions()->updateRoundHighestSet(2 * m_smallBlind);
     setBlinds(hand);
 
-    if (myEvents.onBettingRoundStarted)
-        myEvents.onBettingRoundStarted(Preflop);
+    if (m_events.onBettingRoundStarted)
+        m_events.onBettingRoundStarted(Preflop);
 
     logStateInfo(hand);
 }
@@ -76,7 +76,7 @@ void PreflopState::exit(Hand& hand)
 bool PreflopState::isActionAllowed(const Hand& hand, const PlayerAction action) const
 {
     return (
-        validatePlayerAction(hand.getActingPlayersList(), action, *hand.getBettingActions(), mySmallBlind, Preflop));
+        validatePlayerAction(hand.getActingPlayersList(), action, *hand.getBettingActions(), m_smallBlind, Preflop));
 }
 
 void PreflopState::promptPlayerAction(Hand& hand, Player& player)
@@ -89,19 +89,19 @@ void PreflopState::promptPlayerAction(Hand& hand, Player& player)
 
 std::unique_ptr<HandState> PreflopState::computeNextState(Hand& hand)
 {
-    return computeBettingRoundNextState(hand, myEvents, Preflop);
+    return computeBettingRoundNextState(hand, m_events, Preflop);
 }
 
 void PreflopState::logStateInfo(Hand& hand)
 {
     ensureServicesInitialized();
     HandDebuggableState::logStateInfo(hand);
-    myServices->logger().info("Blinds: SB=" + std::to_string(mySmallBlind) +
-                              ", BB=" + std::to_string(2 * mySmallBlind));
+    m_services->logger().info("Blinds: SB=" + std::to_string(m_smallBlind) +
+                              ", BB=" + std::to_string(2 * m_smallBlind));
     // Log dealer and positions to help diagnose acting order
-    myServices->logger().info("Dealer: Player " + std::to_string(hand.getDealerPlayerId()));
+    m_services->logger().info("Dealer: Player " + std::to_string(hand.getDealerPlayerId()));
     for (const auto& player : *hand.getSeatsList()) {
-        myServices->logger().info(
+        m_services->logger().info(
             "Player " + std::to_string(player->getId()) + " (" + player->getName() + ") position=" +
             positionToString(player->getPosition()));
     }
@@ -116,12 +116,12 @@ void PreflopState::logHoleCards(Hand& hand)
         const HoleCards& holeCards = player->getHoleCards();
         if (holeCards.isValid())
         {
-            myServices->logger().info("Player " + std::to_string(player->getId()) + " (" + player->getName() +
+            m_services->logger().info("Player " + std::to_string(player->getId()) + " (" + player->getName() +
                                       "): " + holeCards.toString());
         }
         else
         {
-            myServices->logger().info("Player " + std::to_string(player->getId()) + " (" + player->getName() +
+            m_services->logger().info("Player " + std::to_string(player->getId()) + " (" + player->getName() +
                                       "): No hole cards");
         }
     }
@@ -155,12 +155,12 @@ void PreflopState::setBlinds(Hand& hand)
         if (player->getPosition() == PlayerPosition::SmallBlind ||
             player->getPosition() == PlayerPosition::ButtonSmallBlind)
         {
-            blindAmount = mySmallBlind;
+            blindAmount = m_smallBlind;
             actionType = ActionType::PostSmallBlind;
         }
         else if (player->getPosition() == PlayerPosition::BigBlind)
         {
-            blindAmount = 2 * mySmallBlind;
+            blindAmount = 2 * m_smallBlind;
             actionType = ActionType::PostBigBlind;
         }
 
@@ -186,9 +186,9 @@ void PreflopState::setBlinds(Hand& hand)
             // Record blind post in hand-level chronological history
             hand.getBettingActions()->recordPlayerAction(getGameState(), blindAction);
 
-            if (myEvents.onPlayerActed)
+            if (m_events.onPlayerActed)
             {
-                myEvents.onPlayerActed(blindAction);
+                m_events.onPlayerActed(blindAction);
             }
         }
     }

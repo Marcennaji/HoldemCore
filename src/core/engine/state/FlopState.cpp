@@ -11,7 +11,7 @@ namespace pkt::core
 {
 using namespace pkt::core::player;
 
-FlopState::FlopState(const GameEvents& events) : myEvents(events)
+FlopState::FlopState(const GameEvents& events) : m_events(events)
 {
 }
 
@@ -25,8 +25,8 @@ void FlopState::enter(Hand& hand)
         player->setAction(*this, {player->getId(), ActionType::None});
     }
 
-    if (myEvents.onBettingRoundStarted)
-        myEvents.onBettingRoundStarted(Flop);
+    if (m_events.onBettingRoundStarted)
+        m_events.onBettingRoundStarted(Flop);
 
     // Deal flop cards (3 cards) and fire event with flop-specific BoardCards
     BoardCards currentBoard = hand.getBoard().getBoardCards();
@@ -42,9 +42,9 @@ void FlopState::enter(Hand& hand)
         hand.getBoard().setBoardCards(flopBoard);
 
         // Fire event with flop-specific board (3 cards)
-        if (myEvents.onBoardCardsDealt)
+        if (m_events.onBoardCardsDealt)
         {
-            myEvents.onBoardCardsDealt(flopBoard);
+            m_events.onBoardCardsDealt(flopBoard);
         }
     }
     logStateInfo(hand);
@@ -69,7 +69,7 @@ void FlopState::promptPlayerAction(Hand& hand, Player& player)
 
 std::unique_ptr<HandState> FlopState::computeNextState(Hand& hand)
 {
-    return computeBettingRoundNextState(hand, myEvents, Flop);
+    return computeBettingRoundNextState(hand, m_events, Flop);
 }
 
 std::shared_ptr<player::Player> FlopState::getNextPlayerToAct(const Hand& hand) const

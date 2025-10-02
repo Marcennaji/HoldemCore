@@ -49,24 +49,24 @@ class Board
     std::list<unsigned> getWinners() const;
     void setWinners(const std::list<unsigned>& w);
 
-    std::vector<unsigned> getShowdownRevealOrder() const { return myShowdownRevealOrder; }
+    std::vector<unsigned> getShowdownRevealOrder() const { return m_showdownRevealOrder; }
 
   private:
     void ensureServicesInitialized() const;
-    const GameEvents& myEvents;
-    pkt::core::player::PlayerList mySeatsList;
-    pkt::core::player::PlayerList myActingPlayersList;
+    const GameEvents& m_events;
+    pkt::core::player::PlayerList m_seatsList;
+    pkt::core::player::PlayerList m_actingPlayersList;
 
-    std::list<unsigned> myWinners;
-    std::vector<unsigned> myShowdownRevealOrder; // ordered, deduplicated, preserves reveal sequence
+    std::list<unsigned> m_winners;
+    std::vector<unsigned> m_showdownRevealOrder; // ordered, deduplicated, preserves reveal sequence
 
-    BoardCards myBoardCards;
-    int myPot{0};
-    int myCurrentRoundTotalBets{0};
-    unsigned myDealerPlayerId{0};
-    bool myAllInCondition{false};
-    unsigned myLastActionPlayerId{0};
-  mutable std::shared_ptr<ServiceContainer> myServices;
+    BoardCards m_boardCards;
+    int m_pot{0};
+    int m_currentRoundTotalBets{0};
+    unsigned m_dealerPlayerId{0};
+    bool m_allInCondition{false};
+    unsigned m_lastActionPlayerId{0};
+  mutable std::shared_ptr<ServiceContainer> m_services;
 };
 
 } // namespace pkt::core

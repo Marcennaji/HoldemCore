@@ -11,29 +11,29 @@ namespace pkt::core
 {
 using namespace pkt::core::player;
 
-RiverState::RiverState(const GameEvents& events) : myEvents(events)
+RiverState::RiverState(const GameEvents& events) : m_events(events)
 {
 }
 
 RiverState::RiverState(const GameEvents& events, std::shared_ptr<pkt::core::ServiceContainer> services)
-    : myEvents(events), myServices(std::move(services))
+    : m_events(events), m_services(std::move(services))
 {
 }
 
 void RiverState::ensureServicesInitialized() const
 {
-    if (!myServices)
+    if (!m_services)
     {
         static std::shared_ptr<pkt::core::ServiceContainer> defaultServices =
             std::make_shared<pkt::core::AppServiceContainer>();
-        myServices = defaultServices;
+        m_services = defaultServices;
     }
 }
 
 void RiverState::enter(Hand& hand)
 {
     ensureServicesInitialized();
-    myServices->logger().info("River");
+    m_services->logger().info("River");
 
     for (auto& player : *hand.getActingPlayersList())
     {
@@ -43,8 +43,8 @@ void RiverState::enter(Hand& hand)
     // Reset betting amounts for new round
     hand.getBettingActions()->resetRoundHighestSet();
 
-    if (myEvents.onBettingRoundStarted)
-        myEvents.onBettingRoundStarted(River);
+    if (m_events.onBettingRoundStarted)
+        m_events.onBettingRoundStarted(River);
 
     // Deal river card and fire event with river-specific BoardCards
     BoardCards currentBoard = hand.getBoard().getBoardCards();
@@ -61,9 +61,9 @@ void RiverState::enter(Hand& hand)
         hand.getBoard().setBoardCards(riverBoard);
 
         // Fire event with river-specific board (5 cards)
-        if (myEvents.onBoardCardsDealt)
+        if (m_events.onBoardCardsDealt)
         {
-            myEvents.onBoardCardsDealt(riverBoard);
+            m_events.onBoardCardsDealt(riverBoard);
         }
     }
     logStateInfo(hand);
@@ -88,7 +88,7 @@ void RiverState::promptPlayerAction(Hand& hand, Player& player)
 
 std::unique_ptr<HandState> RiverState::computeNextState(Hand& hand)
 {
-    return computeBettingRoundNextState(hand, myEvents, River);
+    return computeBettingRoundNextState(hand, m_events, River);
 }
 
 std::shared_ptr<player::Player> RiverState::getNextPlayerToAct(const Hand& hand) const

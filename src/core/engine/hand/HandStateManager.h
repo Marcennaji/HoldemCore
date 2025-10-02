@@ -56,14 +56,14 @@ class HandStateManager
     void checkAndHandleTerminalState(Hand& hand);
     void ensureServicesInitialized() const;
 
-    const GameEvents& myEvents;
-    std::unique_ptr<HandState> myCurrentState;
-    GameLoopErrorCallback myErrorCallback;
-    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices;
+    const GameEvents& m_events;
+    std::unique_ptr<HandState> m_currentState;
+    GameLoopErrorCallback m_errorCallback;
+    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services;
 
     // State initialization parameters
-    int mySmallBlind;
-    unsigned myDealerPlayerId;
+    int m_smallBlind;
+    unsigned m_dealerPlayerId;
 
     // Game loop protection
     static const int MAX_GAME_LOOP_ITERATIONS = 1000;

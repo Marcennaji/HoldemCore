@@ -29,10 +29,10 @@ class GuiAppController
     StartWindow* createMainWindow();
 
   private:
-    std::shared_ptr<pkt::core::ServiceContainer> myServices;
-    std::unique_ptr<PokerTableWindow> myPokerTableWindow;
-    std::unique_ptr<pkt::core::Session> mySession;
-    pkt::core::GameEvents myEvents;
-    std::unique_ptr<GuiBridgeWidgets> myBridge;
+    std::shared_ptr<pkt::core::ServiceContainer> m_services;
+    std::unique_ptr<PokerTableWindow> m_pokerTableWindow;
+    std::unique_ptr<pkt::core::Session> m_session;
+    pkt::core::GameEvents m_events;
+    std::unique_ptr<GuiBridgeWidgets> m_bridge;
 };
 } // namespace pkt::ui::qtwidgets

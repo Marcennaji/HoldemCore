@@ -21,6 +21,6 @@ class SqlitePlayersStatisticsStoreTest : public EngineTest
     void TearDown() override;
 
   protected:
-    std::shared_ptr<pkt::core::AppServiceContainer> myTestServices;
+    std::shared_ptr<pkt::core::AppServiceContainer> m_testServices;
 };
 } // namespace pkt::test

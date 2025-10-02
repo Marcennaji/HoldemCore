@@ -133,21 +133,21 @@ class StrategiesE2ETest : public EngineTest
         gameData.firstSmallBlind = scenario.smallBlind;
 
         // Create seats list
-        mySeatsList = std::make_shared<std::list<std::shared_ptr<Player>>>();
+        m_seatsList = std::make_shared<std::list<std::shared_ptr<Player>>>();
 
         for (const auto& playerConfig : scenario.players)
         {
-            auto player = std::make_shared<Player>(myEvents, getServices(), playerConfig.playerId,
+            auto player = std::make_shared<Player>(m_events, getServices(), playerConfig.playerId,
                                                    playerConfig.playerName, playerConfig.startingCash);
             player->setStrategy(createStrategy(playerConfig.strategyType));
-            mySeatsList->push_back(player);
+            m_seatsList->push_back(player);
         }
 
         // Acting players list starts identical to seats list
-        myActingPlayersList = std::make_shared<std::list<std::shared_ptr<Player>>>();
-        for (const auto& player : *mySeatsList)
+        m_actingPlayersList = std::make_shared<std::list<std::shared_ptr<Player>>>();
+        for (const auto& player : *m_seatsList)
         {
-            myActingPlayersList->push_back(player);
+            m_actingPlayersList->push_back(player);
         }
     }
 
@@ -173,13 +173,13 @@ class StrategiesE2ETest : public EngineTest
         cardsOverriddenCount = 0;
 
         // Override hole cards immediately when dealt
-        myEvents.onHoleCardsDealt = [this, playerCardMap](unsigned playerId, HoleCards dealtCards)
+        m_events.onHoleCardsDealt = [this, playerCardMap](unsigned playerId, HoleCards dealtCards)
         {
             auto it = playerCardMap.find(playerId);
             if (it != playerCardMap.end())
             {
                 // Find the player and override their cards
-                for (auto& player : *mySeatsList)
+                for (auto& player : *m_seatsList)
                 {
                     if (player->getId() == playerId)
                     {
@@ -189,7 +189,7 @@ class StrategiesE2ETest : public EngineTest
 
                         // Increment counter and check if all players have been dealt
                         cardsOverriddenCount++;
-                        if (cardsOverriddenCount == static_cast<int>(mySeatsList->size()))
+                        if (cardsOverriddenCount == static_cast<int>(m_seatsList->size()))
                         {
                             // All players have received their cards, log them
                             logPlayersHoleCardsAfterDealing();
@@ -201,7 +201,7 @@ class StrategiesE2ETest : public EngineTest
         };
 
         // Override board cards when dealt
-        myEvents.onBoardCardsDealt = [this](BoardCards dealtBoard)
+        m_events.onBoardCardsDealt = [this](BoardCards dealtBoard)
         {
             if (!currentScenario.has_value())
                 return;
@@ -209,7 +209,7 @@ class StrategiesE2ETest : public EngineTest
             const auto& scenario = currentScenario.value();
 
             // Check the current game state to determine which cards to set
-            GameState currentState = myHand->getGameState();
+            GameState currentState = m_hand->getGameState();
 
             BoardCards predeterminedBoard;
 
@@ -240,7 +240,7 @@ class StrategiesE2ETest : public EngineTest
                 logTestMessage("Override river card to: " + scenario.boardCards.riverCard.toString());
             }
 
-            myHand->getBoard().setBoardCards(predeterminedBoard);
+            m_hand->getBoard().setBoardCards(predeterminedBoard);
         };
 
         logTestMessage("Predetermined card override events registered");
@@ -254,27 +254,27 @@ class StrategiesE2ETest : public EngineTest
         setupPlayersFromScenario(scenario);
 
         // Create board and hand
-        myBoard = myFactory->createBoard(scenario.dealerPlayerId);
-        myBoard->setSeatsList(mySeatsList);
-        myBoard->setActingPlayersList(myActingPlayersList);
+        m_board = m_factory->createBoard(scenario.dealerPlayerId);
+        m_board->setSeatsList(m_seatsList);
+        m_board->setActingPlayersList(m_actingPlayersList);
 
         StartData startData;
         startData.startDealerPlayerId = scenario.dealerPlayerId;
         startData.numberOfPlayers = static_cast<int>(scenario.players.size());
 
-        myHand = myFactory->createHand(myFactory, myBoard, mySeatsList, myActingPlayersList, gameData, startData);
+        m_hand = m_factory->createHand(m_factory, m_board, m_seatsList, m_actingPlayersList, gameData, startData);
 
         setupPredeterminedCardsFromScenario();
 
-        myHand->initialize();
+        m_hand->initialize();
 
-        EXPECT_EQ(myHand->getGameState(), Preflop);
+        EXPECT_EQ(m_hand->getGameState(), Preflop);
 
-        myHand->runGameLoop();
+        m_hand->runGameLoop();
 
         logPlayerActions();
 
-        EXPECT_EQ(myHand->getGameState(), PostRiver);
+        EXPECT_EQ(m_hand->getGameState(), PostRiver);
 
         // Log final results
         getLogger().info("=== Scenario " + scenario.scenarioName + " Completed ===");
@@ -283,7 +283,7 @@ class StrategiesE2ETest : public EngineTest
 
     void logPlayerActions()
     {
-        for (const auto& player : *mySeatsList)
+        for (const auto& player : *m_seatsList)
         {
             auto lastAction = player->getLastAction();
             getLogger().info("Player " + std::to_string(player->getId()) + " (" + player->getName() + ") " +
@@ -295,7 +295,7 @@ class StrategiesE2ETest : public EngineTest
     void logPlayersHoleCardsAfterDealing()
     {
         getLogger().info("=== Players' Hole Cards After Override ===");
-        for (const auto& player : *mySeatsList)
+        for (const auto& player : *m_seatsList)
         {
             const HoleCards& holeCards = player->getHoleCards();
             if (holeCards.isValid())

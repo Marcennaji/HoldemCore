@@ -34,38 +34,38 @@ void SqlitePlayersStatisticsStoreTest::SetUp()
     auto db = std::make_unique<pkt::infra::SqliteDb>(":memory:");
     auto store = std::make_unique<pkt::infra::SqlitePlayersStatisticsStore>(std::move(db));
 
-    myTestServices = std::make_shared<pkt::core::AppServiceContainer>();
-    myTestServices->setPlayersStatisticsStore(std::move(store));
+    m_testServices = std::make_shared<pkt::core::AppServiceContainer>();
+    m_testServices->setPlayersStatisticsStore(std::move(store));
 
     // Set up other services similar to EngineTest but in our ServiceContainer
     auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
     logger->setLogLevel(pkt::core::LogLevel::Info);
-    myTestServices->setLogger(std::move(logger));
-    myTestServices->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>(myTestServices));
+    m_testServices->setLogger(std::move(logger));
+    m_testServices->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>(m_testServices));
     auto randomizer = std::make_unique<FakeRandomizer>();
     randomizer->values = {3, 5, 7};
-    myTestServices->setRandomizer(std::move(randomizer));
+    m_testServices->setRandomizer(std::move(randomizer));
 
     // Create the factory with our test services
-    auto pokerServices = std::make_shared<pkt::core::PokerServices>(myTestServices);
-    myFactory = std::make_unique<EngineFactory>(myEvents, pokerServices);
+    auto pokerServices = std::make_shared<pkt::core::PokerServices>(m_testServices);
+    m_factory = std::make_unique<EngineFactory>(m_events, pokerServices);
 }
 
 void SqlitePlayersStatisticsStoreTest::TearDown()
 {
-    myTestServices.reset();
+    m_testServices.reset();
     EngineTest::TearDown();
 }
 
 TEST_F(SqlitePlayersStatisticsStoreTest, SaveAndLoadStatistics)
 {
-    auto& store = myTestServices->playersStatisticsStore();
+    auto& store = m_testServices->playersStatisticsStore();
     int nbPlayers = 3;
     initializeHandWithPlayers(nbPlayers, gameData);
 
-    auto playerDealer = getPlayerById(myActingPlayersList, 0);
-    auto playerSb = getPlayerById(myActingPlayersList, 1);
-    auto playerBb = getPlayerById(myActingPlayersList, 2);
+    auto playerDealer = getPlayerById(m_actingPlayersList, 0);
+    auto playerSb = getPlayerById(m_actingPlayersList, 1);
+    auto playerBb = getPlayerById(m_actingPlayersList, 2);
 
     // Inject deterministic strategies
     auto dealerStrategy = std::make_unique<pkt::test::DeterministicStrategy>();
@@ -81,11 +81,11 @@ TEST_F(SqlitePlayersStatisticsStoreTest, SaveAndLoadStatistics)
     playerBb->setStrategy(std::move(bbStrategy));
 
     // Simulate preflop actions via state::promptPlayerAction
-    auto* preflop = dynamic_cast<pkt::core::PreflopState*>(&myHand->getState());
+    auto* preflop = dynamic_cast<pkt::core::PreflopState*>(&m_hand->getState());
     ASSERT_NE(preflop, nullptr);
 
-    preflop->promptPlayerAction(*myHand, *playerDealer); // Dealer folds
-    preflop->promptPlayerAction(*myHand, *playerSb);     // Small blind folds
+    preflop->promptPlayerAction(*m_hand, *playerDealer); // Dealer folds
+    preflop->promptPlayerAction(*m_hand, *playerSb);     // Small blind folds
     // -> round ends automatically, stats should be saved
 
     // Verify loaded statistics for the number of players (index 1-based)

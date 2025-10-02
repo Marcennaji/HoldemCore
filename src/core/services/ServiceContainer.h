@@ -49,22 +49,22 @@ class AppServiceContainer : public ServiceContainer
     Randomizer& randomizer() override;
 
     // Configuration methods for setting up services
-    void setLogger(std::unique_ptr<Logger> logger) { myLogger = std::move(logger); }
+    void setLogger(std::unique_ptr<Logger> logger) { m_logger = std::move(logger); }
     void setPlayersStatisticsStore(std::unique_ptr<PlayersStatisticsStore> store)
     {
-        myPlayersStatisticsStore = std::move(store);
+        m_playersStatisticsStore = std::move(store);
     }
     void setHandEvaluationEngine(std::unique_ptr<HandEvaluationEngine> engine)
     {
-        myHandEvaluationEngine = std::move(engine);
+        m_handEvaluationEngine = std::move(engine);
     }
-    void setRandomizer(std::unique_ptr<Randomizer> randomizer) { myRandomizer = std::move(randomizer); }
+    void setRandomizer(std::unique_ptr<Randomizer> randomizer) { m_randomizer = std::move(randomizer); }
 
   private:
-    std::unique_ptr<Logger> myLogger;
-    std::unique_ptr<PlayersStatisticsStore> myPlayersStatisticsStore;
-    std::unique_ptr<HandEvaluationEngine> myHandEvaluationEngine;
-    std::unique_ptr<Randomizer> myRandomizer;
+    std::unique_ptr<Logger> m_logger;
+    std::unique_ptr<PlayersStatisticsStore> m_playersStatisticsStore;
+    std::unique_ptr<HandEvaluationEngine> m_handEvaluationEngine;
+    std::unique_ptr<Randomizer> m_randomizer;
 };
 
 } // namespace pkt::core

@@ -16,7 +16,7 @@ class PreflopRangeCalculator
     PreflopRangeCalculator();
     explicit PreflopRangeCalculator(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
     // Allow wiring services after default construction when owned by BotStrategyBase
-    void setServices(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer) { myServices = serviceContainer; }
+    void setServices(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer) { m_services = serviceContainer; }
     float calculatePreflopCallingRange(const CurrentHandContext& ctx) const;
     float calculatePreflopRaisingRange(const CurrentHandContext& ctx) const;
 
@@ -25,28 +25,28 @@ class PreflopRangeCalculator
 
   private:
     // Vector index is player position, value is range %
-    std::vector<int> myUtgStartingRange;
-    std::vector<int> myUtgPlusOneStartingRange;
-    std::vector<int> myUtgPlusTwoStartingRange;
-    std::vector<int> myMiddleStartingRange;
-    std::vector<int> myMiddlePlusOneStartingRange;
-    std::vector<int> myLateStartingRange;
-    std::vector<int> myCutoffStartingRange;
-    std::vector<int> myButtonStartingRange;
-    std::vector<int> mySmallBlindStartingRange;
-    std::vector<int> myBigBlindStartingRange;
+    std::vector<int> m_utgStartingRange;
+    std::vector<int> m_utgPlusOneStartingRange;
+    std::vector<int> m_utgPlusTwoStartingRange;
+    std::vector<int> m_middleStartingRange;
+    std::vector<int> m_middlePlusOneStartingRange;
+    std::vector<int> m_lateStartingRange;
+    std::vector<int> m_cutoffStartingRange;
+    std::vector<int> m_buttonStartingRange;
+    std::vector<int> m_smallBlindStartingRange;
+    std::vector<int> m_bigBlindStartingRange;
 
     // calling range helper methods
     float adjustCallForLimpers(float callingRange) const;
     float clampCallingRange(float callingRange) const;
     float adjustCallForRaises(const CurrentHandContext& ctx, float callingRange) const;
     float adjustCallForRaiserStats(float callingRange, const PreflopStatistics& raiserStats, int nbRaises,
-                                   int nbPlayers, PlayerPosition myPosition, int nbActingPlayers) const;
+                                   int nbPlayers, PlayerPosition m_position, int nbActingPlayers) const;
     float adjustCallForNoStats(float callingRange, int nbRaises) const;
-    float adjustCallForBigBet(float callingRange, int potOdd, int myCash, int highestBetAmount, int myTotalBetAmount,
+    float adjustCallForBigBet(float callingRange, int potOdd, int m_cash, int highestBetAmount, int m_totalBetAmount,
                               int smallBlind) const;
     bool shouldAdjustCallForLooseRaiser(const CurrentHandContext& ctx, int nbCalls, int nbRaises) const;
-    bool couldCallForGoodOdds(int potOdd, int myM, PlayerPosition myPosition) const;
+    bool couldCallForGoodOdds(int potOdd, int m_m, PlayerPosition m_position) const;
     bool couldCallForAllIn(const CurrentHandContext& ctx, int potOdd, int nbRaises) const;
 
     // Raising range helper methods
@@ -57,13 +57,13 @@ class PreflopRangeCalculator
     float adjustRaiseForNoRaiserStats(float raisingRange, int nbRaises) const;
     float adjustRaiseForNoRaiser(const CurrentHandContext& ctx, float raisingRange, bool canBluff) const;
     float adjustRaiseForStack(const CurrentHandContext& ctx, float raisingRange) const;
-    float adjustRaiseForBigBet(float raisingRange, int potOdd, int myCash, int highestBetAmount, int myTotalBetAmount,
+    float adjustRaiseForBigBet(float raisingRange, int potOdd, int m_cash, int highestBetAmount, int m_totalBetAmount,
                                int smallBlind) const;
     float clampRaiseRange(float raisingRange) const;
 
   private:
     void ensureServicesInitialized() const;
-    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices; // Injected service container
+    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services; // Injected service container
 };
 
 } // namespace pkt::core::player

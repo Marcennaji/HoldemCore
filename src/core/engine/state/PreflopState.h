@@ -46,12 +46,12 @@ class PreflopState : public HandState, public HandActionProcessor, public HandDe
     void logHoleCards(Hand& hand);
     void ensureServicesInitialized() const;
 
-    const GameEvents& myEvents;
-    const int mySmallBlind{0};
-    unsigned myDealerPlayerId{static_cast<unsigned>(-1)};
-    unsigned mySmallBlindPlayerId{static_cast<unsigned>(-1)};
-    unsigned myBigBlindPlayerId{static_cast<unsigned>(-1)};
-    mutable std::shared_ptr<pkt::core::ServiceContainer> myServices;
+    const GameEvents& m_events;
+    const int m_smallBlind{0};
+    unsigned m_dealerPlayerId{static_cast<unsigned>(-1)};
+    unsigned m_smallBlindPlayerId{static_cast<unsigned>(-1)};
+    unsigned m_bigBlindPlayerId{static_cast<unsigned>(-1)};
+    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services;
 };
 
 } // namespace pkt::core

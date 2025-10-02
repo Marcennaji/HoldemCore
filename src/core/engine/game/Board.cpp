@@ -19,9 +19,9 @@ namespace pkt::core
 {
 using namespace pkt::core::player;
 
-Board::Board(unsigned dp, const GameEvents& events) : myDealerPlayerId(dp), myEvents(events), myServices(nullptr)
+Board::Board(unsigned dp, const GameEvents& events) : m_dealerPlayerId(dp), m_events(events), m_services(nullptr)
 {
-    myBoardCards.reset(); // Initialize with invalid cards
+    m_boardCards.reset(); // Initialize with invalid cards
 }
 
 Board::~Board()
@@ -29,26 +29,26 @@ Board::~Board()
 }
 
 Board::Board(unsigned dp, const GameEvents& events, std::shared_ptr<ServiceContainer> services)
-    : myDealerPlayerId(dp), myEvents(events), myServices(services)
+    : m_dealerPlayerId(dp), m_events(events), m_services(services)
 {
-    myBoardCards.reset();
+    m_boardCards.reset();
 }
 
 void Board::ensureServicesInitialized() const
 {
-    if (!myServices)
+    if (!m_services)
     {
-        myServices = std::make_shared<AppServiceContainer>();
+        m_services = std::make_shared<AppServiceContainer>();
     }
 }
 
 void Board::setSeatsList(PlayerList seats)
 {
-    mySeatsList = seats;
+    m_seatsList = seats;
 }
 void Board::setActingPlayersList(PlayerList actingPlayers)
 {
-    myActingPlayersList = actingPlayers;
+    m_actingPlayersList = actingPlayers;
 }
 
 void Board::distributePot(Hand& hand)
@@ -66,7 +66,7 @@ void Board::distributePot(Hand& hand)
     {
         ensureServicesInitialized();
         // Use ASCII hyphen to avoid mojibake on Windows consoles
-        myServices->logger().info(std::string("Showdown - final board: \"") + bc.toString() + "\"");
+        m_services->logger().info(std::string("Showdown - final board: \"") + bc.toString() + "\"");
         // Only evaluate hands for players who actually participated in the hand
         for (auto& player : *hand.getActingPlayersList())
         {
@@ -78,10 +78,10 @@ void Board::distributePot(Hand& hand)
                 // Build evaluator string strictly as: HOLE then BOARD (e.g., "Ah Ad 2c 7d 9h 4s 3c").
                 std::string handStr = hc.toString() + std::string(" ") + bc.toString();
                 // Extra diagnostic log to verify ordering at runtime.
-                myServices->logger().debug(std::string("Recompute showdown with: \"") + handStr + "\"");
-                player->setHandRanking(pkt::core::HandEvaluator::evaluateHand(handStr.c_str(), myServices));
+                m_services->logger().debug(std::string("Recompute showdown with: \"") + handStr + "\"");
+                player->setHandRanking(pkt::core::HandEvaluator::evaluateHand(handStr.c_str(), m_services));
             }
-            myServices->logger().info(
+            m_services->logger().info(
                 std::string("Player ") + std::to_string(player->getId()) +
                 " showdown hand: \"" + player->getHoleCards().toString() + "\" rank=" + std::to_string(player->getHandRanking())
             );
@@ -90,12 +90,12 @@ void Board::distributePot(Hand& hand)
 
     // Use seats list for pot distribution (includes folded players who contributed)
     // but only evaluate hands for acting players (non-folded players who can win)
-    Pot pot(totalPot, hand.getSeatsList(), myDealerPlayerId, myServices);
+    Pot pot(totalPot, hand.getSeatsList(), m_dealerPlayerId, m_services);
     pot.distribute();
-    myWinners = pot.getWinners();
+    m_winners = pot.getWinners();
 
-    if (myEvents.onHandCompleted)
-        myEvents.onHandCompleted(myWinners, totalPot);
+    if (m_events.onHandCompleted)
+        m_events.onHandCompleted(m_winners, totalPot);
 }
 
 // Helper methods for showdown reveal logic encapsulated in this translation unit
@@ -164,33 +164,33 @@ namespace {
 
 void Board::determineShowdownRevealOrder()
 {
-    myShowdownRevealOrder.clear();
+    m_showdownRevealOrder.clear();
     std::unordered_set<unsigned> seen; // maintain order uniqueness
 
     auto appendReveal = [&](unsigned id) {
-        if (!seen.count(id)) { myShowdownRevealOrder.push_back(id); seen.insert(id); }
+        if (!seen.count(id)) { m_showdownRevealOrder.push_back(id); seen.insert(id); }
     };
 
     // All-in condition: everyone who didn't fold reveals, in seat order
-    if (myAllInCondition)
+    if (m_allInCondition)
     {
-        for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it) {
+        for (auto it = m_seatsList->begin(); it != m_seatsList->end(); ++it) {
             if (isNonFolded(**it)) appendReveal((*it)->getId());
         }
         return;
     }
 
     // Find the last acting player who didn't fold; fallback to first non-folder
-    PlayerListConstIterator lastIt = mySeatsList->end();
-    for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it) {
-        if ((*it)->getId() == myLastActionPlayerId && isNonFolded(**it)) { lastIt = it; break; }
+    PlayerListConstIterator lastIt = m_seatsList->end();
+    for (auto it = m_seatsList->begin(); it != m_seatsList->end(); ++it) {
+        if ((*it)->getId() == m_lastActionPlayerId && isNonFolded(**it)) { lastIt = it; break; }
     }
-    if (lastIt == mySeatsList->end()) {
-        for (auto it = mySeatsList->begin(); it != mySeatsList->end(); ++it) {
+    if (lastIt == m_seatsList->end()) {
+        for (auto it = m_seatsList->begin(); it != m_seatsList->end(); ++it) {
             if (isNonFolded(**it)) { lastIt = it; break; }
         }
     }
-    if (lastIt == mySeatsList->end()) {
+    if (lastIt == m_seatsList->end()) {
         // No players to reveal (all folded?)
         return;
     }
@@ -203,8 +203,8 @@ void Board::determineShowdownRevealOrder()
     levels.emplace_back((*lastIt)->getHandRanking(), contribution(**lastIt));
 
     // Iterate circularly over the table, starting after last actor, up to N players
-    auto it = lastIt; advanceCircular(it, mySeatsList);
-    const unsigned n = static_cast<unsigned>(mySeatsList->size());
+    auto it = lastIt; advanceCircular(it, m_seatsList);
+    const unsigned n = static_cast<unsigned>(m_seatsList->size());
     for (unsigned k = 0; k < n; ++k) {
         if (isNonFolded(**it)) {
             const int rank = (*it)->getHandRanking();
@@ -213,36 +213,36 @@ void Board::determineShowdownRevealOrder()
                 appendReveal((*it)->getId());
             }
         }
-        advanceCircular(it, mySeatsList);
+        advanceCircular(it, m_seatsList);
     }
 }
 
 void Board::setBoardCards(const BoardCards& boardCards)
 {
-    myBoardCards = boardCards;
+    m_boardCards = boardCards;
 }
 
 const BoardCards& Board::getBoardCards() const
 {
-    return myBoardCards;
+    return m_boardCards;
 }
 
 void Board::setAllInCondition(bool theValue)
 {
-    myAllInCondition = theValue;
+    m_allInCondition = theValue;
 }
 void Board::setLastActionPlayerId(unsigned theValue)
 {
-    myLastActionPlayerId = theValue;
+    m_lastActionPlayerId = theValue;
 }
 
 std::list<unsigned> Board::getWinners() const
 {
-    return myWinners;
+    return m_winners;
 }
 void Board::setWinners(const std::list<unsigned>& w)
 {
-    myWinners = w;
+    m_winners = w;
 }
 
  

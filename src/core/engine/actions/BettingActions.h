@@ -26,44 +26,44 @@ class BettingActions
     int getMinRaise(int smallBlind) const;
     int getRoundHighestSet() const;
     void updateRoundHighestSet(int amount);
-    void resetRoundHighestSet() { myRoundHighestSet = 0; }
-    void recordRaise(unsigned int id) { myLastRaiserId = id; }
+    void resetRoundHighestSet() { m_roundHighestSet = 0; }
+    void recordRaise(unsigned int id) { m_lastRaiserId = id; }
 
-    std::optional<unsigned int> getLastRaiserId() const { return myLastRaiserId; }
+    std::optional<unsigned int> getLastRaiserId() const { return m_lastRaiserId; }
 
-    void resetRaiser() { myLastRaiserId = std::nullopt; }
+    void resetRaiser() { m_lastRaiserId = std::nullopt; }
 
-    BettingRoundActions& getPreflop() { return myPreflop; }
-    BettingRoundActions& getFlop() { return myFlop; }
-    BettingRoundActions& getTurn() { return myTurn; }
-    BettingRoundActions& getRiver() { return myRiver; }
+    BettingRoundActions& getPreflop() { return m_preflop; }
+    BettingRoundActions& getFlop() { return m_flop; }
+    BettingRoundActions& getTurn() { return m_turn; }
+    BettingRoundActions& getRiver() { return m_river; }
 
     std::vector<PlayerPosition> getRaisersPositions();
     std::vector<PlayerPosition> getCallersPositions();
     int getLastRaiserId();
     void setLastActionPlayerId(int theValue);
-    int getLastActionPlayerId() const { return myLastActionPlayerId; }
+    int getLastActionPlayerId() const { return m_lastActionPlayerId; }
 
     // Hand action history methods
     void recordPlayerAction(GameState round, const pkt::core::PlayerAction& action);
-    const std::vector<pkt::core::BettingRoundHistory>& getHandActionHistory() const { return myHandActionHistory; }
+    const std::vector<pkt::core::BettingRoundHistory>& getHandActionHistory() const { return m_handActionHistory; }
 
   private:
-    BettingRoundActions myPreflop;
-    BettingRoundActions myFlop;
-    BettingRoundActions myTurn;
-    BettingRoundActions myRiver;
+    BettingRoundActions m_preflop;
+    BettingRoundActions m_flop;
+    BettingRoundActions m_turn;
+    BettingRoundActions m_river;
 
-    int myRoundHighestSet = 0;
-    std::optional<unsigned int> myLastRaiserId = std::nullopt;
-    int myLastActionPlayerId{-1};
-    int myPreviousPlayerId{-1};
+    int m_roundHighestSet = 0;
+    std::optional<unsigned int> m_lastRaiserId = std::nullopt;
+    int m_lastActionPlayerId{-1};
+    int m_previousPlayerId{-1};
 
-    const pkt::core::player::PlayerList& mySeatsList;
-    const pkt::core::player::PlayerList& myActingPlayersList;
+    const pkt::core::player::PlayerList& m_seatsList;
+    const pkt::core::player::PlayerList& m_actingPlayersList;
 
     // Hand-level action history for chronological tracking
-    std::vector<pkt::core::BettingRoundHistory> myHandActionHistory;
+    std::vector<pkt::core::BettingRoundHistory> m_handActionHistory;
 };
 
 } // namespace pkt::core

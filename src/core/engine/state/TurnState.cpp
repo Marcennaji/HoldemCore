@@ -12,29 +12,29 @@ namespace pkt::core
 {
 using namespace pkt::core::player;
 
-TurnState::TurnState(const GameEvents& events) : myEvents(events)
+TurnState::TurnState(const GameEvents& events) : m_events(events)
 {
 }
 
 TurnState::TurnState(const GameEvents& events, std::shared_ptr<pkt::core::ServiceContainer> services)
-    : myEvents(events), myServices(std::move(services))
+    : m_events(events), m_services(std::move(services))
 {
 }
 
 void TurnState::ensureServicesInitialized() const
 {
-    if (!myServices)
+    if (!m_services)
     {
         static std::shared_ptr<pkt::core::ServiceContainer> defaultServices =
             std::make_shared<pkt::core::AppServiceContainer>();
-        myServices = defaultServices;
+        m_services = defaultServices;
     }
 }
 
 void TurnState::enter(Hand& hand)
 {
     ensureServicesInitialized();
-    myServices->logger().info("Turn");
+    m_services->logger().info("Turn");
 
     for (auto& player : *hand.getActingPlayersList())
     {
@@ -43,8 +43,8 @@ void TurnState::enter(Hand& hand)
     // Reset betting amounts for new round
     hand.getBettingActions()->resetRoundHighestSet();
 
-    if (myEvents.onBettingRoundStarted)
-        myEvents.onBettingRoundStarted(Turn);
+    if (m_events.onBettingRoundStarted)
+        m_events.onBettingRoundStarted(Turn);
 
     // Deal turn card and fire event with turn-specific BoardCards
     BoardCards currentBoard = hand.getBoard().getBoardCards();
@@ -61,9 +61,9 @@ void TurnState::enter(Hand& hand)
         hand.getBoard().setBoardCards(turnBoard);
 
         // Fire event with turn-specific board (4 cards)
-        if (myEvents.onBoardCardsDealt)
+        if (m_events.onBoardCardsDealt)
         {
-            myEvents.onBoardCardsDealt(turnBoard);
+            m_events.onBoardCardsDealt(turnBoard);
         }
     }
     logStateInfo(hand);
@@ -88,7 +88,7 @@ void TurnState::promptPlayerAction(Hand& hand, Player& player)
 
 std::unique_ptr<HandState> TurnState::computeNextState(Hand& hand)
 {
-    return computeBettingRoundNextState(hand, myEvents, Turn);
+    return computeBettingRoundNextState(hand, m_events, Turn);
 }
 
 std::shared_ptr<player::Player> TurnState::getNextPlayerToAct(const Hand& hand) const

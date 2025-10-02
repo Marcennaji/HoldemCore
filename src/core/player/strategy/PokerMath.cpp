@@ -15,28 +15,28 @@ namespace pkt::core::player
 bool PokerMath::hasInsufficientEquityForCall(const CurrentHandContext& ctx, float equityMultiplier)
 {
     // This pattern appears in ALL strategy classes with minor variations:
-    // if (ctx.personalContext.myHandSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd)
-    return (ctx.personalContext.myHandSimulation.winRanged * 100.0f) < 
+    // if (ctx.personalContext.m_handSimulation.winRanged * 100 < ctx.commonContext.bettingContext.potOdd)
+    return (ctx.personalContext.m_handSimulation.winRanged * 100.0f) < 
            (ctx.commonContext.bettingContext.potOdd * equityMultiplier);
 }
 
 bool PokerMath::hasVeryStrongEquity(const CurrentHandContext& ctx, float threshold)
 {
-    // Common pattern: ctx.personalContext.myHandSimulation.winRanged > 0.93 && ctx.personalContext.myHandSimulation.win > 0.X
-    return ctx.personalContext.myHandSimulation.winRanged > threshold && 
-           ctx.personalContext.myHandSimulation.win > 0.5f;
+    // Common pattern: ctx.personalContext.m_handSimulation.winRanged > 0.93 && ctx.personalContext.m_handSimulation.win > 0.X
+    return ctx.personalContext.m_handSimulation.winRanged > threshold && 
+           ctx.personalContext.m_handSimulation.win > 0.5f;
 }
 
 bool PokerMath::hasStrongEquityVsField(const CurrentHandContext& ctx, float threshold)
 {
-    return ctx.personalContext.myHandSimulation.winRanged > threshold;
+    return ctx.personalContext.m_handSimulation.winRanged > threshold;
 }
 
 bool PokerMath::hasWeakEquity(const CurrentHandContext& ctx, float threshold)
 {
-    // Common pattern: ctx.personalContext.myHandSimulation.winRanged < 0.25 && ctx.personalContext.myHandSimulation.win < 0.X
-    return ctx.personalContext.myHandSimulation.winRanged < threshold && 
-           ctx.personalContext.myHandSimulation.win < 0.9f;
+    // Common pattern: ctx.personalContext.m_handSimulation.winRanged < 0.25 && ctx.personalContext.m_handSimulation.win < 0.X
+    return ctx.personalContext.m_handSimulation.winRanged < threshold && 
+           ctx.personalContext.m_handSimulation.win < 0.9f;
 }
 
 // ========================================
@@ -47,12 +47,12 @@ bool PokerMath::wouldRiskTooMuchOfStack(const CurrentHandContext& ctx)
 {
     // Common pattern found in all riverCouldCall methods:
     // if (ctx.commonContext.bettingContext.potOdd > 10 && 
-    //     ctx.personalContext.myHandSimulation.winRanged < .5 &&
+    //     ctx.personalContext.m_handSimulation.winRanged < .5 &&
     //     ctx.commonContext.bettingContext.highestBetAmount >= ctx.personalContext.cash + ctx.personalContext.totalBetAmount &&
     //     ctx.personalContext.m > 8)
     
     return ctx.commonContext.bettingContext.potOdd > 10.0f &&
-           ctx.personalContext.myHandSimulation.winRanged < 0.5f &&
+           ctx.personalContext.m_handSimulation.winRanged < 0.5f &&
            ctx.commonContext.bettingContext.highestBetAmount >= 
                (ctx.personalContext.cash + ctx.personalContext.totalBetAmount) &&
            ctx.personalContext.m > 8.0f;
@@ -410,7 +410,7 @@ bool PokerMath::shouldTakeAction(std::shared_ptr<pkt::core::ServiceContainer> se
 
 float PokerMath::getRandomBetMultiplier(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer, float minMultiplier, float maxMultiplier)
 {
-    // Common pattern: myServices->randomizer().getRand(40, 80, 1, &rand); float coeff = rand / 100.0f;
+    // Common pattern: m_services->randomizer().getRand(40, 80, 1, &rand); float coeff = rand / 100.0f;
     int minPercent = static_cast<int>(minMultiplier * 100);
     int maxPercent = static_cast<int>(maxMultiplier * 100);
     int rand = 0;

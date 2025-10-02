@@ -60,7 +60,7 @@ TEST_F(TightAggressiveStrategyTest, Preflop_InPosition_CallsWithOdds)
     ctx.commonContext.gameState = Preflop;
     ctx.personalContext.holeCards = pkt::core::HoleCards("8h", "9h");
     ctx.personalContext.position = PlayerPosition::Button;
-    ctx.personalContext.myHandSimulation.winSd = 0.6f;
+    ctx.personalContext.m_handSimulation.winSd = 0.6f;
     ctx.commonContext.bettingContext.preflopRaisesNumber = 1;
     ctx.commonContext.playersContext.preflopLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events);
     ctx.personalContext.hasPosition = true;
@@ -83,9 +83,9 @@ TEST_F(TightAggressiveStrategyTest, Flop_HighEquity_Raises)
     ctx.commonContext.playersContext.flopLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events);
     ctx.personalContext.hasPosition = true;
 
-    ctx.personalContext.myHandSimulation.win = 0.92f;
-    ctx.personalContext.myHandSimulation.winSd = 0.95f;
-    ctx.personalContext.myHandSimulation.winRanged = 0.9f;
+    ctx.personalContext.m_handSimulation.win = 0.92f;
+    ctx.personalContext.m_handSimulation.winSd = 0.95f;
+    ctx.personalContext.m_handSimulation.winRanged = 0.9f;
 
     PlayerAction action = strategy.decideAction(ctx);
 
@@ -96,7 +96,7 @@ TEST_F(TightAggressiveStrategyTest, Flop_HighEquity_Raises)
 TEST_F(TightAggressiveStrategyTest, Flop_LowEquity_Folds)
 {
     ctx.commonContext.gameState = Flop;
-    ctx.personalContext.myHandSimulation.winSd = 0.2f;
+    ctx.personalContext.m_handSimulation.winSd = 0.2f;
     ctx.commonContext.bettingContext.potOdd = 10;
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.commonContext.bettingContext.flopBetsOrRaisesNumber = 1;
@@ -112,8 +112,8 @@ TEST_F(TightAggressiveStrategyTest, Flop_LowEquity_Folds)
 TEST_F(TightAggressiveStrategyTest, Turn_HighEquity_Raises)
 {
     ctx.commonContext.gameState = Turn;
-    ctx.personalContext.myHandSimulation.win = 0.95f;
-    ctx.personalContext.myHandSimulation.winRanged = 0.95f;
+    ctx.personalContext.m_handSimulation.win = 0.95f;
+    ctx.personalContext.m_handSimulation.winRanged = 0.95f;
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.commonContext.bettingContext.turnBetsOrRaisesNumber = 1;
     ctx.commonContext.playersContext.turnLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events);
@@ -127,8 +127,8 @@ TEST_F(TightAggressiveStrategyTest, Turn_HighEquity_Raises)
 TEST_F(TightAggressiveStrategyTest, Turn_LowEquity_DoesNotRaise)
 {
     ctx.commonContext.gameState = Turn;
-    ctx.personalContext.myHandSimulation.win = 0.4f;
-    ctx.personalContext.myHandSimulation.winRanged = 0.4f;
+    ctx.personalContext.m_handSimulation.win = 0.4f;
+    ctx.personalContext.m_handSimulation.winRanged = 0.4f;
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.commonContext.bettingContext.turnBetsOrRaisesNumber = 1;
     ctx.commonContext.playersContext.turnLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events);
@@ -142,7 +142,7 @@ TEST_F(TightAggressiveStrategyTest, Turn_LowEquity_DoesNotRaise)
 TEST_F(TightAggressiveStrategyTest, Turn_LowEquity_Folds)
 {
     ctx.commonContext.gameState = Turn;
-    ctx.personalContext.myHandSimulation.winSd = 0.1f;
+    ctx.personalContext.m_handSimulation.winSd = 0.1f;
     ctx.commonContext.bettingContext.potOdd = 10;
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.commonContext.bettingContext.turnBetsOrRaisesNumber = 1;
@@ -159,9 +159,9 @@ TEST_F(TightAggressiveStrategyTest, Turn_LowEquity_Folds)
 TEST_F(TightAggressiveStrategyTest, River_Nuts_Raises)
 {
     ctx.commonContext.gameState = River;
-    ctx.personalContext.myHandSimulation.winSd = 1.0f;
-    ctx.personalContext.myHandSimulation.win = 1.0f;
-    ctx.personalContext.myHandSimulation.winRanged = 1.0f;
+    ctx.personalContext.m_handSimulation.winSd = 1.0f;
+    ctx.personalContext.m_handSimulation.win = 1.0f;
+    ctx.personalContext.m_handSimulation.winRanged = 1.0f;
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.commonContext.bettingContext.riverBetsOrRaisesNumber = 5;
     ctx.commonContext.playersContext.lastVPIPPlayer = std::make_shared<pkt::test::DummyPlayer>(2, events);
@@ -177,7 +177,7 @@ TEST_F(TightAggressiveStrategyTest, River_Nuts_Raises)
 TEST_F(TightAggressiveStrategyTest, ZeroCash_CannotRaise)
 {
     ctx.commonContext.gameState = Preflop;
-    ctx.personalContext.myHandSimulation.winSd = 0.5f;
+    ctx.personalContext.m_handSimulation.winSd = 0.5f;
     ctx.personalContext.cash = 0;
     ctx.personalContext.holeCards = pkt::core::HoleCards("8h", "9h");
 

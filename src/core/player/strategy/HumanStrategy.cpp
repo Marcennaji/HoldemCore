@@ -13,19 +13,19 @@ pkt::core::PlayerAction HumanStrategy::decideAction(const CurrentHandContext& ct
     const std::vector<ActionType>& validActions = ctx.commonContext.validActions;
 
     // set up a promise/future pair for asynchronous communication of a PlayerAction value
-    myActionPromise = std::make_unique<std::promise<PlayerAction>>();
-    std::future<PlayerAction> actionFuture = myActionPromise->get_future();
+    m_actionPromise = std::make_unique<std::promise<PlayerAction>>();
+    std::future<PlayerAction> actionFuture = m_actionPromise->get_future();
 
     // Register this strategy as the one waiting for input
-    if (myEvents.onHumanStrategyWaiting)
+    if (m_events.onHumanStrategyWaiting)
     {
-        myEvents.onHumanStrategyWaiting(this);
+        m_events.onHumanStrategyWaiting(this);
     }
 
     // Fire event to notify UI with player ID and valid actions
-    if (myEvents.onAwaitingHumanInput)
+    if (m_events.onAwaitingHumanInput)
     {
-        myEvents.onAwaitingHumanInput(ctx.personalContext.id, validActions);
+        m_events.onAwaitingHumanInput(ctx.personalContext.id, validActions);
     }
 
     // Wait for UI to provide the action via setPlayerAction()
@@ -33,9 +33,9 @@ pkt::core::PlayerAction HumanStrategy::decideAction(const CurrentHandContext& ct
     while (actionFuture.wait_for(std::chrono::milliseconds(10)) == std::future_status::timeout)
     {
         // Process UI framework events to keep interface responsive during wait
-        if (myEvents.onProcessEvents)
+        if (m_events.onProcessEvents)
         {
-            myEvents.onProcessEvents();
+            m_events.onProcessEvents();
         }
     }
     
@@ -48,10 +48,10 @@ pkt::core::PlayerAction HumanStrategy::decideAction(const CurrentHandContext& ct
 
 void HumanStrategy::setPlayerAction(const PlayerAction& action)
 {
-    if (myActionPromise)
+    if (m_actionPromise)
     {
-        myActionPromise->set_value(action);
-        myActionPromise.reset(); // Clear the promise
+        m_actionPromise->set_value(action);
+        m_actionPromise.reset(); // Clear the promise
     }
 }
 

@@ -13,12 +13,12 @@
 namespace pkt::core
 {
 
-EngineFactory::EngineFactory(const GameEvents& events) : myEvents(events), myServices(nullptr)
+EngineFactory::EngineFactory(const GameEvents& events) : m_events(events), m_services(nullptr)
 {
 }
 
 EngineFactory::EngineFactory(const GameEvents& events, std::shared_ptr<PokerServices> services)
-    : myEvents(events), myServices(services)
+    : m_events(events), m_services(services)
 {
 }
 
@@ -26,10 +26,10 @@ EngineFactory::~EngineFactory() = default;
 
 void EngineFactory::ensureServicesInitialized()
 {
-    if (!myServices)
+    if (!m_services)
     {
         auto baseContainer = std::make_shared<AppServiceContainer>();
-        myServices = std::make_shared<PokerServices>(baseContainer);
+        m_services = std::make_shared<PokerServices>(baseContainer);
     }
 }
 
@@ -38,12 +38,12 @@ std::shared_ptr<Hand> EngineFactory::createHand(std::shared_ptr<EngineFactory> f
                                                 pkt::core::player::PlayerList actingPlayers, GameData gd, StartData sd)
 {
     ensureServicesInitialized();
-    return std::make_shared<Hand>(myEvents, f, b, seats, actingPlayers, gd, sd, myServices);
+    return std::make_shared<Hand>(m_events, f, b, seats, actingPlayers, gd, sd, m_services);
 }
 
 std::shared_ptr<Board> EngineFactory::createBoard(unsigned dealerPosition)
 {
     ensureServicesInitialized();
-    return std::make_shared<Board>(dealerPosition, myEvents, myServices);
+    return std::make_shared<Board>(dealerPosition, m_events, m_services);
 }
 } // namespace pkt::core

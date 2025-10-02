@@ -72,7 +72,7 @@ struct PerPlayerHandContext
     PlayerStatistics statistics{};
     PostFlopAnalysisFlags postFlopAnalysisFlags{}; // what are the possibilities, given the board and the hole cards ?
 
-    HandSimulationStats myHandSimulation = {
+    HandSimulationStats m_handSimulation = {
         0.0f, // win
         0.0f, // tie
         0.0f, // lose

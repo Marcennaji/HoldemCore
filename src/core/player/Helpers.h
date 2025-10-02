@@ -70,9 +70,9 @@ inline int getBoardCardsHigherThan(const std::string& stringBoard, const std::st
     return pkt::core::cards::CardRangeAnalyzer::getBoardCardsHigherThan(stringBoard, card);
 }
 
-inline bool hasPosition(PlayerPosition myPos, PlayerList actingPlayers)
+inline bool hasPosition(PlayerPosition m_pos, PlayerList actingPlayers)
 {
-    return pkt::core::player::position::PositionManager::hasPosition(myPos, actingPlayers);
+    return pkt::core::player::position::PositionManager::hasPosition(m_pos, actingPlayers);
 }
 
 inline int playerDistanceCircularOffset(int fromId, int toId, const PlayerList& players)

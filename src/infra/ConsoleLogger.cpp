@@ -9,7 +9,7 @@ using namespace pkt::core;
 
 ConsoleLogger::ConsoleLogger()
 {
-    myLogLevel = LogLevel::Info;
+    m_logLevel = LogLevel::Info;
 }
 
 void ConsoleLogger::error(const std::string& msg)
@@ -19,7 +19,7 @@ void ConsoleLogger::error(const std::string& msg)
 
 void ConsoleLogger::info(const std::string& msg)
 {
-    if (myLogLevel >= LogLevel::Info)
+    if (m_logLevel >= LogLevel::Info)
     {
         std::cout << "[INFO] " << msg << std::endl;
     }
@@ -27,7 +27,7 @@ void ConsoleLogger::info(const std::string& msg)
 
 void ConsoleLogger::verbose(const std::string& msg)
 {
-    if (myLogLevel >= LogLevel::Verbose)
+    if (m_logLevel >= LogLevel::Verbose)
     {
         std::cout << "[VERBOSE] " << msg << std::endl;
     }
@@ -35,7 +35,7 @@ void ConsoleLogger::verbose(const std::string& msg)
 
 void ConsoleLogger::debug(const std::string& msg)
 {
-    if (myLogLevel >= LogLevel::Debug)
+    if (m_logLevel >= LogLevel::Debug)
     {
         std::cout << "[DEBUG] " << msg << std::endl;
     }

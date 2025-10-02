@@ -13,32 +13,32 @@ namespace pkt::core
 
 HandStateManager::HandStateManager(const GameEvents& events, int smallBlind, unsigned dealerPlayerId,
                                    GameLoopErrorCallback errorCallback)
-    : myEvents(events), myErrorCallback(std::move(errorCallback)), mySmallBlind(smallBlind),
-      myDealerPlayerId(dealerPlayerId)
+    : m_events(events), m_errorCallback(std::move(errorCallback)), m_smallBlind(smallBlind),
+      m_dealerPlayerId(dealerPlayerId)
 {
 }
 
 HandStateManager::HandStateManager(const GameEvents& events, int smallBlind, unsigned dealerPlayerId,
                                    GameLoopErrorCallback errorCallback,
                                    std::shared_ptr<pkt::core::ServiceContainer> services)
-    : myEvents(events), myErrorCallback(std::move(errorCallback)), mySmallBlind(smallBlind),
-      myDealerPlayerId(dealerPlayerId), myServices(std::move(services))
+    : m_events(events), m_errorCallback(std::move(errorCallback)), m_smallBlind(smallBlind),
+      m_dealerPlayerId(dealerPlayerId), m_services(std::move(services))
 {
 }
 
 void HandStateManager::ensureServicesInitialized() const
 {
-    if (!myServices)
+    if (!m_services)
     {
-        myServices = std::make_shared<pkt::core::AppServiceContainer>();
+        m_services = std::make_shared<pkt::core::AppServiceContainer>();
     }
 }
 
 void HandStateManager::initializeState(Hand& hand)
 {
     // Pass services to PreflopState to maintain DI consistency and avoid local instantiation
-    myCurrentState = std::make_unique<PreflopState>(myEvents, mySmallBlind, myDealerPlayerId, myServices);
-    myCurrentState->enter(hand);
+    m_currentState = std::make_unique<PreflopState>(m_events, m_smallBlind, m_dealerPlayerId, m_services);
+    m_currentState->enter(hand);
 }
 
 void HandStateManager::runGameLoop(Hand& hand)
@@ -50,7 +50,7 @@ void HandStateManager::runGameLoop(Hand& hand)
     {
         iterationCount++;
 
-        if (auto* processor = dynamic_cast<HandActionProcessor*>(myCurrentState.get()))
+        if (auto* processor = dynamic_cast<HandActionProcessor*>(m_currentState.get()))
         {
             auto nextPlayer = processor->getNextPlayerToAct(hand);
             if (nextPlayer)
@@ -71,12 +71,12 @@ void HandStateManager::runGameLoop(Hand& hand)
     // Check if we hit the emergency brake
     if (iterationCount >= MAX_GAME_LOOP_ITERATIONS)
     {
-        myServices->logger().error("Game loop hit maximum iterations (" + std::to_string(MAX_GAME_LOOP_ITERATIONS) +
+        m_services->logger().error("Game loop hit maximum iterations (" + std::to_string(MAX_GAME_LOOP_ITERATIONS) +
                                    "), terminating to prevent infinite loop");
 
-        if (myErrorCallback)
+        if (m_errorCallback)
         {
-            myErrorCallback("Game loop terminated due to possible infinite loop");
+            m_errorCallback("Game loop terminated due to possible infinite loop");
         }
 
         // Force terminate the game
@@ -108,42 +108,42 @@ void HandStateManager::transitionToNextState(Hand& hand)
 
 void HandStateManager::terminateGame(Hand& hand)
 {
-    if (myCurrentState)
+    if (m_currentState)
     {
-        myCurrentState->exit(hand);
+        m_currentState->exit(hand);
     }
     hand.end();
 }
 
 bool HandStateManager::isTerminal() const
 {
-    return myCurrentState ? myCurrentState->isTerminal() : true;
+    return m_currentState ? m_currentState->isTerminal() : true;
 }
 
 GameState HandStateManager::getGameState() const
 {
-    return myCurrentState ? myCurrentState->getGameState() : GameState::PostRiver;
+    return m_currentState ? m_currentState->getGameState() : GameState::PostRiver;
 }
 
 HandActionProcessor* HandStateManager::getActionProcessor() const
 {
-    return dynamic_cast<HandActionProcessor*>(myCurrentState.get());
+    return dynamic_cast<HandActionProcessor*>(m_currentState.get());
 }
 
 HandState& HandStateManager::getCurrentState() const
 {
-    assert(myCurrentState);
-    return *myCurrentState;
+    assert(m_currentState);
+    return *m_currentState;
 }
 
 void HandStateManager::transitionState(Hand& hand, std::unique_ptr<HandState> newState)
 {
-    if (myCurrentState)
+    if (m_currentState)
     {
-        myCurrentState->exit(hand);
+        m_currentState->exit(hand);
     }
-    myCurrentState = std::move(newState);
-    myCurrentState->enter(hand);
+    m_currentState = std::move(newState);
+    m_currentState->enter(hand);
 }
 
 void HandStateManager::checkAndHandleTerminalState(Hand& hand)

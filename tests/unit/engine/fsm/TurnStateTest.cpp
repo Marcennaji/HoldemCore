@@ -21,8 +21,8 @@ void TurnStateTest::logTestMessage(const std::string& message) const
 void TurnStateTest::SetUp()
 {
     EngineTest::SetUp();
-    myEvents.clear();
-    myEvents.onBettingRoundStarted = [&](GameState state) { myLastGameState = state; };
+    m_events.clear();
+    m_events.onBettingRoundStarted = [&](GameState state) { m_lastGameState = state; };
 }
 
 void TurnStateTest::TearDown()
@@ -34,22 +34,22 @@ TEST_F(TurnStateTest, StartTurnInitializesPlayersCorrectly)
 {
     initializeHandWithPlayers(3, gameData);
 
-    auto playerDealer = getPlayerById(myActingPlayersList, 0);
-    auto playerSb = getPlayerById(myActingPlayersList, 1);
-    auto playerBb = getPlayerById(myActingPlayersList, 2);
+    auto playerDealer = getPlayerById(m_actingPlayersList, 0);
+    auto playerSb = getPlayerById(m_actingPlayersList, 1);
+    auto playerBb = getPlayerById(m_actingPlayersList, 2);
 
     // Progress through preflop to flop
-    myHand->handlePlayerAction({playerDealer->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Fold});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealer->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Fold});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, Flop);
+    EXPECT_EQ(m_lastGameState, Flop);
 
     // Progress through flop to turn
-    myHand->handlePlayerAction({playerDealer->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealer->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, Turn);
+    EXPECT_EQ(m_lastGameState, Turn);
 
     // Verify players are still active and have valid cash amounts
     EXPECT_EQ(isPlayerStillActive(playerDealer->getId()), true);
@@ -62,321 +62,321 @@ TEST_F(TurnStateTest, OnlyChecksOnTurnShouldGoToRiver)
 {
     initializeHandWithPlayers(3, gameData);
 
-    auto playerDealer = getPlayerById(myActingPlayersList, 0);
-    auto playerSb = getPlayerById(myActingPlayersList, 1);
-    auto playerBb = getPlayerById(myActingPlayersList, 2);
+    auto playerDealer = getPlayerById(m_actingPlayersList, 0);
+    auto playerSb = getPlayerById(m_actingPlayersList, 1);
+    auto playerBb = getPlayerById(m_actingPlayersList, 2);
 
     // Progress through preflop and flop
-    myHand->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, Turn);
+    EXPECT_EQ(m_lastGameState, Turn);
 
     // Turn actions - all checks should progress to River
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, River);
+    EXPECT_EQ(m_lastGameState, River);
 }
 
 TEST_F(TurnStateTest, BetOnTurnKeepsRoundOpen)
 {
     initializeHandWithPlayers(3, gameData);
 
-    auto playerDealer = getPlayerById(myActingPlayersList, 0);
-    auto playerSb = getPlayerById(myActingPlayersList, 1);
-    auto playerBb = getPlayerById(myActingPlayersList, 2);
+    auto playerDealer = getPlayerById(m_actingPlayersList, 0);
+    auto playerSb = getPlayerById(m_actingPlayersList, 1);
+    auto playerBb = getPlayerById(m_actingPlayersList, 2);
 
     // Progress through preflop and flop
-    myHand->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, Turn);
+    EXPECT_EQ(m_lastGameState, Turn);
 
     // Turn bet scenario
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 100});
-    EXPECT_EQ(myLastGameState, Turn); // round still open
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 100});
+    EXPECT_EQ(m_lastGameState, Turn); // round still open
 
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Call});
-    EXPECT_EQ(myLastGameState, River); // round closes after call
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Call});
+    EXPECT_EQ(m_lastGameState, River); // round closes after call
 }
 
 TEST_F(TurnStateTest, RaiseOnTurnKeepsRoundOpen)
 {
     initializeHandWithPlayers(3, gameData);
 
-    auto playerDealer = getPlayerById(myActingPlayersList, 0);
-    auto playerSb = getPlayerById(myActingPlayersList, 1);
-    auto playerBb = getPlayerById(myActingPlayersList, 2);
+    auto playerDealer = getPlayerById(m_actingPlayersList, 0);
+    auto playerSb = getPlayerById(m_actingPlayersList, 1);
+    auto playerBb = getPlayerById(m_actingPlayersList, 2);
 
     // Progress through preflop and flop
-    myHand->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, Turn);
+    EXPECT_EQ(m_lastGameState, Turn);
 
     // Turn raise scenario
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 75});
-    EXPECT_EQ(myLastGameState, Turn); // round still open
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 75});
+    EXPECT_EQ(m_lastGameState, Turn); // round still open
 
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Raise, 150});
-    EXPECT_EQ(myLastGameState, Turn); // round still open after raise
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Raise, 150});
+    EXPECT_EQ(m_lastGameState, Turn); // round still open after raise
 
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    EXPECT_EQ(myLastGameState, River); // round closes after call
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    EXPECT_EQ(m_lastGameState, River); // round closes after call
 }
 
 TEST_F(TurnStateTest, FoldOnTurnWithTwoPlayersEndsHand)
 {
     initializeHandWithPlayers(2, gameData);
 
-    auto playerDealerSb = getPlayerById(myActingPlayersList, 0);
-    auto playerBb = getPlayerById(myActingPlayersList, 1);
+    auto playerDealerSb = getPlayerById(m_actingPlayersList, 0);
+    auto playerBb = getPlayerById(m_actingPlayersList, 1);
 
     // Progress through preflop and flop
-    myHand->handlePlayerAction({playerDealerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerDealerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, Turn);
+    EXPECT_EQ(m_lastGameState, Turn);
 
     // One player bets, other folds - should end hand
-    myHand->handlePlayerAction({playerDealerSb->getId(), ActionType::Bet, 80});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Fold});
+    m_hand->handlePlayerAction({playerDealerSb->getId(), ActionType::Bet, 80});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Fold});
 
     // Hand should end with only one player remaining
-    EXPECT_EQ(myActingPlayersList->size(), 1);
-    EXPECT_EQ(myLastGameState, PostRiver); // Hand ends, no further rounds
+    EXPECT_EQ(m_actingPlayersList->size(), 1);
+    EXPECT_EQ(m_lastGameState, PostRiver); // Hand ends, no further rounds
 }
 
 TEST_F(TurnStateTest, AllInOnTurn)
 {
     initializeHandWithPlayers(2, gameData);
 
-    auto playerDealerSb = getPlayerById(myActingPlayersList, 0);
-    auto playerBb = getPlayerById(myActingPlayersList, 1);
+    auto playerDealerSb = getPlayerById(m_actingPlayersList, 0);
+    auto playerBb = getPlayerById(m_actingPlayersList, 1);
 
     // Progress through preflop and flop
-    myHand->handlePlayerAction({playerDealerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerDealerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, Turn);
+    EXPECT_EQ(m_lastGameState, Turn);
 
     // Player goes all-in on turn
-    myHand->handlePlayerAction({playerDealerSb->getId(), ActionType::Allin});
-    EXPECT_EQ(getPlayerById(mySeatsList, playerDealerSb->getId())->getCash(), 0);
-    EXPECT_EQ(myLastGameState, Turn); // Round still open after all-in
+    m_hand->handlePlayerAction({playerDealerSb->getId(), ActionType::Allin});
+    EXPECT_EQ(getPlayerById(m_seatsList, playerDealerSb->getId())->getCash(), 0);
+    EXPECT_EQ(m_lastGameState, Turn); // Round still open after all-in
 }
 
 TEST_F(TurnStateTest, MultipleFoldsOnTurn)
 {
     initializeHandWithPlayers(4, gameData);
 
-    auto playerDealer = getPlayerById(myActingPlayersList, 0);
-    auto playerSb = getPlayerById(myActingPlayersList, 1);
-    auto playerBb = getPlayerById(myActingPlayersList, 2);
-    auto playerUtg = getPlayerById(myActingPlayersList, 3);
+    auto playerDealer = getPlayerById(m_actingPlayersList, 0);
+    auto playerSb = getPlayerById(m_actingPlayersList, 1);
+    auto playerBb = getPlayerById(m_actingPlayersList, 2);
+    auto playerUtg = getPlayerById(m_actingPlayersList, 3);
 
     // Progress through preflop and flop with all players
-    myHand->handlePlayerAction({playerUtg->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerDealer->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerUtg->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerDealer->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
     // Flop - all check
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerUtg->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerDealer->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerUtg->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealer->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, Turn);
-    EXPECT_EQ(myActingPlayersList->size(), 4);
+    EXPECT_EQ(m_lastGameState, Turn);
+    EXPECT_EQ(m_actingPlayersList->size(), 4);
 
     // Multiple folds on turn
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 120});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Fold});
-    EXPECT_EQ(myActingPlayersList->size(), 3);
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 120});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Fold});
+    EXPECT_EQ(m_actingPlayersList->size(), 3);
 
-    myHand->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
-    EXPECT_EQ(myActingPlayersList->size(), 2);
+    m_hand->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
+    EXPECT_EQ(m_actingPlayersList->size(), 2);
 
-    myHand->handlePlayerAction({playerUtg->getId(), ActionType::Call});
-    EXPECT_EQ(myLastGameState, River); // Round should advance to River
+    m_hand->handlePlayerAction({playerUtg->getId(), ActionType::Call});
+    EXPECT_EQ(m_lastGameState, River); // Round should advance to River
 }
 
 TEST_F(TurnStateTest, CheckRaiseScenarioOnTurn)
 {
     initializeHandWithPlayers(3, gameData);
 
-    auto playerDealer = getPlayerById(myActingPlayersList, 0);
-    auto playerSb = getPlayerById(myActingPlayersList, 1);
-    auto playerBb = getPlayerById(myActingPlayersList, 2);
+    auto playerDealer = getPlayerById(m_actingPlayersList, 0);
+    auto playerSb = getPlayerById(m_actingPlayersList, 1);
+    auto playerBb = getPlayerById(m_actingPlayersList, 2);
 
     // Progress through preflop and flop
-    myHand->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, Turn);
+    EXPECT_EQ(m_lastGameState, Turn);
 
     // Check-raise scenario on turn
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Bet, 100});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Raise, 200});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Bet, 100});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Raise, 200});
 
-    EXPECT_EQ(myLastGameState, Turn); // round still open after raise
+    EXPECT_EQ(m_lastGameState, Turn); // round still open after raise
 
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Call});
-    EXPECT_EQ(myLastGameState, River); // round closes after call
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Call});
+    EXPECT_EQ(m_lastGameState, River); // round closes after call
 }
 
 TEST_F(TurnStateTest, AllInCallScenarioOnTurn)
 {
     initializeHandWithPlayers(3, gameData);
 
-    auto playerDealer = getPlayerById(myActingPlayersList, 0);
-    auto playerSb = getPlayerById(myActingPlayersList, 1);
-    auto playerBb = getPlayerById(myActingPlayersList, 2);
+    auto playerDealer = getPlayerById(m_actingPlayersList, 0);
+    auto playerSb = getPlayerById(m_actingPlayersList, 1);
+    auto playerBb = getPlayerById(m_actingPlayersList, 2);
 
     // Progress through preflop and flop
-    myHand->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, Turn);
+    EXPECT_EQ(m_lastGameState, Turn);
 
     // One player goes all-in, other calls
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Allin});
-    EXPECT_EQ(getPlayerById(mySeatsList, playerSb->getId())->getCash(), 0);
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Allin});
+    EXPECT_EQ(getPlayerById(m_seatsList, playerSb->getId())->getCash(), 0);
 
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Call});
 
     // Both players are all-in, but should advance to River first (not skip directly to PostRiver)
-    EXPECT_EQ(myLastGameState, River);
+    EXPECT_EQ(m_lastGameState, River);
 }
 
 TEST_F(TurnStateTest, BetFoldScenarioOnTurn)
 {
     initializeHandWithPlayers(3, gameData);
 
-    auto playerDealer = getPlayerById(myActingPlayersList, 0);
-    auto playerSb = getPlayerById(myActingPlayersList, 1);
-    auto playerBb = getPlayerById(myActingPlayersList, 2);
+    auto playerDealer = getPlayerById(m_actingPlayersList, 0);
+    auto playerSb = getPlayerById(m_actingPlayersList, 1);
+    auto playerBb = getPlayerById(m_actingPlayersList, 2);
 
     // Progress through preflop and flop
-    myHand->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, Turn);
-    size_t initialActingPlayers = myActingPlayersList->size();
+    EXPECT_EQ(m_lastGameState, Turn);
+    size_t initialActingPlayers = m_actingPlayersList->size();
 
     // Bet and fold scenario
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 150});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Fold});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 150});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Fold});
 
     // One player should have folded
-    EXPECT_EQ(myActingPlayersList->size(), initialActingPlayers - 1);
-    EXPECT_EQ(myLastGameState, PostRiver); // Hand ends, no further rounds
+    EXPECT_EQ(m_actingPlayersList->size(), initialActingPlayers - 1);
+    EXPECT_EQ(m_lastGameState, PostRiver); // Hand ends, no further rounds
 }
 
 TEST_F(TurnStateTest, LargeBetOnTurnRequiresResponse)
 {
     initializeHandWithPlayers(3, gameData);
 
-    auto playerDealer = getPlayerById(myActingPlayersList, 0);
-    auto playerSb = getPlayerById(myActingPlayersList, 1);
-    auto playerBb = getPlayerById(myActingPlayersList, 2);
+    auto playerDealer = getPlayerById(m_actingPlayersList, 0);
+    auto playerSb = getPlayerById(m_actingPlayersList, 1);
+    auto playerBb = getPlayerById(m_actingPlayersList, 2);
 
     // Progress through preflop and flop
-    myHand->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, Turn);
+    EXPECT_EQ(m_lastGameState, Turn);
 
     // Large bet on turn
     int initialCash = playerSb->getCash();
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 300});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 300});
 
     // Verify bet was applied
     EXPECT_LT(playerSb->getCash(), initialCash);
-    EXPECT_EQ(myLastGameState, Turn); // round still open, awaiting response
+    EXPECT_EQ(m_lastGameState, Turn); // round still open, awaiting response
 }
 
 TEST_F(TurnStateTest, MultipleRaisesOnTurn)
 {
     initializeHandWithPlayers(3, gameData);
 
-    auto playerDealer = getPlayerById(myActingPlayersList, 0);
-    auto playerSb = getPlayerById(myActingPlayersList, 1);
-    auto playerBb = getPlayerById(myActingPlayersList, 2);
+    auto playerDealer = getPlayerById(m_actingPlayersList, 0);
+    auto playerSb = getPlayerById(m_actingPlayersList, 1);
+    auto playerBb = getPlayerById(m_actingPlayersList, 2);
 
     // Progress through preflop and flop
-    myHand->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealer->getId(), ActionType::Fold});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, Turn);
+    EXPECT_EQ(m_lastGameState, Turn);
 
     // Multiple raises scenario
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 50});
-    EXPECT_EQ(myLastGameState, Turn); // round still open
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Bet, 50});
+    EXPECT_EQ(m_lastGameState, Turn); // round still open
 
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Raise, 100});
-    EXPECT_EQ(myLastGameState, Turn); // round still open after first raise
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Raise, 100});
+    EXPECT_EQ(m_lastGameState, Turn); // round still open after first raise
 
-    myHand->handlePlayerAction({playerSb->getId(), ActionType::Raise, 200});
-    EXPECT_EQ(myLastGameState, Turn); // round still open after second raise
+    m_hand->handlePlayerAction({playerSb->getId(), ActionType::Raise, 200});
+    EXPECT_EQ(m_lastGameState, Turn); // round still open after second raise
 
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Call});
-    EXPECT_EQ(myLastGameState, River); // round closes after call
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Call});
+    EXPECT_EQ(m_lastGameState, River); // round closes after call
 }
 
 TEST_F(TurnStateTest, HeadsUpTurnAction)
 {
     initializeHandWithPlayers(2, gameData);
 
-    auto playerDealerSb = getPlayerById(myActingPlayersList, 0);
-    auto playerBb = getPlayerById(myActingPlayersList, 1);
+    auto playerDealerSb = getPlayerById(m_actingPlayersList, 0);
+    auto playerBb = getPlayerById(m_actingPlayersList, 1);
 
     // Progress through preflop and flop
-    myHand->handlePlayerAction({playerDealerSb->getId(), ActionType::Call});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerDealerSb->getId(), ActionType::Check});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerDealerSb->getId(), ActionType::Check});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Check});
 
-    EXPECT_EQ(myLastGameState, Turn);
-    EXPECT_EQ(myActingPlayersList->size(), 2);
+    EXPECT_EQ(m_lastGameState, Turn);
+    EXPECT_EQ(m_actingPlayersList->size(), 2);
 
     // Heads-up turn action
-    myHand->handlePlayerAction({playerDealerSb->getId(), ActionType::Bet, 60});
-    myHand->handlePlayerAction({playerBb->getId(), ActionType::Raise, 120});
-    myHand->handlePlayerAction({playerDealerSb->getId(), ActionType::Call});
+    m_hand->handlePlayerAction({playerDealerSb->getId(), ActionType::Bet, 60});
+    m_hand->handlePlayerAction({playerBb->getId(), ActionType::Raise, 120});
+    m_hand->handlePlayerAction({playerDealerSb->getId(), ActionType::Call});
 
-    EXPECT_EQ(myLastGameState, River);
+    EXPECT_EQ(m_lastGameState, River);
 }
 
 } // namespace pkt::test

@@ -18,8 +18,8 @@ class MixedPlayerFactory : public IPlayerFactory
     std::shared_ptr<Player> createPlayer(int id, TableProfile profile, int startMoney) override;
 
   private:
-    const GameEvents& myEvents;
-    StrategyAssigner* myStrategyAssigner;
+    const GameEvents& m_events;
+    StrategyAssigner* m_strategyAssigner;
     
     std::shared_ptr<Player> createHumanPlayer(int id, int startMoney);
     std::shared_ptr<Player> createBotPlayer(int id, TableProfile profile, int startMoney);
