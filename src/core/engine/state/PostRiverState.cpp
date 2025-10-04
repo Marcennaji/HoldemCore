@@ -19,20 +19,25 @@ PostRiverState::PostRiverState(const GameEvents& events, std::shared_ptr<pkt::co
 {
 }
 
-void PostRiverState::ensureServicesInitialized() const
+// ISP-compliant constructor using focused service interface
+PostRiverState::PostRiverState(const GameEvents& events, std::shared_ptr<HasLogger> logger)
+    : m_events(events), m_logger(logger)
 {
-    if (!m_services)
-    {
-        static std::shared_ptr<pkt::core::ServiceContainer> defaultServices =
-            std::make_shared<pkt::core::AppServiceContainer>();
-        m_services = defaultServices;
+}
+
+// ISP-compliant helper method
+pkt::core::Logger& PostRiverState::getLogger() const
+{
+    if (m_logger) {
+        return m_logger->logger();
     }
+    // This should not happen in normal operation
+    throw std::runtime_error("PostRiverState: Logger service not properly initialized. Use ISP-compliant constructor.");
 }
 
 void PostRiverState::enter(Hand& hand)
 {
-    ensureServicesInitialized();
-    m_services->logger().info("Post-River");
+    getLogger().info("Post-River");
 
     for (auto& player : *hand.getActingPlayersList())
     {

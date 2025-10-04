@@ -5,6 +5,8 @@
 #pragma once
 
 #include "core/interfaces/HasLogger.h"
+#include "core/interfaces/HasRandomizer.h"
+#include "core/interfaces/HasHandEvaluationEngine.h"
 #include "core/services/ServiceContainer.h"
 #include <memory>
 
@@ -26,11 +28,35 @@ class ServiceAdapter
         return std::make_shared<LoggerFromServiceContainer>(m_services);
     }
     
+    std::shared_ptr<HasRandomizer> createRandomizerService() const {
+        return std::make_shared<RandomizerFromServiceContainer>(m_services);
+    }
+    
+    std::shared_ptr<HasHandEvaluationEngine> createHandEvaluationEngineService() const {
+        return std::make_shared<HandEvaluationEngineFromServiceContainer>(m_services);
+    }
+    
   private:
     class LoggerFromServiceContainer : public HasLogger {
       public:
         explicit LoggerFromServiceContainer(std::shared_ptr<ServiceContainer> services) : m_services(services) {}
         Logger& logger() override { return m_services->logger(); }
+      private:
+        std::shared_ptr<ServiceContainer> m_services;
+    };
+    
+    class RandomizerFromServiceContainer : public HasRandomizer {
+      public:
+        explicit RandomizerFromServiceContainer(std::shared_ptr<ServiceContainer> services) : m_services(services) {}
+        Randomizer& randomizer() override { return m_services->randomizer(); }
+      private:
+        std::shared_ptr<ServiceContainer> m_services;
+    };
+    
+    class HandEvaluationEngineFromServiceContainer : public HasHandEvaluationEngine {
+      public:
+        explicit HandEvaluationEngineFromServiceContainer(std::shared_ptr<ServiceContainer> services) : m_services(services) {}
+        HandEvaluationEngine& handEvaluationEngine() override { return m_services->handEvaluationEngine(); }
       private:
         std::shared_ptr<ServiceContainer> m_services;
     };

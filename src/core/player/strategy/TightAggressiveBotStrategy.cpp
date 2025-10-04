@@ -2,6 +2,8 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 #include <core/player/strategy/TightAggressiveBotStrategy.h>
+#include <core/interfaces/ServiceAdapter.h>
+#include <core/services/ServiceContainer.h>
 
 #include <core/engine/hand/HandEvaluator.h>
 
@@ -22,30 +24,65 @@ namespace pkt::core::player
 
 using namespace std;
 
+// Legacy constructor for backward compatibility - creates default services and delegates to ISP constructor
 TightAggressiveBotStrategy::TightAggressiveBotStrategy()
 {
-    // initialize utg starting range, in a full table
+    auto adapter = ServiceAdapter(std::make_shared<pkt::core::AppServiceContainer>());
+    m_logger = adapter.createLoggerService();
+    m_randomizer = adapter.createRandomizerService();
+    
+    // Initialize ranges
     int utgFullTableRange = 0;
-    ensureServicesInitialized();
-    m_services->randomizer().getRand(2, 3, 1, &utgFullTableRange);
+    getRandomizer().getRand(2, 3, 1, &utgFullTableRange);
     initializeRanges(45, utgFullTableRange);
 }
 
+// Legacy ServiceContainer constructor
 TightAggressiveBotStrategy::TightAggressiveBotStrategy(std::shared_ptr<pkt::core::ServiceContainer> services)
-    : BotStrategyBase(services)
+{
+    auto adapter = ServiceAdapter(services);
+    m_logger = adapter.createLoggerService();
+    m_randomizer = adapter.createRandomizerService();
+    
+    // Initialize ranges
+    int utgFullTableRange = 0;
+    services->randomizer().getRand(2, 3, 1, &utgFullTableRange);
+    initializeRanges(45, utgFullTableRange);
+}
+
+// ISP-compliant constructor using focused service interfaces
+TightAggressiveBotStrategy::TightAggressiveBotStrategy(std::shared_ptr<pkt::core::HasLogger> logger, std::shared_ptr<pkt::core::HasRandomizer> randomizer)
+    : m_logger(logger), m_randomizer(randomizer)
 {
     // initialize utg starting range, in a full table
     int utgFullTableRange = 0;
-    m_services->randomizer().getRand(2, 3, 1, &utgFullTableRange);
+    getRandomizer().getRand(2, 3, 1, &utgFullTableRange);
 
     // Debug logging to see what values we're getting
-    m_services->logger().verbose("TightAggressiveBotStrategy constructor: utgHeadsUpRange=45, utgFullTableRange=" +
-                                 std::to_string(utgFullTableRange));
+    getLogger().verbose("TightAggressiveBotStrategy constructor: utgHeadsUpRange=45, utgFullTableRange=" +
+                        std::to_string(utgFullTableRange));
 
     initializeRanges(45, utgFullTableRange);
 }
 
 TightAggressiveBotStrategy::~TightAggressiveBotStrategy() = default;
+
+// ISP-compliant helper methods
+pkt::core::Logger& TightAggressiveBotStrategy::getLogger() const
+{
+    if (m_logger) {
+        return m_logger->logger();
+    }
+    throw std::runtime_error("TightAggressiveBotStrategy: Logger service not properly initialized. Use ISP-compliant constructor.");
+}
+
+pkt::core::Randomizer& TightAggressiveBotStrategy::getRandomizer() const
+{
+    if (m_randomizer) {
+        return m_randomizer->randomizer();
+    }
+    throw std::runtime_error("TightAggressiveBotStrategy: Randomizer service not properly initialized. Use ISP-compliant constructor.");
+}
 
 bool TightAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
 {
@@ -91,7 +128,7 @@ bool TightAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
 
         stringCallingRange += HIGH_SUITED_CONNECTORS;
 
-        m_services->logger().verbose("\t\tTAG adding high suited connectors to the initial calling range.");
+        getLogger().verbose("\t\tTAG adding high suited connectors to the initial calling range.");
     }
 
     // defend against 3bet bluffs :
@@ -118,7 +155,7 @@ bool TightAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
                 "the initial calling range.");
         }
     }
-    m_services->logger().verbose("\t\tTAG final calling range : " + stringCallingRange);
+    getLogger().verbose("\t\tTAG final calling range : " + stringCallingRange);
 
     return isCardsInRange(ctx.personalContext.holeCards, stringCallingRange);
 }

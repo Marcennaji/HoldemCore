@@ -19,7 +19,10 @@
 #include "strategy/CurrentHandContext.h"
 
 #include "core/interfaces/HandEvaluationEngine.h"
+#include "core/interfaces/Logger.h"
 #include "core/services/ServiceContainer.h"
+#include "core/interfaces/HasLogger.h"
+#include "core/interfaces/HasHandEvaluationEngine.h"
 
 #include <array>
 #include <assert.h>
@@ -43,6 +46,8 @@ class Player
   public:
     Player(const GameEvents&, int id, std::string name, int cash);
     Player(const GameEvents&, std::shared_ptr<ServiceContainer> services, int id, std::string name, int cash);
+    // ISP-compliant constructor using focused service interfaces
+    Player(const GameEvents&, std::shared_ptr<HasLogger> logger, std::shared_ptr<HasHandEvaluationEngine> handEvaluator, int id, std::string name, int cash);
     virtual ~Player() = default;
 
     // ========================================
@@ -133,6 +138,12 @@ class Player
     std::unique_ptr<RangeEstimator>& getRangeEstimator() { return m_rangeEstimator; }
 
     // ========================================
+    // Service Access Helpers (ISP-compliant)
+    // ========================================
+    pkt::core::Logger& getLogger() const;
+    pkt::core::HandEvaluationEngine& getHandEvaluationEngine() const;
+
+    // ========================================
     // Business Logic Methods (Actual Implementation)
     // ========================================
     bool isInVeryLooseMode(const int nbPlayers) const;
@@ -154,6 +165,9 @@ class Player
     const HandSimulationStats computeHandSimulation() const;
     std::unique_ptr<PlayerStrategy> m_strategy;
     std::unique_ptr<PlayerStatisticsUpdater> m_statisticsUpdater;
-    mutable std::shared_ptr<ServiceContainer> m_services; // Injected service container
+    mutable std::shared_ptr<ServiceContainer> m_services; // Injected service container (legacy)
+    // ISP-compliant focused service interfaces
+    std::shared_ptr<HasLogger> m_logger;
+    std::shared_ptr<HasHandEvaluationEngine> m_handEvaluator;
 };
 } // namespace pkt::core::player

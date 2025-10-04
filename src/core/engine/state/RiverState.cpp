@@ -20,26 +20,15 @@ RiverState::RiverState(const GameEvents& events, std::shared_ptr<pkt::core::Serv
 {
 }
 
-void RiverState::ensureServicesInitialized() const
-{
-    if (!m_services)
-    {
-        static std::shared_ptr<pkt::core::ServiceContainer> defaultServices =
-            std::make_shared<pkt::core::AppServiceContainer>();
-        m_services = defaultServices;
-    }
-}
-
 Logger& RiverState::getLogger()
 {
-    // Use focused dependency if available (ISP-compliant)
+    // Use focused dependency (ISP-compliant)
     if (m_loggerService) {
         return m_loggerService->logger();
     }
     
-    // Fall back to legacy service container
-    ensureServicesInitialized();
-    return m_services->logger();
+    // This should not happen in normal operation
+    throw std::runtime_error("RiverState: Logger service not properly initialized. Use ISP-compliant constructor.");
 }
 
 void RiverState::enter(Hand& hand)

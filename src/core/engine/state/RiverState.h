@@ -43,7 +43,6 @@ class RiverState : public HandState, public HandActionProcessor, public HandDebu
     void promptPlayerAction(Hand&, player::Player& player) override;
 
   private:
-    void ensureServicesInitialized() const;
     Logger& getLogger(); // Helper to get logger from either source
 
     const GameEvents& m_events;

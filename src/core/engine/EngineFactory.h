@@ -11,9 +11,9 @@
 #include "core/engine/model/StartData.h"
 #include "core/engine/game/Board.h"
 #include "core/player/Player.h"
-#include "core/services/PokerServices.h"
-#include "core/interfaces/services/LoggerProvider.h"
-#include "core/interfaces/services/HandEvaluationProvider.h"
+#include "core/services/ServiceContainer.h"
+#include "core/interfaces/HasLogger.h"
+#include "core/interfaces/HasHandEvaluationEngine.h"
 
 #include <memory>
 #include <vector>
@@ -26,14 +26,11 @@ class EngineFactory
 {
   public:
     EngineFactory(const GameEvents&);
-
-    // Constructor with PokerServices for dependency injection
-    EngineFactory(const GameEvents&, std::shared_ptr<PokerServices> services);
     
-    // Constructor with focused dependencies (ISP-compliant)
+    // ISP-compliant constructor using focused service interfaces
     EngineFactory(const GameEvents& events, 
-                  std::shared_ptr<LoggerProvider> loggerProvider,
-                  std::shared_ptr<HandEvaluationProvider> handEvalProvider);
+                  std::shared_ptr<HasLogger> logger,
+                  std::shared_ptr<HasHandEvaluationEngine> handEvaluator);
 
     ~EngineFactory();
 
@@ -45,17 +42,17 @@ class EngineFactory
 
   private:
     const GameEvents& m_events;
-    std::shared_ptr<PokerServices> m_services; // Injected service container (legacy)
+    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services; // Legacy fallback
     
-    // Focused dependencies (ISP-compliant)
-    std::shared_ptr<LoggerProvider> m_loggerProvider;
-    std::shared_ptr<HandEvaluationProvider> m_handEvalProvider;
+    // ISP-compliant focused dependencies
+    std::shared_ptr<HasLogger> m_logger;
+    std::shared_ptr<HasHandEvaluationEngine> m_handEvaluator;
 
-    void ensureServicesInitialized();
+    void ensureServicesInitialized() const;
     
-    // Helper methods to get services through focused interfaces or legacy container
-    Logger& getLogger();
-    HandEvaluationEngine& getHandEvaluationEngine();
+    // ISP-compliant helper methods
+    pkt::core::Logger& getLogger() const;
+    pkt::core::HandEvaluationEngine& getHandEvaluationEngine() const;
 };
 
 } // namespace pkt::core

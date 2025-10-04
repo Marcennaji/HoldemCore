@@ -4,6 +4,8 @@
 
 #include "Player.h"
 
+#include "core/interfaces/ServiceAdapter.h"
+#include "core/interfaces/Logger.h"
 #include <core/engine/cards/CardUtilities.h>
 #include <core/engine/hand/Hand.h>
 #include <core/engine/hand/HandEvaluator.h>
@@ -50,12 +52,53 @@ Player::Player(const GameEvents& events, std::shared_ptr<ServiceContainer> servi
     // Initialize with invalid cards - this will be set via context when needed
 }
 
+// ISP-compliant constructor using focused service interfaces
+Player::Player(const GameEvents& events, std::shared_ptr<pkt::core::HasLogger> logger, 
+               std::shared_ptr<pkt::core::HasHandEvaluationEngine> handEvaluator, 
+               int id, std::string name, int cash)
+    : m_id(id), m_name(name), m_events(events), m_logger(logger), m_handEvaluator(handEvaluator)
+{
+    // For components that still depend on full ServiceContainer, use temporary fallback
+    // This will need refactoring when RangeEstimator and PlayerStatisticsUpdater use focused interfaces
+    ensureServicesInitialized(); // Temporary fallback for legacy components
+    
+    m_rangeEstimator = std::make_unique<RangeEstimator>(m_id, m_services);
+    m_currentHandContext = std::make_unique<CurrentHandContext>();
+    m_statisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(m_services);
+    m_statisticsUpdater->loadStatistics(name);
+
+    // Initialize cash in context
+    m_currentHandContext->personalContext.cash = cash;
+    // Initialize with invalid cards - this will be set via context when needed
+}
+
 void Player::ensureServicesInitialized() const
 {
     if (!m_services)
     {
         m_services = std::make_shared<AppServiceContainer>();
     }
+}
+
+// ISP-compliant helper methods
+pkt::core::Logger& Player::getLogger() const
+{
+    if (m_logger) {
+        return m_logger->logger();
+    }
+    // Fallback to legacy service container
+    ensureServicesInitialized();
+    return m_services->logger();
+}
+
+pkt::core::HandEvaluationEngine& Player::getHandEvaluationEngine() const
+{
+    if (m_handEvaluator) {
+        return m_handEvaluator->handEvaluationEngine();
+    }
+    // Fallback to legacy service container
+    ensureServicesInitialized();
+    return m_services->handEvaluationEngine();
 }
 
 const PlayerPosition Player::getPosition() const
@@ -205,12 +248,10 @@ const HandSimulationStats Player::computeHandSimulation() const
     const int nbOpponents = m_seatsList->size() - 1;
     // evaluate my strength against my opponents's guessed ranges :
     float maxOpponentsStrengths = getMaxOpponentsStrengths();
-    ensureServicesInitialized();
-    return m_services->handEvaluationEngine().simulateHandEquity(getCardsValueString(), getStringBoard(), nbOpponents,
-                                                                 maxOpponentsStrengths);
+    return getHandEvaluationEngine().simulateHandEquity(getCardsValueString(), getStringBoard(), nbOpponents,
+                                                       maxOpponentsStrengths);
 #else
-    ensureServicesInitialized();
-    return m_services->handEvaluationEngine().simulateHandEquity("As 6d", "", 2, 0.5);
+    return getHandEvaluationEngine().simulateHandEquity("As 6d", "", 2, 0.5);
 #endif
 }
 
@@ -312,8 +353,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 
         if ((*i).size() != 4)
         {
-            ensureServicesInitialized();
-            m_services->logger().error("invalid hand : " + (*i));
+            getLogger().error("invalid hand : " + (*i));
             continue;
         }
         string s1 = (*i).substr(0, 2);
@@ -346,8 +386,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 
     for (vector<std::string>::const_iterator i = newRanges.begin(); i != newRanges.end(); i++)
     {
-        ensureServicesInitialized();
-        const int rank = m_services->handEvaluationEngine().rankHand(((*i) + board).c_str());
+        const int rank = getHandEvaluationEngine().rankHand(((*i) + board).c_str());
         if (rank > getHandRanking())
         {
             nbWinningHands++;

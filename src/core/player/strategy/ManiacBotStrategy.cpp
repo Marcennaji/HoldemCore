@@ -2,6 +2,8 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 #include <core/player/strategy/ManiacBotStrategy.h>
+#include <core/interfaces/ServiceAdapter.h>
+#include <core/services/ServiceContainer.h>
 
 #include <core/engine/hand/HandEvaluator.h>
 
@@ -22,25 +24,65 @@ namespace pkt::core::player
 
 using namespace std;
 
+// Legacy constructor for backward compatibility - creates default services and delegates to ISP constructor
 ManiacBotStrategy::ManiacBotStrategy()
 {
-    // initialize utg starting range, in a full table
+    auto adapter = ServiceAdapter(std::make_shared<pkt::core::AppServiceContainer>());
+    m_loggerService = adapter.createLoggerService();
+    m_randomizerService = adapter.createRandomizerService();
+    
+    // Initialize ranges
     int utgFullTableRange = 0;
-    ensureServicesInitialized();
-    m_services->randomizer().getRand(30, 35, 1, &utgFullTableRange);
+    getRandomizer().getRand(30, 35, 1, &utgFullTableRange);
     initializeRanges(50, utgFullTableRange);
 }
 
-ManiacBotStrategy::ManiacBotStrategy(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer)
-    : BotStrategyBase(serviceContainer)
+// Legacy ServiceContainer constructor
+ManiacBotStrategy::ManiacBotStrategy(std::shared_ptr<pkt::core::ServiceContainer> services)
 {
-    // initialize utg starting range, in a full table
+    auto adapter = ServiceAdapter(services);
+    m_loggerService = adapter.createLoggerService();
+    m_randomizerService = adapter.createRandomizerService();
+    
+    // Initialize ranges
     int utgFullTableRange = 0;
-    m_services->randomizer().getRand(30, 35, 1, &utgFullTableRange);
+    services->randomizer().getRand(30, 35, 1, &utgFullTableRange);
+    initializeRanges(50, utgFullTableRange);
+}
+
+// ISP-compliant constructor - only accepts what it actually needs (Logger + Randomizer)
+ManiacBotStrategy::ManiacBotStrategy(std::shared_ptr<pkt::core::HasLogger> logger, 
+                                   std::shared_ptr<pkt::core::HasRandomizer> randomizer)
+    : BotStrategyBase(), m_loggerService(logger), m_randomizerService(randomizer)
+{
+    // initialize utg starting range, in a full table  
+    int utgFullTableRange = 0;
+    getRandomizer().getRand(30, 35, 1, &utgFullTableRange);
     initializeRanges(50, utgFullTableRange);
 }
 
 ManiacBotStrategy::~ManiacBotStrategy() = default;
+
+// Helper methods following Single Responsibility Principle
+pkt::core::Logger& ManiacBotStrategy::getLogger()
+{
+    // Use focused dependency (ISP-compliant)
+    if (m_loggerService) {
+        return m_loggerService->logger();
+    }
+    
+    throw std::runtime_error("ManiacBotStrategy: Logger service not properly initialized. Use ISP-compliant constructor.");
+}
+
+pkt::core::Randomizer& ManiacBotStrategy::getRandomizer()
+{
+    // Use focused dependency (ISP-compliant)
+    if (m_randomizerService) {
+        return m_randomizerService->randomizer();
+    }
+    
+    throw std::runtime_error("ManiacBotStrategy: Randomizer service not properly initialized. Use ISP-compliant constructor.");
+}
 
 bool ManiacBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
 {
@@ -75,7 +117,7 @@ bool ManiacBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
 
     if (ctx.commonContext.bettingContext.preflopRaisesNumber < 3)
     {
-        m_services->logger().verbose("\t\tManiac adding high pairs to the initial calling range.");
+        getLogger().verbose("\t\tManiac adding high pairs to the initial calling range.");
         stringCallingRange += HIGH_PAIRS;
     }
 
@@ -129,7 +171,7 @@ bool ManiacBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
                 "the initial calling range.");
         }
     }
-    m_services->logger().verbose("\t\tManiac final calling range : " + stringCallingRange);
+    getLogger().verbose("\t\tManiac final calling range : " + stringCallingRange);
 
     return isCardsInRange(ctx.personalContext.holeCards, stringCallingRange);
 }
@@ -171,7 +213,7 @@ int ManiacBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
 
     stringRaisingRange = rangesString[(int) raisingRange];
 
-    m_services->logger().verbose(stringRaisingRange);
+    getLogger().verbose(stringRaisingRange);
 
     // determine when to 3-bet without a real hand
     bool speculativeHandedAdded = false;
@@ -454,7 +496,7 @@ int ManiacBotStrategy::flopCouldRaise(const CurrentHandContext& ctx)
     {
 
         int rand = 0;
-        m_services->randomizer().getRand(1, 3, 1, &rand);
+        getRandomizer().getRand(1, 3, 1, &rand);
         if (rand == 2)
         {
             return ctx.commonContext.bettingContext.pot * 2;

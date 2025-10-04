@@ -15,6 +15,12 @@ FlopState::FlopState(const GameEvents& events) : m_events(events)
 {
 }
 
+// ISP-compliant constructor - only accepts what it actually needs
+FlopState::FlopState(const GameEvents& events, std::shared_ptr<HasLogger> logger) 
+    : m_events(events), m_loggerService(logger)
+{
+}
+
 void FlopState::enter(Hand& hand)
 {
     // Reset betting amounts for new round
@@ -48,6 +54,33 @@ void FlopState::enter(Hand& hand)
         }
     }
     logStateInfo(hand);
+}
+
+// Helper method following Single Responsibility Principle
+Logger& FlopState::getLogger()
+{
+    // Use focused dependency if available (ISP-compliant)
+    if (m_loggerService) {
+        return m_loggerService->logger();
+    }
+    
+    // Fall back to base class implementation (Open/Closed Principle)
+    static std::shared_ptr<pkt::core::ServiceContainer> defaultServices =
+        std::make_shared<pkt::core::AppServiceContainer>();
+    return defaultServices->logger();
+}
+
+// Override base class method to use focused dependency (Liskov Substitution Principle)
+void FlopState::logStateInfo(Hand& hand)
+{
+    // Use ISP-compliant logging instead of hidden ServiceContainer dependency
+    std::string boardStr = hand.getStringBoard();
+    int pot = hand.getBoard().getPot(hand);
+    
+    Logger& logger = getLogger();
+    logger.info(""); // Empty line for spacing
+    logger.info("Current State: " + gameStateToString(hand.getGameState()) + 
+               ", Board: " + boardStr + ", Pot: " + std::to_string(pot));
 }
 
 void FlopState::exit(Hand& hand)

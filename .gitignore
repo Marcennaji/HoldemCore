@@ -64,3 +64,6 @@ launch_visual_studio_with_qt.bat
 .env.local
 *.local.bat
 migrate_member_variables.py
+
+# temporary docs
+docs

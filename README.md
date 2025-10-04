@@ -47,70 +47,11 @@ cmake --build build/debug-widgets
 
 ---
 
-## 👨‍💻 About
-
-**Marc Ennaji** - Senior Software Engineer  
-[LinkedIn](https://www.linkedin.com/in/marcennaji/) 
-
-### Expertise
-- Modern C++ Development
-- Software Architecture & Design
-- Legacy System Modernization
-- Test-Driven Development
-
-*Available for collaborations and opportunities*
-
----
 
 ## 🏠 Architecture Overview
 
-### Architecture Principles
+See the architecture characteristics in [ARCHITECTURE.md](doc/ARCHITECTURE.md)
 
-**Hexagonal Architecture (Ports & Adapters)**
-
-![Hexagonal Architecture Diagram](doc/architecture.png)
-
-**Key Design Elements:**
-- Dependency injection for testable boundaries
-- Rich domain models with clear separation
-- Event-driven communication
-- Strategy pattern for pluggable AI behaviors
-
-### 4. **Strategy Pattern Implementation**
-
-Demonstrates **advanced OOP design** with pluggable AI behaviors:
-
-```cpp
-class BotStrategy {
-public:
-    virtual PlayerAction decidePreflop(const CurrentHandContext& ctx) = 0;
-    virtual PlayerAction decideFlop(const CurrentHandContext& ctx) = 0;
-    virtual PlayerAction decideTurn(const CurrentHandContext& ctx) = 0;
-    virtual PlayerAction decideRiver(const CurrentHandContext& ctx) = 0;
-};
-
-// Clean composition over inheritance
-Player player(events, "BotName");
-player.setStrategy(std::make_unique<TightAggressiveStrategy>());
-```
-
-**Benefits:**
-- Runtime strategy switching
-- Isolated unit testing
-- Plugin architecture for extensibility
-
-### 5. **Game Engine Features**
-- **Range estimation** for opponent modeling
-- **Monte Carlo simulations** for equity calculations  
-- **Statistical analysis** with persistent player profiles
-- **State machine** managing betting rounds (Preflop → Flop → Turn → River)
-
-### 6. **Testing Strategy**
-- **Comprehensive automated testing** (unit + integration + end-to-end)
-- **TDD approach** with GoogleTest framework
-- **Mock services** for isolated component testing
-
----
 ## 🎮 User Interface
 
 <table>
@@ -148,18 +89,13 @@ player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 
 
 ---
-## � Development Roadmap
+## Development Roadmap
 - eliminate completely remaining SOLID violations in legacy code, by continuous refactoring
 - Develop a Qt Quick (QML) GUI, for mobile version
 - explore the possibility of plugging a machine learning-based bot AI
 
 ---
 
-## 📈 Project Scale
-
-**19,000+ lines** of modern C++ • **Comprehensive test coverage** • **50+ classes**
-
----
 
 ## 📚 Dependencies & Licensing
 
@@ -174,3 +110,19 @@ player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 - [GoogleTest](https://github.com/google/googletest) - Testing framework
 
 **Licensing:** MIT License - Free for commercial and personal use
+
+## 👨‍💻 About
+
+**Marc Ennaji** - Senior Software Engineer  
+[LinkedIn](https://www.linkedin.com/in/marcennaji/) 
+
+### Expertise
+- Modern C++ Development
+- Software Architecture & Design
+- Legacy System Modernization
+- Test-Driven Development
+
+*Available for collaborations and opportunities*
+
+---
+

@@ -43,14 +43,30 @@ PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsig
     }
 }
 
-void PreflopState::ensureServicesInitialized() const
+// ISP-compliant constructor using focused service interface
+PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsigned dealerPlayerId,
+                           std::shared_ptr<HasLogger> logger)
+    : m_events(events), m_smallBlind(smallBlind), m_dealerPlayerId(dealerPlayerId), m_logger(logger)
 {
-    if (!m_services)
+    if (smallBlind <= 0)
     {
-        static std::shared_ptr<pkt::core::ServiceContainer> defaultServices =
-            std::make_shared<pkt::core::AppServiceContainer>();
-        m_services = defaultServices;
+        throw std::invalid_argument("PreflopState: smallBlind must be > 0");
     }
+
+    if (dealerPlayerId == static_cast<unsigned>(-1))
+    {
+        throw std::invalid_argument("PreflopState: dealerPlayerId is invalid");
+    }
+}
+
+// ISP-compliant helper method
+pkt::core::Logger& PreflopState::getLogger() const
+{
+    if (m_logger) {
+        return m_logger->logger();
+    }
+    // This should not happen in normal operation
+    throw std::runtime_error("PreflopState: Logger service not properly initialized. Use ISP-compliant constructor.");
 }
 
 void PreflopState::enter(Hand& hand)
@@ -94,14 +110,13 @@ std::unique_ptr<HandState> PreflopState::computeNextState(Hand& hand)
 
 void PreflopState::logStateInfo(Hand& hand)
 {
-    ensureServicesInitialized();
     HandDebuggableState::logStateInfo(hand);
-    m_services->logger().info("Blinds: SB=" + std::to_string(m_smallBlind) +
-                              ", BB=" + std::to_string(2 * m_smallBlind));
+    getLogger().info("Blinds: SB=" + std::to_string(m_smallBlind) +
+                     ", BB=" + std::to_string(2 * m_smallBlind));
     // Log dealer and positions to help diagnose acting order
-    m_services->logger().info("Dealer: Player " + std::to_string(hand.getDealerPlayerId()));
+    getLogger().info("Dealer: Player " + std::to_string(hand.getDealerPlayerId()));
     for (const auto& player : *hand.getSeatsList()) {
-        m_services->logger().info(
+        getLogger().info(
             "Player " + std::to_string(player->getId()) + " (" + player->getName() + ") position=" +
             positionToString(player->getPosition()));
     }
@@ -110,19 +125,18 @@ void PreflopState::logStateInfo(Hand& hand)
 
 void PreflopState::logHoleCards(Hand& hand)
 {
-    ensureServicesInitialized();
     for (const auto& player : *hand.getSeatsList())
     {
         const HoleCards& holeCards = player->getHoleCards();
         if (holeCards.isValid())
         {
-            m_services->logger().info("Player " + std::to_string(player->getId()) + " (" + player->getName() +
-                                      "): " + holeCards.toString());
+            getLogger().info("Player " + std::to_string(player->getId()) + " (" + player->getName() +
+                            "): " + holeCards.toString());
         }
         else
         {
-            m_services->logger().info("Player " + std::to_string(player->getId()) + " (" + player->getName() +
-                                      "): No hole cards");
+            getLogger().info("Player " + std::to_string(player->getId()) + " (" + player->getName() +
+                            "): No hole cards");
         }
     }
 }

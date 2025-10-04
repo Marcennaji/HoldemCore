@@ -5,7 +5,7 @@
 #include "core/engine/Exception.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
-#include "core/services/PokerServices.h"
+#include "core/player/Player.h"
 #include "core/services/ServiceContainer.h"
 #include "infra/ConsoleLogger.h"
 #include "infra/eval/PsimHandEvaluationEngine.h"
@@ -29,8 +29,8 @@ void EngineTest::SetUp()
     randomizer->values = {3, 5, 7};
     m_services->setRandomizer(std::move(randomizer));
 
-    auto pokerServices = std::make_shared<pkt::core::PokerServices>(m_services);
-    m_factory = std::make_unique<EngineFactory>(m_events, pokerServices);
+    // Use legacy constructor temporarily while migrating to ISP
+    m_factory = std::make_unique<EngineFactory>(m_events);
 
     gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
     gameData.startMoney = 1000;
@@ -44,14 +44,14 @@ void EngineTest::TearDown()
 
 void EngineTest::createPlayersLists(size_t playerCount)
 {
-    m_seatsList = std::make_shared<std::list<std::shared_ptr<Player>>>();
+    m_seatsList = std::make_shared<std::list<std::shared_ptr<pkt::core::player::Player>>>();
     for (size_t i = 0; i < playerCount; ++i)
     {
         auto player = std::make_shared<DummyPlayer>(i, m_events);
         m_seatsList->push_back(player);
     }
 
-    m_actingPlayersList = std::make_shared<std::list<std::shared_ptr<Player>>>();
+    m_actingPlayersList = std::make_shared<std::list<std::shared_ptr<pkt::core::player::Player>>>();
     for (const auto& player : *m_seatsList)
     {
         m_actingPlayersList->push_back(player);

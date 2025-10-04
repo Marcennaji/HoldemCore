@@ -6,7 +6,7 @@
 #include "core/engine/state/PreflopState.h"
 #include "core/interfaces/persistence/NullPlayersStatisticsStore.h"
 #include "core/player/Helpers.h"
-#include "core/services/PokerServices.h"
+// No additional includes needed for legacy constructor
 #include "core/services/ServiceContainer.h"
 #include "infra/ConsoleLogger.h"
 #include "infra/eval/PsimHandEvaluationEngine.h"
@@ -46,9 +46,8 @@ void SqlitePlayersStatisticsStoreTest::SetUp()
     randomizer->values = {3, 5, 7};
     m_testServices->setRandomizer(std::move(randomizer));
 
-    // Create the factory with our test services
-    auto pokerServices = std::make_shared<pkt::core::PokerServices>(m_testServices);
-    m_factory = std::make_unique<EngineFactory>(m_events, pokerServices);
+    // Use legacy constructor temporarily while migrating to ISP
+    m_factory = std::make_unique<EngineFactory>(m_events);
 }
 
 void SqlitePlayersStatisticsStoreTest::TearDown()
