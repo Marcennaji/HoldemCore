@@ -30,10 +30,21 @@ void RiverState::ensureServicesInitialized() const
     }
 }
 
+Logger& RiverState::getLogger()
+{
+    // Use focused dependency if available (ISP-compliant)
+    if (m_loggerService) {
+        return m_loggerService->logger();
+    }
+    
+    // Fall back to legacy service container
+    ensureServicesInitialized();
+    return m_services->logger();
+}
+
 void RiverState::enter(Hand& hand)
 {
-    ensureServicesInitialized();
-    m_services->logger().info("River");
+    getLogger().info("River");
 
     for (auto& player : *hand.getActingPlayersList())
     {

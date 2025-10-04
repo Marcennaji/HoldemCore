@@ -4,7 +4,8 @@
 
 **Portfolio Project: Modern C++ Architecture**
 
-Texas Hold'em simulation engine applying modern software engineering practices: hexagonal architecture, TDD and CI/CD, SOLID principles, and cross-platform design.
+Texas Hold'em simulation engine applying modern software engineering practices: hexagonal architecture, TDD and CI/CD, SOLID principles, continuous refactoring, and cross-platform design.
+The original project, created in 2011, has been substantially rewritten in 2025.
 
 > **Portfolio Notice**: This repository is maintained as a demonstration of C++ engineering. Issues and PRs are welcome but the roadmap follows the author's priorities.
 
@@ -148,7 +149,7 @@ player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 
 ---
 ## � Development Roadmap
-
+- eliminate completely remaining SOLID violations in legacy code, by continuous refactoring
 - Develop a Qt Quick (QML) GUI, for mobile version
 - explore the possibility of plugging a machine learning-based bot AI
 

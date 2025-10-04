@@ -4,7 +4,8 @@
 
 **Projet Portfolio : Architecture C++ Moderne**
 
-Moteur de simulation Texas Hold'em mettant en application des pratiques d’ingénierie logicielle modernes : architecture hexagonale, TDD et CI/CD, principes SOLID et conception multiplateforme.
+Moteur de simulation Texas Hold'em mettant en application des pratiques d’ingénierie logicielle modernes : architecture hexagonale, TDD et CI/CD, principes SOLID, refactoring continu et conception multiplateforme.
+Le projet initial, créé en 2011, a fait l'objet en 2025 d'une réécriture très substantielle.
 
 > **Note Portfolio** : Ce dépôt est maintenu comme une démonstration d'ingénierie C++. Les tickets et PRs sont les bienvenus, mais la feuille de route suit les priorités de l'auteur.
 
@@ -148,7 +149,7 @@ player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 
 ---
 ## 🚧 Feuille de Route de Développement
-
+- refactoring des portions legacy respectant imparfaitement SOLID 
 - Développer une interface graphique Qt Quick (QML), pour version mobile
 - Explorer la possibilité d'intégrer une IA de bot basée sur le machine learning
 
