@@ -289,10 +289,9 @@ float Player::getMaxOpponentsStrengths() const
 // get an opponent winning hands % against me, giving his supposed range
 float Player::getOpponentWinningHandsPercentage(const int opponentId, std::string board) const
 {
-#if (false)
     float result = 0;
 
-    auto opponent = *getPlayerListIteratorById(m_currentHandContext->commonContext.m_seatsList, opponentId);
+    auto opponent = *getPlayerListIteratorById(m_currentHandContext->commonContext.playersContext.actingPlayersList, opponentId);
 
     assert(getHandRanking() > 0);
 
@@ -362,18 +361,16 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
     }
     assert(nbWinningHands / ranges.size() <= 1.0);
     return (float) nbWinningHands / (float) newRanges.size();
-#else
-    return 0;
-#endif
+
 }
 
 std::map<int, float> Player::evaluateOpponentsStrengths() const
 {
 
     map<int, float> result;
-#if (False)
-    PlayerList players = m_seatsList;
-    const int nbPlayers = m_seatsList->size();
+
+    PlayerList players = m_currentHandContext->commonContext.playersContext.actingPlayersList;
+    const int nbPlayers = players->size();
 
     for (PlayerListIterator it = players->begin(); it != players->end(); ++it)
     {
@@ -384,12 +381,11 @@ std::map<int, float> Player::evaluateOpponentsStrengths() const
             continue;
         }
 
-        const float estimatedOpponentWinningHands = getOpponentWinningHandsPercentage((*it)->getId(), getStringBoard());
+        const float estimatedOpponentWinningHands = getOpponentWinningHandsPercentage((*it)->getId(),  m_currentHandContext->commonContext.stringBoard);
         assert(estimatedOpponentWinningHands <= 1.0);
 
         result[(*it)->getId()] = estimatedOpponentWinningHands;
     }
-#endif
 
     return result;
 }
