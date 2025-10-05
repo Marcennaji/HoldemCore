@@ -4,6 +4,7 @@
 #include "core/engine/state/PreflopState.h"
 #include "core/engine/hand/ActionProcessor.h"
 #include "core/engine/hand/HandState.h"
+#include "core/interfaces/ServiceAdapter.h"
 #include "core/services/ServiceContainer.h"
 
 #include <cassert>
@@ -36,8 +37,14 @@ void HandStateManager::ensureServicesInitialized() const
 
 void HandStateManager::initializeState(Hand& hand)
 {
-    // Pass services to PreflopState to maintain DI consistency and avoid local instantiation
-    m_currentState = std::make_unique<PreflopState>(m_events, m_smallBlind, m_dealerPlayerId, m_services);
+    ensureServicesInitialized();
+    
+    // Create ISP-compliant logger interface for PreflopState
+    auto serviceAdapter = std::make_shared<pkt::core::ServiceAdapter>(m_services);
+    auto loggerInterface = serviceAdapter->createLoggerService();
+    
+    // Use ISP-compliant constructor for proper dependency injection
+    m_currentState = std::make_unique<PreflopState>(m_events, m_smallBlind, m_dealerPlayerId, loggerInterface);
     m_currentState->enter(hand);
 }
 

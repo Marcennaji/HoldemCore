@@ -16,7 +16,6 @@ Le projet initial, créé en 2011, a fait l'objet en 2025 d'une réécriture tr�
 Moteur de simulation Texas Hold'em démontrant une architecture logicielle avancée :
 
 - **Architecture Hexagonale** avec séparation stricte des responsabilités
-- **Injection de Dépendances** 
 - **Suite de tests complète** garantissant la fiabilité
 - **Compatibilité multiplateforme** (Windows, Linux, macOS)
 - **Multiples frameworks UI** supportés via des abstractions propres
@@ -24,7 +23,7 @@ Moteur de simulation Texas Hold'em démontrant une architecture logicielle avanc
 ### Fonctionnalités Clés
 - **Modélisation de domaine complexe** : règles de poker, tours d'enchères, évaluation des ranges
 - **Framework de stratégies IA** : comportements de bots modulaires avec analyse statistique
-- **Machine à états** : gestion robuste du flux de jeu
+- **Machine à états** : gestion robuste et simple du flux de jeu
 - **Suivi du comportement** des joueurs avec persistance en base
 
 ---
@@ -47,70 +46,11 @@ cmake --build build/debug-widgets
 
 ---
 
-## 👨‍💻 À Propos
-
-**Marc Ennaji** - Ingénieur Logiciel Senior  
-[LinkedIn](https://www.linkedin.com/in/marcennaji/) 
-
-### Expertise
-- Développement C++ Moderne
-- Architecture & Conception Logicielle
-- Modernisation de Systèmes Legacy
-- Développement Dirigé par les Tests
-
-*Disponible pour collaborations et opportunités*
-
----
-
 ## 🏠 Vue d'Ensemble de l'Architecture
 
-### Principes d'Architecture
+Voir les caractéristiques d'architecture dans [ARCHITECTURE_fr.md](doc/ARCHITECTURE_fr.md)
 
-**Architecture Hexagonale (Ports & Adaptateurs)**
 
-![Diagramme d'Architecture Hexagonale](doc/architecture.png)
-
-**Éléments de Conception Clés :**
-- Injection de dépendances pour des frontières testables
-- Modèles de domaine riches avec séparation claire
-- Communication événementielle
-- Pattern Strategy pour des comportements IA modulaires
-
-### 4. **Implémentation du Pattern Strategy**
-
-Démontre une **conception OOP avancée** avec des comportements IA modulaires :
-
-```cpp
-class BotStrategy {
-public:
-    virtual PlayerAction decidePreflop(const CurrentHandContext& ctx) = 0;
-    virtual PlayerAction decideFlop(const CurrentHandContext& ctx) = 0;
-    virtual PlayerAction decideTurn(const CurrentHandContext& ctx) = 0;
-    virtual PlayerAction decideRiver(const CurrentHandContext& ctx) = 0;
-};
-
-// Composition propre plutôt qu'héritage
-Player player(events, "BotName");
-player.setStrategy(std::make_unique<TightAggressiveStrategy>());
-```
-
-**Avantages :**
-- Changement de stratégie à l'exécution
-- Tests unitaires isolés
-- Architecture de plugins pour l'extensibilité
-
-### 5. **Fonctionnalités du Moteur**
-- **Estimation de ranges** pour la modélisation d'adversaires
-- **Simulations Monte Carlo** pour les calculs d'equity  
-- **Analyse statistique** avec profils de joueurs persistants
-- **Machine à états** gérant les tours d'enchères (Preflop → Flop → Turn → River)
-
-### 6. **Stratégie de Tests**
-- **Tests automatisés complets** (unitaires + intégration + end-to-end)
-- **Approche TDD** avec le framework GoogleTest
-- **Services mock** pour les tests de composants isolés
-
----
 ## 🎮 Interface Utilisateur
 
 <table>
@@ -136,11 +76,6 @@ player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 - **CMake** pour builds multiplateformes
 - **GoogleTest** framework de tests
 
-**Patterns d'Architecture :**
-- Architecture Hexagonale, Injection de Dépendances
-- Pattern Strategy, Machine à États
-- Architecture Événementielle
-
 **Support Multiplateforme :**
 - **Qt 6** (Widgets et QML)
 - **SQLite** base de données embarquée
@@ -149,19 +84,13 @@ player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 
 ---
 ## 🚧 Feuille de Route de Développement
-- refactoring des portions legacy respectant imparfaitement SOLID 
+- refactoring des portions legacy respectant encore imparfaitement SOLID 
 - Développer une interface graphique Qt Quick (QML), pour version mobile
 - Explorer la possibilité d'intégrer une IA de bot basée sur le machine learning
 
 ---
 
-## 📈 Échelle du Projet
-
-**19 000+ lignes** de C++ moderne • **Couverture de tests complète** • **50+ classes**
-
----
-
-## 📚 Dépendances & Licences
+##  Dépendances & Licences
 
 **Framework UI (Optionnel) :**
 - [Qt 6](https://www.qt.io/) - Framework d'application multiplateforme (Qt Widgets et Qt QML)
@@ -174,3 +103,18 @@ player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 - [GoogleTest](https://github.com/google/googletest) - Framework de tests
 
 **Licence :** Licence MIT - Gratuit pour usage commercial et personnel
+
+---
+
+## 👨‍💻 À Propos
+
+**Marc Ennaji** - Ingénieur Logiciel Senior  
+[LinkedIn](https://www.linkedin.com/in/marcennaji/) 
+
+### Expertise
+- Développement C++ Moderne
+- Architecture & Conception Logicielle
+- Modernisation de Systèmes Legacy
+- Développement Dirigé par les Tests
+
+*Disponible pour collaborations et opportunités*

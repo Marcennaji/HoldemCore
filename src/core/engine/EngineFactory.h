@@ -14,6 +14,7 @@
 #include "core/services/ServiceContainer.h"
 #include "core/interfaces/HasLogger.h"
 #include "core/interfaces/HasHandEvaluationEngine.h"
+#include "core/interfaces/HasPlayersStatisticsStore.h"
 
 #include <memory>
 #include <vector>
@@ -30,7 +31,8 @@ class EngineFactory
     // ISP-compliant constructor using focused service interfaces
     EngineFactory(const GameEvents& events, 
                   std::shared_ptr<HasLogger> logger,
-                  std::shared_ptr<HasHandEvaluationEngine> handEvaluator);
+                  std::shared_ptr<HasHandEvaluationEngine> handEvaluator,
+                  std::shared_ptr<HasPlayersStatisticsStore> statisticsStore = nullptr);
 
     ~EngineFactory();
 
@@ -47,12 +49,17 @@ class EngineFactory
     // ISP-compliant focused dependencies
     std::shared_ptr<HasLogger> m_logger;
     std::shared_ptr<HasHandEvaluationEngine> m_handEvaluator;
+    std::shared_ptr<HasPlayersStatisticsStore> m_statisticsStore;
 
     void ensureServicesInitialized() const;
     
     // ISP-compliant helper methods
     pkt::core::Logger& getLogger() const;
     pkt::core::HandEvaluationEngine& getHandEvaluationEngine() const;
+    
+  public:
+    // Method to get service container for Hand (temporary during migration)
+    std::shared_ptr<pkt::core::ServiceContainer> getServiceContainer() const;
 };
 
 } // namespace pkt::core

@@ -11,6 +11,12 @@ PlayerStatisticsUpdater::PlayerStatisticsUpdater(std::shared_ptr<pkt::core::Serv
 {
 }
 
+// ISP-compliant constructor
+PlayerStatisticsUpdater::PlayerStatisticsUpdater(std::shared_ptr<pkt::core::HasPlayersStatisticsStore> statisticsStore)
+    : m_statisticsStore(statisticsStore)
+{
+}
+
 const PlayerStatistics& PlayerStatisticsUpdater::getStatistics(const int nbPlayers) const
 {
     int clamped = nbPlayers;
@@ -272,13 +278,22 @@ void PlayerStatisticsUpdater::ensureServicesInitialized() const
     }
 }
 
+// ISP-compliant helper method
+pkt::core::PlayersStatisticsStore& PlayerStatisticsUpdater::getPlayersStatisticsStore() const
+{
+    if (m_statisticsStore) {
+        return m_statisticsStore->playersStatisticsStore();
+    }
+    // Fallback to legacy service container
+    ensureServicesInitialized();
+    return m_services->playersStatisticsStore();
+}
+
 void PlayerStatisticsUpdater::loadStatistics(const std::string& playerName)
 {
-    ensureServicesInitialized();
-
     resetPlayerStatistics(); // reset stats to 0
 
-    m_statistics = m_services->playersStatisticsStore().loadPlayerStatistics(playerName);
+    m_statistics = getPlayersStatisticsStore().loadPlayerStatistics(playerName);
     if (m_statistics.empty())
     {
         m_statistics.fill(PlayerStatistics());

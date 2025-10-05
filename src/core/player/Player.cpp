@@ -52,19 +52,37 @@ Player::Player(const GameEvents& events, std::shared_ptr<ServiceContainer> servi
     // Initialize with invalid cards - this will be set via context when needed
 }
 
-// ISP-compliant constructor using focused service interfaces
+// ISP-compliant constructor using focused service interfaces (partial)
 Player::Player(const GameEvents& events, std::shared_ptr<pkt::core::HasLogger> logger, 
                std::shared_ptr<pkt::core::HasHandEvaluationEngine> handEvaluator, 
                int id, std::string name, int cash)
     : m_id(id), m_name(name), m_events(events), m_logger(logger), m_handEvaluator(handEvaluator)
 {
-    // For components that still depend on full ServiceContainer, use temporary fallback
-    // This will need refactoring when RangeEstimator and PlayerStatisticsUpdater use focused interfaces
-    ensureServicesInitialized(); // Temporary fallback for legacy components
-    
-    m_rangeEstimator = std::make_unique<RangeEstimator>(m_id, m_services);
+    // Use ISP constructor for RangeEstimator, legacy for PlayerStatisticsUpdater
+    m_rangeEstimator = std::make_unique<RangeEstimator>(m_id, logger, handEvaluator);
     m_currentHandContext = std::make_unique<CurrentHandContext>();
+    
+    // PlayerStatisticsUpdater still needs ServiceContainer fallback
+    ensureServicesInitialized();
     m_statisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(m_services);
+    m_statisticsUpdater->loadStatistics(name);
+
+    // Initialize cash in context
+    m_currentHandContext->personalContext.cash = cash;
+    // Initialize with invalid cards - this will be set via context when needed
+}
+
+// Fully ISP-compliant constructor with all required interfaces
+Player::Player(const GameEvents& events, std::shared_ptr<pkt::core::HasLogger> logger, 
+               std::shared_ptr<pkt::core::HasHandEvaluationEngine> handEvaluator,
+               std::shared_ptr<pkt::core::HasPlayersStatisticsStore> statisticsStore,
+               int id, std::string name, int cash)
+    : m_id(id), m_name(name), m_events(events), m_logger(logger), m_handEvaluator(handEvaluator), m_statisticsStore(statisticsStore)
+{
+    // Use ISP-compliant constructors for all components
+    m_rangeEstimator = std::make_unique<RangeEstimator>(m_id, logger, handEvaluator);
+    m_currentHandContext = std::make_unique<CurrentHandContext>();
+    m_statisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(statisticsStore);
     m_statisticsUpdater->loadStatistics(name);
 
     // Initialize cash in context
@@ -99,6 +117,16 @@ pkt::core::HandEvaluationEngine& Player::getHandEvaluationEngine() const
     // Fallback to legacy service container
     ensureServicesInitialized();
     return m_services->handEvaluationEngine();
+}
+
+pkt::core::PlayersStatisticsStore& Player::getPlayersStatisticsStore() const
+{
+    if (m_statisticsStore) {
+        return m_statisticsStore->playersStatisticsStore();
+    }
+    // Fallback to legacy service container
+    ensureServicesInitialized();
+    return m_services->playersStatisticsStore();
 }
 
 const PlayerPosition Player::getPosition() const
@@ -394,8 +422,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
     }
     if (ranges.size() == 0)
     {
-        ensureServicesInitialized();
-        m_services->logger().error("no ranges for opponent " + std::to_string(opponentId));
+        getLogger().error("no ranges for opponent " + std::to_string(opponentId));
         return 0;
     }
     assert(nbWinningHands / ranges.size() <= 1.0);
@@ -432,11 +459,16 @@ std::map<int, float> Player::evaluateOpponentsStrengths() const
 bool Player::isInVeryLooseMode(const int nbPlayers) const
 {
     // very loose mode = plays very often preflop (last actions in stack are mostly raises/calls/allins)
-    ensureServicesInitialized();
     if (!m_statisticsUpdater)
     {
         // Lazily create if not present (defensive against future refactors)
-        const_cast<Player*>(this)->m_statisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(m_services);
+        if (m_statisticsStore) {
+            const_cast<Player*>(this)->m_statisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(m_statisticsStore);
+        } else {
+            // Fallback to legacy service container
+            ensureServicesInitialized();
+            const_cast<Player*>(this)->m_statisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(m_services);
+        }
     }
     int clampedPlayers = nbPlayers;
     if (clampedPlayers < 0)
@@ -531,8 +563,7 @@ const PostFlopAnalysisFlags Player::getPostFlopAnalysisFlags() const
     std::string stringHand = getCardsValueString();
     std::string stringBoard = m_currentHandContext->commonContext.stringBoard;
 
-    ensureServicesInitialized();
-    return m_services->handEvaluationEngine().analyzeHand(getCardsValueString(), stringBoard);
+    return getHandEvaluationEngine().analyzeHand(getCardsValueString(), stringBoard);
 }
 
 void Player::setPosition(const Hand& hand)
@@ -558,8 +589,7 @@ void Player::setAction(HandState& state, const PlayerAction& action)
 {
     if (action.type != ActionType::None)
     {
-        ensureServicesInitialized();
-        m_services->logger().info(m_name + " " + std::string(actionTypeToString(action.type)) +
+        getLogger().info(m_name + " " + std::string(actionTypeToString(action.type)) +
                                   (action.amount ? " " + std::to_string(action.amount) : ""));
     }
     m_currentHandContext->personalContext.actions.currentHandActions.addAction(state.getGameState(), action);

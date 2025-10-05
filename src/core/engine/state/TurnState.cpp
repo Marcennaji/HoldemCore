@@ -93,7 +93,7 @@ void TurnState::promptPlayerAction(Hand& hand, Player& player)
 
 std::unique_ptr<HandState> TurnState::computeNextState(Hand& hand)
 {
-    return computeBettingRoundNextState(hand, m_events, Turn);
+    return computeBettingRoundNextState(hand, m_events, Turn, m_logger);
 }
 
 std::shared_ptr<player::Player> TurnState::getNextPlayerToAct(const Hand& hand) const

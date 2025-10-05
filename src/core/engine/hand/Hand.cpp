@@ -1,5 +1,6 @@
 #include "Hand.h"
 #include <core/services/ServiceContainer.h>
+#include "core/engine/EngineFactory.h"
 #include "CardUtilities.h"
 #include "DeckManager.h"
 #include "GameEvents.h"
@@ -37,6 +38,24 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
 
     // Create InvalidActionHandler with callbacks
     auto errorProvider = [this](const PlayerAction& action) -> std::string { return getActionValidationError(action); };
+
+    auto autoFoldCallback = [this](unsigned playerId) { handleAutoFold(playerId); };
+
+    m_invalidActionHandler = std::make_unique<InvalidActionHandler>(m_events, errorProvider, autoFoldCallback);
+
+    // Create HandStateManager with error callback for game loop issues
+    auto gameLoopErrorCallback = [this](const std::string& error)
+    {
+        if (m_events.onEngineError)
+        {
+            m_events.onEngineError(error);
+        }
+    };
+    
+    // Pass services to HandStateManager for proper dependency injection
+    ensureServicesInitialized();
+    m_stateManager = std::make_unique<HandStateManager>(m_events, m_smallBlind, startData.startDealerPlayerId,
+                                                        gameLoopErrorCallback, m_services);
 }
 
 Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<Board> board,
@@ -68,21 +87,11 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
             m_events.onEngineError(error);
         }
     };
+    
+    // Pass services to HandStateManager for proper dependency injection
+    ensureServicesInitialized();
     m_stateManager = std::make_unique<HandStateManager>(m_events, m_smallBlind, startData.startDealerPlayerId,
-                                                        gameLoopErrorCallback);
-
-    if (m_smallBlind <= 0)
-    {
-        throw std::invalid_argument("Hand: smallBlind must be > 0");
-    }
-    if (m_dealerPlayerId == static_cast<unsigned>(-1))
-    {
-        throw std::invalid_argument("Hand: dealerPlayerId is invalid");
-    }
-    if (startData.startDealerPlayerId >= static_cast<unsigned>(startData.numberOfPlayers))
-    {
-        throw std::invalid_argument("Hand: startDealerPlayerId is out of range");
-    }
+                                                        gameLoopErrorCallback, m_services);
 }
 
 Hand::~Hand() = default;
@@ -91,8 +100,9 @@ void Hand::ensureServicesInitialized() const
 {
     if (!m_services)
     {
-        auto baseContainer = std::make_shared<AppServiceContainer>();
-        m_services = std::make_shared<PokerServices>(baseContainer);
+        // Get services from the factory to ensure ISP compliance and test service injection
+        auto factoryServices = m_factory->getServiceContainer();
+        m_services = std::make_shared<PokerServices>(factoryServices);
     }
 }
 

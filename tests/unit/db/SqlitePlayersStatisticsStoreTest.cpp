@@ -6,8 +6,8 @@
 #include "core/engine/state/PreflopState.h"
 #include "core/interfaces/persistence/NullPlayersStatisticsStore.h"
 #include "core/player/Helpers.h"
-// No additional includes needed for legacy constructor
 #include "core/services/ServiceContainer.h"
+#include "core/interfaces/ServiceAdapter.h"
 #include "infra/ConsoleLogger.h"
 #include "infra/eval/PsimHandEvaluationEngine.h"
 #include "infra/persistence/SqliteDb.h"
@@ -41,13 +41,19 @@ void SqlitePlayersStatisticsStoreTest::SetUp()
     auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
     logger->setLogLevel(pkt::core::LogLevel::Info);
     m_testServices->setLogger(std::move(logger));
-    m_testServices->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>(m_testServices));
+    m_testServices->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>());
     auto randomizer = std::make_unique<FakeRandomizer>();
     randomizer->values = {3, 5, 7};
     m_testServices->setRandomizer(std::move(randomizer));
 
-    // Use legacy constructor temporarily while migrating to ISP
-    m_factory = std::make_unique<EngineFactory>(m_events);
+    // Create ISP-compliant interfaces for the factory using our test services
+    auto serviceAdapter = std::make_shared<pkt::core::ServiceAdapter>(m_testServices);
+    auto loggerInterface = serviceAdapter->createLoggerService();
+    auto handEvaluatorInterface = serviceAdapter->createHandEvaluationEngineService();
+    auto statisticsStoreInterface = serviceAdapter->createPlayersStatisticsStoreService();
+
+    // Use ISP-compliant constructor with all focused service interfaces
+    m_factory = std::make_unique<EngineFactory>(m_events, loggerInterface, handEvaluatorInterface, statisticsStoreInterface);
 }
 
 void SqlitePlayersStatisticsStoreTest::TearDown()

@@ -7,6 +7,7 @@
 #include "core/interfaces/HasLogger.h"
 #include "core/interfaces/HasRandomizer.h"
 #include "core/interfaces/HasHandEvaluationEngine.h"
+#include "core/interfaces/HasPlayersStatisticsStore.h"
 #include "core/services/ServiceContainer.h"
 #include <memory>
 
@@ -36,6 +37,10 @@ class ServiceAdapter
         return std::make_shared<HandEvaluationEngineFromServiceContainer>(m_services);
     }
     
+    std::shared_ptr<HasPlayersStatisticsStore> createPlayersStatisticsStoreService() const {
+        return std::make_shared<PlayersStatisticsStoreFromServiceContainer>(m_services);
+    }
+    
   private:
     class LoggerFromServiceContainer : public HasLogger {
       public:
@@ -57,6 +62,14 @@ class ServiceAdapter
       public:
         explicit HandEvaluationEngineFromServiceContainer(std::shared_ptr<ServiceContainer> services) : m_services(services) {}
         HandEvaluationEngine& handEvaluationEngine() override { return m_services->handEvaluationEngine(); }
+      private:
+        std::shared_ptr<ServiceContainer> m_services;
+    };
+    
+    class PlayersStatisticsStoreFromServiceContainer : public HasPlayersStatisticsStore {
+      public:
+        explicit PlayersStatisticsStoreFromServiceContainer(std::shared_ptr<ServiceContainer> services) : m_services(services) {}
+        PlayersStatisticsStore& playersStatisticsStore() override { return m_services->playersStatisticsStore(); }
       private:
         std::shared_ptr<ServiceContainer> m_services;
     };

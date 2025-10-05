@@ -23,6 +23,7 @@
 #include "core/services/ServiceContainer.h"
 #include "core/interfaces/HasLogger.h"
 #include "core/interfaces/HasHandEvaluationEngine.h"
+#include "core/interfaces/HasPlayersStatisticsStore.h"
 
 #include <array>
 #include <assert.h>
@@ -46,8 +47,14 @@ class Player
   public:
     Player(const GameEvents&, int id, std::string name, int cash);
     Player(const GameEvents&, std::shared_ptr<ServiceContainer> services, int id, std::string name, int cash);
-    // ISP-compliant constructor using focused service interfaces
+    // ISP-compliant constructor using focused service interfaces (partial)
     Player(const GameEvents&, std::shared_ptr<HasLogger> logger, std::shared_ptr<HasHandEvaluationEngine> handEvaluator, int id, std::string name, int cash);
+    
+    // Fully ISP-compliant constructor with all required interfaces
+    Player(const GameEvents&, std::shared_ptr<HasLogger> logger, 
+           std::shared_ptr<HasHandEvaluationEngine> handEvaluator,
+           std::shared_ptr<HasPlayersStatisticsStore> statisticsStore,
+           int id, std::string name, int cash);
     virtual ~Player() = default;
 
     // ========================================
@@ -142,6 +149,7 @@ class Player
     // ========================================
     pkt::core::Logger& getLogger() const;
     pkt::core::HandEvaluationEngine& getHandEvaluationEngine() const;
+    pkt::core::PlayersStatisticsStore& getPlayersStatisticsStore() const;
 
     // ========================================
     // Business Logic Methods (Actual Implementation)
@@ -169,5 +177,6 @@ class Player
     // ISP-compliant focused service interfaces
     std::shared_ptr<HasLogger> m_logger;
     std::shared_ptr<HasHandEvaluationEngine> m_handEvaluator;
+    std::shared_ptr<HasPlayersStatisticsStore> m_statisticsStore;
 };
 } // namespace pkt::core::player

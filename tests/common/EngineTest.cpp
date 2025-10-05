@@ -5,6 +5,7 @@
 #include "core/engine/Exception.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
+#include "core/interfaces/ServiceAdapter.h"
 #include "core/player/Player.h"
 #include "core/services/ServiceContainer.h"
 #include "infra/ConsoleLogger.h"
@@ -29,8 +30,13 @@ void EngineTest::SetUp()
     randomizer->values = {3, 5, 7};
     m_services->setRandomizer(std::move(randomizer));
 
-    // Use legacy constructor temporarily while migrating to ISP
-    m_factory = std::make_unique<EngineFactory>(m_events);
+    // Create ISP-compliant interfaces for the factory
+    auto serviceAdapter = std::make_shared<pkt::core::ServiceAdapter>(m_services);
+    auto loggerInterface = serviceAdapter->createLoggerService();
+    auto handEvaluatorInterface = serviceAdapter->createHandEvaluationEngineService();
+
+    // Use ISP-compliant constructor
+    m_factory = std::make_unique<EngineFactory>(m_events, loggerInterface, handEvaluatorInterface);
 
     gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
     gameData.startMoney = 1000;
@@ -47,7 +53,7 @@ void EngineTest::createPlayersLists(size_t playerCount)
     m_seatsList = std::make_shared<std::list<std::shared_ptr<pkt::core::player::Player>>>();
     for (size_t i = 0; i < playerCount; ++i)
     {
-        auto player = std::make_shared<DummyPlayer>(i, m_events);
+        auto player = std::make_shared<DummyPlayer>(i, m_events, m_services);
         m_seatsList->push_back(player);
     }
 

@@ -6,6 +6,7 @@
 #include "core/engine/cards/CardUtilities.h"
 #include "core/engine/hand/Hand.h"
 #include "core/engine/model/PlayerPosition.h"
+#include "core/interfaces/HasLogger.h"
 #include "core/player/Helpers.h"
 #include "core/player/Player.h"
 #include "core/services/ServiceContainer.h"
@@ -150,12 +151,13 @@ std::shared_ptr<player::Player> getFirstPlayerToActPostFlop(const Hand& hand)
 
 std::unique_ptr<pkt::core::HandState> computeBettingRoundNextState(pkt::core::Hand& hand,
                                                                     const pkt::core::GameEvents& events,
-                                                                    pkt::core::GameState currentState)
+                                                                    pkt::core::GameState currentState,
+                                                                    std::shared_ptr<pkt::core::HasLogger> logger)
 {
     // If less than 2 players are still in hand (haven't folded), go directly to showdown
     if (hand.getPlayersInHandList()->size() < 2)
     {
-        return std::make_unique<pkt::core::PostRiverState>(events);
+        return std::make_unique<pkt::core::PostRiverState>(events, logger);
     }
 
     // If all remaining players are all-in (no one can act further), we should still
@@ -180,7 +182,7 @@ std::unique_ptr<pkt::core::HandState> computeBettingRoundNextState(pkt::core::Ha
                 hand.getBoard().setBoardCards(flopBoard);
                 if (events.onBoardCardsDealt) events.onBoardCardsDealt(flopBoard);
             }
-            return std::make_unique<pkt::core::FlopState>(events);
+            return std::make_unique<pkt::core::FlopState>(events, logger);
         }
         case pkt::core::GameState::Flop:
         {
@@ -194,7 +196,7 @@ std::unique_ptr<pkt::core::HandState> computeBettingRoundNextState(pkt::core::Ha
                 hand.getBoard().setBoardCards(turnBoard);
                 if (events.onBoardCardsDealt) events.onBoardCardsDealt(turnBoard);
             }
-            return std::make_unique<pkt::core::TurnState>(events);
+            return std::make_unique<pkt::core::TurnState>(events, logger);
         }
         case pkt::core::GameState::Turn:
         {
@@ -208,15 +210,15 @@ std::unique_ptr<pkt::core::HandState> computeBettingRoundNextState(pkt::core::Ha
                 hand.getBoard().setBoardCards(riverBoard);
                 if (events.onBoardCardsDealt) events.onBoardCardsDealt(riverBoard);
             }
-            return std::make_unique<pkt::core::RiverState>(events);
+            return std::make_unique<pkt::core::RiverState>(events, logger);
         }
         case pkt::core::GameState::River:
         {
             // All cards dealt, proceed to showdown
-            return std::make_unique<pkt::core::PostRiverState>(events);
+            return std::make_unique<pkt::core::PostRiverState>(events, logger);
         }
         default:
-            return std::make_unique<pkt::core::PostRiverState>(events);
+            return std::make_unique<pkt::core::PostRiverState>(events, logger);
         }
     }
 
@@ -226,23 +228,23 @@ std::unique_ptr<pkt::core::HandState> computeBettingRoundNextState(pkt::core::Ha
         // If only one or no players can still act, go directly to showdown
         if (hand.getActingPlayersList()->size() <= 1)
         {
-            return std::make_unique<pkt::core::PostRiverState>(events);
+            return std::make_unique<pkt::core::PostRiverState>(events, logger);
         }
 
         // Multiple players can still act, determine next state based on current state
         switch (currentState)
         {
         case pkt::core::GameState::Preflop:
-            return std::make_unique<pkt::core::FlopState>(events);
+            return std::make_unique<pkt::core::FlopState>(events, logger);
         case pkt::core::GameState::Flop:
-            return std::make_unique<pkt::core::TurnState>(events);
+            return std::make_unique<pkt::core::TurnState>(events, logger);
         case pkt::core::GameState::Turn:
-            return std::make_unique<pkt::core::RiverState>(events);
+            return std::make_unique<pkt::core::RiverState>(events, logger);
         case pkt::core::GameState::River:
-            return std::make_unique<pkt::core::PostRiverState>(events);
+            return std::make_unique<pkt::core::PostRiverState>(events, logger);
         default:
             // Shouldn't happen for betting rounds
-            return std::make_unique<pkt::core::PostRiverState>(events);
+            return std::make_unique<pkt::core::PostRiverState>(events, logger);
         }
     }
 

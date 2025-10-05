@@ -102,7 +102,7 @@ void FlopState::promptPlayerAction(Hand& hand, Player& player)
 
 std::unique_ptr<HandState> FlopState::computeNextState(Hand& hand)
 {
-    return computeBettingRoundNextState(hand, m_events, Flop);
+    return computeBettingRoundNextState(hand, m_events, Flop, m_loggerService);
 }
 
 std::shared_ptr<player::Player> FlopState::getNextPlayerToAct(const Hand& hand) const

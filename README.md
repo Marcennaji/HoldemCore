@@ -16,7 +16,6 @@ The original project, created in 2011, has been substantially rewritten in 2025.
 Texas Hold'em simulation engine demonstrating advanced software architecture through:
 
 - **Hexagonal Architecture** with strict separation of concerns
-- **Dependency Injection** container pattern
 - **Comprehensive test suite** ensuring reliability
 - **Cross-platform compatibility** (Windows, Linux, macOS)
 - **Multiple UI frameworks** supported through clean abstractions
@@ -76,11 +75,6 @@ See the architecture characteristics in [ARCHITECTURE.md](doc/ARCHITECTURE.md)
 - **C++20** with modern language features
 - **CMake** for cross-platform builds
 - **GoogleTest** testing framework
-
-**Architecture Patterns:**
-- Hexagonal Architecture, Dependency Injection
-- Strategy Pattern, State Machine
-- Event-driven Architecture
 
 **Platform Support:**
 - **Qt 6** (Widgets and QML)

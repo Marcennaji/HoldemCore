@@ -105,7 +105,7 @@ void PreflopState::promptPlayerAction(Hand& hand, Player& player)
 
 std::unique_ptr<HandState> PreflopState::computeNextState(Hand& hand)
 {
-    return computeBettingRoundNextState(hand, m_events, Preflop);
+    return computeBettingRoundNextState(hand, m_events, Preflop, m_logger);
 }
 
 void PreflopState::logStateInfo(Hand& hand)

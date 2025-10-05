@@ -8,6 +8,8 @@
 #include <core/engine/model/GameState.h>
 #include <core/player/PlayerStatistics.h>
 #include <core/services/ServiceContainer.h>
+#include <core/interfaces/HasLogger.h>
+#include <core/interfaces/HasHandEvaluationEngine.h>
 #include "PreflopRangeEstimator.h"
 
 #include <memory>
@@ -36,6 +38,10 @@ class RangeEstimator
   public:
     RangeEstimator(int playerId);
     explicit RangeEstimator(int playerId, std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
+    
+    // ISP-compliant constructor
+    RangeEstimator(int playerId, std::shared_ptr<pkt::core::HasLogger> logger, 
+                   std::shared_ptr<pkt::core::HasHandEvaluationEngine> handEvaluator);
 
     void setEstimatedRange(const std::string& range);
     std::string getEstimatedRange() const;
@@ -55,7 +61,17 @@ class RangeEstimator
     void updateUnplausibleRangesGivenTurnActions(const CurrentHandContext&);
     void updateUnplausibleRangesGivenRiverActions(const CurrentHandContext&);
     void ensureServicesInitialized() const;
-    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services; // Injected service container
+    
+    // ISP-compliant helper methods
+    pkt::core::Logger& getLogger() const;
+    pkt::core::HandEvaluationEngine& getHandEvaluationEngine() const;
+
+    // Legacy service container (for backward compatibility)
+    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services;
+    
+    // ISP-compliant focused interfaces
+    std::shared_ptr<pkt::core::HasLogger> m_logger;
+    std::shared_ptr<pkt::core::HasHandEvaluationEngine> m_handEvaluator;
 
     std::unique_ptr<PreflopRangeEstimator> m_preflopRangeEstimator;
     std::string m_estimatedRange;

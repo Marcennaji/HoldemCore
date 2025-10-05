@@ -20,6 +20,12 @@ RiverState::RiverState(const GameEvents& events, std::shared_ptr<pkt::core::Serv
 {
 }
 
+// ISP-compliant constructor - only depends on what it needs
+RiverState::RiverState(const GameEvents& events, std::shared_ptr<HasLogger> logger)
+    : m_events(events), m_loggerService(std::move(logger))
+{
+}
+
 Logger& RiverState::getLogger()
 {
     // Use focused dependency (ISP-compliant)
@@ -88,7 +94,7 @@ void RiverState::promptPlayerAction(Hand& hand, Player& player)
 
 std::unique_ptr<HandState> RiverState::computeNextState(Hand& hand)
 {
-    return computeBettingRoundNextState(hand, m_events, River);
+    return computeBettingRoundNextState(hand, m_events, River, m_loggerService);
 }
 
 std::shared_ptr<player::Player> RiverState::getNextPlayerToAct(const Hand& hand) const
