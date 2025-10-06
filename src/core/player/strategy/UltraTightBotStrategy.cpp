@@ -2,6 +2,8 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 #include <core/player/strategy/UltraTightBotStrategy.h>
+#include <core/interfaces/ServiceAdapter.h>
+#include <core/services/ServiceContainer.h>
 
 #include <core/engine/hand/HandEvaluator.h>
 
@@ -22,21 +24,27 @@ namespace pkt::core::player
 
 using namespace std;
 
-UltraTightBotStrategy::UltraTightBotStrategy()
+// ISP-compliant constructor - only accepts what it actually needs (Logger + Randomizer)
+UltraTightBotStrategy::UltraTightBotStrategy(std::shared_ptr<pkt::core::Logger> logger, 
+                                           std::shared_ptr<pkt::core::Randomizer> randomizer)
+    : BotStrategyBase(), m_loggerService(logger), m_randomizerService(randomizer)
 {
-    ensureServicesInitialized();
     // initialize utg starting range, in a full table
     int utgFullTableRange = 0;
-    m_services->randomizer().getRand(1, 2, 1, &utgFullTableRange);
+    getRandomizer().getRand(1, 2, 1, &utgFullTableRange);
     initializeRanges(40, utgFullTableRange);
 }
 
-UltraTightBotStrategy::UltraTightBotStrategy(std::shared_ptr<ServiceContainer> serviceContainer)
-    : BotStrategyBase(serviceContainer)
+// Legacy constructor for backward compatibility - creates default services and delegates to ISP constructor
+UltraTightBotStrategy::UltraTightBotStrategy()
 {
+    auto services = std::make_shared<pkt::core::AppServiceContainer>();
+    m_loggerService = std::shared_ptr<pkt::core::Logger>(services, &services->logger());
+    m_randomizerService = std::shared_ptr<pkt::core::Randomizer>(services, &services->randomizer());
+    
     // initialize utg starting range, in a full table
     int utgFullTableRange = 0;
-    m_services->randomizer().getRand(1, 2, 1, &utgFullTableRange);
+    getRandomizer().getRand(1, 2, 1, &utgFullTableRange);
     initializeRanges(40, utgFullTableRange);
 }
 
@@ -86,7 +94,7 @@ bool UltraTightBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
 
         stringCallingRange += HIGH_SUITED_CONNECTORS;
 
-        m_services->logger().verbose("\t\tTAG adding high suited connectors to the initial calling range.");
+        getLogger().verbose("\t\tTAG adding high suited connectors to the initial calling range.");
     }
 
     // defend against 3bet bluffs :
@@ -100,7 +108,7 @@ bool UltraTightBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
     {
 
         int rand = 0;
-        m_services->randomizer().getRand(1, 5, 1, &rand);
+        getRandomizer().getRand(1, 5, 1, &rand);
         if (rand == 1)
         {
 
@@ -108,12 +116,12 @@ bool UltraTightBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
             stringCallingRange += HIGH_SUITED_ACES;
             stringCallingRange += PAIRS;
 
-            m_services->logger().verbose(
+            getLogger().verbose(
                 "\t\tLAG defending against 3-bet : adding high suited connectors, high suited aces and pairs to "
                 "the initial calling range.");
         }
     }
-    m_services->logger().verbose("\t\tLAG final calling range : " + stringCallingRange);
+    getLogger().verbose("\t\tLAG final calling range : " + stringCallingRange);
 
     return isCardsInRange(ctx.personalContext.holeCards, stringCallingRange);
 }
@@ -155,7 +163,7 @@ int UltraTightBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
 
     stringRaisingRange = rangesString[(int) raisingRange];
 
-    m_services->logger().verbose(stringRaisingRange);
+    getLogger().verbose(stringRaisingRange);
 
     // determine when to 3-bet without a real hand
     bool speculativeHandedAdded = false;
@@ -182,11 +190,11 @@ int UltraTightBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
             {
 
                 int rand = 0;
-                m_services->randomizer().getRand(1, 5, 1, &rand);
+                getRandomizer().getRand(1, 5, 1, &rand);
                 if (rand == 2)
                 {
                     speculativeHandedAdded = true;
-                    m_services->logger().verbose("\t\tTAG trying to steal this bet");
+                    getLogger().verbose("\t\tTAG trying to steal this bet");
                 }
             }
             else
@@ -196,7 +204,7 @@ int UltraTightBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
                 {
 
                     speculativeHandedAdded = true;
-                    m_services->logger().verbose("\t\tLAG adding this speculative hand to our initial raising range");
+                    getLogger().verbose("\t\tLAG adding this speculative hand to our initial raising range");
                 }
             }
         }
@@ -220,10 +228,10 @@ int UltraTightBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
     {
 
         int rand = 0;
-        m_services->randomizer().getRand(1, 8, 1, &rand);
+        getRandomizer().getRand(1, 8, 1, &rand);
         if (rand == 1)
         {
-            m_services->logger().verbose("\t\twon't raise, to hide the hand strength");
+            getLogger().verbose("\t\twon't raise, to hide the hand strength");
             m_couldCall = true;
             return 0;
         }
@@ -262,7 +270,7 @@ int UltraTightBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
             if (getDrawingProbability(ctx.personalContext.postFlopAnalysisFlags) > 25)
             {
                 int rand = 0;
-                m_services->randomizer().getRand(1, 2, 1, &rand);
+                getRandomizer().getRand(1, 2, 1, &rand);
                 if (rand == 1)
                 {
                     return PokerMath::calculateValueBetSize(ctx);  // Was: pot * 0.6
@@ -285,7 +293,7 @@ int UltraTightBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
             {
 
                 int rand = 0;
-                m_services->randomizer().getRand(1, 4, 1, &rand);
+                getRandomizer().getRand(1, 4, 1, &rand);
                 if (rand == 1)
                 {
                     return PokerMath::calculateBluffBetSize(ctx);  // Was: pot * 0.6 (bluff on dry board)
@@ -306,7 +314,7 @@ int UltraTightBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
         }
 
         int rand = 0;
-        m_services->randomizer().getRand(1, 7, 1, &rand);
+        getRandomizer().getRand(1, 7, 1, &rand);
         if (rand == 3 && !ctx.personalContext.hasPosition && ctx.commonContext.bettingContext.preflopRaisesNumber > 0 &&
             ctx.commonContext.playersContext.preflopLastRaiser->getId() != ctx.personalContext.id)
         {
@@ -354,7 +362,7 @@ int UltraTightBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
         }
 
         int rand = 0;
-        m_services->randomizer().getRand(1, 2, 1, &rand);
+        getRandomizer().getRand(1, 2, 1, &rand);
         if (rand == 1)
         {
             // if I was the last raiser preflop, bet if i have a big enough stack
@@ -447,7 +455,7 @@ int UltraTightBotStrategy::flopCouldRaise(const CurrentHandContext& ctx)
     {
 
         int rand = 0;
-        m_services->randomizer().getRand(1, 6, 1, &rand);
+        getRandomizer().getRand(1, 6, 1, &rand);
         if (rand == 2)
         {
             return ctx.commonContext.bettingContext.pot;
@@ -462,7 +470,7 @@ int UltraTightBotStrategy::flopCouldRaise(const CurrentHandContext& ctx)
         {
 
             int rand = 0;
-            m_services->randomizer().getRand(1, 8, 1, &rand);
+            getRandomizer().getRand(1, 8, 1, &rand);
             if (rand == 2 && ctx.personalContext.m_handSimulation.winRanged > 0.3)
             {
                 return ctx.commonContext.bettingContext.pot;
@@ -512,7 +520,7 @@ int UltraTightBotStrategy::turnCouldBet(const CurrentHandContext& ctx)
         getDrawingProbability(ctx.personalContext.postFlopAnalysisFlags) < 9 && ctx.personalContext.cash > pot * 4)
     {
         int rand = 0;
-        m_services->randomizer().getRand(1, 3, 1, &rand);
+        getRandomizer().getRand(1, 3, 1, &rand);
         if (rand == 1)
         {
             return PokerMath::calculateValueBetSize(ctx);
@@ -540,7 +548,7 @@ int UltraTightBotStrategy::turnCouldBet(const CurrentHandContext& ctx)
     if (getDrawingProbability(ctx.personalContext.postFlopAnalysisFlags) > 20 && !ctx.personalContext.hasPosition)
     {
         int rand = 0;
-        m_services->randomizer().getRand(1, 5, 1, &rand);
+        getRandomizer().getRand(1, 5, 1, &rand);
         if (rand == 1)
         {
             return PokerMath::calculateValueBetSize(ctx);
@@ -552,7 +560,7 @@ int UltraTightBotStrategy::turnCouldBet(const CurrentHandContext& ctx)
         if (ctx.personalContext.hasPosition && isPossibleToBluff(ctx))
         {
             int rand = 0;
-            m_services->randomizer().getRand(1, 3, 1, &rand);
+            getRandomizer().getRand(1, 3, 1, &rand);
             if (rand == 2)
             {
                 return PokerMath::calculateValueBetSize(ctx);
@@ -661,7 +669,7 @@ int UltraTightBotStrategy::turnCouldRaise(const CurrentHandContext& ctx)
         ctx.personalContext.m_handSimulation.winSd > 0.9)
     {
         int rand = 0;
-        m_services->randomizer().getRand(1, 3, 1, &rand);
+        getRandomizer().getRand(1, 3, 1, &rand);
         if (rand == 1)
         {
             return 0; // very strong hand, slow play, just call
@@ -709,7 +717,7 @@ int UltraTightBotStrategy::riverCouldBet(const CurrentHandContext& ctx)
         ctx.personalContext.m_handSimulation.winRanged > 0.6 && ctx.personalContext.m_handSimulation.winSd > 0.4)
     {
         int rand = 0;
-        m_services->randomizer().getRand(1, 2, 1, &rand);
+        getRandomizer().getRand(1, 2, 1, &rand);
         if (rand == 1)
         {
             return ctx.commonContext.bettingContext.pot * 0.33;
@@ -728,7 +736,7 @@ int UltraTightBotStrategy::riverCouldBet(const CurrentHandContext& ctx)
         {
 
             int rand = 0;
-            m_services->randomizer().getRand(1, 4, 1, &rand);
+            getRandomizer().getRand(1, 4, 1, &rand);
             if (rand == 1)
             {
                 return PokerMath::calculateBluffBetSize(ctx);
@@ -743,14 +751,14 @@ int UltraTightBotStrategy::riverCouldBet(const CurrentHandContext& ctx)
     }
 
     int rand = 0;
-    m_services->randomizer().getRand(40, 80, 1, &rand);
+    getRandomizer().getRand(40, 80, 1, &rand);
     float coeff = (float) rand / (float) 100;
 
     if (ctx.personalContext.m_handSimulation.winSd > .94 ||
         (ctx.personalContext.hasPosition && ctx.personalContext.m_handSimulation.winSd > .9))
     {
         int rand = 0;
-        m_services->randomizer().getRand(1, 5, 1, &rand);
+        getRandomizer().getRand(1, 5, 1, &rand);
         if (rand != 1 || ctx.personalContext.hasPosition)
         {
             return ctx.commonContext.bettingContext.pot * coeff;
@@ -761,7 +769,7 @@ int UltraTightBotStrategy::riverCouldBet(const CurrentHandContext& ctx)
             ctx.personalContext.m_handSimulation.winSd > 0.5)
     {
         int rand = 0;
-        m_services->randomizer().getRand(1, 7, 1, &rand);
+        getRandomizer().getRand(1, 7, 1, &rand);
         if (rand != 1 || ctx.personalContext.hasPosition)
         {
             return ctx.commonContext.bettingContext.pot * coeff;
@@ -774,7 +782,7 @@ int UltraTightBotStrategy::riverCouldBet(const CurrentHandContext& ctx)
         ctx.commonContext.bettingContext.turnBetsOrRaisesNumber == 0)
     {
         int rand = 0;
-        m_services->randomizer().getRand(1, 2, 1, &rand);
+        getRandomizer().getRand(1, 2, 1, &rand);
         if (rand == 1 || ctx.personalContext.hasPosition)
         {
             return ctx.commonContext.bettingContext.pot * coeff;
@@ -918,4 +926,33 @@ int UltraTightBotStrategy::riverCouldRaise(const CurrentHandContext& ctx)
 
     return 0;
 }
+
+// ISP helper methods - provide clean access to injected dependencies
+pkt::core::Logger& UltraTightBotStrategy::getLogger()
+{
+    if (m_loggerService) {
+        return *m_loggerService;
+    }
+    // Fallback to ServiceContainer for legacy support
+    return m_services->logger();
+}
+
+pkt::core::Randomizer& UltraTightBotStrategy::getRandomizer()
+{
+    if (m_randomizerService) {
+        return *m_randomizerService;
+    }
+    // Fallback to ServiceContainer for legacy support  
+    return m_services->randomizer();
+}
+
+std::shared_ptr<ServiceContainer> UltraTightBotStrategy::createTemporaryServiceContainer()
+{
+    if (m_services) {
+        return m_services;
+    }
+    // Create temporary ServiceContainer for legacy PokerMath calls - fallback when using ISP
+    return std::make_shared<pkt::core::AppServiceContainer>();
+}
+
 } // namespace pkt::core::player

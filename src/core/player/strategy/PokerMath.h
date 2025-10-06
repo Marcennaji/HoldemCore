@@ -5,6 +5,7 @@
 #pragma once
 
 #include <memory>  // For std::shared_ptr
+#include <core/interfaces/Randomizer.h>
 
 // Forward declare ServiceContainer to avoid circular dependencies
 namespace pkt::core {
@@ -189,60 +190,60 @@ public:
     
     /**
      * Generic probability check - replaces getRand(1, X) == Y patterns
-     * @param serviceContainer Service container for randomizer access  
+     * @param randomizer Randomizer service for probability calculations  
      * @param probabilityPercent Probability as percentage (e.g., 50 for 50% chance)
      */
-    static bool shouldPerformAction(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer, float probabilityPercent);
+    static bool shouldPerformAction(pkt::core::Randomizer& randomizer, float probabilityPercent);
     
     /**
      * Check if should perform action based on specific odds (like 1 in 6 chance)
      * Common pattern: getRand(1, N) == 1 -> shouldTakeAction(1.0f/N)
      */
-    static bool shouldTakeAction(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer, float probability);
+    static bool shouldTakeAction(pkt::core::Randomizer& randomizer, float probability);
     
     /**
      * Get random bet coefficient for dynamic sizing
      * Common pattern: getRand(40, 80) / 100 -> getRandomBetMultiplier(0.4f, 0.8f)
      */
-    static float getRandomBetMultiplier(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer, float minMultiplier = 0.4f, float maxMultiplier = 0.8f);
+    static float getRandomBetMultiplier(pkt::core::Randomizer& randomizer, float minMultiplier = 0.4f, float maxMultiplier = 0.8f);
     
     /**
      * Check if should defend against 3-bet based on hand type and strategy
      * Common LAG pattern: getRand(1, 3) == 1 for 33% chance
      */
-    static bool shouldDefendAgainst3Bet(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
+    static bool shouldDefendAgainst3Bet(pkt::core::Randomizer& randomizer);
     
     /**
      * Check if should add speculative hands to range
      * Common pattern: getRand(1, 4) == 1 for 25% chance  
      */
-    static bool shouldAddSpeculativeHand(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
+    static bool shouldAddSpeculativeHand(pkt::core::Randomizer& randomizer);
     
     /**
      * Check if should bluff in specific situations
      * Common patterns: getRand(1, 2) == 1 for 50%, getRand(1, 4) == 1 for 25%
      */
-    static bool shouldBluffFrequently(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);  // 50% chance
-    static bool shouldBluffOccasionally(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer); // 25% chance
-    static bool shouldBluffRarely(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);       // ~15% chance
+    static bool shouldBluffFrequently(pkt::core::Randomizer& randomizer);  // 50% chance
+    static bool shouldBluffOccasionally(pkt::core::Randomizer& randomizer); // 25% chance
+    static bool shouldBluffRarely(pkt::core::Randomizer& randomizer);       // ~15% chance
     
     /**
      * Check if should slowplay very strong hand
      * Common pattern: getRand(1, 4) == 1 with strong equity conditions
      */
-    static bool shouldSlowPlay(const CurrentHandContext& ctx, std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
+    static bool shouldSlowPlay(const CurrentHandContext& ctx, pkt::core::Randomizer& randomizer);
     
     /**
      * Check if should hide hand strength by calling instead of raising
      * Common pattern: getRand(1, 6) == 1 for ~17% chance
      */
-    static bool shouldHideHandStrength(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
+    static bool shouldHideHandStrength(pkt::core::Randomizer& randomizer);
     
     /**
      * Get random range multiplier for UTG position (strategy-dependent)
      * Replaces specific getRand patterns for starting range calculation
      */
-    static int getRandomUTGRange(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer, int minRange, int maxRange);
+    static int getRandomUTGRange(pkt::core::Randomizer& randomizer, int minRange, int maxRange);
 
     // ========================================
     // Constants (formerly magic numbers)

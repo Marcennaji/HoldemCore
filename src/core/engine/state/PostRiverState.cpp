@@ -20,7 +20,7 @@ PostRiverState::PostRiverState(const GameEvents& events, std::shared_ptr<pkt::co
 }
 
 // ISP-compliant constructor using focused service interface
-PostRiverState::PostRiverState(const GameEvents& events, std::shared_ptr<HasLogger> logger)
+PostRiverState::PostRiverState(const GameEvents& events, std::shared_ptr<Logger> logger)
     : m_events(events), m_logger(logger)
 {
 }
@@ -29,7 +29,7 @@ PostRiverState::PostRiverState(const GameEvents& events, std::shared_ptr<HasLogg
 pkt::core::Logger& PostRiverState::getLogger() const
 {
     if (m_logger) {
-        return m_logger->logger();
+        return *m_logger;
     }
     // This should not happen in normal operation
     throw std::runtime_error("PostRiverState: Logger service not properly initialized. Use ISP-compliant constructor.");

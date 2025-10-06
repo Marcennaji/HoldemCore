@@ -12,9 +12,9 @@
 #include "core/engine/game/Board.h"
 #include "core/player/Player.h"
 #include "core/services/ServiceContainer.h"
-#include "core/interfaces/HasLogger.h"
-#include "core/interfaces/HasHandEvaluationEngine.h"
-#include "core/interfaces/HasPlayersStatisticsStore.h"
+#include "core/interfaces/Logger.h"
+#include "core/interfaces/HandEvaluationEngine.h"
+#include "core/interfaces/persistence/PlayersStatisticsStore.h"
 
 #include <memory>
 #include <vector>
@@ -29,12 +29,11 @@ class EngineFactory
     EngineFactory(const GameEvents&);
     
     // ISP-compliant constructor using focused service interfaces
-    EngineFactory(const GameEvents& events, 
-                  std::shared_ptr<HasLogger> logger,
-                  std::shared_ptr<HasHandEvaluationEngine> handEvaluator,
-                  std::shared_ptr<HasPlayersStatisticsStore> statisticsStore = nullptr);
-
-    ~EngineFactory();
+    EngineFactory(const GameEvents& events,
+                  std::shared_ptr<Logger> logger,
+                  std::shared_ptr<HandEvaluationEngine> handEvaluator,
+                  std::shared_ptr<PlayersStatisticsStore> statisticsStore = nullptr,
+                  std::shared_ptr<ServiceContainer> serviceContainer = nullptr);    ~EngineFactory();
 
     virtual std::shared_ptr<Hand> createHand(std::shared_ptr<EngineFactory> f, std::shared_ptr<Board> b,
                                              pkt::core::player::PlayerList seats,
@@ -47,9 +46,9 @@ class EngineFactory
     mutable std::shared_ptr<pkt::core::ServiceContainer> m_services; // Legacy fallback
     
     // ISP-compliant focused dependencies
-    std::shared_ptr<HasLogger> m_logger;
-    std::shared_ptr<HasHandEvaluationEngine> m_handEvaluator;
-    std::shared_ptr<HasPlayersStatisticsStore> m_statisticsStore;
+    std::shared_ptr<Logger> m_logger;
+    std::shared_ptr<HandEvaluationEngine> m_handEvaluator;
+    std::shared_ptr<PlayersStatisticsStore> m_statisticsStore;
 
     void ensureServicesInitialized() const;
     

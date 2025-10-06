@@ -15,6 +15,8 @@
 #include <core/player/range/RangeParser.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include <core/player/strategy/PreflopRangeCalculator.h>
+#include "infra/ConsoleLogger.h"
+#include "infra/eval/PsimHandEvaluationEngine.h"
 #include "Helpers.h"
 
 #include <sstream>
@@ -24,60 +26,19 @@ namespace pkt::core::player
 
 using namespace std;
 
-Player::Player(const GameEvents& events, int id, std::string name, int cash) : m_id(id), m_name(name), m_events(events)
-{
-    // Ensure service container exists for components that depend on it
-    ensureServicesInitialized();
 
-    m_rangeEstimator = std::make_unique<RangeEstimator>(m_id, m_services);
-    m_currentHandContext = std::make_unique<CurrentHandContext>();
-    m_statisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(m_services);
-    m_statisticsUpdater->loadStatistics(name);
 
-    // Initialize cash in context
-    m_currentHandContext->personalContext.cash = cash;
-    // Initialize with invalid cards - this will be set via context when needed
-}
 
-Player::Player(const GameEvents& events, std::shared_ptr<ServiceContainer> services, int id, std::string name, int cash)
-    : m_id(id), m_name(name), m_events(events), m_services(services)
-{
-    m_rangeEstimator = std::make_unique<RangeEstimator>(m_id, m_services);
-    m_currentHandContext = std::make_unique<CurrentHandContext>();
-    m_statisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(m_services);
-    m_statisticsUpdater->loadStatistics(name);
 
-    // Initialize cash in context
-    m_currentHandContext->personalContext.cash = cash;
-    // Initialize with invalid cards - this will be set via context when needed
-}
 
-// ISP-compliant constructor using focused service interfaces (partial)
-Player::Player(const GameEvents& events, std::shared_ptr<pkt::core::HasLogger> logger, 
-               std::shared_ptr<pkt::core::HasHandEvaluationEngine> handEvaluator, 
-               int id, std::string name, int cash)
-    : m_id(id), m_name(name), m_events(events), m_logger(logger), m_handEvaluator(handEvaluator)
-{
-    // Use ISP constructor for RangeEstimator, legacy for PlayerStatisticsUpdater
-    m_rangeEstimator = std::make_unique<RangeEstimator>(m_id, logger, handEvaluator);
-    m_currentHandContext = std::make_unique<CurrentHandContext>();
-    
-    // PlayerStatisticsUpdater still needs ServiceContainer fallback
-    ensureServicesInitialized();
-    m_statisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(m_services);
-    m_statisticsUpdater->loadStatistics(name);
-
-    // Initialize cash in context
-    m_currentHandContext->personalContext.cash = cash;
-    // Initialize with invalid cards - this will be set via context when needed
-}
 
 // Fully ISP-compliant constructor with all required interfaces
-Player::Player(const GameEvents& events, std::shared_ptr<pkt::core::HasLogger> logger, 
-               std::shared_ptr<pkt::core::HasHandEvaluationEngine> handEvaluator,
-               std::shared_ptr<pkt::core::HasPlayersStatisticsStore> statisticsStore,
+Player::Player(const GameEvents& events, std::shared_ptr<pkt::core::Logger> logger, 
+               std::shared_ptr<pkt::core::HandEvaluationEngine> handEvaluator,
+               std::shared_ptr<pkt::core::PlayersStatisticsStore> statisticsStore,
+               std::shared_ptr<pkt::core::Randomizer> randomizer,
                int id, std::string name, int cash)
-    : m_id(id), m_name(name), m_events(events), m_logger(logger), m_handEvaluator(handEvaluator), m_statisticsStore(statisticsStore)
+    : m_id(id), m_name(name), m_events(events), m_logger(logger), m_handEvaluator(handEvaluator), m_statisticsStore(statisticsStore), m_randomizer(randomizer)
 {
     // Use ISP-compliant constructors for all components
     m_rangeEstimator = std::make_unique<RangeEstimator>(m_id, logger, handEvaluator);
@@ -90,43 +51,31 @@ Player::Player(const GameEvents& events, std::shared_ptr<pkt::core::HasLogger> l
     // Initialize with invalid cards - this will be set via context when needed
 }
 
-void Player::ensureServicesInitialized() const
-{
-    if (!m_services)
-    {
-        m_services = std::make_shared<AppServiceContainer>();
-    }
-}
+
 
 // ISP-compliant helper methods
 pkt::core::Logger& Player::getLogger() const
 {
-    if (m_logger) {
-        return m_logger->logger();
-    }
-    // Fallback to legacy service container
-    ensureServicesInitialized();
-    return m_services->logger();
+    assert(m_logger && "Logger service must be available. Use ISP-compliant constructor.");
+    return *m_logger;
 }
 
 pkt::core::HandEvaluationEngine& Player::getHandEvaluationEngine() const
 {
-    if (m_handEvaluator) {
-        return m_handEvaluator->handEvaluationEngine();
-    }
-    // Fallback to legacy service container
-    ensureServicesInitialized();
-    return m_services->handEvaluationEngine();
+    assert(m_handEvaluator && "HandEvaluationEngine service must be available. Use ISP-compliant constructor.");
+    return *m_handEvaluator;
 }
 
 pkt::core::PlayersStatisticsStore& Player::getPlayersStatisticsStore() const
 {
-    if (m_statisticsStore) {
-        return m_statisticsStore->playersStatisticsStore();
-    }
-    // Fallback to legacy service container
-    ensureServicesInitialized();
-    return m_services->playersStatisticsStore();
+    assert(m_statisticsStore && "PlayersStatisticsStore service must be available. Use ISP-compliant constructor.");
+    return *m_statisticsStore;
+}
+
+pkt::core::Randomizer& Player::getRandomizer() const
+{
+    assert(m_randomizer && "Randomizer service must be available. Use ISP-compliant constructor.");
+    return *m_randomizer;
 }
 
 const PlayerPosition Player::getPosition() const
@@ -462,13 +411,8 @@ bool Player::isInVeryLooseMode(const int nbPlayers) const
     if (!m_statisticsUpdater)
     {
         // Lazily create if not present (defensive against future refactors)
-        if (m_statisticsStore) {
-            const_cast<Player*>(this)->m_statisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(m_statisticsStore);
-        } else {
-            // Fallback to legacy service container
-            ensureServicesInitialized();
-            const_cast<Player*>(this)->m_statisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(m_services);
-        }
+        assert(m_statisticsStore && "StatisticsStore service must be available. Use ISP-compliant constructor.");
+        const_cast<Player*>(this)->m_statisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(m_statisticsStore);
     }
     int clampedPlayers = nbPlayers;
     if (clampedPlayers < 0)
@@ -539,8 +483,11 @@ void Player::updateCurrentHandContext(Hand& currentHand)
 
 float Player::calculatePreflopCallingRange(const CurrentHandContext& ctx) const
 {
-    ensureServicesInitialized();
-    PreflopRangeCalculator calculator(m_services);
+    // Use ISP-compliant PreflopRangeCalculator constructor with focused interfaces
+    assert(m_logger && m_randomizer && "Logger and Randomizer services must be available. Use ISP-compliant constructor.");
+    
+    // Use ISP-compliant constructor - no more ServiceContainer dependencies!
+    PreflopRangeCalculator calculator(m_logger, m_randomizer);
     return calculator.calculatePreflopCallingRange(ctx);
 }
 

@@ -42,10 +42,11 @@ class EngineTest : public ::testing::Test
 
     pkt::core::GameData gameData;
 
+  protected:
+    std::shared_ptr<pkt::core::AppServiceContainer> m_services; // Store services for logger access
+    
   private:
     void createPlayersLists(size_t playerCount);
-
-    std::shared_ptr<pkt::core::AppServiceContainer> m_services; // Store services for logger access
     const int startDealerPlayerId{0}; // Starting dealer player ID, can be set to any valid player ID
 };
 } // namespace pkt::test

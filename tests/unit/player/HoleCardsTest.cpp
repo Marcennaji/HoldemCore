@@ -1,7 +1,11 @@
 #include <gtest/gtest.h>
 #include "core/engine/GameEvents.h"
 #include "core/engine/cards/Card.h"
+#include "core/services/ServiceContainer.h"
 #include "core/player/Player.h"
+#include "common/DummyPlayer.h"
+#include "infra/ConsoleLogger.h"
+#include "infra/eval/PsimHandEvaluationEngine.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;
@@ -9,8 +13,17 @@ using namespace pkt::core::player;
 class HoleCardsTest : public ::testing::Test
 {
   protected:
-    void SetUp() override {}
+    void SetUp() override {
+        m_services = std::make_shared<pkt::core::AppServiceContainer>();
+        auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
+        logger->setLogLevel(pkt::core::LogLevel::Info);
+        m_services->setLogger(std::move(logger));
+        m_services->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>());
+    }
     void TearDown() override {}
+    
+    std::shared_ptr<pkt::core::AppServiceContainer> m_services;
+    GameEvents m_events;
 };
 
 TEST_F(HoleCardsTest, DefaultConstructorCreatesInvalidCards)
@@ -88,14 +101,13 @@ TEST_F(HoleCardsTest, ResetToInvalidCards)
 
 TEST_F(HoleCardsTest, PlayerModernInterface)
 {
-    GameEvents events;
-    Player player(events, 1, "TestPlayer", 1000);
+    auto player = std::make_shared<pkt::test::DummyPlayer>(1, m_events, m_services);
 
     // Test setting cards using new Card-based interface (preferred)
-    player.setHoleCards(Card("Qd"), Card("Jc"));
+    player->setHoleCards(Card("Qd"), Card("Jc"));
 
     // Test getting cards using new interface
-    const HoleCards& retrievedCards = player.getHoleCards();
+    const HoleCards& retrievedCards = player->getHoleCards();
 
     EXPECT_TRUE(retrievedCards.isValid());
     EXPECT_EQ(retrievedCards.card1.toString(), "Qd");
@@ -105,19 +117,18 @@ TEST_F(HoleCardsTest, PlayerModernInterface)
 
 TEST_F(HoleCardsTest, PlayerStringConstructorInterface)
 {
-    GameEvents events;
-    Player player(events, 1, "TestPlayer", 1000);
+    auto player = std::make_shared<pkt::test::DummyPlayer>(1, m_events, m_services);
 
     // Test setting cards using string-based HoleCards constructor
     HoleCards holeCards("As", "Kh");
-    player.setHoleCards(holeCards);
+    player->setHoleCards(holeCards);
 
     // Verify the cards are set correctly
-    const HoleCards& retrieved = player.getHoleCards();
+    const HoleCards& retrieved = player->getHoleCards();
     EXPECT_TRUE(retrieved.isValid());
     EXPECT_EQ(retrieved.card1.toString(), "As");
     EXPECT_EQ(retrieved.card2.toString(), "Kh");
-    EXPECT_EQ(player.getCardsValueString(), "As Kh");
+    EXPECT_EQ(player->getCardsValueString(), "As Kh");
 }
 
 TEST_F(HoleCardsTest, RoundTripConversion)
@@ -141,18 +152,17 @@ TEST_F(HoleCardsTest, RoundTripConversion)
 
 TEST_F(HoleCardsTest, ApiTest)
 {
-    GameEvents events;
-    Player player(events, 1, "ModernPlayer", 1000);
+    auto player = std::make_shared<pkt::test::DummyPlayer>(1, m_events, m_services);
 
     // NEW APPROACH: Work directly with Card objects
     Card aceOfSpades("As");
     Card kingOfHearts("Kh");
 
     // Set cards using modern interface - preferred for new FSM code
-    player.setHoleCards(aceOfSpades, kingOfHearts);
+    player->setHoleCards(aceOfSpades, kingOfHearts);
 
     // Access cards as Card objects - type-safe and expressive
-    const HoleCards& holeCards = player.getHoleCards();
+    const HoleCards& holeCards = player->getHoleCards();
 
     // Rich Card API available
     EXPECT_EQ(holeCards.card1.getSuit(), Card::Suit::Spades);
@@ -170,14 +180,13 @@ TEST_F(HoleCardsTest, ApiTest)
 
 TEST_F(HoleCardsTest, ConvenientStringConstructor)
 {
-    GameEvents events;
-    Player player(events, 2, "ConvenientPlayer", 1000);
+    auto player = std::make_shared<pkt::test::DummyPlayer>(2, m_events, m_services);
 
     // CONVENIENT: Create from strings directly
     HoleCards pocket("Qd", "Jc");
-    player.setHoleCards(pocket);
+    player->setHoleCards(pocket);
 
-    const HoleCards& retrieved = player.getHoleCards();
+    const HoleCards& retrieved = player->getHoleCards();
     EXPECT_EQ(retrieved.card1.toString(), "Qd");
     EXPECT_EQ(retrieved.card2.toString(), "Jc");
 

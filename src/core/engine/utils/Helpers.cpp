@@ -6,7 +6,7 @@
 #include "core/engine/cards/CardUtilities.h"
 #include "core/engine/hand/Hand.h"
 #include "core/engine/model/PlayerPosition.h"
-#include "core/interfaces/HasLogger.h"
+#include "core/interfaces/Logger.h"
 #include "core/player/Helpers.h"
 #include "core/player/Player.h"
 #include "core/services/ServiceContainer.h"
@@ -152,7 +152,7 @@ std::shared_ptr<player::Player> getFirstPlayerToActPostFlop(const Hand& hand)
 std::unique_ptr<pkt::core::HandState> computeBettingRoundNextState(pkt::core::Hand& hand,
                                                                     const pkt::core::GameEvents& events,
                                                                     pkt::core::GameState currentState,
-                                                                    std::shared_ptr<pkt::core::HasLogger> logger)
+                                                                    std::shared_ptr<pkt::core::Logger> logger)
 {
     // If less than 2 players are still in hand (haven't folded), go directly to showdown
     if (hand.getPlayersInHandList()->size() < 2)

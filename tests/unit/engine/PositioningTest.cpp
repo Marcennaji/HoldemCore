@@ -6,6 +6,9 @@
 #include "core/engine/model/PlayerPosition.h"
 #include "core/player/Helpers.h"
 #include "core/player/Player.h"
+#include "core/services/ServiceContainer.h"
+#include "infra/ConsoleLogger.h"
+#include "infra/eval/PsimHandEvaluationEngine.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;
@@ -15,11 +18,18 @@ namespace pkt::test {
 // Sanity check for circular offset wrap-around computation
 TEST(PositioningUnit, CircularOffsetWrapAround)
 {
+    // Setup services for DummyPlayer
+    auto services = std::make_shared<pkt::core::AppServiceContainer>();
+    auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
+    logger->setLogLevel(pkt::core::LogLevel::Info);
+    services->setLogger(std::move(logger));
+    services->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>());
+
     // Build a simple list of 6 dummy players with ids 0..5
     auto players = std::make_shared<std::list<std::shared_ptr<Player>>>();
     GameEvents ev; // unused
     for (int i = 0; i < 6; ++i) {
-        players->push_back(std::make_shared<DummyPlayer>(i, ev));
+        players->push_back(std::make_shared<DummyPlayer>(i, ev, services));
     }
 
     // Dealer = 4, To = 0; distance should wrap: indices [4 -> 5 -> 0] => 2

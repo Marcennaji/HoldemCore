@@ -45,7 +45,7 @@ PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsig
 
 // ISP-compliant constructor using focused service interface
 PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsigned dealerPlayerId,
-                           std::shared_ptr<HasLogger> logger)
+                           std::shared_ptr<Logger> logger)
     : m_events(events), m_smallBlind(smallBlind), m_dealerPlayerId(dealerPlayerId), m_logger(logger)
 {
     if (smallBlind <= 0)
@@ -63,7 +63,7 @@ PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsig
 pkt::core::Logger& PreflopState::getLogger() const
 {
     if (m_logger) {
-        return m_logger->logger();
+        return *m_logger;
     }
     // This should not happen in normal operation
     throw std::runtime_error("PreflopState: Logger service not properly initialized. Use ISP-compliant constructor.");

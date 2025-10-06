@@ -6,6 +6,8 @@
 
 #include "core/player/strategy/BotStrategy.h"
 #include "core/player/strategy/BotStrategyBase.h"
+#include "core/interfaces/Logger.h"
+#include "core/interfaces/Randomizer.h"
 
 namespace pkt::core::player
 {
@@ -16,8 +18,24 @@ class LooseAggressiveBotStrategy : public BotStrategyBase
 
   public:
     LooseAggressiveBotStrategy();
-    LooseAggressiveBotStrategy(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
+    
+    // ISP-compliant constructor - only accepts what it actually needs (Logger + Randomizer)
+    LooseAggressiveBotStrategy(std::shared_ptr<pkt::core::Logger> logger, 
+                               std::shared_ptr<pkt::core::Randomizer> randomizer);
+    
     ~LooseAggressiveBotStrategy();
+
+  private:
+    // ISP-compliant service dependencies - direct core interfaces (no wrapper complexity)
+    std::shared_ptr<pkt::core::Logger> m_loggerService;
+    std::shared_ptr<pkt::core::Randomizer> m_randomizerService;
+    
+    // Helper methods following Single Responsibility Principle  
+    pkt::core::Logger& getLogger();
+    pkt::core::Randomizer& getRandomizer();
+    
+    // Temporary adapter for legacy PokerMath calls - will be eliminated when PokerMath is refactored to ISP
+    std::shared_ptr<pkt::core::ServiceContainer> createTemporaryServiceContainer();
 
   protected:
     virtual bool preflopCouldCall(const CurrentHandContext& ctx);

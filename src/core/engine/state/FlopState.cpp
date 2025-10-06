@@ -16,7 +16,7 @@ FlopState::FlopState(const GameEvents& events) : m_events(events)
 }
 
 // ISP-compliant constructor - only accepts what it actually needs
-FlopState::FlopState(const GameEvents& events, std::shared_ptr<HasLogger> logger) 
+FlopState::FlopState(const GameEvents& events, std::shared_ptr<Logger> logger) 
     : m_events(events), m_loggerService(logger)
 {
 }
@@ -61,7 +61,7 @@ Logger& FlopState::getLogger()
 {
     // Use focused dependency if available (ISP-compliant)
     if (m_loggerService) {
-        return m_loggerService->logger();
+        return *m_loggerService;
     }
     
     // Fall back to base class implementation (Open/Closed Principle)

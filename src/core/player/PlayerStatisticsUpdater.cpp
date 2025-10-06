@@ -12,7 +12,7 @@ PlayerStatisticsUpdater::PlayerStatisticsUpdater(std::shared_ptr<pkt::core::Serv
 }
 
 // ISP-compliant constructor
-PlayerStatisticsUpdater::PlayerStatisticsUpdater(std::shared_ptr<pkt::core::HasPlayersStatisticsStore> statisticsStore)
+PlayerStatisticsUpdater::PlayerStatisticsUpdater(std::shared_ptr<pkt::core::PlayersStatisticsStore> statisticsStore)
     : m_statisticsStore(statisticsStore)
 {
 }
@@ -282,7 +282,7 @@ void PlayerStatisticsUpdater::ensureServicesInitialized() const
 pkt::core::PlayersStatisticsStore& PlayerStatisticsUpdater::getPlayersStatisticsStore() const
 {
     if (m_statisticsStore) {
-        return m_statisticsStore->playersStatisticsStore();
+        return *m_statisticsStore;
     }
     // Fallback to legacy service container
     ensureServicesInitialized();

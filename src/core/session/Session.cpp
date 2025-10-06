@@ -7,6 +7,7 @@
 #include <core/engine/game/Game.h>
 
 #include <core/engine/EngineFactory.h>
+#include <core/interfaces/ServiceAdapter.h>
 
 #include <core/player/strategy/LooseAggressiveBotStrategy.h>
 #include <core/player/strategy/ManiacBotStrategy.h>
@@ -66,7 +67,19 @@ std::unique_ptr<player::StrategyAssigner> Session::createStrategyAssigner(const 
 std::unique_ptr<player::MixedPlayerFactory> Session::createPlayerFactory(const GameEvents& events,
                                                                            player::StrategyAssigner* strategyAssigner)
 {
-    return std::make_unique<player::MixedPlayerFactory>(events, strategyAssigner);
+    if (m_serviceContainer) {
+        // Use ISP-compliant constructor with service interfaces
+        auto serviceAdapter = std::make_shared<ServiceAdapter>(m_serviceContainer);
+        auto logger = serviceAdapter->createLoggerService();
+        auto handEvaluator = serviceAdapter->createHandEvaluationEngineService();
+        auto statisticsStore = serviceAdapter->createPlayersStatisticsStoreService();
+        auto randomizer = serviceAdapter->createRandomizerService();
+        
+        return std::make_unique<player::MixedPlayerFactory>(events, strategyAssigner, logger, handEvaluator, statisticsStore, randomizer);
+    } else {
+        // Fallback to legacy constructor
+        return std::make_unique<player::MixedPlayerFactory>(events, strategyAssigner);
+    }
 }
 
 std::shared_ptr<Board> Session::createBoard(const StartData& startData)

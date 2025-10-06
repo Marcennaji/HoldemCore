@@ -3,6 +3,8 @@
 #include <core/engine/model/PlayerPosition.h>
 #include <core/player/PlayerStatistics.h>
 #include <core/services/ServiceContainer.h>
+#include <core/interfaces/Logger.h>
+#include <core/interfaces/Randomizer.h>
 
 #include <vector>
 
@@ -14,9 +16,16 @@ class PreflopRangeCalculator
 {
   public:
     PreflopRangeCalculator();
+    // Legacy ServiceContainer constructor for backward compatibility
     explicit PreflopRangeCalculator(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
+    // ISP-compliant constructor using focused service interfaces
+    PreflopRangeCalculator(std::shared_ptr<pkt::core::Logger> logger, std::shared_ptr<pkt::core::Randomizer> randomizer);
+    
     // Allow wiring services after default construction when owned by BotStrategyBase
     void setServices(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer) { m_services = serviceContainer; }
+    // ISP-compliant service setters
+    void setServices(std::shared_ptr<pkt::core::Logger> logger, std::shared_ptr<pkt::core::Randomizer> randomizer);
+    
     float calculatePreflopCallingRange(const CurrentHandContext& ctx) const;
     float calculatePreflopRaisingRange(const CurrentHandContext& ctx) const;
 
@@ -63,7 +72,17 @@ class PreflopRangeCalculator
 
   private:
     void ensureServicesInitialized() const;
+    
+    // ISP-compliant service access helpers
+    pkt::core::Logger& getLogger() const;
+    pkt::core::Randomizer& getRandomizer() const;
+    
+    // Legacy ServiceContainer support
     mutable std::shared_ptr<pkt::core::ServiceContainer> m_services; // Injected service container
+    
+    // ISP-compliant focused service interfaces
+    std::shared_ptr<pkt::core::Logger> m_logger;
+    std::shared_ptr<pkt::core::Randomizer> m_randomizer;
 };
 
 } // namespace pkt::core::player

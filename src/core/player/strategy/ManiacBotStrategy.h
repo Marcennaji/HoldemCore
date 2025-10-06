@@ -5,8 +5,8 @@
 
 #include "core/player/strategy/BotStrategy.h"
 #include "core/player/strategy/BotStrategyBase.h"
-#include "core/interfaces/HasLogger.h"
-#include "core/interfaces/HasRandomizer.h"
+#include "core/interfaces/Logger.h"
+#include "core/interfaces/Randomizer.h"
 namespace pkt::core::player
 {
 // Forward declaration
@@ -15,13 +15,12 @@ class ManiacBotStrategy : public BotStrategyBase
 {
 
   public:
-    // Legacy constructors for backward compatibility
+    // Legacy default constructor for backward compatibility
     ManiacBotStrategy();
-    ManiacBotStrategy(std::shared_ptr<pkt::core::ServiceContainer> services);
     
     // ISP-compliant constructor - only depends on what it needs
-    ManiacBotStrategy(std::shared_ptr<pkt::core::HasLogger> logger, 
-                     std::shared_ptr<pkt::core::HasRandomizer> randomizer);
+    ManiacBotStrategy(std::shared_ptr<pkt::core::Logger> logger, 
+                     std::shared_ptr<pkt::core::Randomizer> randomizer);
     
     ~ManiacBotStrategy();
 
@@ -46,8 +45,8 @@ class ManiacBotStrategy : public BotStrategyBase
     pkt::core::Randomizer& getRandomizer();
     
     // ISP-compliant focused dependencies
-    std::shared_ptr<pkt::core::HasLogger> m_loggerService;
-    std::shared_ptr<pkt::core::HasRandomizer> m_randomizerService;
+    std::shared_ptr<pkt::core::Logger> m_loggerService;
+    std::shared_ptr<pkt::core::Randomizer> m_randomizerService;
 };
 
 } // namespace pkt::core::player

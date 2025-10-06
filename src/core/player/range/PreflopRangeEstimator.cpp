@@ -8,6 +8,7 @@
 #include <core/player/range/RangeRefiner.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include <core/services/ServiceContainer.h>
+#include <core/interfaces/ServiceAdapter.h>
 #include <string>
 #include <vector>
 
@@ -17,34 +18,41 @@ using namespace std;
 
 PreflopRangeEstimator::PreflopRangeEstimator(int playerId) : m_playerId(playerId)
 {
+    // Legacy constructor - create direct interface from default service container
+    auto defaultServices = std::make_shared<pkt::core::AppServiceContainer>();
+    m_logger = std::shared_ptr<pkt::core::Logger>(defaultServices, &defaultServices->logger());
 }
 
 PreflopRangeEstimator::PreflopRangeEstimator(int playerId,
                                              std::shared_ptr<pkt::core::ServiceContainer> serviceContainer)
-    : m_playerId(playerId), m_services(serviceContainer)
+    : m_playerId(playerId)
+{
+    // Legacy constructor - create direct interface from ServiceContainer
+    m_logger = std::shared_ptr<pkt::core::Logger>(serviceContainer, &serviceContainer->logger());
+}
+
+// ISP-compliant constructor
+PreflopRangeEstimator::PreflopRangeEstimator(int playerId, std::shared_ptr<pkt::core::Logger> logger)
+    : m_playerId(playerId), m_logger(logger)
 {
 }
 
-void PreflopRangeEstimator::ensureServicesInitialized() const
+pkt::core::Logger& PreflopRangeEstimator::getLogger() const
 {
-    if (!m_services)
-    {
-        m_services = std::make_shared<pkt::core::AppServiceContainer>();
-    }
+    assert(m_logger && "PreflopRangeEstimator requires ISP-compliant logger interface");
+    return *m_logger;
 }
 
 string PreflopRangeEstimator::computeEstimatedPreflopRange(const CurrentHandContext& ctx)
 {
-    ensureServicesInitialized();
-
     string estimatedRange;
 
-    m_services->logger().verbose("\n\testimated range for " + std::to_string(ctx.personalContext.id) + " : ");
+    getLogger().verbose("\n\testimated range for " + std::to_string(ctx.personalContext.id) + " : ");
 
     PreflopStatistics preflop = ctx.personalContext.statistics.preflopStatistics;
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
 
-    m_services->logger().verbose(
+    getLogger().verbose(
         "  " + std::to_string(preflop.getVoluntaryPutMoneyInPot()) + "/" + std::to_string(preflop.getPreflopRaise()) +
         ", 3B: " + std::to_string(preflop.getPreflop3Bet()) + ", 4B: " + std::to_string(preflop.getPreflop4Bet()) +
         ", C3B: " + std::to_string(preflop.getPreflopCallthreeBetsFrequency()) +
@@ -60,7 +68,7 @@ string PreflopRangeEstimator::computeEstimatedPreflopRange(const CurrentHandCont
                                       : RangeEstimator::getStandardRaisingRange(nbPlayers) * 0.8;
 
         const string excludeRange = RangeEstimator::getStringRange(nbPlayers, raiseFactor);
-        m_services->logger().verbose("any cards except " + excludeRange + '\n');
+        getLogger().verbose("any cards except " + excludeRange + '\n');
         estimatedRange = RangeRefiner::deduceRange(ANY_CARDS_RANGE, excludeRange);
     }
     else
@@ -83,14 +91,12 @@ string PreflopRangeEstimator::computeEstimatedPreflopRange(const CurrentHandCont
 
 std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(const CurrentHandContext& ctx) const
 {
-    ensureServicesInitialized();
-
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
     assert(ctx.commonContext.playersContext.preflopLastRaiser != nullptr);
 
     float range = 0;
 
-    m_services->logger().verbose(" [ player is last raiser ] ");
+    getLogger().verbose(" [ player is last raiser ] ");
     PreflopStatistics preflopOpponent = ctx.commonContext.playersContext.preflopLastRaiser->getStatisticsUpdater()
                                             ->getStatistics(nbPlayers)
                                             .preflopStatistics;
@@ -142,7 +148,7 @@ std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(co
     {
         range = RangeEstimator::getStandardRaisingRange(nbPlayers);
 
-        m_services->logger().verbose(", but not enough hands -> getting the standard range : " + std::to_string(range));
+        getLogger().verbose(", but not enough hands -> getting the standard range : " + std::to_string(range));
 
         if (ctx.commonContext.bettingContext.preflopRaisesNumber == 2)
         {
@@ -158,7 +164,7 @@ std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(co
         }
     }
 
-    m_services->logger().verbose("range is " + std::to_string(range));
+    getLogger().verbose("range is " + std::to_string(range));
 
     if (nbPlayers > 3)
     {
@@ -175,7 +181,7 @@ std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(co
             range = range * 1.5;
         }
 
-        m_services->logger().verbose(", position adjusted range is " + std::to_string(range));
+        getLogger().verbose(", position adjusted range is " + std::to_string(range));
     }
 
     // Adjust range for loose/aggressive mode
@@ -185,7 +191,7 @@ std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(co
         if (range < 40)
         {
             range = 40;
-            m_services->logger().verbose("\t\toveragression detected, setting range to " + std::to_string(range));
+            getLogger().verbose("\t\toveragression detected, setting range to " + std::to_string(range));
         }
     }
 
@@ -204,15 +210,13 @@ std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromLastRaiser(co
         range = 100;
     }
 
-    m_services->logger().verbose("\n\t\testimated range is " + std::to_string(range) + " % ");
+    getLogger().verbose("\n\t\testimated range is " + std::to_string(range) + " % ");
 
     return RangeEstimator::getStringRange(nbPlayers, range);
 }
 
 std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromCaller(const CurrentHandContext& ctx) const
 {
-    ensureServicesInitialized();
-
     // The player is not the last raiser but has called a raise or limped in preflop
 
     bool isTopRange = true;
@@ -239,7 +243,7 @@ std::string PreflopRangeEstimator::computeEstimatedPreflopRangeFromCaller(const 
 
     std::string rangeString = finalizeEstimatedRange(ctx, ranges, rangesValues, range, nbPlayers, isTopRange);
 
-    m_services->logger().verbose("Estimated range for player " + std::to_string(ctx.personalContext.id) + " is {" +
+    getLogger().verbose("Estimated range for player " + std::to_string(ctx.personalContext.id) + " is {" +
                                  rangeString + "}");
     return rangeString;
 }
@@ -264,10 +268,10 @@ float PreflopRangeEstimator::calculateStartingRange(const CurrentHandContext& ct
     if (ctx.personalContext.statistics.preflopStatistics.hands < MIN_HANDS_STATISTICS_ACCURATE)
     {
         estimatedStartingRange = RangeEstimator::getStandardCallingRange(nbPlayers);
-        m_services->logger().verbose(" [ not enough hands, getting the standard calling range ] ");
+        getLogger().verbose(" [ not enough hands, getting the standard calling range ] ");
     }
 
-    m_services->logger().verbose(" estimated starting range : " + std::to_string(estimatedStartingRange));
+    getLogger().verbose(" estimated starting range : " + std::to_string(estimatedStartingRange));
     return estimatedStartingRange;
 }
 float PreflopRangeEstimator::adjustRangeForPosition(const CurrentHandContext& ctx, int nbPlayers,
@@ -293,7 +297,7 @@ float PreflopRangeEstimator::adjustRangeForPosition(const CurrentHandContext& ct
         range = 100;
     }
 
-    m_services->logger().verbose("Position adjusted starting range : " + std::to_string(range));
+    getLogger().verbose("Position adjusted starting range : " + std::to_string(range));
     return range;
 }
 float PreflopRangeEstimator::adjustRangeForPotOdds(const CurrentHandContext& ctx, const float currentRange) const
@@ -322,7 +326,7 @@ float PreflopRangeEstimator::adjustRangeForPotOdds(const CurrentHandContext& ctx
         range = 40;
     }
 
-    m_services->logger().verbose("Pot odd adjusted starting range : " + std::to_string(range));
+    getLogger().verbose("Pot odd adjusted starting range : " + std::to_string(range));
     return range;
 }
 float PreflopRangeEstimator::adjustRangeForPreflopRaises(const CurrentHandContext& ctx, int opponentRaises,
@@ -374,7 +378,7 @@ float PreflopRangeEstimator::handleLooseAggressiveOpponents(const CurrentHandCon
                 range = 40;
             }
 
-            m_services->logger().verbose("Overagression detected from the raiser, setting calling range to " +
+            getLogger().verbose("Overagression detected from the raiser, setting calling range to " +
                                          std::to_string(range));
         }
     }
@@ -394,7 +398,7 @@ float PreflopRangeEstimator::finalizeRange(const float currentRange) const
         range = 100;
     }
 
-    m_services->logger().verbose("Estimated range is " + std::to_string(range) + " % ");
+    getLogger().verbose("Estimated range is " + std::to_string(range) + " % ");
     return range;
 }
 std::string PreflopRangeEstimator::finalizeEstimatedRange(const CurrentHandContext& ctx,
@@ -404,7 +408,7 @@ std::string PreflopRangeEstimator::finalizeEstimatedRange(const CurrentHandConte
 {
     if (!isTopRange)
     {
-        m_services->logger().verbose(" [ not a top range ] ");
+        getLogger().verbose(" [ not a top range ] ");
         return RangeEstimator::getFilledRange(ranges, rangesValues, range, nbPlayers);
     }
     else
@@ -420,7 +424,7 @@ float PreflopRangeEstimator::handleLimpRange(const CurrentHandContext& ctx, cons
     if (ctx.commonContext.playersContext.actingPlayersList->size() > 3)
     {
         range = currentRange - ctx.personalContext.statistics.preflopStatistics.getPreflopRaise();
-        m_services->logger().verbose("Limp range adjusted for deception: " + std::to_string(range));
+        getLogger().verbose("Limp range adjusted for deception: " + std::to_string(range));
     }
     else
     {
@@ -432,7 +436,7 @@ float PreflopRangeEstimator::handleLimpRange(const CurrentHandContext& ctx, cons
         range = 5;
     }
 
-    m_services->logger().verbose("Limp range : " + std::to_string(range));
+    getLogger().verbose("Limp range : " + std::to_string(range));
     return range;
 }
 float PreflopRangeEstimator::handleSingleRaiseRange(const CurrentHandContext& ctx, const float currentRange) const
@@ -445,7 +449,7 @@ float PreflopRangeEstimator::handleSingleRaiseRange(const CurrentHandContext& ct
         range = 1;
     }
 
-    m_services->logger().verbose("Single bet call range: " + std::to_string(range));
+    getLogger().verbose("Single bet call range: " + std::to_string(range));
 
     if (ctx.personalContext.statistics.preflopStatistics.getVoluntaryPutMoneyInPot() -
             ctx.personalContext.statistics.preflopStatistics.getPreflopRaise() >
@@ -453,7 +457,7 @@ float PreflopRangeEstimator::handleSingleRaiseRange(const CurrentHandContext& ct
     {
         // Loose player adjustment
         range = range / 2;
-        m_services->logger().verbose("Loose player adjusted range: " + std::to_string(range));
+        getLogger().verbose("Loose player adjusted range: " + std::to_string(range));
     }
 
     return range;
@@ -468,7 +472,7 @@ float PreflopRangeEstimator::handleThreeBetRange(const CurrentHandContext& ctx, 
     {
         // Not enough hands, assume the opponent is an average tight player
         range = currentRange / 3;
-        m_services->logger().verbose("3-bet call range (default): " + std::to_string(range));
+        getLogger().verbose("3-bet call range (default): " + std::to_string(range));
     }
     else
     {
@@ -488,13 +492,13 @@ float PreflopRangeEstimator::handleThreeBetRange(const CurrentHandContext& ctx, 
                 range = lastRaiserStats.getPreflop3Bet() * 0.8;
             }
 
-            m_services->logger().verbose("3-bet call range: " + std::to_string(range));
+            getLogger().verbose("3-bet call range: " + std::to_string(range));
         }
         else
         {
             // Cold-calling a 3-bet
             range = ctx.personalContext.statistics.preflopStatistics.getVoluntaryPutMoneyInPot() / 3;
-            m_services->logger().verbose("3-bet cold-call range: " + std::to_string(range));
+            getLogger().verbose("3-bet cold-call range: " + std::to_string(range));
         }
     }
     return range;
@@ -508,7 +512,7 @@ float PreflopRangeEstimator::handleFourBetOrMoreRange(const CurrentHandContext& 
     {
         // Not enough hands, assume the opponent is an average tight player
         range = currentRange / 5;
-        m_services->logger().verbose("4-bet call range (default): " + std::to_string(range));
+        getLogger().verbose("4-bet call range (default): " + std::to_string(range));
     }
     else
     {
@@ -517,13 +521,13 @@ float PreflopRangeEstimator::handleFourBetOrMoreRange(const CurrentHandContext& 
             // Facing a 4-bet after having bet
             range = ctx.personalContext.statistics.preflopStatistics.getPreflop3Bet() *
                     ctx.personalContext.statistics.preflopStatistics.getPreflopCallthreeBetsFrequency() / 100;
-            m_services->logger().verbose("4-bet call range: " + std::to_string(range));
+            getLogger().verbose("4-bet call range: " + std::to_string(range));
         }
         else
         {
             // Cold-calling a 4-bet
             range = ctx.personalContext.statistics.preflopStatistics.getVoluntaryPutMoneyInPot() / 6;
-            m_services->logger().verbose("4-bet cold-call range: " + std::to_string(range));
+            getLogger().verbose("4-bet cold-call range: " + std::to_string(range));
         }
     }
     return range;

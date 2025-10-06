@@ -11,6 +11,7 @@
 #include "core/engine/hand/Hand.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
+#include "core/interfaces/ServiceAdapter.h"
 #include "core/player/strategy/LooseAggressiveBotStrategy.h"
 #include "core/player/strategy/ManiacBotStrategy.h"
 #include "core/player/strategy/TightAggressiveBotStrategy.h"
@@ -108,16 +109,21 @@ class StrategiesE2ETest : public EngineTest
     // Factory method to create strategy based on type
     std::unique_ptr<BotStrategyBase> createStrategy(StrategyType strategyType)
     {
+        // Get direct core interface references from service container
+        auto services = getServices();
+        auto logger = std::shared_ptr<pkt::core::Logger>(services, &services->logger());
+        auto randomizer = std::shared_ptr<pkt::core::Randomizer>(services, &services->randomizer());
+        
         switch (strategyType)
         {
         case StrategyType::TightAggressive:
-            return std::make_unique<TightAggressiveBotStrategy>(getServices());
+            return std::make_unique<TightAggressiveBotStrategy>(logger, randomizer);
         case StrategyType::LooseAggressive:
-            return std::make_unique<LooseAggressiveBotStrategy>(getServices());
+            return std::make_unique<LooseAggressiveBotStrategy>(logger, randomizer);
         case StrategyType::UltraTight:
-            return std::make_unique<UltraTightBotStrategy>(getServices());
+            return std::make_unique<UltraTightBotStrategy>(logger, randomizer);
         case StrategyType::Maniac:
-            return std::make_unique<ManiacBotStrategy>(getServices());
+            return std::make_unique<ManiacBotStrategy>(logger, randomizer);
         default:
             throw std::invalid_argument("Unknown strategy type");
         }
@@ -137,8 +143,15 @@ class StrategiesE2ETest : public EngineTest
 
         for (const auto& playerConfig : scenario.players)
         {
-            auto player = std::make_shared<Player>(m_events, getServices(), playerConfig.playerId,
-                                                   playerConfig.playerName, playerConfig.startingCash);
+            // Create ISP interfaces using ServiceAdapter
+            auto serviceAdapter = std::make_shared<pkt::core::ServiceAdapter>(getServices());
+            auto logger = serviceAdapter->createLoggerService();
+            auto handEvaluator = serviceAdapter->createHandEvaluationEngineService();  
+            auto statisticsStore = serviceAdapter->createPlayersStatisticsStoreService();
+            auto randomizer = serviceAdapter->createRandomizerService();
+            
+            auto player = std::make_shared<Player>(m_events, logger, handEvaluator, statisticsStore, randomizer,
+                                                   playerConfig.playerId, playerConfig.playerName, playerConfig.startingCash);
             player->setStrategy(createStrategy(playerConfig.strategyType));
             m_seatsList->push_back(player);
         }

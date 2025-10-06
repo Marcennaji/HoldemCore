@@ -2,7 +2,7 @@
 #include "core/engine/hand/ActionProcessor.h"
 #include "core/engine/hand/DebuggableState.h"
 #include "core/engine/hand/HandState.h"
-#include "core/interfaces/HasLogger.h"
+#include "core/interfaces/Logger.h"
 
 #include <memory>
 
@@ -27,7 +27,7 @@ class RiverState : public HandState, public HandActionProcessor, public HandDebu
     explicit RiverState(const GameEvents& events, std::shared_ptr<pkt::core::ServiceContainer> services);
     
     // ISP-compliant constructor - only depends on what it needs
-    explicit RiverState(const GameEvents& events, std::shared_ptr<HasLogger> logger);
+    explicit RiverState(const GameEvents& events, std::shared_ptr<Logger> logger);
 
     void enter(Hand&) override;
     void exit(Hand&) override;
@@ -47,7 +47,7 @@ class RiverState : public HandState, public HandActionProcessor, public HandDebu
 
     const GameEvents& m_events;
     mutable std::shared_ptr<pkt::core::ServiceContainer> m_services; // Legacy
-    std::shared_ptr<HasLogger> m_loggerService; // ISP-compliant
+    std::shared_ptr<Logger> m_loggerService; // ISP-compliant
 };
 
 } // namespace pkt::core

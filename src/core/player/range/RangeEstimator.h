@@ -8,8 +8,8 @@
 #include <core/engine/model/GameState.h>
 #include <core/player/PlayerStatistics.h>
 #include <core/services/ServiceContainer.h>
-#include <core/interfaces/HasLogger.h>
-#include <core/interfaces/HasHandEvaluationEngine.h>
+#include <core/interfaces/Logger.h>
+#include <core/interfaces/HandEvaluationEngine.h>
 #include "PreflopRangeEstimator.h"
 
 #include <memory>
@@ -36,12 +36,13 @@ struct CurrentHandContext;
 class RangeEstimator
 {
   public:
+    // ISP-compliant constructor (primary)
+    RangeEstimator(int playerId, std::shared_ptr<pkt::core::Logger> logger, 
+                   std::shared_ptr<pkt::core::HandEvaluationEngine> handEvaluator);
+    
+    // Legacy constructors (deprecated - use ISP constructor)
     RangeEstimator(int playerId);
     explicit RangeEstimator(int playerId, std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
-    
-    // ISP-compliant constructor
-    RangeEstimator(int playerId, std::shared_ptr<pkt::core::HasLogger> logger, 
-                   std::shared_ptr<pkt::core::HasHandEvaluationEngine> handEvaluator);
 
     void setEstimatedRange(const std::string& range);
     std::string getEstimatedRange() const;
@@ -60,6 +61,7 @@ class RangeEstimator
     void updateUnplausibleRangesGivenFlopActions(const CurrentHandContext&);
     void updateUnplausibleRangesGivenTurnActions(const CurrentHandContext&);
     void updateUnplausibleRangesGivenRiverActions(const CurrentHandContext&);
+    
     void ensureServicesInitialized() const;
     
     // ISP-compliant helper methods
@@ -70,8 +72,8 @@ class RangeEstimator
     mutable std::shared_ptr<pkt::core::ServiceContainer> m_services;
     
     // ISP-compliant focused interfaces
-    std::shared_ptr<pkt::core::HasLogger> m_logger;
-    std::shared_ptr<pkt::core::HasHandEvaluationEngine> m_handEvaluator;
+    std::shared_ptr<pkt::core::Logger> m_logger;
+    std::shared_ptr<pkt::core::HandEvaluationEngine> m_handEvaluator;
 
     std::unique_ptr<PreflopRangeEstimator> m_preflopRangeEstimator;
     std::string m_estimatedRange;

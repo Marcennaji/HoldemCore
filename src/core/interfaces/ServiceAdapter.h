@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "core/interfaces/HasLogger.h"
-#include "core/interfaces/HasRandomizer.h"
-#include "core/interfaces/HasHandEvaluationEngine.h"
-#include "core/interfaces/HasPlayersStatisticsStore.h"
+#include "core/interfaces/Logger.h"
+#include "core/interfaces/Randomizer.h"
+#include "core/interfaces/HandEvaluationEngine.h"
+#include "core/interfaces/persistence/PlayersStatisticsStore.h"
 #include "core/services/ServiceContainer.h"
 #include <memory>
 
@@ -25,55 +25,23 @@ class ServiceAdapter
   public:
     explicit ServiceAdapter(std::shared_ptr<ServiceContainer> services) : m_services(services) {}
     
-    std::shared_ptr<HasLogger> createLoggerService() const {
-        return std::make_shared<LoggerFromServiceContainer>(m_services);
+    std::shared_ptr<Logger> createLoggerService() const {
+        return std::shared_ptr<Logger>(&m_services->logger(), [](Logger*){});
     }
     
-    std::shared_ptr<HasRandomizer> createRandomizerService() const {
-        return std::make_shared<RandomizerFromServiceContainer>(m_services);
+    std::shared_ptr<Randomizer> createRandomizerService() const {
+        return std::shared_ptr<Randomizer>(&m_services->randomizer(), [](Randomizer*){});
     }
     
-    std::shared_ptr<HasHandEvaluationEngine> createHandEvaluationEngineService() const {
-        return std::make_shared<HandEvaluationEngineFromServiceContainer>(m_services);
+    std::shared_ptr<HandEvaluationEngine> createHandEvaluationEngineService() const {
+        return std::shared_ptr<HandEvaluationEngine>(&m_services->handEvaluationEngine(), [](HandEvaluationEngine*){});
     }
     
-    std::shared_ptr<HasPlayersStatisticsStore> createPlayersStatisticsStoreService() const {
-        return std::make_shared<PlayersStatisticsStoreFromServiceContainer>(m_services);
+    std::shared_ptr<PlayersStatisticsStore> createPlayersStatisticsStoreService() const {
+        return std::shared_ptr<PlayersStatisticsStore>(&m_services->playersStatisticsStore(), [](PlayersStatisticsStore*){});
     }
     
   private:
-    class LoggerFromServiceContainer : public HasLogger {
-      public:
-        explicit LoggerFromServiceContainer(std::shared_ptr<ServiceContainer> services) : m_services(services) {}
-        Logger& logger() override { return m_services->logger(); }
-      private:
-        std::shared_ptr<ServiceContainer> m_services;
-    };
-    
-    class RandomizerFromServiceContainer : public HasRandomizer {
-      public:
-        explicit RandomizerFromServiceContainer(std::shared_ptr<ServiceContainer> services) : m_services(services) {}
-        Randomizer& randomizer() override { return m_services->randomizer(); }
-      private:
-        std::shared_ptr<ServiceContainer> m_services;
-    };
-    
-    class HandEvaluationEngineFromServiceContainer : public HasHandEvaluationEngine {
-      public:
-        explicit HandEvaluationEngineFromServiceContainer(std::shared_ptr<ServiceContainer> services) : m_services(services) {}
-        HandEvaluationEngine& handEvaluationEngine() override { return m_services->handEvaluationEngine(); }
-      private:
-        std::shared_ptr<ServiceContainer> m_services;
-    };
-    
-    class PlayersStatisticsStoreFromServiceContainer : public HasPlayersStatisticsStore {
-      public:
-        explicit PlayersStatisticsStoreFromServiceContainer(std::shared_ptr<ServiceContainer> services) : m_services(services) {}
-        PlayersStatisticsStore& playersStatisticsStore() override { return m_services->playersStatisticsStore(); }
-      private:
-        std::shared_ptr<ServiceContainer> m_services;
-    };
-    
     std::shared_ptr<ServiceContainer> m_services;
 };
 

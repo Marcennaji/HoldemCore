@@ -2,7 +2,7 @@
 #include "core/engine/hand/ActionProcessor.h"
 #include "core/engine/hand/DebuggableState.h"
 #include "core/engine/hand/HandState.h"
-#include "core/interfaces/HasLogger.h"
+#include "core/interfaces/Logger.h"
 
 namespace pkt::core::player
 {
@@ -22,7 +22,7 @@ class FlopState : public HandState, public HandActionProcessor, public HandDebug
     explicit FlopState(const GameEvents& events);
     
     // ISP-compliant constructor - only depends on what it needs (DIP principle)
-    explicit FlopState(const GameEvents& events, std::shared_ptr<HasLogger> logger);
+    explicit FlopState(const GameEvents& events, std::shared_ptr<Logger> logger);
 
     void enter(Hand&) override;
     void exit(Hand&) override;
@@ -44,7 +44,7 @@ class FlopState : public HandState, public HandActionProcessor, public HandDebug
     Logger& getLogger(); // Helper method following SRP
     
     const GameEvents& m_events;
-    std::shared_ptr<HasLogger> m_loggerService; // ISP-compliant dependency
+    std::shared_ptr<Logger> m_loggerService; // ISP-compliant dependency
 };
 
 } // namespace pkt::core

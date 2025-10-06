@@ -34,19 +34,16 @@ RangeEstimator::RangeEstimator(int playerId, std::shared_ptr<pkt::core::ServiceC
 }
 
 // ISP-compliant constructor
-RangeEstimator::RangeEstimator(int playerId, std::shared_ptr<pkt::core::HasLogger> logger, 
-                               std::shared_ptr<pkt::core::HasHandEvaluationEngine> handEvaluator)
+RangeEstimator::RangeEstimator(int playerId, std::shared_ptr<pkt::core::Logger> logger, 
+                               std::shared_ptr<pkt::core::HandEvaluationEngine> handEvaluator)
     : m_playerId(playerId), m_logger(logger), m_handEvaluator(handEvaluator)
 {
     assert(m_playerId >= 0);
-    // Note: PreflopRangeEstimator still needs ServiceContainer - will be refactored in next step
-    ensureServicesInitialized();
-    m_preflopRangeEstimator = make_unique<PreflopRangeEstimator>(m_playerId, m_services);
+    // Use ISP-compliant PreflopRangeEstimator constructor
+    m_preflopRangeEstimator = make_unique<PreflopRangeEstimator>(m_playerId, m_logger);
 }
 void RangeEstimator::updateUnplausibleRanges(pkt::core::GameState state, const CurrentHandContext& ctx)
 {
-    ensureServicesInitialized();
-
     switch (state)
     {
     case pkt::core::GameState::Preflop:
@@ -78,7 +75,7 @@ void RangeEstimator::ensureServicesInitialized() const
 pkt::core::Logger& RangeEstimator::getLogger() const
 {
     if (m_logger) {
-        return m_logger->logger();
+        return *m_logger;
     }
     // Fallback to legacy service container
     ensureServicesInitialized();
@@ -88,7 +85,7 @@ pkt::core::Logger& RangeEstimator::getLogger() const
 pkt::core::HandEvaluationEngine& RangeEstimator::getHandEvaluationEngine() const
 {
     if (m_handEvaluator) {
-        return m_handEvaluator->handEvaluationEngine();
+        return *m_handEvaluator;
     }
     // Fallback to legacy service container
     ensureServicesInitialized();

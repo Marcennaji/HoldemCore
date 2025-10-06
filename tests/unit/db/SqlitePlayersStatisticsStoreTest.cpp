@@ -24,7 +24,10 @@ namespace pkt::test
 
 void SqlitePlayersStatisticsStoreTest::SetUp()
 {
-    // First do the base setup to initialize game data and other essentials
+    // Call base class SetUp first to initialize m_services and other essentials
+    EngineTest::SetUp();
+    
+    // Override game data settings if needed
     gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
     gameData.startMoney = 1000;
     gameData.firstSmallBlind = 10;
@@ -52,8 +55,8 @@ void SqlitePlayersStatisticsStoreTest::SetUp()
     auto handEvaluatorInterface = serviceAdapter->createHandEvaluationEngineService();
     auto statisticsStoreInterface = serviceAdapter->createPlayersStatisticsStoreService();
 
-    // Use ISP-compliant constructor with all focused service interfaces
-    m_factory = std::make_unique<EngineFactory>(m_events, loggerInterface, handEvaluatorInterface, statisticsStoreInterface);
+    // Use ISP-compliant constructor with all focused service interfaces and the original ServiceContainer
+    m_factory = std::make_unique<EngineFactory>(m_events, loggerInterface, handEvaluatorInterface, statisticsStoreInterface, m_testServices);
 }
 
 void SqlitePlayersStatisticsStoreTest::TearDown()

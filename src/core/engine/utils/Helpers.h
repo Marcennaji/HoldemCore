@@ -19,7 +19,7 @@
 namespace pkt::core
 {
 class ServiceContainer;
-class HasLogger;
+class Logger;
 } // namespace pkt::core
 
 namespace pkt::core::player
@@ -41,7 +41,7 @@ std::shared_ptr<player::Player> getFirstPlayerToActPostFlop(const Hand& hand);
 std::shared_ptr<player::Player> getNextPlayerToActInRound(const Hand& hand, GameState currentRound);
 std::unique_ptr<pkt::core::HandState> computeBettingRoundNextState(Hand& hand, const GameEvents& events,
                                                                     GameState currentState, 
-                                                                    std::shared_ptr<HasLogger> logger);
+                                                                    std::shared_ptr<Logger> logger);
 bool isRoundComplete(const Hand& hand);
 bool isRoundComplete(const Hand& hand, std::shared_ptr<pkt::core::ServiceContainer> services);
 std::vector<ActionType> getValidActionsForPlayer(const Hand& hand, int playerId);

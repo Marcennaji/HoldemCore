@@ -4,7 +4,7 @@
 #include <core/engine/model/GameState.h>
 #include <core/player/PlayerStatistics.h>
 #include <core/services/ServiceContainer.h>
-#include <core/interfaces/HasPlayersStatisticsStore.h>
+#include <core/interfaces/persistence/PlayersStatisticsStore.h>
 
 #include <array>
 #include <memory>
@@ -21,7 +21,7 @@ class PlayerStatisticsUpdater
     explicit PlayerStatisticsUpdater(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
     
     // ISP-compliant constructor
-    explicit PlayerStatisticsUpdater(std::shared_ptr<pkt::core::HasPlayersStatisticsStore> statisticsStore);
+    explicit PlayerStatisticsUpdater(std::shared_ptr<pkt::core::PlayersStatisticsStore> statisticsStore);
 
     void loadStatistics(const std::string& playerName);
     void resetPlayerStatistics();
@@ -44,7 +44,7 @@ class PlayerStatisticsUpdater
     mutable std::shared_ptr<pkt::core::ServiceContainer> m_services;
     
     // ISP-compliant focused interface
-    std::shared_ptr<pkt::core::HasPlayersStatisticsStore> m_statisticsStore;
+    std::shared_ptr<pkt::core::PlayersStatisticsStore> m_statisticsStore;
 
     std::array<pkt::core::player::PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> m_statistics;
 };

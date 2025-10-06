@@ -5,6 +5,9 @@
 #include "core/engine/model/GameState.h"
 #include "core/engine/state/RiverState.h"
 #include "core/player/typedefs.h"
+#include "core/services/ServiceContainer.h"
+#include "infra/ConsoleLogger.h"
+#include "infra/eval/PsimHandEvaluationEngine.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;
@@ -19,11 +22,21 @@ class PotTest : public ::testing::Test
     GameEvents events;
     std::unique_ptr<Pot> pot;
     std::unique_ptr<RiverState> state = std::make_unique<RiverState>(events);
+    std::shared_ptr<pkt::core::AppServiceContainer> m_services;
+
+    void SetUp() override
+    {
+        m_services = std::make_shared<pkt::core::AppServiceContainer>();
+        auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
+        logger->setLogLevel(pkt::core::LogLevel::Info);
+        m_services->setLogger(std::move(logger));
+        m_services->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>());
+    }
 
     std::shared_ptr<DummyPlayer> createPlayer(int id, int cashAtHandStart, int remainingCash, int handRank,
                                               ActionType action)
     {
-        auto p = std::make_shared<DummyPlayer>(id, events);
+        auto p = std::make_shared<DummyPlayer>(id, events, m_services);
         p->setCashAtHandStart(cashAtHandStart);
         p->setCash(remainingCash);
         p->setHandRanking(handRank);

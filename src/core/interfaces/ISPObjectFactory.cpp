@@ -49,7 +49,9 @@ std::shared_ptr<Player> ISPObjectFactory::createPlayer(const GameEvents& events,
 {
     auto loggerService = m_adapter.createLoggerService();
     auto handEvaluationService = m_adapter.createHandEvaluationEngineService();
-    return std::make_shared<Player>(events, loggerService, handEvaluationService, id, name, cash);
+    auto statisticsStoreService = m_adapter.createPlayersStatisticsStoreService();
+    auto randomizerService = m_adapter.createRandomizerService();
+    return std::make_shared<Player>(events, loggerService, handEvaluationService, statisticsStoreService, randomizerService, id, name, cash);
 }
 
 std::shared_ptr<TurnState> ISPObjectFactory::createTurnState(const GameEvents& events) const

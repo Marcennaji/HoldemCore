@@ -12,10 +12,9 @@ DefaultPlayerFactory::DefaultPlayerFactory(const GameEvents& events, StrategyAss
 
 std::shared_ptr<Player> DefaultPlayerFactory::createPlayer(int id, TableProfile profile, int startMoney)
 {
-    auto strategy = m_strategyAssigner->chooseBotStrategyFor(id);
-
-    auto player = std::make_shared<Player>(m_events, id, "Bot_" + std::to_string(id), startMoney);
-    player->setStrategy(std::move(strategy));
-    return player;
+    // DefaultPlayerFactory should not be used in strict ISP mode as it doesn't have access to ISP interfaces
+    // This factory is deprecated - use MixedPlayerFactory with proper ISP interface injection instead
+    assert(false && "DefaultPlayerFactory is deprecated. Use MixedPlayerFactory with ISP interfaces instead.");
+    return nullptr;
 }
 } // namespace pkt::core::player

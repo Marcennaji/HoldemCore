@@ -20,10 +20,9 @@
 
 #include "core/interfaces/HandEvaluationEngine.h"
 #include "core/interfaces/Logger.h"
+#include "core/interfaces/Randomizer.h"
+#include "core/interfaces/persistence/PlayersStatisticsStore.h"
 #include "core/services/ServiceContainer.h"
-#include "core/interfaces/HasLogger.h"
-#include "core/interfaces/HasHandEvaluationEngine.h"
-#include "core/interfaces/HasPlayersStatisticsStore.h"
 
 #include <array>
 #include <assert.h>
@@ -45,15 +44,11 @@ namespace pkt::core::player
 class Player
 {
   public:
-    Player(const GameEvents&, int id, std::string name, int cash);
-    Player(const GameEvents&, std::shared_ptr<ServiceContainer> services, int id, std::string name, int cash);
-    // ISP-compliant constructor using focused service interfaces (partial)
-    Player(const GameEvents&, std::shared_ptr<HasLogger> logger, std::shared_ptr<HasHandEvaluationEngine> handEvaluator, int id, std::string name, int cash);
-    
     // Fully ISP-compliant constructor with all required interfaces
-    Player(const GameEvents&, std::shared_ptr<HasLogger> logger, 
-           std::shared_ptr<HasHandEvaluationEngine> handEvaluator,
-           std::shared_ptr<HasPlayersStatisticsStore> statisticsStore,
+    Player(const GameEvents&, std::shared_ptr<pkt::core::Logger> logger, 
+           std::shared_ptr<pkt::core::HandEvaluationEngine> handEvaluator,
+           std::shared_ptr<pkt::core::PlayersStatisticsStore> statisticsStore,
+           std::shared_ptr<pkt::core::Randomizer> randomizer,
            int id, std::string name, int cash);
     virtual ~Player() = default;
 
@@ -150,6 +145,7 @@ class Player
     pkt::core::Logger& getLogger() const;
     pkt::core::HandEvaluationEngine& getHandEvaluationEngine() const;
     pkt::core::PlayersStatisticsStore& getPlayersStatisticsStore() const;
+    pkt::core::Randomizer& getRandomizer() const;
 
     // ========================================
     // Business Logic Methods (Actual Implementation)
@@ -167,16 +163,14 @@ class Player
     std::unique_ptr<RangeEstimator> m_rangeEstimator;
 
   private:
-    void ensureServicesInitialized() const;
-
     std::map<int, float> evaluateOpponentsStrengths() const;
     const HandSimulationStats computeHandSimulation() const;
     std::unique_ptr<PlayerStrategy> m_strategy;
     std::unique_ptr<PlayerStatisticsUpdater> m_statisticsUpdater;
-    mutable std::shared_ptr<ServiceContainer> m_services; // Injected service container (legacy)
     // ISP-compliant focused service interfaces
-    std::shared_ptr<HasLogger> m_logger;
-    std::shared_ptr<HasHandEvaluationEngine> m_handEvaluator;
-    std::shared_ptr<HasPlayersStatisticsStore> m_statisticsStore;
+    std::shared_ptr<pkt::core::Logger> m_logger;
+    std::shared_ptr<pkt::core::HandEvaluationEngine> m_handEvaluator;
+    std::shared_ptr<pkt::core::PlayersStatisticsStore> m_statisticsStore;
+    std::shared_ptr<pkt::core::Randomizer> m_randomizer;
 };
 } // namespace pkt::core::player

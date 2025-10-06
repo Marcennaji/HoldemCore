@@ -15,6 +15,16 @@ MixedPlayerFactory::MixedPlayerFactory(const GameEvents& events, StrategyAssigne
 {
 }
 
+// ISP-compliant constructor
+MixedPlayerFactory::MixedPlayerFactory(const GameEvents& events, StrategyAssigner* assigner,
+                                       std::shared_ptr<pkt::core::Logger> logger,
+                                       std::shared_ptr<pkt::core::HandEvaluationEngine> handEvaluator,
+                                       std::shared_ptr<pkt::core::PlayersStatisticsStore> statisticsStore,
+                                       std::shared_ptr<pkt::core::Randomizer> randomizer)
+    : m_events(events), m_strategyAssigner(assigner), m_logger(logger), m_handEvaluator(handEvaluator), m_statisticsStore(statisticsStore), m_randomizer(randomizer)
+{
+}
+
 std::shared_ptr<Player> MixedPlayerFactory::createPlayer(int id, TableProfile profile, int startMoney)
 {
     if (id == 0) {
@@ -29,7 +39,16 @@ std::shared_ptr<Player> MixedPlayerFactory::createPlayer(int id, TableProfile pr
 std::shared_ptr<Player> MixedPlayerFactory::createHumanPlayer(int id, int startMoney)
 {
     auto humanStrategy = std::make_unique<HumanStrategy>(m_events);
-    auto player = std::make_shared<Player>(m_events, id, "Human", startMoney);
+    
+    // Enforce strict ISP compliance - all interfaces must be available
+    assert(m_logger && "Logger interface must be provided for ISP compliance");
+    assert(m_handEvaluator && "HandEvaluationEngine interface must be provided for ISP compliance");
+    assert(m_statisticsStore && "PlayersStatisticsStore interface must be provided for ISP compliance");
+    assert(m_randomizer && "Randomizer interface must be provided for ISP compliance");
+    
+    // Use fully ISP-compliant constructor
+    auto player = std::make_shared<Player>(m_events, m_logger, m_handEvaluator, m_statisticsStore, m_randomizer, id, "Human", startMoney);
+    
     player->setStrategy(std::move(humanStrategy));
     return player;
 }
@@ -37,7 +56,15 @@ std::shared_ptr<Player> MixedPlayerFactory::createHumanPlayer(int id, int startM
 std::shared_ptr<Player> MixedPlayerFactory::createBotPlayer(int id, TableProfile profile, int startMoney)
 {
     auto strategy = m_strategyAssigner->chooseBotStrategyFor(id);
-    auto player = std::make_shared<Player>(m_events, id, "Bot_" + std::to_string(id), startMoney);
+    
+    // Enforce strict ISP compliance - all interfaces must be available
+    assert(m_logger && "Logger service must be available for ISP-compliant Player creation");
+    assert(m_handEvaluator && "HandEvaluationEngine service must be available for ISP-compliant Player creation");
+    assert(m_statisticsStore && "StatisticsStore service must be available for ISP-compliant Player creation");
+    assert(m_randomizer && "Randomizer service must be available for ISP-compliant Player creation");
+    
+    auto player = std::make_shared<Player>(m_events, m_logger, m_handEvaluator, m_statisticsStore, m_randomizer, id, "Bot_" + std::to_string(id), startMoney);
+    
     player->setStrategy(std::move(strategy));
     return player;
 }

@@ -22,7 +22,7 @@ TurnState::TurnState(const GameEvents& events, std::shared_ptr<pkt::core::Servic
 }
 
 // ISP-compliant constructor using focused service interface
-TurnState::TurnState(const GameEvents& events, std::shared_ptr<HasLogger> logger)
+TurnState::TurnState(const GameEvents& events, std::shared_ptr<Logger> logger)
     : m_events(events), m_logger(logger)
 {
 }
@@ -31,7 +31,7 @@ TurnState::TurnState(const GameEvents& events, std::shared_ptr<HasLogger> logger
 pkt::core::Logger& TurnState::getLogger() const
 {
     if (m_logger) {
-        return m_logger->logger();
+        return *m_logger;
     }
     // This should not happen in normal operation
     throw std::runtime_error("TurnState: Logger service not properly initialized. Use ISP-compliant constructor.");

@@ -9,6 +9,13 @@
 #include <core/player/Player.h>
 #include <core/player/strategy/HumanStrategy.h>
 #include <core/player/strategy/LooseAggressiveBotStrategy.h>
+#include <core/interfaces/Logger.h>
+#include <core/interfaces/HandEvaluationEngine.h>
+#include <core/interfaces/Randomizer.h>
+#include <core/interfaces/ServiceAdapter.h>
+#include <core/interfaces/persistence/PlayersStatisticsStore.h>
+#include <infra/ConsoleLogger.h>
+#include <infra/eval/PsimHandEvaluationEngine.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <memory>
@@ -46,11 +53,37 @@ class SessionUnitTest : public ::testing::Test
         events = GameEvents{};
         testStartData = StartData{};
         testTableProfile = TableProfile{};
+        
+        // Setup ISP services for Player creation
+        services = std::make_shared<pkt::core::AppServiceContainer>();
+        auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
+        logger->setLogLevel(pkt::core::LogLevel::Info); // Reduce log noise in tests
+        services->setLogger(std::move(logger));
+        services->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>());
+        
+        // Create ISP interfaces using ServiceAdapter helper
+        auto serviceAdapter = std::make_shared<pkt::core::ServiceAdapter>(services);
+        loggerInterface = serviceAdapter->createLoggerService();
+        handEvaluatorInterface = serviceAdapter->createHandEvaluationEngineService();
+        statisticsStoreInterface = serviceAdapter->createPlayersStatisticsStoreService();
+    }
+    
+    // Helper method to create ISP-compliant Players for tests
+    std::shared_ptr<pkt::core::player::Player> createTestPlayer(int id, const std::string& name, int cash = 1000) {
+        auto serviceAdapter = std::make_shared<pkt::core::ServiceAdapter>(services);
+        auto randomizerInterface = serviceAdapter->createRandomizerService();
+        return std::make_shared<pkt::core::player::Player>(events, loggerInterface, handEvaluatorInterface, statisticsStoreInterface, randomizerInterface, id, name, cash);
     }
 
     GameEvents events;
     StartData testStartData;
     TableProfile testTableProfile;
+    
+    // ISP services for Player creation
+    std::shared_ptr<pkt::core::AppServiceContainer> services;
+    std::shared_ptr<pkt::core::Logger> loggerInterface;
+    std::shared_ptr<pkt::core::HandEvaluationEngine> handEvaluatorInterface;
+    std::shared_ptr<pkt::core::PlayersStatisticsStore> statisticsStoreInterface;
 };
 
 // Test 1: Constructor with just events
@@ -275,14 +308,14 @@ TEST_F(SessionUnitTest, ValidatePlayerConfigurationWithValidMixedPlayersSucceeds
     auto playersList = std::make_shared<std::list<std::shared_ptr<player::Player>>>();
     
     // Create human player with ID 0
-    auto humanPlayer = std::make_shared<player::Player>(events, 0, "Human", 1000);
+    auto humanPlayer = createTestPlayer(0, "Human", 1000);
     auto humanStrategy = std::make_unique<player::HumanStrategy>(events);
     humanPlayer->setStrategy(std::move(humanStrategy));
     playersList->push_back(humanPlayer);
     
     // Create bot players with IDs 1 and 2
     for (int i = 1; i <= 2; ++i) {
-        auto botPlayer = std::make_shared<player::Player>(events, i, "Bot_" + std::to_string(i), 1000);
+        auto botPlayer = createTestPlayer(i, "Bot_" + std::to_string(i), 1000);
         auto botStrategy = std::make_unique<player::LooseAggressiveBotStrategy>();
         botPlayer->setStrategy(std::move(botStrategy));
         playersList->push_back(botPlayer);
@@ -318,7 +351,7 @@ TEST_F(SessionUnitTest, ValidatePlayerConfigurationWithNoHumanPlayerThrows)
     auto playersList = std::make_shared<std::list<std::shared_ptr<player::Player>>>();
     
     for (int i = 0; i < 3; ++i) {
-        auto botPlayer = std::make_shared<player::Player>(events, i, "Bot_" + std::to_string(i), 1000);
+        auto botPlayer = createTestPlayer(i, "Bot_" + std::to_string(i), 1000);
         auto botStrategy = std::make_unique<player::LooseAggressiveBotStrategy>();
         botPlayer->setStrategy(std::move(botStrategy));
         playersList->push_back(botPlayer);
@@ -336,14 +369,14 @@ TEST_F(SessionUnitTest, ValidatePlayerConfigurationWithMultipleHumanPlayersThrow
     
     // Create 2 human players
     for (int i = 0; i < 2; ++i) {
-        auto humanPlayer = std::make_shared<player::Player>(events, i, "Human_" + std::to_string(i), 1000);
+        auto humanPlayer = createTestPlayer(i, "Human_" + std::to_string(i), 1000);
         auto humanStrategy = std::make_unique<player::HumanStrategy>(events);
         humanPlayer->setStrategy(std::move(humanStrategy));
         playersList->push_back(humanPlayer);
     }
     
     // Create 1 bot player
-    auto botPlayer = std::make_shared<player::Player>(events, 2, "Bot_2", 1000);
+    auto botPlayer = createTestPlayer(2, "Bot_2", 1000);
     auto botStrategy = std::make_unique<player::LooseAggressiveBotStrategy>();
     botPlayer->setStrategy(std::move(botStrategy));
     playersList->push_back(botPlayer);
@@ -359,13 +392,13 @@ TEST_F(SessionUnitTest, ValidatePlayerConfigurationWithHumanPlayerNotIdZeroThrow
     auto playersList = std::make_shared<std::list<std::shared_ptr<player::Player>>>();
     
     // Create bot player with ID 0
-    auto botPlayer = std::make_shared<player::Player>(events, 0, "Bot_0", 1000);
+    auto botPlayer = createTestPlayer(0, "Bot_0", 1000);
     auto botStrategy = std::make_unique<player::LooseAggressiveBotStrategy>();
     botPlayer->setStrategy(std::move(botStrategy));
     playersList->push_back(botPlayer);
     
     // Create human player with ID 1 (wrong!)
-    auto humanPlayer = std::make_shared<player::Player>(events, 1, "Human", 1000);
+    auto humanPlayer = createTestPlayer(1, "Human", 1000);
     auto humanStrategy = std::make_unique<player::HumanStrategy>(events);
     humanPlayer->setStrategy(std::move(humanStrategy));
     playersList->push_back(humanPlayer);
