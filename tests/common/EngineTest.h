@@ -8,6 +8,11 @@
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/GameState.h"
 #include "core/interfaces/NullLogger.h"
+#include "core/interfaces/Logger.h"
+#include "core/interfaces/HandEvaluationEngine.h"
+#include "core/interfaces/persistence/PlayersStatisticsStore.h"
+#include "core/interfaces/persistence/NullPlayersStatisticsStore.h"
+#include "core/interfaces/Randomizer.h"
 #include "core/player/Player.h"
 #include "core/player/typedefs.h"
 
@@ -27,11 +32,12 @@ class EngineTest : public ::testing::Test
     void checkPostRiverConditions();
     bool isPlayerStillActive(unsigned id) const;
 
-    // Access to services for test logging
     pkt::core::Logger& getLogger() const;
-    std::shared_ptr<pkt::core::ServiceContainer> getServices() const;
+    std::shared_ptr<pkt::core::Logger> getLoggerService() const;
+    std::shared_ptr<pkt::core::HandEvaluationEngine> getHandEvaluationEngineService() const;
+    std::shared_ptr<pkt::core::PlayersStatisticsStore> getPlayersStatisticsStoreService() const;
+    std::shared_ptr<pkt::core::Randomizer> getRandomizerService() const;
     
-    // Virtual method for derived classes to customize logger setup
     virtual pkt::core::LogLevel getTestLogLevel() const { return pkt::core::LogLevel::Info; }
 
     pkt::core::GameEvents m_events;
@@ -46,7 +52,11 @@ class EngineTest : public ::testing::Test
     pkt::core::GameData gameData;
 
   protected:
-    std::shared_ptr<pkt::core::AppServiceContainer> m_services; // Store services for logger access
+
+    std::shared_ptr<pkt::core::Logger> m_logger;
+    std::shared_ptr<pkt::core::HandEvaluationEngine> m_handEvaluationEngine;
+    std::shared_ptr<pkt::core::PlayersStatisticsStore> m_playersStatisticsStore;
+    std::shared_ptr<pkt::core::Randomizer> m_randomizer;
     
   private:
     void createPlayersLists(size_t playerCount);

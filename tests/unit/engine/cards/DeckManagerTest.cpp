@@ -10,7 +10,7 @@ class DeckManagerTest : public ::testing::Test
 {
   protected:
     std::shared_ptr<test::FakeRandomizer> randomizer = std::make_shared<test::FakeRandomizer>();
-    DeckManager deckManager{randomizer};
+    DeckManager deckManager{*randomizer};
 };
 
 TEST_F(DeckManagerTest, InitializeAndShuffleCreatesValidDeck)

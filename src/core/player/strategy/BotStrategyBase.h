@@ -2,7 +2,8 @@
 
 #include "core/engine/model/PlayerAction.h"
 #include "core/player/strategy/BotStrategy.h"
-#include "core/services/ServiceContainer.h"
+#include "core/interfaces/Logger.h"
+#include "core/interfaces/Randomizer.h"
 
 #include <memory>
 
@@ -13,11 +14,9 @@ struct CurrentHandContext;
 class BotStrategyBase : public virtual BotStrategy
 {
   public:
-    BotStrategyBase();
-    BotStrategyBase(std::shared_ptr<pkt::core::ServiceContainer> services);
+    BotStrategyBase(Logger& logger, Randomizer& randomizer);
 
   protected:
-    void ensureServicesInitialized() const;
     pkt::core::PlayerAction decidePreflop(const CurrentHandContext&) override;
     pkt::core::PlayerAction decideFlop(const CurrentHandContext&) override;
     pkt::core::PlayerAction decideTurn(const CurrentHandContext&) override;
@@ -29,7 +28,8 @@ class BotStrategyBase : public virtual BotStrategy
     bool m_couldCall;
     bool m_couldRaise;
 
-    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services; 
+    mutable Logger* m_logger;
+    mutable Randomizer* m_randomizer; 
 
   private:
     virtual bool preflopCouldCall(const CurrentHandContext& ctx) = 0;

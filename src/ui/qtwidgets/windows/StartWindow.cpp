@@ -7,9 +7,11 @@
 
 #include <core/engine/EngineDefs.h>
 #include <core/engine/game/Game.h>
-#include "core/services/ServiceContainer.h"
-
 #include <core/engine/model/GameData.h>
+#include <core/interfaces/Randomizer.h>
+#include <core/interfaces/Logger.h>
+#include <core/interfaces/NullLogger.h>
+#include <core/services/DefaultRandomizer.h>
 
 using namespace std;
 using namespace pkt::core;
@@ -42,8 +44,10 @@ StartWindow::StartWindow(PokerTableWindow* tableWindow, Session* session, QWidge
 }
 
 StartWindow::StartWindow(PokerTableWindow* tableWindow, Session* session,
-                         std::shared_ptr<pkt::core::ServiceContainer> services, QWidget* parent)
-    : QMainWindow(parent), m_pokerTableWindow(tableWindow), m_session(session), m_services(std::move(services))
+                         std::shared_ptr<pkt::core::Randomizer> randomizer,
+                         std::shared_ptr<pkt::core::Logger> logger, QWidget* parent)
+    : QMainWindow(parent), m_pokerTableWindow(tableWindow), m_session(session), 
+      m_randomizer(std::move(randomizer)), m_logger(std::move(logger))
 {
     setWindowTitle(QString(tr("HoldemCore %1").arg(HOLDEM_CORE__BETA_RELEASE_STRING)));
     setStatusBar(nullptr);
@@ -349,9 +353,11 @@ void StartWindow::applyConsistentStyling()
 
 void StartWindow::ensureServicesInitialized()
 {
-    if (!m_services)
-    {
-        m_services = std::make_shared<pkt::core::AppServiceContainer>();
+    if (!m_randomizer) {
+        m_randomizer = std::make_shared<pkt::core::DefaultRandomizer>();
+    }
+    if (!m_logger) {
+        m_logger = std::make_shared<pkt::core::NullLogger>();
     }
 }
 
@@ -383,7 +389,7 @@ void StartWindow::startNewGame()
     startData.numberOfPlayers = gameData.maxNumberOfPlayers;
 
     ensureServicesInitialized();
-    m_services->randomizer().getRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
+    m_randomizer->getRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
     startData.startDealerPlayerId = static_cast<unsigned>(tmpDealerPos);
 
     // Initialize PokerTableWindow with the GameData BEFORE showing it

@@ -1,20 +1,21 @@
 <context>
-Enforcing ISP (Interface Segregation Principle) in code design.
+Refactoring the use of services Logger, PlayersStatisticsStore, Randomizer and HandEvaluationEngine..
 </context>
 
 <goal>
-Evaluate whether the core design adheres to ISP and OCP principles, providing specific examples and suggestions for improvement if necessary.
-The final target is to ensure that interfaces are client-specific and that classes are not forced to implement methods they do not use.
-Calls to ensureServicesInitialized should be minimized or eliminated.
+For the Logger, PlayersStatisticsStore, Randomizer and HandEvaluationEngine services, always use a T& instead of smart pointer in the constructors, 
+so that the class users are forced to provide a valid reference. This also makes the class easier to use and test.
 </goal>
 
 <constraints>
-Focus only on design quality, not syntax.
+Proceed by steps, one class at a time. 
 </constraints>
 
 <instructions>
-Return a concise analysis structured as:
-1. Strengths
-2. Weaknesses
-3. Suggested refactors (no code yet)
+If a class needs a service, it should receive a T& in its constructor and store a T* as a member variable. 
+The constructor should store the address of the reference in the pointer member variable. 
+The class methods should use the pointer member variable to access the service. No need to test for null, as 
+the constructor guarantees that the pointer is valid.
+Wherever possible, there should be only one constructor that takes all the services as parameters.
+Remove the other constructors, so that a caller is obliged to provide all the needed services.
 </instructions>

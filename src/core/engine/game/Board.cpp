@@ -15,129 +15,9 @@
 #include <algorithm>
 #include <unordered_set>
 
-namespace pkt::core
-{
-using namespace pkt::core::player;
-
-Board::Board(unsigned dp, const GameEvents& events) : m_dealerPlayerId(dp), m_events(events), m_services(nullptr)
-{
-    m_boardCards.reset(); // Initialize with invalid cards
-}
-
-Board::~Board()
-{
-}
-
-Board::Board(unsigned dp, const GameEvents& events, std::shared_ptr<ServiceContainer> services)
-    : m_dealerPlayerId(dp), m_events(events), m_services(services)
-{
-    m_boardCards.reset();
-}
-
-// ISP-compliant constructor with focused services (preferred)
-Board::Board(unsigned dp, const GameEvents& events,
-             std::shared_ptr<Logger> logger, std::shared_ptr<HandEvaluationEngine> handEvaluator)
-    : m_dealerPlayerId(dp), m_events(events), m_logger(logger), m_handEvaluator(handEvaluator)
-{
-    m_boardCards.reset();
-}
-
-void Board::ensureServicesInitialized() const
-{
-    if (!m_services)
-    {
-        m_services = std::make_shared<AppServiceContainer>();
-    }
-}
-
-void Board::setSeatsList(PlayerList seats)
-{
-    m_seatsList = seats;
-}
-void Board::setActingPlayersList(PlayerList actingPlayers)
-{
-    m_actingPlayersList = actingPlayers;
-}
-
-void Board::distributePot(Hand& hand)
-{
-    int totalPot = 0;
-
-    // Calculate total pot from all players at the table (including those who folded after contributing)
-    for (auto& player : *hand.getSeatsList())
-    {
-        totalPot += player->getCurrentHandActions().getHandTotalBetAmount();
-    }
-    // Recompute each player's rank with the final board to ensure correct showdown comparison
-    const auto& bc = getBoardCards();
-    if (bc.getNumCards() == 5)
-    {
-        // Use focused Logger service if available, fallback to ServiceContainer for legacy compatibility
-        if (m_logger) {
-            // Use ASCII hyphen to avoid mojibake on Windows consoles
-            m_logger->info(std::string("Showdown - final board: \"") + bc.toString() + "\"");
-        } else {
-            ensureServicesInitialized();
-            // Use ASCII hyphen to avoid mojibake on Windows consoles
-            m_services->logger().info(std::string("Showdown - final board: \"") + bc.toString() + "\"");
-        }
-        // Only evaluate hands for players who actually participated in the hand
-        for (auto& player : *hand.getActingPlayersList())
-        {
-            const auto& hc = player->getHoleCards();
-            // In real games, hole cards are valid; recompute to ensure final ranks.
-            // In unit tests that preset ranks, hole cards may be invalid; skip recompute to respect presets.
-            if (hc.isValid())
-            {
-                // Build evaluator string strictly as: HOLE then BOARD (e.g., "Ah Ad 2c 7d 9h 4s 3c").
-                std::string handStr = hc.toString() + std::string(" ") + bc.toString();
-                // Extra diagnostic log to verify ordering at runtime.
-                // Use focused services if available
-                if (m_logger && m_handEvaluator) {
-                    m_logger->debug(std::string("Recompute showdown with: \"") + handStr + "\"");
-                    player->setHandRanking(m_handEvaluator->rankHand(handStr.c_str()));
-                } else {
-                    if (m_logger) {
-                        m_logger->debug(std::string("Recompute showdown with: \"") + handStr + "\"");
-                    } else {
-                        ensureServicesInitialized();
-                        m_services->logger().debug(std::string("Recompute showdown with: \"") + handStr + "\"");
-                    }
-                    
-                    // Use legacy evaluator when ISP services not available
-                    ensureServicesInitialized();
-                    player->setHandRanking(pkt::core::HandEvaluator::evaluateHand(handStr.c_str(), m_services));
-                }
-            }
-            if (m_logger) {
-                m_logger->info(
-                    std::string("Player ") + std::to_string(player->getId()) +
-                    " showdown hand: \"" + player->getHoleCards().toString() + "\" rank=" + std::to_string(player->getHandRanking())
-                );
-            } else {
-                m_services->logger().info(
-                    std::string("Player ") + std::to_string(player->getId()) +
-                    " showdown hand: \"" + player->getHoleCards().toString() + "\" rank=" + std::to_string(player->getHandRanking())
-                );
-            }
-        }
-    }
-
-    // Use seats list for pot distribution (includes folded players who contributed)
-    // but only evaluate hands for acting players (non-folded players who can win)
-    // Use ISP-compliant Pot constructor if Logger is available, fallback to legacy constructor
-    Pot pot = m_logger ? 
-        Pot(totalPot, hand.getSeatsList(), m_dealerPlayerId, m_logger) :
-        Pot(totalPot, hand.getSeatsList(), m_dealerPlayerId, m_services);
-    pot.distribute();
-    m_winners = pot.getWinners();
-
-    if (m_events.onHandCompleted)
-        m_events.onHandCompleted(m_winners, totalPot);
-}
-
 // Helper methods for showdown reveal logic encapsulated in this translation unit
 namespace {
+    
     inline bool isNonFolded(const pkt::core::player::Player& p) {
         return p.getLastAction().type != pkt::core::ActionType::Fold;
     }
@@ -198,6 +78,75 @@ namespace {
     inline void advanceCircular(It& it, const C& cont) {
         ++it; if (it == cont->end()) it = cont->begin();
     }
+}
+
+namespace pkt::core
+{
+using namespace pkt::core::player;
+
+Board::Board(unsigned dp, const GameEvents& events,
+             Logger& logger, HandEvaluationEngine& handEvaluator)
+    : m_dealerPlayerId(dp), m_events(events), m_logger(&logger), m_handEvaluator(&handEvaluator)
+{
+    m_boardCards.reset();
+}
+
+Board::~Board()
+{
+}
+
+void Board::setSeatsList(PlayerList seats)
+{
+    m_seatsList = seats;
+}
+void Board::setActingPlayersList(PlayerList actingPlayers)
+{
+    m_actingPlayersList = actingPlayers;
+}
+
+void Board::distributePot(Hand& hand)
+{
+    int totalPot = 0;
+
+    // Calculate total pot from all players at the table (including those who folded after contributing)
+    for (auto& player : *hand.getSeatsList())
+    {
+        totalPot += player->getCurrentHandActions().getHandTotalBetAmount();
+    }
+    // Recompute each player's rank with the final board to ensure correct showdown comparison
+    const auto& bc = getBoardCards();
+    if (bc.getNumCards() == 5)
+    {
+        m_logger->info(std::string("Showdown - final board: \"") + bc.toString() + "\"");
+        // Only evaluate hands for players who actually participated in the hand
+        for (auto& player : *hand.getActingPlayersList())
+        {
+            const auto& hc = player->getHoleCards();
+            // In real games, hole cards are valid; recompute to ensure final ranks.
+            // In unit tests that preset ranks, hole cards may be invalid; skip recompute to respect presets.
+            if (hc.isValid())
+            {
+                // Build evaluator string strictly as: HOLE then BOARD (e.g., "Ah Ad 2c 7d 9h 4s 3c").
+                std::string handStr = hc.toString() + std::string(" ") + bc.toString();
+                // Extra diagnostic log to verify ordering at runtime.
+                m_logger->debug(std::string("Recompute showdown with: \"") + handStr + "\"");
+                player->setHandRanking(m_handEvaluator->rankHand(handStr.c_str()));
+            }
+            m_logger->info(
+                std::string("Player ") + std::to_string(player->getId()) +
+                " showdown hand: \"" + player->getHoleCards().toString() + "\" rank=" + std::to_string(player->getHandRanking())
+            );
+        }
+    }
+
+    // Use seats list for pot distribution (includes folded players who contributed)
+    // but only evaluate hands for acting players (non-folded players who can win)
+    Pot pot(totalPot, hand.getSeatsList(), m_dealerPlayerId, *m_logger);
+    pot.distribute();
+    m_winners = pot.getWinners();
+
+    if (m_events.onHandCompleted)
+        m_events.onHandCompleted(m_winners, totalPot);
 }
 
 void Board::determineShowdownRevealOrder()

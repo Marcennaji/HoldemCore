@@ -407,17 +407,14 @@ class Deck
     }
 
     /// Shuffle the deck using Randomizer interface (ISP-compliant)
-    void shuffle(std::shared_ptr<Randomizer> randomizer)
+    void shuffle(Randomizer& randomizer)
     {
-        if (!randomizer) {
-            throw std::runtime_error("Randomizer service is required for deck shuffle");
-        }
 
         // Use a simple shuffle algorithm that uses our randomizer
         for (size_t i = cards.size() - 1; i > 0; --i)
         {
             int randomValues[1];
-            randomizer->getRand(0, static_cast<int>(i), 1, randomValues);
+            randomizer.getRand(0, static_cast<int>(i), 1, randomValues);
             size_t j = static_cast<size_t>(randomValues[0]);
             std::swap(cards[i], cards[j]);
         }

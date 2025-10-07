@@ -5,9 +5,8 @@
 #include "core/engine/Exception.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
-#include "core/interfaces/ServiceAdapter.h"
+#include "core/interfaces/persistence/NullPlayersStatisticsStore.h"
 #include "core/player/Player.h"
-#include "core/services/ServiceContainer.h"
 #include "infra/ConsoleLogger.h"
 #include "infra/eval/PsimHandEvaluationEngine.h"
 
@@ -36,24 +35,20 @@ void EngineTest::SetUp()
     #endif
 #endif
 
-    m_services = std::make_shared<pkt::core::AppServiceContainer>();
     auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
-    logger->setLogLevel(getTestLogLevel()); // Use virtual method for customization
-    m_services->setLogger(std::move(logger));
-    m_services->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>());
+    logger->setLogLevel(getTestLogLevel()); 
+    m_logger = std::move(logger);
+    
+    m_handEvaluationEngine = std::make_unique<pkt::infra::PsimHandEvaluationEngine>();
+    
     auto randomizer = std::make_unique<FakeRandomizer>();
     randomizer->values = {3, 5, 7};
-    m_services->setRandomizer(std::move(randomizer));
+    m_randomizer = std::move(randomizer);
+    
+    // By default, use NullPlayersStatisticsStore
+    m_playersStatisticsStore = std::make_shared<pkt::core::NullPlayersStatisticsStore>();
 
-    // Create ISP-compliant interfaces for the factory
-    auto serviceAdapter = std::make_shared<pkt::core::ServiceAdapter>(m_services);
-    auto loggerInterface = serviceAdapter->createLoggerService();
-    auto handEvaluatorInterface = serviceAdapter->createHandEvaluationEngineService();
-    auto statisticsStoreInterface = serviceAdapter->createPlayersStatisticsStoreService();
-    auto randomizerInterface = serviceAdapter->createRandomizerService();
-
-    // Use ISP-compliant constructor with all required focused interfaces
-    m_factory = std::make_unique<EngineFactory>(m_events, loggerInterface, handEvaluatorInterface, statisticsStoreInterface, randomizerInterface);
+    m_factory = std::make_unique<EngineFactory>(m_events, *m_logger, *m_handEvaluationEngine, *m_playersStatisticsStore, *m_randomizer);
 
     gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
     gameData.startMoney = 1000;
@@ -70,7 +65,7 @@ void EngineTest::createPlayersLists(size_t playerCount)
     m_seatsList = std::make_shared<std::list<std::shared_ptr<pkt::core::player::Player>>>();
     for (size_t i = 0; i < playerCount; ++i)
     {
-        auto player = std::make_shared<DummyPlayer>(i, m_events, m_services);
+        auto player = std::make_shared<DummyPlayer>(i, m_events, m_logger, m_handEvaluationEngine, m_playersStatisticsStore, m_randomizer);
         m_seatsList->push_back(player);
     }
 
@@ -91,7 +86,7 @@ void EngineTest::initializeHandWithPlayers(size_t activePlayerCount, GameData ga
     startData.startDealerPlayerId = startDealerPlayerId;
     startData.numberOfPlayers = static_cast<int>(activePlayerCount);
 
-    m_hand = m_factory->createHand(m_factory, m_board, m_seatsList, m_actingPlayersList, gameData, startData);
+    m_hand = m_factory->createHand(m_board, m_seatsList, m_actingPlayersList, gameData, startData);
 
     m_hand->initialize();
 }
@@ -114,12 +109,27 @@ bool EngineTest::isPlayerStillActive(unsigned id) const
 
 pkt::core::Logger& EngineTest::getLogger() const
 {
-    return m_services->logger();
+    return *m_logger;
 }
 
-std::shared_ptr<pkt::core::ServiceContainer> EngineTest::getServices() const
+std::shared_ptr<pkt::core::Logger> EngineTest::getLoggerService() const
 {
-    return m_services;
+    return m_logger;
+}
+
+std::shared_ptr<pkt::core::HandEvaluationEngine> EngineTest::getHandEvaluationEngineService() const
+{
+    return m_handEvaluationEngine;
+}
+
+std::shared_ptr<pkt::core::PlayersStatisticsStore> EngineTest::getPlayersStatisticsStoreService() const
+{
+    return m_playersStatisticsStore;
+}
+
+std::shared_ptr<pkt::core::Randomizer> EngineTest::getRandomizerService() const
+{
+    return m_randomizer;
 }
 
 } // namespace pkt::test

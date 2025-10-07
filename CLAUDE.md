@@ -16,56 +16,6 @@ The project demonstrates clean modular design, modern dependency management, and
 
 ---
 
-## 2. Active Development Focus
-
-### 🎯 Primary Goal
-**Achieve complete Interface Segregation Principle (ISP) enforcement**  
-and remove all legacy **ServiceContainer** or compatibility code.
-
-### ✅ Completed ISP Migrations
-- **Hand class**: Successfully converted to ISP with focused service injection (`Logger`, `PlayersStatisticsStore`)
-- **EngineFactory**: Updated `createHand()` to use ISP-compliant constructor
-- **Test validation**: SaveAndLoadStatistics test passes with ISP implementation
-
-### 📋 ISP Migration TODO List
-
-#### 🔄 In Progress
-- **Board class**: Convert from ServiceContainer to focused service injection
-  - Identify required services: likely `Logger`, `HandEvaluationEngine`, `Randomizer`
-  - Add ISP constructor: `Board(dealerPosition, events, logger, handEvaluator, randomizer)`
-  - Update `EngineFactory::createBoard()` to use focused services
-
-#### 📌 Next Priority Classes
-- **HandStateManager**: Eliminate ServiceContainer dependencies
-  - Convert to receive only required interfaces
-  - Update Hand constructors to pass focused services
-  
-- **Session class**: Apply ISP to session management
-  - Remove ServiceContainer usage in session lifecycle
-  - Inject focused services for session operations
-
-#### 🧪 Test Infrastructure Updates
-- **Legacy test constructors**: Update remaining test files using old EngineFactory constructor
-  - Fix SessionUnitTest.cpp, SessionE2ETest.cpp compilation errors
-  - Convert single-parameter EngineFactory calls to ISP constructors
-  
-#### 🧹 Final Cleanup Phase
-- **Remove ServiceContainer remnants**: Eliminate all ServiceContainer usage
-- **Remove legacy constructors**: Clean up backward-compatibility constructors
-- **Remove ensureServicesInitialized()**: Eliminate all service initialization helpers
-
-### Objectives
-- Eliminate any usage of `ServiceContainer` or `ensureServicesInitialized()`
-- Ensure each class receives only the interfaces it needs (constructor injection)
-- Maintain clean hexagonal boundaries: **core domain ←→ adapters ←→ UI**
-
-### Secondary Focus
-- Maintain test coverage parity after refactors
-- Preserve build integrity (CMake)
-- Keep the core strictly Qt-free
-
----
-
 ## 3. Architectural Ground Rules
 
 - Respect the design principles from [`doc/ARCHITECTURE.md`](doc/ARCHITECTURE.md)
@@ -82,8 +32,9 @@ and remove all legacy **ServiceContainer** or compatibility code.
 
 - Modern C++20 (smart pointers, ranges, structured bindings)
 - Member variables prefixed with `m_`
-- Follow SOLID, especially SRP and ISP
+- Follow SOLID
 - Maintain clear naming and function responsibility
+- **Comments**: Only add comments when code doesn't speak for itself. Never add obvious comments explaining what you just did or trivial implementation details.
 
 ---
 
@@ -93,9 +44,8 @@ When proposing or modifying code:
 1. **Explain reasoning first**, then propose changes.
 2. **Proceed by small steps, keep the commits easily reviewable
 3. **Preserve unit test integrity**.
-4. **Never reintroduce ServiceContainer or legacy helpers**.
-5. **Use only C++ and Qt conventions consistent with this repo**.
-6. **If unsure, state uncertainty** (“I don’t know”) rather than hallucinate.
+4. **Use only C++ and Qt conventions consistent with this repo**.
+5. **If unsure, state uncertainty** (“I don’t know”) rather than hallucinate.
 
 ---
 
@@ -134,35 +84,14 @@ Use `ARCHITECTURE.md` for design theory, and this file for **actionable guidance
 1. **All code compiles successfully** (including tests)
 2. **ALL tests pass in RELEASE mode** (unit tests + e2e tests) - **MANDATORY before proceeding**
 3. **Use RELEASE build for testing** (much faster than debug) - always use release test executables
-4. **Test execution is NON-NEGOTIABLE** - every ISP migration step must be validated with full test suite
-5. **Basic tests related to modified code are verified**
-6. **No compilation errors or warnings introduced**
+4. **Test execution is NON-NEGOTIABLE** 
 
 ### 🚨 Critical Testing Protocol
 - **ALWAYS run both unit tests AND e2e tests** before marking any task complete
 - **Use release build**: `cmake --build build/vscode/clang/release-widgets --config Release`
 - **Execute**: `tests/unit_tests.exe` and `tests/e2e_tests.exe` (release versions)
-- **All tests must pass** (except explicitly disabled ones) before proceeding to next ISP migration step
-- **NO EXCEPTIONS** - broken tests indicate incomplete or incorrect ISP implementation
+- **All tests must pass** (except explicitly disabled ones) 
 
-### ✅ CURRENT TEST STATUS (2024-12-28)
-**ALL TESTS PASSING** - ISP migration can proceed safely:
-- **Unit Tests**: 389/389 PASSED (12 disabled as expected)
-- **E2E Tests**: 46/46 PASSED 
-- **Total**: 435/435 tests passing
-- **Critical Fix Applied**: Resolved Deck::shuffle() SEH exceptions by replacing static AppServiceContainer with std::shuffle approach
-
-### Summary of Priorities for AI Agents
-
-| Priority | Rule |
-|-----------|------|
-| 1 | Ensure full compilation + test success before marking tasks complete |
-| 2 | Maintain ISP enforcement |
-| 3 | Remove all ServiceContainer remnants |
-| 4 | Keep core Qt-free |
-| 5 | Maintain test coverage |
-| 6 | Follow architectural layering |
-| 7 | Explain changes and output clean diffs |
 
 ---
 

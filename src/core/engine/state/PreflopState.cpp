@@ -8,45 +8,16 @@
 #include "core/engine/model/PlayerPosition.h"
 #include "core/engine/utils/Helpers.h"
 #include "core/player/Player.h"
-#include "core/services/ServiceContainer.h"
+#include "core/interfaces/NullLogger.h"
 
 namespace pkt::core
 {
 using namespace pkt::core::player;
 
-PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsigned dealerPlayerId)
-    : m_events(events), m_smallBlind(smallBlind), m_dealerPlayerId(dealerPlayerId)
-{
-    if (smallBlind <= 0)
-    {
-        throw std::invalid_argument("PreflopState: smallBlind must be > 0");
-    }
-
-    if (dealerPlayerId == static_cast<unsigned>(-1))
-    {
-        throw std::invalid_argument("PreflopState: dealerPlayerId is invalid");
-    }
-}
-
-PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsigned dealerPlayerId,
-                           std::shared_ptr<pkt::core::ServiceContainer> services)
-    : m_events(events), m_smallBlind(smallBlind), m_dealerPlayerId(dealerPlayerId), m_services(std::move(services))
-{
-    if (smallBlind <= 0)
-    {
-        throw std::invalid_argument("PreflopState: smallBlind must be > 0");
-    }
-
-    if (dealerPlayerId == static_cast<unsigned>(-1))
-    {
-        throw std::invalid_argument("PreflopState: dealerPlayerId is invalid");
-    }
-}
-
 // ISP-compliant constructor using focused service interface
 PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsigned dealerPlayerId,
-                           std::shared_ptr<Logger> logger)
-    : m_events(events), m_smallBlind(smallBlind), m_dealerPlayerId(dealerPlayerId), m_logger(logger)
+                           Logger& logger)
+    : m_events(events), m_smallBlind(smallBlind), m_dealerPlayerId(dealerPlayerId), m_logger(&logger)
 {
     if (smallBlind <= 0)
     {
@@ -57,16 +28,6 @@ PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsig
     {
         throw std::invalid_argument("PreflopState: dealerPlayerId is invalid");
     }
-}
-
-// ISP-compliant helper method
-pkt::core::Logger& PreflopState::getLogger() const
-{
-    if (m_logger) {
-        return *m_logger;
-    }
-    // This should not happen in normal operation
-    throw std::runtime_error("PreflopState: Logger service not properly initialized. Use ISP-compliant constructor.");
 }
 
 void PreflopState::enter(Hand& hand)
@@ -105,18 +66,17 @@ void PreflopState::promptPlayerAction(Hand& hand, Player& player)
 
 std::unique_ptr<HandState> PreflopState::computeNextState(Hand& hand)
 {
-    return computeBettingRoundNextState(hand, m_events, Preflop, m_logger);
+    return computeBettingRoundNextState(hand, m_events, Preflop, *m_logger);
 }
 
 void PreflopState::logStateInfo(Hand& hand)
 {
-    HandDebuggableState::logStateInfo(hand);
-    getLogger().info("Blinds: SB=" + std::to_string(m_smallBlind) +
+    m_logger->info("Blinds: SB=" + std::to_string(m_smallBlind) +
                      ", BB=" + std::to_string(2 * m_smallBlind));
     // Log dealer and positions to help diagnose acting order
-    getLogger().info("Dealer: Player " + std::to_string(hand.getDealerPlayerId()));
+    m_logger->info("Dealer: Player " + std::to_string(hand.getDealerPlayerId()));
     for (const auto& player : *hand.getSeatsList()) {
-        getLogger().info(
+        m_logger->info(
             "Player " + std::to_string(player->getId()) + " (" + player->getName() + ") position=" +
             positionToString(player->getPosition()));
     }
@@ -130,12 +90,12 @@ void PreflopState::logHoleCards(Hand& hand)
         const HoleCards& holeCards = player->getHoleCards();
         if (holeCards.isValid())
         {
-            getLogger().info("Player " + std::to_string(player->getId()) + " (" + player->getName() +
+            m_logger->info("Player " + std::to_string(player->getId()) + " (" + player->getName() +
                             "): " + holeCards.toString());
         }
         else
         {
-            getLogger().info("Player " + std::to_string(player->getId()) + " (" + player->getName() +
+            m_logger->info("Player " + std::to_string(player->getId()) + " (" + player->getName() +
                             "): No hole cards");
         }
     }
@@ -155,8 +115,7 @@ std::shared_ptr<player::Player> PreflopState::getFirstPlayerToActInRound(const H
 
 bool PreflopState::isRoundComplete(const Hand& hand) const
 {
-
-    return pkt::core::isRoundComplete(hand);
+    return pkt::core::isRoundComplete(hand, *m_logger);
 }
 
 void PreflopState::setBlinds(Hand& hand)

@@ -6,7 +6,8 @@
 #include <core/player/PlayerStatistics.h>
 #include <core/player/range/HandPlausibilityChecker.h>
 #include <core/player/strategy/CurrentHandContext.h>
-#include <core/services/ServiceContainer.h>
+#include <core/interfaces/NullLogger.h>
+#include <core/interfaces/NullHandEvaluationEngine.h>
 #include "RangeParser.h"
 #include "RangeRefiner.h"
 
@@ -20,28 +21,14 @@ namespace pkt::core::player
 
 using namespace std;
 
-RangeEstimator::RangeEstimator(int playerId) : m_playerId(playerId)
+RangeEstimator::RangeEstimator(int playerId, pkt::core::Logger& logger, 
+                               pkt::core::HandEvaluationEngine& handEvaluator)
+    : m_playerId(playerId), m_logger(&logger), m_handEvaluator(&handEvaluator)
 {
     assert(m_playerId >= 0);
-    m_preflopRangeEstimator = make_unique<PreflopRangeEstimator>(m_playerId);
+     m_preflopRangeEstimator = make_unique<PreflopRangeEstimator>(m_playerId, logger);
 }
 
-RangeEstimator::RangeEstimator(int playerId, std::shared_ptr<pkt::core::ServiceContainer> serviceContainer)
-    : m_playerId(playerId), m_services(serviceContainer)
-{
-    assert(m_playerId >= 0);
-    m_preflopRangeEstimator = make_unique<PreflopRangeEstimator>(m_playerId, m_services);
-}
-
-// ISP-compliant constructor
-RangeEstimator::RangeEstimator(int playerId, std::shared_ptr<pkt::core::Logger> logger, 
-                               std::shared_ptr<pkt::core::HandEvaluationEngine> handEvaluator)
-    : m_playerId(playerId), m_logger(logger), m_handEvaluator(handEvaluator)
-{
-    assert(m_playerId >= 0);
-    // Use ISP-compliant PreflopRangeEstimator constructor
-    m_preflopRangeEstimator = make_unique<PreflopRangeEstimator>(m_playerId, m_logger);
-}
 void RangeEstimator::updateUnplausibleRanges(pkt::core::GameState state, const CurrentHandContext& ctx)
 {
     switch (state)
@@ -63,33 +50,22 @@ void RangeEstimator::updateUnplausibleRanges(pkt::core::GameState state, const C
     }
 }
 
-void RangeEstimator::ensureServicesInitialized() const
-{
-    if (!m_services)
-    {
-        m_services = std::make_shared<pkt::core::AppServiceContainer>();
-    }
-}
-
-// ISP-compliant helper methods
 pkt::core::Logger& RangeEstimator::getLogger() const
 {
     if (m_logger) {
         return *m_logger;
     }
-    // Fallback to legacy service container
-    ensureServicesInitialized();
-    return m_services->logger();
+    static pkt::core::NullLogger nullLogger;
+    return nullLogger;
 }
 
 pkt::core::HandEvaluationEngine& RangeEstimator::getHandEvaluationEngine() const
 {
     if (m_handEvaluator) {
         return *m_handEvaluator;
+    }else{
+        throw std::runtime_error("RangeEstimator::getHandEvaluationEngine: No valid HandEvaluationEngine provided");
     }
-    // Fallback to legacy service container
-    ensureServicesInitialized();
-    return m_services->handEvaluationEngine();
 }
 
 void RangeEstimator::setEstimatedRange(const std::string& range)
@@ -204,8 +180,6 @@ std::string RangeEstimator::getStringRange(int nbPlayers, int range)
 // purpose : remove some unplausible hands (to the opponents' eyes), given what the player did on preflop
 void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(const CurrentHandContext& ctx)
 {
-    ensureServicesInitialized();
-
     computeEstimatedPreflopRange(ctx);
     const string originalEstimatedRange = getEstimatedRange();
 
@@ -243,8 +217,6 @@ void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(const CurrentHan
 
 void RangeEstimator::updateUnplausibleRangesGivenFlopActions(const CurrentHandContext& ctx)
 {
-    ensureServicesInitialized();
-
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
     const string originalEstimatedRange = getEstimatedRange();
     string unplausibleRanges;
@@ -343,8 +315,6 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(const CurrentHandCo
 // purpose : remove some unplausible hands, who would normally be in the estimated preflop range
 void RangeEstimator::updateUnplausibleRangesGivenTurnActions(const CurrentHandContext& ctx)
 {
-    ensureServicesInitialized();
-
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
     const PlayerStatistics& stats = ctx.personalContext.statistics;
     const bool bHavePosition = ctx.personalContext.hasPosition;
@@ -443,8 +413,6 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(const CurrentHandCo
 // purpose : remove some unplausible hands, woul would normally be in the estimated preflop range
 void RangeEstimator::updateUnplausibleRangesGivenRiverActions(const CurrentHandContext& ctx)
 {
-    ensureServicesInitialized();
-
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
     const PlayerStatistics& stats = ctx.personalContext.statistics;
     const bool bHavePosition = ctx.personalContext.hasPosition;

@@ -6,11 +6,6 @@
 
 #include <memory>
 
-namespace pkt::core
-{
-class ServiceContainer;
-} // namespace pkt::core
-
 namespace pkt::core::player
 {
 class Player;
@@ -23,10 +18,8 @@ class GameEvents;
 class TurnState : public HandState, public HandActionProcessor, public HandDebuggableState
 {
   public:
-    explicit TurnState(const GameEvents& events);
-    explicit TurnState(const GameEvents& events, std::shared_ptr<pkt::core::ServiceContainer> services);
-    // ISP-compliant constructor using focused service interface
-    TurnState(const GameEvents& events, std::shared_ptr<Logger> logger);
+ 
+    TurnState(const GameEvents& events, Logger& logger);
 
     void enter(Hand&) override;
     void exit(Hand&) override;
@@ -41,14 +34,11 @@ class TurnState : public HandState, public HandActionProcessor, public HandDebug
     const GameState getGameState() const override { return GameState::Turn; }
     void promptPlayerAction(Hand&, player::Player& player) override;
 
-  protected:
-    // ISP-compliant service access helper
-    pkt::core::Logger& getLogger() const;
+    void logStateInfo(Hand& hand) override;
 
   private:
     const GameEvents& m_events;
-    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services; // Legacy support
-    std::shared_ptr<Logger> m_logger; // ISP-compliant focused dependency
+    Logger* m_logger; 
 };
 
 } // namespace pkt::core

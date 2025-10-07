@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <core/services/ServiceContainer.h>
 #include <core/interfaces/Logger.h>
 
 #include <memory>
@@ -24,12 +23,7 @@ struct CurrentHandContext;
 class PreflopRangeEstimator
 {
   public:
-    // ISP-compliant constructor (primary)
-    PreflopRangeEstimator(int playerId, std::shared_ptr<pkt::core::Logger> logger);
-    
-    // Legacy constructors (deprecated - use ISP constructor)
-    PreflopRangeEstimator(int playerId);
-    explicit PreflopRangeEstimator(int playerId, std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
+    PreflopRangeEstimator(int playerId, pkt::core::Logger& logger);
 
     std::string computeEstimatedPreflopRange(const CurrentHandContext& ctx);
 
@@ -69,10 +63,8 @@ class PreflopRangeEstimator
     float handleFourBetOrMoreRange(const CurrentHandContext& ctx, int opponentRaises, const float currentRange) const;
 
   private:
-    pkt::core::Logger& getLogger() const;
-    
-    // ISP-compliant focused interface
-    std::shared_ptr<pkt::core::Logger> m_logger;
+
+    pkt::core::Logger& m_logger;
 
     int m_playerId;
 };

@@ -16,7 +16,7 @@
 #include "core/engine/hand/HandLifecycle.h"
 #include "core/engine/hand/HandPlayerAction.h"
 #include "core/engine/hand/HandState.h"
-#include "core/services/PokerServices.h"
+
 #include "strategy/CurrentHandContext.h"
 
 namespace pkt::core
@@ -29,20 +29,11 @@ class Board;
 class Hand : public HandLifecycle, public HandPlayerAction, public HandPlayersState, public DeckDealer
 {
   public:
-    Hand(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<Board>,
-         pkt::core::player::PlayerList seats, pkt::core::player::PlayerList actingPlayers, GameData gameData,
-         StartData startData);
 
-    // Constructor with PokerServices for dependency injection
-    Hand(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<Board>,
+    Hand(const GameEvents&, std::shared_ptr<Board>,
          pkt::core::player::PlayerList seats, pkt::core::player::PlayerList actingPlayers, GameData gameData,
-         StartData startData, std::shared_ptr<PokerServices> services);
-
-    // ISP-compliant constructor with focused services
-    Hand(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<Board>,
-         pkt::core::player::PlayerList seats, pkt::core::player::PlayerList actingPlayers, GameData gameData,
-         StartData startData, std::shared_ptr<Logger> logger, std::shared_ptr<PlayersStatisticsStore> statisticsStore,
-         std::shared_ptr<Randomizer> randomizer, std::shared_ptr<HandEvaluationEngine> handEvaluationEngine);
+         StartData startData, Logger& logger, PlayersStatisticsStore& statisticsStore,
+         Randomizer& randomizer, HandEvaluationEngine& handEvaluationEngine);
 
     ~Hand();
 
@@ -68,7 +59,6 @@ class Hand : public HandLifecycle, public HandPlayerAction, public HandPlayersSt
     GameState getGameState() const { return m_stateManager->getGameState(); }
     Board& getBoard() { return *m_board; }
 
-    // Accessor methods for ActionApplier
     HandStateManager* getStateManager() const { return m_stateManager.get(); }
     const GameEvents& getEvents() const { return m_events; }
     void fireOnPotUpdated() const;
@@ -87,24 +77,20 @@ class Hand : public HandLifecycle, public HandPlayerAction, public HandPlayersSt
     // New focused methods for handlePlayerAction refactoring
     void handleAutoFold(unsigned playerId);
     void processValidAction(const PlayerAction& action);
-    void ensureServicesInitialized() const;
     
-    // ISP-compliant helper methods
     Logger& getLogger() const;
     PlayersStatisticsStore& getPlayersStatisticsStore() const;
     
     // Cash validation methods
     void filterPlayersWithInsufficientCash();
 
-    std::shared_ptr<EngineFactory> m_factory;
     const GameEvents& m_events;
     std::shared_ptr<Board> m_board;
-    mutable std::shared_ptr<PokerServices> m_services; // Legacy injected service container
-    // ISP-compliant focused services
-    std::shared_ptr<Logger> m_logger;
-    std::shared_ptr<PlayersStatisticsStore> m_statisticsStore;
-    std::shared_ptr<Randomizer> m_randomizer;
-    std::shared_ptr<HandEvaluationEngine> m_handEvaluationEngine;
+
+    Logger* m_logger;
+    PlayersStatisticsStore* m_statisticsStore;
+    Randomizer* m_randomizer;
+    HandEvaluationEngine* m_handEvaluationEngine;
     std::unique_ptr<HandStateManager> m_stateManager;
     std::unique_ptr<DeckManager> m_deckManager;
     std::unique_ptr<ActionValidator> m_actionValidator;

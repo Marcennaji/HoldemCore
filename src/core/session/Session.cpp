@@ -7,15 +7,11 @@
 #include <core/engine/game/Game.h>
 
 #include <core/engine/EngineFactory.h>
-#include <core/interfaces/ServiceAdapter.h>
-
 #include <core/player/strategy/LooseAggressiveBotStrategy.h>
 #include <core/player/strategy/ManiacBotStrategy.h>
 #include <core/player/strategy/TightAggressiveBotStrategy.h>
 #include <core/player/strategy/UltraTightBotStrategy.h>
-#include <core/services/ServiceContainer.h>
-#include "core/player/DefaultPlayerFactory.h"
-#include "core/player/MixedPlayerFactory.h"
+#include "core/player/PlayerFactory.h"
 #include "core/player/strategy/StrategyAssigner.h"
 #include "core/player/strategy/HumanStrategy.h"
 
@@ -31,23 +27,21 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-Session::Session(const GameEvents& events) : m_events(events), m_engineFactory(nullptr), m_serviceContainer(nullptr)
-{
-}
-
-Session::Session(const GameEvents& events, std::shared_ptr<EngineFactory> engineFactory)
-    : m_events(events), m_engineFactory(engineFactory), m_serviceContainer(nullptr)
-{
-}
-
-Session::Session(const GameEvents& events, std::shared_ptr<ServiceContainer> serviceContainer)
-    : m_events(events), m_engineFactory(nullptr), m_serviceContainer(serviceContainer)
+Session::Session(const GameEvents& events, 
+    EngineFactory& engineFactory,
+    Logger& logger,
+    HandEvaluationEngine& handEvaluationEngine,
+    PlayersStatisticsStore& playersStatisticsStore,
+    Randomizer& randomizer)
+    : m_events(events), m_engineFactory(&engineFactory),
+      m_logger(&logger), m_handEvaluationEngine(&handEvaluationEngine),
+      m_playersStatisticsStore(&playersStatisticsStore), m_randomizer(&randomizer)
 {
 }
 
 Session::~Session() = default;
 
-pkt::core::player::PlayerList Session::createPlayersList(MixedPlayerFactory& playerFactory, int numberOfPlayers,
+pkt::core::player::PlayerList Session::createPlayersList(PlayerFactory& playerFactory, int numberOfPlayers,
                                                          unsigned startMoney, const TableProfile& tableProfile)
 {
     auto playersList = std::make_shared<std::list<std::shared_ptr<Player>>>();
@@ -61,32 +55,19 @@ pkt::core::player::PlayerList Session::createPlayersList(MixedPlayerFactory& pla
 std::unique_ptr<player::StrategyAssigner> Session::createStrategyAssigner(const TableProfile& tableProfile,
                                                                           int numberOfBots)
 {
-    return std::make_unique<player::StrategyAssigner>(tableProfile, numberOfBots);
+    return std::make_unique<player::StrategyAssigner>(tableProfile, numberOfBots, *m_logger, *m_randomizer);
 }
 
-std::unique_ptr<player::MixedPlayerFactory> Session::createPlayerFactory(const GameEvents& events,
+std::unique_ptr<player::PlayerFactory> Session::createPlayerFactory(const GameEvents& events,
                                                                            player::StrategyAssigner* strategyAssigner)
 {
-    if (m_serviceContainer) {
-        // Use ISP-compliant constructor with service interfaces
-        auto serviceAdapter = std::make_shared<ServiceAdapter>(m_serviceContainer);
-        auto logger = serviceAdapter->createLoggerService();
-        auto handEvaluator = serviceAdapter->createHandEvaluationEngineService();
-        auto statisticsStore = serviceAdapter->createPlayersStatisticsStoreService();
-        auto randomizer = serviceAdapter->createRandomizerService();
-        
-        return std::make_unique<player::MixedPlayerFactory>(events, strategyAssigner, logger, handEvaluator, statisticsStore, randomizer);
-    } else {
-        // Fallback to legacy constructor
-        return std::make_unique<player::MixedPlayerFactory>(events, strategyAssigner);
-    }
+    return std::make_unique<player::PlayerFactory>(events, strategyAssigner, 
+                                                  *m_logger, *m_handEvaluationEngine, 
+                                                  *m_playersStatisticsStore, *m_randomizer);
 }
 
 std::shared_ptr<Board> Session::createBoard(const StartData& startData)
 {
-    if (!m_engineFactory)
-        throw std::runtime_error("EngineFactory not initialized");
-
     auto board = m_engineFactory->createBoard(startData.startDealerPlayerId);
     return board;
 }
@@ -94,8 +75,6 @@ std::shared_ptr<Board> Session::createBoard(const StartData& startData)
 void Session::startGame(const GameData& gameData, const StartData& startData)
 {
     validateGameParameters(gameData, startData);
-    ensureEngineFactoryInitialized();
-    ensureServiceContainerInitialized();
     auto gameComponents = createGameComponents(gameData, startData);
     initializeGame(std::move(gameComponents), gameData, startData);
 }
@@ -175,21 +154,9 @@ void Session::fireGameInitializedEvent(int guiSpeed)
     }
 }
 
-void Session::ensureEngineFactoryInitialized()
-{
-    if (!m_engineFactory)
-    {
-        m_engineFactory = std::make_shared<EngineFactory>(m_events);
-    }
-}
 
-void Session::ensureServiceContainerInitialized()
-{
-    if (!m_serviceContainer)
-    {
-        m_serviceContainer = std::make_shared<AppServiceContainer>();
-    }
-}
+
+
 
 Session::GameComponents Session::createGameComponents(const GameData& gameData, const StartData& startData)
 {
@@ -215,7 +182,7 @@ Session::GameComponents Session::createGameComponents(const GameData& gameData, 
 
 void Session::initializeGame(GameComponents&& components, const GameData& gameData, const StartData& startData)
 {
-    m_currentGame = std::make_unique<Game>(m_events, m_engineFactory, components.board, components.playersList,
+    m_currentGame = std::make_unique<Game>(m_events, *m_engineFactory, components.board, components.playersList,
                                            startData.startDealerPlayerId, gameData, startData);
     fireGameInitializedEvent(gameData.guiSpeed);
     m_currentGame->startNewHand();

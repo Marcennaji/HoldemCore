@@ -22,7 +22,6 @@
 #include "core/interfaces/Logger.h"
 #include "core/interfaces/Randomizer.h"
 #include "core/interfaces/persistence/PlayersStatisticsStore.h"
-#include "core/services/ServiceContainer.h"
 
 #include <array>
 #include <assert.h>
@@ -44,12 +43,13 @@ namespace pkt::core::player
 class Player
 {
   public:
-    // Fully ISP-compliant constructor with all required interfaces
-    Player(const GameEvents&, std::shared_ptr<pkt::core::Logger> logger, 
-           std::shared_ptr<pkt::core::HandEvaluationEngine> handEvaluator,
-           std::shared_ptr<pkt::core::PlayersStatisticsStore> statisticsStore,
-           std::shared_ptr<pkt::core::Randomizer> randomizer,
+
+    Player(const GameEvents&, pkt::core::Logger& logger, 
+           pkt::core::HandEvaluationEngine& handEvaluator,
+           pkt::core::PlayersStatisticsStore& statisticsStore,
+           pkt::core::Randomizer& randomizer,
            int id, std::string name, int cash);
+
     virtual ~Player() = default;
 
     // ========================================
@@ -167,10 +167,9 @@ class Player
     const HandSimulationStats computeHandSimulation() const;
     std::unique_ptr<PlayerStrategy> m_strategy;
     std::unique_ptr<PlayerStatisticsUpdater> m_statisticsUpdater;
-    // ISP-compliant focused service interfaces
-    std::shared_ptr<pkt::core::Logger> m_logger;
-    std::shared_ptr<pkt::core::HandEvaluationEngine> m_handEvaluator;
-    std::shared_ptr<pkt::core::PlayersStatisticsStore> m_statisticsStore;
-    std::shared_ptr<pkt::core::Randomizer> m_randomizer;
+    pkt::core::Logger* m_logger;
+    pkt::core::HandEvaluationEngine* m_handEvaluator;
+    pkt::core::PlayersStatisticsStore* m_statisticsStore;
+    pkt::core::Randomizer* m_randomizer;
 };
 } // namespace pkt::core::player

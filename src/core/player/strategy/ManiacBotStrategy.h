@@ -9,18 +9,13 @@
 #include "core/interfaces/Randomizer.h"
 namespace pkt::core::player
 {
-// Forward declaration
 struct CurrentHandContext;
 class ManiacBotStrategy : public BotStrategyBase
 {
 
   public:
-    // Legacy default constructor for backward compatibility
-    ManiacBotStrategy();
-    
-    // ISP-compliant constructor - only depends on what it needs
-    ManiacBotStrategy(std::shared_ptr<pkt::core::Logger> logger, 
-                     std::shared_ptr<pkt::core::Randomizer> randomizer);
+    ManiacBotStrategy(pkt::core::Logger& logger, 
+                     pkt::core::Randomizer& randomizer);
     
     ~ManiacBotStrategy();
 
@@ -38,15 +33,6 @@ class ManiacBotStrategy : public BotStrategyBase
     virtual int flopCouldBet(const CurrentHandContext& ctx);
     virtual int turnCouldBet(const CurrentHandContext& ctx);
     virtual int riverCouldBet(const CurrentHandContext& ctx);
-
-  private:
-    // Helper methods to get services from either focused interfaces or legacy container
-    pkt::core::Logger& getLogger();
-    pkt::core::Randomizer& getRandomizer();
-    
-    // ISP-compliant focused dependencies
-    std::shared_ptr<pkt::core::Logger> m_loggerService;
-    std::shared_ptr<pkt::core::Randomizer> m_randomizerService;
 };
 
 } // namespace pkt::core::player

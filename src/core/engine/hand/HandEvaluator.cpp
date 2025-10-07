@@ -1,21 +1,17 @@
 #include "HandEvaluator.h"
 #include <stdexcept>
-#include "core/services/ServiceContainer.h"
+#include "core/interfaces/NullHandEvaluationEngine.h"
 
 namespace pkt::core
 {
 
-unsigned int HandEvaluator::evaluateHand(const char* hand)
+unsigned int HandEvaluator::evaluateHand(const char* hand, std::shared_ptr<pkt::core::HandEvaluationEngine> engine)
 {
-    // Prefer DI overload; fallback uses a shared default services instance to avoid repeated allocations.
-    static std::shared_ptr<pkt::core::ServiceContainer> s_defaultServices =
-        std::make_shared<pkt::core::AppServiceContainer>();
-    return s_defaultServices->handEvaluationEngine().rankHand(hand);
-}
-
-unsigned int HandEvaluator::evaluateHand(const char* hand, std::shared_ptr<pkt::core::ServiceContainer> services)
-{
-    return services->handEvaluationEngine().rankHand(hand);
+    if (engine) {
+        return engine->rankHand(hand);
+    }else{
+        throw std::runtime_error("HandEvaluator::evaluateHand: No valid HandEvaluationEngine provided");
+    }
 }
 
 } // namespace pkt::core

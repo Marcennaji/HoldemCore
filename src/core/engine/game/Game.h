@@ -25,7 +25,7 @@ class EngineFactory;
 class Game
 {
   public:
-    Game(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<Board> board,
+    Game(const GameEvents& events, EngineFactory& factory, std::shared_ptr<Board> board,
          pkt::core::player::PlayerList seatsList, unsigned dealerId, const GameData& gameData,
          const StartData& startData);
 
@@ -38,7 +38,7 @@ class Game
     void findNextDealer();
 
   private:
-    std::shared_ptr<EngineFactory> m_engineFactory;
+    EngineFactory* m_engineFactory;
     const GameEvents& m_events;
     std::shared_ptr<Hand> m_currentHand;
     std::shared_ptr<Board> m_currentBoard;

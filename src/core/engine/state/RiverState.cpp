@@ -5,41 +5,21 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/utils/Helpers.h"
 #include "core/player/Player.h"
-#include "core/services/ServiceContainer.h"
+#include "core/interfaces/NullLogger.h"
 
 namespace pkt::core
 {
 using namespace pkt::core::player;
 
-RiverState::RiverState(const GameEvents& events) : m_events(events)
-{
-}
 
-RiverState::RiverState(const GameEvents& events, std::shared_ptr<pkt::core::ServiceContainer> services)
-    : m_events(events), m_services(std::move(services))
+RiverState::RiverState(const GameEvents& events, Logger& logger)
+    : m_events(events), m_logger(&logger)
 {
-}
-
-// ISP-compliant constructor - only depends on what it needs
-RiverState::RiverState(const GameEvents& events, std::shared_ptr<Logger> logger)
-    : m_events(events), m_loggerService(std::move(logger))
-{
-}
-
-Logger& RiverState::getLogger()
-{
-    // Use focused dependency (ISP-compliant)
-    if (m_loggerService) {
-        return *m_loggerService;
-    }
-    
-    // This should not happen in normal operation
-    throw std::runtime_error("RiverState: Logger service not properly initialized. Use ISP-compliant constructor.");
 }
 
 void RiverState::enter(Hand& hand)
 {
-    getLogger().info("River");
+    m_logger->info("River");
 
     for (auto& player : *hand.getActingPlayersList())
     {
@@ -94,7 +74,7 @@ void RiverState::promptPlayerAction(Hand& hand, Player& player)
 
 std::unique_ptr<HandState> RiverState::computeNextState(Hand& hand)
 {
-    return computeBettingRoundNextState(hand, m_events, River, m_loggerService);
+    return computeBettingRoundNextState(hand, m_events, River, *m_logger);
 }
 
 std::shared_ptr<player::Player> RiverState::getNextPlayerToAct(const Hand& hand) const
@@ -108,7 +88,12 @@ std::shared_ptr<player::Player> RiverState::getFirstPlayerToActInRound(const Han
 }
 bool RiverState::isRoundComplete(const Hand& hand) const
 {
-    return pkt::core::isRoundComplete(hand);
+    return pkt::core::isRoundComplete(hand, *m_logger);
+}
+
+void RiverState::logStateInfo(Hand& hand)
+{
+    m_logger->info("River state - fifth community card dealt");
 }
 
 } // namespace pkt::core

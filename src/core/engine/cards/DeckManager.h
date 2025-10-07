@@ -14,7 +14,7 @@ namespace pkt::core
 class DeckManager
 {
   public:
-    DeckManager(std::shared_ptr<Randomizer> randomizer);
+    DeckManager(Randomizer& randomizer);
     ~DeckManager() = default;
 
     // Core deck operations
@@ -30,7 +30,7 @@ class DeckManager
 
   private:
     Deck m_deck;
-    std::shared_ptr<Randomizer> m_randomizer;
+    Randomizer* m_randomizer;
 };
 
 } // namespace pkt::core

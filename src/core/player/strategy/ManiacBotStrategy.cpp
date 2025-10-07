@@ -2,8 +2,6 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 #include <core/player/strategy/ManiacBotStrategy.h>
-#include <core/interfaces/ServiceAdapter.h>
-#include <core/services/ServiceContainer.h>
 
 #include <core/engine/hand/HandEvaluator.h>
 
@@ -24,52 +22,20 @@ namespace pkt::core::player
 
 using namespace std;
 
-// Legacy constructor for backward compatibility - creates default services and delegates to ISP constructor
-ManiacBotStrategy::ManiacBotStrategy()
-{
-    auto services = std::make_shared<pkt::core::AppServiceContainer>();
-    m_loggerService = std::shared_ptr<pkt::core::Logger>(services, &services->logger());
-    m_randomizerService = std::shared_ptr<pkt::core::Randomizer>(services, &services->randomizer());
-    
-    // Initialize ranges
-    int utgFullTableRange = 0;
-    getRandomizer().getRand(30, 35, 1, &utgFullTableRange);
-    initializeRanges(50, utgFullTableRange);
-}
+
 
 // ISP-compliant constructor - only accepts what it actually needs (Logger + Randomizer)
-ManiacBotStrategy::ManiacBotStrategy(std::shared_ptr<pkt::core::Logger> logger, 
-                                   std::shared_ptr<pkt::core::Randomizer> randomizer)
-    : BotStrategyBase(), m_loggerService(logger), m_randomizerService(randomizer)
+ManiacBotStrategy::ManiacBotStrategy(pkt::core::Logger& logger, 
+                                   pkt::core::Randomizer& randomizer)
+    : BotStrategyBase(logger, randomizer)
 {
     // initialize utg starting range, in a full table  
     int utgFullTableRange = 0;
-    getRandomizer().getRand(30, 35, 1, &utgFullTableRange);
+    m_randomizer->getRand(30, 35, 1, &utgFullTableRange);
     initializeRanges(50, utgFullTableRange);
 }
 
 ManiacBotStrategy::~ManiacBotStrategy() = default;
-
-// Helper methods following Single Responsibility Principle
-pkt::core::Logger& ManiacBotStrategy::getLogger()
-{
-    // Use focused dependency (ISP-compliant)
-    if (m_loggerService) {
-        return *m_loggerService;
-    }
-    
-    throw std::runtime_error("ManiacBotStrategy: Logger service not properly initialized. Use ISP-compliant constructor.");
-}
-
-pkt::core::Randomizer& ManiacBotStrategy::getRandomizer()
-{
-    // Use focused dependency (ISP-compliant)
-    if (m_randomizerService) {
-        return *m_randomizerService;
-    }
-    
-    throw std::runtime_error("ManiacBotStrategy: Randomizer service not properly initialized. Use ISP-compliant constructor.");
-}
 
 bool ManiacBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
 {
@@ -104,7 +70,7 @@ bool ManiacBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
 
     if (ctx.commonContext.bettingContext.preflopRaisesNumber < 3)
     {
-        getLogger().verbose("\t\tManiac adding high pairs to the initial calling range.");
+        m_logger->verbose("\t\tManiac adding high pairs to the initial calling range.");
         stringCallingRange += HIGH_PAIRS;
     }
 
@@ -116,7 +82,7 @@ bool ManiacBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
         !ctx.commonContext.bettingContext.isPreflopBigBet)
     {
 
-        getLogger().verbose(
+        m_logger->verbose(
             "\t\tManiac adding high suited connectors, high suited aces and pairs to the initial calling range.");
         stringCallingRange += HIGH_SUITED_CONNECTORS;
         stringCallingRange += HIGH_SUITED_ACES;
@@ -130,7 +96,7 @@ bool ManiacBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
             stringCallingRange += CONNECTORS;
             stringCallingRange += SUITED_ONE_GAPED;
             stringCallingRange += SUITED_TWO_GAPED;
-            getLogger().verbose(
+            m_logger->verbose(
                 "\t\tManiac adding suited connectors, suited one-gaped and suited two-gaped to the initial "
                 "calling range.");
         }
@@ -146,19 +112,19 @@ bool ManiacBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
         !ctx.commonContext.bettingContext.isPreflopBigBet)
     {
 
-        if (PokerMath::shouldDefendAgainst3Bet(getRandomizer()))
+        if (PokerMath::shouldDefendAgainst3Bet(*m_randomizer))
         {
 
             stringCallingRange += HIGH_SUITED_CONNECTORS;
             stringCallingRange += HIGH_SUITED_ACES;
             stringCallingRange += PAIRS;
 
-            getLogger().verbose(
+            m_logger->verbose(
                 "\t\tManiac defending against 3-bet : adding high suited connectors, high suited aces and pairs to "
                 "the initial calling range.");
         }
     }
-    getLogger().verbose("\t\tManiac final calling range : " + stringCallingRange);
+    m_logger->verbose("\t\tManiac final calling range : " + stringCallingRange);
 
     return isCardsInRange(ctx.personalContext.holeCards, stringCallingRange);
 }
@@ -200,7 +166,7 @@ int ManiacBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
 
     stringRaisingRange = rangesString[(int) raisingRange];
 
-    getLogger().verbose(stringRaisingRange);
+    m_logger->verbose(stringRaisingRange);
 
     // determine when to 3-bet without a real hand
     bool speculativeHandedAdded = false;
@@ -227,7 +193,7 @@ int ManiacBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
             {
 
                 speculativeHandedAdded = true;
-                getLogger().verbose("\t\tManiac trying to steal this bet");
+                m_logger->verbose("\t\tManiac trying to steal this bet");
             }
             else
             {
@@ -236,7 +202,7 @@ int ManiacBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
                 {
 
                     speculativeHandedAdded = true;
-                    getLogger().verbose(
+                    m_logger->verbose(
                         "\t\tManiac adding this speculative hand to our initial raising range");
                 }
                 else
@@ -245,10 +211,10 @@ int ManiacBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
                         raiserStats.getPreflopCallthreeBetsFrequency() < 30)
                     {
 
-                        if (PokerMath::shouldDefendAgainst3Bet(getRandomizer()))
+                        if (PokerMath::shouldDefendAgainst3Bet(*m_randomizer))
                         {
                             speculativeHandedAdded = true;
-                            getLogger().verbose(
+                            m_logger->verbose(
                                 "\t\tManiac adding this junk hand to our initial raising range");
                         }
                     }
@@ -278,11 +244,11 @@ int ManiacBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
             {
                 // ISP-compliant probability check: 20% chance
                 int rand = 0;
-                getRandomizer().getRand(1, 5, 1, &rand);
+                m_randomizer->getRand(1, 5, 1, &rand);
                 if (rand == 1)
                 {
                     speculativeHandedAdded = true;
-                    getLogger().verbose(
+                    m_logger->verbose(
                         "\t\tManiac adding this speculative hand to our initial raising range");
                 }
             }
@@ -307,10 +273,10 @@ int ManiacBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
 
         // ISP-compliant probability check: 10% chance  
         int rand = 0;
-        getRandomizer().getRand(1, 10, 1, &rand);
+        m_randomizer->getRand(1, 10, 1, &rand);
         if (rand == 1)
         {
-            getLogger().verbose("\t\twon't raise, to hide the hand strength");
+            m_logger->verbose("\t\twon't raise, to hide the hand strength");
             m_couldCall = true;
             return 0;
         }
@@ -342,7 +308,7 @@ int ManiacBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
 
             if (getDrawingProbability(ctx.personalContext.postFlopAnalysisFlags) > 25)
             {
-                if (PokerMath::shouldBluffFrequently(getRandomizer()))
+                if (PokerMath::shouldBluffFrequently(*m_randomizer))
                 {
                     return PokerMath::calculateValueBetSize(ctx);  // Was: pot * 0.6
                 }
@@ -363,7 +329,7 @@ int ManiacBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
                 !ctx.personalContext.postFlopAnalysisFlags.isFlushDrawPossible)
             {
 
-                if (PokerMath::shouldBluffFrequently(getRandomizer()))
+                if (PokerMath::shouldBluffFrequently(*m_randomizer))
                 {
                     return PokerMath::calculateValueBetSize(ctx);
                 }
@@ -489,7 +455,7 @@ int ManiacBotStrategy::flopCouldRaise(const CurrentHandContext& ctx)
     {
 
         int rand = 0;
-        getRandomizer().getRand(1, 3, 1, &rand);
+        m_randomizer->getRand(1, 3, 1, &rand);
         if (rand == 2)
         {
             return ctx.commonContext.bettingContext.pot * 2;
@@ -519,7 +485,7 @@ int ManiacBotStrategy::flopCouldRaise(const CurrentHandContext& ctx)
     {
 
         int rand = 0;
-        getRandomizer().getRand(1, 2, 1, &rand);
+        m_randomizer->getRand(1, 2, 1, &rand);
         if (rand == 2)
         {
             return ctx.commonContext.bettingContext.pot;
@@ -751,7 +717,7 @@ int ManiacBotStrategy::riverCouldBet(const CurrentHandContext& ctx)
         ctx.personalContext.m_handSimulation.winRanged > 0.4 && ctx.personalContext.m_handSimulation.winSd > 0.4)
     {
         int rand = 0;
-        getRandomizer().getRand(1, 2, 1, &rand);
+        m_randomizer->getRand(1, 2, 1, &rand);
         if (rand == 1)
         {
             return ctx.commonContext.bettingContext.pot * 0.33;
@@ -768,7 +734,7 @@ int ManiacBotStrategy::riverCouldBet(const CurrentHandContext& ctx)
         {
 
             int rand = 0;
-            getRandomizer().getRand(1, 4, 1, &rand);
+            m_randomizer->getRand(1, 4, 1, &rand);
             if (rand == 1)
             {
                 return PokerMath::calculateBluffBetSize(ctx);
@@ -776,13 +742,13 @@ int ManiacBotStrategy::riverCouldBet(const CurrentHandContext& ctx)
         }
     }
 
-    float coeff = PokerMath::getRandomBetMultiplier(getRandomizer(), 0.4f, PokerMath::MANIAC_MAX_BET_MULTIPLIER);
+    float coeff = PokerMath::getRandomBetMultiplier(*m_randomizer, 0.4f, PokerMath::MANIAC_MAX_BET_MULTIPLIER);
 
     if (ctx.personalContext.m_handSimulation.winSd > .9 ||
         (ctx.personalContext.hasPosition && ctx.personalContext.m_handSimulation.winSd > .85))
     {
         int rand = 0;
-        getRandomizer().getRand(1, 5, 1, &rand);
+        m_randomizer->getRand(1, 5, 1, &rand);
         if (rand != 1 || ctx.personalContext.hasPosition)
         {
             return ctx.commonContext.bettingContext.pot * coeff;
@@ -793,7 +759,7 @@ int ManiacBotStrategy::riverCouldBet(const CurrentHandContext& ctx)
          (ctx.personalContext.hasPosition && ctx.personalContext.m_handSimulation.winRanged > .7)))
     {
         int rand = 0;
-        getRandomizer().getRand(1, 3, 1, &rand);
+        m_randomizer->getRand(1, 3, 1, &rand);
         if (rand == 1 || ctx.personalContext.hasPosition)
         {
             return ctx.commonContext.bettingContext.pot * coeff;

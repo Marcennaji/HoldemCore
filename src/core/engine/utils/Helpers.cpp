@@ -7,9 +7,9 @@
 #include "core/engine/hand/Hand.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/interfaces/Logger.h"
+#include "core/interfaces/NullLogger.h"
 #include "core/player/Helpers.h"
 #include "core/player/Player.h"
-#include "core/services/ServiceContainer.h"
 // Include FSM states for the helper function
 #include "core/engine/state/FlopState.h"
 #include "core/engine/state/PostRiverState.h"
@@ -97,22 +97,6 @@ std::vector<ActionType> getValidActionsForPlayer(const PlayerList& actingPlayers
         validActions.push_back(ActionType::Allin);
     }
 
-    // Debug logging to help diagnose invalid action reports
-    {
-        static std::shared_ptr<pkt::core::ServiceContainer> s_defaultServices =
-            std::make_shared<pkt::core::AppServiceContainer>();
-        std::string actionsStr;
-        for (size_t i = 0; i < validActions.size(); ++i)
-        {
-            actionsStr += actionTypeToString(validActions[i]);
-            if (i + 1 < validActions.size()) actionsStr += ",";
-        }
-        s_defaultServices->logger().debug(
-            "valid actions for player " + player->getName() + " on " + gameStateToString(gameState) +
-            ": highest=" + std::to_string(currentHighestBet) + ", bet=" + std::to_string(playerBet) +
-            ", cash=" + std::to_string(playerCash) + " => [" + actionsStr + "]");
-    }
-
     return validActions;
 }
 
@@ -152,7 +136,7 @@ std::shared_ptr<player::Player> getFirstPlayerToActPostFlop(const Hand& hand)
 std::unique_ptr<pkt::core::HandState> computeBettingRoundNextState(pkt::core::Hand& hand,
                                                                     const pkt::core::GameEvents& events,
                                                                     pkt::core::GameState currentState,
-                                                                    std::shared_ptr<pkt::core::Logger> logger)
+                                                                    pkt::core::Logger& logger)
 {
     // If less than 2 players are still in hand (haven't folded), go directly to showdown
     if (hand.getPlayersInHandList()->size() < 2)
@@ -223,7 +207,7 @@ std::unique_ptr<pkt::core::HandState> computeBettingRoundNextState(pkt::core::Ha
     }
 
     // If round is complete, check if we can continue betting
-    if (isRoundComplete(hand))
+    if (isRoundComplete(hand, logger))
     {
         // If only one or no players can still act, go directly to showdown
         if (hand.getActingPlayersList()->size() <= 1)
@@ -251,33 +235,24 @@ std::unique_ptr<pkt::core::HandState> computeBettingRoundNextState(pkt::core::Ha
     return nullptr; // Stay in current state - more betting needed
 }
 
-bool isRoundComplete(const Hand& hand)
-{
-    // Prefer using the same services as the hand/state manager when possible to keep logging/config consistent.
-    // Fallback to a shared AppServiceContainer instance only if not available.
-    static std::shared_ptr<pkt::core::ServiceContainer> s_defaultServices =
-        std::make_shared<pkt::core::AppServiceContainer>();
-    return isRoundComplete(hand, s_defaultServices);
-}
-
-bool isRoundComplete(const Hand& hand, std::shared_ptr<pkt::core::ServiceContainer> services)
+bool isRoundComplete(const Hand& hand, pkt::core::Logger& logger)
 {
     assert(hand.getGameState() != GameState::None);
 
     for (auto player = hand.getActingPlayersList()->begin(); player != hand.getActingPlayersList()->end(); ++player)
     {
-        services->logger().verbose("checking if round " + gameStateToString(hand.getGameState()) +
-                                   " is complete : Checking player: " + (*player)->getName());
+        logger.verbose("checking if round " + gameStateToString(hand.getGameState()) +
+                      " is complete : Checking player: " + (*player)->getName());
 
         if ((*player)->getLastAction().type == ActionType::None ||
             (*player)->getLastAction().type == ActionType::PostBigBlind ||
             (*player)->getLastAction().type == ActionType::PostSmallBlind)
         {
-            services->logger().verbose("  ROUND NOT COMPLETE, as player " + (*player)->getName() + " did not act.");
+            logger.verbose("  ROUND NOT COMPLETE, as player " + (*player)->getName() + " did not act.");
             return false;
         }
 
-        services->logger().verbose(
+        logger.verbose(
             "  player round bet amount: " +
             std::to_string((*player)->getCurrentHandActions().getRoundTotalBetAmount(hand.getGameState())) +
             ", hand total bet amount : " + std::to_string((*player)->getCurrentHandActions().getHandTotalBetAmount()) +
@@ -286,12 +261,12 @@ bool isRoundComplete(const Hand& hand, std::shared_ptr<pkt::core::ServiceContain
         if ((*player)->getCurrentHandActions().getRoundTotalBetAmount(hand.getGameState()) <
             hand.getBettingActions()->getRoundHighestSet())
         {
-            services->logger().verbose("  ROUND NOT COMPLETE, as player " + (*player)->getName() +
-                                       " has not matched the highest bet yet.");
+            logger.verbose("  ROUND NOT COMPLETE, as player " + (*player)->getName() +
+                          " has not matched the highest bet yet.");
             return false;
         }
     }
-    services->logger().verbose("  ROUND " + gameStateToString(hand.getGameState()) + " COMPLETE");
+    logger.verbose("  ROUND " + gameStateToString(hand.getGameState()) + " COMPLETE");
     return true;
 }
 

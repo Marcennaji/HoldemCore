@@ -1,8 +1,9 @@
 #include <gtest/gtest.h>
 #include "core/engine/GameEvents.h"
 #include "core/engine/cards/Card.h"
-#include "core/services/ServiceContainer.h"
+#include "core/interfaces/persistence/NullPlayersStatisticsStore.h"
 #include "core/player/Player.h"
+#include "core/services/DefaultRandomizer.h"
 #include "common/DummyPlayer.h"
 #include "infra/ConsoleLogger.h"
 #include "infra/eval/PsimHandEvaluationEngine.h"
@@ -14,15 +15,19 @@ class HoleCardsTest : public ::testing::Test
 {
   protected:
     void SetUp() override {
-        m_services = std::make_shared<pkt::core::AppServiceContainer>();
-        auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
+        auto logger = std::make_shared<pkt::infra::ConsoleLogger>();
         logger->setLogLevel(pkt::core::LogLevel::Info);
-        m_services->setLogger(std::move(logger));
-        m_services->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>());
+        m_logger = logger;
+        m_handEvaluator = std::make_shared<pkt::infra::PsimHandEvaluationEngine>();
+        m_statisticsStore = std::make_shared<pkt::core::NullPlayersStatisticsStore>();
+        m_randomizer = std::make_shared<pkt::core::DefaultRandomizer>();
     }
     void TearDown() override {}
     
-    std::shared_ptr<pkt::core::AppServiceContainer> m_services;
+    std::shared_ptr<pkt::core::Logger> m_logger;
+    std::shared_ptr<pkt::core::HandEvaluationEngine> m_handEvaluator;
+    std::shared_ptr<pkt::core::PlayersStatisticsStore> m_statisticsStore;
+    std::shared_ptr<pkt::core::Randomizer> m_randomizer;
     GameEvents m_events;
 };
 
@@ -101,7 +106,7 @@ TEST_F(HoleCardsTest, ResetToInvalidCards)
 
 TEST_F(HoleCardsTest, PlayerModernInterface)
 {
-    auto player = std::make_shared<pkt::test::DummyPlayer>(1, m_events, m_services);
+    auto player = std::make_shared<pkt::test::DummyPlayer>(1, m_events, m_logger, m_handEvaluator, m_statisticsStore, m_randomizer);
 
     // Test setting cards using new Card-based interface (preferred)
     player->setHoleCards(Card("Qd"), Card("Jc"));
@@ -117,7 +122,7 @@ TEST_F(HoleCardsTest, PlayerModernInterface)
 
 TEST_F(HoleCardsTest, PlayerStringConstructorInterface)
 {
-    auto player = std::make_shared<pkt::test::DummyPlayer>(1, m_events, m_services);
+    auto player = std::make_shared<pkt::test::DummyPlayer>(1, m_events, m_logger, m_handEvaluator, m_statisticsStore, m_randomizer);
 
     // Test setting cards using string-based HoleCards constructor
     HoleCards holeCards("As", "Kh");
@@ -152,7 +157,7 @@ TEST_F(HoleCardsTest, RoundTripConversion)
 
 TEST_F(HoleCardsTest, ApiTest)
 {
-    auto player = std::make_shared<pkt::test::DummyPlayer>(1, m_events, m_services);
+    auto player = std::make_shared<pkt::test::DummyPlayer>(1, m_events, m_logger, m_handEvaluator, m_statisticsStore, m_randomizer);
 
     // NEW APPROACH: Work directly with Card objects
     Card aceOfSpades("As");
@@ -180,7 +185,7 @@ TEST_F(HoleCardsTest, ApiTest)
 
 TEST_F(HoleCardsTest, ConvenientStringConstructor)
 {
-    auto player = std::make_shared<pkt::test::DummyPlayer>(2, m_events, m_services);
+    auto player = std::make_shared<pkt::test::DummyPlayer>(2, m_events, m_logger, m_handEvaluator, m_statisticsStore, m_randomizer);
 
     // CONVENIENT: Create from strings directly
     HoleCards pocket("Qd", "Jc");

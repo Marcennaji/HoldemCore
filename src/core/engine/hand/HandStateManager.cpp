@@ -4,65 +4,31 @@
 #include "core/engine/state/PreflopState.h"
 #include "core/engine/hand/ActionProcessor.h"
 #include "core/engine/hand/HandState.h"
-#include "core/interfaces/ServiceAdapter.h"
 #include "core/interfaces/Logger.h"
-#include "core/services/ServiceContainer.h"
 
 #include <cassert>
 
 namespace pkt::core
 {
 
-HandStateManager::HandStateManager(const GameEvents& events, int smallBlind, unsigned dealerPlayerId,
-                                   GameLoopErrorCallback errorCallback)
-    : m_events(events), m_errorCallback(std::move(errorCallback)), m_smallBlind(smallBlind),
-      m_dealerPlayerId(dealerPlayerId)
-{
-}
-
-HandStateManager::HandStateManager(const GameEvents& events, int smallBlind, unsigned dealerPlayerId,
-                                   GameLoopErrorCallback errorCallback,
-                                   std::shared_ptr<pkt::core::ServiceContainer> services)
-    : m_events(events), m_errorCallback(std::move(errorCallback)), m_smallBlind(smallBlind),
-      m_dealerPlayerId(dealerPlayerId), m_services(std::move(services))
-{
-}
-
-// ISP-compliant constructor with focused Logger service (preferred)
 HandStateManager::HandStateManager(const GameEvents& events, int smallBlind, unsigned int dealerPlayerId,
-                                   GameLoopErrorCallback errorCallback, std::shared_ptr<Logger> logger)
+                                   GameLoopErrorCallback errorCallback, Logger& logger)
     : m_events(events), m_errorCallback(std::move(errorCallback)), m_smallBlind(smallBlind),
-      m_dealerPlayerId(dealerPlayerId), m_logger(std::move(logger))
+      m_dealerPlayerId(dealerPlayerId), m_logger(&logger)
 {
 }
 
-void HandStateManager::ensureServicesInitialized() const
-{
-    if (!m_services)
-    {
-        m_services = std::make_shared<pkt::core::AppServiceContainer>();
-    }
-}
+
 
 void HandStateManager::initializeState(Hand& hand)
 {
-    // Use focused Logger service if available (ISP), fallback to ServiceContainer
-    if (m_logger) {
-        // Direct ISP usage - no service aggregates needed
-        m_currentState = std::make_unique<PreflopState>(m_events, m_smallBlind, m_dealerPlayerId, m_logger);
-    } else {
-        // Legacy path - use ServiceContainer via ServiceAdapter
-        ensureServicesInitialized();
-        auto serviceAdapter = std::make_shared<pkt::core::ServiceAdapter>(m_services);
-        auto loggerInterface = serviceAdapter->createLoggerService();
-        m_currentState = std::make_unique<PreflopState>(m_events, m_smallBlind, m_dealerPlayerId, loggerInterface);
-    }
+    // Direct ISP usage - no service aggregates needed
+    m_currentState = std::make_unique<PreflopState>(m_events, m_smallBlind, m_dealerPlayerId, *m_logger);
     m_currentState->enter(hand);
 }
 
 void HandStateManager::runGameLoop(Hand& hand)
 {
-    ensureServicesInitialized();
     int iterationCount = 0;
 
     while (!isTerminal() && iterationCount < MAX_GAME_LOOP_ITERATIONS)
@@ -90,8 +56,8 @@ void HandStateManager::runGameLoop(Hand& hand)
     // Check if we hit the emergency brake
     if (iterationCount >= MAX_GAME_LOOP_ITERATIONS)
     {
-        m_services->logger().error("Game loop hit maximum iterations (" + std::to_string(MAX_GAME_LOOP_ITERATIONS) +
-                                   "), terminating to prevent infinite loop");
+        m_logger->error("Game loop hit maximum iterations (" + std::to_string(MAX_GAME_LOOP_ITERATIONS) +
+                        "), terminating to prevent infinite loop");
 
         if (m_errorCallback)
         {

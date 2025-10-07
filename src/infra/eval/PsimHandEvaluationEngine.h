@@ -2,14 +2,10 @@
 #include <memory>
 #include <string>
 #include "core/interfaces/HandEvaluationEngine.h"
+#include "core/interfaces/Logger.h"
 
 struct SimResults;
 struct PostFlopState;
-
-namespace pkt::core
-{
-class ServiceContainer;
-}
 
 namespace pkt::infra
 {
@@ -18,11 +14,8 @@ namespace pkt::infra
 class PsimHandEvaluationEngine : public pkt::core::HandEvaluationEngine
 {
   public:
-    /// Default constructor using AppServiceContainer
+    PsimHandEvaluationEngine(std::shared_ptr<pkt::core::Logger> logger);
     PsimHandEvaluationEngine();
-
-    /// Constructor with ServiceContainer dependency injection
-    explicit PsimHandEvaluationEngine(std::shared_ptr<pkt::core::ServiceContainer> services);
 
     unsigned int rankHand(const char* hand) override;
     const char* getEngineName() const override { return "psim"; }
@@ -33,12 +26,10 @@ class PsimHandEvaluationEngine : public pkt::core::HandEvaluationEngine
   private:
     pkt::core::HandSimulationStats convertSimResults(const SimResults& s);
     pkt::core::PostFlopAnalysisFlags convertPostFlopState(const PostFlopState& src);
+    
+    pkt::core::Logger& getLogger() const;
 
-    /// Ensures services are initialized (lazy initialization)
-    void ensureServicesInitialized();
-
-    /// ServiceContainer for dependency injection
-    std::shared_ptr<pkt::core::ServiceContainer> m_services;
+    std::shared_ptr<pkt::core::Logger> m_logger;
 };
 
 } // namespace pkt::infra

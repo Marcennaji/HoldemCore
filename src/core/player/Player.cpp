@@ -4,7 +4,6 @@
 
 #include "Player.h"
 
-#include "core/interfaces/ServiceAdapter.h"
 #include "core/interfaces/Logger.h"
 #include <core/engine/cards/CardUtilities.h>
 #include <core/engine/hand/Hand.h>
@@ -27,28 +26,20 @@ namespace pkt::core::player
 using namespace std;
 
 
-
-
-
-
-
 // Fully ISP-compliant constructor with all required interfaces
-Player::Player(const GameEvents& events, std::shared_ptr<pkt::core::Logger> logger, 
-               std::shared_ptr<pkt::core::HandEvaluationEngine> handEvaluator,
-               std::shared_ptr<pkt::core::PlayersStatisticsStore> statisticsStore,
-               std::shared_ptr<pkt::core::Randomizer> randomizer,
+Player::Player(const GameEvents& events, pkt::core::Logger& logger, 
+               pkt::core::HandEvaluationEngine& handEvaluator,
+               pkt::core::PlayersStatisticsStore& statisticsStore,
+               pkt::core::Randomizer& randomizer,
                int id, std::string name, int cash)
-    : m_id(id), m_name(name), m_events(events), m_logger(logger), m_handEvaluator(handEvaluator), m_statisticsStore(statisticsStore), m_randomizer(randomizer)
+    : m_id(id), m_name(name), m_events(events), m_logger(&logger), m_handEvaluator(&handEvaluator), m_statisticsStore(&statisticsStore), m_randomizer(&randomizer)
 {
-    // Use ISP-compliant constructors for all components
     m_rangeEstimator = std::make_unique<RangeEstimator>(m_id, logger, handEvaluator);
     m_currentHandContext = std::make_unique<CurrentHandContext>();
     m_statisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(statisticsStore);
     m_statisticsUpdater->loadStatistics(name);
 
-    // Initialize cash in context
     m_currentHandContext->personalContext.cash = cash;
-    // Initialize with invalid cards - this will be set via context when needed
 }
 
 
@@ -407,13 +398,6 @@ std::map<int, float> Player::evaluateOpponentsStrengths() const
 
 bool Player::isInVeryLooseMode(const int nbPlayers) const
 {
-    // very loose mode = plays very often preflop (last actions in stack are mostly raises/calls/allins)
-    if (!m_statisticsUpdater)
-    {
-        // Lazily create if not present (defensive against future refactors)
-        assert(m_statisticsStore && "StatisticsStore service must be available. Use ISP-compliant constructor.");
-        const_cast<Player*>(this)->m_statisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(m_statisticsStore);
-    }
     int clampedPlayers = nbPlayers;
     if (clampedPlayers < 0)
         clampedPlayers = 0;
@@ -487,7 +471,7 @@ float Player::calculatePreflopCallingRange(const CurrentHandContext& ctx) const
     assert(m_logger && m_randomizer && "Logger and Randomizer services must be available. Use ISP-compliant constructor.");
     
     // Use ISP-compliant constructor - no more ServiceContainer dependencies!
-    PreflopRangeCalculator calculator(m_logger, m_randomizer);
+    PreflopRangeCalculator calculator(*m_logger, *m_randomizer);
     return calculator.calculatePreflopCallingRange(ctx);
 }
 

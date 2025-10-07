@@ -4,8 +4,10 @@
 #include "core/engine/game/Pot.h"
 #include "core/engine/model/GameState.h"
 #include "core/engine/state/RiverState.h"
+#include "core/interfaces/persistence/NullPlayersStatisticsStore.h"
 #include "core/player/typedefs.h"
-#include "core/services/ServiceContainer.h"
+#include "core/interfaces/NullLogger.h"
+#include "core/services/DefaultRandomizer.h"
 #include "infra/ConsoleLogger.h"
 #include "infra/eval/PsimHandEvaluationEngine.h"
 
@@ -21,22 +23,28 @@ class PotTest : public ::testing::Test
     PlayerList seats;
     GameEvents events;
     std::unique_ptr<Pot> pot;
-    std::unique_ptr<RiverState> state = std::make_unique<RiverState>(events);
-    std::shared_ptr<pkt::core::AppServiceContainer> m_services;
+    std::unique_ptr<RiverState> state;
+
+    std::shared_ptr<pkt::core::Logger> m_logger;
+    std::shared_ptr<pkt::core::HandEvaluationEngine> m_handEvaluationEngine;
+    std::shared_ptr<pkt::core::PlayersStatisticsStore> m_playersStatisticsStore;
+    std::shared_ptr<pkt::core::Randomizer> m_randomizer;
 
     void SetUp() override
     {
-        m_services = std::make_shared<pkt::core::AppServiceContainer>();
-        auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
+        auto logger = std::make_shared<pkt::infra::ConsoleLogger>();
         logger->setLogLevel(pkt::core::LogLevel::Info);
-        m_services->setLogger(std::move(logger));
-        m_services->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>());
+        m_logger = logger;
+        m_handEvaluationEngine = std::make_shared<pkt::infra::PsimHandEvaluationEngine>();
+        m_playersStatisticsStore = std::make_shared<pkt::core::NullPlayersStatisticsStore>();
+        m_randomizer = std::make_shared<pkt::core::DefaultRandomizer>();
+        state = std::make_unique<RiverState>(events, *m_logger);
     }
 
     std::shared_ptr<DummyPlayer> createPlayer(int id, int cashAtHandStart, int remainingCash, int handRank,
                                               ActionType action)
     {
-        auto p = std::make_shared<DummyPlayer>(id, events, m_services);
+        auto p = std::make_shared<DummyPlayer>(id, events, m_logger, m_handEvaluationEngine, m_playersStatisticsStore, m_randomizer);
         p->setCashAtHandStart(cashAtHandStart);
         p->setCash(remainingCash);
         p->setHandRanking(handRank);
@@ -50,7 +58,10 @@ class PotTest : public ::testing::Test
         seats = std::make_shared<std::list<std::shared_ptr<Player>>>();
         for (const auto& p : players)
             seats->push_back(std::static_pointer_cast<Player>(p));
-        pot = std::make_unique<Pot>(potAmount, seats, dealerId);
+        
+        // Create a NullLogger for testing
+        auto logger = std::make_shared<pkt::core::NullLogger>();
+        pot = std::make_unique<Pot>(potAmount, seats, dealerId, *logger);
     }
 };
 

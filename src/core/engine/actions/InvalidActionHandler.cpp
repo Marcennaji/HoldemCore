@@ -1,37 +1,20 @@
 #include "InvalidActionHandler.h"
 #include "GameEvents.h"
-#include "core/services/ServiceContainer.h"
+#include "core/interfaces/NullLogger.h"
 
 namespace pkt::core
 {
 
 InvalidActionHandler::InvalidActionHandler(const GameEvents& events, ErrorMessageProvider errorProvider,
-                                           AutoFoldCallback autoFoldCallback)
-    : m_events(events), m_errorMessageProvider(std::move(errorProvider)),
-      m_autoFoldCallback(std::move(autoFoldCallback))
-{
-}
-
-InvalidActionHandler::InvalidActionHandler(const GameEvents& events, ErrorMessageProvider errorProvider,
                                            AutoFoldCallback autoFoldCallback,
-                                           std::shared_ptr<pkt::core::ServiceContainer> services)
+                                           Logger& logger)
     : m_events(events), m_errorMessageProvider(std::move(errorProvider)),
-      m_autoFoldCallback(std::move(autoFoldCallback)), m_services(std::move(services))
+      m_autoFoldCallback(std::move(autoFoldCallback)), m_logger(&logger)
 {
-}
-
-void InvalidActionHandler::ensureServicesInitialized() const
-{
-    if (!m_services)
-    {
-        m_services = std::make_shared<pkt::core::AppServiceContainer>();
-    }
 }
 
 void InvalidActionHandler::handleInvalidAction(const PlayerAction& action)
 {
-    ensureServicesInitialized();
-
     // Track invalid action attempts
     m_invalidActionCounts[action.playerId]++;
 
@@ -42,9 +25,9 @@ void InvalidActionHandler::handleInvalidAction(const PlayerAction& action)
         m_events.onInvalidPlayerAction(action.playerId, action, reason);
     }
 
-    m_services->logger().error("Invalid action from player " + std::to_string(action.playerId) + " (attempt " +
-                               std::to_string(m_invalidActionCounts[action.playerId]) +
-                               "): " + m_errorMessageProvider(action));
+    m_logger->error("Invalid action from player " + std::to_string(action.playerId) + " (attempt " +
+                    std::to_string(m_invalidActionCounts[action.playerId]) +
+                    "): " + m_errorMessageProvider(action));
 
     // Check if player should be auto-folded due to repeated invalid actions
     if (shouldAutoFoldPlayer(action.playerId))
@@ -72,10 +55,8 @@ int InvalidActionHandler::getInvalidActionCount(unsigned playerId) const
 
 void InvalidActionHandler::executeAutoFold(unsigned playerId)
 {
-    ensureServicesInitialized();
-
-    m_services->logger().error("Player " + std::to_string(playerId) +
-                               " exceeded maximum invalid actions, auto-folding");
+    m_logger->error("Player " + std::to_string(playerId) +
+                    " exceeded maximum invalid actions, auto-folding");
 
     if (m_events.onEngineError)
     {

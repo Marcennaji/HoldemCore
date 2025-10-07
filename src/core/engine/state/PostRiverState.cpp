@@ -4,40 +4,20 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/player/Helpers.h"
 #include "core/player/Player.h"
-#include "core/services/ServiceContainer.h"
+#include "core/interfaces/NullLogger.h"
 
 namespace pkt::core
 {
 using namespace pkt::core::player;
 
-PostRiverState::PostRiverState(const GameEvents& events) : m_events(events)
+PostRiverState::PostRiverState(const GameEvents& events, Logger& logger)
+    : m_events(events), m_logger(&logger)
 {
-}
-
-PostRiverState::PostRiverState(const GameEvents& events, std::shared_ptr<pkt::core::ServiceContainer> services)
-    : m_events(events), m_services(std::move(services))
-{
-}
-
-// ISP-compliant constructor using focused service interface
-PostRiverState::PostRiverState(const GameEvents& events, std::shared_ptr<Logger> logger)
-    : m_events(events), m_logger(logger)
-{
-}
-
-// ISP-compliant helper method
-pkt::core::Logger& PostRiverState::getLogger() const
-{
-    if (m_logger) {
-        return *m_logger;
-    }
-    // This should not happen in normal operation
-    throw std::runtime_error("PostRiverState: Logger service not properly initialized. Use ISP-compliant constructor.");
 }
 
 void PostRiverState::enter(Hand& hand)
 {
-    getLogger().info("Post-River");
+    m_logger->info("Post-River");
 
     for (auto& player : *hand.getActingPlayersList())
     {
@@ -99,6 +79,11 @@ std::shared_ptr<player::Player> PostRiverState::getFirstPlayerToActInRound(const
 bool PostRiverState::isRoundComplete(const Hand& /*hand*/) const
 {
     return true;
+}
+
+void PostRiverState::logStateInfo(Hand& hand)
+{
+    m_logger->info("PostRiver state - showdown completed, pot distributed");
 }
 
 } // namespace pkt::core

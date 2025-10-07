@@ -10,7 +10,6 @@
 namespace pkt::core
 {
 class Logger;
-class ServiceContainer;
 } // namespace pkt::core
 
 namespace pkt::core::player
@@ -42,22 +41,6 @@ class PlayerListUtils
      * @return Iterator to the Player if found, end() otherwise
      */
     static PlayerListIterator getPlayerListIteratorById(PlayerList& list, unsigned id);
-
-    /**
-     * @brief Update acting players list by removing folded/all-in players
-     *
-     * @param actingPlayersList List to update (modified in place)
-     */
-    static void updateActingPlayersList(PlayerList& actingPlayersList);
-
-    /**
-     * @brief Update acting players list by removing folded/all-in players
-     *
-     * @param actingPlayersList List to update (modified in place)
-     * @param services ServiceContainer for accessing services
-     */
-    static void updateActingPlayersList(PlayerList& actingPlayersList,
-                                        std::shared_ptr<pkt::core::ServiceContainer> services);
 
     /**
      * @brief Update acting players list by removing folded/all-in players

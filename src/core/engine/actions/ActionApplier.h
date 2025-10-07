@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/interfaces/Logger.h"
+
 namespace pkt::core
 {
 
@@ -14,7 +16,7 @@ class Player;
 class ActionApplier
 {
   public:
-    static void apply(Hand& hand, const PlayerAction& action);
+    static void apply(Hand& hand, const PlayerAction& action, pkt::core::Logger& logger);
 
   private:
     static void applyCallAction(Hand& hand, player::Player& player, PlayerAction& actionForHistory, int currentHighest,
@@ -27,7 +29,7 @@ class ActionApplier
 
     static void updateBetAndPot(Hand& hand, player::Player& player, int amount);
     static void setLastRaiserForCurrentRound(Hand& hand, unsigned playerId);
-    static void finalizeAction(Hand& hand, player::Player& player, const PlayerAction& actionForHistory);
+    static void finalizeAction(Hand& hand, player::Player& player, const PlayerAction& actionForHistory, pkt::core::Logger& logger);
 };
 
 } // namespace pkt::core

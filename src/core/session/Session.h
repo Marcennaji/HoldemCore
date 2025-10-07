@@ -9,12 +9,14 @@
 #include <core/engine/model/GameData.h>
 #include <core/engine/model/StartData.h>
 #include <core/engine/model/PlayerAction.h>
-#include <core/player/DefaultPlayerFactory.h>
-#include <core/player/MixedPlayerFactory.h>
+#include <core/player/PlayerFactory.h>
 #include <core/player/typedefs.h>
 #include "core/engine/GameEvents.h"
 #include "core/engine/game/Board.h"
-#include "core/services/ServiceContainer.h"
+#include "core/interfaces/Logger.h"
+#include "core/interfaces/HandEvaluationEngine.h"
+#include "core/interfaces/persistence/PlayersStatisticsStore.h"
+#include "core/interfaces/Randomizer.h"
 
 namespace pkt::core
 {
@@ -29,22 +31,20 @@ class Board;
 class Session
 {
   public:
-    Session(const GameEvents& events);
-
-    // Constructor for dependency injection (testing)
-    Session(const GameEvents& events, std::shared_ptr<EngineFactory> engineFactory);
-
-    // Constructor with ServiceContainer for proper dependency injection
-    Session(const GameEvents& events, std::shared_ptr<ServiceContainer> serviceContainer);
+ 
+    Session(const GameEvents& events, 
+            EngineFactory& engineFactory,
+            Logger& logger,
+            HandEvaluationEngine& handEvaluationEngine,
+            PlayersStatisticsStore& playersStatisticsStore,
+            Randomizer& randomizer);
 
     ~Session();
 
     void startGame(const GameData& gameData, const StartData& startData);
     
-    // Method to handle player actions from GUI
     void handlePlayerAction(const PlayerAction& action);
     
-    // Method to start a new hand (called after hand completion)
     void startNewHand();
 
   protected:
@@ -52,7 +52,7 @@ class Session
     virtual std::unique_ptr<player::StrategyAssigner> createStrategyAssigner(const TableProfile& tableProfile,
                                                                              int numberOfBots);
 
-    virtual std::unique_ptr<player::MixedPlayerFactory>
+    virtual std::unique_ptr<player::PlayerFactory>
     createPlayerFactory(const GameEvents& events, player::StrategyAssigner* strategyAssigner);
 
     virtual std::shared_ptr<Board> createBoard(const StartData& startData);
@@ -61,17 +61,15 @@ class Session
     void validateGameParameters(const GameData& gameData, const StartData& startData);
     void validatePlayerConfiguration(const pkt::core::player::PlayerList& playersList);
     void fireGameInitializedEvent(int guiSpeed);
-    void ensureEngineFactoryInitialized();
-    void ensureServiceContainerInitialized();
 
   private:
-    pkt::core::player::PlayerList createPlayersList(player::MixedPlayerFactory& playerFactory, int numberOfPlayers,
+    pkt::core::player::PlayerList createPlayersList(player::PlayerFactory& playerFactory, int numberOfPlayers,
                                                     unsigned startMoney, const TableProfile& tableProfile);
 
     struct GameComponents
     {
         std::unique_ptr<player::StrategyAssigner> strategyAssigner;
-        std::unique_ptr<player::MixedPlayerFactory> playerFactory;
+        std::unique_ptr<player::PlayerFactory> playerFactory;
         pkt::core::player::PlayerList playersList;
         std::shared_ptr<Board> board;
     };
@@ -81,8 +79,12 @@ class Session
 
     std::unique_ptr<Game> m_currentGame;
     const GameEvents& m_events;
-    std::shared_ptr<EngineFactory> m_engineFactory;       // Injected or created
-    std::shared_ptr<ServiceContainer> m_serviceContainer; // Injected service container
+    EngineFactory* m_engineFactory;   
+  
+    Logger* m_logger;
+    HandEvaluationEngine* m_handEvaluationEngine;
+    PlayersStatisticsStore* m_playersStatisticsStore;
+    Randomizer* m_randomizer;
 };
 
 } // namespace pkt::core

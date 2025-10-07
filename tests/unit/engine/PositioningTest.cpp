@@ -4,9 +4,10 @@
 #include "common/DummyPlayer.h"
 #include "core/engine/utils/Helpers.h"
 #include "core/engine/model/PlayerPosition.h"
+#include "core/interfaces/persistence/NullPlayersStatisticsStore.h"
 #include "core/player/Helpers.h"
 #include "core/player/Player.h"
-#include "core/services/ServiceContainer.h"
+#include "core/services/DefaultRandomizer.h"
 #include "infra/ConsoleLogger.h"
 #include "infra/eval/PsimHandEvaluationEngine.h"
 
@@ -18,18 +19,17 @@ namespace pkt::test {
 // Sanity check for circular offset wrap-around computation
 TEST(PositioningUnit, CircularOffsetWrapAround)
 {
-    // Setup services for DummyPlayer
-    auto services = std::make_shared<pkt::core::AppServiceContainer>();
-    auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
+    auto logger = std::make_shared<pkt::infra::ConsoleLogger>();
     logger->setLogLevel(pkt::core::LogLevel::Info);
-    services->setLogger(std::move(logger));
-    services->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>());
+    auto handEvaluationEngine = std::make_shared<pkt::infra::PsimHandEvaluationEngine>();
+    auto statisticsStore = std::make_shared<pkt::core::NullPlayersStatisticsStore>();
+    auto randomizer = std::make_shared<pkt::core::DefaultRandomizer>();
 
     // Build a simple list of 6 dummy players with ids 0..5
     auto players = std::make_shared<std::list<std::shared_ptr<Player>>>();
     GameEvents ev; // unused
     for (int i = 0; i < 6; ++i) {
-        players->push_back(std::make_shared<DummyPlayer>(i, ev, services));
+        players->push_back(std::make_shared<DummyPlayer>(i, ev, logger, handEvaluationEngine, statisticsStore, randomizer));
     }
 
     // Dealer = 4, To = 0; distance should wrap: indices [4 -> 5 -> 0] => 2

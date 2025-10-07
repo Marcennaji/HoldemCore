@@ -1,19 +1,13 @@
 
 #include "PlayerStatisticsUpdater.h"
-#include <core/services/ServiceContainer.h>
 #include "core/player/Player.h"
 #include "core/player/strategy/CurrentHandContext.h"
+#include <core/interfaces/persistence/NullPlayersStatisticsStore.h>
 
 namespace pkt::core::player
 {
-PlayerStatisticsUpdater::PlayerStatisticsUpdater(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer)
-    : m_services(serviceContainer)
-{
-}
-
-// ISP-compliant constructor
-PlayerStatisticsUpdater::PlayerStatisticsUpdater(std::shared_ptr<pkt::core::PlayersStatisticsStore> statisticsStore)
-    : m_statisticsStore(statisticsStore)
+PlayerStatisticsUpdater::PlayerStatisticsUpdater(pkt::core::PlayersStatisticsStore& statisticsStore)
+    : m_statisticsStore(&statisticsStore)
 {
 }
 
@@ -268,25 +262,13 @@ void PlayerStatisticsUpdater::updateRiverStatistics(const CurrentHandContext& ct
     }
 }
 
-void PlayerStatisticsUpdater::ensureServicesInitialized() const
-{
-    if (!m_services)
-    {
-        static std::shared_ptr<pkt::core::ServiceContainer> defaultServices =
-            std::make_shared<pkt::core::AppServiceContainer>();
-        m_services = defaultServices;
-    }
-}
-
-// ISP-compliant helper method
 pkt::core::PlayersStatisticsStore& PlayerStatisticsUpdater::getPlayersStatisticsStore() const
 {
     if (m_statisticsStore) {
         return *m_statisticsStore;
     }
-    // Fallback to legacy service container
-    ensureServicesInitialized();
-    return m_services->playersStatisticsStore();
+    static pkt::core::NullPlayersStatisticsStore nullStore;
+    return nullStore;
 }
 
 void PlayerStatisticsUpdater::loadStatistics(const std::string& playerName)

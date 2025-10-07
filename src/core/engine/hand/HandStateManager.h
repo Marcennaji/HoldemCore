@@ -21,8 +21,7 @@ struct GameEvents;
 /**
  * @brief HandStateManager manages game state transitions and state-specific logic
  *
- * This class centralizes all state management functionality that was previously
- * handled directly in the Hand class. It manages state creation, transitions,
+ * This class manages state creation, transitions,
  * queries, and the main game loop logic.
  */
 class HandStateManager
@@ -30,15 +29,8 @@ class HandStateManager
   public:
     using GameLoopErrorCallback = std::function<void(const std::string&)>;
 
-    HandStateManager(const GameEvents& events, int smallBlind, unsigned dealerPlayerId,
-                     GameLoopErrorCallback errorCallback);
-    explicit HandStateManager(const GameEvents& events, int smallBlind, unsigned dealerPlayerId,
-                              GameLoopErrorCallback errorCallback,
-                              std::shared_ptr<pkt::core::ServiceContainer> services);
-    
-    // ISP-compliant constructor with focused Logger service (preferred)
     HandStateManager(const GameEvents& events, int smallBlind, unsigned int dealerPlayerId,
-                     GameLoopErrorCallback errorCallback, std::shared_ptr<Logger> logger);
+                     GameLoopErrorCallback errorCallback, Logger& logger);
     ~HandStateManager() = default;
 
     // State lifecycle management
@@ -59,13 +51,10 @@ class HandStateManager
   private:
     void transitionState(Hand& hand, std::unique_ptr<HandState> newState);
     void checkAndHandleTerminalState(Hand& hand);
-    void ensureServicesInitialized() const;
-
     const GameEvents& m_events;
     std::unique_ptr<HandState> m_currentState;
     GameLoopErrorCallback m_errorCallback;
-    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services; // Legacy support
-    std::shared_ptr<Logger> m_logger; // ISP-compliant focused service
+    Logger* m_logger; // ISP-compliant focused service
 
     // State initialization parameters
     int m_smallBlind;

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <core/services/ServiceContainer.h>
+
 #include <QtQml/QQmlApplicationEngine>
 #include <QObject>
 #include <memory>

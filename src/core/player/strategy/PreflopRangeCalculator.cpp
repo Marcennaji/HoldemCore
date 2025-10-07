@@ -1,6 +1,7 @@
 
 #include "PreflopRangeCalculator.h"
-#include <core/services/ServiceContainer.h>
+#include "core/interfaces/NullLogger.h"
+#include "core/services/DefaultRandomizer.h"
 #include "CurrentHandContext.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/player/Helpers.h"
@@ -11,61 +12,22 @@ namespace pkt::core::player
 {
 using namespace std;
 
-PreflopRangeCalculator::PreflopRangeCalculator()
-{
-    // Initialize with default ranges to prevent crashes
-    initializeRanges(45, 8); // Default tight-aggressive ranges for 8-player table
-}
-
-PreflopRangeCalculator::PreflopRangeCalculator(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer)
-    : m_services(serviceContainer)
-{
-    // Initialize with default ranges to prevent crashes
-    initializeRanges(45, 8); // Default tight-aggressive ranges for 8-player table
-}
-
 // ISP-compliant constructor using focused service interfaces
-PreflopRangeCalculator::PreflopRangeCalculator(std::shared_ptr<pkt::core::Logger> logger, std::shared_ptr<pkt::core::Randomizer> randomizer)
-    : m_logger(logger), m_randomizer(randomizer)
+PreflopRangeCalculator::PreflopRangeCalculator(pkt::core::Logger& logger, pkt::core::Randomizer& randomizer)
+    : m_logger(&logger), m_randomizer(&randomizer)
 {
     // Initialize with default ranges to prevent crashes
     initializeRanges(45, 8); // Default tight-aggressive ranges for 8-player table
-}
-
-void PreflopRangeCalculator::setServices(std::shared_ptr<pkt::core::Logger> logger, std::shared_ptr<pkt::core::Randomizer> randomizer)
-{
-    m_logger = logger;
-    m_randomizer = randomizer;
 }
 
 pkt::core::Logger& PreflopRangeCalculator::getLogger() const
 {
-    if (m_logger) {
-        return *m_logger;
-    }
-    // Fallback to ServiceContainer for backward compatibility
-    ensureServicesInitialized();
-    return m_services->logger();
+    return *m_logger;
 }
 
 pkt::core::Randomizer& PreflopRangeCalculator::getRandomizer() const
 {
-    if (m_randomizer) {
-        return *m_randomizer;
-    }
-    // Fallback to ServiceContainer for backward compatibility
-    ensureServicesInitialized();
-    return m_services->randomizer();
-}
-
-void PreflopRangeCalculator::ensureServicesInitialized() const
-{
-    if (!m_services)
-    {
-        static std::shared_ptr<pkt::core::ServiceContainer> defaultServices =
-            std::make_shared<pkt::core::AppServiceContainer>();
-        m_services = defaultServices;
-    }
+    return *m_randomizer;
 }
 
 void PreflopRangeCalculator::initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange)
@@ -147,7 +109,6 @@ void PreflopRangeCalculator::initializeRanges(const int utgHeadsUpRange, const i
 
 float PreflopRangeCalculator::calculatePreflopCallingRange(const CurrentHandContext& ctx) const
 {
-    ensureServicesInitialized();
 
     const int nbRaises = ctx.commonContext.bettingContext.preflopRaisesNumber;
     const int nbCalls = ctx.commonContext.bettingContext.preflopCallsNumber;
@@ -215,7 +176,6 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(const CurrentHandCont
 }
 float PreflopRangeCalculator::adjustCallForLimpers(float callingRange) const
 {
-    ensureServicesInitialized();
 
     getLogger().verbose("1 or more players have limped, but nobody has raised. Adjusting callingRange : " +
                                  std::to_string(callingRange) + " * 1.2 = " + std::to_string(callingRange * 1.2));
@@ -277,7 +237,6 @@ float PreflopRangeCalculator::adjustCallForRaiserStats(float callingRange, const
                                                        int nbRaises, int nbPlayers, PlayerPosition m_position,
                                                        int nbActingPlayers) const
 {
-    ensureServicesInitialized();
 
     if ((m_position == Button || m_position == Cutoff) && nbActingPlayers > 5)
     {
@@ -309,7 +268,6 @@ float PreflopRangeCalculator::adjustCallForRaiserStats(float callingRange, const
 
 float PreflopRangeCalculator::adjustCallForNoStats(float callingRange, int nbRaises) const
 {
-    ensureServicesInitialized();
 
     if (nbRaises == 2)
     {
@@ -332,7 +290,6 @@ float PreflopRangeCalculator::adjustCallForBigBet(float callingRange, int potOdd
                                                   int highestBetAmountOrigin, int m_totalBetAmount,
                                                   int smallBlind) const
 {
-    ensureServicesInitialized();
 
     const int highestBetAmount = std::min(m_cash, highestBetAmountOrigin);
 
@@ -392,7 +349,6 @@ bool PreflopRangeCalculator::couldCallForAllIn(const CurrentHandContext& ctx, in
 
 float PreflopRangeCalculator::calculatePreflopRaisingRange(const CurrentHandContext& ctx) const
 {
-    ensureServicesInitialized();
 
     const int nbRaises = ctx.commonContext.bettingContext.preflopRaisesNumber;
     const int nbCalls = ctx.commonContext.bettingContext.preflopCallsNumber;
@@ -424,7 +380,6 @@ float PreflopRangeCalculator::calculatePreflopRaisingRange(const CurrentHandCont
 }
 float PreflopRangeCalculator::adjustRaiseForLimpers(float raisingRange) const
 {
-    ensureServicesInitialized();
 
     getLogger().verbose("2 or more players have limped, but nobody has raised : tightening raising range to " +
                                  std::to_string(raisingRange * 0.7));
@@ -472,7 +427,6 @@ float PreflopRangeCalculator::adjustRaiseForRaiser(const CurrentHandContext& ctx
 float PreflopRangeCalculator::adjustRaiseForRaiserStats(const PreflopStatistics& raiserStats, float raisingRange,
                                                         int nbRaises, int nbPlayers) const
 {
-    ensureServicesInitialized();
 
     if (nbRaises == 1)
     {
@@ -498,7 +452,6 @@ float PreflopRangeCalculator::adjustRaiseForRaiserStats(const PreflopStatistics&
 }
 float PreflopRangeCalculator::adjustRaiseForNoRaiserStats(float raisingRange, int nbRaises) const
 {
-    ensureServicesInitialized();
 
     if (nbRaises == 1)
     {
@@ -517,7 +470,6 @@ float PreflopRangeCalculator::adjustRaiseForNoRaiserStats(float raisingRange, in
 float PreflopRangeCalculator::adjustRaiseForNoRaiser(const CurrentHandContext& ctx, float raisingRange,
                                                      bool canBluff) const
 {
-    ensureServicesInitialized();
 
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
     const PlayerPosition m_position = ctx.personalContext.position;
@@ -539,7 +491,6 @@ float PreflopRangeCalculator::adjustRaiseForNoRaiser(const CurrentHandContext& c
 }
 float PreflopRangeCalculator::adjustRaiseForStack(const CurrentHandContext& ctx, float raisingRange) const
 {
-    ensureServicesInitialized();
 
     const int m_m = ctx.personalContext.m;
     const int nbPlayers = ctx.commonContext.playersContext.nbPlayers;
@@ -579,7 +530,6 @@ float PreflopRangeCalculator::adjustRaiseForStack(const CurrentHandContext& ctx,
 }
 float PreflopRangeCalculator::clampRaiseRange(float raisingRange) const
 {
-    ensureServicesInitialized();
 
     raisingRange = std::ceil(raisingRange);
     if (raisingRange < 0)
@@ -599,7 +549,6 @@ float PreflopRangeCalculator::adjustRaiseForBigBet(float raisingRange, int potOd
                                                    int highestBetAmountOrigin, int m_totalBetAmount,
                                                    int smallBlind) const
 {
-    ensureServicesInitialized();
 
     const int highestBetAmount = std::min(m_cash, highestBetAmountOrigin);
 

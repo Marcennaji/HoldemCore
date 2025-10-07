@@ -2,15 +2,11 @@
 
 #include "core/engine/model/GameState.h"
 #include "core/engine/model/PlayerAction.h"
+#include "core/interfaces/Logger.h"
 #include "typedefs.h"
 
 #include <memory>
 #include <string>
-
-namespace pkt::core
-{
-class ServiceContainer;
-} // namespace pkt::core
 
 namespace pkt::core::player
 {
@@ -33,7 +29,7 @@ class ActionValidator
 {
   public:
     ActionValidator() = default;
-    explicit ActionValidator(std::shared_ptr<pkt::core::ServiceContainer> services);
+    explicit ActionValidator(std::shared_ptr<pkt::core::Logger> logger);
     ~ActionValidator() = default;
 
     // Main validation method - migrated from Helpers.cpp
@@ -63,8 +59,8 @@ class ActionValidator
                              std::string* outReason = nullptr) const;
 
   private:
-    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services;
-    void ensureServicesInitialized() const;
+    std::shared_ptr<pkt::core::Logger> m_logger;
+    pkt::core::Logger& getLogger() const;
 };
 
 } // namespace pkt::core

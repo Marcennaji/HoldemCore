@@ -22,7 +22,8 @@
 
 namespace pkt::core
 {
-class ServiceContainer;
+class Randomizer;
+class Logger;
 }
 
 namespace pkt::ui::qtwidgets
@@ -35,7 +36,8 @@ class StartWindow : public QMainWindow
     StartWindow(PokerTableWindow* tableWindow, pkt::core::Session* session, QWidget* parent = nullptr);
 
     StartWindow(PokerTableWindow* tableWindow, pkt::core::Session* session,
-                std::shared_ptr<pkt::core::ServiceContainer> services, QWidget* parent = nullptr);
+                std::shared_ptr<pkt::core::Randomizer> randomizer,
+                std::shared_ptr<pkt::core::Logger> logger, QWidget* parent = nullptr);
 
     ~StartWindow();
 
@@ -65,7 +67,8 @@ class StartWindow : public QMainWindow
     void applyConsistentStyling();
     void ensureServicesInitialized();
 
-    std::shared_ptr<pkt::core::ServiceContainer> m_services;
+    std::shared_ptr<pkt::core::Randomizer> m_randomizer;
+    std::shared_ptr<pkt::core::Logger> m_logger;
     
     // UI Components
     QWidget* m_centralWidget;

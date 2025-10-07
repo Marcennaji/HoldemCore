@@ -7,7 +7,6 @@
 #include <core/engine/EngineDefs.h>
 #include <core/engine/model/GameState.h>
 #include <core/player/PlayerStatistics.h>
-#include <core/services/ServiceContainer.h>
 #include <core/interfaces/Logger.h>
 #include <core/interfaces/HandEvaluationEngine.h>
 #include "PreflopRangeEstimator.h"
@@ -36,19 +35,14 @@ struct CurrentHandContext;
 class RangeEstimator
 {
   public:
-    // ISP-compliant constructor (primary)
-    RangeEstimator(int playerId, std::shared_ptr<pkt::core::Logger> logger, 
-                   std::shared_ptr<pkt::core::HandEvaluationEngine> handEvaluator);
+    RangeEstimator(int playerId, pkt::core::Logger& logger, 
+                   pkt::core::HandEvaluationEngine& handEvaluator);
     
-    // Legacy constructors (deprecated - use ISP constructor)
-    RangeEstimator(int playerId);
-    explicit RangeEstimator(int playerId, std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
-
     void setEstimatedRange(const std::string& range);
     std::string getEstimatedRange() const;
 
-  void computeEstimatedPreflopRange(const CurrentHandContext&);
-  void updateUnplausibleRanges(pkt::core::GameState, const CurrentHandContext&);
+    void computeEstimatedPreflopRange(const CurrentHandContext&);
+    void updateUnplausibleRanges(pkt::core::GameState, const CurrentHandContext&);
     static int getStandardRaisingRange(int nbPlayers);
     static int getStandardCallingRange(int nbPlayers);
 
@@ -62,18 +56,11 @@ class RangeEstimator
     void updateUnplausibleRangesGivenTurnActions(const CurrentHandContext&);
     void updateUnplausibleRangesGivenRiverActions(const CurrentHandContext&);
     
-    void ensureServicesInitialized() const;
-    
-    // ISP-compliant helper methods
     pkt::core::Logger& getLogger() const;
     pkt::core::HandEvaluationEngine& getHandEvaluationEngine() const;
 
-    // Legacy service container (for backward compatibility)
-    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services;
-    
-    // ISP-compliant focused interfaces
-    std::shared_ptr<pkt::core::Logger> m_logger;
-    std::shared_ptr<pkt::core::HandEvaluationEngine> m_handEvaluator;
+    pkt::core::Logger* m_logger;
+    pkt::core::HandEvaluationEngine* m_handEvaluator;
 
     std::unique_ptr<PreflopRangeEstimator> m_preflopRangeEstimator;
     std::string m_estimatedRange;

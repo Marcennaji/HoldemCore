@@ -2,8 +2,6 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 #include <core/player/strategy/LooseAggressiveBotStrategy.h>
-#include <core/interfaces/ServiceAdapter.h>
-#include <core/services/ServiceContainer.h>
 
 #include <core/engine/hand/HandEvaluator.h>
 
@@ -24,62 +22,18 @@ namespace pkt::core::player
 
 using namespace std;
 
-// Legacy constructor for backward compatibility - creates default services and delegates to ISP constructor
-LooseAggressiveBotStrategy::LooseAggressiveBotStrategy()
-{
-    // Create default core services directly - much simpler than adapters
-    auto serviceContainer = std::make_shared<pkt::core::AppServiceContainer>();
-    m_loggerService = std::shared_ptr<pkt::core::Logger>(serviceContainer, &serviceContainer->logger());
-    m_randomizerService = std::shared_ptr<pkt::core::Randomizer>(serviceContainer, &serviceContainer->randomizer());
-    
-    // initialize utg starting range, in a full table
-    int utgFullTableRange = 0;
-    getRandomizer().getRand(13, 15, 1, &utgFullTableRange);
-    initializeRanges(48, utgFullTableRange);
-}
-
-
-
-// ISP-compliant constructor - only accepts what it actually needs (Logger + Randomizer)
-LooseAggressiveBotStrategy::LooseAggressiveBotStrategy(std::shared_ptr<pkt::core::Logger> logger, 
-                                                     std::shared_ptr<pkt::core::Randomizer> randomizer)
-    : BotStrategyBase(), m_loggerService(logger), m_randomizerService(randomizer)
+LooseAggressiveBotStrategy::LooseAggressiveBotStrategy(pkt::core::Logger& logger, 
+                                                     pkt::core::Randomizer& randomizer)
+    : BotStrategyBase(logger, randomizer)
 {
     // initialize utg starting range, in a full table  
     int utgFullTableRange = 0;
-    m_randomizerService->getRand(13, 15, 1, &utgFullTableRange);
+    m_randomizer->getRand(13, 15, 1, &utgFullTableRange);
     initializeRanges(48, utgFullTableRange);
 }
 
 LooseAggressiveBotStrategy::~LooseAggressiveBotStrategy() = default;
 
-// Helper methods following Single Responsibility Principle
-pkt::core::Logger& LooseAggressiveBotStrategy::getLogger()
-{
-    // Use direct core interface (much simpler than wrapper pattern)
-    if (m_loggerService) {
-        return *m_loggerService;
-    }
-    
-    throw std::runtime_error("LooseAggressiveBotStrategy: Logger service not properly initialized. Use ISP-compliant constructor.");
-}
-
-pkt::core::Randomizer& LooseAggressiveBotStrategy::getRandomizer()
-{
-    // Use direct core interface (much simpler than wrapper pattern)
-    if (m_randomizerService) {
-        return *m_randomizerService;
-    }
-    
-    throw std::runtime_error("LooseAggressiveBotStrategy: Randomizer service not properly initialized. Use ISP-compliant constructor.");
-}
-
-// Note: This method is now obsolete since PokerMath uses Randomizer directly
-std::shared_ptr<pkt::core::ServiceContainer> LooseAggressiveBotStrategy::createTemporaryServiceContainer()
-{
-    // Create a minimal ServiceContainer for any remaining legacy calls
-    return std::make_shared<pkt::core::AppServiceContainer>();
-}
 
 bool LooseAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
 {
@@ -115,7 +69,7 @@ bool LooseAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
     if (ctx.commonContext.bettingContext.preflopRaisesNumber < 3)
     {
 
-        getLogger().verbose("\t\tLAG adding high pairs to the initial calling range.");
+        m_logger->verbose("\t\tLAG adding high pairs to the initial calling range.");
         stringCallingRange += HIGH_PAIRS;
     }
 
@@ -127,7 +81,7 @@ bool LooseAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
         !ctx.commonContext.bettingContext.isPreflopBigBet)
     {
 
-        getLogger().verbose(
+        m_logger->verbose(
             "\t\tLAG adding high suited connectors, high suited aces and pairs to the initial calling range.");
         stringCallingRange += HIGH_SUITED_CONNECTORS;
         stringCallingRange += HIGH_SUITED_ACES;
@@ -141,7 +95,7 @@ bool LooseAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
             stringCallingRange += SUITED_CONNECTORS;
             stringCallingRange += SUITED_ONE_GAPED;
             stringCallingRange += SUITED_TWO_GAPED;
-            getLogger().verbose(
+            m_logger->verbose(
                 "\t\tLAG adding suited connectors, suited one-gaped and suited two-gaped to the initial "
                 "calling range.");
         }
@@ -159,7 +113,7 @@ bool LooseAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
 
         // ISP-compliant: 25% chance to defend against 3-bet
         int rand = 0;
-        m_randomizerService->getRand(1, 4, 1, &rand);
+        m_randomizer->getRand(1, 4, 1, &rand);
         if (rand == 1)
         {
 
@@ -167,12 +121,12 @@ bool LooseAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
             stringCallingRange += HIGH_SUITED_ACES;
             stringCallingRange += PAIRS;
 
-            getLogger().verbose(
+            m_logger->verbose(
                 "\t\tLAG defending against 3-bet : adding high suited connectors, high suited aces and pairs to "
                 "the initial calling range.");
         }
     }
-    getLogger().verbose("\t\tLAG final calling range : " + stringCallingRange);
+    m_logger->verbose("\t\tLAG final calling range : " + stringCallingRange);
 
     return isCardsInRange(ctx.personalContext.holeCards, stringCallingRange);
 }
@@ -214,7 +168,7 @@ int LooseAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
 
     stringRaisingRange = rangesString[(int) raisingRange];
 
-    getLogger().verbose("Raising range : " + stringRaisingRange);
+    m_logger->verbose("Raising range : " + stringRaisingRange);
 
     // determine when to 3-bet without a real hand
     bool speculativeHandedAdded = false;
@@ -241,7 +195,7 @@ int LooseAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
             {
 
                 speculativeHandedAdded = true;
-                getLogger().verbose("\t\tLAG trying to steal this bet");
+                m_logger->verbose("\t\tLAG trying to steal this bet");
             }
             else
             {
@@ -251,7 +205,7 @@ int LooseAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
                 {
 
                     speculativeHandedAdded = true;
-                    getLogger().verbose("\t\tLAG adding this speculative hand to our initial raising range");
+                    m_logger->verbose("\t\tLAG adding this speculative hand to our initial raising range");
                 }
                 else
                 {
@@ -261,11 +215,11 @@ int LooseAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
 
                         // ISP-compliant: 30% chance to add speculative hand
                         int rand = 0;
-                        m_randomizerService->getRand(1, 10, 1, &rand);
+                        m_randomizer->getRand(1, 10, 1, &rand);
                         if (rand <= 3)
                         {
                             speculativeHandedAdded = true;
-                            getLogger().verbose("\t\tLAG adding this junk hand to our initial raising range");
+                            m_logger->verbose("\t\tLAG adding this junk hand to our initial raising range");
                         }
                     }
                 }
@@ -297,7 +251,7 @@ int LooseAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
             {
 
                 speculativeHandedAdded = true;
-                getLogger().verbose("\t\tLAG adding this speculative hand to our initial raising range");
+                m_logger->verbose("\t\tLAG adding this speculative hand to our initial raising range");
             }
         }
     }
@@ -320,10 +274,10 @@ int LooseAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
 
         // ISP-compliant: 15% chance to hide hand strength
         int rand = 0;
-        m_randomizerService->getRand(1, 20, 1, &rand);
+        m_randomizer->getRand(1, 20, 1, &rand);
         if (rand <= 3)
         {
-            getLogger().verbose("\t\twon't raise, to hide the hand strength");
+            m_logger->verbose("\t\twon't raise, to hide the hand strength");
             m_couldCall = true;
             return 0;
         }
@@ -350,7 +304,7 @@ int LooseAggressiveBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
 
             if (getDrawingProbability(ctx.personalContext.postFlopAnalysisFlags) > 25)
             {
-                if (PokerMath::shouldBluffFrequently(*m_randomizerService))
+                if (PokerMath::shouldBluffFrequently(*m_randomizer))
                 {
                     return PokerMath::calculateValueBetSize(ctx);
                 }
@@ -371,7 +325,7 @@ int LooseAggressiveBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
                 !ctx.personalContext.postFlopAnalysisFlags.isFlushDrawPossible)
             {
 
-                if (PokerMath::shouldBluffFrequently(*m_randomizerService))
+                if (PokerMath::shouldBluffFrequently(*m_randomizer))
                 {
                     return PokerMath::calculateBluffBetSize(ctx);
                 }
@@ -398,7 +352,7 @@ int LooseAggressiveBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
 
         // ISP-compliant: 10% chance to bluff rarely
         int rand = 0;
-        m_randomizerService->getRand(1, 10, 1, &rand);
+        m_randomizer->getRand(1, 10, 1, &rand);
         if (rand == 1 && !ctx.personalContext.hasPosition)
         {
             return 0; // may check-raise or check-call
@@ -534,7 +488,7 @@ int LooseAggressiveBotStrategy::flopCouldRaise(const CurrentHandContext& ctx)
         isPossibleToBluff(ctx) && nbRaises < 2)
     {
 
-        if (PokerMath::shouldBluffOccasionally(*m_randomizerService))
+        if (PokerMath::shouldBluffOccasionally(*m_randomizer))
         {
             return ctx.commonContext.bettingContext.pot;
         }
@@ -547,7 +501,7 @@ int LooseAggressiveBotStrategy::flopCouldRaise(const CurrentHandContext& ctx)
             ctx.commonContext.playersContext.actingPlayersList->size() < 4)
         {
 
-            if (PokerMath::shouldAddSpeculativeHand(*m_randomizerService) && ctx.personalContext.m_handSimulation.winRanged > 0.3 &&
+            if (PokerMath::shouldAddSpeculativeHand(*m_randomizer) && ctx.personalContext.m_handSimulation.winRanged > 0.3 &&
                 ctx.personalContext.m_handSimulation.win > 0.5)
             {
                 return ctx.commonContext.bettingContext.pot;
@@ -612,7 +566,7 @@ int LooseAggressiveBotStrategy::turnCouldBet(const CurrentHandContext& ctx)
 
     if (getDrawingProbability(ctx.personalContext.postFlopAnalysisFlags) > 20 && !ctx.personalContext.hasPosition)
     {
-        if (PokerMath::shouldBluffFrequently(*m_randomizerService))
+        if (PokerMath::shouldBluffFrequently(*m_randomizer))
         {
             return PokerMath::calculateValueBetSize(ctx);
         }
@@ -622,7 +576,7 @@ int LooseAggressiveBotStrategy::turnCouldBet(const CurrentHandContext& ctx)
         // no draw, not a good hand, but last to speak and nobody has bet
         if (ctx.personalContext.hasPosition && isPossibleToBluff(ctx))
         {
-            if (PokerMath::shouldBluffFrequently(*m_randomizerService))
+            if (PokerMath::shouldBluffFrequently(*m_randomizer))
             {
                 return PokerMath::calculateBluffBetSize(ctx);
             }
@@ -734,7 +688,7 @@ int LooseAggressiveBotStrategy::turnCouldRaise(const CurrentHandContext& ctx)
     if (ctx.personalContext.m_handSimulation.winRanged > 0.98 && ctx.personalContext.m_handSimulation.win > 0.98 &&
         ctx.personalContext.m_handSimulation.winSd > 0.9)
     {
-        if (PokerMath::shouldAddSpeculativeHand(*m_randomizerService))
+        if (PokerMath::shouldAddSpeculativeHand(*m_randomizer))
         {
             return 0; // very strong hand, slow play, just call
         }
@@ -772,7 +726,7 @@ int LooseAggressiveBotStrategy::turnCouldRaise(const CurrentHandContext& ctx)
         isPossibleToBluff(ctx) && ctx.commonContext.bettingContext.turnBetsOrRaisesNumber < 2)
     {
 
-        if (PokerMath::shouldAddSpeculativeHand(*m_randomizerService))
+        if (PokerMath::shouldAddSpeculativeHand(*m_randomizer))
         {
             return PokerMath::calculateValueBetSize(ctx);
         }
@@ -792,7 +746,7 @@ int LooseAggressiveBotStrategy::riverCouldBet(const CurrentHandContext& ctx)
     if (!ctx.personalContext.hasPosition && ctx.personalContext.m_handSimulation.winRanged < 0.7 &&
         ctx.personalContext.m_handSimulation.winRanged > 0.4 && ctx.personalContext.m_handSimulation.winSd > 0.5)
     {
-        if (PokerMath::shouldBluffFrequently(*m_randomizerService))
+        if (PokerMath::shouldBluffFrequently(*m_randomizer))
         {
             return PokerMath::calculateBlockingBetSize(ctx);
         }
@@ -807,19 +761,19 @@ int LooseAggressiveBotStrategy::riverCouldBet(const CurrentHandContext& ctx)
             ctx.personalContext.cash >= ctx.commonContext.bettingContext.pot && isPossibleToBluff(ctx))
         {
 
-            if (PokerMath::shouldAddSpeculativeHand(*m_randomizerService))
+            if (PokerMath::shouldAddSpeculativeHand(*m_randomizer))
             {
                 return PokerMath::calculateBluffBetSize(ctx);
             }
         }
     }
 
-    float coeff = PokerMath::getRandomBetMultiplier(*m_randomizerService);
+    float coeff = PokerMath::getRandomBetMultiplier(*m_randomizer);
 
     if (ctx.personalContext.m_handSimulation.winSd > .94 ||
         (ctx.personalContext.hasPosition && ctx.personalContext.m_handSimulation.winSd > .9))
     {
-        if (!PokerMath::shouldSlowPlay(ctx, *m_randomizerService) || ctx.personalContext.hasPosition)
+        if (!PokerMath::shouldSlowPlay(ctx, *m_randomizer) || ctx.personalContext.hasPosition)
         {
             return ctx.commonContext.bettingContext.pot * coeff;
         }
@@ -828,7 +782,7 @@ int LooseAggressiveBotStrategy::riverCouldBet(const CurrentHandContext& ctx)
         (ctx.personalContext.m_handSimulation.winRanged > .8 ||
          (ctx.personalContext.hasPosition && ctx.personalContext.m_handSimulation.winRanged > .7)))
     {
-        if (PokerMath::shouldBluffOccasionally(*m_randomizerService) || ctx.personalContext.hasPosition)
+        if (PokerMath::shouldBluffOccasionally(*m_randomizer) || ctx.personalContext.hasPosition)
         {
             return ctx.commonContext.bettingContext.pot * coeff;
         }

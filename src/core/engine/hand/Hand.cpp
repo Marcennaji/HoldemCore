@@ -1,7 +1,6 @@
 #include "Hand.h"
-#include <core/services/ServiceContainer.h>
+
 #include "core/engine/EngineFactory.h"
-#include "core/interfaces/ServiceAdapter.h"
 #include "CardUtilities.h"
 #include "DeckManager.h"
 #include "GameEvents.h"
@@ -24,90 +23,13 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<Board> board,
-           PlayerList seats, PlayerList actingPlayers, GameData gameData, StartData startData)
-    : HandPlayersState(seats, actingPlayers), m_events(events), m_factory(factory), m_board(board), m_services(nullptr),
-      m_actionValidator(std::make_unique<ActionValidator>()),
-      m_startQuantityPlayers(startData.numberOfPlayers), m_smallBlind(gameData.firstSmallBlind),
-      m_startCash(gameData.startMoney)
-{
-    m_seatsList = seats;
-    m_actingPlayersList = actingPlayers;
-    m_dealerPlayerId = startData.startDealerPlayerId;
-    m_smallBlindPlayerId = startData.startDealerPlayerId;
-    m_bigBlindPlayerId = startData.startDealerPlayerId;
-
-    // Create InvalidActionHandler with callbacks
-    auto errorProvider = [this](const PlayerAction& action) -> std::string { return getActionValidationError(action); };
-
-    auto autoFoldCallback = [this](unsigned playerId) { handleAutoFold(playerId); };
-
-    m_invalidActionHandler = std::make_unique<InvalidActionHandler>(m_events, errorProvider, autoFoldCallback);
-
-    // Create HandStateManager with error callback for game loop issues
-    auto gameLoopErrorCallback = [this](const std::string& error)
-    {
-        if (m_events.onEngineError)
-        {
-            m_events.onEngineError(error);
-        }
-    };
-    
-    // Pass services to HandStateManager for proper dependency injection
-    ensureServicesInitialized();
-    // Create DeckManager with randomizer service after services are initialized
-    auto randomizer = std::shared_ptr<Randomizer>(&m_services->randomizer(), [](Randomizer*){});
-    m_deckManager = std::make_unique<DeckManager>(randomizer);
-    m_stateManager = std::make_unique<HandStateManager>(m_events, m_smallBlind, startData.startDealerPlayerId,
-                                                        gameLoopErrorCallback, m_services);
-}
-
-Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<Board> board,
+Hand::Hand(const GameEvents& events, std::shared_ptr<Board> board,
            PlayerList seats, PlayerList actingPlayers, GameData gameData, StartData startData,
-           std::shared_ptr<PokerServices> services)
-    : HandPlayersState(seats, actingPlayers), m_events(events), m_factory(factory), m_board(board),
-      m_services(services), m_actionValidator(std::make_unique<ActionValidator>()), m_startQuantityPlayers(startData.numberOfPlayers),
-      m_smallBlind(gameData.firstSmallBlind), m_startCash(gameData.startMoney)
-{
-    m_seatsList = seats;
-    m_actingPlayersList = actingPlayers;
-    m_dealerPlayerId = startData.startDealerPlayerId;
-    m_smallBlindPlayerId = startData.startDealerPlayerId;
-    m_bigBlindPlayerId = startData.startDealerPlayerId;
-
-    // Create InvalidActionHandler with callbacks
-    auto errorProvider = [this](const PlayerAction& action) -> std::string { return getActionValidationError(action); };
-
-    auto autoFoldCallback = [this](unsigned playerId) { handleAutoFold(playerId); };
-
-    m_invalidActionHandler = std::make_unique<InvalidActionHandler>(m_events, errorProvider, autoFoldCallback);
-
-    // Create HandStateManager with error callback for game loop issues
-    auto gameLoopErrorCallback = [this](const std::string& error)
-    {
-        if (m_events.onEngineError)
-        {
-            m_events.onEngineError(error);
-        }
-    };
-    
-    // Pass services to HandStateManager for proper dependency injection
-    ensureServicesInitialized();
-    // Create DeckManager with randomizer service after services are initialized
-    auto randomizer = std::shared_ptr<Randomizer>(&m_services->randomizer(), [](Randomizer*){});
-    m_deckManager = std::make_unique<DeckManager>(randomizer);
-    m_stateManager = std::make_unique<HandStateManager>(m_events, m_smallBlind, startData.startDealerPlayerId,
-                                                        gameLoopErrorCallback, m_services);
-}
-
-// ISP-compliant constructor with focused services
-Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<Board> board,
-           PlayerList seats, PlayerList actingPlayers, GameData gameData, StartData startData,
-           std::shared_ptr<Logger> logger, std::shared_ptr<PlayersStatisticsStore> statisticsStore,
-           std::shared_ptr<Randomizer> randomizer, std::shared_ptr<HandEvaluationEngine> handEvaluationEngine)
-    : HandPlayersState(seats, actingPlayers), m_factory(factory), m_events(events), m_board(board),
-      m_services(nullptr), m_logger(logger), m_statisticsStore(statisticsStore), m_randomizer(randomizer),
-      m_handEvaluationEngine(handEvaluationEngine),
+           Logger& logger, PlayersStatisticsStore& statisticsStore,
+           Randomizer& randomizer, HandEvaluationEngine& handEvaluationEngine)
+    : HandPlayersState(seats, actingPlayers), m_events(events), m_board(board),
+      m_logger(&logger), m_statisticsStore(&statisticsStore), m_randomizer(&randomizer),
+      m_handEvaluationEngine(&handEvaluationEngine),
       m_actionValidator(std::make_unique<ActionValidator>()),
       m_startQuantityPlayers(startData.numberOfPlayers), m_smallBlind(gameData.firstSmallBlind), 
       m_startCash(gameData.startMoney)
@@ -121,7 +43,7 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
     // Create InvalidActionHandler with callbacks
     auto errorProvider = [this](const PlayerAction& action) -> std::string { return getActionValidationError(action); };
     auto autoFoldCallback = [this](unsigned playerId) { handleAutoFold(playerId); };
-    m_invalidActionHandler = std::make_unique<InvalidActionHandler>(m_events, errorProvider, autoFoldCallback);
+    m_invalidActionHandler = std::make_unique<InvalidActionHandler>(m_events, errorProvider, autoFoldCallback, *m_logger);
 
     // Create HandStateManager with error callback for game loop issues
     auto gameLoopErrorCallback = [this](const std::string& error)
@@ -132,54 +54,30 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
         }
     };
     
-    // Create minimal services for HandStateManager from focused ISP services
-    // Use ISP-compliant HandStateManager with focused Logger service (no ServiceContainer needed)
-    m_deckManager = std::make_unique<DeckManager>(m_randomizer);
+    m_deckManager = std::make_unique<DeckManager>(*m_randomizer);
     m_stateManager = std::make_unique<HandStateManager>(m_events, m_smallBlind, startData.startDealerPlayerId,
-                                                        gameLoopErrorCallback, m_logger);
+                                                        gameLoopErrorCallback, *m_logger);
 }
 
 Hand::~Hand() = default;
 
-void Hand::ensureServicesInitialized() const
-{
-    if (!m_services)
-    {
-        // Get services from the factory to ensure ISP compliance and test service injection
-        auto factoryServices = m_factory->getServiceContainer();
-        m_services = std::make_shared<PokerServices>(factoryServices);
-    }
-}
 
-// ISP-compliant helper methods
 Logger& Hand::getLogger() const
 {
-    if (m_logger) {
-        return *m_logger;
-    }
-    // Fallback to legacy services
-    ensureServicesInitialized();
-    return m_services->logger();
+    return *m_logger;
 }
 
 PlayersStatisticsStore& Hand::getPlayersStatisticsStore() const
 {
-    if (m_statisticsStore) {
-        return *m_statisticsStore;
-    }
-    // Fallback to legacy services
-    ensureServicesInitialized();
-    return m_services->playersStatisticsStore();
+    return *m_statisticsStore;
 }
 
 void Hand::initialize()
 {
     getLogger().info("\n----------------------  New hand ----------------------------\n");
 
-    // Initialize deck but don't deal cards yet - wait until runGameLoop() to match legacy timing
     initAndShuffleDeck();
 
-    // Remove players with insufficient cash before dealing cards
     filterPlayersWithInsufficientCash();
 
     for (auto player = m_seatsList->begin(); player != m_seatsList->end(); ++player)
@@ -199,10 +97,8 @@ void Hand::end()
 
 void Hand::runGameLoop()
 {
-    // Deal cards at the start of game loop to match legacy timing
     dealHoleCards(0); // Pass 0 as index, since no board cards dealt yet
 
-    // Delegate game loop management to HandStateManager
     m_stateManager->runGameLoop(*this);
 }
 
@@ -210,7 +106,6 @@ void Hand::handlePlayerAction(PlayerAction action)
 {
     auto* processor = getActionProcessor();
 
-    // If there's no processor, it means the game state doesn't accept actions
     if (!processor || !processor->isActionAllowed(*this, action))
     {
         m_invalidActionHandler->handleInvalidAction(action);
@@ -226,7 +121,6 @@ void Hand::initAndShuffleDeck()
 
 void Hand::dealHoleCards(size_t cardsArrayIndex)
 {
-    // Validate that there are enough cards in the deck
     if (!m_deckManager->hasEnoughCards(0, m_actingPlayersList->size())) // Use acting players list size
     {
         throw std::runtime_error("Not enough cards in the deck to deal hole cards to all players.");
@@ -234,53 +128,43 @@ void Hand::dealHoleCards(size_t cardsArrayIndex)
 
     for (auto it = m_actingPlayersList->begin(); it != m_actingPlayersList->end(); ++it)
     {
-        // Deal 2 hole cards for this player
         std::vector<Card> holeCardList = m_deckManager->dealCards(2);
 
-        // Create HoleCards from the dealt cards
         HoleCards holeCards(holeCardList[0], holeCardList[1]);
 
         (*it)->setHoleCards(holeCards);
 
-        // Fire event for UI to know hole cards were dealt
         if (m_events.onHoleCardsDealt)
         {
             m_events.onHoleCardsDealt((*it)->getId(), holeCards);
         }
 
         // Build evaluator string with correct ordering: HOLE cards first, then current BOARD cards.
-        // Avoid including invalid board placeholders at preflop to prevent identical ranks.
         BoardCards boardCards = m_board->getBoardCards();
         std::string humanReadableHand = holeCardList[0].toString() + std::string(" ") + holeCardList[1].toString();
         if (boardCards.getNumCards() > 0)
         {
             humanReadableHand += std::string(" ") + boardCards.toString();
         }
-        // Use ISP-compliant hand evaluation service directly
         (*it)->setHandRanking(m_handEvaluationEngine->rankHand(humanReadableHand.c_str()));
     }
 }
 
 size_t Hand::dealBoardCards()
 {
-    // Deal 5 cards for the board (flop, turn, river)
     std::vector<Card> boardCardList = m_deckManager->dealCards(5);
 
-    // Create BoardCards and progressively deal them
     BoardCards boardCards;
 
-    // Deal flop first (3 cards)
     boardCards.dealFlop(boardCardList[0], boardCardList[1], boardCardList[2]);
 
-    // Deal turn (4th card)
     boardCards.dealTurn(boardCardList[3]);
 
-    // Deal river (5th card)
     boardCards.dealRiver(boardCardList[4]);
 
     m_board->setBoardCards(boardCards);
 
-    return 5; // Number of cards dealt
+    return 5; 
 }
 
 std::vector<Card> Hand::dealCardsFromDeck(int numCards)
@@ -477,7 +361,7 @@ void Hand::processValidAction(const PlayerAction& action)
         // Reset invalid action count on successful action
         m_invalidActionHandler->resetInvalidActionCount(action.playerId);
 
-        ActionApplier::apply(*this, action);
+        ActionApplier::apply(*this, action, *m_logger);
 
         // Delegate state transition to HandStateManager
         m_stateManager->transitionToNextState(*this);

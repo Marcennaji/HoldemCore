@@ -4,9 +4,10 @@
 
 #include <infra/ConsoleLogger.h>
 #include <infra/eval/PsimHandEvaluationEngine.h>
-#include "core/services/ServiceContainer.h"
-#include "infra/persistence/SqliteDb.h"
-#include "infra/persistence/SqlitePlayersStatisticsStore.h"
+#include <infra/persistence/SqliteDb.h>
+#include <infra/persistence/SqlitePlayersStatisticsStore.h>
+#include <core/services/DefaultRandomizer.h>
+#include <core/interfaces/Logger.h>
 
 #include <ui/qtwidgets/controller/GuiAppController.h>
 #include <ui/qtwidgets/windows/StartWindow.h>
@@ -40,18 +41,17 @@ int main(int argc, char** argv)
     pkt::ui::qtwidgets::ThemeManager::applyLightTheme(app);
     
     QCoreApplication::setApplicationName("HoldemCore");
-    QCoreApplication::setOrganizationName("M87 Dev");
     QCoreApplication::setApplicationVersion("0.9");
 
-    auto services = std::make_shared<pkt::core::AppServiceContainer>();
-    
-    services->setLogger(std::make_unique<pkt::infra::ConsoleLogger>());
-    services->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>(services));
+    auto logger = std::make_shared<pkt::infra::ConsoleLogger>();
+    logger->setLogLevel(pkt::core::LogLevel::Info);
+    auto handEvaluator = std::make_shared<pkt::infra::PsimHandEvaluationEngine>();
     
     auto db = std::make_unique<pkt::infra::SqliteDb>(getDatabasePath());
-    services->setPlayersStatisticsStore(std::make_unique<pkt::infra::SqlitePlayersStatisticsStore>(std::move(db)));
+    auto statisticsStore = std::make_shared<pkt::infra::SqlitePlayersStatisticsStore>(std::move(db));
+    auto randomizer = std::make_shared<pkt::core::DefaultRandomizer>();
 
-    GuiAppController controller(services);
+    GuiAppController controller(logger, handEvaluator, statisticsStore, randomizer);
     auto* mainWindow = controller.createMainWindow();
     mainWindow->show();
 

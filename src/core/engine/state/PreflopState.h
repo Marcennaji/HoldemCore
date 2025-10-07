@@ -6,11 +6,6 @@
 
 #include <memory>
 
-namespace pkt::core
-{
-class ServiceContainer;
-} // namespace pkt::core
-
 namespace pkt::core::player
 {
 class Player;
@@ -24,12 +19,8 @@ class GameEvents;
 class PreflopState : public HandState, public HandActionProcessor, public HandDebuggableState
 {
   public:
-    PreflopState(const GameEvents& events, const int smallBlind, unsigned dealerPlayerId);
-    explicit PreflopState(const GameEvents& events, const int smallBlind, unsigned dealerPlayerId,
-                          std::shared_ptr<pkt::core::ServiceContainer> services);
-    // ISP-compliant constructor using focused service interface
     PreflopState(const GameEvents& events, const int smallBlind, unsigned dealerPlayerId,
-                 std::shared_ptr<Logger> logger);
+                 Logger& logger);
 
     void enter(Hand&) override;
     void exit(Hand&) override;
@@ -45,10 +36,6 @@ class PreflopState : public HandState, public HandActionProcessor, public HandDe
     const GameState getGameState() const override { return GameState::Preflop; }
     void promptPlayerAction(Hand&, player::Player& player) override;
 
-  protected:
-    // ISP-compliant service access helper
-    pkt::core::Logger& getLogger() const;
-
   private:
     void setBlinds(Hand& hand);
     void logHoleCards(Hand& hand);
@@ -58,8 +45,7 @@ class PreflopState : public HandState, public HandActionProcessor, public HandDe
     unsigned m_dealerPlayerId{static_cast<unsigned>(-1)};
     unsigned m_smallBlindPlayerId{static_cast<unsigned>(-1)};
     unsigned m_bigBlindPlayerId{static_cast<unsigned>(-1)};
-    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services; // Legacy support
-    std::shared_ptr<Logger> m_logger; // ISP-compliant focused dependency
+    Logger* m_logger;
 };
 
 } // namespace pkt::core

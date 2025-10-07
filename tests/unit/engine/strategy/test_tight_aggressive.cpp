@@ -3,7 +3,6 @@
 #include <core/player/strategy/TightAggressiveBotStrategy.h>
 #include "StrategyTest.h"
 #include "core/interfaces/NullLogger.h"
-#include "core/interfaces/ServiceAdapter.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;
@@ -20,12 +19,7 @@ class TightAggressiveStrategyTest : public StrategyTest
     void SetUp() override
     {
         StrategyTest::SetUp();
-        
-        // Create ISP-compliant strategy using test services
-        // Get direct core interface references from service container
-        auto loggerInterface = std::shared_ptr<pkt::core::Logger>(m_services, &m_services->logger());
-        auto randomizerInterface = std::shared_ptr<pkt::core::Randomizer>(m_services, &m_services->randomizer());
-        strategy = std::make_unique<TightAggressiveBotStrategy>(loggerInterface, randomizerInterface);
+        strategy = std::make_unique<TightAggressiveBotStrategy>(*m_logger, *m_randomizer);
     }
 
     std::unique_ptr<TightAggressiveBotStrategy> strategy;
@@ -74,7 +68,7 @@ TEST_F(TightAggressiveStrategyTest, Preflop_InPosition_CallsWithOdds)
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.personalContext.m_handSimulation.winSd = 0.6f;
     ctx.commonContext.bettingContext.preflopRaisesNumber = 1;
-    ctx.commonContext.playersContext.preflopLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events, m_services);
+    ctx.commonContext.playersContext.preflopLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events, m_logger, m_handEvaluationEngine, m_playersStatisticsStore, m_randomizer);
     ctx.personalContext.hasPosition = true;
 
     PlayerAction action = strategy->decideAction(ctx);
@@ -92,7 +86,7 @@ TEST_F(TightAggressiveStrategyTest, Flop_HighEquity_Raises)
     ctx.commonContext.stringBoard = "2h 3d 7c";
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.commonContext.bettingContext.flopBetsOrRaisesNumber = 1;
-    ctx.commonContext.playersContext.flopLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events, m_services);
+    ctx.commonContext.playersContext.flopLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events, m_logger, m_handEvaluationEngine, m_playersStatisticsStore, m_randomizer);
     ctx.personalContext.hasPosition = true;
 
     ctx.personalContext.m_handSimulation.win = 0.92f;
@@ -112,7 +106,7 @@ TEST_F(TightAggressiveStrategyTest, Flop_LowEquity_Folds)
     ctx.commonContext.bettingContext.potOdd = 10;
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.commonContext.bettingContext.flopBetsOrRaisesNumber = 1;
-    ctx.commonContext.playersContext.flopLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events, m_services);
+    ctx.commonContext.playersContext.flopLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events, m_logger, m_handEvaluationEngine, m_playersStatisticsStore, m_randomizer);
     PlayerAction action = strategy->decideAction(ctx);
 
     EXPECT_EQ(action.type, ActionType::Fold);
@@ -128,7 +122,7 @@ TEST_F(TightAggressiveStrategyTest, Turn_HighEquity_Raises)
     ctx.personalContext.m_handSimulation.winRanged = 0.95f;
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.commonContext.bettingContext.turnBetsOrRaisesNumber = 1;
-    ctx.commonContext.playersContext.turnLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events, m_services);
+    ctx.commonContext.playersContext.turnLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events, m_logger, m_handEvaluationEngine, m_playersStatisticsStore, m_randomizer);
 
     PlayerAction action = strategy->decideAction(ctx);
 
@@ -143,7 +137,7 @@ TEST_F(TightAggressiveStrategyTest, Turn_LowEquity_DoesNotRaise)
     ctx.personalContext.m_handSimulation.winRanged = 0.4f;
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.commonContext.bettingContext.turnBetsOrRaisesNumber = 1;
-    ctx.commonContext.playersContext.turnLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events, m_services);
+    ctx.commonContext.playersContext.turnLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events, m_logger, m_handEvaluationEngine, m_playersStatisticsStore, m_randomizer);
 
     PlayerAction action = strategy->decideAction(ctx);
 
@@ -158,7 +152,7 @@ TEST_F(TightAggressiveStrategyTest, Turn_LowEquity_Folds)
     ctx.commonContext.bettingContext.potOdd = 10;
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.commonContext.bettingContext.turnBetsOrRaisesNumber = 1;
-    ctx.commonContext.playersContext.turnLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events, m_services);
+    ctx.commonContext.playersContext.turnLastRaiser = std::make_shared<pkt::test::DummyPlayer>(2, events, m_logger, m_handEvaluationEngine, m_playersStatisticsStore, m_randomizer);
 
     PlayerAction action = strategy->decideAction(ctx);
 
@@ -176,7 +170,7 @@ TEST_F(TightAggressiveStrategyTest, River_Nuts_Raises)
     ctx.personalContext.m_handSimulation.winRanged = 1.0f;
     ctx.personalContext.position = PlayerPosition::Button;
     ctx.commonContext.bettingContext.riverBetsOrRaisesNumber = 5;
-    ctx.commonContext.playersContext.lastVPIPPlayer = std::make_shared<pkt::test::DummyPlayer>(2, events, m_services);
+    ctx.commonContext.playersContext.lastVPIPPlayer = std::make_shared<pkt::test::DummyPlayer>(2, events, m_logger, m_handEvaluationEngine, m_playersStatisticsStore, m_randomizer);
 
     PlayerAction action = strategy->decideAction(ctx);
 

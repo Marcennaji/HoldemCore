@@ -19,10 +19,7 @@ class GameEvents;
 class FlopState : public HandState, public HandActionProcessor, public HandDebuggableState
 {
   public:
-    explicit FlopState(const GameEvents& events);
-    
-    // ISP-compliant constructor - only depends on what it needs (DIP principle)
-    explicit FlopState(const GameEvents& events, std::shared_ptr<Logger> logger);
+    explicit FlopState(const GameEvents& events, Logger& logger);
 
     void enter(Hand&) override;
     void exit(Hand&) override;
@@ -37,14 +34,13 @@ class FlopState : public HandState, public HandActionProcessor, public HandDebug
     const GameState getGameState() const override { return GameState::Flop; }
     void promptPlayerAction(Hand&, player::Player& player) override;
     
-    // Override to use focused logging dependency (LSP compliance)
     void logStateInfo(Hand& hand) override;
 
   private:
-    Logger& getLogger(); // Helper method following SRP
+    Logger& getLogger(); 
     
     const GameEvents& m_events;
-    std::shared_ptr<Logger> m_loggerService; // ISP-compliant dependency
+    Logger* m_logger; 
 };
 
 } // namespace pkt::core

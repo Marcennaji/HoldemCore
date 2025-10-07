@@ -2,8 +2,11 @@
 #pragma once
 
 #include <core/engine/GameEvents.h>
-
 #include <core/session/Session.h>
+#include <core/interfaces/Logger.h>
+#include <core/interfaces/HandEvaluationEngine.h>
+#include <core/interfaces/persistence/PlayersStatisticsStore.h>
+#include <core/interfaces/Randomizer.h>
 
 #include <QString>
 #include <memory>
@@ -11,7 +14,6 @@
 namespace pkt::core
 {
 class Session;
-class ServiceContainer;
 } // namespace pkt::core
 
 namespace pkt::ui::qtwidgets
@@ -22,14 +24,15 @@ class StartWindow;
 class GuiAppController
 {
   public:
-    GuiAppController();
-    GuiAppController(std::shared_ptr<pkt::core::ServiceContainer> services);
+    GuiAppController(std::shared_ptr<pkt::core::Logger> logger,
+                     std::shared_ptr<pkt::core::HandEvaluationEngine> handEvaluationEngine,
+                     std::shared_ptr<pkt::core::PlayersStatisticsStore> statisticsStore,
+                     std::shared_ptr<pkt::core::Randomizer> randomizer);
     ~GuiAppController();
 
     StartWindow* createMainWindow();
 
   private:
-    std::shared_ptr<pkt::core::ServiceContainer> m_services;
     std::unique_ptr<PokerTableWindow> m_pokerTableWindow;
     std::unique_ptr<pkt::core::Session> m_session;
     pkt::core::GameEvents m_events;

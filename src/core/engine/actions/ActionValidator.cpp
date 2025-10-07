@@ -3,37 +3,36 @@
 #include "Helpers.h"             // For getValidActionsForPlayer
 #include "core/player/Helpers.h" // For getPlayerById
 #include "core/player/Player.h"
-#include "core/services/ServiceContainer.h"
+#include "core/interfaces/NullLogger.h"
 
 #include <algorithm>
 
 namespace pkt::core
 {
 
-ActionValidator::ActionValidator(std::shared_ptr<pkt::core::ServiceContainer> services)
-    : m_services(std::move(services))
+ActionValidator::ActionValidator(std::shared_ptr<pkt::core::Logger> logger)
+    : m_logger(logger)
 {
 }
 
-void ActionValidator::ensureServicesInitialized() const
+pkt::core::Logger& ActionValidator::getLogger() const
 {
-    if (!m_services)
-    {
-        m_services = std::make_shared<pkt::core::AppServiceContainer>();
+    if (m_logger) {
+        return *m_logger;
     }
+    static pkt::core::NullLogger nullLogger;
+    return nullLogger;
 }
 
 bool ActionValidator::validatePlayerAction(const pkt::core::player::PlayerList& actingPlayersList,
                                            const PlayerAction& action, const BettingActions& bettingActions,
                                            int smallBlind, const GameState gameState) const
 {
-    ensureServicesInitialized();
-
     auto player = pkt::core::player::getPlayerById(actingPlayersList, action.playerId);
     if (!player)
     {
-        m_services->logger().error(gameStateToString(gameState) + ": player with id " +
-                                   std::to_string(action.playerId) + " not found in actingPlayersList");
+        getLogger().error(gameStateToString(gameState) + ": player with id " +
+                          std::to_string(action.playerId) + " not found in actingPlayersList");
         return false;
     }
 
@@ -63,13 +62,11 @@ bool ActionValidator::validatePlayerActionWithReason(const pkt::core::player::Pl
                                                     int smallBlind, const GameState gameState,
                                                     std::string& outReason) const
 {
-    ensureServicesInitialized();
-
     auto player = pkt::core::player::getPlayerById(actingPlayersList, action.playerId);
     if (!player)
     {
         outReason = "Player not found in active players list";
-        m_services->logger().error(gameStateToString(gameState) + ": player with id " +
+        getLogger().error(gameStateToString(gameState) + ": player with id " +
                                    std::to_string(action.playerId) + " not found in actingPlayersList");
         return false;
     }
@@ -107,8 +104,6 @@ bool ActionValidator::validate(const pkt::core::player::PlayerList& actingPlayer
 bool ActionValidator::isConsecutiveActionAllowed(const BettingActions& bettingActions, const PlayerAction& action,
                                                  const GameState gameState, std::string* outReason) const
 {
-    ensureServicesInitialized();
-
     const auto& handHistory = bettingActions.getHandActionHistory();
     for (const auto& round : handHistory)
     {
@@ -131,7 +126,7 @@ bool ActionValidator::isConsecutiveActionAllowed(const BettingActions& bettingAc
                                   std::string(actionTypeToString(lastVoluntary.second)) + " by player " +
                                   std::to_string(action.playerId);
                 if (outReason) *outReason = msg;
-                m_services->logger().error(gameStateToString(gameState) + ": " + msg);
+                getLogger().error(gameStateToString(gameState) + ": " + msg);
                 return false;
             }
             break;
@@ -146,8 +141,6 @@ bool ActionValidator::isActionTypeValid(const pkt::core::player::PlayerList& act
                                         const std::shared_ptr<pkt::core::player::Player>& player,
                                         std::string* outReason) const
 {
-    ensureServicesInitialized();
-
     std::vector<ActionType> validActions =
         getValidActionsForPlayer(actingPlayersList, action.playerId, bettingActions, smallBlind, gameState);
 
@@ -159,7 +152,7 @@ bool ActionValidator::isActionTypeValid(const pkt::core::player::PlayerList& act
             actionsStr += actionTypeToString(validActions[i]);
             if (i + 1 < validActions.size()) actionsStr += ",";
         }
-        m_services->logger().debug(gameStateToString(gameState) + 
+        getLogger().debug(gameStateToString(gameState) + 
                                    ": valid actions for player " + player->getName() + 
                                    " => [" + actionsStr + "] (requested: " + actionTypeToString(action.type) + ")");
     }
@@ -201,7 +194,7 @@ bool ActionValidator::isActionTypeValid(const pkt::core::player::PlayerList& act
     {
     std::string msg = std::string("Invalid action type: ") + actionTypeToString(action.type);
         if (outReason) *outReason = msg;
-        m_services->logger().error(gameStateToString(gameState) + ": Invalid action type for player " +
+        getLogger().error(gameStateToString(gameState) + ": Invalid action type for player " +
                                    player->getName() + " : " + actionTypeToString(action.type));
     }
 
@@ -213,7 +206,6 @@ bool ActionValidator::isActionAmountValid(const PlayerAction& action, const Bett
                                           const std::shared_ptr<pkt::core::player::Player>& player,
                                           std::string* outReason) const
 {
-    ensureServicesInitialized();
 
     const int currentHighestBet = bettingActions.getRoundHighestSet();
     const int playerBet = player->getCurrentHandActions().getRoundTotalBetAmount(gameState);
@@ -277,7 +269,7 @@ bool ActionValidator::isActionAmountValid(const PlayerAction& action, const Bett
             break;
         }
         if (outReason) *outReason = msg;
-        m_services->logger().error(gameStateToString(gameState) + ": Invalid action amount for player " +
+        getLogger().error(gameStateToString(gameState) + ": Invalid action amount for player " +
                                    std::to_string(action.playerId) + " : " + actionTypeToString(action.type) +
                                    " with amount = " + std::to_string(action.amount));
     }

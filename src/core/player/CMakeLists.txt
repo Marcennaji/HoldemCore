@@ -14,10 +14,8 @@ set(PLAYER_SOURCES
     PlayerStatistics.h
     PlayerStatisticsUpdater.cpp
     PlayerStatisticsUpdater.h
-    DefaultPlayerFactory.cpp
-    DefaultPlayerFactory.h
-    MixedPlayerFactory.cpp
-    MixedPlayerFactory.h
+    PlayerFactory.cpp
+    PlayerFactory.h
     CurrentHandActions.cpp
     CurrentHandActions.h
     Helpers.h

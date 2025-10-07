@@ -6,7 +6,6 @@
 #include "Player.h"
 #include "core/engine/model/PlayerAction.h"
 #include "core/interfaces/Logger.h"
-#include "core/services/ServiceContainer.h"
 
 #include <algorithm>
 
@@ -29,20 +28,6 @@ PlayerListIterator PlayerListUtils::getPlayerListIteratorById(PlayerList& list, 
 {
     return std::find_if(list->begin(), list->end(),
                         [id](const std::shared_ptr<Player>& p) { return p->getId() == id; });
-}
-
-void PlayerListUtils::updateActingPlayersList(PlayerList& m_actingPlayersList)
-{
-    // Use a shared default services instance instead of creating a new container on each call.
-    static std::shared_ptr<pkt::core::ServiceContainer> s_defaultServices =
-        std::make_shared<pkt::core::AppServiceContainer>();
-    updateActingPlayersList(m_actingPlayersList, s_defaultServices);
-}
-
-void PlayerListUtils::updateActingPlayersList(PlayerList& m_actingPlayersList,
-                                              std::shared_ptr<pkt::core::ServiceContainer> services)
-{
-    updateActingPlayersList(m_actingPlayersList, services->logger());
 }
 
 void PlayerListUtils::updateActingPlayersList(PlayerList& m_actingPlayersList, pkt::core::Logger& logger)

@@ -42,7 +42,6 @@ class BotStrategy : public PlayerStrategy
     }
 
   protected:
-    BotStrategy() : m_preflopRangeCalculator(std::make_unique<PreflopRangeCalculator>()) {}
 
     void initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange)
     {

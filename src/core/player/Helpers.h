@@ -39,9 +39,9 @@ inline PlayerListIterator getPlayerListIteratorById(PlayerList list, unsigned id
     return PlayerListUtils::getPlayerListIteratorById(list, id);
 }
 
-inline void updateActingPlayersList(PlayerList& list)
+inline void updateActingPlayersList(PlayerList& list, pkt::core::Logger& logger)
 {
-    PlayerListUtils::updateActingPlayersList(list);
+    PlayerListUtils::updateActingPlayersList(list, logger);
 }
 
 inline bool isCardsInRange(const std::string& card1, const std::string& card2, const std::string& range)

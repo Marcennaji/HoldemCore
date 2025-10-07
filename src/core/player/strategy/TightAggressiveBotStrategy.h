@@ -16,11 +16,7 @@ class TightAggressiveBotStrategy : public BotStrategyBase
 {
 
   public:
-    // Legacy default constructor for backward compatibility
-    TightAggressiveBotStrategy();
-    
-    // ISP-compliant constructor using focused service interfaces
-    TightAggressiveBotStrategy(std::shared_ptr<pkt::core::Logger> logger, std::shared_ptr<pkt::core::Randomizer> randomizer);
+    TightAggressiveBotStrategy(pkt::core::Logger& logger, pkt::core::Randomizer& randomizer);
     ~TightAggressiveBotStrategy();
 
   private:
@@ -37,16 +33,6 @@ class TightAggressiveBotStrategy : public BotStrategyBase
     virtual int flopCouldBet(const CurrentHandContext& ctx);
     virtual int turnCouldBet(const CurrentHandContext& ctx);
     virtual int riverCouldBet(const CurrentHandContext& ctx);
-
-  protected:
-    // ISP-compliant service access helpers
-    pkt::core::Logger& getLogger() const;
-    pkt::core::Randomizer& getRandomizer() const;
-
-  private:
-    // ISP-compliant focused service interfaces
-    std::shared_ptr<pkt::core::Logger> m_logger;
-    std::shared_ptr<pkt::core::Randomizer> m_randomizer;
 };
 
 } // namespace pkt::core::player

@@ -7,36 +7,14 @@
 namespace pkt::core
 {
 
-Pot::Pot(unsigned total, pkt::core::player::PlayerList seats, unsigned dealerId)
-    : m_total(total), m_seats(std::move(seats)), m_dealerId(dealerId)
-{
-}
-
 Pot::Pot(unsigned total, pkt::core::player::PlayerList seats, unsigned dealerId,
-         std::shared_ptr<ServiceContainer> serviceContainer)
-    : m_total(total), m_seats(std::move(seats)), m_dealerId(dealerId), m_services(serviceContainer)
+         Logger& logger)
+    : m_total(total), m_seats(std::move(seats)), m_dealerId(dealerId), m_logger(&logger)
 {
-}
-
-// ISP-compliant constructor with focused services (preferred)
-Pot::Pot(unsigned total, pkt::core::player::PlayerList seats, unsigned dealerId,
-         std::shared_ptr<Logger> logger)
-    : m_total(total), m_seats(std::move(seats)), m_dealerId(dealerId), m_logger(logger)
-{
-}
-
-void Pot::ensureServicesInitialized() const
-{
-    if (!m_services)
-    {
-        m_services = std::make_shared<AppServiceContainer>();
-    }
 }
 
 void Pot::distribute()
 {
-    ensureServicesInitialized();
-
     m_winners.clear();
     std::vector<unsigned> contributions = initializePlayerContributions();
     std::vector<unsigned> remaining = contributions;
@@ -63,15 +41,8 @@ void Pot::distribute()
         int potLevel = static_cast<int>(contributorsCount * level);
         if (potLevel > m_total)
         {
-            // Use focused Logger service if available, fallback to ServiceContainer for legacy compatibility
-            if (m_logger) {
-                m_logger->info("Pot level " + std::to_string(potLevel) +
-                              " exceeds total available chips : " + std::to_string(m_total));
-            } else {
-                ensureServicesInitialized();
-                m_services->logger().info("Pot level " + std::to_string(potLevel) +
-                                         " exceeds total available chips : " + std::to_string(m_total));
-            }
+            m_logger->info("Pot level " + std::to_string(potLevel) +
+                          " exceeds total available chips : " + std::to_string(m_total));
             potLevel = m_total;
         }
 

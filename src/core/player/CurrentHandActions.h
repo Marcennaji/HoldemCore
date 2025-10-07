@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include <core/services/ServiceContainer.h>
 #include "core/engine/model/GameState.h"
 #include "core/engine/model/PlayerAction.h"
 #include "core/interfaces/Logger.h"
@@ -17,7 +16,7 @@ class CurrentHandActions
 {
   public:
     CurrentHandActions();
-    explicit CurrentHandActions(std::shared_ptr<pkt::core::ServiceContainer> serviceContainer);
+    explicit CurrentHandActions(std::shared_ptr<Logger> logger);
     ~CurrentHandActions() = default;
 
     void reset();
@@ -37,8 +36,7 @@ class CurrentHandActions
     void writeActionsToLog(Logger& logger) const;
 
   private:
-    void ensureServicesInitialized() const;
-    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services; // Injected service container
+    std::shared_ptr<Logger> m_logger;
 
     std::map<GameState, std::vector<PlayerAction>> m_actionsByState;
     PlayerAction m_lastAction{-1, ActionType::None, 0};

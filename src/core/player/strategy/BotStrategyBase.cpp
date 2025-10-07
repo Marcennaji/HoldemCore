@@ -6,43 +6,23 @@
 #include <core/player/Helpers.h>
 #include "CurrentHandContext.h"
 #include "core/player/Player.h"
-#include "PokerMath.h"  // Phase 3: Include utilities for preflop calculations
+#include "PokerMath.h"
+#include "core/interfaces/NullLogger.h"
+#include "core/services/DefaultRandomizer.h"
 
 using namespace std;
 
 namespace pkt::core::player
 {
 
-BotStrategyBase::BotStrategyBase()
+BotStrategyBase::BotStrategyBase(Logger& logger, Randomizer& randomizer) 
+    : m_logger(&logger), m_randomizer(&randomizer)
 {
-    // Default constructor - services will be initialized lazily
-}
-
-BotStrategyBase::BotStrategyBase(std::shared_ptr<pkt::core::ServiceContainer> services) : m_services(services)
-{
-    // Constructor with services injection
-    // Also ensure our PreflopRangeCalculator uses the same injected services
-    if (m_services && m_preflopRangeCalculator)
-    {
-        // Replace the default-constructed calculator with one bound to injected services
-        m_preflopRangeCalculator = std::make_unique<PreflopRangeCalculator>(m_services);
-    }
-}
-
-void BotStrategyBase::ensureServicesInitialized() const
-{
-    if (!m_services)
-    {
-        // Use a shared default container to avoid repeated allocations and to keep a consistent default
-        static std::shared_ptr<pkt::core::ServiceContainer> defaultServices =
-            std::make_shared<pkt::core::AppServiceContainer>();
-        m_services = defaultServices;
-    }
+    m_preflopRangeCalculator = std::make_unique<PreflopRangeCalculator>(*m_logger, *m_randomizer);
 }
 
 PlayerAction BotStrategyBase::decidePreflop(const CurrentHandContext& ctx)
 {
-    ensureServicesInitialized();
     PlayerAction resultingAction;
     resultingAction.playerId = ctx.personalContext.id;
 
@@ -74,7 +54,6 @@ PlayerAction BotStrategyBase::decidePreflop(const CurrentHandContext& ctx)
 }
 PlayerAction BotStrategyBase::decideFlop(const CurrentHandContext& ctx)
 {
-    ensureServicesInitialized();
     PlayerAction resultingAction;
     resultingAction.playerId = ctx.personalContext.id;
 
@@ -115,7 +94,6 @@ PlayerAction BotStrategyBase::decideFlop(const CurrentHandContext& ctx)
 }
 PlayerAction BotStrategyBase::decideTurn(const CurrentHandContext& ctx)
 {
-    ensureServicesInitialized();
     PlayerAction resultingAction;
     resultingAction.playerId = ctx.personalContext.id;
 
@@ -156,7 +134,6 @@ PlayerAction BotStrategyBase::decideTurn(const CurrentHandContext& ctx)
 }
 PlayerAction BotStrategyBase::decideRiver(const CurrentHandContext& ctx)
 {
-    ensureServicesInitialized();
     PlayerAction resultingAction;
     resultingAction.playerId = ctx.personalContext.id;
 
@@ -261,8 +238,7 @@ bool BotStrategyBase::shouldPotControlOnTurn(const CurrentHandContext& ctx, int 
 
 void BotStrategyBase::logPotControl() const
 {
-    ensureServicesInitialized();
-    m_services->logger().verbose("\t\tShould control pot");
+    m_logger->verbose("\t\tShould control pot");
 }
 
 int BotStrategyBase::computePreflopRaiseAmount(const CurrentHandContext& ctx)
@@ -367,8 +343,7 @@ bool BotStrategyBase::isPossibleToBluff(const CurrentHandContext& ctx) const
 
     if (players == nullptr)
     {
-        ensureServicesInitialized();
-        m_services->logger().info("BotStrategyBase::isPossibleToBluff() is not compatible with legacy (non FSM) code");
+        m_logger->info("BotStrategyBase::isPossibleToBluff() is not compatible with legacy (non FSM) code");
         return false; // TODO remove this after FSM migration is complete
     }
 

@@ -10,7 +10,7 @@ namespace pkt::core
 
 using namespace pkt::core::player;
 
-void ActionApplier::apply(Hand& hand, const PlayerAction& action)
+void ActionApplier::apply(Hand& hand, const PlayerAction& action, pkt::core::Logger& logger)
 {
     auto player = getPlayerById(hand.getActingPlayersList(), action.playerId);
     if (!player)
@@ -47,7 +47,7 @@ void ActionApplier::apply(Hand& hand, const PlayerAction& action)
         break;
     }
 
-    finalizeAction(hand, *player, actionForHistory);
+    finalizeAction(hand, *player, actionForHistory, logger);
 }
 
 void ActionApplier::applyCallAction(Hand& hand, player::Player& player, PlayerAction& actionForHistory,
@@ -176,14 +176,14 @@ void ActionApplier::setLastRaiserForCurrentRound(Hand& hand, unsigned playerId)
     }
 }
 
-void ActionApplier::finalizeAction(Hand& hand, player::Player& player, const PlayerAction& actionForHistory)
+void ActionApplier::finalizeAction(Hand& hand, player::Player& player, const PlayerAction& actionForHistory, pkt::core::Logger& logger)
 {
     // Record action in hand-level chronological history
     hand.getBettingActions()->recordPlayerAction(hand.getStateManager()->getGameState(), actionForHistory);
 
     player.processAction(actionForHistory, hand);
 
-    updateActingPlayersList(hand.getActingPlayersListMutable());
+    updateActingPlayersList(hand.getActingPlayersListMutable(), logger);
 
     if (hand.getEvents().onPlayerActed)
     {

@@ -4,7 +4,7 @@
 
 #include <infra/ConsoleLogger.h>
 #include <infra/eval/PsimHandEvaluationEngine.h>
-#include "core/services/ServiceContainer.h"
+
 #include "infra/persistence/SqliteDb.h"
 #include "infra/persistence/SqlitePlayersStatisticsStore.h"
 

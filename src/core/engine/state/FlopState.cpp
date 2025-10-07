@@ -6,18 +6,14 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/utils/Helpers.h"
 #include "core/player/Player.h"
+#include "core/interfaces/NullLogger.h"
 
 namespace pkt::core
 {
 using namespace pkt::core::player;
 
-FlopState::FlopState(const GameEvents& events) : m_events(events)
-{
-}
-
-// ISP-compliant constructor - only accepts what it actually needs
-FlopState::FlopState(const GameEvents& events, std::shared_ptr<Logger> logger) 
-    : m_events(events), m_loggerService(logger)
+FlopState::FlopState(const GameEvents& events, Logger& logger) 
+    : m_events(events), m_logger(&logger)
 {
 }
 
@@ -60,14 +56,12 @@ void FlopState::enter(Hand& hand)
 Logger& FlopState::getLogger()
 {
     // Use focused dependency if available (ISP-compliant)
-    if (m_loggerService) {
-        return *m_loggerService;
+    if (m_logger) {
+        return *m_logger;
     }
     
-    // Fall back to base class implementation (Open/Closed Principle)
-    static std::shared_ptr<pkt::core::ServiceContainer> defaultServices =
-        std::make_shared<pkt::core::AppServiceContainer>();
-    return defaultServices->logger();
+    static pkt::core::NullLogger nullLogger;
+    return nullLogger;
 }
 
 // Override base class method to use focused dependency (Liskov Substitution Principle)
@@ -102,7 +96,7 @@ void FlopState::promptPlayerAction(Hand& hand, Player& player)
 
 std::unique_ptr<HandState> FlopState::computeNextState(Hand& hand)
 {
-    return computeBettingRoundNextState(hand, m_events, Flop, m_loggerService);
+    return computeBettingRoundNextState(hand, m_events, Flop, *m_logger);
 }
 
 std::shared_ptr<player::Player> FlopState::getNextPlayerToAct(const Hand& hand) const
@@ -117,7 +111,7 @@ std::shared_ptr<player::Player> FlopState::getFirstPlayerToActInRound(const Hand
 
 bool FlopState::isRoundComplete(const Hand& hand) const
 {
-    return pkt::core::isRoundComplete(hand);
+    return pkt::core::isRoundComplete(hand, *m_logger);
 }
 
 } // namespace pkt::core

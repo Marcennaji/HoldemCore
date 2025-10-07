@@ -6,40 +6,21 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/utils/Helpers.h"
 #include "core/player/Player.h"
-#include "core/services/ServiceContainer.h"
+#include "core/interfaces/NullLogger.h"
 
 namespace pkt::core
 {
 using namespace pkt::core::player;
 
-TurnState::TurnState(const GameEvents& events) : m_events(events)
-{
-}
 
-TurnState::TurnState(const GameEvents& events, std::shared_ptr<pkt::core::ServiceContainer> services)
-    : m_events(events), m_services(std::move(services))
+TurnState::TurnState(const GameEvents& events, Logger& logger)
+    : m_events(events), m_logger(&logger)
 {
-}
-
-// ISP-compliant constructor using focused service interface
-TurnState::TurnState(const GameEvents& events, std::shared_ptr<Logger> logger)
-    : m_events(events), m_logger(logger)
-{
-}
-
-// ISP-compliant helper method
-pkt::core::Logger& TurnState::getLogger() const
-{
-    if (m_logger) {
-        return *m_logger;
-    }
-    // This should not happen in normal operation
-    throw std::runtime_error("TurnState: Logger service not properly initialized. Use ISP-compliant constructor.");
 }
 
 void TurnState::enter(Hand& hand)
 {
-    getLogger().info("Turn");
+    m_logger->info("Turn");
 
     for (auto& player : *hand.getActingPlayersList())
     {
@@ -93,7 +74,7 @@ void TurnState::promptPlayerAction(Hand& hand, Player& player)
 
 std::unique_ptr<HandState> TurnState::computeNextState(Hand& hand)
 {
-    return computeBettingRoundNextState(hand, m_events, Turn, m_logger);
+    return computeBettingRoundNextState(hand, m_events, Turn, *m_logger);
 }
 
 std::shared_ptr<player::Player> TurnState::getNextPlayerToAct(const Hand& hand) const
@@ -108,7 +89,12 @@ std::shared_ptr<player::Player> TurnState::getFirstPlayerToActInRound(const Hand
 }
 bool TurnState::isRoundComplete(const Hand& hand) const
 {
-    return pkt::core::isRoundComplete(hand);
+    return pkt::core::isRoundComplete(hand, *m_logger);
+}
+
+void TurnState::logStateInfo(Hand& hand)
+{
+    m_logger->info("Turn state - fourth community card dealt");
 }
 
 } // namespace pkt::core

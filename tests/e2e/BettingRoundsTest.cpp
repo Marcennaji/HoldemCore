@@ -1213,7 +1213,7 @@ TEST_F(BettingRoundsTest, ConsecutiveHandsWorkCorrectly_RegressionTest)
     startData.numberOfPlayers = 3;
     
     // Create Game instance to test consecutive hands
-    auto game = std::make_unique<Game>(m_events, m_factory, m_board, m_seatsList, 
+    auto game = std::make_unique<Game>(m_events, *m_factory, m_board, m_seatsList, 
                                       0, gameData, startData);
 
     // Also verify dealer rotation across consecutive hands.
