@@ -7,6 +7,7 @@
 #include "../services/PokerServices.h"
 
 #include <core/services/ServiceContainer.h>
+#include <core/services/DefaultRandomizer.h>
 #include "core/engine/game/Board.h"
 #include "strategy/LooseAggressiveBotStrategy.h"
 #include "strategy/ManiacBotStrategy.h"
@@ -15,6 +16,8 @@
 #include "core/engine/EngineDefs.h"
 #include <infra/ConsoleLogger.h>
 #include <infra/eval/PsimHandEvaluationEngine.h>
+#include <infra/persistence/SqlitePlayersStatisticsStore.h>
+#include <stdexcept>
 
 // Adapter classes to bridge ISP interfaces back to concrete implementations
 // These are needed during the migration period to populate ServiceContainer
@@ -27,94 +30,86 @@ namespace {
 namespace pkt::core
 {
 
-EngineFactory::EngineFactory(const GameEvents& events) : m_events(events)
+// Backward-compatible constructor for legacy code and tests
+EngineFactory::EngineFactory(const GameEvents& events) 
+    : m_events(events)
 {
+    // Create default services for backward compatibility
+    // This maintains existing behavior while transitioning to ISP
+    auto logger = std::make_shared<pkt::infra::ConsoleLogger>();
+    logger->setLogLevel(pkt::core::LogLevel::Info);
+    
+    auto handEvaluator = std::make_shared<pkt::infra::PsimHandEvaluationEngine>();
+    
+    // For statistics store, we'll need a default implementation from ServiceContainer
+    auto container = std::make_shared<AppServiceContainer>();
+    
+    m_logger = logger;
+    m_handEvaluator = handEvaluator;
+    // Use aliasing constructor to create shared_ptr that references the container's statistics store
+    // but keeps the container alive through the control block
+    m_statisticsStore = std::shared_ptr<PlayersStatisticsStore>(container, &container->playersStatisticsStore());
 }
 
-// ISP-compliant constructor using focused service interfaces
+// ISP-compliant constructor with focused service interfaces (preferred)
 EngineFactory::EngineFactory(const GameEvents& events, 
                              std::shared_ptr<Logger> logger,
                              std::shared_ptr<HandEvaluationEngine> handEvaluator,
-                             std::shared_ptr<PlayersStatisticsStore> statisticsStore,
-                             std::shared_ptr<ServiceContainer> serviceContainer)
-    : m_events(events), m_logger(logger), m_handEvaluator(handEvaluator), m_statisticsStore(statisticsStore), m_services(serviceContainer)
+                             std::shared_ptr<PlayersStatisticsStore> statisticsStore)
+    : m_events(events), m_logger(logger), m_handEvaluator(handEvaluator), m_statisticsStore(statisticsStore)
 {
+    // Validate that all required dependencies are provided
+    if (!m_logger || !m_handEvaluator || !m_statisticsStore) {
+        throw std::invalid_argument("EngineFactory requires all focused dependencies (Logger, HandEvaluationEngine, PlayersStatisticsStore)");
+    }
 }
 
 EngineFactory::~EngineFactory() = default;
 
-void EngineFactory::ensureServicesInitialized() const
+// Helper method to create temporary ServiceContainer from focused services
+// This is a bridge during migration - eventually Hand and Board should accept focused services directly
+std::shared_ptr<pkt::core::ServiceContainer> EngineFactory::createServiceContainerFromFocusedServices() const
 {
-    if (!m_services)
-    {
-        // Create a default service container as fallback
-        auto appServices = std::make_shared<AppServiceContainer>();
-        auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
-        logger->setLogLevel(pkt::core::LogLevel::Info);
-        appServices->setLogger(std::move(logger));
-        appServices->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>());
-        m_services = appServices;
-        
-        // Note: When using ISP interfaces from ServiceAdapter, the original ServiceContainer
-        // should be passed directly to avoid this fallback
-    }
-}
-
-pkt::core::Logger& EngineFactory::getLogger() const
-{
-    if (m_logger) {
-        return *m_logger;
-    }
-    // Fallback to legacy service container
-    ensureServicesInitialized();
-    return m_services->logger();
-}
-
-pkt::core::HandEvaluationEngine& EngineFactory::getHandEvaluationEngine() const
-{
-    if (m_handEvaluator) {
-        return *m_handEvaluator;
-    }
-    // Fallback to legacy service container
-    ensureServicesInitialized();
-    return m_services->handEvaluationEngine();
-}
-
-std::shared_ptr<pkt::core::ServiceContainer> EngineFactory::getServiceContainer() const
-{
-    ensureServicesInitialized();
-    return m_services;
+    auto container = std::make_shared<AppServiceContainer>();
+    
+    // Create simple copies of our focused services since ServiceContainer expects to own them
+    auto loggerCopy = std::make_unique<pkt::infra::ConsoleLogger>();
+    loggerCopy->setLogLevel(pkt::core::LogLevel::Info);
+    
+    auto handEvaluatorCopy = std::make_unique<pkt::infra::PsimHandEvaluationEngine>();
+    
+    container->setLogger(std::move(loggerCopy));
+    container->setHandEvaluationEngine(std::move(handEvaluatorCopy));
+    
+    // TODO: Remove this bridge method entirely once Hand is converted to ISP
+    // For now, let the container create its own default statistics store
+    
+    // We'll need a default randomizer since it's not part of our focused services yet
+    container->setRandomizer(std::make_unique<DefaultRandomizer>());
+    
+    return container;
 }
 
 std::shared_ptr<Hand> EngineFactory::createHand(std::shared_ptr<EngineFactory> f, std::shared_ptr<Board> b,
                                                 pkt::core::player::PlayerList seats,
                                                 pkt::core::player::PlayerList actingPlayers, GameData gd, StartData sd)
 {
-    // Use ISP-compliant approach when focused dependencies are available
-    if (m_logger && m_handEvaluator) {
-        // Create PokerServices wrapper for legacy Hand constructor
-        ensureServicesInitialized(); // Ensure m_services is available
-        auto pokerServices = std::make_shared<PokerServices>(m_services);
-        return std::make_shared<Hand>(m_events, f, b, seats, actingPlayers, gd, sd, pokerServices);
-    }
-    
-    // Legacy fallback
-    ensureServicesInitialized();
-    auto pokerServices = std::make_shared<PokerServices>(m_services);
-    return std::make_shared<Hand>(m_events, f, b, seats, actingPlayers, gd, sd, pokerServices);
+    // Use ISP-compliant Hand constructor with focused services
+    return std::make_shared<Hand>(m_events, f, b, seats, actingPlayers, gd, sd, m_logger, m_statisticsStore);
 }
 
 std::shared_ptr<Board> EngineFactory::createBoard(unsigned dealerPosition)
 {
-    // Use ISP-compliant approach when focused dependencies are available
-    if (m_logger && m_handEvaluator) {
-        // Use legacy ServiceContainer for Board constructor
-        ensureServicesInitialized(); // Ensure m_services is available
-        return std::make_shared<Board>(dealerPosition, m_events, m_services);
-    }
+    // Create ServiceContainer from our focused services for legacy Board constructor
+    auto serviceContainer = createServiceContainerFromFocusedServices();
     
-    // Legacy fallback
-    ensureServicesInitialized();
-    return std::make_shared<Board>(dealerPosition, m_events, m_services);
+    return std::make_shared<Board>(dealerPosition, m_events, serviceContainer);
 }
+
+// Legacy method for backward compatibility (used by Hand.cpp)
+std::shared_ptr<pkt::core::ServiceContainer> EngineFactory::getServiceContainer() const
+{
+    return createServiceContainerFromFocusedServices();
+}
+
 } // namespace pkt::core

@@ -95,16 +95,25 @@ Use `ARCHITECTURE.md` for design theory, and this file for **actionable guidance
 
 ---
 
-## 8. Summary of Priorities for AI Agents
+## 8. Task Completion Criteria
+
+**A task is considered COMPLETE only when:**
+1. **All code compiles successfully** (including tests)
+2. **All existing tests continue to pass** 
+3. **Basic tests related to modified code are verified**
+4. **No compilation errors or warnings introduced**
+
+### Summary of Priorities for AI Agents
 
 | Priority | Rule |
 |-----------|------|
-| 1 | Maintain ISP enforcement |
-| 2 | Remove all ServiceContainer remnants |
-| 3 | Keep core Qt-free |
-| 4 | Maintain test coverage |
-| 5 | Follow architectural layering |
-| 6 | Explain changes and output clean diffs |
+| 1 | Ensure full compilation + test success before marking tasks complete |
+| 2 | Maintain ISP enforcement |
+| 3 | Remove all ServiceContainer remnants |
+| 4 | Keep core Qt-free |
+| 5 | Maintain test coverage |
+| 6 | Follow architectural layering |
+| 7 | Explain changes and output clean diffs |
 
 ---
 

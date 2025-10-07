@@ -24,15 +24,9 @@ namespace pkt::test
 
 void SqlitePlayersStatisticsStoreTest::SetUp()
 {
-    // Call base class SetUp first to initialize m_services and other essentials
+    // Call base class SetUp first to initialize basic infrastructure
     EngineTest::SetUp();
     
-    // Override game data settings if needed
-    gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
-    gameData.startMoney = 1000;
-    gameData.firstSmallBlind = 10;
-    gameData.tableProfile = TableProfile::RandomOpponents;
-
     // Create a ServiceContainer with the test database
     auto db = std::make_unique<pkt::infra::SqliteDb>(":memory:");
     auto store = std::make_unique<pkt::infra::SqlitePlayersStatisticsStore>(std::move(db));
@@ -49,14 +43,23 @@ void SqlitePlayersStatisticsStoreTest::SetUp()
     randomizer->values = {3, 5, 7};
     m_testServices->setRandomizer(std::move(randomizer));
 
-    // Create ISP-compliant interfaces for the factory using our test services
+    // Replace the services and factory to use our test services with SQLite database
+    m_services = m_testServices;
+    
+    // Recreate the factory with our test services
     auto serviceAdapter = std::make_shared<pkt::core::ServiceAdapter>(m_testServices);
     auto loggerInterface = serviceAdapter->createLoggerService();
     auto handEvaluatorInterface = serviceAdapter->createHandEvaluationEngineService();
     auto statisticsStoreInterface = serviceAdapter->createPlayersStatisticsStoreService();
 
-    // Use ISP-compliant constructor with all focused service interfaces and the original ServiceContainer
-    m_factory = std::make_unique<EngineFactory>(m_events, loggerInterface, handEvaluatorInterface, statisticsStoreInterface, m_testServices);
+    // Use ISP-compliant constructor with all focused service interfaces
+    m_factory = std::make_unique<EngineFactory>(m_events, loggerInterface, handEvaluatorInterface, statisticsStoreInterface);
+    
+    // Override game data settings if needed
+    gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
+    gameData.startMoney = 1000;
+    gameData.firstSmallBlind = 10;
+    gameData.tableProfile = TableProfile::RandomOpponents;
 }
 
 void SqlitePlayersStatisticsStoreTest::TearDown()

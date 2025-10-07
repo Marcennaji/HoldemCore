@@ -26,14 +26,16 @@ namespace pkt::core
 class EngineFactory
 {
   public:
-    EngineFactory(const GameEvents&);
+    // Backward-compatible constructor for legacy code and tests
+    explicit EngineFactory(const GameEvents& events);
     
-    // ISP-compliant constructor using focused service interfaces
+    // ISP-compliant constructor with focused service interfaces (preferred)
     EngineFactory(const GameEvents& events,
                   std::shared_ptr<Logger> logger,
                   std::shared_ptr<HandEvaluationEngine> handEvaluator,
-                  std::shared_ptr<PlayersStatisticsStore> statisticsStore = nullptr,
-                  std::shared_ptr<ServiceContainer> serviceContainer = nullptr);    ~EngineFactory();
+                  std::shared_ptr<PlayersStatisticsStore> statisticsStore);    
+                  
+    ~EngineFactory();
 
     virtual std::shared_ptr<Hand> createHand(std::shared_ptr<EngineFactory> f, std::shared_ptr<Board> b,
                                              pkt::core::player::PlayerList seats,
@@ -43,21 +45,23 @@ class EngineFactory
 
   private:
     const GameEvents& m_events;
-    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services; // Legacy fallback
-    
     // ISP-compliant focused dependencies
     std::shared_ptr<Logger> m_logger;
     std::shared_ptr<HandEvaluationEngine> m_handEvaluator;
     std::shared_ptr<PlayersStatisticsStore> m_statisticsStore;
-
-    void ensureServicesInitialized() const;
-    
-    // ISP-compliant helper methods
-    pkt::core::Logger& getLogger() const;
-    pkt::core::HandEvaluationEngine& getHandEvaluationEngine() const;
     
   public:
-    // Method to get service container for Hand (temporary during migration)
+    // ISP-compliant accessors for focused services
+    Logger& getLogger() const { return *m_logger; }
+    HandEvaluationEngine& getHandEvaluationEngine() const { return *m_handEvaluator; }
+    PlayersStatisticsStore& getPlayersStatisticsStore() const { return *m_statisticsStore; }
+    
+  private:
+    // Helper method to create ServiceContainer from focused services during migration
+    std::shared_ptr<pkt::core::ServiceContainer> createServiceContainerFromFocusedServices() const;
+    
+  public:
+    // Legacy method for backward compatibility (used by Hand.cpp)
     std::shared_ptr<pkt::core::ServiceContainer> getServiceContainer() const;
 };
 

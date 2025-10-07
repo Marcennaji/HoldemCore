@@ -94,6 +94,41 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
                                                         gameLoopErrorCallback, m_services);
 }
 
+// ISP-compliant constructor with focused services
+Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<Board> board,
+           PlayerList seats, PlayerList actingPlayers, GameData gameData, StartData startData,
+           std::shared_ptr<Logger> logger, std::shared_ptr<PlayersStatisticsStore> statisticsStore)
+    : HandPlayersState(seats, actingPlayers), m_events(events), m_factory(factory), m_board(board),
+      m_logger(logger), m_statisticsStore(statisticsStore),
+      m_deckManager(std::make_unique<DeckManager>()),
+      m_actionValidator(std::make_unique<ActionValidator>()), m_startQuantityPlayers(startData.numberOfPlayers),
+      m_smallBlind(gameData.firstSmallBlind), m_startCash(gameData.startMoney)
+{
+    m_seatsList = seats;
+    m_actingPlayersList = actingPlayers;
+    m_dealerPlayerId = startData.startDealerPlayerId;
+    m_smallBlindPlayerId = startData.startDealerPlayerId;
+    m_bigBlindPlayerId = startData.startDealerPlayerId;
+
+    // Create InvalidActionHandler with callbacks
+    auto errorProvider = [this](const PlayerAction& action) -> std::string { return getActionValidationError(action); };
+    auto autoFoldCallback = [this](unsigned playerId) { handleAutoFold(playerId); };
+    m_invalidActionHandler = std::make_unique<InvalidActionHandler>(m_events, errorProvider, autoFoldCallback);
+
+    // Create HandStateManager with error callback for game loop issues
+    auto gameLoopErrorCallback = [this](const std::string& error)
+    {
+        if (m_events.onEngineError)
+        {
+            m_events.onEngineError(error);
+        }
+    };
+    
+    // ISP-compliant: no services needed for HandStateManager (TODO: convert HandStateManager to ISP too)
+    m_stateManager = std::make_unique<HandStateManager>(m_events, m_smallBlind, startData.startDealerPlayerId,
+                                                        gameLoopErrorCallback, nullptr);
+}
+
 Hand::~Hand() = default;
 
 void Hand::ensureServicesInitialized() const
@@ -106,10 +141,30 @@ void Hand::ensureServicesInitialized() const
     }
 }
 
+// ISP-compliant helper methods
+Logger& Hand::getLogger() const
+{
+    if (m_logger) {
+        return *m_logger;
+    }
+    // Fallback to legacy services
+    ensureServicesInitialized();
+    return m_services->logger();
+}
+
+PlayersStatisticsStore& Hand::getPlayersStatisticsStore() const
+{
+    if (m_statisticsStore) {
+        return *m_statisticsStore;
+    }
+    // Fallback to legacy services
+    ensureServicesInitialized();
+    return m_services->playersStatisticsStore();
+}
+
 void Hand::initialize()
 {
-    ensureServicesInitialized();
-    m_services->logger().info("\n----------------------  New hand ----------------------------\n");
+    getLogger().info("\n----------------------  New hand ----------------------------\n");
 
     // Initialize deck but don't deal cards yet - wait until runGameLoop() to match legacy timing
     initAndShuffleDeck();
@@ -129,8 +184,7 @@ void Hand::initialize()
 
 void Hand::end()
 {
-    ensureServicesInitialized();
-    m_services->playersStatisticsStore().savePlayersStatistics(m_seatsList);
+    getPlayersStatisticsStore().savePlayersStatistics(m_seatsList);
 }
 
 void Hand::runGameLoop()
@@ -297,8 +351,7 @@ int Hand::getPotOdd(const int playerCash, const int playerSet) const
 
     if (pot == 0)
     { // shouldn't happen, but...
-        ensureServicesInitialized();
-        m_services->logger().error("Pot = " + std::to_string(m_board->getPot(*this)) + " + " +
+        getLogger().error("Pot = " + std::to_string(m_board->getPot(*this)) + " + " +
                                    std::to_string(m_board->getSets(*this)) + " = " + std::to_string(pot));
         return 0;
     }
@@ -379,14 +432,13 @@ PlayerAction Hand::getDefaultActionForPlayer(unsigned playerId) const
 
 void Hand::handleAutoFold(unsigned playerId)
 {
-    ensureServicesInitialized();
-    m_services->logger().error("Player " + std::to_string(playerId) +
+    getLogger().error("Player " + std::to_string(playerId) +
                                " exceeded maximum invalid actions, auto-folding");
 
     // If the game state is terminal, don't try to process any actions
     if (m_stateManager->isTerminal())
     {
-        m_services->logger().error("Cannot auto-fold player " + std::to_string(playerId) + " - game state is terminal");
+        getLogger().error("Cannot auto-fold player " + std::to_string(playerId) + " - game state is terminal");
 
         if (m_events.onEngineError)
         {
@@ -427,8 +479,7 @@ void Hand::processValidAction(const PlayerAction& action)
             m_events.onEngineError("Error processing player action: " + std::string(e.what()));
         }
 
-        ensureServicesInitialized();
-        m_services->logger().error("Error in handlePlayerAction: " + std::string(e.what()));
+        getLogger().error("Error in handlePlayerAction: " + std::string(e.what()));
 
         // Re-throw critical errors
         throw;
@@ -437,8 +488,6 @@ void Hand::processValidAction(const PlayerAction& action)
 
 void Hand::filterPlayersWithInsufficientCash()
 {
-    ensureServicesInitialized();
-    
     // Remove players from acting players list who cannot afford minimum participation
     // Cards will only be dealt to players in the acting list, so this is sufficient
     auto it = m_actingPlayersList->begin();
@@ -449,7 +498,7 @@ void Hand::filterPlayersWithInsufficientCash()
         // Players with zero cash cannot participate at all
         if (playerCash <= 0)
         {
-            m_services->logger().info("Player " + (*it)->getName() + " (ID: " + 
+            getLogger().info("Player " + (*it)->getName() + " (ID: " + 
                 std::to_string((*it)->getId()) + ") auto-folded due to insufficient cash: " + 
                 std::to_string(playerCash));
             
@@ -474,7 +523,7 @@ void Hand::filterPlayersWithInsufficientCash()
     }
     
     // Log the number of players remaining for the hand
-    m_services->logger().debug("Hand will proceed with " + std::to_string(m_actingPlayersList->size()) + " players");
+    getLogger().debug("Hand will proceed with " + std::to_string(m_actingPlayersList->size()) + " players");
 }
 
 } // namespace pkt::core

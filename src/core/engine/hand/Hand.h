@@ -38,6 +38,11 @@ class Hand : public HandLifecycle, public HandPlayerAction, public HandPlayersSt
          pkt::core::player::PlayerList seats, pkt::core::player::PlayerList actingPlayers, GameData gameData,
          StartData startData, std::shared_ptr<PokerServices> services);
 
+    // ISP-compliant constructor with focused services
+    Hand(const GameEvents&, std::shared_ptr<EngineFactory> f, std::shared_ptr<Board>,
+         pkt::core::player::PlayerList seats, pkt::core::player::PlayerList actingPlayers, GameData gameData,
+         StartData startData, std::shared_ptr<Logger> logger, std::shared_ptr<PlayersStatisticsStore> statisticsStore);
+
     ~Hand();
 
     HandActionProcessor* getActionProcessor() const;
@@ -83,13 +88,20 @@ class Hand : public HandLifecycle, public HandPlayerAction, public HandPlayersSt
     void processValidAction(const PlayerAction& action);
     void ensureServicesInitialized() const;
     
+    // ISP-compliant helper methods
+    Logger& getLogger() const;
+    PlayersStatisticsStore& getPlayersStatisticsStore() const;
+    
     // Cash validation methods
     void filterPlayersWithInsufficientCash();
 
     std::shared_ptr<EngineFactory> m_factory;
     const GameEvents& m_events;
     std::shared_ptr<Board> m_board;
-    mutable std::shared_ptr<PokerServices> m_services; // Injected service container
+    mutable std::shared_ptr<PokerServices> m_services; // Legacy injected service container
+    // ISP-compliant focused services
+    std::shared_ptr<Logger> m_logger;
+    std::shared_ptr<PlayersStatisticsStore> m_statisticsStore;
     std::unique_ptr<HandStateManager> m_stateManager;
     std::unique_ptr<DeckManager> m_deckManager;
     std::unique_ptr<ActionValidator> m_actionValidator;
