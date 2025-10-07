@@ -34,9 +34,9 @@ void SqlitePlayersStatisticsStoreTest::SetUp()
     m_testServices = std::make_shared<pkt::core::AppServiceContainer>();
     m_testServices->setPlayersStatisticsStore(std::move(store));
 
-    // Set up other services similar to EngineTest but in our ServiceContainer
+    // Reuse the logger from base class (already configured with correct log level)
     auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
-    logger->setLogLevel(pkt::core::LogLevel::Info);
+    logger->setLogLevel(getTestLogLevel()); // Use inherited log level configuration
     m_testServices->setLogger(std::move(logger));
     m_testServices->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>());
     auto randomizer = std::make_unique<FakeRandomizer>();

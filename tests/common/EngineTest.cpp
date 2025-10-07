@@ -12,6 +12,10 @@
 #include "infra/eval/PsimHandEvaluationEngine.h"
 
 #include <memory>
+#ifdef _WIN32
+#include <windows.h>
+#include <crtdbg.h>
+#endif
 
 using namespace pkt::core;
 using namespace pkt::core::player;
@@ -21,9 +25,20 @@ namespace pkt::test
 
 void EngineTest::SetUp()
 {
+#ifdef _DEBUG
+    // In debug mode, disable gtest exception catching to get proper stack traces
+    testing::GTEST_FLAG(catch_exceptions) = false;
+    
+    // Windows-specific: Disable error dialog boxes, let debugger handle crashes
+    #ifdef _WIN32
+    SetErrorMode(SEM_NOGPFAULTERRORBOX | SEM_FAILCRITICALERRORS | SEM_NOALIGNMENTFAULTEXCEPT);
+    _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
+    #endif
+#endif
+
     m_services = std::make_shared<pkt::core::AppServiceContainer>();
     auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
-    logger->setLogLevel(pkt::core::LogLevel::Info);
+    logger->setLogLevel(getTestLogLevel()); // Use virtual method for customization
     m_services->setLogger(std::move(logger));
     m_services->setHandEvaluationEngine(std::make_unique<pkt::infra::PsimHandEvaluationEngine>());
     auto randomizer = std::make_unique<FakeRandomizer>();

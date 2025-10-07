@@ -104,9 +104,10 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
 Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<Board> board,
            PlayerList seats, PlayerList actingPlayers, GameData gameData, StartData startData,
            std::shared_ptr<Logger> logger, std::shared_ptr<PlayersStatisticsStore> statisticsStore,
-           std::shared_ptr<Randomizer> randomizer)
+           std::shared_ptr<Randomizer> randomizer, std::shared_ptr<HandEvaluationEngine> handEvaluationEngine)
     : HandPlayersState(seats, actingPlayers), m_factory(factory), m_events(events), m_board(board),
       m_services(nullptr), m_logger(logger), m_statisticsStore(statisticsStore), m_randomizer(randomizer),
+      m_handEvaluationEngine(handEvaluationEngine),
       m_actionValidator(std::make_unique<ActionValidator>()),
       m_startQuantityPlayers(startData.numberOfPlayers), m_smallBlind(gameData.firstSmallBlind), 
       m_startCash(gameData.startMoney)
@@ -132,12 +133,10 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
     };
     
     // Create minimal services for HandStateManager from focused ISP services
-    // This ensures HandStateManager doesn't receive nullptr services which causes crashes
-    ensureServicesInitialized();
-    // Create DeckManager with focused ISP Randomizer service (no service aggregates needed)
+    // Use ISP-compliant HandStateManager with focused Logger service (no ServiceContainer needed)
     m_deckManager = std::make_unique<DeckManager>(m_randomizer);
     m_stateManager = std::make_unique<HandStateManager>(m_events, m_smallBlind, startData.startDealerPlayerId,
-                                                        gameLoopErrorCallback, m_services);
+                                                        gameLoopErrorCallback, m_logger);
 }
 
 Hand::~Hand() = default;
@@ -257,8 +256,8 @@ void Hand::dealHoleCards(size_t cardsArrayIndex)
         {
             humanReadableHand += std::string(" ") + boardCards.toString();
         }
-        // Prefer using existing services to avoid creating a new container inside HandEvaluator
-        (*it)->setHandRanking(HandEvaluator::evaluateHand(humanReadableHand.c_str(), m_services));
+        // Use ISP-compliant hand evaluation service directly
+        (*it)->setHandRanking(m_handEvaluationEngine->rankHand(humanReadableHand.c_str()));
     }
 }
 

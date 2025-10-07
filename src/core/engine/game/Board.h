@@ -8,6 +8,8 @@
 #include "core/engine/game/Board.h"
 #include "core/player/typedefs.h"
 #include "core/services/ServiceContainer.h"
+#include "core/interfaces/Logger.h"
+#include "core/interfaces/HandEvaluationEngine.h"
 
 #include <iostream>
 #include <memory>
@@ -28,6 +30,11 @@ class Board
   public:
     Board(unsigned dealerPosition, const GameEvents& events);
     Board(unsigned dealerPosition, const GameEvents& events, std::shared_ptr<ServiceContainer> services);
+    
+    // ISP-compliant constructor with focused services (preferred)
+    Board(unsigned dealerPosition, const GameEvents& events,
+          std::shared_ptr<Logger> logger, std::shared_ptr<HandEvaluationEngine> handEvaluator);
+          
     ~Board();
 
     void setSeatsList(pkt::core::player::PlayerList seats);
@@ -66,7 +73,11 @@ class Board
     unsigned m_dealerPlayerId{0};
     bool m_allInCondition{false};
     unsigned m_lastActionPlayerId{0};
-  mutable std::shared_ptr<ServiceContainer> m_services;
+    mutable std::shared_ptr<ServiceContainer> m_services; // Legacy service container (to be removed)
+    
+    // ISP-compliant focused services (preferred)
+    std::shared_ptr<Logger> m_logger;
+    std::shared_ptr<HandEvaluationEngine> m_handEvaluator;
 };
 
 } // namespace pkt::core

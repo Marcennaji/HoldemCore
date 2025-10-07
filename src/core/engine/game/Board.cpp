@@ -34,6 +34,14 @@ Board::Board(unsigned dp, const GameEvents& events, std::shared_ptr<ServiceConta
     m_boardCards.reset();
 }
 
+// ISP-compliant constructor with focused services (preferred)
+Board::Board(unsigned dp, const GameEvents& events,
+             std::shared_ptr<Logger> logger, std::shared_ptr<HandEvaluationEngine> handEvaluator)
+    : m_dealerPlayerId(dp), m_events(events), m_logger(logger), m_handEvaluator(handEvaluator)
+{
+    m_boardCards.reset();
+}
+
 void Board::ensureServicesInitialized() const
 {
     if (!m_services)
@@ -64,9 +72,15 @@ void Board::distributePot(Hand& hand)
     const auto& bc = getBoardCards();
     if (bc.getNumCards() == 5)
     {
-        ensureServicesInitialized();
-        // Use ASCII hyphen to avoid mojibake on Windows consoles
-        m_services->logger().info(std::string("Showdown - final board: \"") + bc.toString() + "\"");
+        // Use focused Logger service if available, fallback to ServiceContainer for legacy compatibility
+        if (m_logger) {
+            // Use ASCII hyphen to avoid mojibake on Windows consoles
+            m_logger->info(std::string("Showdown - final board: \"") + bc.toString() + "\"");
+        } else {
+            ensureServicesInitialized();
+            // Use ASCII hyphen to avoid mojibake on Windows consoles
+            m_services->logger().info(std::string("Showdown - final board: \"") + bc.toString() + "\"");
+        }
         // Only evaluate hands for players who actually participated in the hand
         for (auto& player : *hand.getActingPlayersList())
         {
@@ -78,19 +92,43 @@ void Board::distributePot(Hand& hand)
                 // Build evaluator string strictly as: HOLE then BOARD (e.g., "Ah Ad 2c 7d 9h 4s 3c").
                 std::string handStr = hc.toString() + std::string(" ") + bc.toString();
                 // Extra diagnostic log to verify ordering at runtime.
-                m_services->logger().debug(std::string("Recompute showdown with: \"") + handStr + "\"");
-                player->setHandRanking(pkt::core::HandEvaluator::evaluateHand(handStr.c_str(), m_services));
+                // Use focused services if available
+                if (m_logger && m_handEvaluator) {
+                    m_logger->debug(std::string("Recompute showdown with: \"") + handStr + "\"");
+                    player->setHandRanking(m_handEvaluator->rankHand(handStr.c_str()));
+                } else {
+                    if (m_logger) {
+                        m_logger->debug(std::string("Recompute showdown with: \"") + handStr + "\"");
+                    } else {
+                        ensureServicesInitialized();
+                        m_services->logger().debug(std::string("Recompute showdown with: \"") + handStr + "\"");
+                    }
+                    
+                    // Use legacy evaluator when ISP services not available
+                    ensureServicesInitialized();
+                    player->setHandRanking(pkt::core::HandEvaluator::evaluateHand(handStr.c_str(), m_services));
+                }
             }
-            m_services->logger().info(
-                std::string("Player ") + std::to_string(player->getId()) +
-                " showdown hand: \"" + player->getHoleCards().toString() + "\" rank=" + std::to_string(player->getHandRanking())
-            );
+            if (m_logger) {
+                m_logger->info(
+                    std::string("Player ") + std::to_string(player->getId()) +
+                    " showdown hand: \"" + player->getHoleCards().toString() + "\" rank=" + std::to_string(player->getHandRanking())
+                );
+            } else {
+                m_services->logger().info(
+                    std::string("Player ") + std::to_string(player->getId()) +
+                    " showdown hand: \"" + player->getHoleCards().toString() + "\" rank=" + std::to_string(player->getHandRanking())
+                );
+            }
         }
     }
 
     // Use seats list for pot distribution (includes folded players who contributed)
     // but only evaluate hands for acting players (non-folded players who can win)
-    Pot pot(totalPot, hand.getSeatsList(), m_dealerPlayerId, m_services);
+    // Use ISP-compliant Pot constructor if Logger is available, fallback to legacy constructor
+    Pot pot = m_logger ? 
+        Pot(totalPot, hand.getSeatsList(), m_dealerPlayerId, m_logger) :
+        Pot(totalPot, hand.getSeatsList(), m_dealerPlayerId, m_services);
     pot.distribute();
     m_winners = pot.getWinners();
 

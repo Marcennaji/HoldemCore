@@ -7,6 +7,7 @@
 namespace pkt::core
 {
 class ServiceContainer;
+class Logger;
 } // namespace pkt::core
 
 namespace pkt::core
@@ -34,6 +35,10 @@ class HandStateManager
     explicit HandStateManager(const GameEvents& events, int smallBlind, unsigned dealerPlayerId,
                               GameLoopErrorCallback errorCallback,
                               std::shared_ptr<pkt::core::ServiceContainer> services);
+    
+    // ISP-compliant constructor with focused Logger service (preferred)
+    HandStateManager(const GameEvents& events, int smallBlind, unsigned int dealerPlayerId,
+                     GameLoopErrorCallback errorCallback, std::shared_ptr<Logger> logger);
     ~HandStateManager() = default;
 
     // State lifecycle management
@@ -59,7 +64,8 @@ class HandStateManager
     const GameEvents& m_events;
     std::unique_ptr<HandState> m_currentState;
     GameLoopErrorCallback m_errorCallback;
-    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services;
+    mutable std::shared_ptr<pkt::core::ServiceContainer> m_services; // Legacy support
+    std::shared_ptr<Logger> m_logger; // ISP-compliant focused service
 
     // State initialization parameters
     int m_smallBlind;

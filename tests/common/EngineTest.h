@@ -30,6 +30,9 @@ class EngineTest : public ::testing::Test
     // Access to services for test logging
     pkt::core::Logger& getLogger() const;
     std::shared_ptr<pkt::core::ServiceContainer> getServices() const;
+    
+    // Virtual method for derived classes to customize logger setup
+    virtual pkt::core::LogLevel getTestLogLevel() const { return pkt::core::LogLevel::Info; }
 
     pkt::core::GameEvents m_events;
     std::shared_ptr<pkt::core::EngineFactory> m_factory;

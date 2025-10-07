@@ -5,6 +5,7 @@
 #include "core/engine/hand/ActionProcessor.h"
 #include "core/engine/hand/HandState.h"
 #include "core/interfaces/ServiceAdapter.h"
+#include "core/interfaces/Logger.h"
 #include "core/services/ServiceContainer.h"
 
 #include <cassert>
@@ -27,6 +28,14 @@ HandStateManager::HandStateManager(const GameEvents& events, int smallBlind, uns
 {
 }
 
+// ISP-compliant constructor with focused Logger service (preferred)
+HandStateManager::HandStateManager(const GameEvents& events, int smallBlind, unsigned int dealerPlayerId,
+                                   GameLoopErrorCallback errorCallback, std::shared_ptr<Logger> logger)
+    : m_events(events), m_errorCallback(std::move(errorCallback)), m_smallBlind(smallBlind),
+      m_dealerPlayerId(dealerPlayerId), m_logger(std::move(logger))
+{
+}
+
 void HandStateManager::ensureServicesInitialized() const
 {
     if (!m_services)
@@ -37,14 +46,17 @@ void HandStateManager::ensureServicesInitialized() const
 
 void HandStateManager::initializeState(Hand& hand)
 {
-    ensureServicesInitialized();
-    
-    // Create ISP-compliant logger interface for PreflopState
-    auto serviceAdapter = std::make_shared<pkt::core::ServiceAdapter>(m_services);
-    auto loggerInterface = serviceAdapter->createLoggerService();
-    
-    // Use ISP-compliant constructor for proper dependency injection
-    m_currentState = std::make_unique<PreflopState>(m_events, m_smallBlind, m_dealerPlayerId, loggerInterface);
+    // Use focused Logger service if available (ISP), fallback to ServiceContainer
+    if (m_logger) {
+        // Direct ISP usage - no service aggregates needed
+        m_currentState = std::make_unique<PreflopState>(m_events, m_smallBlind, m_dealerPlayerId, m_logger);
+    } else {
+        // Legacy path - use ServiceContainer via ServiceAdapter
+        ensureServicesInitialized();
+        auto serviceAdapter = std::make_shared<pkt::core::ServiceAdapter>(m_services);
+        auto loggerInterface = serviceAdapter->createLoggerService();
+        m_currentState = std::make_unique<PreflopState>(m_events, m_smallBlind, m_dealerPlayerId, loggerInterface);
+    }
     m_currentState->enter(hand);
 }
 

@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 #include "core/player/Player.h"
-#include "core/services/ServiceContainer.h"
+#include "core/interfaces/Logger.h"
 
 namespace pkt::core
 {
@@ -15,6 +15,10 @@ class Pot
     Pot(unsigned total, pkt::core::player::PlayerList seats, unsigned dealerId);
     explicit Pot(unsigned total, pkt::core::player::PlayerList seats, unsigned dealerId,
                  std::shared_ptr<ServiceContainer> serviceContainer);
+    
+    // ISP-compliant constructor with focused services (preferred)
+    Pot(unsigned total, pkt::core::player::PlayerList seats, unsigned dealerId,
+        std::shared_ptr<Logger> logger);
 
     void distribute();
     const std::list<unsigned>& getWinners() const { return m_winners; }
@@ -40,7 +44,8 @@ class Pot
     std::vector<size_t> indexesOf(const std::list<unsigned>& ids);
     void ensureServicesInitialized() const;
 
-    mutable std::shared_ptr<ServiceContainer> m_services; // Injected service container
+    mutable std::shared_ptr<ServiceContainer> m_services; // Legacy service container (to be removed)
+    std::shared_ptr<Logger> m_logger; // ISP-compliant focused service
 };
 
 } // namespace pkt::core

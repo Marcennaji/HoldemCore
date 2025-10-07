@@ -96,15 +96,13 @@ std::shared_ptr<Hand> EngineFactory::createHand(std::shared_ptr<EngineFactory> f
                                                 pkt::core::player::PlayerList actingPlayers, GameData gd, StartData sd)
 {
     // Use ISP-compliant Hand constructor with focused services
-    return std::make_shared<Hand>(m_events, f, b, seats, actingPlayers, gd, sd, m_logger, m_statisticsStore, m_randomizer);
+    return std::make_shared<Hand>(m_events, f, b, seats, actingPlayers, gd, sd, m_logger, m_statisticsStore, m_randomizer, m_handEvaluator);
 }
 
 std::shared_ptr<Board> EngineFactory::createBoard(unsigned dealerPosition)
 {
-    // Create ServiceContainer from our focused services for legacy Board constructor
-    auto serviceContainer = createServiceContainerFromFocusedServices();
-    
-    return std::make_shared<Board>(dealerPosition, m_events, serviceContainer);
+    // Use ISP-compliant Board constructor with focused services
+    return std::make_shared<Board>(dealerPosition, m_events, m_logger, m_handEvaluator);
 }
 
 // Legacy method for backward compatibility (used by Hand.cpp)
