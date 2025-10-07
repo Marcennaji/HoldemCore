@@ -1,20 +1,41 @@
-## 🏠 Architecture Overview
+# 🏠 Architecture Overview
 
-### Architecture Principles
+## 1. Architectural Principles
 
-**Hexagonal Architecture (Ports & Adapters)**
+### Hexagonal Architecture (Ports & Adapters)
 
 ![Hexagonal Architecture Diagram](architecture.png)
 
-**Key Design Elements:**
-- Dependency injection for testable boundaries
-- Rich domain models with clear separation
-- Event-driven communication
-- Strategy pattern for pluggable AI behaviors
+**Core ideas:**
+- **Domain-centric** design — engine logic independent of UI or infrastructure
+- **Dependency inversion** — interfaces in core, implementations in adapters
+- **Dependency injection** for testable boundaries
+- **Event-driven** communication between components
+- **Clean layering:** `core/`, `infra/`, `ui/`, `app/`, `tests/`
 
-**Strategy Pattern Implementation**
+### Benefits
+- Isolated, testable modules
+- Reusable domain core across multiple front-ends
+- Easy extension with new adapters (e.g. REST, QML, CLI)
 
-Pluggable AI behaviors:
+---
+
+## 2. Domain Model
+
+### Core Subsystems
+| Module | Responsibility |
+|---------|----------------|
+| `engine/` | Game orchestration, FSM control |
+| `hand/` | Lifecycle and statistics |
+| `game/` | Board, pot distribution, betting logic |
+| `player/` | Player entities, strategies, and statistics |
+| `interfaces/` | Abstract service contracts (logging, RNG, persistence) |
+
+---
+
+## 3. Strategy Pattern — AI Player Behavior
+
+Example of a pluggable strategy:
 
 ```cpp
 class BotStrategy {
@@ -29,11 +50,64 @@ Player player(events, "BotName");
 player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 ```
 
-**Benefits:**
-- Runtime strategy switching
-- Isolated unit testing
-- Plugin architecture for extensibility
+**Advantages**
+- Runtime strategy switching  
+- Unit-testable decision logic  
+- Extensible plugin framework  
 
+---
 
+## 4. Engine Design
+
+### Finite State Machine
+`Preflop → Flop → Turn → River → PostRiver`
+
+Each state:
+- Encapsulates its own decision logic
+- Emits state transitions via `GameEvents`
+- Keeps domain purity — no Qt dependencies
+
+---
+
+## 5. Current Architectural Rules
+
+- Core must remain **Qt-free**
+- Use **constructor injection** for all dependencies
+- Eliminate any **ServiceContainer** usage
+- Keep **ISP (Interface Segregation Principle)** compliance
+- Maintain **hexagonal boundaries** strictly:
+  - Core logic → no infrastructure knowledge  
+  - UI layers → communicate only via bridges and events
+
+---
+
+## 6. Testing Strategy
+
+- **Unit Tests:** GoogleTest, 100% coverage on domain logic  
+- **Integration / E2E:** validates FSM, betting rounds, statistics persistence  
+- **Test Fixtures:** mirror production setup with mock interfaces
+
+---
+
+## 7. Reference Layout
+
+```
+HoldemCore/
+├── src/
+│   ├── core/          # Domain logic
+│   ├── infra/         # Infrastructure adapters (DB, eval engine, logging)
+│   ├── ui/            # UI front-ends (Qt Widgets, QML)
+│   └── app/           # Application entrypoints
+└── tests/             # Unit and E2E tests
+```
+
+---
+
+## 8. Future Evolution
+
+- Fully decouple `EngineFactory` from ServiceContainer
+- Finalize migration to pure dependency injection
+- Refine QML front-end with event bridge
+- Introduce poker AI experimentation layer (optional)
 
 ---

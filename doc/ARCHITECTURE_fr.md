@@ -1,21 +1,34 @@
-## 🏠 Vue d'Ensemble de l'Architecture
+# 🏠 Vue d’ensemble de l’architecture
 
-### Principes d'Architecture
+## 1. Principes architecturaux
 
-**Architecture Hexagonale (Ports & Adaptateurs)**
+### Architecture hexagonale (Ports & Adaptateurs)
+![Diagramme d'architecture hexagonale](architecture.png)
 
-![Diagramme d'Architecture Hexagonale](architecture.png)
+**Idées clés :**
+- Conception centrée sur le domaine — la logique du moteur est indépendante de l’interface utilisateur et de l’infrastructure
+- Inversion des dépendances — les interfaces résident dans le cœur, les implémentations dans les adaptateurs
+- Injection de dépendances — permet des frontières testables et un couplage faible
+- Communication événementielle entre les composants
+- Couches propres et claires : core/, infra/, ui/, app/, tests/
 
-**Éléments de Conception Clés :**
-- Injection de dépendances pour des frontières testables
-- Modèles de domaine riches avec séparation claire
-- Communication événementielle
-- Pattern Strategy pour des comportements IA modulaires
+### Bénéfices
+- Modules isolés et facilement testables
+- Noyau de domaine réutilisable pour plusieurs interfaces
+- Extension aisée avec de nouveaux adaptateurs (ex. REST, QML, CLI)
 
-**Implémentation du Pattern Strategy**
+## 2. Modèle de domaine
+### Sous-systèmes principaux
+**Module	Responsabilité**
+engine/	    Orchestration du jeu, contrôle de la machine à états (FSM)
+hand/	    Cycle de vie et statistiques d’une main
+game/	    Plateau, distribution du pot, logique de mise
+player/	    Entités joueur, stratégies et statistiques
+interfaces/	Contrats de service abstraits (journalisation, générateur aléatoire, persistance)
 
-Comportements IA modulaires :
+### 3. Design pattern Strategy — Comportement des joueurs IA
 
+Exemple d’une stratégie interchangeable :
 ```cpp
 class BotStrategy {
 public:
@@ -29,11 +42,44 @@ Player player(events, "BotName");
 player.setStrategy(std::make_unique<TightAggressiveStrategy>());
 ```
 
-**Avantages :**
-- Changement de stratégie à l'exécution
-- Tests unitaires isolés
-- Architecture de plugins pour l'extensibilité
+**Avantages**
+- Changement de stratégie à l’exécution
+- Logique décisionnelle testable unitairement
+- Cadre extensible pour de nouvelles stratégies
 
+## 4. Conception du moteur
+### Machine à états finis
+`Preflop → Flop → Turn → River → PostRiver`
 
+Chaque état :
+- Encapsule sa propre logique décisionnelle
+- Émet des transitions via GameEvents
+- Préserve la pureté du domaine — aucune dépendance à Qt
 
----
+## 5. Règles architecturales actuelles
+- Le cœur doit rester indépendant de Qt
+- Utiliser l’injection par constructeur pour toutes les dépendances
+- Supprimer toute utilisation du ServiceContainer
+- Respecter le principe de ségrégation des interfaces (ISP)
+- Maintenir des frontières hexagonales strictes :
+   - Logique du cœur → aucune connaissance de l’infrastructure
+   - Couches UI → communication uniquement via ponts et événements
+
+## 6. Stratégie de test
+- Tests unitaires : GoogleTest, couverture complète de la logique du domaine
+- Tests d’intégration / de bout en bout (E2E) : validation de la FSM, des tours de mise, de la persistance des statistiques
+- Fixtures de test : reproduisent la configuration de production avec des interfaces mockées
+
+## 7. Structure de référence
+HoldemCore/
+├── src/
+│   ├── core/          # Logique métier principale
+│   ├── infra/         # Adaptateurs d’infrastructure (BDD, moteur d’évaluation, logs)
+│   ├── ui/            # Interfaces utilisateur (Qt Widgets, QML)
+│   └── app/           # Points d’entrée applicatifs
+└── tests/             # Tests unitaires et E2E
+
+## 8. Évolutions futures
+- Finaliser la migration vers une injection de dépendances pure
+- Améliorer l’interface Qt Widgets et développer une interface Qt QML
+- Introduire une couche expérimentale d’IA (machine learning) pour la stratégie poker

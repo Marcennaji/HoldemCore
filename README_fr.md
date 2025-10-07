@@ -1,40 +1,39 @@
 # HoldemCore
 
-**🌐 Language / Langue:** [English](README.md) | [Français](README_fr.md)
+**🌐 Langue / Language :** [Français](README_fr.md) | [English](README.md)
 
-**Projet Portfolio : Architecture C++ Moderne**
+**Projet Portfolio : Architecture logicielle moderne en C++**
 
-Moteur de simulation Texas Hold'em mettant en application des pratiques d’ingénierie logicielle modernes : architecture hexagonale, TDD et CI/CD, principes SOLID, refactoring continu et conception multiplateforme.
-Le projet initial, créé en 2011, a fait l'objet en 2025 d'une réécriture très substantielle.
+HoldemCore est un moteur de simulation **Texas Hold'em** développé en **C++20 moderne**, démontrant des pratiques d’ingénierie logicielle éprouvées:
+architecture hexagonale, principes SOLID, inversion de dépendances et refactorisation continue.
 
-> **Note Portfolio** : Ce dépôt est maintenu comme une démonstration d'ingénierie C++. Les tickets et PRs sont les bienvenus, mais la feuille de route suit les priorités de l'auteur.
+Le projet d’origine (2011) a été **entièrement modernisé en 2025** pour illustrer la rigueur et la qualité d’un développement C++ professionnel.
+
+> **Note de portfolio :**  
+> Ce dépôt est maintenu comme démonstration d’architecture et d’ingénierie C++.  
+> Les issues et PR sont les bienvenues, mais la feuille de route suit les priorités de l’auteur.
+
+---
+
+## 🎯 Points forts du projet
+
+- **Architecture hexagonale** assurant une séparation stricte entre domaine, infrastructure et interface utilisateur  
+- **Suite de tests complète**, avec couverture unitaire et de bout en bout  
+- **Conception multiplateforme**, basée sur CMake et C++ moderne  
+- **Interfaces graphiques multiples :** Qt Widgets et Qt Quick (QML), extensible à d'autres frameworks 
+- **Facilité d'implémentation de nouvelles stratégies de poker**, via des interfaces abstraites simples
+- **Moteur événementiel** avec machine à états
 
 ---
 
-## 🎯 Vitrine du Projet
-
-Moteur de simulation Texas Hold'em démontrant une architecture logicielle avancée :
-
-- **Architecture Hexagonale** avec séparation stricte des responsabilités
-- **Suite de tests complète** garantissant la fiabilité
-- **Compatibilité multiplateforme** (Windows, Linux, macOS)
-- **Multiples frameworks UI** supportés via des abstractions propres
-
-### Fonctionnalités Clés
-- **Modélisation de domaine complexe** : règles de poker, tours d'enchères, évaluation des ranges
-- **Framework de stratégies IA** : comportements de bots modulaires avec analyse statistique
-- **Machine à états** : gestion robuste et simple du flux de jeu
-- **Suivi du comportement** des joueurs avec persistance en base
-
----
-## 🚀 Démarrage Rapide
+## 🚀 Démarrage rapide
 
 ### Prérequis
-- CMake 3.20+
-- Compilateur compatible C++20
-- Qt 6.x (optionnel, uniquement pour l'interface graphique)
+- CMake ≥ 3.20  
+- Compilateur compatible C++20  
+- Qt 6.x (uniquement pour l’interface graphique)
 
-### Construction & Tests
+### Compilation & Tests
 ```bash
 git clone https://github.com/Marcennaji/HoldemCore.git
 cd HoldemCore
@@ -46,75 +45,51 @@ cmake --build build/debug-widgets
 
 ---
 
-## 🏠 Vue d'Ensemble de l'Architecture
+## 🏗️ Vue d’ensemble de l’architecture
 
-Voir les caractéristiques d'architecture dans [ARCHITECTURE_fr.md](doc/ARCHITECTURE_fr.md)
+Explications et diagrammes détaillés :  
+👉 [ARCHITECTURE.md](doc/ARCHITECTURE.md)
 
-
-## 🎮 Interface Utilisateur
-
-<table>
-  <tr>
-    <td width="50%">
-      <img src="doc/start%20game.png" alt="Démarrer une nouvelle partie" width="100%">
-      <p align="center"><em>Fenêtre de Configuration de Partie</em></p>
-    </td>
-    <td width="50%">
-      <img src="doc/poker%20table.png" alt="Interface de Table de Poker" width="100%">
-      <p align="center"><em>Interface de Table de Poker</em></p>
-    </td>
-  </tr>
-</table>
-
-*Version Qt Widgets (bientôt disponible : version Qt Quick/QML)*
-
-
-## 🔧 Stack Technique
-
-**Technologies Centrales :**
-- **C++20** avec fonctionnalités modernes
-- **CMake** pour builds multiplateformes
-- **GoogleTest** framework de tests
-
-**Support Multiplateforme :**
-- **Qt 6** (Widgets et QML)
-- **SQLite** base de données embarquée
-- **C++ standard** multiplateforme
-
-
----
-## 🚧 Feuille de Route de Développement
-- refactoring des portions legacy respectant encore imparfaitement SOLID 
-- Développer une interface graphique Qt Quick (QML), pour version mobile
-- Explorer la possibilité d'intégrer une IA de bot basée sur le machine learning
+<p align="center">
+  <img src="doc/architecture.png" alt="Diagramme d'architecture hexagonale" width="80%">
+</p>
 
 ---
 
-##  Dépendances & Licences
+## 🧰 Pile technique
 
-**Framework UI (Optionnel) :**
-- [Qt 6](https://www.qt.io/) - Framework d'application multiplateforme (Qt Widgets et Qt QML)
-  
-  *Note : Le moteur central est découplé de l’interface utilisateur. Qt n'est requis que pour l'interface Widgets fournie. Les développeurs peuvent intégrer n'importe quel framework UI grâce à l'architecture hexagonale.*
+**Langages et frameworks**
+- **C++20 moderne**
+- Système de build **CMake**
+- **Qt 6** (Widgets et QML, si vous souhaitez utiliser les UI fournies et optionnelles)
+- **GoogleTest** pour les tests
+- **SQLite3** pour la persistance
 
-**Composants Tiers (facilement remplaçables si nécessaire) :**
-- [psim](https://github.com/christophschmalhofer/poker/tree/master/XPokerEval/XPokerEval.PokerSim) - Moteur d'évaluation de mains
-- [SQLite3](https://www.sqlite.org/) - Base de données embarquée  
-- [GoogleTest](https://github.com/google/googletest) - Framework de tests
+**Composants tiers**
+- [psim](https://github.com/christophschmalhofer/poker/tree/master/XPokerEval/XPokerEval.PokerSim)  
+- [SQLite3](https://www.sqlite.org/)  
+- [GoogleTest](https://github.com/google/googletest)
 
-**Licence :** Licence MIT - Gratuit pour usage commercial et personnel
+**Licence :** MIT — utilisation libre, personnelle ou commerciale.
 
 ---
 
-## 👨‍💻 À Propos
+## 📈 Feuille de route
 
-**Marc Ennaji** - Ingénieur Logiciel Senior  
-[LinkedIn](https://www.linkedin.com/in/marcennaji/) 
+- 🧩 Éliminer les violations SOLID/ISP restantes dans le code legacy de 2011  
+- 🎨 Améliorer l'UI Qt Widgets existante (application desktop) et développer une interface Qt Quick (QML) pour mobile  
+- 🧠 Explorer l’intégration d’un bot IA basé sur apprentissage
 
-### Expertise
-- Développement C++ Moderne
-- Architecture & Conception Logicielle
-- Modernisation de Systèmes Legacy
-- Développement Dirigé par les Tests
+---
 
-*Disponible pour collaborations et opportunités*
+## 👨‍💻 Auteur
+
+**Marc Ennaji** — Ingénieur logiciel senior  
+[LinkedIn](https://www.linkedin.com/in/marcennaji/)
+
+### Domaines d’expertise
+- Développement C++ moderne
+- Architecture logicielle et conception orientée objet  
+- Modernisation de systèmes existants  
+- Développement piloté par les tests (TDD)
+
