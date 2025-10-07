@@ -55,12 +55,13 @@ EngineFactory::EngineFactory(const GameEvents& events)
 EngineFactory::EngineFactory(const GameEvents& events, 
                              std::shared_ptr<Logger> logger,
                              std::shared_ptr<HandEvaluationEngine> handEvaluator,
-                             std::shared_ptr<PlayersStatisticsStore> statisticsStore)
-    : m_events(events), m_logger(logger), m_handEvaluator(handEvaluator), m_statisticsStore(statisticsStore)
+                             std::shared_ptr<PlayersStatisticsStore> statisticsStore,
+                             std::shared_ptr<Randomizer> randomizer)
+    : m_events(events), m_logger(logger), m_handEvaluator(handEvaluator), m_statisticsStore(statisticsStore), m_randomizer(randomizer)
 {
     // Validate that all required dependencies are provided
-    if (!m_logger || !m_handEvaluator || !m_statisticsStore) {
-        throw std::invalid_argument("EngineFactory requires all focused dependencies (Logger, HandEvaluationEngine, PlayersStatisticsStore)");
+    if (!m_logger || !m_handEvaluator || !m_statisticsStore || !m_randomizer) {
+        throw std::invalid_argument("EngineFactory requires all focused dependencies (Logger, HandEvaluationEngine, PlayersStatisticsStore, Randomizer)");
     }
 }
 
@@ -95,7 +96,7 @@ std::shared_ptr<Hand> EngineFactory::createHand(std::shared_ptr<EngineFactory> f
                                                 pkt::core::player::PlayerList actingPlayers, GameData gd, StartData sd)
 {
     // Use ISP-compliant Hand constructor with focused services
-    return std::make_shared<Hand>(m_events, f, b, seats, actingPlayers, gd, sd, m_logger, m_statisticsStore);
+    return std::make_shared<Hand>(m_events, f, b, seats, actingPlayers, gd, sd, m_logger, m_statisticsStore, m_randomizer);
 }
 
 std::shared_ptr<Board> EngineFactory::createBoard(unsigned dealerPosition)

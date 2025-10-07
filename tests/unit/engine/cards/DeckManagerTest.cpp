@@ -1,5 +1,7 @@
 #include "core/engine/cards/DeckManager.h"
+#include "common/FakeRandomizer.h"
 #include <gtest/gtest.h>
+#include <memory>
 
 namespace pkt::core
 {
@@ -7,7 +9,8 @@ namespace pkt::core
 class DeckManagerTest : public ::testing::Test
 {
   protected:
-    DeckManager deckManager;
+    std::shared_ptr<test::FakeRandomizer> randomizer = std::make_shared<test::FakeRandomizer>();
+    DeckManager deckManager{randomizer};
 };
 
 TEST_F(DeckManagerTest, InitializeAndShuffleCreatesValidDeck)

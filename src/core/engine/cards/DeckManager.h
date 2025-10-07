@@ -1,17 +1,20 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 #include "core/engine/cards/Card.h"
+#include "core/interfaces/Randomizer.h"
 
 namespace pkt::core
 {
 
 /// DeckManager handles pure deck operations for a poker hand
-/// Extracted from Hand class to separate deck management from game logic
+/// Extracted from Hand class to separate deck management from game logic  
+/// ISP-compliant: only depends on Randomizer interface
 class DeckManager
 {
   public:
-    DeckManager();
+    DeckManager(std::shared_ptr<Randomizer> randomizer);
     ~DeckManager() = default;
 
     // Core deck operations
@@ -27,6 +30,7 @@ class DeckManager
 
   private:
     Deck m_deck;
+    std::shared_ptr<Randomizer> m_randomizer;
 };
 
 } // namespace pkt::core

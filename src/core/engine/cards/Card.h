@@ -1,9 +1,10 @@
 #pragma once
 
 #include "core/engine/cards/CardUtilities.h"
-#include "core/services/ServiceContainer.h"
+#include "core/interfaces/Randomizer.h"
 
 #include <algorithm>
+#include <memory>
 #include <random>
 #include <stdexcept>
 #include <string>
@@ -11,8 +12,6 @@
 
 namespace pkt::core
 {
-
-class ServiceContainer;
 
 /// Represents a playing card with suit and rank.
 /// Wraps the existing int-based card representation to maintain compatibility.
@@ -407,25 +406,18 @@ class Deck
         nextCardIndex = 0;
     }
 
-    /// Shuffle the deck using random number generator
-    void shuffle()
+    /// Shuffle the deck using Randomizer interface (ISP-compliant)
+    void shuffle(std::shared_ptr<Randomizer> randomizer)
     {
-        static std::shared_ptr<pkt::core::ServiceContainer> defaultServices =
-            std::make_shared<pkt::core::AppServiceContainer>();
-        shuffle(defaultServices);
-    }
-
-    /// Shuffle the deck using ServiceContainer
-    void shuffle(std::shared_ptr<pkt::core::ServiceContainer> services)
-    {
-        // Use the randomizer service for consistency with the rest of the system
-        auto& randomizer = services->randomizer();
+        if (!randomizer) {
+            throw std::runtime_error("Randomizer service is required for deck shuffle");
+        }
 
         // Use a simple shuffle algorithm that uses our randomizer
         for (size_t i = cards.size() - 1; i > 0; --i)
         {
             int randomValues[1];
-            randomizer.getRand(0, static_cast<int>(i), 1, randomValues);
+            randomizer->getRand(0, static_cast<int>(i), 1, randomValues);
             size_t j = static_cast<size_t>(randomValues[0]);
             std::swap(cards[i], cards[j]);
         }

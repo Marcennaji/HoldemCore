@@ -15,6 +15,7 @@
 #include "core/interfaces/Logger.h"
 #include "core/interfaces/HandEvaluationEngine.h"
 #include "core/interfaces/persistence/PlayersStatisticsStore.h"
+#include "core/interfaces/Randomizer.h"
 
 #include <memory>
 #include <vector>
@@ -33,7 +34,8 @@ class EngineFactory
     EngineFactory(const GameEvents& events,
                   std::shared_ptr<Logger> logger,
                   std::shared_ptr<HandEvaluationEngine> handEvaluator,
-                  std::shared_ptr<PlayersStatisticsStore> statisticsStore);    
+                  std::shared_ptr<PlayersStatisticsStore> statisticsStore,
+                  std::shared_ptr<Randomizer> randomizer);    
                   
     ~EngineFactory();
 
@@ -49,12 +51,14 @@ class EngineFactory
     std::shared_ptr<Logger> m_logger;
     std::shared_ptr<HandEvaluationEngine> m_handEvaluator;
     std::shared_ptr<PlayersStatisticsStore> m_statisticsStore;
+    std::shared_ptr<Randomizer> m_randomizer;
     
   public:
     // ISP-compliant accessors for focused services
     Logger& getLogger() const { return *m_logger; }
     HandEvaluationEngine& getHandEvaluationEngine() const { return *m_handEvaluator; }
     PlayersStatisticsStore& getPlayersStatisticsStore() const { return *m_statisticsStore; }
+    Randomizer& getRandomizer() const { return *m_randomizer; }
     
   private:
     // Helper method to create ServiceContainer from focused services during migration

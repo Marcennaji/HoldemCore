@@ -1,6 +1,7 @@
 #include "Hand.h"
 #include <core/services/ServiceContainer.h>
 #include "core/engine/EngineFactory.h"
+#include "core/interfaces/ServiceAdapter.h"
 #include "CardUtilities.h"
 #include "DeckManager.h"
 #include "GameEvents.h"
@@ -26,7 +27,7 @@ using namespace pkt::core::player;
 Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<Board> board,
            PlayerList seats, PlayerList actingPlayers, GameData gameData, StartData startData)
     : HandPlayersState(seats, actingPlayers), m_events(events), m_factory(factory), m_board(board), m_services(nullptr),
-      m_deckManager(std::make_unique<DeckManager>()), m_actionValidator(std::make_unique<ActionValidator>()),
+      m_actionValidator(std::make_unique<ActionValidator>()),
       m_startQuantityPlayers(startData.numberOfPlayers), m_smallBlind(gameData.firstSmallBlind),
       m_startCash(gameData.startMoney)
 {
@@ -54,6 +55,9 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
     
     // Pass services to HandStateManager for proper dependency injection
     ensureServicesInitialized();
+    // Create DeckManager with randomizer service after services are initialized
+    auto randomizer = std::shared_ptr<Randomizer>(&m_services->randomizer(), [](Randomizer*){});
+    m_deckManager = std::make_unique<DeckManager>(randomizer);
     m_stateManager = std::make_unique<HandStateManager>(m_events, m_smallBlind, startData.startDealerPlayerId,
                                                         gameLoopErrorCallback, m_services);
 }
@@ -62,8 +66,7 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
            PlayerList seats, PlayerList actingPlayers, GameData gameData, StartData startData,
            std::shared_ptr<PokerServices> services)
     : HandPlayersState(seats, actingPlayers), m_events(events), m_factory(factory), m_board(board),
-      m_services(services), m_deckManager(std::make_unique<DeckManager>()),
-      m_actionValidator(std::make_unique<ActionValidator>()), m_startQuantityPlayers(startData.numberOfPlayers),
+      m_services(services), m_actionValidator(std::make_unique<ActionValidator>()), m_startQuantityPlayers(startData.numberOfPlayers),
       m_smallBlind(gameData.firstSmallBlind), m_startCash(gameData.startMoney)
 {
     m_seatsList = seats;
@@ -90,6 +93,9 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
     
     // Pass services to HandStateManager for proper dependency injection
     ensureServicesInitialized();
+    // Create DeckManager with randomizer service after services are initialized
+    auto randomizer = std::shared_ptr<Randomizer>(&m_services->randomizer(), [](Randomizer*){});
+    m_deckManager = std::make_unique<DeckManager>(randomizer);
     m_stateManager = std::make_unique<HandStateManager>(m_events, m_smallBlind, startData.startDealerPlayerId,
                                                         gameLoopErrorCallback, m_services);
 }
@@ -97,12 +103,13 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
 // ISP-compliant constructor with focused services
 Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std::shared_ptr<Board> board,
            PlayerList seats, PlayerList actingPlayers, GameData gameData, StartData startData,
-           std::shared_ptr<Logger> logger, std::shared_ptr<PlayersStatisticsStore> statisticsStore)
-    : HandPlayersState(seats, actingPlayers), m_events(events), m_factory(factory), m_board(board),
-      m_logger(logger), m_statisticsStore(statisticsStore),
-      m_deckManager(std::make_unique<DeckManager>()),
-      m_actionValidator(std::make_unique<ActionValidator>()), m_startQuantityPlayers(startData.numberOfPlayers),
-      m_smallBlind(gameData.firstSmallBlind), m_startCash(gameData.startMoney)
+           std::shared_ptr<Logger> logger, std::shared_ptr<PlayersStatisticsStore> statisticsStore,
+           std::shared_ptr<Randomizer> randomizer)
+    : HandPlayersState(seats, actingPlayers), m_factory(factory), m_events(events), m_board(board),
+      m_services(nullptr), m_logger(logger), m_statisticsStore(statisticsStore), m_randomizer(randomizer),
+      m_actionValidator(std::make_unique<ActionValidator>()),
+      m_startQuantityPlayers(startData.numberOfPlayers), m_smallBlind(gameData.firstSmallBlind), 
+      m_startCash(gameData.startMoney)
 {
     m_seatsList = seats;
     m_actingPlayersList = actingPlayers;
@@ -124,9 +131,13 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<EngineFactory> factory, std
         }
     };
     
-    // ISP-compliant: no services needed for HandStateManager (TODO: convert HandStateManager to ISP too)
+    // Create minimal services for HandStateManager from focused ISP services
+    // This ensures HandStateManager doesn't receive nullptr services which causes crashes
+    ensureServicesInitialized();
+    // Create DeckManager with focused ISP Randomizer service (no service aggregates needed)
+    m_deckManager = std::make_unique<DeckManager>(m_randomizer);
     m_stateManager = std::make_unique<HandStateManager>(m_events, m_smallBlind, startData.startDealerPlayerId,
-                                                        gameLoopErrorCallback, nullptr);
+                                                        gameLoopErrorCallback, m_services);
 }
 
 Hand::~Hand() = default;

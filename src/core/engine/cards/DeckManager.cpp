@@ -4,12 +4,13 @@
 namespace pkt::core
 {
 
-DeckManager::DeckManager() = default;
+DeckManager::DeckManager(std::shared_ptr<Randomizer> randomizer) 
+    : m_randomizer(randomizer) {}
 
 void DeckManager::initializeAndShuffle()
 {
     m_deck.initializeFullDeck();
-    m_deck.shuffle();
+    m_deck.shuffle(m_randomizer);
 }
 
 std::vector<Card> DeckManager::dealCards(int numCards)

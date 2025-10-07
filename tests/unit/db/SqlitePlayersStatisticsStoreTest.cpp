@@ -51,9 +51,10 @@ void SqlitePlayersStatisticsStoreTest::SetUp()
     auto loggerInterface = serviceAdapter->createLoggerService();
     auto handEvaluatorInterface = serviceAdapter->createHandEvaluationEngineService();
     auto statisticsStoreInterface = serviceAdapter->createPlayersStatisticsStoreService();
+    auto randomizerInterface = serviceAdapter->createRandomizerService();
 
     // Use ISP-compliant constructor with all focused service interfaces
-    m_factory = std::make_unique<EngineFactory>(m_events, loggerInterface, handEvaluatorInterface, statisticsStoreInterface);
+    m_factory = std::make_unique<EngineFactory>(m_events, loggerInterface, handEvaluatorInterface, statisticsStoreInterface, randomizerInterface);
     
     // Override game data settings if needed
     gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;

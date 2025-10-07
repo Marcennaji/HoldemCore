@@ -35,9 +35,10 @@ void EngineTest::SetUp()
     auto loggerInterface = serviceAdapter->createLoggerService();
     auto handEvaluatorInterface = serviceAdapter->createHandEvaluationEngineService();
     auto statisticsStoreInterface = serviceAdapter->createPlayersStatisticsStoreService();
+    auto randomizerInterface = serviceAdapter->createRandomizerService();
 
     // Use ISP-compliant constructor with all required focused interfaces
-    m_factory = std::make_unique<EngineFactory>(m_events, loggerInterface, handEvaluatorInterface, statisticsStoreInterface);
+    m_factory = std::make_unique<EngineFactory>(m_events, loggerInterface, handEvaluatorInterface, statisticsStoreInterface, randomizerInterface);
 
     gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
     gameData.startMoney = 1000;
