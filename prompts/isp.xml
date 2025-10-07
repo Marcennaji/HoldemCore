@@ -1,0 +1,20 @@
+<context>
+Enforcing ISP (Interface Segregation Principle) in code design.
+</context>
+
+<goal>
+Evaluate whether the core design adheres to ISP and OCP principles, providing specific examples and suggestions for improvement if necessary.
+The final target is to ensure that interfaces are client-specific and that classes are not forced to implement methods they do not use.
+Calls to ensureServicesInitialized should be minimized or eliminated.
+</goal>
+
+<constraints>
+Focus only on design quality, not syntax.
+</constraints>
+
+<instructions>
+Return a concise analysis structured as:
+1. Strengths
+2. Weaknesses
+3. Suggested refactors (no code yet)
+</instructions>

@@ -76,9 +76,9 @@ Explications et diagrammes détaillés :
 
 ## 📈 Feuille de route
 
-- 🧩 Éliminer les violations SOLID/ISP restantes dans le code legacy de 2011  
+- 🧩 Éliminer les violations SOLID restantes dans le code legacy de 2011  
 - 🎨 Améliorer l'UI Qt Widgets existante (application desktop) et développer une interface Qt Quick (QML) pour mobile  
-- 🧠 Explorer l’intégration d’un bot IA basé sur apprentissage
+- 🧠 Explorer l’intégration d’un bot basé sur machine learning
 
 ---
 

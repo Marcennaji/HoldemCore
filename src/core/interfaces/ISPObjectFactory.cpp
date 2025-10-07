@@ -1,9 +1,4 @@
-// Hold#include \"core/engine/state/TurnState.h\"
-#include \"core/engine/state/PreflopState.h\"
-#include \"core/engine/state/PostRiverState.h\"
-#include \"core/player/strategy/ManiacBotStrategy.h\"
-#include \"core/player/strategy/TightAggressiveBotStrategy.h\"
-#include \"core/player/Player.h\"e — Texas Hold'em simulator
+// HoldemCore — Texas Hold'em simulator
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
@@ -14,6 +9,7 @@
 #include "core/engine/state/PreflopState.h"
 #include "core/engine/state/PostRiverState.h"
 #include "core/player/strategy/ManiacBotStrategy.h"
+#include "core/player/strategy/TightAggressiveBotStrategy.h"
 #include "core/player/Player.h"
 
 namespace pkt::core
