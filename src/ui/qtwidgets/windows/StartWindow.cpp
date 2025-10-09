@@ -10,7 +10,7 @@
 #include <core/engine/model/GameData.h>
 #include <core/interfaces/Randomizer.h>
 #include <core/interfaces/Logger.h>
-#include <core/interfaces/NullLogger.h>
+#include "infra/NullLogger.h"
 #include <core/services/DefaultRandomizer.h>
 
 using namespace std;
@@ -357,7 +357,7 @@ void StartWindow::ensureServicesInitialized()
         m_randomizer = std::make_shared<pkt::core::DefaultRandomizer>();
     }
     if (!m_logger) {
-        m_logger = std::make_shared<pkt::core::NullLogger>();
+        m_logger = std::make_shared<pkt::infra::NullLogger>();
     }
 }
 

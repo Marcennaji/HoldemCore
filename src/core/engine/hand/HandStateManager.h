@@ -6,7 +6,6 @@
 
 namespace pkt::core
 {
-class ServiceContainer;
 class Logger;
 } // namespace pkt::core
 

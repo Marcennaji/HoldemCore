@@ -14,8 +14,6 @@
 #include <core/player/range/RangeParser.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include <core/player/strategy/PreflopRangeCalculator.h>
-#include "infra/ConsoleLogger.h"
-#include "infra/eval/PsimHandEvaluationEngine.h"
 #include "Helpers.h"
 
 #include <sstream>
@@ -40,33 +38,6 @@ Player::Player(const GameEvents& events, pkt::core::Logger& logger,
     m_statisticsUpdater->loadStatistics(name);
 
     m_currentHandContext->personalContext.cash = cash;
-}
-
-
-
-// ISP-compliant helper methods
-pkt::core::Logger& Player::getLogger() const
-{
-    assert(m_logger && "Logger service must be available. Use ISP-compliant constructor.");
-    return *m_logger;
-}
-
-pkt::core::HandEvaluationEngine& Player::getHandEvaluationEngine() const
-{
-    assert(m_handEvaluator && "HandEvaluationEngine service must be available. Use ISP-compliant constructor.");
-    return *m_handEvaluator;
-}
-
-pkt::core::PlayersStatisticsStore& Player::getPlayersStatisticsStore() const
-{
-    assert(m_statisticsStore && "PlayersStatisticsStore service must be available. Use ISP-compliant constructor.");
-    return *m_statisticsStore;
-}
-
-pkt::core::Randomizer& Player::getRandomizer() const
-{
-    assert(m_randomizer && "Randomizer service must be available. Use ISP-compliant constructor.");
-    return *m_randomizer;
 }
 
 const PlayerPosition Player::getPosition() const
@@ -216,10 +187,10 @@ const HandSimulationStats Player::computeHandSimulation() const
     const int nbOpponents = m_seatsList->size() - 1;
     // evaluate my strength against my opponents's guessed ranges :
     float maxOpponentsStrengths = getMaxOpponentsStrengths();
-    return getHandEvaluationEngine().simulateHandEquity(getCardsValueString(), getStringBoard(), nbOpponents,
+    return m_handEvaluator->simulateHandEquity(getCardsValueString(), getStringBoard(), nbOpponents,
                                                        maxOpponentsStrengths);
 #else
-    return getHandEvaluationEngine().simulateHandEquity("As 6d", "", 2, 0.5);
+    return m_handEvaluator->simulateHandEquity("As 6d", "", 2, 0.5);
 #endif
 }
 
@@ -321,7 +292,9 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 
         if ((*i).size() != 4)
         {
-            getLogger().error("invalid hand : " + (*i));
+            if (m_logger) {
+                m_logger->error("invalid hand : " + (*i));
+            }
             continue;
         }
         string s1 = (*i).substr(0, 2);
@@ -354,7 +327,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 
     for (vector<std::string>::const_iterator i = newRanges.begin(); i != newRanges.end(); i++)
     {
-        const int rank = getHandEvaluationEngine().rankHand(((*i) + board).c_str());
+        const int rank = m_handEvaluator->rankHand(((*i) + board).c_str());
         if (rank > getHandRanking())
         {
             nbWinningHands++;
@@ -362,7 +335,9 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
     }
     if (ranges.size() == 0)
     {
-        getLogger().error("no ranges for opponent " + std::to_string(opponentId));
+        if (m_logger) {
+            m_logger->error("no ranges for opponent " + std::to_string(opponentId));
+        }
         return 0;
     }
     assert(nbWinningHands / ranges.size() <= 1.0);
@@ -466,11 +441,7 @@ void Player::updateCurrentHandContext(Hand& currentHand)
 }
 
 float Player::calculatePreflopCallingRange(const CurrentHandContext& ctx) const
-{
-    // Use ISP-compliant PreflopRangeCalculator constructor with focused interfaces
-    assert(m_logger && m_randomizer && "Logger and Randomizer services must be available. Use ISP-compliant constructor.");
-    
-    // Use ISP-compliant constructor - no more ServiceContainer dependencies!
+{    
     PreflopRangeCalculator calculator(*m_logger, *m_randomizer);
     return calculator.calculatePreflopCallingRange(ctx);
 }
@@ -494,7 +465,7 @@ const PostFlopAnalysisFlags Player::getPostFlopAnalysisFlags() const
     std::string stringHand = getCardsValueString();
     std::string stringBoard = m_currentHandContext->commonContext.stringBoard;
 
-    return getHandEvaluationEngine().analyzeHand(getCardsValueString(), stringBoard);
+    return m_handEvaluator->analyzeHand(getCardsValueString(), stringBoard);
 }
 
 void Player::setPosition(const Hand& hand)
@@ -520,8 +491,10 @@ void Player::setAction(HandState& state, const PlayerAction& action)
 {
     if (action.type != ActionType::None)
     {
-        getLogger().info(m_name + " " + std::string(actionTypeToString(action.type)) +
-                                  (action.amount ? " " + std::to_string(action.amount) : ""));
+        if (m_logger) {
+            m_logger->info(m_name + " " + std::string(actionTypeToString(action.type)) +
+                                      (action.amount ? " " + std::to_string(action.amount) : ""));
+        }
     }
     m_currentHandContext->personalContext.actions.currentHandActions.addAction(state.getGameState(), action);
 }

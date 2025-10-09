@@ -6,7 +6,6 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/utils/Helpers.h"
 #include "core/player/Player.h"
-#include "core/interfaces/NullLogger.h"
 
 namespace pkt::core
 {
@@ -52,29 +51,17 @@ void FlopState::enter(Hand& hand)
     logStateInfo(hand);
 }
 
-// Helper method following Single Responsibility Principle
-Logger& FlopState::getLogger()
-{
-    // Use focused dependency if available (ISP-compliant)
-    if (m_logger) {
-        return *m_logger;
-    }
-    
-    static pkt::core::NullLogger nullLogger;
-    return nullLogger;
-}
-
 // Override base class method to use focused dependency (Liskov Substitution Principle)
 void FlopState::logStateInfo(Hand& hand)
 {
-    // Use ISP-compliant logging instead of hidden ServiceContainer dependency
     std::string boardStr = hand.getStringBoard();
     int pot = hand.getBoard().getPot(hand);
     
-    Logger& logger = getLogger();
-    logger.info(""); // Empty line for spacing
-    logger.info("Current State: " + gameStateToString(hand.getGameState()) + 
-               ", Board: " + boardStr + ", Pot: " + std::to_string(pot));
+    if (m_logger) {
+        m_logger->info(""); // Empty line for spacing
+        m_logger->info("Current State: " + gameStateToString(hand.getGameState()) + 
+                   ", Board: " + boardStr + ", Pot: " + std::to_string(pot));
+    }
 }
 
 void FlopState::exit(Hand& hand)

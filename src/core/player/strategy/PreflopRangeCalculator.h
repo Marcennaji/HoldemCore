@@ -64,11 +64,6 @@ class PreflopRangeCalculator
 
   private:
     
-    // ISP-compliant service access helpers
-    pkt::core::Logger& getLogger() const;
-    pkt::core::Randomizer& getRandomizer() const;
-    
-    // ISP-compliant focused service interfaces
     pkt::core::Logger* m_logger;
     pkt::core::Randomizer* m_randomizer;
 };

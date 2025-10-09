@@ -13,7 +13,7 @@
 #include <core/interfaces/HandEvaluationEngine.h>
 #include <core/interfaces/Randomizer.h>
 #include <core/interfaces/persistence/PlayersStatisticsStore.h>
-#include <core/interfaces/persistence/NullPlayersStatisticsStore.h>
+#include <infra/persistence/NullPlayersStatisticsStore.h>
 #include <core/services/DefaultRandomizer.h>
 #include <infra/ConsoleLogger.h>
 #include <infra/eval/PsimHandEvaluationEngine.h>

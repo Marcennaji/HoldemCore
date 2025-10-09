@@ -27,8 +27,6 @@ class PsimHandEvaluationEngine : public pkt::core::HandEvaluationEngine
     pkt::core::HandSimulationStats convertSimResults(const SimResults& s);
     pkt::core::PostFlopAnalysisFlags convertPostFlopState(const PostFlopState& src);
     
-    pkt::core::Logger& getLogger() const;
-
     std::shared_ptr<pkt::core::Logger> m_logger;
 };
 

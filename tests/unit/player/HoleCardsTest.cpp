@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "core/engine/GameEvents.h"
 #include "core/engine/cards/Card.h"
-#include "core/interfaces/persistence/NullPlayersStatisticsStore.h"
+#include "infra/persistence/NullPlayersStatisticsStore.h"
 #include "core/player/Player.h"
 #include "core/services/DefaultRandomizer.h"
 #include "common/DummyPlayer.h"

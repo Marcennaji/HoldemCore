@@ -5,7 +5,7 @@
 #include "core/engine/Exception.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
-#include "core/interfaces/persistence/NullPlayersStatisticsStore.h"
+#include "infra/persistence/NullPlayersStatisticsStore.h"
 #include "core/player/Player.h"
 #include "infra/ConsoleLogger.h"
 #include "infra/eval/PsimHandEvaluationEngine.h"

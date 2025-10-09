@@ -7,7 +7,6 @@
 #include <core/engine/model/Ranges.h>
 #include <core/player/range/RangeRefiner.h>
 #include <core/player/strategy/CurrentHandContext.h>
-#include <core/interfaces/NullLogger.h>
 #include <string>
 #include <vector>
 

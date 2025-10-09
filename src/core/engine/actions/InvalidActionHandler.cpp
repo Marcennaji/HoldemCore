@@ -1,6 +1,5 @@
 #include "InvalidActionHandler.h"
 #include "GameEvents.h"
-#include "core/interfaces/NullLogger.h"
 
 namespace pkt::core
 {

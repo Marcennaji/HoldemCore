@@ -4,7 +4,7 @@
 #include "common/DummyPlayer.h"
 #include "core/engine/utils/Helpers.h"
 #include "core/engine/model/PlayerPosition.h"
-#include "core/interfaces/persistence/NullPlayersStatisticsStore.h"
+#include "infra/persistence/NullPlayersStatisticsStore.h"
 #include "core/player/Helpers.h"
 #include "core/player/Player.h"
 #include "core/services/DefaultRandomizer.h"

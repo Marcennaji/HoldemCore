@@ -4,9 +4,9 @@
 #include "core/engine/game/Pot.h"
 #include "core/engine/model/GameState.h"
 #include "core/engine/state/RiverState.h"
-#include "core/interfaces/persistence/NullPlayersStatisticsStore.h"
+#include "infra/persistence/NullPlayersStatisticsStore.h"
 #include "core/player/typedefs.h"
-#include "core/interfaces/NullLogger.h"
+#include "infra/NullLogger.h"
 #include "core/services/DefaultRandomizer.h"
 #include "infra/ConsoleLogger.h"
 #include "infra/eval/PsimHandEvaluationEngine.h"
@@ -60,7 +60,7 @@ class PotTest : public ::testing::Test
             seats->push_back(std::static_pointer_cast<Player>(p));
         
         // Create a NullLogger for testing
-        auto logger = std::make_shared<pkt::core::NullLogger>();
+        auto logger = std::make_shared<pkt::infra::NullLogger>();
         pot = std::make_unique<Pot>(potAmount, seats, dealerId, *logger);
     }
 };

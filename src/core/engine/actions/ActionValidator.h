@@ -29,7 +29,7 @@ class ActionValidator
 {
   public:
     ActionValidator() = default;
-    explicit ActionValidator(std::shared_ptr<pkt::core::Logger> logger);
+    explicit ActionValidator(pkt::core::Logger& logger);
     ~ActionValidator() = default;
 
     // Main validation method - migrated from Helpers.cpp
@@ -59,8 +59,7 @@ class ActionValidator
                              std::string* outReason = nullptr) const;
 
   private:
-    std::shared_ptr<pkt::core::Logger> m_logger;
-    pkt::core::Logger& getLogger() const;
+    pkt::core::Logger* m_logger = nullptr;
 };
 
 } // namespace pkt::core

@@ -4,7 +4,7 @@
 #include "common/FakeRandomizer.h"
 #include "core/engine/EngineDefs.h"
 #include "core/engine/state/PreflopState.h"
-#include "core/interfaces/persistence/NullPlayersStatisticsStore.h"
+#include "infra/persistence/NullPlayersStatisticsStore.h"
 #include "core/player/Helpers.h"
 
 #include "infra/ConsoleLogger.h"

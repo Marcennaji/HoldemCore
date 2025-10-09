@@ -56,9 +56,6 @@ class RangeEstimator
     void updateUnplausibleRangesGivenTurnActions(const CurrentHandContext&);
     void updateUnplausibleRangesGivenRiverActions(const CurrentHandContext&);
     
-    pkt::core::Logger& getLogger() const;
-    pkt::core::HandEvaluationEngine& getHandEvaluationEngine() const;
-
     pkt::core::Logger* m_logger;
     pkt::core::HandEvaluationEngine* m_handEvaluator;
 

@@ -37,8 +37,6 @@ class FlopState : public HandState, public HandActionProcessor, public HandDebug
     void logStateInfo(Hand& hand) override;
 
   private:
-    Logger& getLogger(); 
-    
     const GameEvents& m_events;
     Logger* m_logger; 
 };

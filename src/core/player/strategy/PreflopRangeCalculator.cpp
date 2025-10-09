@@ -1,6 +1,5 @@
 
 #include "PreflopRangeCalculator.h"
-#include "core/interfaces/NullLogger.h"
 #include "core/services/DefaultRandomizer.h"
 #include "CurrentHandContext.h"
 #include "core/engine/model/PlayerPosition.h"
@@ -18,16 +17,6 @@ PreflopRangeCalculator::PreflopRangeCalculator(pkt::core::Logger& logger, pkt::c
 {
     // Initialize with default ranges to prevent crashes
     initializeRanges(45, 8); // Default tight-aggressive ranges for 8-player table
-}
-
-pkt::core::Logger& PreflopRangeCalculator::getLogger() const
-{
-    return *m_logger;
-}
-
-pkt::core::Randomizer& PreflopRangeCalculator::getRandomizer() const
-{
-    return *m_randomizer;
 }
 
 void PreflopRangeCalculator::initializeRanges(const int utgHeadsUpRange, const int utgFullTableRange)
@@ -123,7 +112,7 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(const CurrentHandCont
 
     float callingRange = getRange(m_position, nbPlayers);
 
-    getLogger().verbose("Initial calling range : " + std::to_string(callingRange));
+    m_logger->verbose("Initial calling range : " + std::to_string(callingRange));
 
     // Handle no raises and no calls
     if (nbRaises == 0 && nbCalls == 0 && m_position != Button && m_position != SmallBlind)
@@ -177,7 +166,7 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(const CurrentHandCont
 float PreflopRangeCalculator::adjustCallForLimpers(float callingRange) const
 {
 
-    getLogger().verbose("1 or more players have limped, but nobody has raised. Adjusting callingRange : " +
+    m_logger->verbose("1 or more players have limped, but nobody has raised. Adjusting callingRange : " +
                                  std::to_string(callingRange) + " * 1.2 = " + std::to_string(callingRange * 1.2));
     return callingRange * 1.2;
 }
@@ -194,7 +183,7 @@ float PreflopRangeCalculator::clampCallingRange(float callingRange) const
         callingRange = 100;
     }
 
-    getLogger().verbose("calling range : " + std::to_string(callingRange) + "%");
+    m_logger->verbose("calling range : " + std::to_string(callingRange) + "%");
     return callingRange;
 }
 
@@ -260,7 +249,7 @@ float PreflopRangeCalculator::adjustCallForRaiserStats(float callingRange, const
         callingRange = raiserStats.getPreflop4Bet() * 0.5f;
     }
 
-    getLogger().verbose(
+    m_logger->verbose(
         "PreflopRangeCalculator adjusting callingRange to the last raiser's stats, value is now " +
         std::to_string(callingRange));
     return callingRange;
@@ -282,7 +271,7 @@ float PreflopRangeCalculator::adjustCallForNoStats(float callingRange, int nbRai
         callingRange /= 4;
     }
 
-        getLogger().verbose("No stats available, callingRange value is now " + std::to_string(callingRange));
+        m_logger->verbose("No stats available, callingRange value is now " + std::to_string(callingRange));
     return callingRange;
 }
 
@@ -317,7 +306,7 @@ float PreflopRangeCalculator::adjustCallForBigBet(float callingRange, int potOdd
         callingRange *= 0.1f;
     }
 
-    getLogger().verbose("Pot odd is " + std::to_string(potOdd) + " : adjusting callingRange, value is now " +
+    m_logger->verbose("Pot odd is " + std::to_string(potOdd) + " : adjusting callingRange, value is now " +
                                  std::to_string(callingRange));
     return callingRange;
 }
@@ -357,7 +346,7 @@ float PreflopRangeCalculator::calculatePreflopRaisingRange(const CurrentHandCont
 
     float raisingRange = getRange(m_position, nbPlayers) * 0.8;
 
-    getLogger().verbose("Initial raising range : " + std::to_string(raisingRange));
+    m_logger->verbose("Initial raising range : " + std::to_string(raisingRange));
 
     if (nbRaises == 0 && nbCalls > 1 && nbPlayers > 3)
     {
@@ -381,7 +370,7 @@ float PreflopRangeCalculator::calculatePreflopRaisingRange(const CurrentHandCont
 float PreflopRangeCalculator::adjustRaiseForLimpers(float raisingRange) const
 {
 
-    getLogger().verbose("2 or more players have limped, but nobody has raised : tightening raising range to " +
+    m_logger->verbose("2 or more players have limped, but nobody has raised : tightening raising range to " +
                                  std::to_string(raisingRange * 0.7));
     return raisingRange * 0.7;
 }
@@ -445,7 +434,7 @@ float PreflopRangeCalculator::adjustRaiseForRaiserStats(const PreflopStatistics&
         raisingRange = 0; // Raise with aces only
     }
 
-    getLogger().verbose("Adjusting raising range based on raiser stats, value is now " +
+    m_logger->verbose("Adjusting raising range based on raiser stats, value is now " +
                                  std::to_string(raisingRange));
 
     return raisingRange;
@@ -462,7 +451,7 @@ float PreflopRangeCalculator::adjustRaiseForNoRaiserStats(float raisingRange, in
         raisingRange = 0; // 4-bet with aces only
     }
 
-    getLogger().verbose("No stats available for raiser, adjusting raising range to " +
+    m_logger->verbose("No stats available for raiser, adjusting raising range to " +
                                  std::to_string(raisingRange));
 
     return raisingRange;
@@ -478,12 +467,12 @@ float PreflopRangeCalculator::adjustRaiseForNoRaiser(const CurrentHandContext& c
         (m_position == SmallBlind || m_position == Button || m_position == Cutoff) && canBluff)
     {
         int rand = 0;
-        getRandomizer().getRand(1, 3, 1, &rand);
+        m_randomizer->getRand(1, 3, 1, &rand);
         if (rand == 2)
         {
             raisingRange = 100;
 
-            getLogger().verbose("Trying to steal blinds, setting raising range to 100");
+            m_logger->verbose("Trying to steal blinds, setting raising range to 100");
         }
     }
 
@@ -522,7 +511,7 @@ float PreflopRangeCalculator::adjustRaiseForStack(const CurrentHandContext& ctx,
         }
         raisingRange = std::max(f, raisingRange);
 
-        getLogger().verbose("Hands left: " + std::to_string(handsLeft) + ", minimum raising range set to " +
+        m_logger->verbose("Hands left: " + std::to_string(handsLeft) + ", minimum raising range set to " +
                                      std::to_string(f));
     }
 
@@ -541,7 +530,7 @@ float PreflopRangeCalculator::clampRaiseRange(float raisingRange) const
         raisingRange = 100;
     }
 
-    getLogger().verbose("Final raising range: " + std::to_string(raisingRange) + "%");
+    m_logger->verbose("Final raising range: " + std::to_string(raisingRange) + "%");
 
     return raisingRange;
 }
@@ -576,7 +565,7 @@ float PreflopRangeCalculator::adjustRaiseForBigBet(float raisingRange, int potOd
         raisingRange = std::min(1.0f, raisingRange * 0.2f);
     }
 
-    getLogger().verbose("Adjusted raising range for big bet: " + std::to_string(raisingRange));
+    m_logger->verbose("Adjusted raising range for big bet: " + std::to_string(raisingRange));
 
     return raisingRange;
 }

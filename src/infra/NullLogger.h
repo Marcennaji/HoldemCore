@@ -6,17 +6,17 @@
 
 #include "core/interfaces/Logger.h"
 
-namespace pkt::core
+namespace pkt::infra
 {
 
-class NullLogger : public Logger
+class NullLogger : public pkt::core::Logger
 {
   public:
-    virtual void setLogLevel(LogLevel level) override {}
+    virtual void setLogLevel(pkt::core::LogLevel level) override {}
     virtual void error(const std::string& msg) override {}
     virtual void info(const std::string& msg) override {}
     virtual void verbose(const std::string& msg) override {}
     virtual void debug(const std::string& msg) override {}
 };
 
-} // namespace pkt::core
+} // namespace pkt::infra

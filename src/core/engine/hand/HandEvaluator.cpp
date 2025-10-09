@@ -1,6 +1,5 @@
 #include "HandEvaluator.h"
 #include <stdexcept>
-#include "core/interfaces/NullHandEvaluationEngine.h"
 
 namespace pkt::core
 {

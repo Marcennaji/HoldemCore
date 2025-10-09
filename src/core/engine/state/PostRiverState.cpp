@@ -4,7 +4,6 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/player/Helpers.h"
 #include "core/player/Player.h"
-#include "core/interfaces/NullLogger.h"
 
 namespace pkt::core
 {

@@ -18,6 +18,7 @@ target_include_directories(core INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/engine/game
     ${CMAKE_CURRENT_SOURCE_DIR}/engine/utils
     ${CMAKE_CURRENT_SOURCE_DIR}/engine/state
+    ${CMAKE_CURRENT_SOURCE_DIR}/engine/interfaces
     ${CMAKE_CURRENT_SOURCE_DIR}/player
     ${CMAKE_CURRENT_SOURCE_DIR}/services
     ${CMAKE_SOURCE_DIR}/src

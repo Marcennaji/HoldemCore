@@ -7,10 +7,6 @@
 #include <memory>  // For std::shared_ptr
 #include <core/interfaces/Randomizer.h>
 
-// Forward declare ServiceContainer to avoid circular dependencies
-namespace pkt::core {
-    class ServiceContainer;
-}
 
 namespace pkt::core::player
 {

@@ -1,5 +1,5 @@
 @startuml
-title HoldemCore – Hexagonal Architecture with Dependency Injection
+title HoldemCore – Hexagonal Architecture with Constructor Dependency Injection
 
 skinparam packageStyle rectangle
 skinparam shadowing false
@@ -11,18 +11,13 @@ package "Core (Domain)" as Core {
   [Session] as Session
   [EngineFactory] as EngineFactory
   [Player/Strategy] as PlayerStrategy
+  [PlayerFactory] as PlayerFactory
+  [Hand] as Hand
   [Interfaces/Ports] as Ports
 }
 
-package "Services (DI Container)" as Services {
-  [ServiceContainer] as ServiceContainer
-  [AppServiceContainer] as AppServiceContainer
-  [PokerServices] as PokerServices
-  [BotServices] as BotServices
-}
-
 package "Application (Composition Root)" as App {
-  [main.cpp] as Main
+  [main_qt_widgets.cpp] as Main
   [GuiAppController] as GuiController
 }
 
@@ -30,6 +25,7 @@ package "Infrastructure (Adapters)" as Infra {
   [ConsoleLogger] as ConsoleLogger
   [SqlitePlayersStatisticsStore] as SqliteStore
   [PsimHandEvaluationEngine] as PsimEngine
+  [DefaultRandomizer] as DefaultRandomizer
   [SqliteDb] as SqliteDb
 }
 
@@ -48,53 +44,47 @@ package "Third-party" as ThirdParty {
 
 ' Core Domain Relationships
 Ports -[#0000FF]-> Engine : defines contracts
-GameEvents -[#0000FF]-> Engine : event callbacks
-Session -[#green]-> EngineFactory : creates
-Session -[#green]-> GameEvents : coordinates
+GameEvents -[#0000FF]-> Session : event system
+Session -[#green]-> EngineFactory : uses
+Session -[#green]-> PlayerFactory : creates
+EngineFactory -[#green]-> Hand : creates
 EngineFactory -[#green]-> Engine : creates
-Engine -[#green]-> PlayerStrategy : uses
+PlayerFactory -[#green]-> PlayerStrategy : creates
 Engine -[#green]-> Ports : depends on
-Engine -[#green]-> GameEvents : emits
+Hand -[#green]-> Ports : depends on
+PlayerStrategy -[#green]-> Ports : depends on
+Session -[#green]-> Ports : depends on
+EngineFactory -[#green]-> Ports : depends on
+PlayerFactory -[#green]-> Ports : depends on
 
-' Service Container Relationships
-Services -[#purple]-> Core : injected into
-AppServiceContainer -[#purple]-> ServiceContainer : implements
-PokerServices -[#purple]-> ServiceContainer : decorates
-BotServices -[#purple]-> ServiceContainer : decorates
-EngineFactory -[#purple]-> PokerServices : uses
-Session -[#purple]-> ServiceContainer : uses
-PlayerStrategy -[#purple]-> BotServices : uses
-
-' Application Layer (Composition Root)
-Main -[#red]-> AppServiceContainer : configures & creates
-Main -[#red]-> GuiController : creates with services
-GuiController -[#red]-> Session : creates with services
+' Application Layer (Composition Root & Direct DI)
+Main -[#red]-> Infra : creates concrete adapters
+Main -[#red]-> GuiController : injects adapters
+GuiController -[#red]-> Session : creates with injected deps
+GuiController -[#red]-> EngineFactory : creates with injected deps
 GuiController -[#red]-> UI : creates
-Session -[#red]-> EngineFactory : creates with services
 
-' Infrastructure Adapters
-Infra -[#orange]-> Ports : implements
-ConsoleLogger -[#orange]-> Ports : Logger
-SqliteStore -[#orange]-> Ports : PlayersStatisticsStore
-PsimEngine -[#orange]-> Ports : HandEvaluationEngine
+' Infrastructure Adapters (implement core interfaces)
+ConsoleLogger -[#orange]-> Ports : implements Logger
+SqliteStore -[#orange]-> Ports : implements PlayersStatisticsStore  
+PsimEngine -[#orange]-> Ports : implements HandEvaluationEngine
+DefaultRandomizer -[#orange]-> Ports : implements Randomizer
 SqliteStore -[#orange]-> SqliteDb : uses
 
 ' UI Adapters
 UI -[#orange]-> GameEvents : subscribes to
-  StartWindow --> Session : triggers
+StartWindow -[#orange]-> Session : triggers game start
 Bridge -[#orange]-> GameEvents : handles events
 Bridge -[#orange]-> TableWindow : updates UI
 
 ' Third-party Dependencies
-Infra -[#gray]-> ThirdParty : depends on
 SqliteDb -[#gray]-> SQLite3 : uses
-PsimEngine -[#gray]-> psim : uses
+PsimEngine -[#gray]-> psim : uses  
 UI -[#gray]-> Qt6 : framework
-Core -[#gray]-> GoogleTest : testing
 
-' Dependency Injection Flow (main architectural pattern)
-note right of Main : Composition Root:\nConfigures concrete services\nand injects them throughout\nthe application
-note right of Services : Service Container:\nProvides clean abstraction\nfor dependency injection\nwithout singletons
-note right of Core : Pure Domain Logic:\nZero knowledge of\nexternal dependencies\nAll services injected
+' Constructor Dependency Injection Flow
+note right of Main : Composition Root:\n• Creates concrete adapters\n• Injects via constructors\n• No service containers\n• Pure dependency injection
+note right of Ports : Abstract Interfaces:\n• Logger\n• HandEvaluationEngine\n• PlayersStatisticsStore\n• Randomizer
+note right of Core : Pure Domain Logic:\n• Zero infrastructure knowledge\n• All dependencies injected\n• Constructor injection only\n• ISP compliant
 
 @enduml

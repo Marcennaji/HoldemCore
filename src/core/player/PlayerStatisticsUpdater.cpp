@@ -2,7 +2,6 @@
 #include "PlayerStatisticsUpdater.h"
 #include "core/player/Player.h"
 #include "core/player/strategy/CurrentHandContext.h"
-#include <core/interfaces/persistence/NullPlayersStatisticsStore.h>
 
 namespace pkt::core::player
 {
@@ -264,11 +263,8 @@ void PlayerStatisticsUpdater::updateRiverStatistics(const CurrentHandContext& ct
 
 pkt::core::PlayersStatisticsStore& PlayerStatisticsUpdater::getPlayersStatisticsStore() const
 {
-    if (m_statisticsStore) {
-        return *m_statisticsStore;
-    }
-    static pkt::core::NullPlayersStatisticsStore nullStore;
-    return nullStore;
+    return *m_statisticsStore;
+
 }
 
 void PlayerStatisticsUpdater::loadStatistics(const std::string& playerName)

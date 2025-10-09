@@ -7,7 +7,6 @@
 #include "core/engine/hand/Hand.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/interfaces/Logger.h"
-#include "core/interfaces/NullLogger.h"
 #include "core/player/Helpers.h"
 #include "core/player/Player.h"
 // Include FSM states for the helper function

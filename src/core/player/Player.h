@@ -140,14 +140,6 @@ class Player
     std::unique_ptr<RangeEstimator>& getRangeEstimator() { return m_rangeEstimator; }
 
     // ========================================
-    // Service Access Helpers (ISP-compliant)
-    // ========================================
-    pkt::core::Logger& getLogger() const;
-    pkt::core::HandEvaluationEngine& getHandEvaluationEngine() const;
-    pkt::core::PlayersStatisticsStore& getPlayersStatisticsStore() const;
-    pkt::core::Randomizer& getRandomizer() const;
-
-    // ========================================
     // Business Logic Methods (Actual Implementation)
     // ========================================
     bool isInVeryLooseMode(const int nbPlayers) const;

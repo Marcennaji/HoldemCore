@@ -1,7 +1,7 @@
 #pragma once
 
 #include <core/engine/GameEvents.h>
-#include <core/interfaces/NullLogger.h>
+#include "infra/NullLogger.h"
 #include <core/player/Player.h>
 #include <core/player/strategy/LooseAggressiveBotStrategy.h>
 #include <core/interfaces/Randomizer.h>
