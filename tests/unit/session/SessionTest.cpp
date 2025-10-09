@@ -22,6 +22,10 @@ using namespace pkt::core;
 namespace pkt::test
 {
 
+
+
+
+
 // Testable Session class that exposes protected methods for testing
 class TestableSession : public Session
 {
@@ -311,39 +315,52 @@ TEST_F(SessionUnitTest, StartNewHand_WithoutCurrentGame_DoesNotCrash)
 // Error Handling and Edge Case Tests
 // =============================================================================
 
-TEST_F(SessionUnitTest, DISABLED_StartGame_BoundaryValues_HandledCorrectly)
+TEST_F(SessionUnitTest, StartGame_BoundaryValues_ValidatesCorrectly)
 {
-    // Arrange
-    Session session(events, *engineFactory, *logger, 
-                   *handEvaluator, *statsStore, *randomizer);
+    // Test boundary value validation without actually starting the game
+    // (to avoid hang on human player input)
     
-    // Test minimum valid players (2)
+    // Arrange
+    TestableSession session(events, *engineFactory, *logger, 
+                           *handEvaluator, *statsStore, *randomizer);
+    
+    // Act & Assert - Test minimum valid players (2)
     startData.numberOfPlayers = 2;
     gameData.startMoney = 1;  // Minimum valid money
     
-    // Act & Assert - Should succeed with boundary values
-    EXPECT_NO_THROW(session.startGame(gameData, startData));
-    EXPECT_EQ(gameInitializedCallCount, 1);
+    // Should pass parameter validation
+    EXPECT_NO_THROW(session.validateGameParameters(gameData, startData));
+    
+    // Test maximum valid players (10)  
+    startData.numberOfPlayers = 10;
+    startData.startDealerPlayerId = 9;  // Maximum valid dealer ID
+    gameData.startMoney = 100000;  // Large money value
+    
+    // Should pass parameter validation
+    EXPECT_NO_THROW(session.validateGameParameters(gameData, startData));
 }
 
-TEST_F(SessionUnitTest, DISABLED_StartGame_MaximumValues_HandledCorrectly)
+TEST_F(SessionUnitTest, StartGame_MaximumValues_ValidatesCorrectly)
 {
+    // Test maximum value validation without actually starting the game
+    // (to avoid hang on human player input)
+    
     // Arrange
-    Session session(events, *engineFactory, *logger, 
-                   *handEvaluator, *statsStore, *randomizer);
+    TestableSession session(events, *engineFactory, *logger, 
+                           *handEvaluator, *statsStore, *randomizer);
     
     // Test maximum valid players (10)
     startData.numberOfPlayers = 10;
     startData.startDealerPlayerId = 9;  // Maximum valid dealer ID
     gameData.startMoney = 100000;  // Large money value
     
-    // Act & Assert - Should succeed with maximum values
-    EXPECT_NO_THROW(session.startGame(gameData, startData));
-    EXPECT_EQ(gameInitializedCallCount, 1);
+    // Act & Assert - Should pass parameter validation with maximum values
+    EXPECT_NO_THROW(session.validateGameParameters(gameData, startData));
 }
 
-TEST_F(SessionUnitTest, DISABLED_StartGame_NegativeValues_ThrowsAppropriateExceptions)
+TEST_F(SessionUnitTest, StartGame_NegativeValues_ThrowsAppropriateExceptions)
 {
+    // This test only validates parameters, so no hanging issue
     // Arrange
     TestableSession session(events, *engineFactory, *logger, 
                            *handEvaluator, *statsStore, *randomizer);

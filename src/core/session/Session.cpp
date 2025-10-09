@@ -136,11 +136,11 @@ void Session::validateGameParameters(const GameData& gameData, const StartData& 
     {
         throw std::invalid_argument("Game supports maximum 10 players");
     }
-    if (gameData.startMoney == 0)
+    if (gameData.startMoney <= 0)
     {
         throw std::invalid_argument("Start money must be greater than 0");
     }
-    if (startData.startDealerPlayerId >= startData.numberOfPlayers)
+    if (startData.startDealerPlayerId < 0 || startData.startDealerPlayerId >= startData.numberOfPlayers)
     {
         throw std::invalid_argument("Dealer player ID must be valid player index");
     }
