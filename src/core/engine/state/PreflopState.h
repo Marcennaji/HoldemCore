@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 #pragma once
 #include "core/engine/hand/ActionProcessor.h"
 #include "core/engine/hand/DebuggableState.h"
@@ -16,6 +21,13 @@ namespace pkt::core
 
 class GameEvents;
 
+/**
+ * @brief Represents the Preflop state in a Texas Hold'em hand.
+ * 
+ * The Preflop state is the initial betting round that occurs after players receive their hole cards
+ * but before any community cards are dealt. Players can call, raise, or fold based on their hole cards.
+ * This state handles blinds posting and manages the first round of betting actions.
+ */
 class PreflopState : public HandState, public HandActionProcessor, public HandDebuggableState
 {
   public:

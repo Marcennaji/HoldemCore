@@ -20,6 +20,13 @@ namespace pkt::core::player
 {
 struct CurrentHandContext;
 
+/**
+ * @brief Estimates opponent hand ranges based on preflop betting patterns.
+ * 
+ * Analyzes preflop actions and statistics to determine the likely range
+ * of starting hands an opponent might have, considering position, betting
+ * history, and player tendencies.
+ */
 class PreflopRangeEstimator
 {
   public:

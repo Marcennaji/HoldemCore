@@ -23,6 +23,14 @@
 
 namespace pkt::core
 {
+
+/**
+ * @brief Factory class for creating and managing poker engine components.
+ * 
+ * This factory provides centralized creation of engine objects including hands,
+ * boards, players, and other game components. It ensures proper initialization
+ * and dependency injection throughout the poker engine system.
+ */
 class EngineFactory
 {
   public:

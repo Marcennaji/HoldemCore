@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 #pragma once
 #include <memory>
 #include <string>
@@ -10,6 +15,12 @@ struct PostFlopState;
 namespace pkt::infra
 {
 
+/**
+ * @brief Concrete hand evaluation engine implementation using the psim library.
+ * 
+ * Implements the HandEvaluationEngine interface using the psim poker evaluation
+ * library for hand ranking, equity simulation, and postflop analysis functionality.
+ */
 /// Poker hand evaluator using the psim library
 class PsimHandEvaluationEngine : public pkt::core::HandEvaluationEngine
 {

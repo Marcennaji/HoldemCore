@@ -14,6 +14,13 @@ namespace pkt::core::player
 // Forward declaration
 struct CurrentHandContext;
 
+/**
+ * @brief Abstract base class for automated bot playing strategies.
+ * 
+ * This class provides the foundation for implementing different bot personalities
+ * and decision-making algorithms. Bot strategies automatically decide actions
+ * based on game context, hand strength, and poker theory principles.
+ */
 class BotStrategy : public PlayerStrategy
 {
   public:

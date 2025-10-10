@@ -22,6 +22,13 @@ class Hand;
 class Board;
 class EngineFactory;
 
+/**
+ * @brief Main game controller that manages poker game flow and state.
+ * 
+ * This class orchestrates a complete poker game session, managing players,
+ * hands, dealer rotation, and overall game progression. It coordinates between
+ * the engine factory, game events, and individual hand management.
+ */
 class Game
 {
   public:

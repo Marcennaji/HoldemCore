@@ -16,6 +16,13 @@
 namespace pkt::core::player
 {
 
+/**
+ * @brief Factory class for creating and configuring poker players.
+ * 
+ * Handles the creation of player instances with proper dependency injection,
+ * strategy assignment, and initialization of player statistics and state
+ * management components.
+ */
 class PlayerFactory
 {
   public:

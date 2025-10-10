@@ -12,6 +12,13 @@ struct sqlite3;
 namespace pkt::infra
 {
 
+/**
+ * @brief SQLite database wrapper for persistent data storage.
+ * 
+ * Provides a simplified interface for SQLite database operations including
+ * connection management, SQL execution, and prepared statement creation
+ * for poker engine data persistence needs.
+ */
 class SqliteDb
 {
   public:

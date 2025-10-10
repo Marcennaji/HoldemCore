@@ -12,6 +12,13 @@
 namespace pkt::infra
 {
 
+/**
+ * @brief Logger implementation that outputs messages to the console.
+ * 
+ * This logger provides console-based logging functionality for debugging
+ * and monitoring the poker engine. It supports different log levels and
+ * outputs formatted messages to standard output streams.
+ */
 class ConsoleLogger : public pkt::core::Logger
 {
   public:

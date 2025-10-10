@@ -9,6 +9,13 @@
 namespace pkt::infra
 {
 
+/**
+ * @brief Null object pattern implementation of Logger that discards all messages.
+ * 
+ * This logger implementation provides a no-op logger that silently discards
+ * all log messages. Useful for testing or when logging is not desired
+ * without having to check for null pointers throughout the code.
+ */
 class NullLogger : public pkt::core::Logger
 {
   public:

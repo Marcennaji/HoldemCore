@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 #pragma once
 
 #include <list>
@@ -9,6 +14,13 @@
 namespace pkt::core
 {
 
+/**
+ * @brief Manages pot distribution and winner calculation in poker hands.
+ * 
+ * Handles the distribution of chips from the pot to winning players
+ * at the end of a hand, including side pot calculations and proper
+ * chip distribution among multiple winners.
+ */
 class Pot
 {
   public:

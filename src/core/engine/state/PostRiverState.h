@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 #pragma once
 #include "core/engine/hand/ActionProcessor.h"
 #include "core/engine/hand/DebuggableState.h"
@@ -15,6 +20,13 @@ namespace pkt::core
 {
 class GameEvents;
 
+/**
+ * @brief Represents the Post-River state in a Texas Hold'em hand.
+ * 
+ * The Post-River state occurs after all betting rounds are complete and handles
+ * the showdown phase where players reveal their cards and the winner is determined.
+ * This state manages pot distribution and hand resolution.
+ */
 class PostRiverState : public HandState, public HandActionProcessor, public HandDebuggableState
 {
   public:

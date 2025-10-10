@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 #pragma once
 
 #include <core/player/PlayerStatistics.h>
@@ -20,18 +25,25 @@ namespace pkt::core::player
 
 class CurrentHandActions;
 
-/*
-This class is for pruning the range of possible hands a player may have, given his actions postflop, and his playing
-style. Parameters:
-- possibleSituation : the PostFlopAnalysisFlags that correspond to a possible hand the player may have started with
-preflop
-- ctx : the CurrentHandContext of the player on who we want to check the plausibility of the possibleSituation
-Note that the *private" data of CurrentHandContext is not used here, only the public data (statistics, position,
-actions).
 
-Returns : true if the possibleSituation is unplausible given the actions of the player and his playing style
-*/
-
+/**
+ * @brief Validates hand plausibility across all betting rounds and actions.
+ * 
+ * Comprehensive hand range validation system that checks whether specific
+ * hand combinations are consistent with observed betting patterns throughout
+ * all phases of the hand (flop, turn, river).
+ *
+ * This class is for pruning the range of possible hands a player may have, given his actions postflop, and his playing style. 
+ * 
+ * Parameters for the methods are:
+ * 
+ * - possibleSituation : the PostFlopAnalysisFlags that correspond to a possible hand the player may have started with preflop
+ * - ctx : the CurrentHandContext of the player on who we want to check the plausibility of the possibleSituation
+ * 
+ * Note that the "private" data of CurrentHandContext is not used here, only the public data (statistics, position,
+ * actions).
+ * 
+ */
 class HandPlausibilityChecker
 {
   public:

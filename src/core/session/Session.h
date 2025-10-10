@@ -28,6 +28,13 @@ class StrategyAssigner;
 }
 class Board;
 
+/**
+ * @brief Manages poker game sessions and coordinates game lifecycle.
+ * 
+ * Orchestrates the overall game session including player management,
+ * hand execution, action handling, and coordination between different
+ * game components like board, players, and statistics.
+ */
 class Session
 {
   public:

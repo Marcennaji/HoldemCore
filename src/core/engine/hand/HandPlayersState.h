@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 #pragma once
 
 #include "BettingActions.h"
@@ -8,6 +13,13 @@
 namespace pkt::core
 {
 
+/**
+ * @brief Manages the state and organization of players during a poker hand.
+ * 
+ * Tracks which players are seated, actively playing, still in the hand,
+ * and handles player state transitions throughout the different phases
+ * of a poker hand.
+ */
 class HandPlayersState
 {
   public:

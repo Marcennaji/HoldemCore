@@ -1,3 +1,7 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
 #pragma once
 
 #include "BettingRoundActions.h"
@@ -18,6 +22,13 @@ struct BettingRoundHistory
     std::vector<std::pair<unsigned, pkt::core::ActionType>> actions; // playerId, action
 };
 
+/**
+ * @brief Manages betting actions and validation during poker betting rounds.
+ * 
+ * This class handles the logic for determining valid betting actions,
+ * calculating minimum raises, tracking betting history, and validating
+ * player actions within the context of the current betting round.
+ */
 class BettingActions
 {
   public:

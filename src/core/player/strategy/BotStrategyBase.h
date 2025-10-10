@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 #pragma once
 
 #include "core/engine/model/PlayerAction.h"
@@ -11,6 +16,13 @@ namespace pkt::core::player
 {
 struct CurrentHandContext;
 
+/**
+ * @brief Base implementation class providing common functionality for bot strategies.
+ * 
+ * This class serves as the foundation for concrete bot strategy implementations,
+ * providing shared decision-making logic, helper methods, and common patterns
+ * used across different bot personalities and playing styles.
+ */
 class BotStrategyBase : public virtual BotStrategy
 {
   public:

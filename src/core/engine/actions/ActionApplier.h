@@ -1,3 +1,7 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
 #pragma once
 
 #include "core/interfaces/Logger.h"
@@ -13,6 +17,13 @@ namespace player
 class Player;
 }
 
+/**
+ * @brief Applies player actions to the game state during a poker hand.
+ * 
+ * This utility class handles the application of various player actions
+ * (call, raise, bet, fold, etc.) to the current hand state, updating
+ * player balances, pot amounts, and game history accordingly.
+ */
 class ActionApplier
 {
   public:

@@ -13,6 +13,14 @@ namespace pkt::core::player
 {
 // Forward declaration
 struct CurrentHandContext;
+
+/**
+ * @brief Implements a loose-aggressive playing style for bot players.
+ * 
+ * This strategy plays a wider range of hands (loose) and plays them aggressively
+ * with frequent betting and raising. It applies pressure across many situations
+ * but can be more volatile than tight-aggressive play.
+ */
 class LooseAggressiveBotStrategy : public BotStrategyBase
 {
 

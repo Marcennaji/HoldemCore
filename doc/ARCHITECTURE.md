@@ -71,10 +71,7 @@ Each state:
 
 ## 5. Current Architectural Rules
 
-- Core must remain **Qt-free**
-- Use **constructor injection** for all dependencies
-- Eliminate any **ServiceContainer** usage
-- Keep **ISP (Interface Segregation Principle)** compliance
+- Core must remain **UI-free** (Qt, etc)
 - Maintain **hexagonal boundaries** strictly:
   - Core logic → no infrastructure knowledge  
   - UI layers → communicate only via bridges and events
@@ -83,9 +80,8 @@ Each state:
 
 ## 6. Testing Strategy
 
-- **Unit Tests:** GoogleTest, 100% coverage on domain logic  
+- **Unit Tests:** GoogleTest, main core components are covered  
 - **Integration / E2E:** validates FSM, betting rounds, statistics persistence  
-- **Test Fixtures:** mirror production setup with mock interfaces
 
 ---
 
@@ -96,18 +92,9 @@ HoldemCore/
 ├── src/
 │   ├── core/          # Domain logic
 │   ├── infra/         # Infrastructure adapters (DB, eval engine, logging)
-│   ├── ui/            # UI front-ends (Qt Widgets, QML)
+│   ├── ui/            # UI front-ends (Qt Widgets, QML...)
 │   └── app/           # Application entrypoints
 └── tests/             # Unit and E2E tests
 ```
 
----
 
-## 8. Future Evolution
-
-- Fully decouple `EngineFactory` from ServiceContainer
-- Finalize migration to pure dependency injection
-- Refine QML front-end with event bridge
-- Introduce poker AI experimentation layer (optional)
-
----

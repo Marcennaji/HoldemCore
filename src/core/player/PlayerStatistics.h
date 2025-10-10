@@ -102,6 +102,13 @@ class RiverStatistics
     long fourBets;
 };
 
+/**
+ * @brief Tracks comprehensive playing statistics for a player across multiple hands.
+ * 
+ * This class maintains detailed statistics about a player's performance including
+ * showdown frequency, hand counts, and preflop statistics. Used for analyzing
+ * player tendencies and performance over time.
+ */
 class PlayerStatistics
 {
   public:

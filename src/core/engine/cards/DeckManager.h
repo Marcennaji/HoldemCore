@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 #pragma once
 
 #include <vector>
@@ -8,9 +13,14 @@
 namespace pkt::core
 {
 
-/// DeckManager handles pure deck operations for a poker hand
-/// Extracted from Hand class to separate deck management from game logic  
-/// ISP-compliant: only depends on Randomizer interface
+/**
+ * @brief Manages deck initialization, shuffling, and card dealing operations.
+ * 
+ * Handles all deck-related operations for poker games including shuffling,
+ * dealing cards to players and board, and tracking remaining cards.
+ * Follows ISP principles by depending only on the Randomizer interface.
+ */
+
 class DeckManager
 {
   public:

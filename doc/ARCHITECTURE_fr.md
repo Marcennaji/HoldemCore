@@ -57,29 +57,21 @@ Chaque état :
 - Préserve la pureté du domaine — aucune dépendance à Qt
 
 ## 5. Règles architecturales actuelles
-- Le cœur doit rester indépendant de Qt
-- Utiliser l’injection par constructeur pour toutes les dépendances
-- Supprimer toute utilisation du ServiceContainer
+- Le cœur doit rester indépendant de toute UI (Qt ou autre)
 - Respecter le principe de ségrégation des interfaces (ISP)
 - Maintenir des frontières hexagonales strictes :
    - Logique du cœur → aucune connaissance de l’infrastructure
    - Couches UI → communication uniquement via ponts et événements
 
 ## 6. Stratégie de test
-- Tests unitaires : GoogleTest, couverture complète de la logique du domaine
+- Tests unitaires : GoogleTest, couverture des principaux composants du domaine
 - Tests d’intégration / de bout en bout (E2E) : validation de la FSM, des tours de mise, de la persistance des statistiques
-- Fixtures de test : reproduisent la configuration de production avec des interfaces mockées
 
 ## 7. Structure de référence
 HoldemCore/
 ├── src/
 │   ├── core/          # Logique métier principale
 │   ├── infra/         # Adaptateurs d’infrastructure (BDD, moteur d’évaluation, logs)
-│   ├── ui/            # Interfaces utilisateur (Qt Widgets, QML)
+│   ├── ui/            # Interfaces utilisateur (Qt Widgets, QML...)
 │   └── app/           # Points d’entrée applicatifs
 └── tests/             # Tests unitaires et E2E
-
-## 8. Évolutions futures
-- Finaliser la migration vers une injection de dépendances pure
-- Améliorer l’interface Qt Widgets et développer une interface Qt QML
-- Introduire une couche expérimentale d’IA (machine learning) pour la stratégie poker

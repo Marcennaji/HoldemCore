@@ -13,6 +13,13 @@
 namespace pkt::core
 {
 
+/**
+ * @brief Abstract interface for persisting player statistics data.
+ * 
+ * Defines the contract for loading and saving player statistics,
+ * enabling different storage implementations (database, file system, etc.)
+ * to be used for persistent player data management.
+ */
 class PlayersStatisticsStore
 {
   public:

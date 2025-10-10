@@ -2,8 +2,6 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
-/* Exception class for engine errors. */
-
 #pragma once
 
 #include "model/EngineError.h"
@@ -14,6 +12,13 @@
 namespace pkt::core
 {
 
+/**
+ * @brief Exception class for poker engine errors.
+ * 
+ * This class provides detailed error reporting for engine-related failures,
+ * including source file location, error codes, and descriptive messages.
+ * Used throughout the poker engine to handle exceptional conditions.
+ */
 class Exception : public std::exception
 {
   public:

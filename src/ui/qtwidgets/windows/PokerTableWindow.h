@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 // PokerTableWindow.h
 #pragma once
 
@@ -31,6 +36,15 @@ class Board;
 
 namespace pkt::ui::qtwidgets
 {
+
+/**
+ * @brief Main window for the poker table user interface.
+ * 
+ * This class provides the graphical user interface for playing poker,
+ * displaying the table, player positions, cards, betting controls,
+ * and game state information. It handles user interactions and
+ * communicates with the poker engine through the session.
+ */
 class PokerTableWindow : public QWidget
 {
     Q_OBJECT

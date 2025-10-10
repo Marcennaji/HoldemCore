@@ -32,6 +32,13 @@ namespace pkt::core::player
 class Player;
 struct CurrentHandContext;
 
+/**
+ * @brief Estimates opponent hand ranges based on betting patterns and statistics.
+ * 
+ * Analyzes player actions and statistics to estimate the likely range of hands
+ * an opponent might hold, supporting both preflop and postflop range estimation
+ * for strategic decision making.
+ */
 class RangeEstimator
 {
   public:

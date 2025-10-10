@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 #pragma once
 #include <map>
 #include <string>
@@ -6,6 +11,13 @@
 namespace pkt::core
 {
 
+/**
+ * @brief Utility functions for card string conversions and representations.
+ * 
+ * Provides static methods for converting between card indices and
+ * human-readable string representations, supporting both individual
+ * cards and collections of cards.
+ */
 /// Utility class for card string representations and conversions
 class CardUtilities
 {

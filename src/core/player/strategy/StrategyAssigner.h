@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 #pragma once
 #include <memory>
 #include "core/engine/model/TableProfile.h"
@@ -8,6 +13,13 @@
 namespace pkt::core::player
 {
 
+/**
+ * @brief Assigns and manages AI strategies for bot players at the poker table.
+ * 
+ * Handles the allocation of different AI strategies to bot players based on
+ * table configuration and desired playing styles, ensuring a diverse and
+ * realistic playing environment for poker simulations.
+ */
 class StrategyAssigner
 {
   public:

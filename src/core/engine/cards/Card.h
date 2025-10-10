@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 #pragma once
 
 #include "core/engine/cards/CardUtilities.h"
@@ -13,6 +18,13 @@
 namespace pkt::core
 {
 
+/**
+ * @brief Represents a playing card with suit and rank for poker games.
+ * 
+ * Provides a type-safe wrapper around integer card representations,
+ * supporting standard 52-card deck operations including parsing,
+ * string conversion, and compatibility with existing card systems.
+ */
 /// Represents a playing card with suit and rank.
 /// Wraps the existing int-based card representation to maintain compatibility.
 class Card

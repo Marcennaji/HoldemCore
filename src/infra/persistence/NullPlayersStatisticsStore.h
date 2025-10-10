@@ -13,6 +13,13 @@
 namespace pkt::core
 {
 
+/**
+ * @brief Null object implementation of PlayersStatisticsStore interface.
+ * 
+ * Provides a no-operation implementation of the statistics store interface
+ * for testing scenarios or when persistent statistics storage is not needed.
+ * Follows the Null Object pattern to avoid null pointer checks.
+ */
 class NullPlayersStatisticsStore : public PlayersStatisticsStore
 {
   public:

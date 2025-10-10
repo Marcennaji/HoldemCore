@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 #pragma once
 #include <string>
 #include <vector>
@@ -60,6 +65,13 @@ struct PostFlopAnalysisFlags
     unsigned int betterOuts : 4;   ///< How many cards will give us a fullhouse or better?
 };
 
+/**
+ * @brief Abstract interface for poker hand evaluation and analysis engines.
+ * 
+ * Defines the contract for hand evaluation systems that can rank hands,
+ * simulate equity, and analyze post-flop situations. Allows pluggable
+ * evaluation engines for different poker variants and analysis needs.
+ */
 /// Abstract interface for poker hand evaluation engines
 class HandEvaluationEngine
 {

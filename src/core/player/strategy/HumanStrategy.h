@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 #pragma once
 
 #include "PlayerStrategy.h"
@@ -9,6 +14,13 @@
 namespace pkt::core::player
 {
 
+/**
+ * @brief Strategy for human players that prompts for manual input.
+ * 
+ * This strategy allows human players to make their own decisions during the game.
+ * It handles user interaction through events and provides the interface for
+ * manual action selection (fold, call, raise, etc.).
+ */
 class HumanStrategy : public PlayerStrategy
 {
   public:

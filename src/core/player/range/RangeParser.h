@@ -9,6 +9,13 @@
 namespace pkt::core::player
 {
 
+/**
+ * @brief Parses and converts poker hand range notations into usable formats.
+ * 
+ * Handles the conversion of range strings (like "AA-KK, AKs+") into
+ * atomic card combinations or simplified range representations for
+ * range analysis and probability calculations.
+ */
 class RangeParser
 {
   public:

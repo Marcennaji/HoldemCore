@@ -19,6 +19,13 @@ namespace pkt::core
 
 class Hand;
 
+/**
+ * @brief Manages community card state and showdown logic in Texas Hold'em poker games.
+ * 
+ * Maintains the state of community cards (board) and handles showdown-related
+ * operations including pot distribution, winner determination, and reveal order
+ * coordination with the hand evaluation engine.
+ */
 class Board 
 {
   public:

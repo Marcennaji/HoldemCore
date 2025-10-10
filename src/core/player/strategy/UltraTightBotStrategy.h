@@ -12,6 +12,14 @@ namespace pkt::core::player
 {
 // Forward declaration
 struct CurrentHandContext;
+
+/**
+ * @brief Implements an ultra-tight playing style for bot players.
+ * 
+ * This strategy plays an extremely selective range of hands, focusing only on
+ * premium holdings. It's a very conservative approach that minimizes risk but
+ * may miss profitable opportunities with marginal hands.
+ */
 class UltraTightBotStrategy : public BotStrategyBase
 {
 

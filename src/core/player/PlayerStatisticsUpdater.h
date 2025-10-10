@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 #pragma once
 
 #include <core/engine/EngineDefs.h>
@@ -14,6 +19,13 @@ namespace pkt::core::player
 {
 struct CurrentHandContext;
 
+/**
+ * @brief Manages updating and persisting player statistics throughout gameplay.
+ * 
+ * Handles loading player statistics from storage, updating them based on
+ * actions and hand outcomes, and persisting the updated statistics back
+ * to the storage system.
+ */
 class PlayerStatisticsUpdater
 {
   public:

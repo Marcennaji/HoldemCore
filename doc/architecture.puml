@@ -21,7 +21,7 @@ package "Application (Composition Root)" as App {
   [GuiAppController] as GuiController
 }
 
-package "Infrastructure (Adapters)" as Infra {
+package "Infrastructure (Secondary Adapters)" as Infra {
   [ConsoleLogger] as ConsoleLogger
   [SqlitePlayersStatisticsStore] as SqliteStore
   [PsimHandEvaluationEngine] as PsimEngine
@@ -29,7 +29,7 @@ package "Infrastructure (Adapters)" as Infra {
   [SqliteDb] as SqliteDb
 }
 
-package "UI (Adapters)" as UI {
+package "UI (Primary Adapters)" as UI {
   [StartWindow] as StartWindow
   [PokerTableWindow] as TableWindow
   [GuiBridgeWidgets] as Bridge
@@ -64,18 +64,18 @@ GuiController -[#red]-> Session : creates with injected deps
 GuiController -[#red]-> EngineFactory : creates with injected deps
 GuiController -[#red]-> UI : creates
 
-' Infrastructure Adapters (implement core interfaces)
+' Secondary Adapters (implement core interfaces - driven by application)
 ConsoleLogger -[#orange]-> Ports : implements Logger
 SqliteStore -[#orange]-> Ports : implements PlayersStatisticsStore  
 PsimEngine -[#orange]-> Ports : implements HandEvaluationEngine
 DefaultRandomizer -[#orange]-> Ports : implements Randomizer
 SqliteStore -[#orange]-> SqliteDb : uses
 
-' UI Adapters
-UI -[#orange]-> GameEvents : subscribes to
-StartWindow -[#orange]-> Session : triggers game start
-Bridge -[#orange]-> GameEvents : handles events
-Bridge -[#orange]-> TableWindow : updates UI
+' Primary Adapters (drive the application - user interfaces)
+UI -[#purple]-> GameEvents : subscribes to
+StartWindow -[#purple]-> Session : drives application
+Bridge -[#purple]-> GameEvents : handles events
+Bridge -[#purple]-> TableWindow : updates UI
 
 ' Third-party Dependencies
 SqliteDb -[#gray]-> SQLite3 : uses
@@ -83,8 +83,10 @@ PsimEngine -[#gray]-> psim : uses
 UI -[#gray]-> Qt6 : framework
 
 ' Constructor Dependency Injection Flow
-note right of Main : Composition Root:\n• Creates concrete adapters\n• Injects via constructors\n• No service containers\n• Pure dependency injection
+note right of Main : Composition Root:\n• Creates concrete adapters\n• Injects via constructors\n• Pure dependency injection
 note bottom of Ports : Abstract Interfaces:\n• Logger\n• HandEvaluationEngine\n• PlayersStatisticsStore\n• Randomizer
 note bottom of Core : Pure Domain Logic:\n• Zero infrastructure knowledge\n• All dependencies injected\n• Constructor injection only\n• ISP compliant
+note left of UI : Primary Adapters:\n• Drive the application\n• User interfaces\n• Trigger use cases
+note right of Infra : Secondary Adapters:\n• Driven by application\n• Implement core interfaces\n• Infrastructure concerns
 
 @enduml

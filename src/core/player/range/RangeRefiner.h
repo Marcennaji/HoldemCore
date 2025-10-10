@@ -9,6 +9,13 @@
 namespace pkt::core::player
 {
 
+/**
+ * @brief Helper class for subtracting implausible hole cards from player ranges.
+ * 
+ * Refines opponent hand ranges by removing implausible combinations based on
+ * the player's playing style and observed actions during the current hand,
+ * producing more accurate range estimates for strategic decision making.
+ */
 class RangeRefiner
 {
   public:

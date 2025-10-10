@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 #pragma once
 
 #include <optional>
@@ -11,6 +16,13 @@
 
 namespace pkt::core
 {
+/**
+ * @brief Tracks and analyzes betting actions within a single betting round.
+ * 
+ * This class provides analysis of betting patterns during a specific round
+ * (preflop, flop, turn, or river), tracking raises, calls, and player positions
+ * to support game logic and statistical analysis.
+ */
 class BettingRoundActions
 {
   public:

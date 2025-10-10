@@ -19,6 +19,13 @@ namespace pkt::infra
 using core::player::PlayerList;
 using core::player::PlayerStatistics;
 
+/**
+ * @brief SQLite database implementation for storing player statistics.
+ * 
+ * This class provides persistent storage of player performance data using SQLite.
+ * It tracks wins, losses, hands played, and other statistical information
+ * for analysis and long-term player performance monitoring.
+ */
 class SqlitePlayersStatisticsStore : public pkt::core::PlayersStatisticsStore
 {
 

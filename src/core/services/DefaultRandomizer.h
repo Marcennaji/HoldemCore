@@ -9,6 +9,13 @@
 namespace pkt::core
 {
 
+/**
+ * @brief Default implementation of the randomizer interface using standard library.
+ * 
+ * This class provides cryptographically secure random number generation
+ * for card shuffling, dealing, and other game mechanics that require
+ * unpredictable random values.
+ */
 class DefaultRandomizer : public pkt::core::Randomizer
 {
   public:

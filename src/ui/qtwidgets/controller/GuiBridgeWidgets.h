@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 #pragma once
 
 #include <QObject>
@@ -21,6 +26,13 @@ namespace pkt::ui::qtwidgets
 {
 class PokerTableWindow;
 
+/**
+ * @brief Bridge between the poker engine core and Qt Widgets GUI components.
+ * 
+ * Handles communication between the game engine and the user interface,
+ * translating game events to GUI updates and user interactions back to
+ * the poker engine core.
+ */
 class GuiBridgeWidgets : public QObject
 {
     Q_OBJECT

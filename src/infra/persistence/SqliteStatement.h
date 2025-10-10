@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 #pragma once
 
 #include <stdexcept>
@@ -6,6 +11,13 @@
 
 struct sqlite3_stmt;
 
+/**
+ * @brief RAII wrapper for SQLite prepared statements.
+ * 
+ * Provides a type-safe interface for SQLite prepared statements with
+ * automatic resource management, parameter binding, and result retrieval
+ * for database operations in the poker engine.
+ */
 class SqliteStatement
 {
   public:

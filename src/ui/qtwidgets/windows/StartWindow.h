@@ -29,6 +29,14 @@ class Logger;
 namespace pkt::ui::qtwidgets
 {
 class PokerTableWindow;
+
+/**
+ * @brief Initial window for configuring and starting poker games.
+ * 
+ * This window allows users to set up game parameters such as number of players,
+ * bot difficulty levels, blinds, starting chip counts, and other game settings
+ * before launching the main poker table interface.
+ */
 class StartWindow : public QMainWindow
 {
     Q_OBJECT

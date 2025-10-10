@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 
 #pragma once
 
@@ -12,6 +17,13 @@
 namespace pkt::core::player
 {
 
+/**
+ * @brief Tracks and manages player actions during the current poker hand.
+ * 
+ * Maintains a record of all actions taken by a player during different
+ * game states (preflop, flop, turn, river) within the current hand,
+ * supporting action history analysis and strategy evaluation.
+ */
 class CurrentHandActions
 {
   public:

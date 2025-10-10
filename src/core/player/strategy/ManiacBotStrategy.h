@@ -10,6 +10,14 @@
 namespace pkt::core::player
 {
 struct CurrentHandContext;
+
+/**
+ * @brief Implements a maniac playing style for bot players.
+ * 
+ * This strategy plays very aggressively with almost any hand, frequently betting
+ * and raising regardless of hand strength. It creates maximum action and pressure
+ * but is generally unprofitable and highly volatile.
+ */
 class ManiacBotStrategy : public BotStrategyBase
 {
 

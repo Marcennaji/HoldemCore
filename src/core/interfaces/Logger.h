@@ -16,6 +16,13 @@ enum class LogLevel
     Debug
 };
 
+/**
+ * @brief Abstract interface for logging functionality across the application.
+ * 
+ * Provides a unified logging interface with multiple log levels (quiet, info,
+ * verbose, debug) allowing different logging implementations to be plugged
+ * into the poker engine system.
+ */
 class Logger
 {
   public:

@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 #pragma once
 
 #include <memory>
@@ -13,6 +18,13 @@ namespace pkt::core::player
 {
 struct CurrentHandContext;
 
+/**
+ * @brief Calculates optimal preflop hand ranges based on position and game dynamics.
+ * 
+ * Determines appropriate calling and raising ranges for different positions
+ * and table configurations, providing strategic guidance for preflop
+ * decision-making based on position, number of players, and game context.
+ */
 class PreflopRangeCalculator
 {
   public:

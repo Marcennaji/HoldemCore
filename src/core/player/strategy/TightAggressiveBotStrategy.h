@@ -12,6 +12,14 @@ namespace pkt::core::player
 {
 // Forward declaration
 struct CurrentHandContext;
+
+/**
+ * @brief Implements a tight-aggressive playing style for bot players.
+ * 
+ * This strategy plays a selective range of hands (tight) but plays them aggressively
+ * with betting and raising. It's considered one of the most profitable poker strategies,
+ * focusing on strong hands and applying pressure when holding them.
+ */
 class TightAggressiveBotStrategy : public BotStrategyBase
 {
 

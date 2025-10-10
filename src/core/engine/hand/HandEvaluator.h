@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 #pragma once
 #include <memory>
 #include "core/interfaces/HandEvaluationEngine.h"
@@ -5,7 +10,14 @@
 namespace pkt::core
 {
 
-/// Poker hand evaluation utility class using pluggable evaluation engines
+/**
+ * @brief Evaluates poker hand strength using pluggable evaluation engines.
+ * 
+ * Provides a unified interface for evaluating 7-card poker hands (5 community
+ * cards + 2 hole cards) using different evaluation algorithms through the
+ * HandEvaluationEngine interface.
+ */
+
 class HandEvaluator
 {
   public:

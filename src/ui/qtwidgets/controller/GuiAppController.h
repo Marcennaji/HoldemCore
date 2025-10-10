@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 // GuiAppController.h
 #pragma once
 
@@ -21,6 +26,12 @@ namespace pkt::ui::qtwidgets
 class PokerTableWindow;
 class GuiBridgeWidgets;
 class StartWindow;
+/**
+ * @brief Main application controller for the Qt Widgets-based poker GUI.
+ * 
+ * Manages the overall application flow, window creation, and coordination
+ * between the poker engine core and the Qt-based user interface components.
+ */
 class GuiAppController
 {
   public:

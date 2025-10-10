@@ -1,3 +1,8 @@
+// HoldemCore — Texas Hold'em simulator
+// Copyright (c) 2025 Marc Ennaji
+// Licensed under the MIT License — see LICENSE file for details.
+
+
 #pragma once
 #include "core/engine/hand/ActionProcessor.h"
 #include "core/engine/hand/DebuggableState.h"
@@ -15,6 +20,13 @@ namespace pkt::core
 {
 class GameEvents;
 
+/**
+ * @brief Represents the Turn state in a Texas Hold'em hand.
+ * 
+ * The Turn state occurs after the flop when the fourth community card is dealt.
+ * Players can check, bet, call, raise, or fold during this betting round.
+ * Manages player actions and determines when to transition to the next state.
+ */
 class TurnState : public HandState, public HandActionProcessor, public HandDebuggableState
 {
   public:
