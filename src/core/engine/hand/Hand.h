@@ -12,7 +12,7 @@
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
 #include "core/engine/hand/ActionProcessor.h"
-#include "core/engine/hand/DeckDealer.h"
+#include "core/engine/hand/HandCardDealer.h"
 #include "core/engine/hand/HandLifecycle.h"
 #include "core/engine/hand/HandPlayerAction.h"
 #include "core/engine/hand/HandState.h"
@@ -26,7 +26,7 @@ class HandState;
 class EngineFactory;
 class Board;
 
-class Hand : public HandLifecycle, public HandPlayerAction, public HandPlayersState, public DeckDealer
+class Hand : public HandLifecycle, public HandPlayerAction, public HandPlayersState
 {
   public:
 
@@ -42,9 +42,11 @@ class Hand : public HandLifecycle, public HandPlayerAction, public HandPlayersSt
     void initialize() override;
     void runGameLoop() override;
     void end() override;
-    size_t dealBoardCards() override;
-    void dealHoleCards(size_t lastArrayIndex) override;
-    void initAndShuffleDeck() override;
+    
+    // Card dealing operations (now delegated to HandCardDealer)
+    void initAndShuffleDeck();
+    void dealHoleCards(size_t lastArrayIndex);
+    size_t dealBoardCards();
 
     // Method for round states to deal cards progressively
     std::vector<Card> dealCardsFromDeck(int numCards);
@@ -92,7 +94,7 @@ class Hand : public HandLifecycle, public HandPlayerAction, public HandPlayersSt
     Randomizer* m_randomizer;
     HandEvaluationEngine* m_handEvaluationEngine;
     std::unique_ptr<HandStateManager> m_stateManager;
-    std::unique_ptr<DeckManager> m_deckManager;
+    std::unique_ptr<HandCardDealer> m_cardDealer;
     std::unique_ptr<ActionValidator> m_actionValidator;
     std::unique_ptr<InvalidActionHandler> m_invalidActionHandler;
     int m_startQuantityPlayers;

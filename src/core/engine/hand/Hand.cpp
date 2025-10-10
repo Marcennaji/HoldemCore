@@ -4,6 +4,7 @@
 #include "CardUtilities.h"
 #include "DeckManager.h"
 #include "GameEvents.h"
+#include "HandCardDealer.h"
 #include "core/engine/actions/ActionApplier.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/player/Helpers.h"
@@ -54,7 +55,8 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<Board> board,
         }
     };
     
-    m_deckManager = std::make_unique<DeckManager>(*m_randomizer);
+    auto deckManager = std::make_unique<DeckManager>(*m_randomizer);
+    m_cardDealer = std::make_unique<HandCardDealer>(std::move(deckManager), m_events, *m_logger, *m_handEvaluationEngine);
     m_stateManager = std::make_unique<HandStateManager>(m_events, m_smallBlind, startData.startDealerPlayerId,
                                                         gameLoopErrorCallback, *m_logger);
 }
@@ -116,60 +118,22 @@ void Hand::handlePlayerAction(PlayerAction action)
 }
 void Hand::initAndShuffleDeck()
 {
-    m_deckManager->initializeAndShuffle();
+    m_cardDealer->initializeAndShuffleDeck();
 }
 
 void Hand::dealHoleCards(size_t cardsArrayIndex)
 {
-    if (!m_deckManager->hasEnoughCards(0, m_actingPlayersList->size())) // Use acting players list size
-    {
-        throw std::runtime_error("Not enough cards in the deck to deal hole cards to all players.");
-    }
-
-    for (auto it = m_actingPlayersList->begin(); it != m_actingPlayersList->end(); ++it)
-    {
-        std::vector<Card> holeCardList = m_deckManager->dealCards(2);
-
-        HoleCards holeCards(holeCardList[0], holeCardList[1]);
-
-        (*it)->setHoleCards(holeCards);
-
-        if (m_events.onHoleCardsDealt)
-        {
-            m_events.onHoleCardsDealt((*it)->getId(), holeCards);
-        }
-
-        // Build evaluator string with correct ordering: HOLE cards first, then current BOARD cards.
-        BoardCards boardCards = m_board->getBoardCards();
-        std::string humanReadableHand = holeCardList[0].toString() + std::string(" ") + holeCardList[1].toString();
-        if (boardCards.getNumCards() > 0)
-        {
-            humanReadableHand += std::string(" ") + boardCards.toString();
-        }
-        (*it)->setHandRanking(m_handEvaluationEngine->rankHand(humanReadableHand.c_str()));
-    }
+    m_cardDealer->dealHoleCards(m_actingPlayersList, *m_board);
 }
 
 size_t Hand::dealBoardCards()
 {
-    std::vector<Card> boardCardList = m_deckManager->dealCards(5);
-
-    BoardCards boardCards;
-
-    boardCards.dealFlop(boardCardList[0], boardCardList[1], boardCardList[2]);
-
-    boardCards.dealTurn(boardCardList[3]);
-
-    boardCards.dealRiver(boardCardList[4]);
-
-    m_board->setBoardCards(boardCards);
-
-    return 5; 
+    return m_cardDealer->dealBoardCards(*m_board);
 }
 
 std::vector<Card> Hand::dealCardsFromDeck(int numCards)
 {
-    return m_deckManager->dealCards(numCards);
+    return m_cardDealer->dealCardsFromDeck(numCards);
 }
 
 HandCommonContext Hand::updateHandCommonContext()

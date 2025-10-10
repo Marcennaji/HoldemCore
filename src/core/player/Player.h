@@ -40,6 +40,21 @@ class HandState;
 namespace pkt::core::player
 {
 
+  /**
+ * @brief Player facade that coordinates poker player behavior and state.
+ * 
+ * This class implements the Facade pattern, providing a unified interface to:
+ * - Player identity and core properties
+ * - Strategy delegation (Strategy pattern)
+ * - Hand context state management
+ * - Statistics tracking
+ * - Range estimation
+ * 
+ * Most methods delegate to appropriate component objects rather than 
+ * implementing logic directly.
+ */
+
+
 class Player
 {
   public:
