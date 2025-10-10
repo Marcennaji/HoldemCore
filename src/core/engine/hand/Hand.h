@@ -8,6 +8,7 @@
 #include "Player.h"
 #include "core/engine/cards/DeckManager.h"
 #include "core/engine/hand/HandPlayersState.h"
+#include "core/engine/hand/HandPlayersManager.h"
 #include "core/engine/hand/HandStateManager.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
@@ -27,7 +28,7 @@ class HandState;
 class EngineFactory;
 class Board;
 
-class Hand : public HandLifecycle, public HandPlayerAction, public HandPlayersState
+class Hand : public HandLifecycle, public HandPlayerAction
 {
   public:
 
@@ -61,11 +62,20 @@ class Hand : public HandLifecycle, public HandPlayerAction, public HandPlayersSt
     HandState& getState() { return m_stateManager->getCurrentState(); }
     GameState getGameState() const { return m_stateManager->getGameState(); }
     Board& getBoard() { return *m_board; }
+    
+    // Player management delegation (replaces HandPlayersState inheritance)
+    const pkt::core::player::PlayerList getSeatsList() const { return m_playersManager->getSeatsList(); }
+    const pkt::core::player::PlayerList getActingPlayersList() const { return m_playersManager->getActingPlayersList(); }
+    const pkt::core::player::PlayerList getPlayersInHandList() const { return m_playersManager->getPlayersInHandList(); }
+    std::shared_ptr<BettingActions> getBettingActions() const { return m_playersManager->getBettingActions(); }
+    int getDealerPlayerId() const { return m_playersManager->getDealerPlayerId(); }
+    int getSmallBlindPlayerId() const { return m_playersManager->getSmallBlindPlayerId(); }
+    int getBigBlindPlayerId() const { return m_playersManager->getBigBlindPlayerId(); }
 
     HandStateManager* getStateManager() const { return m_stateManager.get(); }
     const GameEvents& getEvents() const { return m_events; }
     void fireOnPotUpdated() const;
-    pkt::core::player::PlayerList& getActingPlayersListMutable() { return m_actingPlayersList; }
+    pkt::core::player::PlayerList& getActingPlayersListMutable() { return m_playersManager->getActingPlayersListMutable(); }
 
     // Hand action history methods (delegates to BettingActions)
     const std::vector<pkt::core::BettingRoundHistory>& getHandActionHistory() const
@@ -84,8 +94,8 @@ class Hand : public HandLifecycle, public HandPlayerAction, public HandPlayersSt
     Logger& getLogger() const;
     PlayersStatisticsStore& getPlayersStatisticsStore() const;
     
-    // Cash validation methods
-    void filterPlayersWithInsufficientCash();
+    // Cash validation methods (delegates to HandPlayersManager)
+    void filterPlayersWithInsufficientCash() { m_playersManager->filterPlayersWithInsufficientCash(); }
 
     const GameEvents& m_events;
     std::shared_ptr<Board> m_board;
@@ -97,6 +107,7 @@ class Hand : public HandLifecycle, public HandPlayerAction, public HandPlayersSt
     std::unique_ptr<HandStateManager> m_stateManager;
     std::unique_ptr<HandCardDealer> m_cardDealer;
     std::unique_ptr<HandCalculator> m_calculator;
+    std::unique_ptr<HandPlayersManager> m_playersManager;
     std::unique_ptr<ActionValidator> m_actionValidator;
     std::unique_ptr<InvalidActionHandler> m_invalidActionHandler;
     int m_startQuantityPlayers;

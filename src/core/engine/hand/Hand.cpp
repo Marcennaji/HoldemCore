@@ -6,6 +6,7 @@
 #include "GameEvents.h"
 #include "HandCardDealer.h"
 #include "HandCalculator.h"
+#include "HandPlayersManager.h"
 #include "core/engine/actions/ActionApplier.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/player/Helpers.h"
@@ -29,18 +30,18 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<Board> board,
            PlayerList seats, PlayerList actingPlayers, GameData gameData, StartData startData,
            Logger& logger, PlayersStatisticsStore& statisticsStore,
            Randomizer& randomizer, HandEvaluationEngine& handEvaluationEngine)
-    : HandPlayersState(seats, actingPlayers), m_events(events), m_board(board),
+    : m_events(events), m_board(board),
       m_logger(&logger), m_statisticsStore(&statisticsStore), m_randomizer(&randomizer),
       m_handEvaluationEngine(&handEvaluationEngine),
       m_actionValidator(std::make_unique<ActionValidator>()),
       m_startQuantityPlayers(startData.numberOfPlayers), m_smallBlind(gameData.firstSmallBlind), 
       m_startCash(gameData.startMoney)
 {
-    m_seatsList = seats;
-    m_actingPlayersList = actingPlayers;
-    m_dealerPlayerId = startData.startDealerPlayerId;
-    m_smallBlindPlayerId = startData.startDealerPlayerId;
-    m_bigBlindPlayerId = startData.startDealerPlayerId;
+    // Create HandPlayersManager to handle all player-related operations
+    m_playersManager = std::make_unique<HandPlayersManager>(seats, actingPlayers, m_events, *m_logger);
+    m_playersManager->setDealerPlayerId(startData.startDealerPlayerId);
+    m_playersManager->setSmallBlindPlayerId(startData.startDealerPlayerId);
+    m_playersManager->setBigBlindPlayerId(startData.startDealerPlayerId);
 
     // Create InvalidActionHandler with callbacks
     auto errorProvider = [this](const PlayerAction& action) -> std::string { return getActionValidationError(action); };
@@ -84,10 +85,7 @@ void Hand::initialize()
 
     filterPlayersWithInsufficientCash();
 
-    for (auto player = m_seatsList->begin(); player != m_seatsList->end(); ++player)
-    {
-        (*player)->resetForNewHand(*this);
-    }
+    m_playersManager->preparePlayersForNewHand(*this);
 
     getBettingActions()->getPreflop().setLastRaiser(nullptr);
 
@@ -96,7 +94,7 @@ void Hand::initialize()
 
 void Hand::end()
 {
-    getPlayersStatisticsStore().savePlayersStatistics(m_seatsList);
+    getPlayersStatisticsStore().savePlayersStatistics(getSeatsList());
 }
 
 void Hand::runGameLoop()
@@ -125,7 +123,7 @@ void Hand::initAndShuffleDeck()
 
 void Hand::dealHoleCards(size_t cardsArrayIndex)
 {
-    m_cardDealer->dealHoleCards(m_actingPlayersList, *m_board);
+    m_cardDealer->dealHoleCards(getActingPlayersList(), *m_board);
 }
 
 size_t Hand::dealBoardCards()
@@ -153,8 +151,8 @@ HandCommonContext Hand::updateHandCommonContext()
     handContext.playersContext.lastVPIPPlayer = 
         (lastVPIPPlayerId != -1) ? getPlayerById(getSeatsList(), lastVPIPPlayerId) : nullptr;
         
-    handContext.playersContext.callersPositions = m_bettingActions->getCallersPositions();
-    handContext.playersContext.raisersPositions = m_bettingActions->getRaisersPositions();
+    handContext.playersContext.callersPositions = getBettingActions()->getCallersPositions();
+    handContext.playersContext.raisersPositions = getBettingActions()->getRaisersPositions();
     
     // Directly assign last raiser pointers - they're already validated by the BettingRoundActions
     handContext.playersContext.preflopLastRaiser = getBettingActions()->getPreflop().getLastRaiser();
@@ -223,7 +221,7 @@ std::string Hand::getActionValidationError(const PlayerAction& action) const
         return "Current game state does not accept player actions";
     }
 
-    auto player = getPlayerById(m_actingPlayersList, action.playerId);
+    auto player = m_playersManager->validatePlayer(action.playerId);
     if (!player)
     {
         return "Player not found in active players list";
@@ -239,7 +237,7 @@ std::string Hand::getActionValidationError(const PlayerAction& action) const
     // Use the comprehensive ActionValidator with a detailed reason
     {
         std::string reason;
-        if (!m_actionValidator->validatePlayerActionWithReason(m_actingPlayersList, action, *getBettingActions(),
+        if (!m_actionValidator->validatePlayerActionWithReason(getActingPlayersList(), action, *getBettingActions(),
                                                                m_smallBlind, m_stateManager->getGameState(), reason))
         {
             return reason.empty() ? std::string("Action validation failed.") : reason;
@@ -314,44 +312,6 @@ void Hand::processValidAction(const PlayerAction& action)
     }
 }
 
-void Hand::filterPlayersWithInsufficientCash()
-{
-    // Remove players from acting players list who cannot afford minimum participation
-    // Cards will only be dealt to players in the acting list, so this is sufficient
-    auto it = m_actingPlayersList->begin();
-    while (it != m_actingPlayersList->end())
-    {
-        const int playerCash = (*it)->getCash();
-        
-        // Players with zero cash cannot participate at all
-        if (playerCash <= 0)
-        {
-            getLogger().info("Player " + (*it)->getName() + " (ID: " + 
-                std::to_string((*it)->getId()) + ") auto-folded due to insufficient cash: " + 
-                std::to_string(playerCash));
-            
-            // Create a fold action to notify the UI that this player is folded
-            PlayerAction autoFoldAction;
-            autoFoldAction.playerId = (*it)->getId();
-            autoFoldAction.type = ActionType::Fold;
-            autoFoldAction.amount = 0;
-            
-            // Fire the player action event to notify UI that this player folded
-            if (m_events.onPlayerActed)
-            {
-                m_events.onPlayerActed(autoFoldAction);
-            }
-                
-            it = m_actingPlayersList->erase(it);
-        }
-        else
-        {
-            ++it;
-        }
-    }
-    
-    // Log the number of players remaining for the hand
-    getLogger().debug("Hand will proceed with " + std::to_string(m_actingPlayersList->size()) + " players");
-}
+// filterPlayersWithInsufficientCash() now handled by HandPlayersManager
 
 } // namespace pkt::core
