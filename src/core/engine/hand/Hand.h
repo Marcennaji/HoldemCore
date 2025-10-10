@@ -13,6 +13,7 @@
 #include "core/engine/model/StartData.h"
 #include "core/engine/hand/ActionProcessor.h"
 #include "core/engine/hand/HandCardDealer.h"
+#include "core/engine/hand/HandCalculator.h"
 #include "core/engine/hand/HandLifecycle.h"
 #include "core/engine/hand/HandPlayerAction.h"
 #include "core/engine/hand/HandState.h"
@@ -95,6 +96,7 @@ class Hand : public HandLifecycle, public HandPlayerAction, public HandPlayersSt
     HandEvaluationEngine* m_handEvaluationEngine;
     std::unique_ptr<HandStateManager> m_stateManager;
     std::unique_ptr<HandCardDealer> m_cardDealer;
+    std::unique_ptr<HandCalculator> m_calculator;
     std::unique_ptr<ActionValidator> m_actionValidator;
     std::unique_ptr<InvalidActionHandler> m_invalidActionHandler;
     int m_startQuantityPlayers;

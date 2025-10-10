@@ -5,6 +5,7 @@
 #include "DeckManager.h"
 #include "GameEvents.h"
 #include "HandCardDealer.h"
+#include "HandCalculator.h"
 #include "core/engine/actions/ActionApplier.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/player/Helpers.h"
@@ -57,6 +58,7 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<Board> board,
     
     auto deckManager = std::make_unique<DeckManager>(*m_randomizer);
     m_cardDealer = std::make_unique<HandCardDealer>(std::move(deckManager), m_events, *m_logger, *m_handEvaluationEngine);
+    m_calculator = std::make_unique<HandCalculator>(*m_logger);
     m_stateManager = std::make_unique<HandStateManager>(m_events, m_smallBlind, startData.startDealerPlayerId,
                                                         gameLoopErrorCallback, *m_logger);
 }
@@ -175,52 +177,20 @@ HandCommonContext Hand::updateHandCommonContext()
 }
 float Hand::getM(int cash) const
 {
-    int blinds = m_smallBlind + (m_smallBlind * 2);
-    if (blinds > 0 && cash > 0)
-    {
-        return (float) cash / blinds;
-    }
-    else
-    {
-        return 0;
-    }
+    return m_calculator->calculateM(cash, m_smallBlind);
 }
 std::string Hand::getStringBoard() const
 {
-    const BoardCards& boardCards = m_board->getBoardCards();
-
-    // Use modern BoardCards toString but adjust for legacy format compatibility
-    std::string boardString = boardCards.toString();
-
-    if (boardString == "<no cards>" || boardString == "Invalid Board State")
-    {
-        return ""; // Legacy behavior for preflop/invalid states
-    }
-
-    // Add leading space to match legacy format (cards have spaces between them in toString())
-    return " " + boardString;
+    return m_board->getStringRepresentation();
 }
 
 int Hand::getPotOdd(const int playerCash, const int playerSet) const
 {
-    const int highestBetAmount = min(playerCash, getBettingActions()->getRoundHighestSet());
-
-    int pot = m_board->getPot(*this) + m_board->getSets(*this);
-
-    if (pot == 0)
-    { // shouldn't happen, but...
-        getLogger().error("Pot = " + std::to_string(m_board->getPot(*this)) + " + " +
-                                   std::to_string(m_board->getSets(*this)) + " = " + std::to_string(pot));
-        return 0;
-    }
-
-    int odd = (highestBetAmount - playerSet) * 100 / pot;
-    if (odd < 0)
-    {
-        odd = -odd; // happens if m_totalBetAmount > highestBetAmount
-    }
-
-    return odd;
+    int pot = m_board->getPot(*this);
+    int sets = m_board->getSets(*this);
+    int roundHighestSet = getBettingActions()->getRoundHighestSet();
+    
+    return m_calculator->calculatePotOdd(playerCash, playerSet, pot, sets, roundHighestSet, getLogger());
 }
 
 HandActionProcessor* Hand::getActionProcessor() const

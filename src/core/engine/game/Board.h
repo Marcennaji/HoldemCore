@@ -47,6 +47,8 @@ class Board
     void setWinners(const std::list<unsigned>& w);
 
     std::vector<unsigned> getShowdownRevealOrder() const { return m_showdownRevealOrder; }
+    
+    std::string getStringRepresentation() const;
 
   private:
     const GameEvents& m_events;

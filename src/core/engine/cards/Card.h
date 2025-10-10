@@ -191,6 +191,10 @@ struct HoleCards
 /// Valid states: 0 cards (preflop), 3 cards (flop), 4 cards (turn), 5 cards (river)
 struct BoardCards
 {
+    // String constants for different board states
+    static constexpr const char* NO_CARDS_STRING = "<no cards>";
+    static constexpr const char* INVALID_BOARD_STRING = "Invalid Board State";
+
     Card flop1, flop2, flop3, turn, river;
     int numCards; // Track how many cards are actually set (0, 3, 4, or 5)
 
@@ -274,7 +278,7 @@ struct BoardCards
     std::string toString() const
     {
         if (numCards == 0)
-            return "<no cards>";
+            return NO_CARDS_STRING;
         if (numCards == 3)
             return flop1.toString() + " " + flop2.toString() + " " + flop3.toString();
         if (numCards == 4)
@@ -282,7 +286,7 @@ struct BoardCards
         if (numCards == 5)
             return flop1.toString() + " " + flop2.toString() + " " + flop3.toString() + " " + turn.toString() + " " +
                    river.toString();
-        return "Invalid Board State";
+        return INVALID_BOARD_STRING;
     }
 
     /// Convert to int array for legacy interface compatibility

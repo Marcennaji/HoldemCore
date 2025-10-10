@@ -254,4 +254,15 @@ int Board::getSets(const Hand& hand) const
     }
     return total;
 }
+
+std::string Board::getStringRepresentation() const
+{
+    if (m_boardCards.isPreflop() || !m_boardCards.isValid())
+    {
+        return ""; 
+    }
+
+    return " " + m_boardCards.toString();
+}
+
 } // namespace pkt::core
