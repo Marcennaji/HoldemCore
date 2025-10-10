@@ -19,7 +19,7 @@ class HoleCardsTest : public ::testing::Test
         logger->setLogLevel(pkt::core::LogLevel::Info);
         m_logger = logger;
         m_handEvaluator = std::make_shared<pkt::infra::PsimHandEvaluationEngine>();
-        m_statisticsStore = std::make_shared<pkt::core::NullPlayersStatisticsStore>();
+        m_statisticsStore = std::make_shared<pkt::infra::NullPlayersStatisticsStore>();
         m_randomizer = std::make_shared<pkt::core::DefaultRandomizer>();
     }
     void TearDown() override {}

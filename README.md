@@ -76,9 +76,9 @@ Detailed explanation and diagrams:
 
 ## 📈 Roadmap
 
-- 🧩 Remove remaining legacy code from 2011, that is not yet SOLID-compliant 
-- 🎨 Improve the existing Qt Widgets UI, develop a QML (Qt Quick) front-end for mobile
-- 🧠 Explore ML-based bot strategy generation
+- 🧩 Still some architecture and design improvements to achieve (currently on progress) 
+- 🎨 Refactor and improve the existing Qt Widgets UI
+- 🧠 Develop a QML (Qt Quick) front-end for mobile
 
 ---
 

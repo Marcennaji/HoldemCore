@@ -48,7 +48,7 @@ cmake --build build/debug-widgets
 ## 🏗️ Vue d’ensemble de l’architecture
 
 Explications et diagrammes détaillés :  
-👉 [ARCHITECTURE.md](doc/ARCHITECTURE.md)
+👉 [ARCHITECTURE.md](doc/ARCHITECTURE_fr.md)
 
 <p align="center">
   <img src="doc/architecture.png" alt="Diagramme d'architecture hexagonale" width="80%">
@@ -76,9 +76,9 @@ Explications et diagrammes détaillés :
 
 ## 📈 Feuille de route
 
-- 🧩 Éliminer les violations SOLID restantes dans le code legacy de 2011  
-- 🎨 Améliorer l'UI Qt Widgets existante (application desktop) et développer une interface Qt Quick (QML) pour mobile  
-- 🧠 Explorer l’intégration d’un bot basé sur machine learning
+- 🧩 Améliorer encore certains aspects de l'architecture et du design (travail actuellement en cours) 
+- 🎨 Refactorer et améliorer l'UI Qt Widgets existante (application desktop)  
+- 🧠 Développer une interface Qt Quick (QML) pour mobile
 
 ---
 

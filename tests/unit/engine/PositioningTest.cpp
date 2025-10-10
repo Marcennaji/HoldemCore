@@ -22,7 +22,7 @@ TEST(PositioningUnit, CircularOffsetWrapAround)
     auto logger = std::make_shared<pkt::infra::ConsoleLogger>();
     logger->setLogLevel(pkt::core::LogLevel::Info);
     auto handEvaluationEngine = std::make_shared<pkt::infra::PsimHandEvaluationEngine>();
-    auto statisticsStore = std::make_shared<pkt::core::NullPlayersStatisticsStore>();
+    auto statisticsStore = std::make_shared<pkt::infra::NullPlayersStatisticsStore>();
     auto randomizer = std::make_shared<pkt::core::DefaultRandomizer>();
 
     // Build a simple list of 6 dummy players with ids 0..5

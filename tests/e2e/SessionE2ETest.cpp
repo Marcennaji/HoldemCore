@@ -43,7 +43,7 @@ class SessionE2Etest : public ::testing::Test
         logger->setLogLevel(pkt::core::LogLevel::Info); // Reduce log noise in tests
         m_logger = logger;
         m_handEvaluator = std::make_shared<pkt::infra::PsimHandEvaluationEngine>();
-        m_statisticsStore = std::make_shared<pkt::core::NullPlayersStatisticsStore>();
+        m_statisticsStore = std::make_shared<pkt::infra::NullPlayersStatisticsStore>();
         m_randomizer = std::make_shared<pkt::core::DefaultRandomizer>();
     }
 

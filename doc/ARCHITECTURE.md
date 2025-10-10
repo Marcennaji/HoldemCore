@@ -13,6 +13,42 @@
 - **Event-driven** communication between components
 - **Clean layering:** `core/`, `infra/`, `ui/`, `app/`, `tests/`
 
+### Layer Dependencies (Dependency Direction)
+
+```
+                    ┌─────────────────┐
+                    │       App       │ ← Composition Root
+                    │   (AppFactory)  │   (orchestrates all)
+                    └─────────────────┘
+                            │
+                    ┌───────┼───────┐
+                    ↓       ↓       ↓
+            ┌───────────┐   │   ┌───────────┐
+            │    UI     │   │   │   Infra   │
+            │ (Widgets) │   │   │(Adapters) │
+            └───────────┘   │   └───────────┘
+                    │       │       │
+                    └───────┼───────┘
+                            ↓
+                    ┌───────────────┐
+                    │     Core      │ ← Stable Center
+                    │   (Domain)    │   • Business Logic
+                    │               │   • Interfaces
+                    │  ┌─────────┐  │   • No Dependencies
+                    │  │Interface│  │
+                    │  │Contracts│  │
+                    │  └─────────┘  │
+                    └───────────────┘
+```
+
+**Dependency Flow:**
+- `App` → depends on → `UI + Core + Infra` (orchestrates everything)
+- `UI` → depends on → `Core` (uses interfaces)
+- `Infra` → depends on → `Core` (implements interfaces)  
+- `Core` → depends on → **NOTHING** (pure domain)
+
+**Key Rule:** All arrows point **toward Core** - it's the stable foundation.
+
 ### Benefits
 - Isolated, testable modules
 - Reusable domain core across multiple front-ends
@@ -69,32 +105,103 @@ Each state:
 
 ---
 
-## 5. Current Architectural Rules
+## 5. Composition Root Pattern — AppFactory
+
+### Dependency Inversion Implementation
+
+The `AppFactory` serves as the **composition root** for the entire application, implementing proper dependency inversion:
+
+```cpp
+// src/app/AppFactory.h
+class AppFactory {
+public:
+    // Configuration-based creation
+    static std::unique_ptr<GuiAppController> createApplication(
+        LoggerType loggerType = LoggerType::Console,
+        HandEvaluatorType evaluatorType = HandEvaluatorType::Psim,
+        DatabaseType dbType = DatabaseType::Sqlite
+    );
+    
+    // Environment-specific shortcuts
+    static std::unique_ptr<GuiAppController> createTestApp();
+    ...
+};
+```
+
+### Clean Main Application
+
+```cpp
+// src/app/main_qt_widgets.cpp - No concrete dependencies!
+int main(int argc, char** argv) {
+    QApplication app(argc, argv);
+    
+    // Single point of configuration
+    auto controller = pkt::app::AppFactory::createApplication(
+        pkt::app::LoggerType::Console,
+        pkt::app::HandEvaluatorType::Psim,
+        pkt::app::DatabaseType::Sqlite
+    );
+    
+    auto* mainWindow = controller->createMainWindow();
+    mainWindow->show();
+    return app.exec();
+}
+```
+
+### Benefits of AppFactory Pattern
+
+- ✅ **Dependency Inversion:** High-level modules don't depend on low-level modules
+- ✅ **Single Responsibility:** `main()` focuses on application lifecycle, not object construction
+- ✅ **Open/Closed:** Easy to add new implementations without changing existing code
+- ✅ **Configuration Flexibility:** Switch implementations via simple enum changes
+- ✅ **Testability:** Easy to inject mock implementations for testing
+
+### Adding New Implementations
+
+To add a new database (e.g., PostgreSQL):
+
+1. **Create the implementation:** `PostgreSqlPlayersStatisticsStore`
+2. **Add enum value:** `DatabaseType::PostgreSql`
+3. **Add factory case:** One switch statement in `AppFactory::createStatisticsStore()`
+4. **Update main:** Change `DatabaseType::Sqlite` to `DatabaseType::PostgreSql`
+
+**Zero changes needed** in core business logic, UI, or tests!
+
+---
+
+## 6. Current Architectural Rules
 
 - Core must remain **UI-free** (Qt, etc)
 - Maintain **hexagonal boundaries** strictly:
   - Core logic → no infrastructure knowledge  
   - UI layers → communicate only via bridges and events
+- **Composition Root:** All concrete dependencies instantiated only in `AppFactory`
+- **Dependency Inversion:** High-level modules depend only on abstractions
 
 ---
 
-## 6. Testing Strategy
+## 7. Testing Strategy
 
 - **Unit Tests:** GoogleTest, main core components are covered  
 - **Integration / E2E:** validates FSM, betting rounds, statistics persistence  
 
 ---
 
-## 7. Reference Layout
+## 8. Reference Layout
 
 ```
 HoldemCore/
 ├── src/
-│   ├── core/          # Domain logic
+│   ├── core/          # Domain logic (business rules, interfaces)
 │   ├── infra/         # Infrastructure adapters (DB, eval engine, logging)
 │   ├── ui/            # UI front-ends (Qt Widgets, QML...)
-│   └── app/           # Application entrypoints
+│   └── app/           # Application layer (AppFactory composition root)
+│       ├── AppFactory.h       # Dependency injection factory
+│       ├── AppFactory.cpp     # Concrete instantiation logic
+│       └── main_*.cpp         # Clean application entry points
 └── tests/             # Unit and E2E tests
 ```
+
+
 
 

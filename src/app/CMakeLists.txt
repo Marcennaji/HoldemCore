@@ -7,6 +7,8 @@ if(USE_WIDGETS)
 
     add_executable(HoldemCore-widgets
         main_qt_widgets.cpp
+        AppFactory.cpp
+        AppFactory.h
     )
 
     target_include_directories(HoldemCore-widgets PUBLIC
@@ -19,29 +21,6 @@ if(USE_WIDGETS)
         infra
         qtwidgets
         Qt6::Widgets
-        Qt6::Core
-        Qt6::Gui
-    )
-endif()
-
-if(USE_QML)
-    find_package(Qt6 REQUIRED COMPONENTS Quick Qml Core Gui)
-
-    add_executable(HoldemCore-qml
-        main_qt_qml.cpp
-    )
-
-    target_include_directories(HoldemCore-qml PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_SOURCE_DIR}/src
-    )
-
-    target_link_libraries(HoldemCore-qml
-        core_session
-        infra
-        qtqml
-        Qt6::Quick
-        Qt6::Qml
         Qt6::Core
         Qt6::Gui
     )

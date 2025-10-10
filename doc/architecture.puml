@@ -1,5 +1,5 @@
 @startuml
-title HoldemCore – Hexagonal Architecture with Constructor Dependency Injection
+title HoldemCore – Hexagonal Architecture with AppFactory Composition Root
 
 skinparam packageStyle rectangle
 skinparam shadowing false
@@ -18,6 +18,7 @@ package "Core (Domain)" as Core {
 
 package "Application (Composition Root)" as App {
   [main_qt_widgets.cpp] as Main
+  [AppFactory] as AppFactory
   [GuiAppController] as GuiController
 }
 
@@ -57,9 +58,10 @@ Session -[#green]-> Ports : depends on
 EngineFactory -[#green]-> Ports : depends on
 PlayerFactory -[#green]-> Ports : depends on
 
-' Application Layer (Composition Root & Direct DI)
-Main -[#red]-> Infra : creates concrete adapters
-Main -[#red]-> GuiController : injects adapters
+' Application Layer (Composition Root via AppFactory)
+Main -[#red]-> AppFactory : delegates to factory
+AppFactory -[#red]-> Infra : creates concrete adapters
+AppFactory -[#red]-> GuiController : injects adapters via constructor
 GuiController -[#red]-> Session : creates with injected deps
 GuiController -[#red]-> EngineFactory : creates with injected deps
 GuiController -[#red]-> UI : creates
@@ -82,8 +84,9 @@ SqliteDb -[#gray]-> SQLite3 : uses
 PsimEngine -[#gray]-> psim : uses  
 UI -[#gray]-> Qt6 : framework
 
-' Constructor Dependency Injection Flow
-note right of Main : Composition Root:\n• Creates concrete adapters\n• Injects via constructors\n• Pure dependency injection
+' AppFactory Composition Root Pattern
+note right of Main : Clean Entry Point:\n• No concrete dependencies\n• Delegates to AppFactory\n• Single responsibility
+note right of AppFactory : Composition Root:\n• Creates all concrete adapters\n• Configurable implementations\n• Pure dependency injection\n• Single point of change
 note bottom of Ports : Abstract Interfaces:\n• Logger\n• HandEvaluationEngine\n• PlayersStatisticsStore\n• Randomizer
 note bottom of Core : Pure Domain Logic:\n• Zero infrastructure knowledge\n• All dependencies injected\n• Constructor injection only\n• ISP compliant
 note left of UI : Primary Adapters:\n• Drive the application\n• User interfaces\n• Trigger use cases

@@ -46,7 +46,7 @@ void EngineTest::SetUp()
     m_randomizer = std::move(randomizer);
     
     // By default, use NullPlayersStatisticsStore
-    m_playersStatisticsStore = std::make_shared<pkt::core::NullPlayersStatisticsStore>();
+    m_playersStatisticsStore = std::make_shared<pkt::infra::NullPlayersStatisticsStore>();
 
     m_factory = std::make_unique<EngineFactory>(m_events, *m_logger, *m_handEvaluationEngine, *m_playersStatisticsStore, *m_randomizer);
 

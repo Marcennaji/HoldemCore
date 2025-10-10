@@ -57,7 +57,7 @@ class SessionUnitTest : public ::testing::Test
         // Initialize real implementations - no mocking needed
         logger = std::make_unique<pkt::infra::NullLogger>();
         handEvaluator = std::make_unique<pkt::infra::PsimHandEvaluationEngine>();
-        statsStore = std::make_unique<NullPlayersStatisticsStore>();
+        statsStore = std::make_unique<infra::NullPlayersStatisticsStore>();
         randomizer = std::make_unique<DefaultRandomizer>();
         engineFactory = std::make_unique<EngineFactory>(
             events, *logger, *handEvaluator, *statsStore, *randomizer);

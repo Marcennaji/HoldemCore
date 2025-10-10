@@ -10,7 +10,7 @@
 
 #include <array>
 
-namespace pkt::core
+namespace pkt::infra
 {
 
 /**
@@ -20,7 +20,7 @@ namespace pkt::core
  * for testing scenarios or when persistent statistics storage is not needed.
  * Follows the Null Object pattern to avoid null pointer checks.
  */
-class NullPlayersStatisticsStore : public PlayersStatisticsStore
+class NullPlayersStatisticsStore : public pkt::core::PlayersStatisticsStore
 {
   public:
     NullPlayersStatisticsStore()

@@ -36,7 +36,7 @@ class PotTest : public ::testing::Test
         logger->setLogLevel(pkt::core::LogLevel::Info);
         m_logger = logger;
         m_handEvaluationEngine = std::make_shared<pkt::infra::PsimHandEvaluationEngine>();
-        m_playersStatisticsStore = std::make_shared<pkt::core::NullPlayersStatisticsStore>();
+        m_playersStatisticsStore = std::make_shared<pkt::infra::NullPlayersStatisticsStore>();
         m_randomizer = std::make_shared<pkt::core::DefaultRandomizer>();
         state = std::make_unique<RiverState>(events, *m_logger);
     }
