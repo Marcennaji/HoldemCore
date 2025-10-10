@@ -9,6 +9,7 @@
 #include "core/engine/cards/DeckManager.h"
 #include "core/engine/hand/HandPlayersState.h"
 #include "core/engine/hand/HandPlayersManager.h"
+#include "core/engine/hand/HandActionHandler.h"
 #include "core/engine/hand/HandStateManager.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
@@ -28,7 +29,7 @@ class HandState;
 class EngineFactory;
 class Board;
 
-class Hand : public HandLifecycle, public HandPlayerAction
+class Hand : public HandLifecycle
 {
   public:
 
@@ -40,12 +41,12 @@ class Hand : public HandLifecycle, public HandPlayerAction
     ~Hand();
 
     HandActionProcessor* getActionProcessor() const;
-    void handlePlayerAction(PlayerAction action) override;
+    void handlePlayerAction(PlayerAction action); 
     void initialize() override;
     void runGameLoop() override;
     void end() override;
     
-    // Card dealing operations (now delegated to HandCardDealer)
+    // Card dealing operations (delegated to HandCardDealer)
     void initAndShuffleDeck();
     void dealHoleCards(size_t lastArrayIndex);
     size_t dealBoardCards();
@@ -63,7 +64,7 @@ class Hand : public HandLifecycle, public HandPlayerAction
     GameState getGameState() const { return m_stateManager->getGameState(); }
     Board& getBoard() { return *m_board; }
     
-    // Player management delegation (replaces HandPlayersState inheritance)
+    // Player management delegation 
     const pkt::core::player::PlayerList getSeatsList() const { return m_playersManager->getSeatsList(); }
     const pkt::core::player::PlayerList getActingPlayersList() const { return m_playersManager->getActingPlayersList(); }
     const pkt::core::player::PlayerList getPlayersInHandList() const { return m_playersManager->getPlayersInHandList(); }
@@ -77,19 +78,12 @@ class Hand : public HandLifecycle, public HandPlayerAction
     void fireOnPotUpdated() const;
     pkt::core::player::PlayerList& getActingPlayersListMutable() { return m_playersManager->getActingPlayersListMutable(); }
 
-    // Hand action history methods (delegates to BettingActions)
     const std::vector<pkt::core::BettingRoundHistory>& getHandActionHistory() const
     {
         return getBettingActions()->getHandActionHistory();
     }
 
   private:
-    std::string getActionValidationError(const PlayerAction& action) const;
-    PlayerAction getDefaultActionForPlayer(unsigned playerId) const;
-
-    // New focused methods for handlePlayerAction refactoring
-    void handleAutoFold(unsigned playerId);
-    void processValidAction(const PlayerAction& action);
     
     Logger& getLogger() const;
     PlayersStatisticsStore& getPlayersStatisticsStore() const;
@@ -108,8 +102,7 @@ class Hand : public HandLifecycle, public HandPlayerAction
     std::unique_ptr<HandCardDealer> m_cardDealer;
     std::unique_ptr<HandCalculator> m_calculator;
     std::unique_ptr<HandPlayersManager> m_playersManager;
-    std::unique_ptr<ActionValidator> m_actionValidator;
-    std::unique_ptr<InvalidActionHandler> m_invalidActionHandler;
+    std::unique_ptr<HandActionHandler> m_actionHandler;
     int m_startQuantityPlayers;
     int m_startCash;
     int m_smallBlind;

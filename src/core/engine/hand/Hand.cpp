@@ -7,6 +7,7 @@
 #include "HandCardDealer.h"
 #include "HandCalculator.h"
 #include "HandPlayersManager.h"
+#include "HandActionHandler.h"
 #include "core/engine/actions/ActionApplier.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/player/Helpers.h"
@@ -33,7 +34,6 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<Board> board,
     : m_events(events), m_board(board),
       m_logger(&logger), m_statisticsStore(&statisticsStore), m_randomizer(&randomizer),
       m_handEvaluationEngine(&handEvaluationEngine),
-      m_actionValidator(std::make_unique<ActionValidator>()),
       m_startQuantityPlayers(startData.numberOfPlayers), m_smallBlind(gameData.firstSmallBlind), 
       m_startCash(gameData.startMoney)
 {
@@ -43,10 +43,20 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<Board> board,
     m_playersManager->setSmallBlindPlayerId(startData.startDealerPlayerId);
     m_playersManager->setBigBlindPlayerId(startData.startDealerPlayerId);
 
-    // Create InvalidActionHandler with callbacks
-    auto errorProvider = [this](const PlayerAction& action) -> std::string { return getActionValidationError(action); };
-    auto autoFoldCallback = [this](unsigned playerId) { handleAutoFold(playerId); };
-    m_invalidActionHandler = std::make_unique<InvalidActionHandler>(m_events, errorProvider, autoFoldCallback, *m_logger);
+    // Create ActionValidator and HandActionHandler with InvalidActionHandler
+    auto actionValidator = std::make_unique<ActionValidator>();
+    
+    // Create callbacks for InvalidActionHandler
+    auto errorProvider = [this](const PlayerAction& action) -> std::string { 
+        return m_actionHandler->getActionValidationError(action, *this, *m_playersManager); 
+    };
+    auto autoFoldCallback = [this](unsigned playerId) { 
+        m_actionHandler->handleAutoFold(playerId, *this); 
+    };
+    auto invalidActionHandler = std::make_unique<InvalidActionHandler>(m_events, errorProvider, autoFoldCallback, *m_logger);
+    
+    // Create HandActionHandler to handle all action processing
+    m_actionHandler = std::make_unique<HandActionHandler>(m_events, *m_logger, std::move(actionValidator), std::move(invalidActionHandler));
 
     // Create HandStateManager with error callback for game loop issues
     auto gameLoopErrorCallback = [this](const std::string& error)
@@ -106,15 +116,7 @@ void Hand::runGameLoop()
 
 void Hand::handlePlayerAction(PlayerAction action)
 {
-    auto* processor = getActionProcessor();
-
-    if (!processor || !processor->isActionAllowed(*this, action))
-    {
-        m_invalidActionHandler->handleInvalidAction(action);
-        return;
-    }
-
-    processValidAction(action);
+    m_actionHandler->handlePlayerAction(action, *this);
 }
 void Hand::initAndShuffleDeck()
 {
@@ -208,110 +210,6 @@ void Hand::fireOnPotUpdated() const
     }
 }
 
-std::string Hand::getActionValidationError(const PlayerAction& action) const
-{
-    if (m_stateManager->isTerminal())
-    {
-        return "Game state is terminal";
-    }
-
-    auto* processor = m_stateManager->getActionProcessor();
-    if (!processor)
-    {
-        return "Current game state does not accept player actions";
-    }
-
-    auto player = m_playersManager->validatePlayer(action.playerId);
-    if (!player)
-    {
-        return "Player not found in active players list";
-    }
-
-    // Check if it's the player's turn
-    auto currentPlayer = processor->getNextPlayerToAct(*this);
-    if (!currentPlayer || currentPlayer->getId() != action.playerId)
-    {
-        return "It's not this player's turn to act";
-    }
-
-    // Use the comprehensive ActionValidator with a detailed reason
-    {
-        std::string reason;
-        if (!m_actionValidator->validatePlayerActionWithReason(getActingPlayersList(), action, *getBettingActions(),
-                                                               m_smallBlind, m_stateManager->getGameState(), reason))
-        {
-            return reason.empty() ? std::string("Action validation failed.") : reason;
-        }
-    }
-
-    return ""; // Empty string means action is valid
-}
-
-PlayerAction Hand::getDefaultActionForPlayer(unsigned playerId) const
-{
-    PlayerAction defaultAction;
-    defaultAction.playerId = playerId;
-    defaultAction.type = ActionType::Fold; // Default to fold for safety
-    defaultAction.amount = 0;
-    return defaultAction;
-}
-
-void Hand::handleAutoFold(unsigned playerId)
-{
-    getLogger().error("Player " + std::to_string(playerId) +
-                               " exceeded maximum invalid actions, auto-folding");
-
-    // If the game state is terminal, don't try to process any actions
-    if (m_stateManager->isTerminal())
-    {
-        getLogger().error("Cannot auto-fold player " + std::to_string(playerId) + " - game state is terminal");
-
-        if (m_events.onEngineError)
-        {
-            m_events.onEngineError("Player " + std::to_string(playerId) +
-                                   " attempted action in terminal state - no auto-fold processed");
-        }
-        return;
-    }
-
-    // Create a fold action as default
-    PlayerAction autoFoldAction = getDefaultActionForPlayer(playerId);
-
-    if (m_events.onEngineError)
-    {
-        m_events.onEngineError("Player " + std::to_string(playerId) + " auto-folded due to repeated invalid actions");
-    }
-
-    // Recursively call with the auto-fold action
-    handlePlayerAction(autoFoldAction);
-}
-
-void Hand::processValidAction(const PlayerAction& action)
-{
-    try
-    {
-        // Reset invalid action count on successful action
-        m_invalidActionHandler->resetInvalidActionCount(action.playerId);
-
-        ActionApplier::apply(*this, action, *m_logger);
-
-        // Delegate state transition to HandStateManager
-        m_stateManager->transitionToNextState(*this);
-    }
-    catch (const std::exception& e)
-    {
-        if (m_events.onEngineError)
-        {
-            m_events.onEngineError("Error processing player action: " + std::string(e.what()));
-        }
-
-        getLogger().error("Error in handlePlayerAction: " + std::string(e.what()));
-
-        // Re-throw critical errors
-        throw;
-    }
-}
-
-// filterPlayersWithInsufficientCash() now handled by HandPlayersManager
+// Action processing methods now handled by HandActionHandler
 
 } // namespace pkt::core
