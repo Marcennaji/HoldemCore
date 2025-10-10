@@ -29,6 +29,36 @@ class HandState;
 class EngineFactory;
 class Board;
 
+/**
+ * @brief Coordinator class for a single poker hand, orchestrating all hand-related operations through composition.
+ * 
+ * The Hand class serves as the central coordinator for a poker hand, implementing the SOLID principles
+ * through composition over inheritance. It delegates responsibilities to specialized component managers:
+ * 
+ * Architecture:
+ * - HandPlayersManager: Manages player collections, positions, and player-related state
+ * - HandActionHandler: Processes and validates player actions with error handling
+ * - HandCardDealer: Handles deck management and card distribution operations
+ * - HandCalculator: Performs hand-related calculations (pot odds, M-ratio, etc.)
+ * - HandStateManager: Manages game state transitions and the game loop
+ * - HandLifecycleManager: Handles hand initialization, execution, and cleanup
+ * 
+ * The Hand class maintains minimal state and serves as a clean interface that coordinates
+ * between these components, ensuring proper separation of concerns and maintainability.
+ * This design follows the Composition over Inheritance principle and implements the
+ * Coordinator pattern for complex domain orchestration.
+ * 
+ * Usage:
+ * 1. Create Hand instance with required dependencies
+ * 2. Call initialize() to set up the hand
+ * 3. Call runGameLoop() to execute the hand logic
+ * 4. Call end() to finalize and clean up
+ * 
+ * Thread Safety: Not thread-safe; designed for single-threaded game execution.
+ * 
+ * @see HandPlayersManager, HandActionHandler, HandCardDealer, HandCalculator, 
+ *      HandStateManager, HandLifecycleManager
+ */
 class Hand
 {
   public:
@@ -77,6 +107,11 @@ class Hand
     // Additional methods needed for lifecycle management
     void filterPlayersWithInsufficientCash() { m_playersManager->filterPlayersWithInsufficientCash(); }
 
+    // Context management methods
+    void populateGeneralGameContext(pkt::core::player::HandCommonContext& context);
+    void populatePlayersContextInfo(pkt::core::player::HandCommonContext& context);
+    void populateBettingContextInfo(pkt::core::player::HandCommonContext& context);
+
     HandStateManager* getStateManager() const { return m_stateManager.get(); }
     const GameEvents& getEvents() const { return m_events; }
     void fireOnPotUpdated() const;
@@ -88,6 +123,14 @@ class Hand
     }
 
   private:
+    
+    // Constructor helper methods for component initialization
+    void initializePlayersManager(const pkt::core::player::PlayerList& seats, 
+                                 const pkt::core::player::PlayerList& actingPlayers, 
+                                 const StartData& startData);
+    void initializeActionHandler();
+    void initializeCardAndStateComponents(const StartData& startData);
+    void initializeLifecycleManager();
     
     Logger& getLogger() const;
     PlayersStatisticsStore& getPlayersStatisticsStore() const;

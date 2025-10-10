@@ -84,7 +84,7 @@ UI -[#gray]-> Qt6 : framework
 
 ' Constructor Dependency Injection Flow
 note right of Main : Composition Root:\n• Creates concrete adapters\n• Injects via constructors\n• No service containers\n• Pure dependency injection
-note right of Ports : Abstract Interfaces:\n• Logger\n• HandEvaluationEngine\n• PlayersStatisticsStore\n• Randomizer
-note right of Core : Pure Domain Logic:\n• Zero infrastructure knowledge\n• All dependencies injected\n• Constructor injection only\n• ISP compliant
+note bottom of Ports : Abstract Interfaces:\n• Logger\n• HandEvaluationEngine\n• PlayersStatisticsStore\n• Randomizer
+note bottom of Core : Pure Domain Logic:\n• Zero infrastructure knowledge\n• All dependencies injected\n• Constructor injection only\n• ISP compliant
 
 @enduml
