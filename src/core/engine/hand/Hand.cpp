@@ -72,6 +72,9 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<Board> board,
     m_calculator = std::make_unique<HandCalculator>(*m_logger);
     m_stateManager = std::make_unique<HandStateManager>(m_events, m_smallBlind, startData.startDealerPlayerId,
                                                         gameLoopErrorCallback, *m_logger);
+    
+    // Create HandLifecycleManager to handle lifecycle operations
+    m_lifecycleManager = std::make_unique<HandLifecycleManager>(*m_logger, *m_statisticsStore);
 }
 
 Hand::~Hand() = default;
@@ -89,29 +92,17 @@ PlayersStatisticsStore& Hand::getPlayersStatisticsStore() const
 
 void Hand::initialize()
 {
-    getLogger().info("\n----------------------  New hand ----------------------------\n");
-
-    initAndShuffleDeck();
-
-    filterPlayersWithInsufficientCash();
-
-    m_playersManager->preparePlayersForNewHand(*this);
-
-    getBettingActions()->getPreflop().setLastRaiser(nullptr);
-
-    m_stateManager->initializeState(*this);
+    m_lifecycleManager->initialize(*this);
 }
 
 void Hand::end()
 {
-    getPlayersStatisticsStore().savePlayersStatistics(getSeatsList());
+    m_lifecycleManager->end(*this);
 }
 
 void Hand::runGameLoop()
 {
-    dealHoleCards(0); // Pass 0 as index, since no board cards dealt yet
-
-    m_stateManager->runGameLoop(*this);
+    m_lifecycleManager->runGameLoop(*this);
 }
 
 void Hand::handlePlayerAction(PlayerAction action)

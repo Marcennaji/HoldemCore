@@ -16,7 +16,7 @@
 #include "core/engine/hand/ActionProcessor.h"
 #include "core/engine/hand/HandCardDealer.h"
 #include "core/engine/hand/HandCalculator.h"
-#include "core/engine/hand/HandLifecycle.h"
+#include "core/engine/hand/HandLifecycleManager.h"
 #include "core/engine/hand/HandPlayerAction.h"
 #include "core/engine/hand/HandState.h"
 
@@ -29,7 +29,7 @@ class HandState;
 class EngineFactory;
 class Board;
 
-class Hand : public HandLifecycle
+class Hand
 {
   public:
 
@@ -42,9 +42,9 @@ class Hand : public HandLifecycle
 
     HandActionProcessor* getActionProcessor() const;
     void handlePlayerAction(PlayerAction action); 
-    void initialize() override;
-    void runGameLoop() override;
-    void end() override;
+    void initialize();
+    void runGameLoop();
+    void end();
     
     // Card dealing operations (delegated to HandCardDealer)
     void initAndShuffleDeck();
@@ -69,9 +69,13 @@ class Hand : public HandLifecycle
     const pkt::core::player::PlayerList getActingPlayersList() const { return m_playersManager->getActingPlayersList(); }
     const pkt::core::player::PlayerList getPlayersInHandList() const { return m_playersManager->getPlayersInHandList(); }
     std::shared_ptr<BettingActions> getBettingActions() const { return m_playersManager->getBettingActions(); }
+    HandPlayersManager* getPlayersManager() const { return m_playersManager.get(); }
     int getDealerPlayerId() const { return m_playersManager->getDealerPlayerId(); }
     int getSmallBlindPlayerId() const { return m_playersManager->getSmallBlindPlayerId(); }
     int getBigBlindPlayerId() const { return m_playersManager->getBigBlindPlayerId(); }
+    
+    // Additional methods needed for lifecycle management
+    void filterPlayersWithInsufficientCash() { m_playersManager->filterPlayersWithInsufficientCash(); }
 
     HandStateManager* getStateManager() const { return m_stateManager.get(); }
     const GameEvents& getEvents() const { return m_events; }
@@ -87,9 +91,6 @@ class Hand : public HandLifecycle
     
     Logger& getLogger() const;
     PlayersStatisticsStore& getPlayersStatisticsStore() const;
-    
-    // Cash validation methods (delegates to HandPlayersManager)
-    void filterPlayersWithInsufficientCash() { m_playersManager->filterPlayersWithInsufficientCash(); }
 
     const GameEvents& m_events;
     std::shared_ptr<Board> m_board;
@@ -103,6 +104,7 @@ class Hand : public HandLifecycle
     std::unique_ptr<HandCalculator> m_calculator;
     std::unique_ptr<HandPlayersManager> m_playersManager;
     std::unique_ptr<HandActionHandler> m_actionHandler;
+    std::unique_ptr<HandLifecycleManager> m_lifecycleManager;
     int m_startQuantityPlayers;
     int m_startCash;
     int m_smallBlind;
