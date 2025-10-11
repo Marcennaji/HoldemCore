@@ -9,9 +9,6 @@
 #include <core/engine/game/Game.h>
 #include <core/engine/model/GameData.h>
 #include <core/interfaces/Randomizer.h>
-#include <core/interfaces/Logger.h>
-#include "infra/NullLogger.h"
-#include <core/services/DefaultRandomizer.h>
 
 using namespace std;
 using namespace pkt::core;
@@ -19,35 +16,14 @@ using namespace pkt::core;
 namespace pkt::ui::qtwidgets
 {
 
-StartWindow::StartWindow(PokerTableWindow* tableWindow, Session* session, QWidget* parent)
-    : QMainWindow(parent), m_pokerTableWindow(tableWindow), m_session(session)
-{
-    setWindowTitle(QString(tr("HoldemCore %1").arg(HOLDEM_CORE__BETA_RELEASE_STRING)));
-    setStatusBar(nullptr);
-    setFixedSize(520, 400);
-    
-    // Ensure table window starts hidden until a game is started
-    if (m_pokerTableWindow) m_pokerTableWindow->hide();
-
-    createInterface();
-    applyConsistentStyling();
-
-    connect(m_startGameButton, &QPushButton::clicked, this, &StartWindow::startNewGame);
-
-    // When the table window is closed, return to StartWindow
-    if (m_pokerTableWindow) {
-        connect(m_pokerTableWindow, &PokerTableWindow::windowClosed, this, [this]() {
-            this->show();
-        });
-    }
-    show();
-}
-
-StartWindow::StartWindow(PokerTableWindow* tableWindow, Session* session,
+StartWindow::StartWindow(PokerTableWindow* tableWindow, 
+                         Session* session,
                          std::shared_ptr<pkt::core::Randomizer> randomizer,
-                         std::shared_ptr<pkt::core::Logger> logger, QWidget* parent)
-    : QMainWindow(parent), m_pokerTableWindow(tableWindow), m_session(session), 
-      m_randomizer(std::move(randomizer)), m_logger(std::move(logger))
+                         QWidget* parent)
+    : QMainWindow(parent), 
+      m_pokerTableWindow(tableWindow), 
+      m_session(session),
+      m_randomizer(std::move(randomizer))
 {
     setWindowTitle(QString(tr("HoldemCore %1").arg(HOLDEM_CORE__BETA_RELEASE_STRING)));
     setStatusBar(nullptr);
@@ -351,16 +327,6 @@ void StartWindow::applyConsistentStyling()
     );
 }
 
-void StartWindow::ensureServicesInitialized()
-{
-    if (!m_randomizer) {
-        m_randomizer = std::make_shared<pkt::core::DefaultRandomizer>();
-    }
-    if (!m_logger) {
-        m_logger = std::make_shared<pkt::infra::NullLogger>();
-    }
-}
-
 StartWindow::~StartWindow()
 {
 }
@@ -388,7 +354,7 @@ void StartWindow::startNewGame()
     int tmpDealerPos = 0;
     startData.numberOfPlayers = gameData.maxNumberOfPlayers;
 
-    ensureServicesInitialized();
+    // Dealer selection using injected randomizer
     m_randomizer->getRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
     startData.startDealerPlayerId = static_cast<unsigned>(tmpDealerPos);
 

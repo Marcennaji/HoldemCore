@@ -4,8 +4,7 @@
 
 **Projet Portfolio : Architecture logicielle moderne en C++**
 
-HoldemCore est un moteur de simulation **Texas Hold'em** développé en **C++20 moderne**, démontrant des pratiques d’ingénierie logicielle éprouvées:
-architecture hexagonale, principes SOLID, inversion de dépendances et refactorisation continue.
+HoldemCore est un moteur de simulation **Texas Hold'em** développé en **C++20 moderne**, qui met en oeuvre une architecture Ports & Adapteurs (hexagonale), et applique les principes SOLID.
 
 Le projet d’origine (2011) a été **entièrement modernisé en 2025** pour illustrer la rigueur et la qualité d’un développement C++ professionnel.
 
@@ -17,7 +16,7 @@ Le projet d’origine (2011) a été **entièrement modernisé en 2025** pour il
 
 ## 🎯 Points forts du projet
 
-- **Architecture hexagonale** assurant une séparation stricte entre domaine, infrastructure et interface utilisateur  
+- **Architecture hexagonale** assurant une testabilité et flexibilité maximale, une séparation stricte entre domaine, infrastructure et interface utilisateur  
 - **Suite de tests complète**, avec couverture unitaire et de bout en bout  
 - **Conception multiplateforme**, basée sur CMake et C++ moderne  
 - **Interfaces graphiques multiples :** Qt Widgets et Qt Quick (QML), extensible à d'autres frameworks 
@@ -74,9 +73,8 @@ Explications et diagrammes détaillés :
 
 ---
 
-## 📈 Feuille de route
+## 📈 Prochaines étapes
 
-- 🧩 Améliorer encore certains aspects de l'architecture et du design (travail actuellement en cours) 
 - 🎨 Refactorer et améliorer l'UI Qt Widgets existante (application desktop)  
 - 🧠 Développer une interface Qt Quick (QML) pour mobile
 
@@ -90,6 +88,6 @@ Explications et diagrammes détaillés :
 ### Domaines d’expertise
 - Développement C++ moderne
 - Architecture logicielle et conception orientée objet  
-- Modernisation de systèmes existants  
-- Développement piloté par les tests (TDD)
+- Modernisation de systèmes "legacy""  
+
 

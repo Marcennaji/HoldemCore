@@ -4,8 +4,8 @@
 
 **Portfolio Project: Modern C++ Architecture**
 
-HoldemCore is a **Texas Hold'em simulation engine** built in **modern C++20**, demonstrating robust software engineering techniques:
-hexagonal architecture, SOLID principles, dependency inversion, and continuous refactoring.
+HoldemCore is a **Texas Hold'em simulation engine** built in **modern C++20**, demonstrating a showcase of
+Ports & Adapters (aka hexagonal) architecture and SOLID principles application.
 
 The original project (2011) has been **fully modernized in 2025** to showcase professional software craftsmanship.
 
@@ -17,10 +17,10 @@ The original project (2011) has been **fully modernized in 2025** to showcase pr
 
 ## 🎯 Project Highlights
 
-- **Hexagonal Architecture** ensuring clean separation between domain, infrastructure, and UI
+- **Ports & Adapters Architecture** ensuring maximal testability, flexibility, clean separation between domain, infrastructure, and UI
 - **Comprehensive test suite** with full unit and end-to-end coverage
 - **Cross-platform design** using CMake and modern C++
-- **Multiple UIs:** Qt Widgets and Qt Quick (QML), extensible to other UI frameworks
+- **Multiple UIs:** Qt Widgets and Qt Quick (QML), easily extensible to other UI frameworks
 - **Implement easily new bots strategies**, via simple abstract interfaces
 - **Event-driven engine** with clear state machine implementation
 
@@ -51,7 +51,7 @@ Detailed explanation and diagrams:
 👉 [ARCHITECTURE.md](doc/ARCHITECTURE.md)
 
 <p align="center">
-  <img src="doc/architecture.png" alt="Hexagonal Architecture Diagram" width="80%">
+  <img src="doc/architecture.png" alt="Ports & Adapters (hexagonal) architecture Diagram" width="80%">
 </p>
 
 ---
@@ -74,11 +74,10 @@ Detailed explanation and diagrams:
 
 ---
 
-## 📈 Roadmap
+## 📈 Next steps
 
-- 🧩 Still some architecture and design improvements to achieve (currently on progress) 
-- 🎨 Refactor and improve the existing Qt Widgets UI
-- 🧠 Develop a QML (Qt Quick) front-end for mobile
+- 🎨 Refactor and improve the existing Qt Widgets UI (desktop application)
+- 🧠 Add QML front-end prototype (mobile)
 
 ---
 
@@ -91,5 +90,5 @@ Detailed explanation and diagrams:
 - Modern C++
 - Software Architecture & Design
 - Legacy System Modernization
-- Test-Driven Development
+
 

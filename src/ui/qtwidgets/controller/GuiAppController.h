@@ -44,6 +44,13 @@ class GuiAppController
     StartWindow* createMainWindow();
 
   private:
+    // Service dependencies (stored to ensure lifetime)
+    std::shared_ptr<pkt::core::Logger> m_logger;
+    std::shared_ptr<pkt::core::HandEvaluationEngine> m_handEvaluationEngine;
+    std::shared_ptr<pkt::core::PlayersStatisticsStore> m_statisticsStore;
+    std::shared_ptr<pkt::core::Randomizer> m_randomizer;
+    
+    // Application components
     std::unique_ptr<PokerTableWindow> m_pokerTableWindow;
     std::unique_ptr<pkt::core::Session> m_session;
     pkt::core::GameEvents m_events;

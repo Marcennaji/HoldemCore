@@ -23,7 +23,6 @@
 namespace pkt::core
 {
 class Randomizer;
-class Logger;
 }
 
 namespace pkt::ui::qtwidgets
@@ -36,16 +35,17 @@ class PokerTableWindow;
  * This window allows users to set up game parameters such as number of players,
  * bot difficulty levels, blinds, starting chip counts, and other game settings
  * before launching the main poker table interface.
+ * 
+ * Dependencies are injected from the composition root (GuiAppController).
  */
 class StartWindow : public QMainWindow
 {
     Q_OBJECT
   public:
-    StartWindow(PokerTableWindow* tableWindow, pkt::core::Session* session, QWidget* parent = nullptr);
-
-    StartWindow(PokerTableWindow* tableWindow, pkt::core::Session* session,
+    StartWindow(PokerTableWindow* tableWindow, 
+                pkt::core::Session* session,
                 std::shared_ptr<pkt::core::Randomizer> randomizer,
-                std::shared_ptr<pkt::core::Logger> logger, QWidget* parent = nullptr);
+                QWidget* parent = nullptr);
 
     ~StartWindow();
 
@@ -73,10 +73,8 @@ class StartWindow : public QMainWindow
     void createOpponentsSettings(); 
     void createActionArea();
     void applyConsistentStyling();
-    void ensureServicesInitialized();
 
     std::shared_ptr<pkt::core::Randomizer> m_randomizer;
-    std::shared_ptr<pkt::core::Logger> m_logger;
     
     // UI Components
     QWidget* m_centralWidget;

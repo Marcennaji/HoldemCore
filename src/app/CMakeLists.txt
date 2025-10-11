@@ -1,6 +1,6 @@
 # Default values
 option(USE_WIDGETS "Build Widgets version" ON)
-option(USE_QML "Build QML version" ON)
+option(USE_QML "Build QML version" OFF)
 
 if(USE_WIDGETS)
     find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui)

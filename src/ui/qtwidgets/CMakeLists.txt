@@ -40,4 +40,4 @@ target_include_directories(qtwidgets PUBLIC
 )
 
 # Link Qt libraries and core_session library
-target_link_libraries(qtwidgets PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Sql core_session infra)
+target_link_libraries(qtwidgets PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Sql core_session)
