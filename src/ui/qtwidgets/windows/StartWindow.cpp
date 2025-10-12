@@ -8,7 +8,6 @@
 #include <core/engine/EngineDefs.h>
 #include <core/engine/game/Game.h>
 #include <core/engine/model/GameData.h>
-#include <core/ports/Randomizer.h>
 
 using namespace std;
 using namespace pkt::core;
@@ -18,12 +17,10 @@ namespace pkt::ui::qtwidgets
 
 StartWindow::StartWindow(PokerTableWindow* tableWindow, 
                          Session* session,
-                         std::shared_ptr<pkt::core::Randomizer> randomizer,
                          QWidget* parent)
     : QMainWindow(parent), 
       m_pokerTableWindow(tableWindow), 
-      m_session(session),
-      m_randomizer(std::move(randomizer))
+      m_session(session)
 {
     setWindowTitle(QString(tr("HoldemCore %1").arg(HOLDEM_CORE__BETA_RELEASE_STRING)));
     setStatusBar(nullptr);
@@ -351,12 +348,8 @@ void StartWindow::startNewGame()
     gameData.guiSpeed = m_speedSpinBox->value();
 
     StartData startData;
-    int tmpDealerPos = 0;
     startData.numberOfPlayers = gameData.maxNumberOfPlayers;
-
-    // Dealer selection using injected randomizer
-    m_randomizer->getRand(0, startData.numberOfPlayers - 1, 1, &tmpDealerPos);
-    startData.startDealerPlayerId = static_cast<unsigned>(tmpDealerPos);
+    // Dealer will be auto-selected by Session (StartData::AUTO_SELECT_DEALER is the default)
 
     // Initialize PokerTableWindow with the GameData BEFORE showing it
     if (m_pokerTableWindow) {

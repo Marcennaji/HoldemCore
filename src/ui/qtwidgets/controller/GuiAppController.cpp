@@ -28,7 +28,7 @@ GuiAppController::GuiAppController(std::shared_ptr<pkt::core::Logger> logger,
 
 StartWindow* GuiAppController::createMainWindow()
 {
-    auto* w = new StartWindow(m_pokerTableWindow.get(), m_session.get(), m_randomizer, nullptr);
+    auto* w = new StartWindow(m_pokerTableWindow.get(), m_session.get(), nullptr);
     if (m_pokerTableWindow) m_pokerTableWindow->hide();
     return w;
 }

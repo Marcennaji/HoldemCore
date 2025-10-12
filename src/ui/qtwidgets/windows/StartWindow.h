@@ -20,11 +20,6 @@
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QButtonGroup>
 
-namespace pkt::core
-{
-class Randomizer;
-}
-
 namespace pkt::ui::qtwidgets
 {
 class PokerTableWindow;
@@ -44,7 +39,6 @@ class StartWindow : public QMainWindow
   public:
     StartWindow(PokerTableWindow* tableWindow, 
                 pkt::core::Session* session,
-                std::shared_ptr<pkt::core::Randomizer> randomizer,
                 QWidget* parent = nullptr);
 
     ~StartWindow();
@@ -73,8 +67,6 @@ class StartWindow : public QMainWindow
     void createOpponentsSettings(); 
     void createActionArea();
     void applyConsistentStyling();
-
-    std::shared_ptr<pkt::core::Randomizer> m_randomizer;
     
     // UI Components
     QWidget* m_centralWidget;

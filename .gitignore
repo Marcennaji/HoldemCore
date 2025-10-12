@@ -71,6 +71,5 @@ docs
 # External dependencies and workflow files
 _deps/
 prompts/
-.github/
 
 

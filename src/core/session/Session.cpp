@@ -75,8 +75,17 @@ std::shared_ptr<Board> Session::createBoard(const StartData& startData)
 void Session::startGame(const GameData& gameData, const StartData& startData)
 {
     validateGameParameters(gameData, startData);
-    auto gameComponents = createGameComponents(gameData, startData);
-    initializeGame(std::move(gameComponents), gameData, startData);
+    
+    // Auto-select dealer if not specified
+    StartData adjustedStartData = startData;
+    if (adjustedStartData.startDealerPlayerId == StartData::AUTO_SELECT_DEALER) {
+        int randomDealer = 0;
+        m_randomizer.getRand(0, adjustedStartData.numberOfPlayers - 1, 1, &randomDealer);
+        adjustedStartData.startDealerPlayerId = static_cast<unsigned>(randomDealer);
+    }
+    
+    auto gameComponents = createGameComponents(gameData, adjustedStartData);
+    initializeGame(std::move(gameComponents), gameData, adjustedStartData);
 }
 
 void Session::validatePlayerConfiguration(const pkt::core::player::PlayerList& playersList)

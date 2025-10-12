@@ -10,7 +10,11 @@ namespace pkt::core
 struct StartData
 {
     StartData() = default;
-    unsigned startDealerPlayerId{0};
+    
+    // If startDealerPlayerId is UINT_MAX, the Session will randomly select a dealer
+    static constexpr unsigned AUTO_SELECT_DEALER = UINT_MAX;
+    
+    unsigned startDealerPlayerId{AUTO_SELECT_DEALER};
     int numberOfPlayers{0};
 };
 
