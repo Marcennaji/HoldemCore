@@ -56,16 +56,6 @@ PokerTableWindow::PokerTableWindow(pkt::core::Session* session, QWidget* parent)
     {
         setupUi();
         connectSignals();
-
-        // Community cards start hidden (will be shown when dealt)
-        for (int i = 0; i < 5; ++i)
-        {
-            if (m_communityCards[i])
-            {
-                m_communityCards[i]->setVisible(false);
-                m_communityCards[i]->clear(); // Ensure no content initially
-            }
-        }
     }
     catch (...)
     {
@@ -118,7 +108,11 @@ void PokerTableWindow::setupUi()
 
     // Create all UI components properly
     createPlayerAreas();
-    createCenterArea();
+    
+    // Create board area
+    m_boardArea = new BoardArea(this);
+    positionBoardArea();
+    
     createActionButtons();
     createBettingControls();
 
@@ -489,9 +483,9 @@ void PokerTableWindow::refresh()
 
 void PokerTableWindow::refreshPot(int amount)
 {
-    if (m_potLabel)
+    if (m_boardArea)
     {
-        m_potLabel->setText(QString("Pot: $%1").arg(amount));
+        m_boardArea->updatePot(amount);
     }
 }
 
@@ -534,36 +528,14 @@ void PokerTableWindow::showBoardCards(const pkt::core::BoardCards& boardCards)
 {
     qDebug() << "showBoardCards called with numCards:" << boardCards.numCards;
 
-    // Clear all community cards first
-    for (int i = 0; i < 5; ++i)
+    if (m_boardArea)
     {
-        m_communityCards[i]->clear();
-        m_communityCards[i]->setVisible(false);
+        m_boardArea->showCommunityCards(boardCards);
     }
-
-    // Show cards based on number of cards dealt
-    if (boardCards.numCards >= 3)
-    {
-        // Flop
-        m_communityCards[0]->setPixmap(getCardPixmap(boardCards.flop1));
-        m_communityCards[1]->setPixmap(getCardPixmap(boardCards.flop2));
-        m_communityCards[2]->setPixmap(getCardPixmap(boardCards.flop3));
-        m_communityCards[0]->setVisible(true);
-        m_communityCards[1]->setVisible(true);
-        m_communityCards[2]->setVisible(true);
-    }
-    if (boardCards.numCards >= 4)
-    {
-        // Turn
-        m_communityCards[3]->setPixmap(getCardPixmap(boardCards.turn));
-        m_communityCards[3]->setVisible(true);
-    }
+    
+    // Track river for showdown inference
     if (boardCards.numCards >= 5)
     {
-        // River
-        m_communityCards[4]->setPixmap(getCardPixmap(boardCards.river));
-        m_communityCards[4]->setVisible(true);
-        // We definitely saw the river; use this to infer showdown in case events arrive quickly
         m_sawRiver = true;
     }
 }
@@ -594,10 +566,10 @@ void PokerTableWindow::updateGamePhase(pkt::core::GameState gameState)
         break;
     }
 
-    // Update the center area round state
-    if (m_roundStateLabel)
+    // Update the board area round state
+    if (m_boardArea)
     {
-        m_roundStateLabel->setText(QString("Phase: %1").arg(phaseText));
+        m_boardArea->updateRoundState(phaseText);
     }
 }
 
@@ -776,7 +748,10 @@ void PokerTableWindow::resetForNewHand()
     refreshPot(0);
 
     // Update round state
-    m_roundStateLabel->setText("⏳ Starting new hand...");
+    if (m_boardArea)
+    {
+        m_boardArea->updateRoundState("⏳ Starting new hand...");
+    }
 
     // Enable player input for new hand
     enablePlayerInput(true);
@@ -834,9 +809,9 @@ void PokerTableWindow::positionPlayersInCircle()
     const int widgetHalfH = 136 / 2;
     const int widgetHalfW = 120 / 2;
 
-    // Clearance from the center area (community cards) in both axes
-    const int centerHalfH = m_centerArea ? (m_centerArea->height() / 2) : 90;
-    const int centerHalfW = m_centerArea ? (m_centerArea->width() / 2) : 180;
+    // Clearance from the board area (community cards) in both axes
+    const int centerHalfH = m_boardArea ? (m_boardArea->height() / 2) : 90;
+    const int centerHalfW = m_boardArea ? (m_boardArea->width() / 2) : 180;
     const int minVerticalRadius = centerHalfH + widgetHalfH + 32;
     const int minHorizontalRadius = centerHalfW + widgetHalfW + 32;
 
@@ -917,110 +892,27 @@ QPoint PokerTableWindow::calculateCircularPosition(int playerIndex, int totalPla
     return QPoint(x, y);
 }
 
-void PokerTableWindow::createCenterArea()
+void PokerTableWindow::positionBoardArea()
 {
-    // Create center area as invisible container (no background, no border)
-    m_centerArea = new QGroupBox(this);
-    m_centerArea->setStyleSheet("QGroupBox {"
-                                "  background: qradialgradient(cx: 0.5, cy: 0.5, radius: 1, "
-                                "    stop: 0 rgba(255,255,255,0.8), stop: 0.7 rgba(248,249,250,0.6), stop: 1 rgba(233,236,239,0.4));"
-                                "  border: 1px solid rgba(206,212,218,0.3);"
-                                "  border-radius: 12px;"
-                                "  margin: 0px;"
-                                "  padding: 8px;"
-                                "}");
-
-    auto centerLayout = new QVBoxLayout(m_centerArea);
-    centerLayout->setContentsMargins(8, 8, 8, 8); // Add some internal margins for better spacing
-
-    // Clean pot information display - text only
-    m_potLabel = new QLabel("Pot: $0", this);
-    m_potLabel->setAlignment(Qt::AlignCenter);
-    m_potLabel->setStyleSheet("QLabel {"
-                              "  color: #2c3e50;"
-                              "  font-size: 24px;"
-                              "  font-weight: 700;"
-                              "  margin: 0px;"
-                              "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-                              "    stop: 0 rgba(255,255,255,0.9), stop: 1 rgba(248,249,250,0.8));"
-                              "  border: 1px solid rgba(206,212,218,0.5);"
-                              "  border-radius: 6px;"
-                              "  padding: 10px 16px;"
-                              "}");
-
-    // Clean round state display - text only
-    m_roundStateLabel = new QLabel("Waiting for players...", this);
-    m_roundStateLabel->setAlignment(Qt::AlignCenter);
-    m_roundStateLabel->setStyleSheet("QLabel {"
-                                     "  color: #6c757d;"
-                                     "  font-size: 15px;"
-                                     "  font-weight: 600;"
-                                     "  margin: 0px;"
-                                     "  background: rgba(248,249,250,0.7);"
-                                     "  border: 1px solid rgba(206,212,218,0.3);"
-                                     "  border-radius: 4px;"
-                                     "  padding: 6px 12px;"
-                                     "}");
-
-    // Clean community cards layout with elegant styling
-    auto communityLayout = new QHBoxLayout();
-    communityLayout->setSpacing(4); // Tighter spacing between cards to reduce overall width
-    for (int i = 0; i < 5; ++i)
-    {
-        m_communityCards[i] = new QLabel(this);
-        m_communityCards[i]->setFixedSize(50, 70); // Slightly smaller cards to save space
-        m_communityCards[i]->setScaledContents(true);
-        m_communityCards[i]->setStyleSheet("QLabel {"
-                                           "  border: 2px solid #dee2e6;"
-                                           "  border-radius: 8px;"
-                                           "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-                                           "    stop: 0 #ffffff, stop: 0.5 #fefefe, stop: 1 #f8f9fa);"
-                                           "  margin: 0px;"
-                                           "  padding: 2px;"
-                                           "}");
-        m_communityCards[i]->setPixmap(getCardBackPixmap());
-        m_communityCards[i]->setVisible(true); // Make visible for demo
-        communityLayout->addWidget(m_communityCards[i]);
-    }
-
-    // Clean center area layout with elegant spacing
-    centerLayout->setSpacing(10); // Clean spacing between elements
-    centerLayout->addWidget(m_potLabel);
-    centerLayout->addSpacing(2); // Small gap
-    centerLayout->addWidget(m_roundStateLabel);
-
-    // Add spacing before community cards
-    centerLayout->addSpacing(12);
-    centerLayout->addLayout(communityLayout);
-
-    // Set container size for positioning - increased height to fully show community cards
-    m_centerArea->setFixedSize(360, 220); // Increased height from 180 to 220 to show full community cards
-
-    // Position it properly in the resizeEvent or when the window is shown
-    positionCenterArea();
-}
-
-void PokerTableWindow::positionCenterArea()
-{
-    if (m_centerArea)
+    if (m_boardArea)
     {
         const int bottomReserve = reservedBottomHeight();
         const int effectiveHeight = std::max(0, height() - bottomReserve);
-        int centerX = (width() - m_centerArea->width()) / 2;
+        int centerX = (width() - m_boardArea->width()) / 2;
         
-        // Move the center area lower in the window by adding an offset
+        // Move the board area lower in the window by adding an offset
         // Instead of centering it vertically, position it at about 60% down from the top
-        int baseY = (effectiveHeight - m_centerArea->height()) / 2;
+        int baseY = (effectiveHeight - m_boardArea->height()) / 2;
         int lowerOffset = effectiveHeight / 8; // Move down by 1/8 of the effective height
         int centerY = baseY + lowerOffset;
         
         // Ensure it doesn't go too low and overlap with the bottom controls
-        int maxY = effectiveHeight - m_centerArea->height() - 20; // 20px margin from bottom
+        int maxY = effectiveHeight - m_boardArea->height() - 20; // 20px margin from bottom
         centerY = std::min(centerY, maxY);
         
-        m_centerArea->move(centerX, centerY);
-        // Ensure the center area (and community cards) render above players if close
-        m_centerArea->raise();
+        m_boardArea->move(centerX, centerY);
+        // Ensure the board area renders above players if close
+        m_boardArea->raise();
     }
 }
 
@@ -1068,7 +960,7 @@ void PokerTableWindow::resizeEvent(QResizeEvent* event)
     // Since window size is now fixed, repositioning should be consistent
     // Keep the repositioning logic for showEvent compatibility
     positionPlayersInCircle();
-    positionCenterArea();
+    positionBoardArea();
     positionDealerButtons();
 }
 
@@ -1078,7 +970,7 @@ void PokerTableWindow::showEvent(QShowEvent* event)
 
     // Position elements when window is first shown (now we have proper size)
     positionPlayersInCircle();
-    positionCenterArea();
+    positionBoardArea();
     positionDealerButtons();
 }
 

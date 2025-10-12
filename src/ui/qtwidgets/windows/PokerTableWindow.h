@@ -29,6 +29,7 @@
 #include "core/player/Player.h"
 #include "core/session/Session.h"
 #include "ui/qtwidgets/widgets/PlayerPanel.h"
+#include "ui/qtwidgets/widgets/BoardArea.h"
 
 namespace pkt::core
 {
@@ -141,8 +142,7 @@ class PokerTableWindow : public QWidget
     // Circular table layout helpers
     void positionPlayersInCircle();
     QPoint calculateCircularPosition(int playerIndex, int totalPlayers, const QPoint& center, int radius);
-    void createCenterArea();
-    void positionCenterArea();
+    void positionBoardArea();
   void positionDealerButtons();
     
     // Card visualization helpers
@@ -166,11 +166,8 @@ class PokerTableWindow : public QWidget
     int m_activePlayerId;   // Currently active player (-1 if none)
     int m_dealerPosition;   // Current dealer position (-1 if none)
     
-    // Center area for pot, phase, and community cards
-  QGroupBox* m_centerArea = nullptr;
-  QLabel* m_potLabel = nullptr;
-  QLabel* m_roundStateLabel = nullptr;
-  std::array<QLabel*, 5> m_communityCards{};
+    // Board area for pot, phase, and community cards
+    BoardArea* m_boardArea = nullptr;
 
     // Action controls
   QGroupBox* m_actionGroup = nullptr;
