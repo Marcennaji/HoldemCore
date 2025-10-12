@@ -174,9 +174,9 @@ class Player
     const HandSimulationStats computeHandSimulation() const;
     std::unique_ptr<PlayerStrategy> m_strategy;
     std::unique_ptr<PlayerStatisticsUpdater> m_statisticsUpdater;
-    pkt::core::Logger* m_logger;
-    pkt::core::HandEvaluationEngine* m_handEvaluator;
-    pkt::core::PlayersStatisticsStore* m_statisticsStore;
-    pkt::core::Randomizer* m_randomizer;
+    core::Logger& m_logger;
+    core::HandEvaluationEngine& m_handEvaluator;
+    core::PlayersStatisticsStore& m_statisticsStore;
+    core::Randomizer& m_randomizer;
 };
 } // namespace pkt::core::player

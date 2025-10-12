@@ -30,7 +30,7 @@ Player::Player(const GameEvents& events, pkt::core::Logger& logger,
                pkt::core::PlayersStatisticsStore& statisticsStore,
                pkt::core::Randomizer& randomizer,
                int id, std::string name, int cash)
-    : m_id(id), m_name(name), m_events(events), m_logger(&logger), m_handEvaluator(&handEvaluator), m_statisticsStore(&statisticsStore), m_randomizer(&randomizer)
+    : m_id(id), m_name(name), m_events(events), m_logger(logger), m_handEvaluator(handEvaluator), m_statisticsStore(statisticsStore), m_randomizer(randomizer)
 {
     m_rangeEstimator = std::make_unique<RangeEstimator>(m_id, logger, handEvaluator);
     m_currentHandContext = std::make_unique<CurrentHandContext>();
@@ -187,10 +187,10 @@ const HandSimulationStats Player::computeHandSimulation() const
     const int nbOpponents = m_seatsList->size() - 1;
     // evaluate my strength against my opponents's guessed ranges :
     float maxOpponentsStrengths = getMaxOpponentsStrengths();
-    return m_handEvaluator->simulateHandEquity(getCardsValueString(), getStringBoard(), nbOpponents,
+    return m_handEvaluator.simulateHandEquity(getCardsValueString(), getStringBoard(), nbOpponents,
                                                        maxOpponentsStrengths);
 #else
-    return m_handEvaluator->simulateHandEquity("As 6d", "", 2, 0.5);
+    return m_handEvaluator.simulateHandEquity("As 6d", "", 2, 0.5);
 #endif
 }
 
@@ -292,9 +292,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 
         if ((*i).size() != 4)
         {
-            if (m_logger) {
-                m_logger->error("invalid hand : " + (*i));
-            }
+            m_logger.error("invalid hand : " + (*i));
             continue;
         }
         string s1 = (*i).substr(0, 2);
@@ -327,7 +325,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
 
     for (vector<std::string>::const_iterator i = newRanges.begin(); i != newRanges.end(); i++)
     {
-        const int rank = m_handEvaluator->rankHand(((*i) + board).c_str());
+        const int rank = m_handEvaluator.rankHand(((*i) + board).c_str());
         if (rank > getHandRanking())
         {
             nbWinningHands++;
@@ -335,9 +333,7 @@ float Player::getOpponentWinningHandsPercentage(const int opponentId, std::strin
     }
     if (ranges.size() == 0)
     {
-        if (m_logger) {
-            m_logger->error("no ranges for opponent " + std::to_string(opponentId));
-        }
+        m_logger.error("no ranges for opponent " + std::to_string(opponentId));
         return 0;
     }
     assert(nbWinningHands / ranges.size() <= 1.0);
@@ -442,7 +438,7 @@ void Player::updateCurrentHandContext(Hand& currentHand)
 
 float Player::calculatePreflopCallingRange(const CurrentHandContext& ctx) const
 {    
-    PreflopRangeCalculator calculator(*m_logger, *m_randomizer);
+    PreflopRangeCalculator calculator(m_logger, m_randomizer);
     return calculator.calculatePreflopCallingRange(ctx);
 }
 
@@ -465,7 +461,7 @@ const PostFlopAnalysisFlags Player::getPostFlopAnalysisFlags() const
     std::string stringHand = getCardsValueString();
     std::string stringBoard = m_currentHandContext->commonContext.stringBoard;
 
-    return m_handEvaluator->analyzeHand(getCardsValueString(), stringBoard);
+    return m_handEvaluator.analyzeHand(getCardsValueString(), stringBoard);
 }
 
 void Player::setPosition(const Hand& hand)
@@ -491,10 +487,8 @@ void Player::setAction(HandState& state, const PlayerAction& action)
 {
     if (action.type != ActionType::None)
     {
-        if (m_logger) {
-            m_logger->info(m_name + " " + std::string(actionTypeToString(action.type)) +
-                                      (action.amount ? " " + std::to_string(action.amount) : ""));
-        }
+        m_logger.info(m_name + " " + std::string(actionTypeToString(action.type)) +
+                                  (action.amount ? " " + std::to_string(action.amount) : ""));
     }
     m_currentHandContext->personalContext.actions.currentHandActions.addAction(state.getGameState(), action);
 }

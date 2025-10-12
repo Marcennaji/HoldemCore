@@ -40,7 +40,7 @@ class BotStrategyBase : public virtual BotStrategy
     bool m_couldCall;
     bool m_couldRaise;
 
-    mutable Logger* m_logger;
+    Logger& m_logger;
     mutable Randomizer* m_randomizer; 
 
   private:

@@ -68,3 +68,9 @@ migrate_member_variables.py
 # temporary docs
 docs
 
+# External dependencies and workflow files
+_deps/
+prompts/
+.github/
+
+

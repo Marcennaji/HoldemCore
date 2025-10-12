@@ -38,8 +38,8 @@ class StrategyAssigner
     int m_countUltraTight = 0;
     int m_maxPerType;
     
-    pkt::core::Logger* m_logger;
-    pkt::core::Randomizer* m_randomizer;
+    core::Logger& m_logger;
+    core::Randomizer& m_randomizer;
 };
 
 } // namespace pkt::core::player

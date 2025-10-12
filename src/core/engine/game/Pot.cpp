@@ -9,7 +9,7 @@ namespace pkt::core
 
 Pot::Pot(unsigned total, pkt::core::player::PlayerList seats, unsigned dealerId,
          Logger& logger)
-    : m_total(total), m_seats(std::move(seats)), m_dealerId(dealerId), m_logger(&logger)
+    : m_total(total), m_seats(std::move(seats)), m_dealerId(dealerId), m_logger(logger)
 {
 }
 
@@ -41,7 +41,7 @@ void Pot::distribute()
         int potLevel = static_cast<int>(contributorsCount * level);
         if (potLevel > m_total)
         {
-            m_logger->info("Pot level " + std::to_string(potLevel) +
+            m_logger.info("Pot level " + std::to_string(potLevel) +
                           " exceeds total available chips : " + std::to_string(m_total));
             potLevel = m_total;
         }

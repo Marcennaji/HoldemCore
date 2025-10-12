@@ -76,8 +76,8 @@ class PreflopRangeCalculator
 
   private:
     
-    pkt::core::Logger* m_logger;
-    pkt::core::Randomizer* m_randomizer;
+    core::Logger& m_logger;
+    core::Randomizer& m_randomizer;
 };
 
 } // namespace pkt::core::player

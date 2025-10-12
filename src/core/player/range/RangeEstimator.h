@@ -63,8 +63,8 @@ class RangeEstimator
     void updateUnplausibleRangesGivenTurnActions(const CurrentHandContext&);
     void updateUnplausibleRangesGivenRiverActions(const CurrentHandContext&);
     
-    pkt::core::Logger* m_logger;
-    pkt::core::HandEvaluationEngine* m_handEvaluator;
+    core::Logger& m_logger;
+    core::HandEvaluationEngine& m_handEvaluator;
 
     std::unique_ptr<PreflopRangeEstimator> m_preflopRangeEstimator;
     std::string m_estimatedRange;

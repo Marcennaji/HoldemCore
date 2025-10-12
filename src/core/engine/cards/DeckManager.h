@@ -40,7 +40,7 @@ class DeckManager
 
   private:
     Deck m_deck;
-    Randomizer* m_randomizer;
+    Randomizer& m_randomizer;
 };
 
 } // namespace pkt::core

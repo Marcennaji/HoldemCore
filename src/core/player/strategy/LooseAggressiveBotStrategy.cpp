@@ -69,7 +69,7 @@ bool LooseAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
     if (ctx.commonContext.bettingContext.preflopRaisesNumber < 3)
     {
 
-        m_logger->verbose("\t\tLAG adding high pairs to the initial calling range.");
+        m_logger.verbose("\t\tLAG adding high pairs to the initial calling range.");
         stringCallingRange += HIGH_PAIRS;
     }
 
@@ -81,7 +81,7 @@ bool LooseAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
         !ctx.commonContext.bettingContext.isPreflopBigBet)
     {
 
-        m_logger->verbose(
+        m_logger.verbose(
             "\t\tLAG adding high suited connectors, high suited aces and pairs to the initial calling range.");
         stringCallingRange += HIGH_SUITED_CONNECTORS;
         stringCallingRange += HIGH_SUITED_ACES;
@@ -95,7 +95,7 @@ bool LooseAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
             stringCallingRange += SUITED_CONNECTORS;
             stringCallingRange += SUITED_ONE_GAPED;
             stringCallingRange += SUITED_TWO_GAPED;
-            m_logger->verbose(
+            m_logger.verbose(
                 "\t\tLAG adding suited connectors, suited one-gaped and suited two-gaped to the initial "
                 "calling range.");
         }
@@ -121,12 +121,12 @@ bool LooseAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
             stringCallingRange += HIGH_SUITED_ACES;
             stringCallingRange += PAIRS;
 
-            m_logger->verbose(
+            m_logger.verbose(
                 "\t\tLAG defending against 3-bet : adding high suited connectors, high suited aces and pairs to "
                 "the initial calling range.");
         }
     }
-    m_logger->verbose("\t\tLAG final calling range : " + stringCallingRange);
+    m_logger.verbose("\t\tLAG final calling range : " + stringCallingRange);
 
     return isCardsInRange(ctx.personalContext.holeCards, stringCallingRange);
 }
@@ -168,7 +168,7 @@ int LooseAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
 
     stringRaisingRange = rangesString[(int) raisingRange];
 
-    m_logger->verbose("Raising range : " + stringRaisingRange);
+    m_logger.verbose("Raising range : " + stringRaisingRange);
 
     // determine when to 3-bet without a real hand
     bool speculativeHandedAdded = false;
@@ -195,7 +195,7 @@ int LooseAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
             {
 
                 speculativeHandedAdded = true;
-                m_logger->verbose("\t\tLAG trying to steal this bet");
+                m_logger.verbose("\t\tLAG trying to steal this bet");
             }
             else
             {
@@ -205,7 +205,7 @@ int LooseAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
                 {
 
                     speculativeHandedAdded = true;
-                    m_logger->verbose("\t\tLAG adding this speculative hand to our initial raising range");
+                    m_logger.verbose("\t\tLAG adding this speculative hand to our initial raising range");
                 }
                 else
                 {
@@ -219,7 +219,7 @@ int LooseAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
                         if (rand <= 3)
                         {
                             speculativeHandedAdded = true;
-                            m_logger->verbose("\t\tLAG adding this junk hand to our initial raising range");
+                            m_logger.verbose("\t\tLAG adding this junk hand to our initial raising range");
                         }
                     }
                 }
@@ -251,7 +251,7 @@ int LooseAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
             {
 
                 speculativeHandedAdded = true;
-                m_logger->verbose("\t\tLAG adding this speculative hand to our initial raising range");
+                m_logger.verbose("\t\tLAG adding this speculative hand to our initial raising range");
             }
         }
     }
@@ -277,7 +277,7 @@ int LooseAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
         m_randomizer->getRand(1, 20, 1, &rand);
         if (rand <= 3)
         {
-            m_logger->verbose("\t\twon't raise, to hide the hand strength");
+            m_logger.verbose("\t\twon't raise, to hide the hand strength");
             m_couldCall = true;
             return 0;
         }

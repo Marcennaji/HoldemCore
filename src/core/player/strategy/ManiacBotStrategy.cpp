@@ -70,7 +70,7 @@ bool ManiacBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
 
     if (ctx.commonContext.bettingContext.preflopRaisesNumber < 3)
     {
-        m_logger->verbose("\t\tManiac adding high pairs to the initial calling range.");
+        m_logger.verbose("\t\tManiac adding high pairs to the initial calling range.");
         stringCallingRange += HIGH_PAIRS;
     }
 
@@ -82,7 +82,7 @@ bool ManiacBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
         !ctx.commonContext.bettingContext.isPreflopBigBet)
     {
 
-        m_logger->verbose(
+        m_logger.verbose(
             "\t\tManiac adding high suited connectors, high suited aces and pairs to the initial calling range.");
         stringCallingRange += HIGH_SUITED_CONNECTORS;
         stringCallingRange += HIGH_SUITED_ACES;
@@ -96,7 +96,7 @@ bool ManiacBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
             stringCallingRange += CONNECTORS;
             stringCallingRange += SUITED_ONE_GAPED;
             stringCallingRange += SUITED_TWO_GAPED;
-            m_logger->verbose(
+            m_logger.verbose(
                 "\t\tManiac adding suited connectors, suited one-gaped and suited two-gaped to the initial "
                 "calling range.");
         }
@@ -119,12 +119,12 @@ bool ManiacBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
             stringCallingRange += HIGH_SUITED_ACES;
             stringCallingRange += PAIRS;
 
-            m_logger->verbose(
+            m_logger.verbose(
                 "\t\tManiac defending against 3-bet : adding high suited connectors, high suited aces and pairs to "
                 "the initial calling range.");
         }
     }
-    m_logger->verbose("\t\tManiac final calling range : " + stringCallingRange);
+    m_logger.verbose("\t\tManiac final calling range : " + stringCallingRange);
 
     return isCardsInRange(ctx.personalContext.holeCards, stringCallingRange);
 }
@@ -166,7 +166,7 @@ int ManiacBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
 
     stringRaisingRange = rangesString[(int) raisingRange];
 
-    m_logger->verbose(stringRaisingRange);
+    m_logger.verbose(stringRaisingRange);
 
     // determine when to 3-bet without a real hand
     bool speculativeHandedAdded = false;
@@ -193,7 +193,7 @@ int ManiacBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
             {
 
                 speculativeHandedAdded = true;
-                m_logger->verbose("\t\tManiac trying to steal this bet");
+                m_logger.verbose("\t\tManiac trying to steal this bet");
             }
             else
             {
@@ -202,7 +202,7 @@ int ManiacBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
                 {
 
                     speculativeHandedAdded = true;
-                    m_logger->verbose(
+                    m_logger.verbose(
                         "\t\tManiac adding this speculative hand to our initial raising range");
                 }
                 else
@@ -214,7 +214,7 @@ int ManiacBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
                         if (PokerMath::shouldDefendAgainst3Bet(*m_randomizer))
                         {
                             speculativeHandedAdded = true;
-                            m_logger->verbose(
+                            m_logger.verbose(
                                 "\t\tManiac adding this junk hand to our initial raising range");
                         }
                     }
@@ -248,7 +248,7 @@ int ManiacBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
                 if (rand == 1)
                 {
                     speculativeHandedAdded = true;
-                    m_logger->verbose(
+                    m_logger.verbose(
                         "\t\tManiac adding this speculative hand to our initial raising range");
                 }
             }
@@ -276,7 +276,7 @@ int ManiacBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
         m_randomizer->getRand(1, 10, 1, &rand);
         if (rand == 1)
         {
-            m_logger->verbose("\t\twon't raise, to hide the hand strength");
+            m_logger.verbose("\t\twon't raise, to hide the hand strength");
             m_couldCall = true;
             return 0;
         }

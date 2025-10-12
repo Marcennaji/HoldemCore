@@ -13,13 +13,13 @@ using namespace pkt::core::player;
 
 
 TurnState::TurnState(const GameEvents& events, Logger& logger)
-    : m_events(events), m_logger(&logger)
+    : m_events(events), m_logger(logger)
 {
 }
 
 void TurnState::enter(Hand& hand)
 {
-    m_logger->info("Turn");
+    m_logger.info("Turn");
 
     for (auto& player : *hand.getActingPlayersList())
     {
@@ -73,7 +73,7 @@ void TurnState::promptPlayerAction(Hand& hand, Player& player)
 
 std::unique_ptr<HandState> TurnState::computeNextState(Hand& hand)
 {
-    return computeBettingRoundNextState(hand, m_events, Turn, *m_logger);
+    return computeBettingRoundNextState(hand, m_events, Turn, m_logger);
 }
 
 std::shared_ptr<player::Player> TurnState::getNextPlayerToAct(const Hand& hand) const
@@ -88,12 +88,12 @@ std::shared_ptr<player::Player> TurnState::getFirstPlayerToActInRound(const Hand
 }
 bool TurnState::isRoundComplete(const Hand& hand) const
 {
-    return pkt::core::isRoundComplete(hand, *m_logger);
+    return pkt::core::isRoundComplete(hand, m_logger);
 }
 
 void TurnState::logStateInfo(Hand& hand)
 {
-    m_logger->info("Turn state - fourth community card dealt");
+    m_logger.info("Turn state - fourth community card dealt");
 }
 
 } // namespace pkt::core

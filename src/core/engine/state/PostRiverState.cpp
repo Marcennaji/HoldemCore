@@ -10,13 +10,13 @@ namespace pkt::core
 using namespace pkt::core::player;
 
 PostRiverState::PostRiverState(const GameEvents& events, Logger& logger)
-    : m_events(events), m_logger(&logger)
+    : m_events(events), m_logger(logger)
 {
 }
 
 void PostRiverState::enter(Hand& hand)
 {
-    m_logger->info("Post-River");
+    m_logger.info("Post-River");
 
     for (auto& player : *hand.getActingPlayersList())
     {
@@ -82,7 +82,7 @@ bool PostRiverState::isRoundComplete(const Hand& /*hand*/) const
 
 void PostRiverState::logStateInfo(Hand& hand)
 {
-    m_logger->info("PostRiver state - showdown completed, pot distributed");
+    m_logger.info("PostRiver state - showdown completed, pot distributed");
 }
 
 } // namespace pkt::core

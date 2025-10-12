@@ -57,7 +57,7 @@ class PreflopState : public HandState, public HandActionProcessor, public HandDe
     unsigned m_dealerPlayerId{static_cast<unsigned>(-1)};
     unsigned m_smallBlindPlayerId{static_cast<unsigned>(-1)};
     unsigned m_bigBlindPlayerId{static_cast<unsigned>(-1)};
-    Logger* m_logger;
+    Logger& m_logger;
 };
 
 } // namespace pkt::core

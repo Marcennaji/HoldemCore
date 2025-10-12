@@ -50,7 +50,7 @@ class PostRiverState : public HandState, public HandActionProcessor, public Hand
 
   private:
     const GameEvents& m_events;
-    Logger* m_logger; 
+    Logger& m_logger; 
 };
 
 } // namespace pkt::core

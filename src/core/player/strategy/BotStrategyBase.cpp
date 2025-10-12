@@ -15,9 +15,9 @@ namespace pkt::core::player
 {
 
 BotStrategyBase::BotStrategyBase(Logger& logger, Randomizer& randomizer) 
-    : m_logger(&logger), m_randomizer(&randomizer)
+    : m_logger(logger), m_randomizer(&randomizer)
 {
-    m_preflopRangeCalculator = std::make_unique<PreflopRangeCalculator>(*m_logger, *m_randomizer);
+    m_preflopRangeCalculator = std::make_unique<PreflopRangeCalculator>(m_logger, *m_randomizer);
 }
 
 PlayerAction BotStrategyBase::decidePreflop(const CurrentHandContext& ctx)
@@ -237,7 +237,7 @@ bool BotStrategyBase::shouldPotControlOnTurn(const CurrentHandContext& ctx, int 
 
 void BotStrategyBase::logPotControl() const
 {
-    m_logger->verbose("\t\tShould control pot");
+    m_logger.verbose("\t\tShould control pot");
 }
 
 int BotStrategyBase::computePreflopRaiseAmount(const CurrentHandContext& ctx)
@@ -342,7 +342,7 @@ bool BotStrategyBase::isPossibleToBluff(const CurrentHandContext& ctx) const
 
     if (players == nullptr)
     {
-        m_logger->info("BotStrategyBase::isPossibleToBluff() is not compatible with legacy (non FSM) code");
+        m_logger.info("BotStrategyBase::isPossibleToBluff() is not compatible with legacy (non FSM) code");
         return false; // TODO remove this after FSM migration is complete
     }
 

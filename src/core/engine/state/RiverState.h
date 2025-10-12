@@ -51,7 +51,7 @@ class RiverState : public HandState, public HandActionProcessor, public HandDebu
   private:
 
     const GameEvents& m_events;
-    Logger* m_logger; 
+    Logger& m_logger; 
 };
 
 } // namespace pkt::core

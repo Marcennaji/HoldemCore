@@ -86,12 +86,12 @@ class Session
 
     std::unique_ptr<Game> m_currentGame;
     const GameEvents& m_events;
-    EngineFactory* m_engineFactory;   
+    EngineFactory& m_engineFactory;   
   
-    Logger* m_logger;
-    HandEvaluationEngine* m_handEvaluationEngine;
-    PlayersStatisticsStore* m_playersStatisticsStore;
-    Randomizer* m_randomizer;
+    Logger& m_logger;
+    HandEvaluationEngine& m_handEvaluationEngine;
+    PlayersStatisticsStore& m_playersStatisticsStore;
+    Randomizer& m_randomizer;
 };
 
 } // namespace pkt::core

@@ -72,8 +72,8 @@ class Board
     bool m_allInCondition{false};
     unsigned m_lastActionPlayerId{0};
     
-    Logger* m_logger;
-    HandEvaluationEngine* m_handEvaluator;
+    Logger& m_logger;
+    HandEvaluationEngine& m_handEvaluator;
 };
 
 } // namespace pkt::core

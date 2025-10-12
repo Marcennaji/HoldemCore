@@ -60,8 +60,8 @@ class HandCardDealer
   private:
     std::unique_ptr<DeckManager> m_deckManager;
     const GameEvents& m_events;
-    Logger* m_logger;
-    HandEvaluationEngine* m_handEvaluationEngine;
+    Logger& m_logger;
+    HandEvaluationEngine& m_handEvaluationEngine;
 
     // Helper methods
     void setPlayerHoleCardsAndRanking(std::shared_ptr<player::Player> player, 

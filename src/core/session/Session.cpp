@@ -33,9 +33,9 @@ Session::Session(const GameEvents& events,
     HandEvaluationEngine& handEvaluationEngine,
     PlayersStatisticsStore& playersStatisticsStore,
     Randomizer& randomizer)
-    : m_events(events), m_engineFactory(&engineFactory),
-      m_logger(&logger), m_handEvaluationEngine(&handEvaluationEngine),
-      m_playersStatisticsStore(&playersStatisticsStore), m_randomizer(&randomizer)
+    : m_events(events), m_engineFactory(engineFactory),
+      m_logger(logger), m_handEvaluationEngine(handEvaluationEngine),
+      m_playersStatisticsStore(playersStatisticsStore), m_randomizer(randomizer)
 {
 }
 
@@ -55,20 +55,20 @@ pkt::core::player::PlayerList Session::createPlayersList(PlayerFactory& playerFa
 std::unique_ptr<player::StrategyAssigner> Session::createStrategyAssigner(const TableProfile& tableProfile,
                                                                           int numberOfBots)
 {
-    return std::make_unique<player::StrategyAssigner>(tableProfile, numberOfBots, *m_logger, *m_randomizer);
+    return std::make_unique<player::StrategyAssigner>(tableProfile, numberOfBots, m_logger, m_randomizer);
 }
 
 std::unique_ptr<player::PlayerFactory> Session::createPlayerFactory(const GameEvents& events,
                                                                            player::StrategyAssigner* strategyAssigner)
 {
     return std::make_unique<player::PlayerFactory>(events, strategyAssigner, 
-                                                  *m_logger, *m_handEvaluationEngine, 
-                                                  *m_playersStatisticsStore, *m_randomizer);
+                                                  m_logger, m_handEvaluationEngine, 
+                                                  m_playersStatisticsStore, m_randomizer);
 }
 
 std::shared_ptr<Board> Session::createBoard(const StartData& startData)
 {
-    auto board = m_engineFactory->createBoard(startData.startDealerPlayerId);
+    auto board = m_engineFactory.createBoard(startData.startDealerPlayerId);
     return board;
 }
 
@@ -182,7 +182,7 @@ Session::GameComponents Session::createGameComponents(const GameData& gameData, 
 
 void Session::initializeGame(GameComponents&& components, const GameData& gameData, const StartData& startData)
 {
-    m_currentGame = std::make_unique<Game>(m_events, *m_engineFactory, components.board, components.playersList,
+    m_currentGame = std::make_unique<Game>(m_events, m_engineFactory, components.board, components.playersList,
                                            startData.startDealerPlayerId, gameData, startData);
     fireGameInitializedEvent(gameData.guiSpeed);
     m_currentGame->startNewHand();

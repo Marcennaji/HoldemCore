@@ -6,7 +6,7 @@
 namespace pkt::core::player
 {
 PlayerStatisticsUpdater::PlayerStatisticsUpdater(pkt::core::PlayersStatisticsStore& statisticsStore)
-    : m_statisticsStore(&statisticsStore)
+    : m_statisticsStore(statisticsStore)
 {
 }
 
@@ -263,7 +263,7 @@ void PlayerStatisticsUpdater::updateRiverStatistics(const CurrentHandContext& ct
 
 pkt::core::PlayersStatisticsStore& PlayerStatisticsUpdater::getPlayersStatisticsStore() const
 {
-    return *m_statisticsStore;
+    return m_statisticsStore;
 
 }
 

@@ -48,17 +48,17 @@ class EngineFactory
                                              pkt::core::player::PlayerList actingPlayers, GameData, StartData);
 
     virtual std::shared_ptr<Board> createBoard(unsigned dealerPosition);
-    Logger& getLogger() const { return *m_logger; }
-    HandEvaluationEngine& getHandEvaluationEngine() const { return *m_handEvaluator; }
-    PlayersStatisticsStore& getPlayersStatisticsStore() const { return *m_statisticsStore; }
-    Randomizer& getRandomizer() const { return *m_randomizer; }
+    Logger& getLogger() const { return m_logger; }
+    HandEvaluationEngine& getHandEvaluationEngine() const { return m_handEvaluator; }
+    PlayersStatisticsStore& getPlayersStatisticsStore() const { return m_statisticsStore; }
+    Randomizer& getRandomizer() const { return m_randomizer; }
     
   private:
     const GameEvents& m_events;
-    Logger* m_logger;
-    HandEvaluationEngine* m_handEvaluator;
-    PlayersStatisticsStore* m_statisticsStore;
-    Randomizer* m_randomizer;
+    Logger& m_logger;
+    HandEvaluationEngine& m_handEvaluator;
+    PlayersStatisticsStore& m_statisticsStore;
+    Randomizer& m_randomizer;
 
 };
 

@@ -86,7 +86,7 @@ using namespace pkt::core::player;
 
 Board::Board(unsigned dp, const GameEvents& events,
              Logger& logger, HandEvaluationEngine& handEvaluator)
-    : m_dealerPlayerId(dp), m_events(events), m_logger(&logger), m_handEvaluator(&handEvaluator)
+    : m_dealerPlayerId(dp), m_events(events), m_logger(logger), m_handEvaluator(handEvaluator)
 {
     m_boardCards.reset();
 }
@@ -117,7 +117,7 @@ void Board::distributePot(Hand& hand)
     const auto& bc = getBoardCards();
     if (bc.getNumCards() == 5)
     {
-        m_logger->info(std::string("Showdown - final board: \"") + bc.toString() + "\"");
+        m_logger.info(std::string("Showdown - final board: \"") + bc.toString() + "\"");
         // Only evaluate hands for players who actually participated in the hand
         for (auto& player : *hand.getActingPlayersList())
         {
@@ -129,10 +129,10 @@ void Board::distributePot(Hand& hand)
                 // Build evaluator string strictly as: HOLE then BOARD (e.g., "Ah Ad 2c 7d 9h 4s 3c").
                 std::string handStr = hc.toString() + std::string(" ") + bc.toString();
                 // Extra diagnostic log to verify ordering at runtime.
-                m_logger->debug(std::string("Recompute showdown with: \"") + handStr + "\"");
-                player->setHandRanking(m_handEvaluator->rankHand(handStr.c_str()));
+                m_logger.debug(std::string("Recompute showdown with: \"") + handStr + "\"");
+                player->setHandRanking(m_handEvaluator.rankHand(handStr.c_str()));
             }
-            m_logger->info(
+            m_logger.info(
                 std::string("Player ") + std::to_string(player->getId()) +
                 " showdown hand: \"" + player->getHoleCards().toString() + "\" rank=" + std::to_string(player->getHandRanking())
             );
@@ -141,7 +141,7 @@ void Board::distributePot(Hand& hand)
 
     // Use seats list for pot distribution (includes folded players who contributed)
     // but only evaluate hands for acting players (non-folded players who can win)
-    Pot pot(totalPot, hand.getSeatsList(), m_dealerPlayerId, *m_logger);
+    Pot pot(totalPot, hand.getSeatsList(), m_dealerPlayerId, m_logger);
     pot.distribute();
     m_winners = pot.getWinners();
 

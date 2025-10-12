@@ -46,7 +46,7 @@ class PlayerStatisticsUpdater
     
     pkt::core::PlayersStatisticsStore& getPlayersStatisticsStore() const;
 
-    pkt::core::PlayersStatisticsStore* m_statisticsStore;
+    core::PlayersStatisticsStore& m_statisticsStore;
 
     std::array<pkt::core::player::PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> m_statistics;
 };

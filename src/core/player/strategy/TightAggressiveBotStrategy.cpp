@@ -31,7 +31,7 @@ TightAggressiveBotStrategy::TightAggressiveBotStrategy(pkt::core::Logger& logger
    m_randomizer->getRand(2, 3, 1, &utgFullTableRange);
 
     // Debug logging to see what values we're getting
-    m_logger->verbose("TightAggressiveBotStrategy constructor: utgHeadsUpRange=45, utgFullTableRange=" +
+    m_logger.verbose("TightAggressiveBotStrategy constructor: utgHeadsUpRange=45, utgFullTableRange=" +
                         std::to_string(utgFullTableRange));
 
     initializeRanges(45, utgFullTableRange);
@@ -84,7 +84,7 @@ bool TightAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
 
         stringCallingRange += HIGH_SUITED_CONNECTORS;
 
-        m_logger->verbose("\t\tTAG adding high suited connectors to the initial calling range.");
+        m_logger.verbose("\t\tTAG adding high suited connectors to the initial calling range.");
     }
 
     // defend against 3bet bluffs :
@@ -106,12 +106,12 @@ bool TightAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
             stringCallingRange += HIGH_SUITED_ACES;
             stringCallingRange += PAIRS;
 
-            m_logger->verbose(
+            m_logger.verbose(
                 "\t\tTAG defending against 3-bet : adding high suited connectors, high suited aces and pairs to "
                 "the initial calling range.");
         }
     }
-    m_logger->verbose("\t\tTAG final calling range : " + stringCallingRange);
+    m_logger.verbose("\t\tTAG final calling range : " + stringCallingRange);
 
     return isCardsInRange(ctx.personalContext.holeCards, stringCallingRange);
 }
@@ -153,7 +153,7 @@ int TightAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
 
     stringRaisingRange = rangesString[(int) raisingRange];
 
-    m_logger->verbose(stringRaisingRange);
+    m_logger.verbose(stringRaisingRange);
 
     // determine when to 3-bet without a real hand
     bool speculativeHandedAdded = false;
@@ -184,7 +184,7 @@ int TightAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
                 if (rand == 2)
                 {
                     speculativeHandedAdded = true;
-                    m_logger->verbose("\t\tTAG trying to steal this bet");
+                    m_logger.verbose("\t\tTAG trying to steal this bet");
                 }
             }
             else
@@ -195,7 +195,7 @@ int TightAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
                 {
 
                     speculativeHandedAdded = true;
-                    m_logger->verbose("\t\tTAG adding this speculative hand to our initial raising range");
+                    m_logger.verbose("\t\tTAG adding this speculative hand to our initial raising range");
                 }
             }
         }
@@ -222,7 +222,7 @@ int TightAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
        m_randomizer->getRand(1, 8, 1, &rand);
         if (rand <= 1)
         {
-            m_logger->verbose("\t\twon't raise, to hide the hand strength");
+            m_logger.verbose("\t\twon't raise, to hide the hand strength");
             m_couldCall = true;
             return 0;
         }

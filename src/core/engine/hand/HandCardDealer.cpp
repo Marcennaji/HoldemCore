@@ -16,7 +16,7 @@ HandCardDealer::HandCardDealer(std::unique_ptr<DeckManager> deckManager,
                                Logger& logger,
                                HandEvaluationEngine& handEvaluationEngine)
     : m_deckManager(std::move(deckManager)), m_events(events), 
-      m_logger(&logger), m_handEvaluationEngine(&handEvaluationEngine)
+      m_logger(logger), m_handEvaluationEngine(handEvaluationEngine)
 {
 }
 
@@ -88,7 +88,7 @@ void HandCardDealer::setPlayerHoleCardsAndRanking(std::shared_ptr<player::Player
 
     // Build hand evaluation string and set player ranking
     std::string humanReadableHand = buildHandEvaluationString(holeCardList, board);
-    player->setHandRanking(m_handEvaluationEngine->rankHand(humanReadableHand.c_str()));
+    player->setHandRanking(m_handEvaluationEngine.rankHand(humanReadableHand.c_str()));
 }
 
 std::string HandCardDealer::buildHandEvaluationString(const std::vector<Card>& holeCardList, 

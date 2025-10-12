@@ -12,7 +12,7 @@ namespace pkt::core
 using namespace pkt::core::player;
 
 FlopState::FlopState(const GameEvents& events, Logger& logger) 
-    : m_events(events), m_logger(&logger)
+    : m_events(events), m_logger(logger)
 {
 }
 
@@ -57,11 +57,9 @@ void FlopState::logStateInfo(Hand& hand)
     std::string boardStr = hand.getStringBoard();
     int pot = hand.getBoard().getPot(hand);
     
-    if (m_logger) {
-        m_logger->info(""); // Empty line for spacing
-        m_logger->info("Current State: " + gameStateToString(hand.getGameState()) + 
-                   ", Board: " + boardStr + ", Pot: " + std::to_string(pot));
-    }
+    m_logger.info(""); // Empty line for spacing
+    m_logger.info("Current State: " + gameStateToString(hand.getGameState()) + 
+               ", Board: " + boardStr + ", Pot: " + std::to_string(pot));
 }
 
 void FlopState::exit(Hand& hand)
@@ -83,7 +81,7 @@ void FlopState::promptPlayerAction(Hand& hand, Player& player)
 
 std::unique_ptr<HandState> FlopState::computeNextState(Hand& hand)
 {
-    return computeBettingRoundNextState(hand, m_events, Flop, *m_logger);
+    return computeBettingRoundNextState(hand, m_events, Flop, m_logger);
 }
 
 std::shared_ptr<player::Player> FlopState::getNextPlayerToAct(const Hand& hand) const
@@ -98,7 +96,7 @@ std::shared_ptr<player::Player> FlopState::getFirstPlayerToActInRound(const Hand
 
 bool FlopState::isRoundComplete(const Hand& hand) const
 {
-    return pkt::core::isRoundComplete(hand, *m_logger);
+    return pkt::core::isRoundComplete(hand, m_logger);
 }
 
 } // namespace pkt::core

@@ -50,7 +50,7 @@ class TurnState : public HandState, public HandActionProcessor, public HandDebug
 
   private:
     const GameEvents& m_events;
-    Logger* m_logger; 
+    Logger& m_logger; 
 };
 
 } // namespace pkt::core

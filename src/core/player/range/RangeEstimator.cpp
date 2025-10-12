@@ -21,7 +21,7 @@ using namespace std;
 
 RangeEstimator::RangeEstimator(int playerId, pkt::core::Logger& logger, 
                                pkt::core::HandEvaluationEngine& handEvaluator)
-    : m_playerId(playerId), m_logger(&logger), m_handEvaluator(&handEvaluator)
+    : m_playerId(playerId), m_logger(logger), m_handEvaluator(handEvaluator)
 {
     assert(m_playerId >= 0);
      m_preflopRangeEstimator = make_unique<PreflopRangeEstimator>(m_playerId, logger);
@@ -191,7 +191,7 @@ void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(const CurrentHan
     {
         setEstimatedRange(originalEstimatedRange);
     }
-    m_logger->info("\tPlausible range on preflop for player " + std::to_string(ctx.personalContext.id) +
+    m_logger.info("\tPlausible range on preflop for player " + std::to_string(ctx.personalContext.id) +
                               " :\t" + getEstimatedRange());
 }
 
@@ -201,7 +201,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(const CurrentHandCo
     const string originalEstimatedRange = getEstimatedRange();
     string unplausibleRanges;
 
-    m_logger->verbose("\tPlausible range on flop, before update :\t" + getEstimatedRange());
+    m_logger.verbose("\tPlausible range on flop, before update :\t" + getEstimatedRange());
 
     // update my unplausible hands (unplausible to my opponents eyes), given what I did on flop
 
@@ -211,7 +211,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(const CurrentHandCo
 
     if (ctx.personalContext.actions.isInVeryLooseMode)
     {
-        m_logger->verbose("\tSeems to be (temporarily ?) on very loose mode : estimated range is\t" +
+        m_logger.verbose("\tSeems to be (temporarily ?) on very loose mode : estimated range is\t" +
                                      getEstimatedRange());
         return;
     }
@@ -226,7 +226,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(const CurrentHandCo
 
         std::string stringHand = s1 + " " + s2;
         PostFlopAnalysisFlags postFlopFlags =
-            m_handEvaluator->analyzeHand(stringHand, ctx.commonContext.stringBoard);
+            m_handEvaluator.analyzeHand(stringHand, ctx.commonContext.stringBoard);
 
         bool removeHand = false;
 
@@ -280,7 +280,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(const CurrentHandCo
     {
         // keep previous range
 
-        m_logger->verbose("\tCan't remove all plausible ranges, keeping last one");
+        m_logger.verbose("\tCan't remove all plausible ranges, keeping last one");
 
         setEstimatedRange(originalEstimatedRange);
         unplausibleRanges = "";
@@ -288,7 +288,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(const CurrentHandCo
 
     if (unplausibleRanges != "")
     {
-        m_logger->verbose("\tRemoving unplausible hole cards : " + unplausibleRanges);
+        m_logger.verbose("\tRemoving unplausible hole cards : " + unplausibleRanges);
     }
 }
 
@@ -301,7 +301,7 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(const CurrentHandCo
     const string originalEstimatedRange = getEstimatedRange();
     string unplausibleRanges;
 
-    m_logger->verbose("\tPlausible range on turn, before update :\t" + getEstimatedRange());
+    m_logger.verbose("\tPlausible range on turn, before update :\t" + getEstimatedRange());
 
     // update my unplausible hands (unplausible to my opponents eyes), given what I did on turn
 
@@ -310,7 +310,7 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(const CurrentHandCo
 
     if (ctx.personalContext.actions.isInVeryLooseMode)
     {
-        m_logger->verbose("\tSeems to be (temporarily ?) on very loose mode : estimated range is\t" +
+        m_logger.verbose("\tSeems to be (temporarily ?) on very loose mode : estimated range is\t" +
                                      getEstimatedRange());
         return;
     }
@@ -325,7 +325,7 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(const CurrentHandCo
 
         std::string stringHand = s1 + " " + s2;
         PostFlopAnalysisFlags postFlopFlags =
-            m_handEvaluator->analyzeHand(stringHand, ctx.commonContext.stringBoard);
+            m_handEvaluator.analyzeHand(stringHand, ctx.commonContext.stringBoard);
 
         bool removeHand = false;
         const auto& turnActions =
@@ -379,14 +379,14 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(const CurrentHandCo
     {
         // keep previous range
 
-        m_logger->verbose("\tCan't remove all plausible ranges, keeping last one");
+        m_logger.verbose("\tCan't remove all plausible ranges, keeping last one");
         setEstimatedRange(originalEstimatedRange);
         unplausibleRanges = "";
     }
 
     if (unplausibleRanges != "")
     {
-        m_logger->verbose("\tRemoving unplausible hole cards : " + unplausibleRanges);
+        m_logger.verbose("\tRemoving unplausible hole cards : " + unplausibleRanges);
     }
 }
 
@@ -399,7 +399,7 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(const CurrentHandC
     const string originalEstimatedRange = getEstimatedRange();
     string unplausibleRanges;
 
-    m_logger->verbose("\tPlausible range on river, before update :\t" + getEstimatedRange());
+    m_logger.verbose("\tPlausible range on river, before update :\t" + getEstimatedRange());
 
     // update my unplausible hands (unplausible to my opponents eyes), given what I did on river
 
@@ -409,7 +409,7 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(const CurrentHandC
 
     if (ctx.personalContext.actions.isInVeryLooseMode)
     {
-        m_logger->verbose("\tSeems to be on very loose mode : estimated range is\t" + getEstimatedRange());
+        m_logger.verbose("\tSeems to be on very loose mode : estimated range is\t" + getEstimatedRange());
         return;
     }
 
@@ -423,7 +423,7 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(const CurrentHandC
 
         std::string stringHand = s1 + " " + s2;
         PostFlopAnalysisFlags postFlopFlags =
-            m_handEvaluator->analyzeHand(stringHand, ctx.commonContext.stringBoard);
+            m_handEvaluator.analyzeHand(stringHand, ctx.commonContext.stringBoard);
 
         bool removeHand = false;
         const auto& riverActions =
@@ -476,14 +476,14 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(const CurrentHandC
     {
         // keep previous range
 
-        m_logger->verbose("\tCan't remove all plausible ranges, keeping last one");
+        m_logger.verbose("\tCan't remove all plausible ranges, keeping last one");
         setEstimatedRange(originalEstimatedRange);
         unplausibleRanges = "";
     }
 
     if (unplausibleRanges != "")
     {
-        m_logger->verbose("\tRemoving unplausible hole cards : " + unplausibleRanges);
+        m_logger.verbose("\tRemoving unplausible hole cards : " + unplausibleRanges);
     }
 }
 

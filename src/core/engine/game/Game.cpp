@@ -20,7 +20,7 @@ using namespace pkt::core::player;
 
 Game::Game(const GameEvents& events, EngineFactory& factory, std::shared_ptr<Board> board,
            PlayerList seatsList, unsigned dealerId, const GameData& gameData, const StartData& startData)
-    : m_engineFactory(&factory), m_events(events), m_currentBoard(board), m_seatsList(seatsList),
+    : m_engineFactory(factory), m_events(events), m_currentBoard(board), m_seatsList(seatsList),
       m_dealerPlayerId(dealerId), m_gameData(gameData), m_startData(startData)
 {
     if (!board || !seatsList || seatsList->empty())
@@ -52,7 +52,7 @@ void Game::startNewHand()
     StartData handStart = m_startData;
     handStart.startDealerPlayerId = m_dealerPlayerId;
 
-    m_currentHand = m_engineFactory->createHand(m_currentBoard, m_seatsList, m_actingPlayersList,
+    m_currentHand = m_engineFactory.createHand(m_currentBoard, m_seatsList, m_actingPlayersList,
                                                 m_gameData, handStart);
     m_currentHand->initialize();
     m_currentHand->runGameLoop();

@@ -12,13 +12,13 @@ using namespace pkt::core::player;
 
 
 RiverState::RiverState(const GameEvents& events, Logger& logger)
-    : m_events(events), m_logger(&logger)
+    : m_events(events), m_logger(logger)
 {
 }
 
 void RiverState::enter(Hand& hand)
 {
-    m_logger->info("River");
+    m_logger.info("River");
 
     for (auto& player : *hand.getActingPlayersList())
     {
@@ -73,7 +73,7 @@ void RiverState::promptPlayerAction(Hand& hand, Player& player)
 
 std::unique_ptr<HandState> RiverState::computeNextState(Hand& hand)
 {
-    return computeBettingRoundNextState(hand, m_events, River, *m_logger);
+    return computeBettingRoundNextState(hand, m_events, River, m_logger);
 }
 
 std::shared_ptr<player::Player> RiverState::getNextPlayerToAct(const Hand& hand) const
@@ -87,12 +87,12 @@ std::shared_ptr<player::Player> RiverState::getFirstPlayerToActInRound(const Han
 }
 bool RiverState::isRoundComplete(const Hand& hand) const
 {
-    return pkt::core::isRoundComplete(hand, *m_logger);
+    return pkt::core::isRoundComplete(hand, m_logger);
 }
 
 void RiverState::logStateInfo(Hand& hand)
 {
-    m_logger->info("River state - fifth community card dealt");
+    m_logger.info("River state - fifth community card dealt");
 }
 
 } // namespace pkt::core

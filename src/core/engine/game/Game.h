@@ -45,7 +45,7 @@ class Game
     void findNextDealer();
 
   private:
-    EngineFactory* m_engineFactory;
+    EngineFactory& m_engineFactory;
     const GameEvents& m_events;
     std::shared_ptr<Hand> m_currentHand;
     std::shared_ptr<Board> m_currentBoard;

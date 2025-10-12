@@ -39,10 +39,10 @@ class PlayerFactory
     const GameEvents& m_events;
     StrategyAssigner* m_strategyAssigner;
     
-    pkt::core::Logger* m_logger;
-    pkt::core::HandEvaluationEngine* m_handEvaluator;
-    pkt::core::PlayersStatisticsStore* m_statisticsStore;
-    pkt::core::Randomizer* m_randomizer;
+    pkt::core::Logger& m_logger;
+    pkt::core::HandEvaluationEngine& m_handEvaluator;
+    pkt::core::PlayersStatisticsStore& m_statisticsStore;
+    pkt::core::Randomizer& m_randomizer;
     
     std::shared_ptr<Player> createHumanPlayer(int id, int startMoney);
     std::shared_ptr<Player> createBotPlayer(int id, TableProfile profile, int startMoney);

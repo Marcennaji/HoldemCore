@@ -50,7 +50,7 @@ class Pot
 
     std::shared_ptr<player::Player> resolveRemainderReceiver(const std::vector<size_t>& winnerIndices) const;
     std::vector<size_t> indexesOf(const std::list<unsigned>& ids);
-    Logger* m_logger; 
+    Logger& m_logger; 
 };
 
 } // namespace pkt::core
