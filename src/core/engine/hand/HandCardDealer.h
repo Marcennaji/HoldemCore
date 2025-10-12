@@ -7,8 +7,8 @@
 #include "core/engine/cards/Card.h"
 #include "core/engine/cards/DeckManager.h"
 #include "core/engine/GameEvents.h"
-#include "core/interfaces/HandEvaluationEngine.h"
-#include "core/interfaces/Logger.h"
+#include "core/ports/HandEvaluationEngine.h"
+#include "core/ports/Logger.h"
 #include "core/player/typedefs.h"
 #include <memory>
 #include <vector>

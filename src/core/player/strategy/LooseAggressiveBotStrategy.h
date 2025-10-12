@@ -6,8 +6,8 @@
 
 #include "core/player/strategy/BotStrategy.h"
 #include "core/player/strategy/BotStrategyBase.h"
-#include "core/interfaces/Logger.h"
-#include "core/interfaces/Randomizer.h"
+#include "core/ports/Logger.h"
+#include "core/ports/Randomizer.h"
 
 namespace pkt::core::player
 {

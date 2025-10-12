@@ -7,7 +7,7 @@
 #pragma once
 
 #include "common/EngineTest.h"
-#include "infra/persistence/SqlitePlayersStatisticsStore.h"
+#include "adapters/infrastructure/statistics/sqlite/SqlitePlayersStatisticsStore.h"
 
 #include <memory>
 

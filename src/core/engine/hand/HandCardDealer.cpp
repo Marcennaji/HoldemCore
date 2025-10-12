@@ -5,7 +5,7 @@
 #include "HandCardDealer.h"
 #include "core/engine/game/Board.h"
 #include "core/player/Player.h"
-#include "core/interfaces/Logger.h"
+#include "core/ports/Logger.h"
 #include <stdexcept>
 
 namespace pkt::core

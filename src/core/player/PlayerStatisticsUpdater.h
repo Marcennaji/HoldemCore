@@ -9,7 +9,7 @@
 #include <core/engine/model/GameState.h>
 #include <core/player/PlayerStatistics.h>
 
-#include <core/interfaces/persistence/PlayersStatisticsStore.h>
+#include <core/ports/PlayersStatisticsStore.h>
 
 #include <array>
 #include <memory>

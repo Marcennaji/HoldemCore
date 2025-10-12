@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <core/interfaces/Logger.h>
+#include <core/ports/Logger.h>
 
 #include <memory>
 #include <string>

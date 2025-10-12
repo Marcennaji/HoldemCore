@@ -51,8 +51,7 @@ target_link_libraries(unit_tests
     PRIVATE
     player
     engine
-    service
-    infra
+    infrastructure
     core_session
     gtest_main
     gmock_main
@@ -76,8 +75,7 @@ target_link_libraries(e2e_tests
     PRIVATE
     player
     engine
-    service
-    infra
+    infrastructure
     core_session
     gtest_main
 )

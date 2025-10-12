@@ -8,7 +8,7 @@
 #include <core/engine/EngineDefs.h>
 #include <core/engine/game/Game.h>
 #include <core/engine/model/GameData.h>
-#include <core/interfaces/Randomizer.h>
+#include <core/ports/Randomizer.h>
 
 using namespace std;
 using namespace pkt::core;

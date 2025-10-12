@@ -9,7 +9,7 @@
 #include <memory>
 #include <vector>
 #include "core/player/Player.h"
-#include "core/interfaces/Logger.h"
+#include "core/ports/Logger.h"
 
 namespace pkt::core
 {

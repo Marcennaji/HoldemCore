@@ -18,10 +18,10 @@
 #include "range/RangeEstimator.h"
 #include "strategy/CurrentHandContext.h"
 
-#include "core/interfaces/HandEvaluationEngine.h"
-#include "core/interfaces/Logger.h"
-#include "core/interfaces/Randomizer.h"
-#include "core/interfaces/persistence/PlayersStatisticsStore.h"
+#include "core/ports/HandEvaluationEngine.h"
+#include "core/ports/Logger.h"
+#include "core/ports/Randomizer.h"
+#include "core/ports/PlayersStatisticsStore.h"
 
 #include <array>
 #include <assert.h>

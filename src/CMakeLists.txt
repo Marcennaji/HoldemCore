@@ -16,7 +16,7 @@ endif()
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 add_subdirectory(core)
-add_subdirectory(infra)
+add_subdirectory(adapters/infrastructure)
 add_subdirectory(ui)
 add_subdirectory(third_party)
 

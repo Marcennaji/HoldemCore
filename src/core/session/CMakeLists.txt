@@ -18,5 +18,4 @@ target_link_libraries(core_session
     PUBLIC
     engine
     player
-    service
 )

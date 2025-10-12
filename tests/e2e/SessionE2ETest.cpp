@@ -9,14 +9,14 @@
 #include <core/engine/model/GameData.h>
 #include <core/engine/model/StartData.h>
 #include <core/session/Session.h>
-#include <core/interfaces/Logger.h>
-#include <core/interfaces/HandEvaluationEngine.h>
-#include <core/interfaces/Randomizer.h>
-#include <core/interfaces/persistence/PlayersStatisticsStore.h>
-#include <infra/persistence/NullPlayersStatisticsStore.h>
-#include <core/services/DefaultRandomizer.h>
-#include <infra/ConsoleLogger.h>
-#include <infra/eval/PsimHandEvaluationEngine.h>
+#include <core/ports/Logger.h>
+#include <core/ports/HandEvaluationEngine.h>
+#include <core/ports/Randomizer.h>
+#include <core/ports/PlayersStatisticsStore.h>
+#include <adapters/infrastructure/statistics/NullPlayersStatisticsStore.h>
+#include <adapters/infrastructure/randomizer/DefaultRandomizer.h>
+#include <adapters/infrastructure/logger/ConsoleLogger.h>
+#include <adapters/infrastructure/hand_evaluation/PsimHandEvaluationEngine.h>
 #include <gtest/gtest.h>
 
 using namespace pkt::core;

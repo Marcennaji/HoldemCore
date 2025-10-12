@@ -8,7 +8,7 @@
 #include <vector>
 #include <memory>
 #include "core/engine/cards/Card.h"
-#include "core/interfaces/Randomizer.h"
+#include "core/ports/Randomizer.h"
 
 namespace pkt::core
 {

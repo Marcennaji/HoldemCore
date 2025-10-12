@@ -8,10 +8,10 @@
 
 **Core ideas:**
 - **Domain-centric** design — engine logic independent of UI or infrastructure
-- **Dependency inversion** — interfaces in core, implementations in adapters
+- **Dependency inversion** — ports (interfaces) in core, adapters (implementations) in infrastructure
 - **Dependency injection** for testable boundaries
 - **Event-driven** communication between components
-- **Clean layering:** `core/`, `infra/`, `ui/`, `app/`, `tests/`
+- **Clean layering:** `core/`, `adapters/`, `ui/`, `app/`, `tests/`
 
 ### Layer Dependencies (Dependency Direction)
 
@@ -24,8 +24,8 @@
                     ┌───────┼───────┐
                     ↓       ↓       ↓
             ┌───────────┐   │   ┌───────────┐
-            │    UI     │   │   │   Infra   │
-            │ (Widgets) │   │   │(Adapters) │
+            │    UI     │   │   │ Adapters  │
+            │ (Widgets) │   │   │  (Infra)  │
             └───────────┘   │   └───────────┘
                     │       │       │
                     └───────┼───────┘
@@ -33,18 +33,18 @@
                     ┌───────────────┐
                     │     Core      │ ← Stable Center
                     │   (Domain)    │   • Business Logic
-                    │               │   • Interfaces
+                    │               │   • Ports
                     │  ┌─────────┐  │   • No Dependencies
-                    │  │Interface│  │
-                    │  │Contracts│  │
+                    │  │  Ports  │  │
+                    │  │(Interf.)│  │
                     │  └─────────┘  │
                     └───────────────┘
 ```
 
 **Dependency Flow:**
-- `App` → depends on → `UI + Core + Infra` (orchestrates everything)
-- `UI` → depends on → `Core` (uses interfaces)
-- `Infra` → depends on → `Core` (implements interfaces)  
+- `App` → depends on → `UI + Core + Adapters` (orchestrates everything)
+- `UI` → depends on → `Core` (uses ports)
+- `Adapters` → depends on → `Core` (implements ports)  
 - `Core` → depends on → **NOTHING** (pure domain)
 
 **Key Rule:** All arrows point **toward Core** - it's the stable foundation.
@@ -65,7 +65,7 @@
 | `hand/` | Lifecycle and statistics |
 | `game/` | Board, pot distribution, betting logic |
 | `player/` | Player entities, strategies, and statistics |
-| `interfaces/` | Abstract service contracts (logging, RNG, persistence) |
+| `ports/` | Abstract service contracts (logging, RNG, persistence) |
 
 ---
 
@@ -192,14 +192,24 @@ To add a new database (e.g., PostgreSQL):
 ```
 HoldemCore/
 ├── src/
-│   ├── core/          # Domain logic (business rules, interfaces)
-│   ├── infra/         # Infrastructure adapters (DB, eval engine, logging)
-│   ├── ui/            # UI front-ends (Qt Widgets, QML...)
-│   └── app/           # Application layer (AppFactory composition root)
-│       ├── AppFactory.h       # Dependency injection factory
-│       ├── AppFactory.cpp     # Concrete instantiation logic
-│       └── main_*.cpp         # Clean application entry points
-└── tests/             # Unit and E2E tests
+│   ├── core/                  # Domain logic (business rules, ports)
+│   │   ├── engine/           # Game engine and FSM
+│   │   ├── player/           # Player entities and strategies
+│   │   ├── session/          # Session management
+│   │   └── ports/            # Abstract interfaces (Logger, Randomizer, etc.)
+│   ├── adapters/             # Infrastructure adapters
+│   │   └── infrastructure/   # Concrete implementations
+│   │       ├── logger/       # ConsoleLogger, NullLogger
+│   │       ├── hand_evaluation/  # PsimHandEvaluationEngine
+│   │       ├── statistics/   # Statistics storage
+│   │       │   └── sqlite/   # SQLite implementation
+│   │       └── randomizer/   # DefaultRandomizer
+│   ├── ui/                   # UI front-ends (Qt Widgets, QML...)
+│   └── app/                  # Application layer (AppFactory composition root)
+│       ├── AppFactory.h      # Dependency injection factory
+│       ├── AppFactory.cpp    # Concrete instantiation logic
+│       └── main_*.cpp        # Clean application entry points
+└── tests/                    # Unit and E2E tests
 ```
 
 

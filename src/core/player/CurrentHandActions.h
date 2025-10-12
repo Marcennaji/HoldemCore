@@ -8,7 +8,7 @@
 
 #include "core/engine/model/GameState.h"
 #include "core/engine/model/PlayerAction.h"
-#include "core/interfaces/Logger.h"
+#include "core/ports/Logger.h"
 
 #include <map>
 #include <memory>

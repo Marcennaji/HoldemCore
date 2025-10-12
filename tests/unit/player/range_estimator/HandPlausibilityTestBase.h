@@ -8,7 +8,7 @@
 #include <gtest/gtest.h>
 #include "core/engine/EngineDefs.h"
 #include "core/engine/model/GameState.h"
-#include "core/interfaces/HandEvaluationEngine.h"
+#include "core/ports/HandEvaluationEngine.h"
 #include "core/player/PlayerStatistics.h"
 #include "core/player/range/HandPlausibilityChecker.h"
 #include "core/player/strategy/CurrentHandContext.h"

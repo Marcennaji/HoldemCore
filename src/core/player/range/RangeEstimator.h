@@ -7,8 +7,8 @@
 #include <core/engine/EngineDefs.h>
 #include <core/engine/model/GameState.h>
 #include <core/player/PlayerStatistics.h>
-#include <core/interfaces/Logger.h>
-#include <core/interfaces/HandEvaluationEngine.h>
+#include <core/ports/Logger.h>
+#include <core/ports/HandEvaluationEngine.h>
 #include "PreflopRangeEstimator.h"
 
 #include <memory>

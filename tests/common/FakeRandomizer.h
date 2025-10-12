@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "core/interfaces/Randomizer.h"
+#include "core/ports/Randomizer.h"
 
 #include <vector>
 

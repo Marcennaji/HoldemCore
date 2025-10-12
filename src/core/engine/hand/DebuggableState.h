@@ -8,7 +8,7 @@
 #include "core/engine/hand/Hand.h"
 #include "core/engine/model/GameState.h"
 #include "core/engine/game/Board.h"
-#include "core/interfaces/Logger.h"
+#include "core/ports/Logger.h"
 
 namespace pkt::core
 {

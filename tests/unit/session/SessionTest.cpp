@@ -12,10 +12,10 @@
 #include "core/engine/model/StartData.h"
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/model/TableProfile.h"
-#include "infra/NullLogger.h"
-#include "infra/eval/PsimHandEvaluationEngine.h"
-#include "infra/persistence/NullPlayersStatisticsStore.h"
-#include "core/services/DefaultRandomizer.h"
+#include "adapters/infrastructure/logger/NullLogger.h"
+#include "adapters/infrastructure/hand_evaluation/PsimHandEvaluationEngine.h"
+#include "adapters/infrastructure/statistics/NullPlayersStatisticsStore.h"
+#include "adapters/infrastructure/randomizer/DefaultRandomizer.h"
 
 using namespace pkt::core;
 

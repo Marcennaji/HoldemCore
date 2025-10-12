@@ -6,7 +6,7 @@
 #pragma once
 
 #include "core/engine/cards/CardUtilities.h"
-#include "core/interfaces/Randomizer.h"
+#include "core/ports/Randomizer.h"
 
 #include <algorithm>
 #include <memory>

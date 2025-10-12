@@ -7,7 +7,7 @@
 #include "CurrentHandContext.h"
 #include "core/player/Player.h"
 #include "PokerMath.h"
-#include "core/services/DefaultRandomizer.h"
+#include "adapters/infrastructure/randomizer/DefaultRandomizer.h"
 
 using namespace std;
 

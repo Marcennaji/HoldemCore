@@ -5,10 +5,10 @@
 #include "core/engine/Exception.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
-#include "infra/persistence/NullPlayersStatisticsStore.h"
+#include "adapters/infrastructure/statistics/NullPlayersStatisticsStore.h"
 #include "core/player/Player.h"
-#include "infra/ConsoleLogger.h"
-#include "infra/eval/PsimHandEvaluationEngine.h"
+#include "adapters/infrastructure/logger/ConsoleLogger.h"
+#include "adapters/infrastructure/hand_evaluation/PsimHandEvaluationEngine.h"
 
 #include <memory>
 #ifdef _WIN32

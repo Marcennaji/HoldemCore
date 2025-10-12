@@ -5,7 +5,7 @@
 
 #pragma once
 #include <memory>
-#include "core/interfaces/HandEvaluationEngine.h"
+#include "core/ports/HandEvaluationEngine.h"
 
 namespace pkt::core
 {

@@ -2,7 +2,7 @@
 
 #include <core/player/strategy/TightAggressiveBotStrategy.h>
 #include "StrategyTest.h"
-#include "infra/NullLogger.h"
+#include "adapters/infrastructure/logger/NullLogger.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;

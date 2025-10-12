@@ -7,10 +7,10 @@
 #include <memory>
 #include "core/engine/model/TableProfile.h"
 #include "core/player/strategy/StrategyAssigner.h"
-#include "core/interfaces/Logger.h"
-#include "core/interfaces/HandEvaluationEngine.h"
-#include "core/interfaces/persistence/PlayersStatisticsStore.h"
-#include "core/interfaces/Randomizer.h"
+#include "core/ports/Logger.h"
+#include "core/ports/HandEvaluationEngine.h"
+#include "core/ports/PlayersStatisticsStore.h"
+#include "core/ports/Randomizer.h"
 #include "core/player/Player.h"
 
 namespace pkt::core::player

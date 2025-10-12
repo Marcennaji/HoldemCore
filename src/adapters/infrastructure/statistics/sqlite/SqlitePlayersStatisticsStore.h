@@ -7,7 +7,7 @@
 #include <core/player/typedefs.h>
 #include "SqliteDb.h"
 #include "core/engine/EngineDefs.h"
-#include "core/interfaces/persistence/PlayersStatisticsStore.h"
+#include "core/ports/PlayersStatisticsStore.h"
 #include "core/player/PlayerStatistics.h"
 
 #include <filesystem>

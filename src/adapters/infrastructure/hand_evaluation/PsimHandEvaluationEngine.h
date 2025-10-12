@@ -6,8 +6,8 @@
 #pragma once
 #include <memory>
 #include <string>
-#include "core/interfaces/HandEvaluationEngine.h"
-#include "core/interfaces/Logger.h"
+#include "core/ports/HandEvaluationEngine.h"
+#include "core/ports/Logger.h"
 
 struct SimResults;
 struct PostFlopState;

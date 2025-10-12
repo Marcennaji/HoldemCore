@@ -7,7 +7,7 @@
 #include "core/engine/hand/ActionProcessor.h"
 #include "core/engine/hand/DebuggableState.h"
 #include "core/engine/hand/HandState.h"
-#include "core/interfaces/Logger.h"
+#include "core/ports/Logger.h"
 
 namespace pkt::core::player
 {

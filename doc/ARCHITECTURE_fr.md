@@ -7,10 +7,10 @@
 
 **Idées clés :**
 - Conception centrée sur le domaine — la logique du moteur est indépendante de l’interface utilisateur et de l’infrastructure
-- Inversion des dépendances — les interfaces résident dans le cœur, les implémentations dans les adaptateurs
+- Inversion des dépendances — les ports (interfaces) résident dans le cœur, les adaptateurs (implémentations) dans l'infrastructure
 - Injection de dépendances — permet des frontières testables et un couplage faible
 - Communication événementielle entre les composants
-- Couches propres et claires : core/, infra/, ui/, app/, tests/
+- Couches propres et claires : core/, adapters/, ui/, app/, tests/
 
 ### Bénéfices
 - Modules isolés et facilement testables
@@ -28,8 +28,8 @@
                     ┌───────┼───────┐
                     ↓       ↓       ↓
             ┌───────────┐   │   ┌───────────┐
-            │    UI     │   │   │   Infra   │
-            │ (Widgets) │   │   │(Adapteurs)│
+            │    UI     │   │   │ Adapters  │
+            │ (Widgets) │   │   │  (Infra)  │
             └───────────┘   │   └───────────┘
                     │       │       │
                     └───────┼───────┘
@@ -37,18 +37,18 @@
                     ┌───────────────┐
                     │     Core      │ ← Centre stable
                     │   (Domaine)   │   • Logique métier
-                    │               │   • Interfaces
+                    │               │   • Ports
                     │  ┌─────────┐  │   • Aucune dépendance
-                    │  │Contrats │  │
-                    │  │Interface│  │
+                    │  │  Ports  │  │
+                    │  │(Interf.)│  │
                     │  └─────────┘  │
                     └───────────────┘
 ```
 
 **Flux de dépendances :**
-- `App` → dépend de → `UI + Core + Infra` (orchestre tout)
-- `UI` → dépend de → `Core` (utilise les interfaces)
-- `Infra` → dépend de → `Core` (implémente les interfaces)
+- `App` → dépend de → `UI + Core + Adapters` (orchestre tout)
+- `UI` → dépend de → `Core` (utilise les ports)
+- `Adapters` → dépend de → `Core` (implémente les ports)
 - `Core` → dépend de → **RIEN** (domaine pur)
 
 **Règle clé :** Toutes les flèches pointent **vers Core** - c'est la fondation stable.
@@ -62,7 +62,7 @@
 | `hand/` | Cycle de vie et statistiques d'une main |
 | `game/` | Plateau, distribution du pot, logique de mise |
 | `player/` | Entités joueur, stratégies et statistiques |
-| `interfaces/` | Contrats de service abstraits (journalisation, générateur aléatoire, persistance) |
+| `ports/` | Contrats de service abstraits (journalisation, générateur aléatoire, persistance) |
 
 ---
 
@@ -177,14 +177,24 @@ Pour ajouter une nouvelle base de données (ex. PostgreSQL) :
 ```
 HoldemCore/
 ├── src/
-│   ├── core/          # Logique métier (règles business, interfaces)
-│   ├── infra/         # Adaptateurs d'infrastructure (BDD, moteur d'évaluation, logs)
-│   ├── ui/            # Interfaces utilisateur (Qt Widgets, QML...)
-│   └── app/           # Couche applicative (racine de composition AppFactory)
-│       ├── AppFactory.h       # Factory d'injection de dépendances
-│       ├── AppFactory.cpp     # Logique d'instanciation concrète
-│       └── main_*.cpp         # Points d'entrée applicatifs propres
-└── tests/             # Tests unitaires et E2E
+│   ├── core/                  # Logique métier (règles business, ports)
+│   │   ├── engine/           # Moteur de jeu et FSM
+│   │   ├── player/           # Entités joueur et stratégies
+│   │   ├── session/          # Gestion de session
+│   │   └── ports/            # Interfaces abstraites (Logger, Randomizer, etc.)
+│   ├── adapters/             # Adaptateurs d'infrastructure
+│   │   └── infrastructure/   # Implémentations concrètes
+│   │       ├── logger/       # ConsoleLogger, NullLogger
+│   │       ├── hand_evaluation/  # PsimHandEvaluationEngine
+│   │       ├── statistics/   # Stockage des statistiques
+│   │       │   └── sqlite/   # Implémentation SQLite
+│   │       └── randomizer/   # DefaultRandomizer
+│   ├── ui/                   # Interfaces utilisateur (Qt Widgets, QML...)
+│   └── app/                  # Couche applicative (racine de composition AppFactory)
+│       ├── AppFactory.h      # Factory d'injection de dépendances
+│       ├── AppFactory.cpp    # Logique d'instanciation concrète
+│       └── main_*.cpp        # Points d'entrée applicatifs propres
+└── tests/                    # Tests unitaires et E2E
 ```
 
 

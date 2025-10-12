@@ -4,12 +4,12 @@
 #include "common/DummyPlayer.h"
 #include "core/engine/utils/Helpers.h"
 #include "core/engine/model/PlayerPosition.h"
-#include "infra/persistence/NullPlayersStatisticsStore.h"
+#include "adapters/infrastructure/statistics/NullPlayersStatisticsStore.h"
 #include "core/player/Helpers.h"
 #include "core/player/Player.h"
-#include "core/services/DefaultRandomizer.h"
-#include "infra/ConsoleLogger.h"
-#include "infra/eval/PsimHandEvaluationEngine.h"
+#include "adapters/infrastructure/randomizer/DefaultRandomizer.h"
+#include "adapters/infrastructure/logger/ConsoleLogger.h"
+#include "adapters/infrastructure/hand_evaluation/PsimHandEvaluationEngine.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;

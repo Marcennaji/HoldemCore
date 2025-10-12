@@ -5,19 +5,19 @@
 #include "AppFactory.h"
 
 // Core interfaces
-#include <core/interfaces/Logger.h>
-#include <core/interfaces/HandEvaluationEngine.h>
-#include <core/interfaces/persistence/PlayersStatisticsStore.h>
-#include <core/interfaces/Randomizer.h>
+#include <core/ports/Logger.h>
+#include <core/ports/HandEvaluationEngine.h>
+#include <core/ports/PlayersStatisticsStore.h>
+#include <core/ports/Randomizer.h>
 
 // Infrastructure implementations
-#include <infra/ConsoleLogger.h>
-#include <infra/NullLogger.h>
-#include <infra/eval/PsimHandEvaluationEngine.h>
-#include <infra/persistence/SqliteDb.h>
-#include <infra/persistence/SqlitePlayersStatisticsStore.h>
-#include <infra/persistence/NullPlayersStatisticsStore.h>
-#include <core/services/DefaultRandomizer.h>
+#include <adapters/infrastructure/logger/ConsoleLogger.h>
+#include <adapters/infrastructure/logger/NullLogger.h>
+#include <adapters/infrastructure/hand_evaluation/PsimHandEvaluationEngine.h>
+#include <adapters/infrastructure/statistics/sqlite/SqliteDb.h>
+#include <adapters/infrastructure/statistics/sqlite/SqlitePlayersStatisticsStore.h>
+#include <adapters/infrastructure/statistics/NullPlayersStatisticsStore.h>
+#include <adapters/infrastructure/randomizer/DefaultRandomizer.h>
 
 // UI controller
 #include <ui/qtwidgets/controller/GuiAppController.h>

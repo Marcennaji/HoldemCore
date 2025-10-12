@@ -4,12 +4,12 @@
 #include "common/FakeRandomizer.h"
 #include "core/engine/EngineDefs.h"
 #include "core/engine/state/PreflopState.h"
-#include "infra/persistence/NullPlayersStatisticsStore.h"
+#include "adapters/infrastructure/statistics/NullPlayersStatisticsStore.h"
 #include "core/player/Helpers.h"
 
-#include "infra/ConsoleLogger.h"
-#include "infra/eval/PsimHandEvaluationEngine.h"
-#include "infra/persistence/SqliteDb.h"
+#include "adapters/infrastructure/logger/ConsoleLogger.h"
+#include "adapters/infrastructure/hand_evaluation/PsimHandEvaluationEngine.h"
+#include "adapters/infrastructure/statistics/sqlite/SqliteDb.h"
 
 #include <memory>
 

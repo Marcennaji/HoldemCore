@@ -18,7 +18,7 @@ if(USE_WIDGETS)
 
     target_link_libraries(HoldemCore-widgets
         core_session
-        infra
+        infrastructure
         qtwidgets
         Qt6::Widgets
         Qt6::Core

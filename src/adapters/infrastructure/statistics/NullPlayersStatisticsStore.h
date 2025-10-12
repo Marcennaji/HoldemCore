@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "core/interfaces/persistence/PlayersStatisticsStore.h"
+#include "core/ports/PlayersStatisticsStore.h"
 #include "core/engine/EngineDefs.h"
 #include "core/player/PlayerStatistics.h"
 

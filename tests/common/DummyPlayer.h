@@ -6,10 +6,10 @@
 #pragma once
 
 #include <core/engine/GameEvents.h>
-#include "infra/NullLogger.h"
+#include "adapters/infrastructure/logger/NullLogger.h"
 #include <core/player/Player.h>
 #include <core/player/strategy/LooseAggressiveBotStrategy.h>
-#include <core/interfaces/Randomizer.h>
+#include <core/ports/Randomizer.h>
 #include "DeterministicStrategy.h"
 
 namespace pkt::test

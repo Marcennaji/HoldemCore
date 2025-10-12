@@ -7,8 +7,8 @@
 
 #include "core/engine/model/PlayerAction.h"
 #include "core/player/strategy/BotStrategy.h"
-#include "core/interfaces/Logger.h"
-#include "core/interfaces/Randomizer.h"
+#include "core/ports/Logger.h"
+#include "core/ports/Randomizer.h"
 
 #include <memory>
 

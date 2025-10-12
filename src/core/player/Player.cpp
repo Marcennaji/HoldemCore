@@ -4,13 +4,13 @@
 
 #include "Player.h"
 
-#include "core/interfaces/Logger.h"
+#include "core/ports/Logger.h"
 #include <core/engine/cards/CardUtilities.h>
 #include <core/engine/hand/Hand.h>
 #include <core/engine/hand/HandEvaluator.h>
 #include <core/engine/model/Ranges.h>
 #include <core/engine/utils/Helpers.h>
-#include <core/interfaces/persistence/PlayersStatisticsStore.h>
+#include <core/ports/PlayersStatisticsStore.h>
 #include <core/player/range/RangeParser.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include <core/player/strategy/PreflopRangeCalculator.h>

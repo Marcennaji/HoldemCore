@@ -5,7 +5,7 @@
 #include "PlayerListUtils.h"
 #include "Player.h"
 #include "core/engine/model/PlayerAction.h"
-#include "core/interfaces/Logger.h"
+#include "core/ports/Logger.h"
 
 #include <algorithm>
 

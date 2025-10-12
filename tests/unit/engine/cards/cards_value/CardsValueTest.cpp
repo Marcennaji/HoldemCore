@@ -1,7 +1,7 @@
 #include "common/common.h"
 #include "core/engine/hand/HandEvaluator.h"
-#include "infra/ConsoleLogger.h"
-#include "infra/eval/PsimHandEvaluationEngine.h"
+#include "adapters/infrastructure/logger/ConsoleLogger.h"
+#include "adapters/infrastructure/hand_evaluation/PsimHandEvaluationEngine.h"
 
 using namespace pkt::core;
 namespace pkt::test

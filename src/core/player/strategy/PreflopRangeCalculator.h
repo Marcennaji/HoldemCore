@@ -9,8 +9,8 @@
 #include <core/engine/model/PlayerPosition.h>
 #include <core/player/PlayerStatistics.h>
 
-#include <core/interfaces/Logger.h>
-#include <core/interfaces/Randomizer.h>
+#include <core/ports/Logger.h>
+#include <core/ports/Randomizer.h>
 
 #include <vector>
 

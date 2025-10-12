@@ -4,12 +4,12 @@
 #include "core/engine/game/Pot.h"
 #include "core/engine/model/GameState.h"
 #include "core/engine/state/RiverState.h"
-#include "infra/persistence/NullPlayersStatisticsStore.h"
+#include "adapters/infrastructure/statistics/NullPlayersStatisticsStore.h"
 #include "core/player/typedefs.h"
-#include "infra/NullLogger.h"
-#include "core/services/DefaultRandomizer.h"
-#include "infra/ConsoleLogger.h"
-#include "infra/eval/PsimHandEvaluationEngine.h"
+#include "adapters/infrastructure/logger/NullLogger.h"
+#include "adapters/infrastructure/randomizer/DefaultRandomizer.h"
+#include "adapters/infrastructure/logger/ConsoleLogger.h"
+#include "adapters/infrastructure/hand_evaluation/PsimHandEvaluationEngine.h"
 
 using namespace pkt::core;
 using namespace pkt::core::player;

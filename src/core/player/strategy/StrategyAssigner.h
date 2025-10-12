@@ -6,8 +6,8 @@
 #pragma once
 #include <memory>
 #include "core/engine/model/TableProfile.h"
-#include "core/interfaces/Logger.h"
-#include "core/interfaces/Randomizer.h"
+#include "core/ports/Logger.h"
+#include "core/ports/Randomizer.h"
 #include "core/player/strategy/BotStrategy.h"
 
 namespace pkt::core::player

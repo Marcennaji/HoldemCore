@@ -1,6 +1,6 @@
 #include "PsimHandEvaluationEngine.h"
-#include "core/interfaces/HandEvaluationEngine.h"
-#include "infra/NullLogger.h"
+#include "core/ports/HandEvaluationEngine.h"
+#include "adapters/infrastructure/logger/NullLogger.h"
 #include "third_party/psim/psim.hpp"
 
 namespace pkt::infra

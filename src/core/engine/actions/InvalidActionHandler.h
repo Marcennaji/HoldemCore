@@ -10,7 +10,7 @@
 #include <memory>
 #include <string>
 #include "core/engine/model/PlayerAction.h"
-#include "core/interfaces/Logger.h"
+#include "core/ports/Logger.h"
 
 namespace pkt::core
 {

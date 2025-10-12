@@ -5,7 +5,7 @@
 #pragma once
 
 #include <memory>  // For std::shared_ptr
-#include <core/interfaces/Randomizer.h>
+#include <core/ports/Randomizer.h>
 
 
 namespace pkt::core::player

@@ -13,10 +13,10 @@
 #include <core/player/typedefs.h>
 #include "core/engine/GameEvents.h"
 #include "core/engine/game/Board.h"
-#include "core/interfaces/Logger.h"
-#include "core/interfaces/HandEvaluationEngine.h"
-#include "core/interfaces/persistence/PlayersStatisticsStore.h"
-#include "core/interfaces/Randomizer.h"
+#include "core/ports/Logger.h"
+#include "core/ports/HandEvaluationEngine.h"
+#include "core/ports/PlayersStatisticsStore.h"
+#include "core/ports/Randomizer.h"
 
 namespace pkt::core
 {

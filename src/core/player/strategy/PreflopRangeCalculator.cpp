@@ -1,6 +1,6 @@
 
 #include "PreflopRangeCalculator.h"
-#include "core/services/DefaultRandomizer.h"
+#include "adapters/infrastructure/randomizer/DefaultRandomizer.h"
 #include "CurrentHandContext.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/player/Helpers.h"

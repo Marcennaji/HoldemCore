@@ -11,10 +11,10 @@
 #include "core/engine/model/StartData.h"
 #include "core/engine/game/Board.h"
 #include "core/player/Player.h"
-#include "core/interfaces/Logger.h"
-#include "core/interfaces/HandEvaluationEngine.h"
-#include "core/interfaces/persistence/PlayersStatisticsStore.h"
-#include "core/interfaces/Randomizer.h"
+#include "core/ports/Logger.h"
+#include "core/ports/HandEvaluationEngine.h"
+#include "core/ports/PlayersStatisticsStore.h"
+#include "core/ports/Randomizer.h"
 
 #include <memory>
 #include <vector>

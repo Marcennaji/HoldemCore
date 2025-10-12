@@ -3,7 +3,7 @@
 // Licensed under the MIT License — see LICENSE file for details.
 
 #include "DrawProbabilityCalculator.h"
-#include "core/interfaces/HandEvaluationEngine.h"
+#include "core/ports/HandEvaluationEngine.h"
 
 namespace pkt::core::probability
 {

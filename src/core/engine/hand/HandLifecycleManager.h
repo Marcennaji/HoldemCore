@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "core/interfaces/Logger.h"
-#include "core/interfaces/persistence/PlayersStatisticsStore.h"
+#include "core/ports/Logger.h"
+#include "core/ports/PlayersStatisticsStore.h"
 
 namespace pkt::core
 {

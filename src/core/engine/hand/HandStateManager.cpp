@@ -4,7 +4,7 @@
 #include "core/engine/state/PreflopState.h"
 #include "core/engine/hand/ActionProcessor.h"
 #include "core/engine/hand/HandState.h"
-#include "core/interfaces/Logger.h"
+#include "core/ports/Logger.h"
 
 #include <cassert>
 
