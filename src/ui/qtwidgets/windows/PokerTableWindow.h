@@ -28,6 +28,7 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/player/Player.h"
 #include "core/session/Session.h"
+#include "ui/qtwidgets/widgets/PlayerPanel.h"
 
 namespace pkt::core
 {
@@ -136,11 +137,6 @@ class PokerTableWindow : public QWidget
     void createBettingControls();
     // Compute the vertical space reserved at the bottom for controls
     int reservedBottomHeight() const;
-    // Styling helpers (avoid duplication)
-    QString defaultPlayerGroupStyle() const;
-    QString activePlayerGroupStyle() const;
-    QString currentActionLabelStyleBase() const;
-    QString currentActionLabelStyleFor(const QString& action) const;
     
     // Circular table layout helpers
     void positionPlayersInCircle();
@@ -161,20 +157,8 @@ class PokerTableWindow : public QWidget
   QVBoxLayout* m_mainLayout = nullptr;
   QGridLayout* m_tableLayout = nullptr;
     
-    // Player areas (all players including human in circular layout)
-    struct PlayerUIComponents {
-    QGroupBox* playerGroup = nullptr;
-    QLabel* holeCard1 = nullptr;
-    QLabel* holeCard2 = nullptr;
-    QLabel* dealerButton = nullptr;  // Dealer button indicator
-    QLabel* currentActionLabel = nullptr; // Prominent action text
-    QLabel* winnerLabel = nullptr; // Winner badge shown at hand end
-    QGraphicsOpacityEffect* card1OpacityEffect = nullptr;
-    QGraphicsOpacityEffect* card2OpacityEffect = nullptr;
-    bool isFolded = false;
-    bool isHuman = false;  // True for human player (index 0)
-    };
-    std::vector<PlayerUIComponents> m_playerComponents;
+    // Player panels (all players including human in circular layout)
+    std::vector<PlayerPanel*> m_playerPanels;
     int m_maxPlayers;
     int m_startMoney; // Starting cash amount for current game
     
@@ -207,9 +191,6 @@ class PokerTableWindow : public QWidget
     
     // Next hand control
   QPushButton* m_nextHandButton = nullptr;
-    
-  // Helpers
-  void applyFoldVisual(int seat, bool folded);
 
     // Cached state for showdown reveal
     std::vector<pkt::core::HoleCards> m_cachedHoleCards;

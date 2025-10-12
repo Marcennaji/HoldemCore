@@ -44,8 +44,8 @@ PokerTableWindow::PokerTableWindow(pkt::core::Session* session, QWidget* parent)
         // This could cause issues later
     }
 
-    // Initialize player components vector for ALL players (including human)
-    m_playerComponents.resize(m_maxPlayers); // Include human player
+    // Initialize player panels vector for ALL players (including human)
+    m_playerPanels.resize(m_maxPlayers, nullptr); // Will be created in createPlayerAreas
     m_cachedHoleCards.resize(m_maxPlayers);  // Cache dealt cards per player
 
     setWindowTitle("Poker Table - HoldemCore");
@@ -83,67 +83,18 @@ void PokerTableWindow::initializeWithGameData(const pkt::core::GameData& gameDat
     {
         m_maxPlayers = gameData.maxNumberOfPlayers;
 
-        // Clear existing player components
-        for (auto& component : m_playerComponents)
+        // Clear existing player panels
+        for (auto* panel : m_playerPanels)
         {
-            // Unset graphics effects to avoid double-deletion when labels are destroyed
-            if (component.holeCard1)
+            if (panel)
             {
-                component.holeCard1->setGraphicsEffect(nullptr);
-                component.card1OpacityEffect = nullptr; // Ownership transfers to label; null our pointer
-            }
-            if (component.holeCard2)
-            {
-                component.holeCard2->setGraphicsEffect(nullptr);
-                component.card2OpacityEffect = nullptr;
-            }
-
-            // Delete dealer button (created as child of this)
-            if (component.dealerButton)
-            {
-                component.dealerButton->setParent(nullptr);
-                delete component.dealerButton;
-                component.dealerButton = nullptr;
-            }
-
-            // Delete labels (children will clean up their effects)
-            if (component.holeCard1)
-            {
-                component.holeCard1->setParent(nullptr);
-                delete component.holeCard1;
-                component.holeCard1 = nullptr;
-            }
-            if (component.holeCard2)
-            {
-                component.holeCard2->setParent(nullptr);
-                delete component.holeCard2;
-                component.holeCard2 = nullptr;
-            }
-            if (component.currentActionLabel)
-            {
-                component.currentActionLabel->setParent(nullptr);
-                delete component.currentActionLabel;
-                component.currentActionLabel = nullptr;
-            }
-            if (component.winnerLabel)
-            {
-                component.winnerLabel->setParent(nullptr);
-                delete component.winnerLabel;
-                component.winnerLabel = nullptr;
-            }
-
-            // Finally delete the player group
-            if (component.playerGroup)
-            {
-                component.playerGroup->setParent(nullptr);
-                delete component.playerGroup;
-                component.playerGroup = nullptr;
+                delete panel;
             }
         }
 
-        // Resize and recreate ALL player components (including human player)
-        m_playerComponents.clear();
-        m_playerComponents.resize(m_maxPlayers); // Include human player
+        // Resize and recreate ALL player panels (including human player)
+        m_playerPanels.clear();
+        m_playerPanels.resize(m_maxPlayers, nullptr);
         m_cachedHoleCards.clear();
         m_cachedHoleCards.resize(m_maxPlayers);
 
@@ -192,12 +143,12 @@ void PokerTableWindow::setupUi()
                                     "}");
     m_nextHandButton->setVisible(false); // Hidden by default
 
-    // Add all player widgets to the main widget (they will be positioned absolutely)
-    for (auto& player : m_playerComponents)
+    // Add all player panels to the main widget (they will be positioned absolutely)
+    for (auto* panel : m_playerPanels)
     {
-        if (player.playerGroup)
+        if (panel)
         {
-            player.playerGroup->show();
+            panel->show();
         }
     }
 
@@ -251,94 +202,12 @@ void PokerTableWindow::closeEvent(QCloseEvent* event)
 
 void PokerTableWindow::createPlayerAreas()
 {
-    // Create UI components for ALL players (including human player at index 0)
+    // Create PlayerPanel widgets for ALL players (including human player at index 0)
     for (int i = 0; i < m_maxPlayers; ++i)
     {
-        auto& player = m_playerComponents[i];
-
-        // Mark if this is the human player (index 0)
-        player.isHuman = (i == 0);
-
-        QString playerName = player.isHuman ? "You" : QString("Bot %1").arg(i);
-        player.playerGroup = new QGroupBox(playerName, this);
-        player.playerGroup->setStyleSheet(defaultPlayerGroupStyle());
-
-        auto layout = new QVBoxLayout(player.playerGroup);
-
-        // Hole cards in horizontal layout
-        auto cardLayout = new QHBoxLayout();
-        player.holeCard1 = new QLabel(player.playerGroup);
-        player.holeCard2 = new QLabel(player.playerGroup);
-
-        // Unified card styling and size for all players (scaled with reduced group height)
-        player.holeCard1->setFixedSize(50, 70);
-        player.holeCard2->setFixedSize(50, 70);
-        QString cardStyle = "QLabel {"
-                            "  border: 1px solid #ced4da;"
-                            "  border-radius: 6px;"
-                            "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-                            "    stop: 0 #ffffff, stop: 1 #f8f9fa);"
-                            "  margin: 1px;"
-                            "}";
-        player.holeCard1->setStyleSheet(cardStyle);
-        player.holeCard2->setStyleSheet(cardStyle);
-
-        player.holeCard1->setScaledContents(true);
-        player.holeCard2->setScaledContents(true);
-
-        player.holeCard1->setPixmap(getCardBackPixmap());
-        player.holeCard2->setPixmap(getCardBackPixmap());
-
-        // Prepare opacity effects for fold visualization
-        player.card1OpacityEffect = new QGraphicsOpacityEffect(this);
-        player.card2OpacityEffect = new QGraphicsOpacityEffect(this);
-        player.card1OpacityEffect->setOpacity(1.0);
-        player.card2OpacityEffect->setOpacity(1.0);
-        player.holeCard1->setGraphicsEffect(player.card1OpacityEffect);
-        player.holeCard2->setGraphicsEffect(player.card2OpacityEffect);
-
-        cardLayout->addWidget(player.holeCard1);
-        cardLayout->addWidget(player.holeCard2);
-
-        // Prominent current action label
-        player.currentActionLabel = new QLabel("", player.playerGroup);
-        player.currentActionLabel->setAlignment(Qt::AlignCenter);
-        player.currentActionLabel->setStyleSheet(currentActionLabelStyleBase());
-
-        // Winner badge label (hidden by default)
-        player.winnerLabel = new QLabel("WINNER", player.playerGroup);
-        player.winnerLabel->setAlignment(Qt::AlignCenter);
-        player.winnerLabel->setStyleSheet("QLabel {"
-                                          "  color: #155724;"
-                                          "  background: rgba(212, 237, 218, 0.95);"
-                                          "  border: 1px solid #c3e6cb;"
-                                          "  border-radius: 6px;"
-                                          "  font-weight: 800;"
-                                          "  padding: 2px 4px;"
-                                          "}");
-        player.winnerLabel->setVisible(false);
-
-        // Create dealer button indicator (kept outside the player's layout so we can overlay on the border)
-        player.dealerButton = new QLabel("D", this);
-        player.dealerButton->setFixedSize(18, 18);
-        player.dealerButton->setAlignment(Qt::AlignCenter);
-        player.dealerButton->setStyleSheet("QLabel {"
-                                           "  background: rgba(255, 215, 0, 0.85);"
-                                           "  border: 1px solid #b8860b;"
-                                           "  border-radius: 9px;"
-                                           "  color: #202020;"
-                                           "  font-weight: 600;"
-                                           "  font-size: 10px;"
-                                           "}");
-        player.dealerButton->setVisible(false); // Initially hidden
-
-        layout->addLayout(cardLayout);
-        layout->addWidget(player.currentActionLabel);
-        layout->addWidget(player.winnerLabel);
-        // Note: Do NOT add dealerButton to the layout; we position it overlaying the group border.
-
-        player.playerGroup->setVisible(true);
-        player.playerGroup->setFixedSize(120, 136); // 80% of 170
+        bool isHuman = (i == 0);
+        m_playerPanels[i] = new PlayerPanel(i, isHuman, this);
+        m_playerPanels[i]->setVisible(true);
     }
 }
 
@@ -405,88 +274,6 @@ void PokerTableWindow::createActionButtons()
     m_actionLayout->addWidget(m_betButton);
     m_actionLayout->addWidget(m_raiseButton);
     m_actionLayout->addWidget(m_allInButton);
-}
-
-// Unified style helpers
-QString PokerTableWindow::defaultPlayerGroupStyle() const
-{
-    return QString("QGroupBox {"
-                   "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-                   "    stop: 0 #ffffff, stop: 0.5 #f8f9fa, stop: 1 #e9ecef);"
-                   "  border: 2px solid #dee2e6;"
-                   "  border-radius: 10px;"
-                   "  margin-top: 8px;"
-                   "  color: #495057;"
-                   "  font-weight: 600;"
-                   "  font-size: 12px;"
-                   "}"
-                   "QGroupBox:title {"
-                   "  subcontrol-origin: margin;"
-                   "  left: 8px;"
-                   "  padding: 0 4px 0 4px;"
-                   "}");
-}
-
-QString PokerTableWindow::activePlayerGroupStyle() const
-{
-    return QString("QGroupBox {"
-                   "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-                   "    stop: 0 #e8f4fd, stop: 0.5 #e3f2fd, stop: 1 #bbdefb);"
-                   "  border: 3px solid #1976d2;"
-                   "  border-radius: 12px;"
-                   "  margin-top: 8px;"
-                   "  color: #0d47a1;"
-                   "  font-weight: bold;"
-                   "}"
-                   "QGroupBox:title {"
-                   "  subcontrol-origin: margin;"
-                   "  left: 8px;"
-                   "  padding: 0 4px 0 4px;"
-                   "  color: #0d47a1;"
-                   "  font-weight: bold;"
-                   "}");
-}
-
-QString PokerTableWindow::currentActionLabelStyleBase() const
-{
-    return QString("QLabel {"
-                   "  color: #1f3044;"
-                   "  font-size: 14px;"
-                   "  font-weight: 700;"
-                   "  border: 1px solid #cbd5e1;"
-                   "  border-radius: 6px;"
-                   "  background: rgba(255,255,255,0.9);"
-                   "  padding: 4px 6px;"
-                   "}");
-}
-
-QString PokerTableWindow::currentActionLabelStyleFor(const QString& action) const
-{
-    QString base = currentActionLabelStyleBase();
-    // For folds, keep neutral styling but make it italic and not bold
-    if (action.compare("folded", Qt::CaseInsensitive) == 0 || action.compare("FOLD", Qt::CaseInsensitive) == 0)
-    {
-        return QString("QLabel {"
-                       "  color: #1f3044;"
-                       "  font-size: 14px;"
-                       "  font-style: italic;"
-                       "  font-weight: 400;"
-                       "  border: 1px solid #cbd5e1;"
-                       "  border-radius: 6px;"
-                       "  background: rgba(255,255,255,0.9);"
-                       "  padding: 4px 6px;"
-                       "}");
-    }
-    if (action.compare("CALL", Qt::CaseInsensitive) == 0 || action.compare("CHECK", Qt::CaseInsensitive) == 0)
-    {
-        return base + " QLabel { color: #1b5e20; border-color: #c8e6c9; background: #e8f5e9; }";
-    }
-    if (action.compare("BET", Qt::CaseInsensitive) == 0 || action.compare("RAISE", Qt::CaseInsensitive) == 0 ||
-        action.contains("ALL", Qt::CaseInsensitive))
-    {
-        return base + " QLabel { color: #0d47a1; border-color: #bbdefb; background: #e3f2fd; }";
-    }
-    return base;
 }
 
 void PokerTableWindow::createBettingControls()
@@ -710,51 +497,36 @@ void PokerTableWindow::refreshPot(int amount)
 
 void PokerTableWindow::refreshPlayer(int seat, const pkt::core::player::Player& player)
 {
-    if (seat < 0 || seat >= m_maxPlayers)
+    if (seat < 0 || seat >= m_maxPlayers || !m_playerPanels[seat])
         return;
 
-    // All players (including human at seat 0) are now in m_playerComponents
-    auto& playerUI = m_playerComponents[seat];
-
-    // Show player area
-    playerUI.playerGroup->setVisible(true);
-
-    // Title contains name and chips near the name line: e.g., "Bot1  chips = 125"
-    QString prefix = playerUI.isHuman ? "You" : QString("Bot %1").arg(seat);
-    const QString displayName = QString("%1").arg(playerUI.isHuman ? prefix : prefix);
-    playerUI.playerGroup->setTitle(QString("%1  chips = %2").arg(displayName).arg(player.getCash()));
+    // Show player panel
+    m_playerPanels[seat]->setVisible(true);
+    m_playerPanels[seat]->updateChips(player.getCash());
 }
 
 void PokerTableWindow::updatePlayerCash(unsigned playerId, int newChips)
 {
-    if (playerId >= m_playerComponents.size())
+    if (playerId >= static_cast<unsigned>(m_playerPanels.size()) || !m_playerPanels[playerId])
         return;
-    auto& ui = m_playerComponents[playerId];
-    if (!ui.playerGroup)
-        return;
-    const QString prefix = ui.isHuman ? "You" : QString("Bot %1").arg(playerId);
-    ui.playerGroup->setTitle(QString("%1  chips = %2").arg(prefix).arg(newChips));
+    
+    m_playerPanels[playerId]->updateChips(newChips);
 }
 
 void PokerTableWindow::showHoleCards(int seat, const pkt::core::HoleCards& holeCards)
 {
-    if (seat < 0 || seat >= m_maxPlayers)
+    if (seat < 0 || seat >= m_maxPlayers || !m_playerPanels[seat])
         return;
 
-    // All players (including human at seat 0) are now in m_playerComponents
-    auto& playerUI = m_playerComponents[seat];
-
-    if (holeCards.isValid() && !playerUI.isFolded)
+    if (holeCards.isValid())
     {
-        playerUI.holeCard1->setPixmap(getCardPixmap(holeCards.card1));
-        playerUI.holeCard2->setPixmap(getCardPixmap(holeCards.card2));
+        m_playerPanels[seat]->showHoleCards(holeCards);
         // Cache for potential showdown reveal
         cacheHoleCards(seat, holeCards);
     }
     else
     {
-        playerUI.holeCard1->setPixmap(getCardBackPixmap());
-        playerUI.holeCard2->setPixmap(getCardBackPixmap());
+        m_playerPanels[seat]->hideHoleCards();
     }
 }
 
@@ -831,25 +603,22 @@ void PokerTableWindow::updateGamePhase(pkt::core::GameState gameState)
 
 void PokerTableWindow::clearActionLabelsForNewRound()
 {
-    for (auto& p : m_playerComponents)
+    for (auto* panel : m_playerPanels)
     {
         // Keep 'folded' text visible across rounds; clear others
-        if (p.currentActionLabel && !p.isFolded)
+        if (panel && !panel->isFolded())
         {
-            p.currentActionLabel->clear();
+            panel->clearAction();
         }
     }
 }
 
 void PokerTableWindow::clearPlayerActionLabel(int playerId)
 {
-    if (playerId < 0 || playerId >= m_maxPlayers)
+    if (playerId < 0 || playerId >= m_maxPlayers || !m_playerPanels[playerId])
         return;
-    auto& ui = m_playerComponents[playerId];
-    if (ui.currentActionLabel)
-    {
-        ui.currentActionLabel->clear();
-    }
+    
+    m_playerPanels[playerId]->clearAction();
 }
 
 void PokerTableWindow::updatePlayerStatus(int playerId, const QString& status)
@@ -933,60 +702,16 @@ void PokerTableWindow::enablePlayerInput(bool enabled)
 // Structured UI updates (no string parsing)
 void PokerTableWindow::showPlayerAction(int playerId, pkt::core::ActionType action, int amount)
 {
-    if (playerId < 0 || playerId >= m_maxPlayers)
+    if (playerId < 0 || playerId >= m_maxPlayers || !m_playerPanels[playerId])
         return;
-    auto& ui = m_playerComponents[playerId];
-
-    QString text;
-    switch (action)
-    {
-    case pkt::core::ActionType::Fold:
-        text = "folded";
-        applyFoldVisual(playerId, true);
-        break;
-    case pkt::core::ActionType::Check:
-        text = "CHECK";
-        break;
-    case pkt::core::ActionType::Call:
-        text = "CALL";
-        break;
-    case pkt::core::ActionType::Bet:
-        text = amount > 0 ? QString("BET %1").arg(amount) : "BET";
-        break;
-    case pkt::core::ActionType::Raise:
-        text = amount > 0 ? QString("RAISE %1").arg(amount) : "RAISE";
-        break;
-    case pkt::core::ActionType::Allin:
-        text = "ALL-IN";
-        break;
-    case pkt::core::ActionType::PostSmallBlind:
-        text = amount > 0 ? QString("SB %1").arg(amount) : "SB";
-        break;
-    case pkt::core::ActionType::PostBigBlind:
-        text = amount > 0 ? QString("BB %1").arg(amount) : "BB";
-        break;
-    default:
-        text = QString::fromUtf8(actionTypeToString(action)).toUpper();
-        break;
-    }
-
-    if (ui.currentActionLabel)
-    {
-        ui.currentActionLabel->setText(text);
-        ui.currentActionLabel->setStyleSheet(currentActionLabelStyleFor(text));
-    }
-
-    // Also refresh cash after an action (amount may be relevant depending on action type)
-    // The authoritative cash is in the Player model; expect controller to call refreshPlayer as state changes.
-    // As a fallback, if bet/raise/all-in, we can force a UI refresh from session if provided, otherwise do nothing
-    // here.
+    
+    m_playerPanels[playerId]->showAction(action, amount);
 }
 
 void PokerTableWindow::showPlayerTurn(int playerId)
 {
     if (playerId < 0 || playerId >= m_maxPlayers)
         return;
-    auto& ui = m_playerComponents[playerId];
     // Do NOT overwrite the player's last action during the betting round.
     // We only indicate turn via highlighting to keep last action visible.
     setActivePlayer(playerId);
@@ -1021,23 +746,13 @@ void PokerTableWindow::resetForNewHand()
     pkt::core::BoardCards emptyBoard; // Default constructor creates preflop state (0 cards)
     showBoardCards(emptyBoard);
 
-    // Reset all player hole cards to card backs
-    for (int i = 0; i < static_cast<int>(m_playerComponents.size()); ++i)
+    // Reset all player panels
+    for (auto* panel : m_playerPanels)
     {
-        auto& player = m_playerComponents[i];
-        if (player.holeCard1 && player.holeCard2)
+        if (panel)
         {
-            player.holeCard1->setPixmap(getCardBackPixmap());
-            player.holeCard2->setPixmap(getCardBackPixmap());
+            panel->reset();
         }
-        // Preserve last action label until the next betting round starts.
-        // clearActionLabelsForNewRound() will clear them on GameState change.
-        if (player.winnerLabel)
-        {
-            player.winnerLabel->clear();
-            player.winnerLabel->setVisible(false);
-        }
-        applyFoldVisual(i, false);
     }
 
     // Reset showdown flags and caches
@@ -1054,14 +769,7 @@ void PokerTableWindow::resetForNewHand()
     // Clear player highlights
     clearPlayerHighlights();
 
-    // Hide dealer indicator until blinds are posted for the new hand
-    for (auto& player : m_playerComponents)
-    {
-        if (player.dealerButton)
-        {
-            player.dealerButton->setVisible(false);
-        }
-    }
+    // Hide dealer indicators
     m_dealerPosition = -1;
 
     // Reset pot display
@@ -1080,22 +788,10 @@ void PokerTableWindow::showWinners(const std::list<unsigned>& winnerIds, int tot
     const bool isSplit = winnerIds.size() > 1;
     for (unsigned id : winnerIds)
     {
-        if (id < m_playerComponents.size())
+        if (id < m_playerPanels.size() && m_playerPanels[id])
         {
-            auto& player = m_playerComponents[id];
-            if (player.winnerLabel)
-            {
-                if (isSplit)
-                {
-                    // Avoid implying the full pot went to each; indicate split
-                    player.winnerLabel->setText("WINNER (split)");
-                }
-                else
-                {
-                    player.winnerLabel->setText(QString("WINNER +%1").arg(totalPot));
-                }
-                player.winnerLabel->setVisible(true);
-            }
+            m_playerPanels[id]->showWinner(true);
+            
             // If we reached showdown (not everyone folded), reveal the winner's hole cards
             if ((m_reachedShowdown || m_sawRiver || isSplit) && id < m_cachedHoleCards.size())
             {
@@ -1114,37 +810,16 @@ void PokerTableWindow::revealShowdownOrder(const std::vector<unsigned>& revealOr
     // Reveal strictly according to engine-provided order. Use cached hole cards.
     for (unsigned id : revealOrder)
     {
-        if (id < m_playerComponents.size() && id < m_cachedHoleCards.size())
+        if (id < m_playerPanels.size() && m_playerPanels[id] && id < m_cachedHoleCards.size())
         {
-            auto& ui = m_playerComponents[id];
             const auto& hc = m_cachedHoleCards[id];
-            if (!ui.isFolded && hc.isValid())
+            if (!m_playerPanels[id]->isFolded() && hc.isValid())
             {
                 showHoleCards(static_cast<int>(id), hc);
             }
         }
         // slight UI pacing to make reveal readable
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1);
-    }
-}
-
-void PokerTableWindow::applyFoldVisual(int seat, bool folded)
-{
-    if (seat < 0 || seat >= m_maxPlayers)
-        return;
-    auto& p = m_playerComponents[seat];
-    p.isFolded = folded;
-    if (p.card1OpacityEffect && p.card2OpacityEffect)
-    {
-        p.card1OpacityEffect->setOpacity(folded ? 0.35 : 1.0);
-        p.card2OpacityEffect->setOpacity(folded ? 0.35 : 1.0);
-    }
-    if (folded)
-    {
-        if (p.holeCard1)
-            p.holeCard1->setPixmap(getCardBackPixmap());
-        if (p.holeCard2)
-            p.holeCard2->setPixmap(getCardBackPixmap());
     }
 }
 
@@ -1196,17 +871,17 @@ void PokerTableWindow::positionPlayersInCircle()
     int cy = std::clamp(center.y(), minCy, std::max(minCy, maxCy));
     center.setY(cy);
 
-    // Position all player areas in a circle
+    // Position all player panels in a circle
     for (int i = 0; i < m_maxPlayers; ++i)
     {
-        auto& player = m_playerComponents[i];
-        if (!player.playerGroup)
+        auto* panel = m_playerPanels[i];
+        if (!panel)
             continue;
 
         QPoint position = calculateCircularPosition(i, m_maxPlayers, center, radius);
-        player.playerGroup->move(position);
-        player.playerGroup->show();  // Ensure widget is visible
-        player.playerGroup->raise(); // Bring to front
+        panel->move(position);
+        panel->show();  // Ensure widget is visible
+        panel->raise(); // Bring to front
     }
 
     // After moving player groups, reposition dealer badges to sit on the border
@@ -1351,21 +1026,22 @@ void PokerTableWindow::positionCenterArea()
 
 void PokerTableWindow::positionDealerButtons()
 {
-    // Place the dealer "D" badge at the bottom-right corner, slightly overlapping the QGroupBox border
-    for (auto& p : m_playerComponents)
+    // Place the dealer "D" badge at the bottom-right corner, slightly overlapping the panel border
+    for (auto* panel : m_playerPanels)
     {
-        if (!p.playerGroup || !p.dealerButton || !p.dealerButton->isVisible())
+        if (!panel || !panel->dealerButton() || !panel->dealerButton()->isVisible())
             continue;
-        const QWidget* g = p.playerGroup;
-        // Coordinates relative to parent (PokerTableWindow), since dealerButton parent is this
-        const QPoint groupTopLeft = g->pos();
-        const int badgeW = p.dealerButton->width();
-        const int badgeH = p.dealerButton->height();
+        
+        QLabel* badge = panel->dealerButton();
+        // Coordinates relative to parent (PokerTableWindow)
+        const QPoint panelTopLeft = panel->pos();
+        const int badgeW = badge->width();
+        const int badgeH = badge->height();
         // Bottom-right corner with a small overlap
-        const int x = groupTopLeft.x() + g->width() - badgeW + 4;  // overlap 4px outside on X
-        const int y = groupTopLeft.y() + g->height() - badgeH + 4; // overlap 4px outside on Y
-        p.dealerButton->move(x, y);
-        p.dealerButton->raise();
+        const int x = panelTopLeft.x() + panel->width() - badgeW + 4;  // overlap 4px outside on X
+        const int y = panelTopLeft.y() + panel->height() - badgeH + 4; // overlap 4px outside on Y
+        badge->move(x, y);
+        badge->raise();
     }
 }
 
@@ -1427,40 +1103,31 @@ void PokerTableWindow::setActivePlayer(int playerId)
     m_activePlayerId = playerId;
 
     // Highlight the active player
-    if (playerId >= 0 && playerId < static_cast<int>(m_playerComponents.size()))
+    if (playerId >= 0 && playerId < static_cast<int>(m_playerPanels.size()) && m_playerPanels[playerId])
     {
-        auto& player = m_playerComponents[playerId];
-        if (player.playerGroup)
-        {
-            // Apply unified active player styling
-            player.playerGroup->setStyleSheet(activePlayerGroupStyle());
-        }
+        m_playerPanels[playerId]->setActive(true);
     }
 }
 
 void PokerTableWindow::setDealerPosition(int playerId)
 {
     // Hide all dealer buttons first
-    for (auto& player : m_playerComponents)
+    for (auto* panel : m_playerPanels)
     {
-        if (player.dealerButton)
+        if (panel)
         {
-            player.dealerButton->setVisible(false);
+            panel->setDealer(false);
         }
     }
 
     m_dealerPosition = playerId;
 
     // Show dealer button for the specified player
-    if (playerId >= 0 && playerId < static_cast<int>(m_playerComponents.size()))
+    if (playerId >= 0 && playerId < static_cast<int>(m_playerPanels.size()) && m_playerPanels[playerId])
     {
-        auto& player = m_playerComponents[playerId];
-        if (player.dealerButton)
-        {
-            player.dealerButton->setVisible(true);
-            // Immediately position it over the border
-            positionDealerButtons();
-        }
+        m_playerPanels[playerId]->setDealer(true);
+        // Immediately position it over the border
+        positionDealerButtons();
     }
 }
 
@@ -1493,13 +1160,11 @@ void PokerTableWindow::resetBetControls()
 void PokerTableWindow::clearPlayerHighlights()
 {
     // Reset all players to their default styling
-    for (size_t i = 0; i < m_playerComponents.size(); ++i)
+    for (auto* panel : m_playerPanels)
     {
-        auto& player = m_playerComponents[i];
-        if (player.playerGroup)
+        if (panel)
         {
-            // Restore unified default styling
-            player.playerGroup->setStyleSheet(defaultPlayerGroupStyle());
+            panel->setActive(false);
         }
     }
 
