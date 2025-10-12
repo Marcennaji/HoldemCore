@@ -76,8 +76,7 @@ Detailed explanation and diagrams:
 
 ## 📈 Next steps
 
-- 🎨 Refactor and improve the existing Qt Widgets UI (desktop application)
-- 🧠 Add QML front-end prototype (mobile)
+- 🧠 Add QML front-end (mobile)
 
 ---
 

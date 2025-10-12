@@ -75,7 +75,6 @@ Explications et diagrammes détaillés :
 
 ## 📈 Prochaines étapes
 
-- 🎨 Refactorer et améliorer l'UI Qt Widgets existante (application desktop)  
 - 🧠 Développer une interface Qt Quick (QML) pour mobile
 
 ---

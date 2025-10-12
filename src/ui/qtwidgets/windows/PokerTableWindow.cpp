@@ -113,8 +113,8 @@ void PokerTableWindow::setupUi()
     m_boardArea = new BoardArea(this);
     positionBoardArea();
     
-    createActionButtons();
-    createBettingControls();
+    // Create action bar
+    m_actionBar = new ActionBar(this);
 
     // Create Next Hand button
     m_nextHandButton = new QPushButton("Next Hand", this);
@@ -152,12 +152,8 @@ void PokerTableWindow::setupUi()
     // Add stretch space to push action controls to bottom
     m_mainLayout->addStretch();
 
-    // Create a horizontal layout for actions and betting controls side by side
-    auto actionBettingLayout = new QHBoxLayout();
-    actionBettingLayout->addWidget(m_actionGroup);
-    actionBettingLayout->addWidget(m_bettingGroup);
-
-    m_mainLayout->addLayout(actionBettingLayout);
+    // Add action bar
+    m_mainLayout->addWidget(m_actionBar);
 
     // Add Next Hand button (centered)
     auto nextHandLayout = new QHBoxLayout();
@@ -205,228 +201,44 @@ void PokerTableWindow::createPlayerAreas()
     }
 }
 
-void PokerTableWindow::createActionButtons()
-{
-    m_actionGroup = new QGroupBox("Actions", this);
-    m_actionGroup->setStyleSheet("QGroupBox {"
-                                 "  background-color: #f8fafc;"
-                                 "  border: 1.5px solid #b0b0b0;"
-                                 "  border-radius: 8px;"
-                                 "  margin-top: 10px;"
-                                 "  color: #333;"
-                                 "  font-weight: normal;"
-                                 "}"
-                                 "QGroupBox:title {"
-                                 "  subcontrol-origin: margin;"
-                                 "  left: 10px;"
-                                 "  padding: 0 3px 0 3px;"
-                                 "}");
-    m_actionLayout = new QHBoxLayout(m_actionGroup);
-
-    m_foldButton = new QPushButton("Fold", this);
-    m_callButton = new QPushButton("Call", this);
-    m_checkButton = new QPushButton("Check", this);
-    m_betButton = new QPushButton("Bet", this);
-    m_raiseButton = new QPushButton("Raise", this);
-    m_allInButton = new QPushButton("All-In", this);
-
-    // Unified, sober light style for all action buttons
-    QString unifiedBtnStyle = "QPushButton {"
-                              "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-                              "    stop: 0 #ffffff, stop: 1 #f1f3f5);"
-                              "  border: 2px solid #dee2e6;"
-                              "  border-radius: 10px;"
-                              "  padding: 12px 18px;"
-                              "  color: #2c3e50;"
-                              "  font-size: 14px;"
-                              "  font-weight: 600;"
-                              "  min-width: 88px;"
-                              "}"
-                              "QPushButton:hover {"
-                              "  background: #f8f9fa;"
-                              "  border-color: #adb5bd;"
-                              "}"
-                              "QPushButton:pressed {"
-                              "  background: #e9ecef;"
-                              "}"
-                              "QPushButton:disabled {"
-                              "  background: #f1f3f5;"
-                              "  color: #a1a1a1;"
-                              "  border-color: #e9ecef;"
-                              "}";
-
-    m_foldButton->setStyleSheet(unifiedBtnStyle);
-    m_callButton->setStyleSheet(unifiedBtnStyle);
-    m_checkButton->setStyleSheet(unifiedBtnStyle);
-    m_betButton->setStyleSheet(unifiedBtnStyle);
-    m_raiseButton->setStyleSheet(unifiedBtnStyle);
-    m_allInButton->setStyleSheet(unifiedBtnStyle);
-
-    m_actionLayout->addWidget(m_foldButton);
-    m_actionLayout->addWidget(m_callButton);
-    m_actionLayout->addWidget(m_checkButton);
-    m_actionLayout->addWidget(m_betButton);
-    m_actionLayout->addWidget(m_raiseButton);
-    m_actionLayout->addWidget(m_allInButton);
-}
-
-void PokerTableWindow::createBettingControls()
-{
-    m_bettingGroup = new QGroupBox("Betting Amount", this);
-    m_bettingGroup->setStyleSheet("QGroupBox {"
-                                  "  background-color: #f8fafc;"
-                                  "  border: 1px solid #b0b0b0;"
-                                  "  border-radius: 8px;"
-                                  "  margin-top: 10px;"
-                                  "  color: #333;"
-                                  "  font-weight: normal;"
-                                  "}"
-                                  "QGroupBox:title {"
-                                  "  subcontrol-origin: margin;"
-                                  "  left: 10px;"
-                                  "  padding: 0 3px 0 3px;"
-                                  "}");
-    m_bettingLayout = new QHBoxLayout(m_bettingGroup);
-
-    m_betAmountLabel = new QLabel("Amount: $0", this);
-    m_betSlider = new QSlider(Qt::Horizontal, this);
-    m_betSpinBox = new QSpinBox(this);
-
-    m_betAmountLabel->setStyleSheet("color: #495057; font-size: 14px;");
-
-    m_betSlider->setMinimum(0);
-    m_betSlider->setMaximum(1000);
-    m_betSlider->setValue(0);
-    m_betSlider->setMinimumWidth(200); // Ensure adequate width for usability
-
-    m_betSpinBox->setMinimum(0);
-    m_betSpinBox->setMaximum(10000);
-    m_betSpinBox->setValue(0);
-    m_betSpinBox->setMinimumWidth(80); // Ensure adequate width
-
-    m_bettingLayout->addWidget(m_betAmountLabel);
-    m_bettingLayout->addWidget(m_betSlider);
-    m_bettingLayout->addWidget(m_betSpinBox);
-
-    // Set proportional sizing - action buttons take more space
-    m_bettingGroup->setMaximumWidth(350); // Limit betting area width
-    m_bettingGroup->setEnabled(false);
-
-    // Enhanced betting controls styling (sober, light)
-    QString sliderStyle = "QSlider::groove:horizontal {"
-                          "  border: 1px solid #ced4da;"
-                          "  height: 10px;"
-                          "  background: #f1f3f5;"
-                          "  border-radius: 5px;"
-                          "}"
-                          "QSlider::handle:horizontal {"
-                          "  background: #adb5bd;"
-                          "  border: 1px solid #868e96;"
-                          "  width: 18px;"
-                          "  margin: -6px 0;"
-                          "  border-radius: 9px;"
-                          "}"
-                          "QSlider::handle:horizontal:hover {"
-                          "  background: #868e96;"
-                          "}";
-
-    QString spinBoxStyle = "QSpinBox {"
-                           "  background-color: #ffffff;"
-                           "  border: 1px solid #ced4da;"
-                           "  border-radius: 6px;"
-                           "  padding: 6px;"
-                           "  color: #343a40;"
-                           "  font-size: 14px;"
-                           "  min-width: 100px;"
-                           "}"
-                           "QSpinBox:focus {"
-                           "  border: 1px solid #adb5bd;"
-                           "}"
-                           "QSpinBox::up-button, QSpinBox::down-button {"
-                           "  background: #f1f3f5;"
-                           "  border: 1px solid #ced4da;"
-                           "  width: 18px;"
-                           "}"
-                           "QSpinBox::up-button:hover, QSpinBox::down-button:hover {"
-                           "  background: #e9ecef;"
-                           "}";
-
-    m_betSlider->setStyleSheet(sliderStyle);
-    m_betSpinBox->setStyleSheet(spinBoxStyle);
-}
-
 void PokerTableWindow::connectSignals()
 {
-    // Connect button clicks to emit signals
-    connect(m_foldButton, &QPushButton::clicked, this, &PokerTableWindow::foldClicked);
-    connect(m_callButton, &QPushButton::clicked, this, &PokerTableWindow::callClicked);
-    connect(m_checkButton, &QPushButton::clicked, this, &PokerTableWindow::checkClicked);
-    connect(m_allInButton, &QPushButton::clicked, this, &PokerTableWindow::allInClicked);
-    // Also reset bet controls after any action click
-    connect(m_foldButton, &QPushButton::clicked, this, [this]() { resetBetControls(); });
-    connect(m_callButton, &QPushButton::clicked, this, [this]() { resetBetControls(); });
-    connect(m_checkButton, &QPushButton::clicked, this, [this]() { resetBetControls(); });
-    connect(m_allInButton, &QPushButton::clicked, this, [this]() { resetBetControls(); });
+    // Connect ActionBar signals to window signals
+    connect(m_actionBar, &ActionBar::foldClicked, this, &PokerTableWindow::foldClicked);
+    connect(m_actionBar, &ActionBar::callClicked, this, &PokerTableWindow::callClicked);
+    connect(m_actionBar, &ActionBar::checkClicked, this, &PokerTableWindow::checkClicked);
+    connect(m_actionBar, &ActionBar::allInClicked, this, &PokerTableWindow::allInClicked);
+    connect(m_actionBar, &ActionBar::betClicked, this, &PokerTableWindow::onRaiseAction);
+    connect(m_actionBar, &ActionBar::raiseClicked, this, &PokerTableWindow::onRaiseAction);
 
-    // Connect bet/raise buttons to onRaiseAction slot
-    connect(m_betButton, &QPushButton::clicked, this, &PokerTableWindow::onRaiseAction);
-    connect(m_raiseButton, &QPushButton::clicked, this, &PokerTableWindow::onRaiseAction);
+    // Reset bet controls after simple actions
+    connect(m_actionBar, &ActionBar::foldClicked, m_actionBar, &ActionBar::resetBetControls);
+    connect(m_actionBar, &ActionBar::callClicked, m_actionBar, &ActionBar::resetBetControls);
+    connect(m_actionBar, &ActionBar::checkClicked, m_actionBar, &ActionBar::resetBetControls);
+    connect(m_actionBar, &ActionBar::allInClicked, m_actionBar, &ActionBar::resetBetControls);
 
     // Connect Next Hand button
     connect(m_nextHandButton, &QPushButton::clicked, this, &PokerTableWindow::onNextHandClicked);
-
-    // Connect betting controls
-    connect(m_betSlider, &QSlider::valueChanged, this, &PokerTableWindow::onBetAmountChanged);
-    connect(m_betSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &PokerTableWindow::onBetAmountChanged);
-
-    // Enable all buttons initially for testing
-    m_foldButton->setEnabled(true);
-    m_callButton->setEnabled(true);
-    m_checkButton->setEnabled(true);
-    m_betButton->setEnabled(true);
-    m_raiseButton->setEnabled(true);
-    m_allInButton->setEnabled(true);
 }
 
 // Slot implementations
-void PokerTableWindow::onBetAmountChanged(int amount)
-{
-    // Sync slider and spinbox
-    if (sender() == m_betSlider)
-    {
-        m_betSpinBox->setValue(amount);
-    }
-    else if (sender() == m_betSpinBox)
-    {
-        m_betSlider->setValue(amount);
-    }
-
-    m_betAmountLabel->setText(QString("Amount: $%1").arg(amount));
-}
-
 void PokerTableWindow::onRaiseAction()
 {
-    int amount = m_betSpinBox->value();
-    if (sender() == m_betButton)
-    {
-        emit betClicked(amount);
-    }
-    else
-    {
-        emit raiseClicked(amount);
-    }
-    // Reset the betting controls after action
-    resetBetControls();
+    // Get the bet amount from ActionBar
+    int raiseAmount = m_actionBar->getBetValue();
+    emit betClicked(raiseAmount);
+    emit raiseClicked(raiseAmount);
+    m_actionBar->resetBetControls();
 }
 
 void PokerTableWindow::onNextHandClicked()
 {
-    // Hide the Next Hand button and show action buttons
+    // Hide the Next Hand button and show action bar
     m_nextHandButton->setVisible(false);
-    m_actionGroup->setVisible(true);
-    m_bettingGroup->setVisible(true);
-    // m_statusLabel->setText("Starting next hand...");
-    // m_statusLabel->setStyleSheet("color: #2d8659;");
+    if (m_actionBar)
+    {
+        m_actionBar->setVisible(true);
+    }
 
     emit nextHandRequested();
 }
@@ -615,59 +427,48 @@ void PokerTableWindow::showErrorMessage(const QString& message)
 
 void PokerTableWindow::setAvailableActions(const std::vector<pkt::core::ActionType>& actions)
 {
-    // Disable all actions first
-    m_foldButton->setEnabled(false);
-    m_callButton->setEnabled(false);
-    m_checkButton->setEnabled(false);
-    m_betButton->setEnabled(false);
-    m_raiseButton->setEnabled(false);
-    m_allInButton->setEnabled(false);
-    m_bettingGroup->setEnabled(false);
+    if (!m_actionBar)
+        return;
 
-    // Enable available actions
+    // Check which actions are available
+    bool canFold = false, canCall = false, canCheck = false;
+    bool canBet = false, canRaise = false, canAllIn = false;
+
     for (const auto& action : actions)
     {
         switch (action)
         {
         case pkt::core::ActionType::Fold:
-            m_foldButton->setEnabled(true);
+            canFold = true;
             break;
         case pkt::core::ActionType::Call:
-            m_callButton->setEnabled(true);
+            canCall = true;
             break;
         case pkt::core::ActionType::Check:
-            m_checkButton->setEnabled(true);
+            canCheck = true;
             break;
         case pkt::core::ActionType::Bet:
-            m_betButton->setEnabled(true);
-            m_bettingGroup->setEnabled(true);
+            canBet = true;
             break;
         case pkt::core::ActionType::Raise:
-            m_raiseButton->setEnabled(true);
-            m_bettingGroup->setEnabled(true);
+            canRaise = true;
             break;
         case pkt::core::ActionType::Allin:
-            m_allInButton->setEnabled(true);
+            canAllIn = true;
             break;
         default:
             break;
         }
     }
+
+    m_actionBar->setAvailableActions(canFold, canCall, canCheck, canBet, canRaise, canAllIn);
 }
 
 void PokerTableWindow::enablePlayerInput(bool enabled)
 {
-    m_actionGroup->setEnabled(enabled);
-    if (!enabled)
+    if (m_actionBar)
     {
-        m_bettingGroup->setEnabled(false);
-        // m_statusLabel->setText("Waiting for other players...");
-        // m_statusLabel->setStyleSheet("color: blue;");
-    }
-    else
-    {
-        // m_statusLabel->setText("Your turn - choose an action");
-        // m_statusLabel->setStyleSheet("color: green;");
+        m_actionBar->enableInput(enabled);
     }
 }
 
@@ -694,9 +495,11 @@ void PokerTableWindow::onHandCompleted()
     // Show the Next Hand button when a hand is completed
     m_nextHandButton->setVisible(true);
 
-    // Hide action buttons during hand completion
-    m_actionGroup->setVisible(false);
-    m_bettingGroup->setVisible(false);
+    // Hide action bar during hand completion
+    if (m_actionBar)
+    {
+        m_actionBar->setVisible(false);
+    }
 
     // Update status to indicate hand is complete
     // m_statusLabel->setText("Hand completed! Click 'Next Hand' to continue.");
@@ -710,9 +513,11 @@ void PokerTableWindow::resetForNewHand()
     // Hide the Next Hand button
     m_nextHandButton->setVisible(false);
 
-    // Show action buttons for the new hand
-    m_actionGroup->setVisible(true);
-    m_bettingGroup->setVisible(true);
+    // Show action bar for the new hand
+    if (m_actionBar)
+    {
+        m_actionBar->setVisible(true);
+    }
 
     // Explicitly clear board cards using the same method as game events
     pkt::core::BoardCards emptyBoard; // Default constructor creates preflop state (0 cards)
@@ -976,14 +781,13 @@ void PokerTableWindow::showEvent(QShowEvent* event)
 
 int PokerTableWindow::reservedBottomHeight() const
 {
-    // Reserve enough vertical space to fit: action group, betting group, and next hand button rows.
+    // Reserve enough vertical space to fit: action bar and next hand button rows.
     // If widgets exist, use their size hints; otherwise fall back to conservative defaults.
-    int actionH = m_actionGroup ? m_actionGroup->sizeHint().height() : 70;
-    int bettingH = m_bettingGroup ? m_bettingGroup->sizeHint().height() : 60;
+    int actionBarH = m_actionBar ? m_actionBar->sizeHint().height() : 100;
     int nextHandH = m_nextHandButton ? (m_nextHandButton->sizeHint().height() + 12) : 40;
     // Include some padding and layout spacing
     int padding = 24; // extra gap between human cards and controls
-    return actionH + bettingH + nextHandH + padding;
+    return actionBarH + nextHandH + padding;
 }
 
 // Player state indicator implementations
@@ -1037,16 +841,6 @@ void PokerTableWindow::setDealerFromSmallBlind(int smallBlindId)
             dealerId = m_maxPlayers - 1;
     }
     setDealerPosition(dealerId);
-}
-
-void PokerTableWindow::resetBetControls()
-{
-    if (m_betSlider)
-        m_betSlider->setValue(0);
-    if (m_betSpinBox)
-        m_betSpinBox->setValue(0);
-    if (m_betAmountLabel)
-        m_betAmountLabel->setText("Amount: $0");
 }
 
 void PokerTableWindow::clearPlayerHighlights()

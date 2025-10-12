@@ -28,8 +28,10 @@
 #include "core/engine/model/PlayerAction.h"
 #include "core/player/Player.h"
 #include "core/session/Session.h"
+#include "core/engine/EngineDefs.h"
 #include "ui/qtwidgets/widgets/PlayerPanel.h"
 #include "ui/qtwidgets/widgets/BoardArea.h"
+#include "ui/qtwidgets/widgets/ActionBar.h"
 
 namespace pkt::core
 {
@@ -121,7 +123,6 @@ class PokerTableWindow : public QWidget
   void windowClosed();       // Emitted when the table window is closed by the user
 
   private slots:
-    void onBetAmountChanged(int amount);
     void onRaiseAction();
     void onNextHandClicked();  // Slot for Next Hand button click
 
@@ -134,8 +135,6 @@ class PokerTableWindow : public QWidget
     void setupUi();
     void connectSignals();
     void createPlayerAreas();
-    void createActionButtons();
-    void createBettingControls();
     // Compute the vertical space reserved at the bottom for controls
     int reservedBottomHeight() const;
     
@@ -169,22 +168,8 @@ class PokerTableWindow : public QWidget
     // Board area for pot, phase, and community cards
     BoardArea* m_boardArea = nullptr;
 
-    // Action controls
-  QGroupBox* m_actionGroup = nullptr;
-  QHBoxLayout* m_actionLayout = nullptr;
-  QPushButton* m_foldButton = nullptr;
-  QPushButton* m_callButton = nullptr;
-  QPushButton* m_checkButton = nullptr;
-  QPushButton* m_betButton = nullptr;
-  QPushButton* m_raiseButton = nullptr;
-  QPushButton* m_allInButton = nullptr;
-    
-    // Betting controls
-  QGroupBox* m_bettingGroup = nullptr;
-  QHBoxLayout* m_bettingLayout = nullptr;
-  QSlider* m_betSlider = nullptr;
-  QSpinBox* m_betSpinBox = nullptr;
-  QLabel* m_betAmountLabel = nullptr;
+    // Action bar for buttons and betting controls
+    ActionBar* m_actionBar = nullptr;
     
     // Next hand control
   QPushButton* m_nextHandButton = nullptr;
