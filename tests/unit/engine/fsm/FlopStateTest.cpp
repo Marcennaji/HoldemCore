@@ -238,8 +238,9 @@ TEST_F(FlopStateTest, AllInCallScenarioOnFlop)
 
     m_hand->handlePlayerAction({playerBb->getId(), ActionType::Call});
 
-    // Both players are all-in, but should advance to Turn first (not skip directly to PostRiver)
-    EXPECT_EQ(m_lastGameState, Turn);
+    // Both players are all-in with no more betting possible, so all remaining cards are dealt
+    // and the hand advances directly to PostRiver (showdown) state
+    EXPECT_EQ(m_lastGameState, PostRiver);
 }
 
 TEST_F(FlopStateTest, BetFoldScenarioOnFlop)
