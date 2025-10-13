@@ -50,6 +50,9 @@ cmake --build build/debug-widgets
 Detailed explanation and diagrams:  
 👉 [ARCHITECTURE.md](doc/ARCHITECTURE.md)
 
+**Architecture Quality:**  
+📋 [Independent SOLID & Hexagonal Architecture Review](doc/ARCHITECTURE_REVIEW.md) — Systematic analysis confirming zero significant architectural issues.
+
 <p align="center">
   <img src="doc/architecture.png" alt="Ports & Adapters (hexagonal) architecture Diagram" width="80%">
 </p>

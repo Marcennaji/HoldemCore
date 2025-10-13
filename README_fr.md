@@ -44,10 +44,13 @@ cmake --build build/debug-widgets
 
 ---
 
-## 🏗️ Vue d’ensemble de l’architecture
+## 🏗️ Vue d'ensemble de l'architecture
 
-Explications et diagrammes détaillés :  
+Explications et diagrammes détaillés :  
 👉 [ARCHITECTURE.md](doc/ARCHITECTURE_fr.md)
+
+**Qualité architecturale :**  
+📋 [Revue indépendante SOLID & Architecture Hexagonale](doc/ARCHITECTURE_REVIEW_fr.md) — Analyse systématique confirmant zéro problème architectural significatif.
 
 <p align="center">
   <img src="doc/architecture.png" alt="Diagramme d'architecture hexagonale" width="80%">

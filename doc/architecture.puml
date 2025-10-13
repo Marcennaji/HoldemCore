@@ -5,24 +5,24 @@ skinparam packageStyle rectangle
 skinparam shadowing false
 skinparam componentStyle rectangle
 
-package "Core (Domain)" as Core {
+package "Core (Domain)" as Core #LightYellow {
   [Engine] as Engine
   [GameEvents] as GameEvents
   [Session] as Session
   [EngineFactory] as EngineFactory
-  [Player/Strategy] as PlayerStrategy
+  [Player (Facade)] as Player
   [PlayerFactory] as PlayerFactory
-  [Hand] as Hand
+  [Hand (Facade)] as Hand
   [Interfaces/Ports] as Ports
 }
 
-package "Application (Composition Root)" as App {
+package "Application (Composition Root)" as App #LightBlue {
   [main_qt_widgets.cpp] as Main
   [AppFactory] as AppFactory
   [GuiAppController] as GuiController
 }
 
-package "Infrastructure (Secondary Adapters)" as Infra {
+package "Infrastructure (Secondary Adapters)" as Infra #LightGreen {
   [ConsoleLogger] as ConsoleLogger
   [SqlitePlayersStatisticsStore] as SqliteStore
   [PsimHandEvaluationEngine] as PsimEngine
@@ -30,13 +30,13 @@ package "Infrastructure (Secondary Adapters)" as Infra {
   [SqliteDb] as SqliteDb
 }
 
-package "UI (Primary Adapters)" as UI {
+package "UI (Primary Adapters)" as UI #LightCyan {
   [StartWindow] as StartWindow
   [PokerTableWindow] as TableWindow
   [GuiBridgeWidgets] as Bridge
 }
 
-package "Third-party" as ThirdParty {
+package "Third-party" as ThirdParty #LightGray {
   [SQLite3] as SQLite3
   [psim] as psim
   [Qt6] as Qt6
@@ -50,10 +50,10 @@ Session -[#green]-> EngineFactory : uses
 Session -[#green]-> PlayerFactory : creates
 EngineFactory -[#green]-> Hand : creates
 EngineFactory -[#green]-> Engine : creates
-PlayerFactory -[#green]-> PlayerStrategy : creates
+PlayerFactory -[#green]-> Player : creates
 Engine -[#green]-> Ports : depends on
 Hand -[#green]-> Ports : depends on
-PlayerStrategy -[#green]-> Ports : depends on
+Player -[#green]-> Ports : depends on
 Session -[#green]-> Ports : depends on
 EngineFactory -[#green]-> Ports : depends on
 PlayerFactory -[#green]-> Ports : depends on
@@ -88,7 +88,8 @@ UI -[#gray]-> Qt6 : framework
 note right of Main : Clean Entry Point:\n• No concrete dependencies\n• Delegates to AppFactory\n• Single responsibility
 note right of AppFactory : Composition Root:\n• Creates all concrete adapters\n• Configurable implementations\n• Pure dependency injection\n• Single point of change
 note bottom of Ports : Abstract Interfaces:\n• Logger\n• HandEvaluationEngine\n• PlayersStatisticsStore\n• Randomizer
-note bottom of Core : Pure Domain Logic:\n• Zero infrastructure knowledge\n• All dependencies injected\n• Constructor injection only\n• ISP compliant
+note bottom of Core : Pure Domain Logic:\n• Zero infrastructure knowledge\n• All dependencies injected\n• Constructor injection only\n• Facades coordinate components
+note left of Core : Hand Facade:\nDelegates to 6 managers:\n• HandPlayersManager\n• HandActionHandler\n• HandCardDealer\n• HandCalculator\n• HandStateManager\n• HandLifecycleManager\n\nPlayer Facade:\nDelegates to:\n• PlayerStrategy\n• PlayerStatisticsUpdater\n• RangeEstimator\n• CurrentHandContext
 note left of UI : Primary Adapters:\n• Drive the application\n• User interfaces\n• Trigger use cases
 note right of Infra : Secondary Adapters:\n• Driven by application\n• Implement core interfaces\n• Infrastructure concerns
 

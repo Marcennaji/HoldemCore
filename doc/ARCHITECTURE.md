@@ -1,5 +1,7 @@
 # 🏠 Architecture Overview
 
+> **Architecture Validation:** This architecture has been independently reviewed and validated. See the [SOLID & Hexagonal Architecture Review](ARCHITECTURE_REVIEW.md) for detailed analysis.
+
 ## 1. Architectural Principles
 
 ### Hexagonal Architecture (Ports & Adapters)

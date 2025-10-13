@@ -1,4 +1,6 @@
-# 🏠 Vue d’ensemble de l’architecture
+# 🏠 Vue d'ensemble de l'architecture
+
+> **Validation architecturale :** Cette architecture a été revue et validée de façon indépendante. Voir la [Revue SOLID & Architecture Hexagonale](ARCHITECTURE_REVIEW_fr.md) pour une analyse détaillée.
 
 ## 1. Principes architecturaux
 
