@@ -10,7 +10,7 @@ HoldemCore is a **C++20 Texas Hold’em simulation engine** applying SOLID and H
 The project demonstrates clean modular design, modern dependency management, and continuous refactoring discipline.
 
 - **Core:** pure C++ engine, Qt-free
-- **UI:** Qt Widgets and QML bridges
+- **UI:** Qt Widgets and (soon to come) QML bridges
 - **Tests:** GoogleTest framework (all passing)
 - **Build:** CMake + Clang (cross-platform)
 
@@ -42,8 +42,7 @@ The project demonstrates clean modular design, modern dependency management, and
 - **Exception**: Only inherit directly from `::testing::Test` if using `EngineTest` makes the test significantly more complicated
 - Use `initializeHandWithPlayers()` to set up test hands with players
 - Use `getPlayerById()` helper to retrieve players from seat lists
-- Follow existing test patterns (see `ShowdownRevealOrderTest.cpp`, `PotTest.cpp` as examples)
-- No need for custom `createPlayer()` methods when inheriting from `EngineTest`
+- Follow existing test patterns
 
 ---
 

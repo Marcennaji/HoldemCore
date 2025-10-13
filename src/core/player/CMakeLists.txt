@@ -19,6 +19,8 @@ set(PLAYER_SOURCES
     CurrentHandActions.cpp
     CurrentHandActions.h
     Helpers.h
+    OpponentsStrengthsEvaluator.cpp
+    OpponentsStrengthsEvaluator.h
     
     # Range estimation files
     range/RangeEstimator.cpp

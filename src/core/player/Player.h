@@ -15,6 +15,7 @@
 #include <string>
 #include <typeinfo>
 #include "CurrentHandActions.h"
+#include "OpponentsStrengthsEvaluator.h"
 #include "range/RangeEstimator.h"
 #include "strategy/CurrentHandContext.h"
 
@@ -153,24 +154,28 @@ class Player
     // ========================================
     virtual float calculatePreflopCallingRange(const CurrentHandContext& ctx) const;
     std::unique_ptr<RangeEstimator>& getRangeEstimator() { return m_rangeEstimator; }
+    const std::unique_ptr<RangeEstimator>& getRangeEstimator() const { return m_rangeEstimator; }
+
+    // ========================================
+    // Opponent Strength Evaluation (Delegate to m_opponentsStrengthsEvaluator)
+    // ========================================
+    std::unique_ptr<OpponentsStrengthsEvaluator>& getOpponentsStrengthsEvaluator() { 
+        return m_opponentsStrengthsEvaluator; 
+    }
 
     // ========================================
     // Business Logic Methods (Actual Implementation)
     // ========================================
     bool isInVeryLooseMode(const int nbPlayers) const;
 
-  protected:
-    float getMaxOpponentsStrengths() const;
-    float getOpponentWinningHandsPercentage(const int idPlayer, std::string board) const;
-
     const GameEvents& m_events;
     std::unique_ptr<CurrentHandContext> m_currentHandContext;
     const int m_id;
     const std::string m_name;
     std::unique_ptr<RangeEstimator> m_rangeEstimator;
+    std::unique_ptr<OpponentsStrengthsEvaluator> m_opponentsStrengthsEvaluator;
 
   private:
-    std::map<int, float> evaluateOpponentsStrengths() const;
     const HandSimulationStats computeHandSimulation() const;
     std::unique_ptr<PlayerStrategy> m_strategy;
     std::unique_ptr<PlayerStatisticsUpdater> m_statisticsUpdater;

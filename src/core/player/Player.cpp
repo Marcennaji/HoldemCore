@@ -33,6 +33,7 @@ Player::Player(const GameEvents& events, pkt::core::Logger& logger,
     : m_id(id), m_name(name), m_events(events), m_logger(logger), m_handEvaluator(handEvaluator), m_statisticsStore(statisticsStore), m_randomizer(randomizer)
 {
     m_rangeEstimator = std::make_unique<RangeEstimator>(m_id, logger, handEvaluator);
+    m_opponentsStrengthsEvaluator = std::make_unique<OpponentsStrengthsEvaluator>(m_id, logger, handEvaluator);
     m_currentHandContext = std::make_unique<CurrentHandContext>();
     m_statisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(statisticsStore);
     m_statisticsUpdater->loadStatistics(name);
@@ -185,186 +186,19 @@ const HandSimulationStats Player::computeHandSimulation() const
 {
 #if (False)
     const int nbOpponents = m_seatsList->size() - 1;
-    // evaluate my strength against my opponents's guessed ranges :
-    float maxOpponentsStrengths = getMaxOpponentsStrengths();
-    return m_handEvaluator.simulateHandEquity(getCardsValueString(), getStringBoard(), nbOpponents,
-                                                       maxOpponentsStrengths);
+    // Evaluate strength against opponents' guessed ranges
+    auto evaluation = m_opponentsStrengthsEvaluator->evaluateOpponents(
+        *m_currentHandContext,
+        getHoleCards(),
+        getHandRanking()
+    );
+    return m_handEvaluator.simulateHandEquity(getCardsValueString(), 
+                                              m_currentHandContext->commonContext.stringBoard, 
+                                              nbOpponents,
+                                              evaluation.maxStrength);
 #else
     return m_handEvaluator.simulateHandEquity("As 6d", "", 2, 0.5);
 #endif
-}
-
-float Player::getMaxOpponentsStrengths() const
-{
-
-    std::map<int, float> strenghts = evaluateOpponentsStrengths(); // id player --> % of possible hands that beat us
-
-    float maxOpponentsStrengths = 0;
-    int opponentID = -1;
-
-    for (std::map<int, float>::const_iterator i = strenghts.begin(); i != strenghts.end(); i++)
-    {
-
-        assert(i->second <= 1.0);
-        if (i->second > maxOpponentsStrengths)
-        {
-            maxOpponentsStrengths = i->second;
-        }
-
-        opponentID = i->first;
-    }
-
-    //	// if we are facing a single opponent in very loose mode, don't adjust the strength
-    //	if (strenghts.size() == 1){
-    //		std::shared_ptr<Player> opponent = getPlayerByUniqueId(opponentID);
-    //
-    //		if (opponent->isInVeryLooseMode(nbPlayers))
-    //			return maxOpponentsStrengths;
-    //	}
-    //
-    //	// adjust roughly maxOpponentsStrengths value according to the number of opponents : the more opponents, the
-    // more chances we are beaten
-    //
-    //	const float originMaxOpponentsStrengths = maxOpponentsStrengths;
-    //
-    //	if (strenghts.size() == 2) // 2 opponents
-    //		maxOpponentsStrengths = maxOpponentsStrengths * 1.1;
-    //	else
-    //	if (strenghts.size() == 3) // 3 opponents
-    //		maxOpponentsStrengths = maxOpponentsStrengths * 1.2;
-    //	else
-    //	if (strenghts.size() == 4) // 4 opponents
-    //		maxOpponentsStrengths = maxOpponentsStrengths * 1.3;
-    //	else
-    //	if (strenghts.size() > 4)
-    //		maxOpponentsStrengths = maxOpponentsStrengths * 1.4;
-    //
-    //	// adjust roughly maxOpponentsStrengths value according to the number of raises : the more raises, the more
-    // chances we are beaten
-    //
-    //	const int nbRaises =	currentHand.getFlopBetsOrRaisesNumber() +
-    //							currentHand.getTurnBetsOrRaisesNumber() +
-    //							currentHand.getRiverBetsOrRaisesNumber();
-    //
-    //	if (nbRaises == 2)
-    //		maxOpponentsStrengths = maxOpponentsStrengths * 1.2;
-    //	else
-    //	if (nbRaises == 3)
-    //		maxOpponentsStrengths = maxOpponentsStrengths * 1.5;
-    //	else
-    //	if (nbRaises == 4)
-    //		maxOpponentsStrengths = maxOpponentsStrengths * 2;
-    //	else
-    //	if (nbRaises > 4)
-    //		maxOpponentsStrengths = maxOpponentsStrengths * 3;
-    //
-    //	if (maxOpponentsStrengths > 1){
-
-    //		maxOpponentsStrengths = 1;
-    //	}
-
-    return maxOpponentsStrengths;
-}
-
-// get an opponent winning hands % against me, giving his supposed range
-float Player::getOpponentWinningHandsPercentage(const int opponentId, std::string board) const
-{
-    float result = 0;
-
-    auto opponent = *getPlayerListIteratorById(m_currentHandContext->commonContext.playersContext.actingPlayersList, opponentId);
-
-    assert(getHandRanking() > 0);
-
-    // compute winning hands % against my rank
-    int nbWinningHands = 0;
-
-    if (opponent->m_rangeEstimator->getEstimatedRange().size() == 0)
-    {
-        opponent->getRangeEstimator()->computeEstimatedPreflopRange(*m_currentHandContext);
-    }
-
-    vector<std::string> ranges = RangeParser::getRangeAtomicValues(opponent->m_rangeEstimator->getEstimatedRange());
-
-    vector<std::string> newRanges;
-
-    for (vector<std::string>::const_iterator i = ranges.begin(); i != ranges.end(); i++)
-    {
-
-        if ((*i).size() != 4)
-        {
-            m_logger.error("invalid hand : " + (*i));
-            continue;
-        }
-        string s1 = (*i).substr(0, 2);
-        string s2 = (*i).substr(2, 4);
-
-        // delete hands that can't exist, given the board
-        if (board.find(s1) != string::npos || board.find(s2) != string::npos)
-        {
-            continue;
-        }
-
-        // delete hands that can't exist, given the player's cards (if they are supposed to be known)
-        if (opponentId != m_id)
-        {
-            const std::string card1Str = getHoleCards().card1.toString();
-            const std::string card2Str = getHoleCards().card2.toString();
-            if (card1Str.find(s1) != string::npos || card2Str.find(s1) != string::npos ||
-                card1Str.find(s2) != string::npos || card2Str.find(s2) != string::npos)
-            {
-                continue;
-            }
-        }
-
-        newRanges.push_back(*i);
-    }
-    if (newRanges.size() == 0)
-    {
-        newRanges.push_back(ANY_CARDS_RANGE);
-    }
-
-    for (vector<std::string>::const_iterator i = newRanges.begin(); i != newRanges.end(); i++)
-    {
-        const int rank = m_handEvaluator.rankHand(((*i) + board).c_str());
-        if (rank > getHandRanking())
-        {
-            nbWinningHands++;
-        }
-    }
-    if (ranges.size() == 0)
-    {
-        m_logger.error("no ranges for opponent " + std::to_string(opponentId));
-        return 0;
-    }
-    assert(nbWinningHands / ranges.size() <= 1.0);
-    return (float) nbWinningHands / (float) newRanges.size();
-
-}
-
-std::map<int, float> Player::evaluateOpponentsStrengths() const
-{
-
-    map<int, float> result;
-
-    PlayerList players = m_currentHandContext->commonContext.playersContext.actingPlayersList;
-    const int nbPlayers = players->size();
-
-    for (PlayerListIterator it = players->begin(); it != players->end(); ++it)
-    {
-
-        if ((*it)->getId() == m_id || (*it)->getLastAction().type == ActionType::Fold ||
-            (*it)->getLastAction().type == ActionType::None)
-        {
-            continue;
-        }
-
-        const float estimatedOpponentWinningHands = getOpponentWinningHandsPercentage((*it)->getId(),  m_currentHandContext->commonContext.stringBoard);
-        assert(estimatedOpponentWinningHands <= 1.0);
-
-        result[(*it)->getId()] = estimatedOpponentWinningHands;
-    }
-
-    return result;
 }
 
 bool Player::isInVeryLooseMode(const int nbPlayers) const
