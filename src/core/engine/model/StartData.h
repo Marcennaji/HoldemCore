@@ -11,10 +11,10 @@ struct StartData
 {
     StartData() = default;
     
-    // If startDealerPlayerId is UINT_MAX, the Session will randomly select a dealer
-    static constexpr unsigned AUTO_SELECT_DEALER = UINT_MAX;
+    // If startDealerPlayerId is -1, the Session will randomly select a dealer
+    static constexpr int AUTO_SELECT_DEALER = -1;
     
-    unsigned startDealerPlayerId{AUTO_SELECT_DEALER};
+    int startDealerPlayerId{AUTO_SELECT_DEALER};
     int numberOfPlayers{0};
 };
 

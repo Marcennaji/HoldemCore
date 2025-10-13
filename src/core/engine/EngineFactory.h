@@ -47,7 +47,7 @@ class EngineFactory
                                              pkt::core::player::PlayerList seats,
                                              pkt::core::player::PlayerList actingPlayers, GameData, StartData);
 
-    virtual std::shared_ptr<Board> createBoard(unsigned dealerPosition);
+    virtual std::shared_ptr<Board> createBoard(int dealerPosition);
     Logger& getLogger() const { return m_logger; }
     HandEvaluationEngine& getHandEvaluationEngine() const { return m_handEvaluator; }
     PlayersStatisticsStore& getPlayersStatisticsStore() const { return m_statisticsStore; }

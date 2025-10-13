@@ -30,7 +30,7 @@ class Board
 {
   public:
 
-    Board(unsigned dealerPosition, const GameEvents& events,
+    Board(int dealerPosition, const GameEvents& events,
           Logger& logger, HandEvaluationEngine& handEvaluator);
           
     ~Board();
@@ -68,7 +68,7 @@ class Board
     BoardCards m_boardCards;
     int m_pot{0};
     int m_currentRoundTotalBets{0};
-    unsigned m_dealerPlayerId{0};
+    int m_dealerPlayerId{0};
     bool m_allInCondition{false};
     unsigned m_lastActionPlayerId{0};
     

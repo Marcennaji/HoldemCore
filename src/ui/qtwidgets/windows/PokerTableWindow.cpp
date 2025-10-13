@@ -208,7 +208,7 @@ void PokerTableWindow::connectSignals()
     connect(m_actionBar, &ActionBar::callClicked, this, &PokerTableWindow::callClicked);
     connect(m_actionBar, &ActionBar::checkClicked, this, &PokerTableWindow::checkClicked);
     connect(m_actionBar, &ActionBar::allInClicked, this, &PokerTableWindow::allInClicked);
-    connect(m_actionBar, &ActionBar::betClicked, this, &PokerTableWindow::onRaiseAction);
+    connect(m_actionBar, &ActionBar::betClicked, this, &PokerTableWindow::onBetAction);
     connect(m_actionBar, &ActionBar::raiseClicked, this, &PokerTableWindow::onRaiseAction);
 
     // Reset bet controls after simple actions
@@ -222,11 +222,18 @@ void PokerTableWindow::connectSignals()
 }
 
 // Slot implementations
+void PokerTableWindow::onBetAction()
+{
+    // Get the bet amount from ActionBar
+    int betAmount = m_actionBar->getBetValue();
+    emit betClicked(betAmount);
+    m_actionBar->resetBetControls();
+}
+
 void PokerTableWindow::onRaiseAction()
 {
     // Get the bet amount from ActionBar
     int raiseAmount = m_actionBar->getBetValue();
-    emit betClicked(raiseAmount);
     emit raiseClicked(raiseAmount);
     m_actionBar->resetBetControls();
 }

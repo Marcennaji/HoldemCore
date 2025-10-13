@@ -19,6 +19,7 @@
 namespace pkt::core
 {
 class Session;
+class EngineFactory;
 } // namespace pkt::core
 
 namespace pkt::ui::qtwidgets
@@ -51,6 +52,7 @@ class GuiAppController
     std::shared_ptr<pkt::core::Randomizer> m_randomizer;
     
     // Application components
+    std::shared_ptr<pkt::core::EngineFactory> m_engineFactory;
     std::unique_ptr<PokerTableWindow> m_pokerTableWindow;
     std::unique_ptr<pkt::core::Session> m_session;
     pkt::core::GameEvents m_events;

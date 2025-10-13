@@ -123,6 +123,7 @@ class PokerTableWindow : public QWidget
   void windowClosed();       // Emitted when the table window is closed by the user
 
   private slots:
+    void onBetAction();
     void onRaiseAction();
     void onNextHandClicked();  // Slot for Next Hand button click
 

@@ -81,7 +81,7 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
     if (adjustedStartData.startDealerPlayerId == StartData::AUTO_SELECT_DEALER) {
         int randomDealer = 0;
         m_randomizer.getRand(0, adjustedStartData.numberOfPlayers - 1, 1, &randomDealer);
-        adjustedStartData.startDealerPlayerId = static_cast<unsigned>(randomDealer);
+        adjustedStartData.startDealerPlayerId = randomDealer;
     }
     
     auto gameComponents = createGameComponents(gameData, adjustedStartData);
@@ -149,7 +149,9 @@ void Session::validateGameParameters(const GameData& gameData, const StartData& 
     {
         throw std::invalid_argument("Start money must be greater than 0");
     }
-    if (startData.startDealerPlayerId < 0 || startData.startDealerPlayerId >= startData.numberOfPlayers)
+    // Allow AUTO_SELECT_DEALER (-1), otherwise validate the dealer ID is a valid player index
+    if (startData.startDealerPlayerId != StartData::AUTO_SELECT_DEALER && 
+        (startData.startDealerPlayerId < 0 || startData.startDealerPlayerId >= startData.numberOfPlayers))
     {
         throw std::invalid_argument("Dealer player ID must be valid player index");
     }

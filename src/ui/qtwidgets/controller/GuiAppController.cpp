@@ -18,8 +18,8 @@ GuiAppController::GuiAppController(std::shared_ptr<pkt::core::Logger> logger,
       m_statisticsStore(std::move(statisticsStore)),
       m_randomizer(std::move(randomizer))
 {
-    auto engineFactory = std::make_shared<pkt::core::EngineFactory>(m_events, *m_logger, *m_handEvaluationEngine, *m_statisticsStore, *m_randomizer);
-    m_session = std::make_unique<pkt::core::Session>(m_events, *engineFactory, *m_logger, *m_handEvaluationEngine, *m_statisticsStore, *m_randomizer);
+    m_engineFactory = std::make_shared<pkt::core::EngineFactory>(m_events, *m_logger, *m_handEvaluationEngine, *m_statisticsStore, *m_randomizer);
+    m_session = std::make_unique<pkt::core::Session>(m_events, *m_engineFactory, *m_logger, *m_handEvaluationEngine, *m_statisticsStore, *m_randomizer);
     m_pokerTableWindow = std::make_unique<PokerTableWindow>(m_session.get());
     m_bridge = std::make_unique<GuiBridgeWidgets>(m_session.get(), m_pokerTableWindow.get());
 

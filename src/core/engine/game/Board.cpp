@@ -84,7 +84,7 @@ namespace pkt::core
 {
 using namespace pkt::core::player;
 
-Board::Board(unsigned dp, const GameEvents& events,
+Board::Board(int dp, const GameEvents& events,
              Logger& logger, HandEvaluationEngine& handEvaluator)
     : m_dealerPlayerId(dp), m_events(events), m_logger(logger), m_handEvaluator(handEvaluator)
 {

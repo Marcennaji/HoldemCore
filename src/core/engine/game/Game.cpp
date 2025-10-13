@@ -19,7 +19,7 @@ using namespace std;
 using namespace pkt::core::player;
 
 Game::Game(const GameEvents& events, EngineFactory& factory, std::shared_ptr<Board> board,
-           PlayerList seatsList, unsigned dealerId, const GameData& gameData, const StartData& startData)
+           PlayerList seatsList, int dealerId, const GameData& gameData, const StartData& startData)
     : m_engineFactory(factory), m_events(events), m_currentBoard(board), m_seatsList(seatsList),
       m_dealerPlayerId(dealerId), m_gameData(gameData), m_startData(startData)
 {

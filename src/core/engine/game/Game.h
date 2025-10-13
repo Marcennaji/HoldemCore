@@ -33,7 +33,7 @@ class Game
 {
   public:
     Game(const GameEvents& events, EngineFactory& factory, std::shared_ptr<Board> board,
-         pkt::core::player::PlayerList seatsList, unsigned dealerId, const GameData& gameData,
+         pkt::core::player::PlayerList seatsList, int dealerId, const GameData& gameData,
          const StartData& startData);
 
     ~Game() = default;
@@ -53,7 +53,7 @@ class Game
     pkt::core::player::PlayerList m_seatsList;
     pkt::core::player::PlayerList m_actingPlayersList;
 
-    unsigned m_dealerPlayerId{0};
+    int m_dealerPlayerId{0};
     GameData m_gameData;
     StartData m_startData;
 };

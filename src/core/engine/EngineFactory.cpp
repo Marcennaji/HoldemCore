@@ -33,7 +33,7 @@ std::shared_ptr<Hand> EngineFactory::createHand(std::shared_ptr<Board> b,
     return std::make_shared<Hand>(m_events, b, seats, actingPlayers, gd, sd, m_logger, m_statisticsStore, m_randomizer, m_handEvaluator);
 }
 
-std::shared_ptr<Board> EngineFactory::createBoard(unsigned dealerPosition)
+std::shared_ptr<Board> EngineFactory::createBoard(int dealerPosition)
 {
     return std::make_shared<Board>(dealerPosition, m_events, m_logger, m_handEvaluator);
 }
