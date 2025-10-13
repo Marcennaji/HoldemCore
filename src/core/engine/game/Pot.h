@@ -47,6 +47,7 @@ class Pot
     void awardRemainder(const std::vector<size_t>& winnerIndices, int remainder);
     void reduceContributions(std::vector<unsigned>& contributions, unsigned level);
     void finalizeDistribution();
+    void determineAbsoluteBestHands();
 
     std::shared_ptr<player::Player> resolveRemainderReceiver(const std::vector<size_t>& winnerIndices) const;
     std::vector<size_t> indexesOf(const std::list<unsigned>& ids);

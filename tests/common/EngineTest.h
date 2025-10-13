@@ -34,6 +34,7 @@ class EngineTest : public ::testing::Test
     void TearDown() override;
 
     void initializeHandWithPlayers(size_t activePlayerCount, pkt::core::GameData);
+    void setupHandWithoutInitialize(size_t activePlayerCount, pkt::core::GameData gameData);
     void checkPostRiverConditions();
     bool isPlayerStillActive(unsigned id) const;
 

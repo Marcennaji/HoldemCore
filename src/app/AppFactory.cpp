@@ -30,13 +30,12 @@ namespace pkt::app {
 
 std::unique_ptr<pkt::ui::qtwidgets::GuiAppController> 
 AppFactory::createApplication(LoggerType loggerType, HandEvaluatorType evaluatorType, DatabaseType dbType) {
-    // Create all dependencies
+
     auto logger = createLogger(loggerType);
     auto handEvaluator = createHandEvaluator(evaluatorType);
     auto statisticsStore = createStatisticsStore(dbType);
     auto randomizer = createRandomizer();
 
-    // Create and return the main controller
     return std::make_unique<pkt::ui::qtwidgets::GuiAppController>(
         logger, handEvaluator, statisticsStore, randomizer);
 }
@@ -45,8 +44,8 @@ std::unique_ptr<pkt::ui::qtwidgets::GuiAppController>
 AppFactory::createTestApp() {
     return createApplication(
         LoggerType::Null,
-        HandEvaluatorType::Psim,  // Keep real evaluator for realistic tests
-        DatabaseType::Sqlite  // Use real DB for persistent test data
+        HandEvaluatorType::Psim,  
+        DatabaseType::Sqlite  
     );
 }
 
@@ -55,7 +54,7 @@ AppFactory::createLogger(LoggerType type) {
     switch (type) {
         case LoggerType::Console: {
             auto logger = std::make_shared<pkt::infra::ConsoleLogger>();
-            logger->setLogLevel(pkt::core::LogLevel::Info);
+            logger->setLogLevel(pkt::core::LogLevel::Verbose);
             return logger;
         }
         

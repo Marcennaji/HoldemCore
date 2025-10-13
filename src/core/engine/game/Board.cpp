@@ -118,9 +118,14 @@ void Board::distributePot(Hand& hand)
     if (bc.getNumCards() == 5)
     {
         m_logger.info(std::string("Showdown - final board: \"") + bc.toString() + "\"");
-        // Only evaluate hands for players who actually participated in the hand
-        for (auto& player : *hand.getActingPlayersList())
+        // Evaluate hands for all seated players (includes all-in players)
+        // Skip only players who folded
+        for (auto& player : *hand.getSeatsList())
         {
+            // Skip folded players - they cannot win
+            if (player->getLastAction().type == ActionType::Fold)
+                continue;
+            
             const auto& hc = player->getHoleCards();
             // In real games, hole cards are valid; recompute to ensure final ranks.
             // In unit tests that preset ranks, hole cards may be invalid; skip recompute to respect presets.
@@ -134,7 +139,8 @@ void Board::distributePot(Hand& hand)
             }
             m_logger.info(
                 std::string("Player ") + std::to_string(player->getId()) +
-                " showdown hand: \"" + player->getHoleCards().toString() + "\" rank=" + std::to_string(player->getHandRanking())
+                " showdown hand: \"" + player->getHoleCards().toString() + "\" rank=" + std::to_string(player->getHandRanking()) +
+                " (higher is better)"
             );
         }
     }

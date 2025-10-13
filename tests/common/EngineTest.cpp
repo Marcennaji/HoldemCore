@@ -90,6 +90,23 @@ void EngineTest::initializeHandWithPlayers(size_t activePlayerCount, GameData ga
 
     m_hand->initialize();
 }
+
+void EngineTest::setupHandWithoutInitialize(size_t activePlayerCount, GameData gameData)
+{
+    createPlayersLists(activePlayerCount);
+    m_board = m_factory->createBoard(startDealerPlayerId);
+    m_board->setSeatsList(m_seatsList);
+    m_board->setActingPlayersList(m_actingPlayersList);
+
+    StartData startData;
+    startData.startDealerPlayerId = startDealerPlayerId;
+    startData.numberOfPlayers = static_cast<int>(activePlayerCount);
+
+    m_hand = m_factory->createHand(m_board, m_seatsList, m_actingPlayersList, gameData, startData);
+    
+    // Note: m_hand->initialize() is NOT called - caller must do it after modifying players
+}
+
 void EngineTest::checkPostRiverConditions()
 {
 

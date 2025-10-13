@@ -448,6 +448,9 @@ void Player::resetForNewHand(const Hand& hand)
     setCashAtHandStart(getCash());
     setPosition(hand);
     getRangeEstimator()->setEstimatedRange("");
+    // Clear hole cards from previous hand
+    m_currentHandContext->personalContext.holeCards = HoleCards();
+    m_currentHandContext->personalContext.handRanking = 0;
 }
 void Player::processAction(const PlayerAction& action, Hand& hand)
 {

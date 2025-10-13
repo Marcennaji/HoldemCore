@@ -84,7 +84,8 @@ void PreflopState::logStateInfo(Hand& hand)
 
 void PreflopState::logHoleCards(Hand& hand)
 {
-    for (const auto& player : *hand.getSeatsList())
+    // Only log hole cards for players who are actually playing (not auto-folded)
+    for (const auto& player : *hand.getActingPlayersList())
     {
         const HoleCards& holeCards = player->getHoleCards();
         if (holeCards.isValid())

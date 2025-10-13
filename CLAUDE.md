@@ -36,6 +36,15 @@ The project demonstrates clean modular design, modern dependency management, and
 - Maintain clear naming and function responsibility
 - **Comments**: Only add comments when code doesn't speak for itself. Never add obvious comments explaining what you just did or trivial implementation details.
 
+### Test Guidelines
+
+- **All unit tests and e2e tests should inherit from `EngineTest`** (see `tests/common/EngineTest.h`)
+- **Exception**: Only inherit directly from `::testing::Test` if using `EngineTest` makes the test significantly more complicated
+- Use `initializeHandWithPlayers()` to set up test hands with players
+- Use `getPlayerById()` helper to retrieve players from seat lists
+- Follow existing test patterns (see `ShowdownRevealOrderTest.cpp`, `PotTest.cpp` as examples)
+- No need for custom `createPlayer()` methods when inheriting from `EngineTest`
+
 ---
 
 ## 5. Expected AI Assistant Behavior

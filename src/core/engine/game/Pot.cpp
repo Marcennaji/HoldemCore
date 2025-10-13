@@ -73,9 +73,12 @@ void Pot::distribute()
     }
 
     finalizeDistribution();
-
-    m_winners.sort();
-    m_winners.unique();
+    
+    // After all pots distributed, determine who had the absolute best hand(s)
+    // for GUI display (only show players with strongest hand, not all side pot winners)
+    determineAbsoluteBestHands();
+    // Note: determineAbsoluteBestHands() replaces m_winners with only the absolute best hands
+    // The list is already properly formed, no need for sort/unique after
 }
 
 std::vector<unsigned> Pot::initializePlayerContributions()
@@ -122,16 +125,24 @@ std::vector<size_t> Pot::determineWinners(const std::vector<size_t>& eligible, u
     for (size_t i : eligible)
     {
         auto it = std::next(m_seats->begin(), i);
-        if ((*it)->getHandRanking() > bestRank)
-            bestRank = (*it)->getHandRanking();
+        int rank = (*it)->getHandRanking();
+        m_logger.verbose("  Player " + std::to_string((*it)->getId()) + " with hole cards " + (*it)->getHoleCards().toString() 
+        + ", rank: " + std::to_string(rank));
+        if (rank > bestRank)
+            bestRank = rank;
     }
+    m_logger.verbose("Best rank at this level: " + std::to_string(bestRank) + " (higher is better)");
 
     std::vector<size_t> winners;
     for (size_t i : eligible)
     {
         auto it = std::next(m_seats->begin(), i);
         if ((*it)->getHandRanking() == bestRank)
+        {
+            m_logger.verbose("  Winner: Player " + std::to_string((*it)->getId()) + " with rank " + std::to_string(bestRank) 
+            + " corresponding to hole cards " + (*it)->getHoleCards().toString());
             winners.push_back(i);
+        }
     }
 
     return winners;
@@ -271,6 +282,62 @@ std::vector<size_t> Pot::indexesOf(const std::list<unsigned>& ids)
     }
 
     return result;
+}
+
+void Pot::determineAbsoluteBestHands()
+{
+    if (!m_seats || m_seats->empty())
+        return;
+        
+    // Find the absolute best hand among all non-folded players
+    int bestRank = 0;
+    
+    m_logger.verbose("Determining absolute best hand for GUI display:");
+    
+    for (const auto& player : *m_seats)
+    {
+        if (!player)
+            continue;
+            
+        if (player->getLastAction().type != ActionType::Fold)
+        {
+            int rank = player->getHandRanking();
+            m_logger.verbose("  Player " + std::to_string(player->getId()) + 
+                           " (non-folded) has rank: " + std::to_string(rank));
+            if (rank > bestRank)
+            {
+                bestRank = rank;
+            }
+        }
+    }
+    
+    m_logger.verbose("Best rank overall: " + std::to_string(bestRank));
+    
+    // If bestRank is still 0, it means all players folded or have no hand ranking
+    // In this case, keep the current winners list (from pot distribution)
+    if (bestRank == 0)
+    {
+        m_logger.verbose("No valid hand rankings found, keeping current winners");
+        return;
+    }
+    
+    // Clear and replace m_winners with only players who have the absolute best hand
+    m_winners.clear();
+    
+    // Add all players who have the best rank (handles ties)
+    for (const auto& player : *m_seats)
+    {
+        if (!player)
+            continue;
+            
+        if (player->getLastAction().type != ActionType::Fold && 
+            player->getHandRanking() == bestRank)
+        {
+            m_winners.push_back(player->getId());
+            m_logger.verbose("  GUI Winner: Player " + std::to_string(player->getId()) + 
+                           " with best rank " + std::to_string(bestRank));
+        }
+    }
 }
 
 } // namespace pkt::core

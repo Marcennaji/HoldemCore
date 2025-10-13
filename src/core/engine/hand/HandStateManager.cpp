@@ -22,7 +22,13 @@ HandStateManager::HandStateManager(const GameEvents& events, int smallBlind, uns
 
 void HandStateManager::initializeState(Hand& hand)
 {
-    // Direct ISP usage - no service aggregates needed
+    // Clean up any previous state first
+    if (m_currentState)
+    {
+        m_currentState->exit(hand);
+        m_currentState.reset();
+    }
+    
     m_currentState = std::make_unique<PreflopState>(m_events, m_smallBlind, m_dealerPlayerId, *m_logger);
     m_currentState->enter(hand);
 }
@@ -112,12 +118,12 @@ GameState HandStateManager::getGameState() const
 
 HandActionProcessor* HandStateManager::getActionProcessor() const
 {
-    return dynamic_cast<HandActionProcessor*>(m_currentState.get());
+    return m_currentState ? dynamic_cast<HandActionProcessor*>(m_currentState.get()) : nullptr;
 }
 
 HandState& HandStateManager::getCurrentState() const
 {
-    assert(m_currentState);
+    assert(m_currentState && "HandStateManager::getCurrentState() called before state initialization");
     return *m_currentState;
 }
 
