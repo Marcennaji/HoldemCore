@@ -21,81 +21,104 @@ SqlitePlayersStatisticsStore::SqlitePlayersStatisticsStore(std::unique_ptr<Sqlit
 
     // Ensure schema exists
     m_db->exec(R"SQL(
-        CREATE TABLE IF NOT EXISTS PlayersStatistics (
+        CREATE TABLE  IF NOT EXISTS PlayersStatistics (
             strategy_name TEXT NOT NULL,
-            nb_players INTEGER NOT NULL,
+            table_type TEXT NOT NULL CHECK(table_type IN ('HU', 'SH', 'FR')),
+
             /* preflop */
             pf_hands INTEGER NOT NULL,
             pf_checks INTEGER NOT NULL,
             pf_calls INTEGER NOT NULL,
             pf_raises INTEGER NOT NULL,
             pf_threeBets INTEGER NOT NULL,
-            pf_callthreeBets INTEGER NOT NULL,
-            pf_callthreeBetsOpportunities INTEGER NOT NULL,
             pf_fourBets INTEGER NOT NULL,
             pf_folds INTEGER NOT NULL,
             pf_limps INTEGER NOT NULL,
+            pf_callThreeBets INTEGER NOT NULL,
+            pf_callThreeBetsOpportunities INTEGER NOT NULL,
+
             /* flop */
             f_hands INTEGER NOT NULL,
             f_checks INTEGER NOT NULL,
             f_bets INTEGER NOT NULL,
             f_calls INTEGER NOT NULL,
             f_raises INTEGER NOT NULL,
-            f_threeBets INTEGER NOT NULL,
-            f_fourBets INTEGER NOT NULL,
             f_folds INTEGER NOT NULL,
             f_continuationBets INTEGER NOT NULL,
             f_continuationBetsOpportunities INTEGER NOT NULL,
+
             /* turn */
             t_hands INTEGER NOT NULL,
             t_checks INTEGER NOT NULL,
             t_bets INTEGER NOT NULL,
             t_calls INTEGER NOT NULL,
             t_raises INTEGER NOT NULL,
-            t_threeBets INTEGER NOT NULL,
-            t_fourBets INTEGER NOT NULL,
             t_folds INTEGER NOT NULL,
+
             /* river */
             r_hands INTEGER NOT NULL,
             r_checks INTEGER NOT NULL,
             r_bets INTEGER NOT NULL,
             r_calls INTEGER NOT NULL,
             r_raises INTEGER NOT NULL,
-            r_threeBets INTEGER NOT NULL,
-            r_fourBets INTEGER NOT NULL,
             r_folds INTEGER NOT NULL,
-            PRIMARY KEY (strategy_name, nb_players)
+
+            /* showdown */
+            sd_wentToShowdown INTEGER NOT NULL,
+            sd_wonShowdown INTEGER NOT NULL,
+            sd_wonWithoutShowdown INTEGER NOT NULL,
+
+            /* bet sizing */
+            avg_bet_size_ratio REAL NOT NULL DEFAULT 0.0,
+
+            PRIMARY KEY (strategy_name, table_type)
         );
     )SQL");
 }
 
 SqlitePlayersStatisticsStore::~SqlitePlayersStatisticsStore() = default;
 
-void SqlitePlayersStatisticsStore::initializeStrategyStatistics(const std::string& playerName, const int nbPlayers)
+std::string SqlitePlayersStatisticsStore::getTableType(const int nbPlayers)
 {
+    if (nbPlayers == 2)
+        return "HU"; // Heads-Up
+    if (nbPlayers <= 6)
+        return "SH"; // Short-Handed
+    return "FR";     // Full Ring
+}
+
+void SqlitePlayersStatisticsStore::initializeStrategyStatistics(const std::string& strategyName, const int nbPlayers)
+{
+    std::string tableType = getTableType(nbPlayers);
+
     // Insert if not exists
     auto stmt = m_db->prepare("INSERT OR IGNORE INTO PlayersStatistics("
-                              "strategy_name, nb_players,"
-                              "pf_hands,pf_checks,pf_calls,pf_raises,pf_threeBets,pf_callthreeBets,pf_"
-                              "callthreeBetsOpportunities,pf_fourBets,pf_folds,pf_limps,"
-                              "f_hands,f_checks,f_bets,f_calls,f_raises,f_threeBets,f_fourBets,f_folds,f_"
+                              "strategy_name, table_type,"
+                              "pf_hands,pf_checks,pf_calls,pf_raises,pf_threeBets,pf_callThreeBets,pf_"
+                              "callThreeBetsOpportunities,pf_fourBets,pf_folds,pf_limps,"
+                              "f_hands,f_checks,f_bets,f_calls,f_raises,f_folds,f_"
                               "continuationBets,f_continuationBetsOpportunities,"
-                              "t_hands,t_checks,t_bets,t_calls,t_raises,t_threeBets,t_fourBets,t_folds,"
-                              "r_hands,r_checks,r_bets,r_calls,r_raises,r_threeBets,r_fourBets,r_folds"
+                              "t_hands,t_checks,t_bets,t_calls,t_raises,t_folds,"
+                              "r_hands,r_checks,r_bets,r_calls,r_raises,r_folds,"
+                              "sd_wentToShowdown,sd_wonShowdown,sd_wonWithoutShowdown,"
+                              "avg_bet_size_ratio"
                               ") VALUES (?1, ?2,"
-                              // 35 zeros:
-                              "0,0,0,0,0,0,0,0,0,0,"
-                              "0,0,0,0,0,0,0,0,0,0,"
-                              "0,0,0,0,0,0,0,0,"
-                              "0,0,0,0,0,0,0,0)");
-    stmt->bindText(1, playerName);
-    stmt->bindInt(2, nbPlayers);
+                              // pf (10) + f (8) + t (6) + r (6) + sd (3) + avg (1) = 34 values
+                              "0,0,0,0,0,0,0,0,0,0," // preflop (10)
+                              "0,0,0,0,0,0,0,0,"     // flop (8)
+                              "0,0,0,0,0,0,"         // turn (6)
+                              "0,0,0,0,0,0,"         // river (6)
+                              "0,0,0,"               // showdown (3)
+                              "0.0)");               // avg_bet_size_ratio
+    stmt->bindText(1, strategyName);
+    stmt->bindText(2, tableType);
     stmt->step();
 }
 
 void SqlitePlayersStatisticsStore::savePlayersStatistics(PlayerList seatsList)
 {
     int nbPlayers = static_cast<int>(seatsList->size());
+    std::string tableType = getTableType(nbPlayers);
 
     for (auto& player : *seatsList)
     {
@@ -105,21 +128,30 @@ void SqlitePlayersStatisticsStore::savePlayersStatistics(PlayerList seatsList)
             continue;
         }
 
-        initializeStrategyStatistics(player->getName(), nbPlayers);
+        initializeStrategyStatistics(player->getStrategyTypeName(), nbPlayers);
 
-        auto stmt = m_db->prepare(
-            "UPDATE PlayersStatistics SET "
-            "pf_hands=?3,pf_checks=?4,pf_calls=?5,pf_raises=?6,pf_threeBets=?7,pf_callthreeBets=?8,"
-            "pf_callthreeBetsOpportunities=?9,pf_fourBets=?10,pf_folds=?11,pf_limps=?12,"
-            "f_hands=?13,f_checks=?14,f_bets=?15,f_calls=?16,f_raises=?17,f_threeBets=?18,f_fourBets=?19,f_folds=?20,"
-            "f_continuationBets=?21,f_continuationBetsOpportunities=?22,"
-            "t_hands=?23,t_checks=?24,t_bets=?25,t_calls=?26,t_raises=?27,t_threeBets=?28,t_fourBets=?29,t_folds=?30,"
-            "r_hands=?31,r_checks=?32,r_bets=?33,r_calls=?34,r_raises=?35,r_threeBets=?36,r_fourBets=?37,r_folds=?38 "
-            "WHERE strategy_name=?1 AND nb_players=?2");
+        auto stmt =
+            m_db->prepare("UPDATE PlayersStatistics SET "
+                          "pf_hands=pf_hands+?3,pf_checks=pf_checks+?4,pf_calls=pf_calls+?5,"
+                          "pf_raises=pf_raises+?6,pf_threeBets=pf_threeBets+?7,pf_callThreeBets=pf_callThreeBets+?8,"
+                          "pf_callThreeBetsOpportunities=pf_callThreeBetsOpportunities+?9,"
+                          "pf_fourBets=pf_fourBets+?10,pf_folds=pf_folds+?11,pf_limps=pf_limps+?12,"
+                          "f_hands=f_hands+?13,f_checks=f_checks+?14,f_bets=f_bets+?15,f_calls=f_calls+?16,"
+                          "f_raises=f_raises+?17,f_folds=f_folds+?18,"
+                          "f_continuationBets=f_continuationBets+?19,"
+                          "f_continuationBetsOpportunities=f_continuationBetsOpportunities+?20,"
+                          "t_hands=t_hands+?21,t_checks=t_checks+?22,t_bets=t_bets+?23,t_calls=t_calls+?24,"
+                          "t_raises=t_raises+?25,t_folds=t_folds+?26,"
+                          "r_hands=r_hands+?27,r_checks=r_checks+?28,r_bets=r_bets+?29,r_calls=r_calls+?30,"
+                          "r_raises=r_raises+?31,r_folds=r_folds+?32,"
+                          "sd_wentToShowdown=sd_wentToShowdown+?33,sd_wonShowdown=sd_wonShowdown+?34,"
+                          "sd_wonWithoutShowdown=sd_wonWithoutShowdown+?35,"
+                          "avg_bet_size_ratio=?36 "
+                          "WHERE strategy_name=?1 AND table_type=?2");
 
         // keys
-        stmt->bindText(1, player->getName());
-        stmt->bindInt(2, nbPlayers);
+        stmt->bindText(1, player->getStrategyTypeName());
+        stmt->bindText(2, tableType);
 
         // preflop
         stmt->bindInt(3, stats.preflopStatistics.hands);
@@ -139,64 +171,78 @@ void SqlitePlayersStatisticsStore::savePlayersStatistics(PlayerList seatsList)
         stmt->bindInt(15, stats.flopStatistics.bets);
         stmt->bindInt(16, stats.flopStatistics.calls);
         stmt->bindInt(17, stats.flopStatistics.raises);
-        stmt->bindInt(18, stats.flopStatistics.threeBets);
-        stmt->bindInt(19, stats.flopStatistics.fourBets);
-        stmt->bindInt(20, stats.flopStatistics.folds);
-        stmt->bindInt(21, stats.flopStatistics.continuationBets);
-        stmt->bindInt(22, stats.flopStatistics.continuationBetsOpportunities);
+        stmt->bindInt(18, stats.flopStatistics.folds);
+        stmt->bindInt(19, stats.flopStatistics.continuationBets);
+        stmt->bindInt(20, stats.flopStatistics.continuationBetsOpportunities);
 
         // turn
-        stmt->bindInt(23, stats.turnStatistics.hands);
-        stmt->bindInt(24, stats.turnStatistics.checks);
-        stmt->bindInt(25, stats.turnStatistics.bets);
-        stmt->bindInt(26, stats.turnStatistics.calls);
-        stmt->bindInt(27, stats.turnStatistics.raises);
-        stmt->bindInt(28, stats.turnStatistics.threeBets);
-        stmt->bindInt(29, stats.turnStatistics.fourBets);
-        stmt->bindInt(30, stats.turnStatistics.folds);
+        stmt->bindInt(21, stats.turnStatistics.hands);
+        stmt->bindInt(22, stats.turnStatistics.checks);
+        stmt->bindInt(23, stats.turnStatistics.bets);
+        stmt->bindInt(24, stats.turnStatistics.calls);
+        stmt->bindInt(25, stats.turnStatistics.raises);
+        stmt->bindInt(26, stats.turnStatistics.folds);
 
         // river
-        stmt->bindInt(31, stats.riverStatistics.hands);
-        stmt->bindInt(32, stats.riverStatistics.checks);
-        stmt->bindInt(33, stats.riverStatistics.bets);
-        stmt->bindInt(34, stats.riverStatistics.calls);
-        stmt->bindInt(35, stats.riverStatistics.raises);
-        stmt->bindInt(36, stats.riverStatistics.threeBets);
-        stmt->bindInt(37, stats.riverStatistics.fourBets);
-        stmt->bindInt(38, stats.riverStatistics.folds);
+        stmt->bindInt(27, stats.riverStatistics.hands);
+        stmt->bindInt(28, stats.riverStatistics.checks);
+        stmt->bindInt(29, stats.riverStatistics.bets);
+        stmt->bindInt(30, stats.riverStatistics.calls);
+        stmt->bindInt(31, stats.riverStatistics.raises);
+        stmt->bindInt(32, stats.riverStatistics.folds);
+
+        // showdown (using placeholder values if not available in stats)
+        stmt->bindInt(33, 0); // TODO: Add sd_wentToShowdown to PlayerStatistics
+        stmt->bindInt(34, 0); // TODO: Add sd_wonShowdown to PlayerStatistics
+        stmt->bindInt(35, 0); // TODO: Add sd_wonWithoutShowdown to PlayerStatistics
+
+        // bet sizing (using placeholder if not available)
+        stmt->bindDouble(36, 0.0); // TODO: Add avg_bet_size_ratio to PlayerStatistics
 
         stmt->step();
     }
 }
 
 std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1>
-SqlitePlayersStatisticsStore::loadPlayerStatistics(const std::string& playerName)
+SqlitePlayersStatisticsStore::loadPlayerStatistics(const std::string& strategyName)
 {
     // make sure that we have initial values for this player
     for (int nbPlayers = 2; nbPlayers <= MAX_NUMBER_OF_PLAYERS; nbPlayers++)
-        initializeStrategyStatistics(playerName, nbPlayers);
+        initializeStrategyStatistics(strategyName, nbPlayers);
 
     std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> results{};
 
-    auto stmt = m_db->prepare("SELECT nb_players,"
-                              "pf_hands,pf_checks,pf_calls,pf_raises,pf_threeBets,pf_callthreeBets,pf_"
-                              "callthreeBetsOpportunities,pf_fourBets,pf_folds,pf_limps,"
-                              "f_hands,f_checks,f_bets,f_calls,f_raises,f_threeBets,f_fourBets,f_folds,f_"
+    auto stmt = m_db->prepare("SELECT table_type,"
+                              "pf_hands,pf_checks,pf_calls,pf_raises,pf_threeBets,pf_callThreeBets,pf_"
+                              "callThreeBetsOpportunities,pf_fourBets,pf_folds,pf_limps,"
+                              "f_hands,f_checks,f_bets,f_calls,f_raises,f_folds,f_"
                               "continuationBets,f_continuationBetsOpportunities,"
-                              "t_hands,t_checks,t_bets,t_calls,t_raises,t_threeBets,t_fourBets,t_folds,"
-                              "r_hands,r_checks,r_bets,r_calls,r_raises,r_threeBets,r_fourBets,r_folds "
+                              "t_hands,t_checks,t_bets,t_calls,t_raises,t_folds,"
+                              "r_hands,r_checks,r_bets,r_calls,r_raises,r_folds,"
+                              "sd_wentToShowdown,sd_wonShowdown,sd_wonWithoutShowdown,"
+                              "avg_bet_size_ratio "
                               "FROM PlayersStatistics WHERE strategy_name=?1");
-    stmt->bindText(1, playerName);
+    stmt->bindText(1, strategyName);
 
     while (stmt->step())
     {
-        int n = stmt->getInt(0);
-        if (n < 0 || n > MAX_NUMBER_OF_PLAYERS)
+        std::string tableType = stmt->getText(0);
+
+        // Map table_type back to nbPlayers for array indexing
+        int nbPlayers = 0;
+        if (tableType == "HU")
+            nbPlayers = 2;
+        else if (tableType == "SH")
+            nbPlayers = 6; // Use 6 as representative for SH (3-6 players)
+        else if (tableType == "FR")
+            nbPlayers = 9; // Use 9 as representative for FR (7-10 players)
+
+        if (nbPlayers < 2 || nbPlayers > MAX_NUMBER_OF_PLAYERS)
             continue;
 
         PlayerStatistics ps{};
 
-        // map preflop
+        // preflop
         ps.preflopStatistics.hands = stmt->getInt(1);
         ps.preflopStatistics.checks = stmt->getInt(2);
         ps.preflopStatistics.calls = stmt->getInt(3);
@@ -214,33 +260,49 @@ SqlitePlayersStatisticsStore::loadPlayerStatistics(const std::string& playerName
         ps.flopStatistics.bets = stmt->getInt(13);
         ps.flopStatistics.calls = stmt->getInt(14);
         ps.flopStatistics.raises = stmt->getInt(15);
-        ps.flopStatistics.threeBets = stmt->getInt(16);
-        ps.flopStatistics.fourBets = stmt->getInt(17);
-        ps.flopStatistics.folds = stmt->getInt(18);
-        ps.flopStatistics.continuationBets = stmt->getInt(19);
-        ps.flopStatistics.continuationBetsOpportunities = stmt->getInt(20);
+        ps.flopStatistics.folds = stmt->getInt(16);
+        ps.flopStatistics.continuationBets = stmt->getInt(17);
+        ps.flopStatistics.continuationBetsOpportunities = stmt->getInt(18);
 
         // turn
-        ps.turnStatistics.hands = stmt->getInt(21);
-        ps.turnStatistics.checks = stmt->getInt(22);
-        ps.turnStatistics.bets = stmt->getInt(23);
-        ps.turnStatistics.calls = stmt->getInt(24);
-        ps.turnStatistics.raises = stmt->getInt(25);
-        ps.turnStatistics.threeBets = stmt->getInt(26);
-        ps.turnStatistics.fourBets = stmt->getInt(27);
-        ps.turnStatistics.folds = stmt->getInt(28);
+        ps.turnStatistics.hands = stmt->getInt(19);
+        ps.turnStatistics.checks = stmt->getInt(20);
+        ps.turnStatistics.bets = stmt->getInt(21);
+        ps.turnStatistics.calls = stmt->getInt(22);
+        ps.turnStatistics.raises = stmt->getInt(23);
+        ps.turnStatistics.folds = stmt->getInt(24);
 
         // river
-        ps.riverStatistics.hands = stmt->getInt(29);
-        ps.riverStatistics.checks = stmt->getInt(30);
-        ps.riverStatistics.bets = stmt->getInt(31);
-        ps.riverStatistics.calls = stmt->getInt(32);
-        ps.riverStatistics.raises = stmt->getInt(33);
-        ps.riverStatistics.threeBets = stmt->getInt(34);
-        ps.riverStatistics.fourBets = stmt->getInt(35);
-        ps.riverStatistics.folds = stmt->getInt(36);
+        ps.riverStatistics.hands = stmt->getInt(25);
+        ps.riverStatistics.checks = stmt->getInt(26);
+        ps.riverStatistics.bets = stmt->getInt(27);
+        ps.riverStatistics.calls = stmt->getInt(28);
+        ps.riverStatistics.raises = stmt->getInt(29);
+        ps.riverStatistics.folds = stmt->getInt(30);
 
-        results[n] = ps;
+        // showdown - TODO: Add these to PlayerStatistics struct
+        // int sd_wentToShowdown = stmt->getInt(31);
+        // int sd_wonShowdown = stmt->getInt(32);
+        // int sd_wonWithoutShowdown = stmt->getInt(33);
+
+        // bet sizing - TODO: Add this to PlayerStatistics struct
+        // double avg_bet_size_ratio = stmt->getDouble(34);
+
+        // Store in result array - use same stats for all player counts that map to this table_type
+        if (tableType == "HU")
+        {
+            results[2] = ps;
+        }
+        else if (tableType == "SH")
+        {
+            for (int i = 3; i <= 6; i++)
+                results[i] = ps;
+        }
+        else if (tableType == "FR")
+        {
+            for (int i = 7; i <= MAX_NUMBER_OF_PLAYERS; i++)
+                results[i] = ps;
+        }
     }
 
     return results;

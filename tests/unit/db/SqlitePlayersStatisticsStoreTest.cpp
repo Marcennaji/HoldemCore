@@ -1,14 +1,14 @@
 #include "SqlitePlayersStatisticsStoreTest.h"
+#include "adapters/infrastructure/statistics/NullPlayersStatisticsStore.h"
 #include "common/DeterministicStrategy.h"
 #include "common/EngineTest.h"
 #include "common/FakeRandomizer.h"
 #include "core/engine/EngineDefs.h"
 #include "core/engine/state/PreflopState.h"
-#include "adapters/infrastructure/statistics/NullPlayersStatisticsStore.h"
 #include "core/player/Helpers.h"
 
-#include "adapters/infrastructure/logger/ConsoleLogger.h"
 #include "adapters/infrastructure/hand_evaluation/PsimHandEvaluationEngine.h"
+#include "adapters/infrastructure/logger/ConsoleLogger.h"
 #include "adapters/infrastructure/statistics/sqlite/SqliteDb.h"
 
 #include <memory>
@@ -24,20 +24,21 @@ namespace pkt::test
 void SqlitePlayersStatisticsStoreTest::SetUp()
 {
     EngineTest::SetUp();
-    
+
     auto db = std::make_unique<pkt::infra::SqliteDb>(":memory:");
     m_playersStatisticsStore = std::make_unique<pkt::infra::SqlitePlayersStatisticsStore>(std::move(db));
 
     auto logger = std::make_shared<pkt::infra::ConsoleLogger>();
-    logger->setLogLevel(getTestLogLevel()); 
+    logger->setLogLevel(getTestLogLevel());
     m_logger = logger;
-    
+
     auto randomizer = std::make_shared<FakeRandomizer>();
     randomizer->values = {3, 5, 7};
     m_randomizer = randomizer;
 
-    m_factory = std::make_unique<EngineFactory>(m_events, *m_logger, *m_handEvaluationEngine, *m_playersStatisticsStore, *m_randomizer);
-    
+    m_factory = std::make_unique<EngineFactory>(m_events, *m_logger, *m_handEvaluationEngine, *m_playersStatisticsStore,
+                                                *m_randomizer);
+
     gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
     gameData.startMoney = 1000;
     gameData.firstSmallBlind = 10;
@@ -80,17 +81,23 @@ TEST_F(SqlitePlayersStatisticsStoreTest, SaveAndLoadStatistics)
     preflop->promptPlayerAction(*m_hand, *playerSb);     // Small blind folds
     // -> round ends automatically, stats should be saved
 
-    // Verify loaded statistics for the number of players (index 1-based)
-    auto dealerStats = store.loadPlayerStatistics(playerDealer->getName());
-    EXPECT_EQ(dealerStats[nbPlayers].preflopStatistics.hands, 1);
-    EXPECT_EQ(dealerStats[nbPlayers].preflopStatistics.folds, 1);
+    // Note: All three players use DeterministicStrategy, so they share the same statistics record
+    // Verify loaded statistics for the strategy (not individual players)
+    auto dealerStats = store.loadPlayerStatistics(playerDealer->getStrategyTypeName());
+    // Only Dealer and SB acted (both folded), BB didn't get a chance to act
+    // Total: 2 hands, 2 folds
+    EXPECT_EQ(dealerStats[nbPlayers].preflopStatistics.hands, 2);
+    EXPECT_EQ(dealerStats[nbPlayers].preflopStatistics.folds, 2);
 
-    auto sbStats = store.loadPlayerStatistics(playerSb->getName());
-    EXPECT_EQ(sbStats[nbPlayers].preflopStatistics.hands, 1);
-    EXPECT_EQ(sbStats[nbPlayers].preflopStatistics.folds, 1);
+    auto sbStats = store.loadPlayerStatistics(playerSb->getStrategyTypeName());
+    // Same strategy, same stats
+    EXPECT_EQ(sbStats[nbPlayers].preflopStatistics.hands, 2);
+    EXPECT_EQ(sbStats[nbPlayers].preflopStatistics.folds, 2);
 
-    auto bbStats = store.loadPlayerStatistics(playerBb->getName());
-    EXPECT_EQ(bbStats[nbPlayers].preflopStatistics.hands, 0); // Big blind did not act
+    auto bbStats = store.loadPlayerStatistics(playerBb->getStrategyTypeName());
+    // Same strategy, same stats
+    EXPECT_EQ(bbStats[nbPlayers].preflopStatistics.hands, 2);
+    EXPECT_EQ(bbStats[nbPlayers].preflopStatistics.folds, 2);
 }
 
 } // namespace pkt::test

@@ -4,17 +4,17 @@
 
 #include "Player.h"
 
-#include "core/ports/Logger.h"
 #include <core/engine/cards/CardUtilities.h>
 #include <core/engine/hand/Hand.h>
 #include <core/engine/hand/HandEvaluator.h>
 #include <core/engine/model/Ranges.h>
 #include <core/engine/utils/Helpers.h>
-#include <core/ports/PlayersStatisticsStore.h>
 #include <core/player/range/RangeParser.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include <core/player/strategy/PreflopRangeCalculator.h>
+#include <core/ports/PlayersStatisticsStore.h>
 #include "Helpers.h"
+#include "core/ports/Logger.h"
 
 #include <sstream>
 
@@ -23,20 +23,18 @@ namespace pkt::core::player
 
 using namespace std;
 
-
 // Fully ISP-compliant constructor with all required interfaces
-Player::Player(const GameEvents& events, pkt::core::Logger& logger, 
-               pkt::core::HandEvaluationEngine& handEvaluator,
-               pkt::core::PlayersStatisticsStore& statisticsStore,
-               pkt::core::Randomizer& randomizer,
-               int id, std::string name, int cash)
-    : m_id(id), m_name(name), m_events(events), m_logger(logger), m_handEvaluator(handEvaluator), m_statisticsStore(statisticsStore), m_randomizer(randomizer)
+Player::Player(const GameEvents& events, pkt::core::Logger& logger, pkt::core::HandEvaluationEngine& handEvaluator,
+               pkt::core::PlayersStatisticsStore& statisticsStore, pkt::core::Randomizer& randomizer, int id,
+               std::string name, int cash)
+    : m_id(id), m_name(name), m_events(events), m_logger(logger), m_handEvaluator(handEvaluator),
+      m_statisticsStore(statisticsStore), m_randomizer(randomizer)
 {
     m_rangeEstimator = std::make_unique<RangeEstimator>(m_id, logger, handEvaluator);
     m_opponentsStrengthsEvaluator = std::make_unique<OpponentsStrengthsEvaluator>(m_id, logger, handEvaluator);
     m_currentHandContext = std::make_unique<CurrentHandContext>();
     m_statisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(statisticsStore);
-    m_statisticsUpdater->loadStatistics(name);
+    m_statisticsUpdater->loadStatistics(getStrategyTypeName());
 
     m_currentHandContext->personalContext.cash = cash;
 }
@@ -187,15 +185,10 @@ const HandSimulationStats Player::computeHandSimulation() const
 #if (False)
     const int nbOpponents = m_seatsList->size() - 1;
     // Evaluate strength against opponents' guessed ranges
-    auto evaluation = m_opponentsStrengthsEvaluator->evaluateOpponents(
-        *m_currentHandContext,
-        getHoleCards(),
-        getHandRanking()
-    );
-    return m_handEvaluator.simulateHandEquity(getCardsValueString(), 
-                                              m_currentHandContext->commonContext.stringBoard, 
-                                              nbOpponents,
-                                              evaluation.maxStrength);
+    auto evaluation =
+        m_opponentsStrengthsEvaluator->evaluateOpponents(*m_currentHandContext, getHoleCards(), getHandRanking());
+    return m_handEvaluator.simulateHandEquity(getCardsValueString(), m_currentHandContext->commonContext.stringBoard,
+                                              nbOpponents, evaluation.maxStrength);
 #else
     return m_handEvaluator.simulateHandEquity("As 6d", "", 2, 0.5);
 #endif
@@ -271,7 +264,7 @@ void Player::updateCurrentHandContext(Hand& currentHand)
 }
 
 float Player::calculatePreflopCallingRange(const CurrentHandContext& ctx) const
-{    
+{
     PreflopRangeCalculator calculator(m_logger, m_randomizer);
     return calculator.calculatePreflopCallingRange(ctx);
 }
@@ -325,7 +318,7 @@ void Player::setAction(HandState& state, const PlayerAction& action)
     if (action.type != ActionType::None)
     {
         m_logger.info(m_name + " " + std::string(actionTypeToString(action.type)) +
-                                  (action.amount ? " " + std::to_string(action.amount) : ""));
+                      (action.amount ? " " + std::to_string(action.amount) : ""));
     }
     m_currentHandContext->personalContext.actions.currentHandActions.addAction(state.getGameState(), action);
 }

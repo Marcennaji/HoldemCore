@@ -16,17 +16,14 @@ void PlayerStatistics::reset()
     flopStatistics.reset();
     turnStatistics.reset();
     riverStatistics.reset();
+    showdownStatistics.reset();
 }
 
 float PlayerStatistics::getWentToShowDown() const
 {
-
-    if ((riverStatistics.hands - riverStatistics.folds) == 0)
-    {
-        return 0;
-    }
-
-    return ((riverStatistics.hands - riverStatistics.folds) * 100) / (flopStatistics.hands);
+    if (flopStatistics.hands == 0)
+        return 0.0f;
+    return (showdownStatistics.wentToShowdown * 100.0f) / flopStatistics.hands;
 }
 
 void PreflopStatistics::addLastAction(PlayerAction p)
@@ -254,6 +251,12 @@ float RiverStatistics::getAgressionFactor() const
     }
 
     return (float) (raises + bets) / (float) calls;
+}
+void ShowdownStatistics::reset()
+{
+    wentToShowdown = 0;
+    wonShowdown = 0;
+    wonWithoutShowdown = 0;
 }
 
 } // namespace pkt::core::player

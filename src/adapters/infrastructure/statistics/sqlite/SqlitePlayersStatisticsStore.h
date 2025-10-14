@@ -36,10 +36,11 @@ class SqlitePlayersStatisticsStore : public pkt::core::PlayersStatisticsStore
 
     void savePlayersStatistics(PlayerList seatsList) override;
     std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1>
-    loadPlayerStatistics(const std::string& playerName) override;
+    loadPlayerStatistics(const std::string& strategyName) override;
 
   private:
-    void initializeStrategyStatistics(const std::string& playerName, const int nbPlayers);
+    void initializeStrategyStatistics(const std::string& strategyName, const int nbPlayers);
+    std::string getTableType(const int nbPlayers);
     std::unique_ptr<SqliteDb> m_db;
     std::string m_sql;
 };

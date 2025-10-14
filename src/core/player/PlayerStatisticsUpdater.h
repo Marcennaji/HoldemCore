@@ -2,7 +2,6 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
-
 #pragma once
 
 #include <core/engine/EngineDefs.h>
@@ -21,7 +20,7 @@ struct CurrentHandContext;
 
 /**
  * @brief Manages updating and persisting player statistics throughout gameplay.
- * 
+ *
  * Handles loading player statistics from storage, updating them based on
  * actions and hand outcomes, and persisting the updated statistics back
  * to the storage system.
@@ -31,7 +30,7 @@ class PlayerStatisticsUpdater
   public:
     explicit PlayerStatisticsUpdater(pkt::core::PlayersStatisticsStore& statisticsStore);
 
-    void loadStatistics(const std::string& playerName);
+    void loadStatistics(const std::string& strategyName);
     void resetPlayerStatistics();
     void updateStatistics(GameState state, const CurrentHandContext& ctx);
 
@@ -43,7 +42,7 @@ class PlayerStatisticsUpdater
     void updateFlopStatistics(const CurrentHandContext& ctx);
     void updateTurnStatistics(const CurrentHandContext& ctx);
     void updateRiverStatistics(const CurrentHandContext& ctx);
-    
+
     pkt::core::PlayersStatisticsStore& getPlayersStatisticsStore() const;
 
     core::PlayersStatisticsStore& m_statisticsStore;

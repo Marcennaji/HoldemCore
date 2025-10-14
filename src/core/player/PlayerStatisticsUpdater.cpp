@@ -264,14 +264,13 @@ void PlayerStatisticsUpdater::updateRiverStatistics(const CurrentHandContext& ct
 pkt::core::PlayersStatisticsStore& PlayerStatisticsUpdater::getPlayersStatisticsStore() const
 {
     return m_statisticsStore;
-
 }
 
-void PlayerStatisticsUpdater::loadStatistics(const std::string& playerName)
+void PlayerStatisticsUpdater::loadStatistics(const std::string& strategyName)
 {
     resetPlayerStatistics(); // reset stats to 0
 
-    m_statistics = getPlayersStatisticsStore().loadPlayerStatistics(playerName);
+    m_statistics = getPlayersStatisticsStore().loadPlayerStatistics(strategyName);
     if (m_statistics.empty())
     {
         m_statistics.fill(PlayerStatistics());

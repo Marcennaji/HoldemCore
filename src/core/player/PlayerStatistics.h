@@ -102,6 +102,14 @@ class RiverStatistics
     long fourBets;
 };
 
+class ShowdownStatistics {
+  public:
+  void reset();
+    int wentToShowdown = 0;
+    int wonShowdown = 0;
+    int wonWithoutShowdown = 0;
+};
+
 /**
  * @brief Tracks comprehensive playing statistics for a player across multiple hands.
  * 
@@ -109,6 +117,8 @@ class RiverStatistics
  * showdown frequency, hand counts, and preflop statistics. Used for analyzing
  * player tendencies and performance over time.
  */
+
+
 class PlayerStatistics
 {
   public:
@@ -123,5 +133,6 @@ class PlayerStatistics
     FlopStatistics flopStatistics;
     TurnStatistics turnStatistics;
     RiverStatistics riverStatistics;
+    ShowdownStatistics showdownStatistics;
 };
 } // namespace pkt::core::player
