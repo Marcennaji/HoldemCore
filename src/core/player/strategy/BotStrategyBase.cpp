@@ -1,21 +1,20 @@
 #include "BotStrategyBase.h"
 
-#include <core/engine/model/Ranges.h>
 #include <core/engine/actions/ActionValidator.h>
+#include <core/engine/model/Ranges.h>
 #include <core/engine/utils/Helpers.h>
 #include <core/player/Helpers.h>
 #include "CurrentHandContext.h"
-#include "core/player/Player.h"
 #include "PokerMath.h"
 #include "adapters/infrastructure/randomizer/DefaultRandomizer.h"
+#include "core/player/Player.h"
 
 using namespace std;
 
 namespace pkt::core::player
 {
 
-BotStrategyBase::BotStrategyBase(Logger& logger, Randomizer& randomizer) 
-    : m_logger(logger), m_randomizer(&randomizer)
+BotStrategyBase::BotStrategyBase(Logger& logger, Randomizer& randomizer) : m_logger(logger), m_randomizer(&randomizer)
 {
     m_preflopRangeCalculator = std::make_unique<PreflopRangeCalculator>(m_logger, *m_randomizer);
 }
@@ -29,7 +28,7 @@ PlayerAction BotStrategyBase::decidePreflop(const CurrentHandContext& ctx)
     bool couldCall = preflopCouldCall(ctx);
     int raiseAmount = preflopCouldRaise(ctx);
 
-    if (raiseAmount > 0)
+    if (raiseAmount > 0 && canAffordToRaise(ctx, raiseAmount))
     {
         resultingAction.type = ActionType::Raise;
         resultingAction.amount = raiseAmount;
@@ -38,7 +37,7 @@ PlayerAction BotStrategyBase::decidePreflop(const CurrentHandContext& ctx)
     {
         resultingAction.type = ActionType::Call;
     }
-    else if (ctx.commonContext.bettingContext.preflopRaisesNumber == 0 && 
+    else if (ctx.commonContext.bettingContext.preflopRaisesNumber == 0 &&
              ctx.personalContext.position == PlayerPosition::BigBlind)
     {
         // If last to speak, hand not good enough to raise/call, and nobody has raised: check
@@ -48,7 +47,7 @@ PlayerAction BotStrategyBase::decidePreflop(const CurrentHandContext& ctx)
     {
         resultingAction.type = ActionType::Fold;
     }
-    
+
     return resultingAction;
 }
 PlayerAction BotStrategyBase::decideFlop(const CurrentHandContext& ctx)
@@ -60,7 +59,7 @@ PlayerAction BotStrategyBase::decideFlop(const CurrentHandContext& ctx)
     {
         // No bets yet - decide whether to bet or check
         int betAmount = flopCouldBet(ctx);
-        if (betAmount > 0)
+        if (betAmount > 0 && betAmount <= ctx.personalContext.cash)
         {
             resultingAction.type = ActionType::Bet;
             resultingAction.amount = betAmount;
@@ -74,7 +73,7 @@ PlayerAction BotStrategyBase::decideFlop(const CurrentHandContext& ctx)
     {
         // There are bets/raises - decide whether to call, raise, or fold
         int raiseAmount = flopCouldRaise(ctx);
-        if (raiseAmount > 0)
+        if (raiseAmount > 0 && canAffordToRaise(ctx, raiseAmount))
         {
             resultingAction.type = ActionType::Raise;
             resultingAction.amount = raiseAmount;
@@ -100,7 +99,7 @@ PlayerAction BotStrategyBase::decideTurn(const CurrentHandContext& ctx)
     {
         // No bets yet - decide whether to bet or check
         int betAmount = turnCouldBet(ctx);
-        if (betAmount > 0)
+        if (betAmount > 0 && betAmount <= ctx.personalContext.cash)
         {
             resultingAction.type = ActionType::Bet;
             resultingAction.amount = betAmount;
@@ -114,7 +113,7 @@ PlayerAction BotStrategyBase::decideTurn(const CurrentHandContext& ctx)
     {
         // There are bets/raises - decide whether to call, raise, or fold
         int raiseAmount = turnCouldRaise(ctx);
-        if (raiseAmount > 0)
+        if (raiseAmount > 0 && canAffordToRaise(ctx, raiseAmount))
         {
             resultingAction.type = ActionType::Raise;
             resultingAction.amount = raiseAmount;
@@ -128,7 +127,7 @@ PlayerAction BotStrategyBase::decideTurn(const CurrentHandContext& ctx)
             resultingAction.type = ActionType::Fold;
         }
     }
-    
+
     return resultingAction;
 }
 PlayerAction BotStrategyBase::decideRiver(const CurrentHandContext& ctx)
@@ -140,7 +139,7 @@ PlayerAction BotStrategyBase::decideRiver(const CurrentHandContext& ctx)
     {
         // No bets yet - decide whether to bet or check
         int betAmount = riverCouldBet(ctx);
-        if (betAmount > 0)
+        if (betAmount > 0 && betAmount <= ctx.personalContext.cash)
         {
             resultingAction.type = ActionType::Bet;
             resultingAction.amount = betAmount;
@@ -154,7 +153,7 @@ PlayerAction BotStrategyBase::decideRiver(const CurrentHandContext& ctx)
     {
         // There are bets/raises - decide whether to call, raise, or fold
         int raiseAmount = riverCouldRaise(ctx);
-        if (raiseAmount > 0)
+        if (raiseAmount > 0 && canAffordToRaise(ctx, raiseAmount))
         {
             resultingAction.type = ActionType::Raise;
             resultingAction.amount = raiseAmount;
@@ -168,7 +167,7 @@ PlayerAction BotStrategyBase::decideRiver(const CurrentHandContext& ctx)
             resultingAction.type = ActionType::Fold;
         }
     }
-    
+
     return resultingAction;
 }
 bool BotStrategyBase::shouldPotControl(const CurrentHandContext& ctx)
@@ -258,7 +257,7 @@ int BotStrategyBase::computeFirstRaiseAmount(const CurrentHandContext& ctx, int 
     float baseRaise = PokerMath::calculateStandardOpenRaise(ctx);
     float positionAdjustment = PokerMath::getPositionRaiseAdjustment(ctx);
     float limperAdjustment = PokerMath::getLimperRaiseAdjustment(ctx);
-    
+
     int raiseAmount = static_cast<int>(baseRaise + positionAdjustment + limperAdjustment);
 
     return finalizeRaiseAmount(ctx, raiseAmount);
@@ -404,14 +403,16 @@ bool BotStrategyBase::canAffordToCall(const CurrentHandContext& ctx) const
 
 bool BotStrategyBase::canAffordToRaise(const CurrentHandContext& ctx, int raiseAmount) const
 {
-    const int currentPlayerBet = ctx.personalContext.actions.currentHandActions.getRoundTotalBetAmount(ctx.commonContext.gameState);
+    const int currentPlayerBet =
+        ctx.personalContext.actions.currentHandActions.getRoundTotalBetAmount(ctx.commonContext.gameState);
     const int extraCashRequired = raiseAmount - currentPlayerBet;
     return ctx.personalContext.cash >= extraCashRequired;
 }
 
 int BotStrategyBase::getCallAmount(const CurrentHandContext& ctx) const
 {
-    const int currentPlayerBet = ctx.personalContext.actions.currentHandActions.getRoundTotalBetAmount(ctx.commonContext.gameState);
+    const int currentPlayerBet =
+        ctx.personalContext.actions.currentHandActions.getRoundTotalBetAmount(ctx.commonContext.gameState);
     return ctx.commonContext.bettingContext.highestBetAmount - currentPlayerBet;
 }
 } // namespace pkt::core::player

@@ -2,6 +2,7 @@
 #include "SqliteDb.h"
 #include "SqliteStatement.h"
 #include "core/player/Player.h"
+#include "core/player/strategy/PlayerStrategy.h"
 
 #include <sstream>
 #include <stdexcept>
@@ -122,13 +123,21 @@ void SqlitePlayersStatisticsStore::savePlayersStatistics(PlayerList seatsList)
 
     for (auto& player : *seatsList)
     {
+        std::string strategyName = player->getStrategyName();
+
+        // Skip players without a valid strategy
+        if (strategyName.empty() || strategyName == PlayerStrategy::NO_STRATEGY_NAME)
+        {
+            continue;
+        }
+
         const auto& stats = player->getStatisticsUpdater()->getStatistics(nbPlayers);
         if (stats.preflopStatistics.hands == 0)
         {
             continue;
         }
 
-        initializeStrategyStatistics(player->getStrategyTypeName(), nbPlayers);
+        initializeStrategyStatistics(strategyName, nbPlayers);
 
         auto stmt =
             m_db->prepare("UPDATE PlayersStatistics SET "
@@ -150,7 +159,7 @@ void SqlitePlayersStatisticsStore::savePlayersStatistics(PlayerList seatsList)
                           "WHERE strategy_name=?1 AND table_type=?2");
 
         // keys
-        stmt->bindText(1, player->getStrategyTypeName());
+        stmt->bindText(1, strategyName);
         stmt->bindText(2, tableType);
 
         // preflop
@@ -206,6 +215,12 @@ void SqlitePlayersStatisticsStore::savePlayersStatistics(PlayerList seatsList)
 std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1>
 SqlitePlayersStatisticsStore::loadPlayerStatistics(const std::string& strategyName)
 {
+    // Skip loading for invalid strategy names
+    if (strategyName.empty() || strategyName == PlayerStrategy::NO_STRATEGY_NAME)
+    {
+        return std::array<PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1>{};
+    }
+
     // make sure that we have initial values for this player
     for (int nbPlayers = 2; nbPlayers <= MAX_NUMBER_OF_PLAYERS; nbPlayers++)
         initializeStrategyStatistics(strategyName, nbPlayers);

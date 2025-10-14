@@ -1,9 +1,9 @@
 #include "HandStateManager.h"
 #include "GameEvents.h"
 #include "Hand.h"
-#include "core/engine/state/PreflopState.h"
 #include "core/engine/hand/ActionProcessor.h"
 #include "core/engine/hand/HandState.h"
+#include "core/engine/state/PreflopState.h"
 #include "core/ports/Logger.h"
 
 #include <cassert>
@@ -18,8 +18,6 @@ HandStateManager::HandStateManager(const GameEvents& events, int smallBlind, uns
 {
 }
 
-
-
 void HandStateManager::initializeState(Hand& hand)
 {
     // Clean up any previous state first
@@ -28,7 +26,7 @@ void HandStateManager::initializeState(Hand& hand)
         m_currentState->exit(hand);
         m_currentState.reset();
     }
-    
+
     m_currentState = std::make_unique<PreflopState>(m_events, m_smallBlind, m_dealerPlayerId, *m_logger);
     m_currentState->enter(hand);
 }
@@ -73,8 +71,6 @@ void HandStateManager::runGameLoop(Hand& hand)
         // Force terminate the game
         return;
     }
-
-    checkAndHandleTerminalState(hand);
 }
 
 void HandStateManager::handleStateTransition(Hand& hand)

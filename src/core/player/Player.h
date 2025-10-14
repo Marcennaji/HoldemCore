@@ -21,8 +21,8 @@
 
 #include "core/ports/HandEvaluationEngine.h"
 #include "core/ports/Logger.h"
-#include "core/ports/Randomizer.h"
 #include "core/ports/PlayersStatisticsStore.h"
+#include "core/ports/Randomizer.h"
 
 #include <array>
 #include <assert.h>
@@ -41,30 +41,26 @@ class HandState;
 namespace pkt::core::player
 {
 
-  /**
+/**
  * @brief Player facade that coordinates poker player behavior and state.
- * 
+ *
  * This class implements the Facade pattern, providing a unified interface to:
  * - Player identity and core properties
  * - Strategy delegation (Strategy pattern)
  * - Hand context state management
  * - Statistics tracking
  * - Range estimation
- * 
- * Most methods delegate to appropriate component objects rather than 
+ *
+ * Most methods delegate to appropriate component objects rather than
  * implementing logic directly.
  */
-
 
 class Player
 {
   public:
-
-    Player(const GameEvents&, pkt::core::Logger& logger, 
-           pkt::core::HandEvaluationEngine& handEvaluator,
-           pkt::core::PlayersStatisticsStore& statisticsStore,
-           pkt::core::Randomizer& randomizer,
-           int id, std::string name, int cash);
+    Player(const GameEvents&, pkt::core::Logger& logger, pkt::core::HandEvaluationEngine& handEvaluator,
+           pkt::core::PlayersStatisticsStore& statisticsStore, pkt::core::Randomizer& randomizer, int id,
+           std::string name, int cash);
 
     virtual ~Player() = default;
 
@@ -85,14 +81,14 @@ class Player
         return m_strategy->decideAction(ctx);
     }
 
-    std::string getStrategyTypeName() const
+    std::string getStrategyName() const
     {
         if (!m_strategy)
         {
-            return "None";
+            return PlayerStrategy::NO_STRATEGY_NAME;
         }
-        const auto& strategy = *m_strategy;
-        return typeid(strategy).name();
+
+        return m_strategy->getName();
     }
 
     template <typename StrategyType> bool hasStrategyType() const
@@ -159,8 +155,9 @@ class Player
     // ========================================
     // Opponent Strength Evaluation (Delegate to m_opponentsStrengthsEvaluator)
     // ========================================
-    std::unique_ptr<OpponentsStrengthsEvaluator>& getOpponentsStrengthsEvaluator() { 
-        return m_opponentsStrengthsEvaluator; 
+    std::unique_ptr<OpponentsStrengthsEvaluator>& getOpponentsStrengthsEvaluator()
+    {
+        return m_opponentsStrengthsEvaluator;
     }
 
     // ========================================

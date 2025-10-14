@@ -83,18 +83,18 @@ TEST_F(SqlitePlayersStatisticsStoreTest, SaveAndLoadStatistics)
 
     // Note: All three players use DeterministicStrategy, so they share the same statistics record
     // Verify loaded statistics for the strategy (not individual players)
-    auto dealerStats = store.loadPlayerStatistics(playerDealer->getStrategyTypeName());
+    auto dealerStats = store.loadPlayerStatistics(playerDealer->getStrategyName());
     // Only Dealer and SB acted (both folded), BB didn't get a chance to act
     // Total: 2 hands, 2 folds
     EXPECT_EQ(dealerStats[nbPlayers].preflopStatistics.hands, 2);
     EXPECT_EQ(dealerStats[nbPlayers].preflopStatistics.folds, 2);
 
-    auto sbStats = store.loadPlayerStatistics(playerSb->getStrategyTypeName());
+    auto sbStats = store.loadPlayerStatistics(playerSb->getStrategyName());
     // Same strategy, same stats
     EXPECT_EQ(sbStats[nbPlayers].preflopStatistics.hands, 2);
     EXPECT_EQ(sbStats[nbPlayers].preflopStatistics.folds, 2);
 
-    auto bbStats = store.loadPlayerStatistics(playerBb->getStrategyTypeName());
+    auto bbStats = store.loadPlayerStatistics(playerBb->getStrategyName());
     // Same strategy, same stats
     EXPECT_EQ(bbStats[nbPlayers].preflopStatistics.hands, 2);
     EXPECT_EQ(bbStats[nbPlayers].preflopStatistics.folds, 2);

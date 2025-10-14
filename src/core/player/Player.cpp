@@ -34,7 +34,7 @@ Player::Player(const GameEvents& events, pkt::core::Logger& logger, pkt::core::H
     m_opponentsStrengthsEvaluator = std::make_unique<OpponentsStrengthsEvaluator>(m_id, logger, handEvaluator);
     m_currentHandContext = std::make_unique<CurrentHandContext>();
     m_statisticsUpdater = std::make_unique<PlayerStatisticsUpdater>(statisticsStore);
-    m_statisticsUpdater->loadStatistics(getStrategyTypeName());
+    m_statisticsUpdater->loadStatistics(getStrategyName());
 
     m_currentHandContext->personalContext.cash = cash;
 }
@@ -182,16 +182,12 @@ std::string Player::getCardsValueString() const
 
 const HandSimulationStats Player::computeHandSimulation() const
 {
-#if (False)
-    const int nbOpponents = m_seatsList->size() - 1;
+    const int nbOpponents = m_currentHandContext->commonContext.playersContext.nbPlayers - 1;
     // Evaluate strength against opponents' guessed ranges
     auto evaluation =
         m_opponentsStrengthsEvaluator->evaluateOpponents(*m_currentHandContext, getHoleCards(), getHandRanking());
     return m_handEvaluator.simulateHandEquity(getCardsValueString(), m_currentHandContext->commonContext.stringBoard,
                                               nbOpponents, evaluation.maxStrength);
-#else
-    return m_handEvaluator.simulateHandEquity("As 6d", "", 2, 0.5);
-#endif
 }
 
 bool Player::isInVeryLooseMode(const int nbPlayers) const

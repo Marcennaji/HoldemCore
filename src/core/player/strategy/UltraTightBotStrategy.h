@@ -15,7 +15,7 @@ struct CurrentHandContext;
 
 /**
  * @brief Implements an ultra-tight playing style for bot players.
- * 
+ *
  * This strategy plays an extremely selective range of hands, focusing only on
  * premium holdings. It's a very conservative approach that minimizes risk but
  * may miss profitable opportunities with marginal hands.
@@ -24,25 +24,25 @@ class UltraTightBotStrategy : public BotStrategyBase
 {
 
   public:
-    UltraTightBotStrategy(pkt::core::Logger& logger, 
-                          pkt::core::Randomizer& randomizer);
-    
+    UltraTightBotStrategy(pkt::core::Logger& logger, pkt::core::Randomizer& randomizer);
+
     ~UltraTightBotStrategy();
+    std::string getName() const override { return "UltraTightBot"; }
 
   protected:
-    virtual bool preflopCouldCall(const CurrentHandContext& ctx);
-    virtual bool flopCouldCall(const CurrentHandContext& ctx);
-    virtual bool turnCouldCall(const CurrentHandContext& ctx);
-    virtual bool riverCouldCall(const CurrentHandContext& ctx);
+    virtual bool preflopCouldCall(const CurrentHandContext& ctx) override;
+    virtual bool flopCouldCall(const CurrentHandContext& ctx) override;
+    virtual bool turnCouldCall(const CurrentHandContext& ctx) override;
+    virtual bool riverCouldCall(const CurrentHandContext& ctx) override;
 
-    virtual int preflopCouldRaise(const CurrentHandContext& ctx);
-    virtual int flopCouldRaise(const CurrentHandContext& ctx);
-    virtual int turnCouldRaise(const CurrentHandContext& ctx);
-    virtual int riverCouldRaise(const CurrentHandContext& ctx);
+    virtual int preflopCouldRaise(const CurrentHandContext& ctx) override;
+    virtual int flopCouldRaise(const CurrentHandContext& ctx) override;
+    virtual int turnCouldRaise(const CurrentHandContext& ctx) override;
+    virtual int riverCouldRaise(const CurrentHandContext& ctx) override;
 
-    virtual int flopCouldBet(const CurrentHandContext& ctx);
-    virtual int turnCouldBet(const CurrentHandContext& ctx);
-    virtual int riverCouldBet(const CurrentHandContext& ctx);
+    virtual int flopCouldBet(const CurrentHandContext& ctx) override;
+    virtual int turnCouldBet(const CurrentHandContext& ctx) override;
+    virtual int riverCouldBet(const CurrentHandContext& ctx) override;
 };
 
 } // namespace pkt::core::player

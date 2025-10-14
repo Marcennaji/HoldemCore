@@ -2,7 +2,6 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
-
 #pragma once
 
 #include "core/engine/model/PlayerAction.h"
@@ -17,7 +16,7 @@ class DeterministicStrategy : public pkt::core::player::BotStrategy
 {
   public:
     void setLastAction(pkt::core::GameState state, pkt::core::PlayerAction action) { m_actions[state] = action; }
-
+    virtual std::string getName() const override { return "DeterministicStrategy"; }
     void clear() { m_actions.clear(); }
 
   private:
