@@ -135,6 +135,21 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(const CurrentHandCont
     // Handle raises
     callingRange = adjustCallForRaises(ctx, callingRange);
 
+    // Check if facing an all-in (to avoid overly loose adjustments)
+    std::shared_ptr<Player> lastRaiser = ctx.commonContext.playersContext.preflopLastRaiser;
+    bool isFacingAllIn = lastRaiser && lastRaiser->getLastAction().type == ActionType::Allin;
+
+    // Additional tightening for all-ins: calling all-ins requires premium hands
+    if (isFacingAllIn)
+    {
+        // Tighten significantly more when facing all-in (typically 15-25% of current range)
+        float allInTighteningFactor = 0.2f; // Keep only top 20% of current range
+        callingRange *= allInTighteningFactor;
+        m_logger.decisionMaking(
+            "Facing all-in - applying aggressive tightening factor: " + std::to_string(1.0f / allInTighteningFactor) +
+            "x tighter → " + std::to_string(callingRange) + "%");
+    }
+
     // Tighten range for big bets
     if (isPreflopBigBet)
     {
@@ -143,9 +158,8 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(const CurrentHandCont
                                 m_totalBetAmount, smallBlind);
     }
 
-    // Adjust for loose/aggressive raiser
-    // MODIFIED: Instead of forcing minimum 20%, expand proportionally to respect strategy tightness
-    if (shouldAdjustCallForLooseRaiser(ctx, nbCalls, nbRaises))
+    // Adjust for loose/aggressive raiser (but not when facing all-in)
+    if (!isFacingAllIn && shouldAdjustCallForLooseRaiser(ctx, nbCalls, nbRaises))
     {
         float expandedRange = callingRange * 1.5f; // 50% expansion
         m_logger.decisionMaking("Adjusting calling range for loose/aggressive raiser: " + std::to_string(callingRange) +
@@ -153,28 +167,18 @@ float PreflopRangeCalculator::calculatePreflopCallingRange(const CurrentHandCont
         callingRange = expandedRange;
     }
 
-    // Adjust for good odds
-    // MODIFIED: Instead of forcing 40%, expand proportionally to respect strategy tightness
-    if (couldCallForGoodOdds(potOdd, m_m, m_position))
+    // Adjust for good odds (but not when facing all-in)
+    if (!isFacingAllIn && couldCallForGoodOdds(potOdd, m_m, m_position))
     {
         float expandedRange = callingRange * 2.0f; // Double the range for good odds
         m_logger.decisionMaking("Adjusting calling range for good pot odds: " + std::to_string(callingRange) + "% → " +
                                 std::to_string(expandedRange) + "%");
         callingRange = expandedRange;
     }
-
-    // Adjust for all-in raiser
-    // DISABLED: This was causing ultra-tight strategies to call all-ins with 100% of hands!
-    // The logic doesn't account for strategy tightness and is too aggressive.
-    // Even with good pot odds, ultra-tight should not call all-ins with any two cards.
-    /*
-    if (couldCallForAllIn(ctx, potOdd, nbRaises))
+    else if (isFacingAllIn)
     {
-        m_logger.decisionMaking("Adjusting calling range for all-in: " +
-                                std::to_string(callingRange) + "% → 100%");
-        callingRange = 100.0f;
+        m_logger.decisionMaking("Facing all-in - skipping good odds and loose raiser adjustments");
     }
-    */
 
     return clampCallingRange(callingRange);
 }
