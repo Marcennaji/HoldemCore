@@ -5,6 +5,7 @@
 // PokerTableWindow.h
 #pragma once
 
+#include <QCheckBox>
 #include <QGraphicsOpacityEffect>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -172,6 +173,7 @@ class PokerTableWindow : public QWidget
 
     // Next hand control
     QPushButton* m_nextHandButton = nullptr;
+    QCheckBox* m_pauseBetweenHandsCheckbox = nullptr;
 
     // Cached state for showdown reveal
     std::vector<pkt::core::HoleCards> m_cachedHoleCards;

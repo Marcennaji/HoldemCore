@@ -40,11 +40,58 @@ PlayerAction BotStrategyBase::decidePreflop(const CurrentHandContext& ctx)
     int raiseAmount = preflopCouldRaise(ctx);
     m_logger.decisionMaking("After preflopCouldRaise: " + std::to_string(raiseAmount));
 
+    // Check if we want to raise
     if (raiseAmount > 0 && canAffordToRaise(ctx, raiseAmount))
     {
-        resultingAction.type = ActionType::Raise;
-        resultingAction.amount = raiseAmount;
-        m_logger.decisionMaking(">>> FINAL DECISION: RAISE " + std::to_string(raiseAmount));
+        // Additional check: Is the raise amount actually higher than the current highest bet?
+        // This is crucial when facing an all-in from a player with more chips than us
+        const int currentHighestBet = ctx.commonContext.bettingContext.highestBetAmount;
+
+        if (raiseAmount > currentHighestBet)
+        {
+            // Valid raise - our raise is higher than current bet
+            resultingAction.type = ActionType::Raise;
+            resultingAction.amount = raiseAmount;
+            m_logger.decisionMaking(">>> FINAL DECISION: RAISE " + std::to_string(raiseAmount));
+        }
+        else if (raiseAmount >= ctx.personalContext.cash * 0.9)
+        {
+            // We want to commit most/all of our stack, but it's not enough to raise
+            // Convert to ALL-IN or CALL depending on whether we have enough to call
+            const int callAmount = getCallAmount(ctx);
+
+            if (ctx.personalContext.cash >= callAmount)
+            {
+                // We have enough to call the all-in
+                resultingAction.type = ActionType::Call;
+                m_logger.decisionMaking(">>> FINAL DECISION: CALL (wanted to raise " + std::to_string(raiseAmount) +
+                                        " but not enough to raise above " + std::to_string(currentHighestBet) + ")");
+            }
+            else
+            {
+                // We don't have enough to call - go all-in with what we have
+                resultingAction.type = ActionType::Allin;
+                resultingAction.amount = ctx.personalContext.cash;
+                m_logger.decisionMaking(">>> FINAL DECISION: ALL-IN " + std::to_string(ctx.personalContext.cash) +
+                                        " (wanted to raise but not enough chips)");
+            }
+        }
+        else
+        {
+            // We computed a raise but it's not high enough and we're not fully committed
+            // Fall back to call/fold logic
+            if (couldCall && canAffordToCall(ctx))
+            {
+                resultingAction.type = ActionType::Call;
+                m_logger.decisionMaking(">>> FINAL DECISION: CALL (raise amount " + std::to_string(raiseAmount) +
+                                        " not sufficient to raise above " + std::to_string(currentHighestBet) + ")");
+            }
+            else
+            {
+                resultingAction.type = ActionType::Fold;
+                m_logger.decisionMaking(">>> FINAL DECISION: FOLD (raise amount insufficient and cannot/won't call)");
+            }
+        }
     }
     else if (couldCall)
     {
@@ -103,9 +150,31 @@ PlayerAction BotStrategyBase::decideFlop(const CurrentHandContext& ctx)
         int raiseAmount = flopCouldRaise(ctx);
         if (raiseAmount > 0 && canAffordToRaise(ctx, raiseAmount))
         {
-            resultingAction.type = ActionType::Raise;
-            resultingAction.amount = raiseAmount;
-            m_logger.decisionMaking(">>> FINAL DECISION: RAISE " + std::to_string(raiseAmount));
+            // Check if raise is valid (higher than current bet)
+            const int currentHighestBet = ctx.commonContext.bettingContext.highestBetAmount;
+
+            if (raiseAmount > currentHighestBet)
+            {
+                resultingAction.type = ActionType::Raise;
+                resultingAction.amount = raiseAmount;
+                m_logger.decisionMaking(">>> FINAL DECISION: RAISE " + std::to_string(raiseAmount));
+            }
+            else if (raiseAmount >= ctx.personalContext.cash * 0.9 && flopCouldCall(ctx))
+            {
+                // Want to commit but not enough to raise - call instead
+                resultingAction.type = ActionType::Call;
+                m_logger.decisionMaking(">>> FINAL DECISION: CALL (wanted to raise but insufficient)");
+            }
+            else if (flopCouldCall(ctx))
+            {
+                resultingAction.type = ActionType::Call;
+                m_logger.decisionMaking(">>> FINAL DECISION: CALL");
+            }
+            else
+            {
+                resultingAction.type = ActionType::Fold;
+                m_logger.decisionMaking(">>> FINAL DECISION: FOLD");
+            }
         }
         else if (flopCouldCall(ctx))
         {
@@ -148,8 +217,27 @@ PlayerAction BotStrategyBase::decideTurn(const CurrentHandContext& ctx)
         int raiseAmount = turnCouldRaise(ctx);
         if (raiseAmount > 0 && canAffordToRaise(ctx, raiseAmount))
         {
-            resultingAction.type = ActionType::Raise;
-            resultingAction.amount = raiseAmount;
+            // Check if raise is valid (higher than current bet)
+            const int currentHighestBet = ctx.commonContext.bettingContext.highestBetAmount;
+
+            if (raiseAmount > currentHighestBet)
+            {
+                resultingAction.type = ActionType::Raise;
+                resultingAction.amount = raiseAmount;
+            }
+            else if (raiseAmount >= ctx.personalContext.cash * 0.9 && turnCouldCall(ctx))
+            {
+                // Want to commit but not enough to raise - call instead
+                resultingAction.type = ActionType::Call;
+            }
+            else if (turnCouldCall(ctx))
+            {
+                resultingAction.type = ActionType::Call;
+            }
+            else
+            {
+                resultingAction.type = ActionType::Fold;
+            }
         }
         else if (turnCouldCall(ctx))
         {
@@ -188,8 +276,27 @@ PlayerAction BotStrategyBase::decideRiver(const CurrentHandContext& ctx)
         int raiseAmount = riverCouldRaise(ctx);
         if (raiseAmount > 0 && canAffordToRaise(ctx, raiseAmount))
         {
-            resultingAction.type = ActionType::Raise;
-            resultingAction.amount = raiseAmount;
+            // Check if raise is valid (higher than current bet)
+            const int currentHighestBet = ctx.commonContext.bettingContext.highestBetAmount;
+
+            if (raiseAmount > currentHighestBet)
+            {
+                resultingAction.type = ActionType::Raise;
+                resultingAction.amount = raiseAmount;
+            }
+            else if (raiseAmount >= ctx.personalContext.cash * 0.9 && riverCouldCall(ctx))
+            {
+                // Want to commit but not enough to raise - call instead
+                resultingAction.type = ActionType::Call;
+            }
+            else if (riverCouldCall(ctx))
+            {
+                resultingAction.type = ActionType::Call;
+            }
+            else
+            {
+                resultingAction.type = ActionType::Fold;
+            }
         }
         else if (riverCouldCall(ctx))
         {

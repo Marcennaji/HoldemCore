@@ -115,6 +115,20 @@ void PokerTableWindow::setupUi()
     // Create action bar
     m_actionBar = new ActionBar(this);
 
+    // Create "Pause between hands" checkbox
+    m_pauseBetweenHandsCheckbox = new QCheckBox("Pause between hands", this);
+    m_pauseBetweenHandsCheckbox->setChecked(true); // Default: pause enabled
+    m_pauseBetweenHandsCheckbox->setStyleSheet("QCheckBox {"
+                                               "  color: #1f3044;"
+                                               "  font-size: 14px;"
+                                               "  font-weight: 600;"
+                                               "  padding: 4px;"
+                                               "}"
+                                               "QCheckBox::indicator {"
+                                               "  width: 18px;"
+                                               "  height: 18px;"
+                                               "}");
+
     // Create Next Hand button
     m_nextHandButton = new QPushButton("Next Hand", this);
     m_nextHandButton->setStyleSheet("QPushButton {"
@@ -154,9 +168,11 @@ void PokerTableWindow::setupUi()
     // Add action bar
     m_mainLayout->addWidget(m_actionBar);
 
-    // Add Next Hand button (centered)
+    // Add "Pause between hands" checkbox and Next Hand button (centered)
     auto nextHandLayout = new QHBoxLayout();
     nextHandLayout->addStretch();
+    nextHandLayout->addWidget(m_pauseBetweenHandsCheckbox);
+    nextHandLayout->addSpacing(10); // Small space between checkbox and button
     nextHandLayout->addWidget(m_nextHandButton);
     nextHandLayout->addStretch();
     m_mainLayout->addLayout(nextHandLayout);
@@ -492,13 +508,31 @@ void PokerTableWindow::showPlayerTurn(int playerId)
 
 void PokerTableWindow::onHandCompleted()
 {
-    // Show the Next Hand button when a hand is completed
-    m_nextHandButton->setVisible(true);
+    // Check if "Pause between hands" is enabled
+    bool shouldPause = m_pauseBetweenHandsCheckbox && m_pauseBetweenHandsCheckbox->isChecked();
 
-    // Hide action bar during hand completion
-    if (m_actionBar)
+    if (shouldPause)
     {
-        m_actionBar->setVisible(false);
+        // Show the Next Hand button when a hand is completed
+        m_nextHandButton->setVisible(true);
+
+        // Hide action bar during hand completion
+        if (m_actionBar)
+        {
+            m_actionBar->setVisible(false);
+        }
+    }
+    else
+    {
+        // Automatically start next hand without pausing
+        // Hide action bar briefly
+        if (m_actionBar)
+        {
+            m_actionBar->setVisible(false);
+        }
+
+        // Emit next hand request immediately
+        emit nextHandRequested();
     }
 }
 
