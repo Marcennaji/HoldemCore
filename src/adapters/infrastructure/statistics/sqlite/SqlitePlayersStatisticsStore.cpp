@@ -131,10 +131,11 @@ void SqlitePlayersStatisticsStore::savePlayersStatistics(PlayerList seatsList)
             continue;
         }
 
-        const auto& stats = player->getStatisticsUpdater()->getStatistics(nbPlayers);
-        if (stats.preflopStatistics.hands == 0)
+        // Get delta since last save
+        const auto delta = player->getStatisticsUpdater()->getStatisticsDeltaAndUpdateBaseline(nbPlayers);
+        if (delta.preflopStatistics.hands == 0)
         {
-            continue;
+            continue; // No new hands played, skip saving
         }
 
         initializeStrategyStatistics(strategyName, nbPlayers);
@@ -163,42 +164,42 @@ void SqlitePlayersStatisticsStore::savePlayersStatistics(PlayerList seatsList)
         stmt->bindText(2, tableType);
 
         // preflop
-        stmt->bindInt(3, stats.preflopStatistics.hands);
-        stmt->bindInt(4, stats.preflopStatistics.checks);
-        stmt->bindInt(5, stats.preflopStatistics.calls);
-        stmt->bindInt(6, stats.preflopStatistics.raises);
-        stmt->bindInt(7, stats.preflopStatistics.threeBets);
-        stmt->bindInt(8, stats.preflopStatistics.callthreeBets);
-        stmt->bindInt(9, stats.preflopStatistics.callthreeBetsOpportunities);
-        stmt->bindInt(10, stats.preflopStatistics.fourBets);
-        stmt->bindInt(11, stats.preflopStatistics.folds);
-        stmt->bindInt(12, stats.preflopStatistics.limps);
+        stmt->bindInt(3, delta.preflopStatistics.hands);
+        stmt->bindInt(4, delta.preflopStatistics.checks);
+        stmt->bindInt(5, delta.preflopStatistics.calls);
+        stmt->bindInt(6, delta.preflopStatistics.raises);
+        stmt->bindInt(7, delta.preflopStatistics.threeBets);
+        stmt->bindInt(8, delta.preflopStatistics.callthreeBets);
+        stmt->bindInt(9, delta.preflopStatistics.callthreeBetsOpportunities);
+        stmt->bindInt(10, delta.preflopStatistics.fourBets);
+        stmt->bindInt(11, delta.preflopStatistics.folds);
+        stmt->bindInt(12, delta.preflopStatistics.limps);
 
         // flop
-        stmt->bindInt(13, stats.flopStatistics.hands);
-        stmt->bindInt(14, stats.flopStatistics.checks);
-        stmt->bindInt(15, stats.flopStatistics.bets);
-        stmt->bindInt(16, stats.flopStatistics.calls);
-        stmt->bindInt(17, stats.flopStatistics.raises);
-        stmt->bindInt(18, stats.flopStatistics.folds);
-        stmt->bindInt(19, stats.flopStatistics.continuationBets);
-        stmt->bindInt(20, stats.flopStatistics.continuationBetsOpportunities);
+        stmt->bindInt(13, delta.flopStatistics.hands);
+        stmt->bindInt(14, delta.flopStatistics.checks);
+        stmt->bindInt(15, delta.flopStatistics.bets);
+        stmt->bindInt(16, delta.flopStatistics.calls);
+        stmt->bindInt(17, delta.flopStatistics.raises);
+        stmt->bindInt(18, delta.flopStatistics.folds);
+        stmt->bindInt(19, delta.flopStatistics.continuationBets);
+        stmt->bindInt(20, delta.flopStatistics.continuationBetsOpportunities);
 
         // turn
-        stmt->bindInt(21, stats.turnStatistics.hands);
-        stmt->bindInt(22, stats.turnStatistics.checks);
-        stmt->bindInt(23, stats.turnStatistics.bets);
-        stmt->bindInt(24, stats.turnStatistics.calls);
-        stmt->bindInt(25, stats.turnStatistics.raises);
-        stmt->bindInt(26, stats.turnStatistics.folds);
+        stmt->bindInt(21, delta.turnStatistics.hands);
+        stmt->bindInt(22, delta.turnStatistics.checks);
+        stmt->bindInt(23, delta.turnStatistics.bets);
+        stmt->bindInt(24, delta.turnStatistics.calls);
+        stmt->bindInt(25, delta.turnStatistics.raises);
+        stmt->bindInt(26, delta.turnStatistics.folds);
 
         // river
-        stmt->bindInt(27, stats.riverStatistics.hands);
-        stmt->bindInt(28, stats.riverStatistics.checks);
-        stmt->bindInt(29, stats.riverStatistics.bets);
-        stmt->bindInt(30, stats.riverStatistics.calls);
-        stmt->bindInt(31, stats.riverStatistics.raises);
-        stmt->bindInt(32, stats.riverStatistics.folds);
+        stmt->bindInt(27, delta.riverStatistics.hands);
+        stmt->bindInt(28, delta.riverStatistics.checks);
+        stmt->bindInt(29, delta.riverStatistics.bets);
+        stmt->bindInt(30, delta.riverStatistics.calls);
+        stmt->bindInt(31, delta.riverStatistics.raises);
+        stmt->bindInt(32, delta.riverStatistics.folds);
 
         // showdown (using placeholder values if not available in stats)
         stmt->bindInt(33, 0); // TODO: Add sd_wentToShowdown to PlayerStatistics

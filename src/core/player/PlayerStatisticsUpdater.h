@@ -33,9 +33,13 @@ class PlayerStatisticsUpdater
     void loadStatistics(const std::string& strategyName);
     void resetPlayerStatistics();
     void updateStatistics(GameState state, const CurrentHandContext& ctx);
+    void resetHandCountingFlags(); // Reset flags for a new hand
 
     // Return the statistics for the specified number of players
     const PlayerStatistics& getStatistics(const int nbPlayers) const;
+
+    // Get delta since last save and update last saved stats
+    PlayerStatistics getStatisticsDeltaAndUpdateBaseline(const int nbPlayers);
 
   private:
     void updatePreflopStatistics(const CurrentHandContext& ctx);
@@ -48,6 +52,13 @@ class PlayerStatisticsUpdater
     core::PlayersStatisticsStore& m_statisticsStore;
 
     std::array<pkt::core::player::PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> m_statistics;
+    std::array<pkt::core::player::PlayerStatistics, MAX_NUMBER_OF_PLAYERS + 1> m_lastSavedStatistics;
+
+    // Track which streets have been processed this hand to avoid double-counting
+    bool m_preflopCounted = false;
+    bool m_flopCounted = false;
+    bool m_turnCounted = false;
+    bool m_riverCounted = false;
 };
 
 } // namespace pkt::core::player

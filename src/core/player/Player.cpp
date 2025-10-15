@@ -274,6 +274,9 @@ void Player::resetForNewHand(const Hand& hand)
     // Clear hole cards from previous hand
     m_currentHandContext->personalContext.holeCards = HoleCards();
     m_currentHandContext->personalContext.handRanking = 0;
+
+    // Reset statistics counting flags for the new hand
+    getStatisticsUpdater()->resetHandCountingFlags();
 }
 void Player::processAction(const PlayerAction& action, Hand& hand)
 {

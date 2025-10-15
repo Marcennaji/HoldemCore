@@ -6,7 +6,8 @@
 namespace pkt::core::player
 {
 PlayerStatisticsUpdater::PlayerStatisticsUpdater(pkt::core::PlayersStatisticsStore& statisticsStore)
-    : m_statisticsStore(statisticsStore)
+    : m_statisticsStore(statisticsStore), m_preflopCounted(false), m_flopCounted(false), m_turnCounted(false),
+      m_riverCounted(false)
 {
 }
 
@@ -27,6 +28,15 @@ void PlayerStatisticsUpdater::resetPlayerStatistics()
         m_statistics[i].reset();
     }
 }
+
+void PlayerStatisticsUpdater::resetHandCountingFlags()
+{
+    m_preflopCounted = false;
+    m_flopCounted = false;
+    m_turnCounted = false;
+    m_riverCounted = false;
+}
+
 void PlayerStatisticsUpdater::updateStatistics(GameState state, const CurrentHandContext& ctx)
 {
     switch (state)
@@ -55,8 +65,13 @@ void PlayerStatisticsUpdater::updatePreflopStatistics(const CurrentHandContext& 
     if (actions.empty())
         return;
 
-    m_statistics[nbPlayers].totalHands++;
-    m_statistics[nbPlayers].preflopStatistics.hands++;
+    // Only increment hands counter once per street, not on every action
+    if (!m_preflopCounted)
+    {
+        m_statistics[nbPlayers].totalHands++;
+        m_statistics[nbPlayers].preflopStatistics.hands++;
+        m_preflopCounted = true;
+    }
 
     for (const auto& action : actions)
     {
@@ -135,7 +150,19 @@ void PlayerStatisticsUpdater::updateFlopStatistics(const CurrentHandContext& ctx
     if (actions.empty())
         return;
 
-    m_statistics[nbPlayers].flopStatistics.hands++;
+    // Only increment hands counter once per street, not on every action
+    if (!m_flopCounted)
+    {
+        m_statistics[nbPlayers].flopStatistics.hands++;
+        m_flopCounted = true;
+
+        // Continuation bet opportunity: check once per street if player was preflop raiser
+        if (ctx.commonContext.playersContext.preflopLastRaiser &&
+            ctx.commonContext.playersContext.preflopLastRaiser->getId() == ctx.personalContext.id)
+        {
+            m_statistics[nbPlayers].flopStatistics.continuationBetsOpportunities++;
+        }
+    }
 
     for (const auto& action : actions)
     {
@@ -168,15 +195,12 @@ void PlayerStatisticsUpdater::updateFlopStatistics(const CurrentHandContext& ctx
             m_statistics[nbPlayers].flopStatistics.threeBets++;
         }
 
-        // continuation bets
+        // Continuation bet: increment only when we actually bet
         if (ctx.commonContext.playersContext.preflopLastRaiser &&
-            ctx.commonContext.playersContext.preflopLastRaiser->getId() == ctx.personalContext.id)
+            ctx.commonContext.playersContext.preflopLastRaiser->getId() == ctx.personalContext.id &&
+            action.type == ActionType::Bet)
         {
-            m_statistics[nbPlayers].flopStatistics.continuationBetsOpportunities++;
-            if (action.type == ActionType::Bet)
-            {
-                m_statistics[nbPlayers].flopStatistics.continuationBets++;
-            }
+            m_statistics[nbPlayers].flopStatistics.continuationBets++;
         }
     }
 }
@@ -187,7 +211,12 @@ void PlayerStatisticsUpdater::updateTurnStatistics(const CurrentHandContext& ctx
     if (actions.empty())
         return;
 
-    m_statistics[nbPlayers].turnStatistics.hands++;
+    // Only increment hands counter once per street, not on every action
+    if (!m_turnCounted)
+    {
+        m_statistics[nbPlayers].turnStatistics.hands++;
+        m_turnCounted = true;
+    }
 
     for (const auto& action : actions)
     {
@@ -227,7 +256,12 @@ void PlayerStatisticsUpdater::updateRiverStatistics(const CurrentHandContext& ct
     if (actions.empty())
         return;
 
-    m_statistics[nbPlayers].riverStatistics.hands++;
+    // Only increment hands counter once per street, not on every action
+    if (!m_riverCounted)
+    {
+        m_statistics[nbPlayers].riverStatistics.hands++;
+        m_riverCounted = true;
+    }
 
     for (const auto& action : actions)
     {
@@ -275,6 +309,72 @@ void PlayerStatisticsUpdater::loadStatistics(const std::string& strategyName)
     {
         m_statistics.fill(PlayerStatistics());
     }
+
+    // Initialize last saved to match loaded values (no delta yet)
+    m_lastSavedStatistics = m_statistics;
+}
+
+PlayerStatistics PlayerStatisticsUpdater::getStatisticsDeltaAndUpdateBaseline(const int nbPlayers)
+{
+    int clamped = nbPlayers;
+    if (clamped < 0)
+        clamped = 0;
+    if (clamped > MAX_NUMBER_OF_PLAYERS)
+        clamped = MAX_NUMBER_OF_PLAYERS;
+
+    // Calculate delta by subtracting last saved from current
+    PlayerStatistics delta;
+    const auto& current = m_statistics[clamped];
+    const auto& lastSaved = m_lastSavedStatistics[clamped];
+
+    delta.totalHands = current.totalHands - lastSaved.totalHands;
+
+    // Preflop deltas
+    delta.preflopStatistics.hands = current.preflopStatistics.hands - lastSaved.preflopStatistics.hands;
+    delta.preflopStatistics.checks = current.preflopStatistics.checks - lastSaved.preflopStatistics.checks;
+    delta.preflopStatistics.calls = current.preflopStatistics.calls - lastSaved.preflopStatistics.calls;
+    delta.preflopStatistics.raises = current.preflopStatistics.raises - lastSaved.preflopStatistics.raises;
+    delta.preflopStatistics.threeBets = current.preflopStatistics.threeBets - lastSaved.preflopStatistics.threeBets;
+    delta.preflopStatistics.fourBets = current.preflopStatistics.fourBets - lastSaved.preflopStatistics.fourBets;
+    delta.preflopStatistics.folds = current.preflopStatistics.folds - lastSaved.preflopStatistics.folds;
+    delta.preflopStatistics.limps = current.preflopStatistics.limps - lastSaved.preflopStatistics.limps;
+    delta.preflopStatistics.callthreeBets =
+        current.preflopStatistics.callthreeBets - lastSaved.preflopStatistics.callthreeBets;
+    delta.preflopStatistics.callthreeBetsOpportunities =
+        current.preflopStatistics.callthreeBetsOpportunities - lastSaved.preflopStatistics.callthreeBetsOpportunities;
+
+    // Flop deltas
+    delta.flopStatistics.hands = current.flopStatistics.hands - lastSaved.flopStatistics.hands;
+    delta.flopStatistics.checks = current.flopStatistics.checks - lastSaved.flopStatistics.checks;
+    delta.flopStatistics.bets = current.flopStatistics.bets - lastSaved.flopStatistics.bets;
+    delta.flopStatistics.calls = current.flopStatistics.calls - lastSaved.flopStatistics.calls;
+    delta.flopStatistics.raises = current.flopStatistics.raises - lastSaved.flopStatistics.raises;
+    delta.flopStatistics.folds = current.flopStatistics.folds - lastSaved.flopStatistics.folds;
+    delta.flopStatistics.continuationBets =
+        current.flopStatistics.continuationBets - lastSaved.flopStatistics.continuationBets;
+    delta.flopStatistics.continuationBetsOpportunities =
+        current.flopStatistics.continuationBetsOpportunities - lastSaved.flopStatistics.continuationBetsOpportunities;
+
+    // Turn deltas
+    delta.turnStatistics.hands = current.turnStatistics.hands - lastSaved.turnStatistics.hands;
+    delta.turnStatistics.checks = current.turnStatistics.checks - lastSaved.turnStatistics.checks;
+    delta.turnStatistics.bets = current.turnStatistics.bets - lastSaved.turnStatistics.bets;
+    delta.turnStatistics.calls = current.turnStatistics.calls - lastSaved.turnStatistics.calls;
+    delta.turnStatistics.raises = current.turnStatistics.raises - lastSaved.turnStatistics.raises;
+    delta.turnStatistics.folds = current.turnStatistics.folds - lastSaved.turnStatistics.folds;
+
+    // River deltas
+    delta.riverStatistics.hands = current.riverStatistics.hands - lastSaved.riverStatistics.hands;
+    delta.riverStatistics.checks = current.riverStatistics.checks - lastSaved.riverStatistics.checks;
+    delta.riverStatistics.bets = current.riverStatistics.bets - lastSaved.riverStatistics.bets;
+    delta.riverStatistics.calls = current.riverStatistics.calls - lastSaved.riverStatistics.calls;
+    delta.riverStatistics.raises = current.riverStatistics.raises - lastSaved.riverStatistics.raises;
+    delta.riverStatistics.folds = current.riverStatistics.folds - lastSaved.riverStatistics.folds;
+
+    // Update baseline for next save
+    m_lastSavedStatistics[clamped] = m_statistics[clamped];
+
+    return delta;
 }
 
 } // namespace pkt::core::player
