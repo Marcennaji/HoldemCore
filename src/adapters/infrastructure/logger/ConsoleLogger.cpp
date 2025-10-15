@@ -25,6 +25,14 @@ void ConsoleLogger::info(const std::string& msg)
     }
 }
 
+void ConsoleLogger::decisionMaking(const std::string& msg)
+{
+    if (m_logLevel >= LogLevel::DecisionMaking)
+    {
+        std::cout << "[DECISION] " << msg << std::endl;
+    }
+}
+
 void ConsoleLogger::verbose(const std::string& msg)
 {
     if (m_logLevel >= LogLevel::Verbose)

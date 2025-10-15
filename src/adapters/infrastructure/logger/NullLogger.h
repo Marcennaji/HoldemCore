@@ -11,7 +11,7 @@ namespace pkt::infra
 
 /**
  * @brief Null object pattern implementation of Logger that discards all messages.
- * 
+ *
  * This logger implementation provides a no-op logger that silently discards
  * all log messages. Useful for testing or when logging is not desired
  * without having to check for null pointers throughout the code.
@@ -22,6 +22,7 @@ class NullLogger : public pkt::core::Logger
     virtual void setLogLevel(pkt::core::LogLevel level) override {}
     virtual void error(const std::string& msg) override {}
     virtual void info(const std::string& msg) override {}
+    virtual void decisionMaking(const std::string& msg) override {}
     virtual void verbose(const std::string& msg) override {}
     virtual void debug(const std::string& msg) override {}
 };

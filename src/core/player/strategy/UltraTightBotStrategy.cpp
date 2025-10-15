@@ -22,8 +22,7 @@ namespace pkt::core::player
 
 using namespace std;
 
-UltraTightBotStrategy::UltraTightBotStrategy(pkt::core::Logger& logger, 
-                                           pkt::core::Randomizer& randomizer)
+UltraTightBotStrategy::UltraTightBotStrategy(pkt::core::Logger& logger, pkt::core::Randomizer& randomizer)
     : BotStrategyBase(logger, randomizer)
 {
     // initialize utg starting range, in a full table
@@ -32,15 +31,20 @@ UltraTightBotStrategy::UltraTightBotStrategy(pkt::core::Logger& logger,
     initializeRanges(40, utgFullTableRange);
 }
 
-
-
 UltraTightBotStrategy::~UltraTightBotStrategy() = default;
 
 bool UltraTightBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
 {
+    m_logger.decisionMaking(">>> UltraTightBotStrategy::preflopCouldCall - Player " +
+                            std::to_string(ctx.personalContext.id) +
+                            " with hand: " + ctx.personalContext.holeCards.toString());
+
     float callingRange = getPreflopRangeCalculator()->calculatePreflopCallingRange(ctx);
+    m_logger.decisionMaking("\tCalculated calling range: " + std::to_string(callingRange) + "%");
+
     if (callingRange == -1)
     {
+        m_logger.decisionMaking("\tDecision: FOLD (calling range = -1, must raise or fold)");
         return false; // never call : raise or fold
     }
 
@@ -107,17 +111,28 @@ bool UltraTightBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
                 "the initial calling range.");
         }
     }
-    m_logger.verbose("\t\tLAG final calling range : " + stringCallingRange);
+    m_logger.decisionMaking("\t\tUltraTight final calling range: " + stringCallingRange);
 
-    return isCardsInRange(ctx.personalContext.holeCards, stringCallingRange);
+    bool inRange = isCardsInRange(ctx.personalContext.holeCards, stringCallingRange);
+    m_logger.decisionMaking("\tHand " + ctx.personalContext.holeCards.toString() + (inRange ? " IS" : " IS NOT") +
+                            " in calling range");
+    m_logger.decisionMaking("\tDecision: " + std::string(inRange ? "CALL" : "FOLD"));
+
+    return inRange;
 }
 
 int UltraTightBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
 {
+    m_logger.decisionMaking(">>> UltraTightBotStrategy::preflopCouldRaise - Player " +
+                            std::to_string(ctx.personalContext.id) +
+                            " with hand: " + ctx.personalContext.holeCards.toString());
+
     float raisingRange = getPreflopRangeCalculator()->calculatePreflopRaisingRange(ctx);
+    m_logger.decisionMaking("\tCalculated raising range: " + std::to_string(raisingRange) + "%");
 
     if (raisingRange == -1)
     {
+        m_logger.decisionMaking("\tDecision: NO RAISE (raising range = -1, must call or fold)");
         return 0; // never raise : call or fold
     }
 
@@ -149,7 +164,7 @@ int UltraTightBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
 
     stringRaisingRange = rangesString[(int) raisingRange];
 
-    m_logger.verbose(stringRaisingRange);
+    m_logger.decisionMaking("\t\tUltraTight raising range string: " + stringRaisingRange);
 
     // determine when to 3-bet without a real hand
     bool speculativeHandedAdded = false;
@@ -223,7 +238,14 @@ int UltraTightBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
         }
     }
 
-    return computePreflopRaiseAmount(ctx);
+    int raiseAmount = computePreflopRaiseAmount(ctx);
+
+    bool inRange = isCardsInRange(ctx.personalContext.holeCards, stringRaisingRange);
+    m_logger.decisionMaking("\tHand " + ctx.personalContext.holeCards.toString() + (inRange ? " IS" : " IS NOT") +
+                            " in raising range");
+    m_logger.decisionMaking("\tDecision: " + std::string(raiseAmount > 0 ? "RAISE" : "NO RAISE") +
+                            " amount = " + std::to_string(raiseAmount));
+    return raiseAmount;
 }
 
 int UltraTightBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
@@ -259,7 +281,7 @@ int UltraTightBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
                 m_randomizer->getRand(1, 2, 1, &rand);
                 if (rand == 1)
                 {
-                    return PokerMath::calculateValueBetSize(ctx);  // Was: pot * 0.6
+                    return PokerMath::calculateValueBetSize(ctx); // Was: pot * 0.6
                 }
             }
 
@@ -268,11 +290,11 @@ int UltraTightBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
                  ctx.personalContext.postFlopAnalysisFlags.isStraight) &&
                 ctx.personalContext.postFlopAnalysisFlags.isFlushDrawPossible)
             {
-                return PokerMath::calculateValueBetSize(ctx);  // Was: pot * 0.6
+                return PokerMath::calculateValueBetSize(ctx); // Was: pot * 0.6
             }
 
             // if the flop is dry, try to get the pot
-            if (!PokerMath::tooManyOpponents(ctx, 3) && isPossibleToBluff(ctx) &&  // Was: nbPlayers < 3
+            if (!PokerMath::tooManyOpponents(ctx, 3) && isPossibleToBluff(ctx) && // Was: nbPlayers < 3
                 getBoardCardsHigherThan(ctx.commonContext.stringBoard, "Jh") < 2 &&
                 getBoardCardsHigherThan(ctx.commonContext.stringBoard, "Kh") == 0 &&
                 !ctx.personalContext.postFlopAnalysisFlags.isFlushDrawPossible)
@@ -282,7 +304,7 @@ int UltraTightBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
                 m_randomizer->getRand(1, 4, 1, &rand);
                 if (rand == 1)
                 {
-                    return PokerMath::calculateBluffBetSize(ctx);  // Was: pot * 0.6 (bluff on dry board)
+                    return PokerMath::calculateBluffBetSize(ctx); // Was: pot * 0.6 (bluff on dry board)
                 }
             }
         }
@@ -389,8 +411,9 @@ bool UltraTightBotStrategy::flopCouldCall(const CurrentHandContext& ctx)
         return false;
     }
 
-    // Fold with very weak equity 
-    if (PokerMath::hasWeakEquity(ctx, PokerMath::WEAK_EQUITY_THRESHOLD) && ctx.personalContext.m_handSimulation.win < 0.3)
+    // Fold with very weak equity
+    if (PokerMath::hasWeakEquity(ctx, PokerMath::WEAK_EQUITY_THRESHOLD) &&
+        ctx.personalContext.m_handSimulation.win < 0.3)
     {
         return false;
     }
@@ -436,8 +459,7 @@ int UltraTightBotStrategy::flopCouldRaise(const CurrentHandContext& ctx)
     if ((isDrawingProbOk(ctx.personalContext.postFlopAnalysisFlags, ctx.commonContext.bettingContext.potOdd) ||
          ctx.personalContext.hasPosition) &&
         ctx.commonContext.playersContext.actingPlayersList->size() == 2 &&
-        !PokerMath::hasInsufficientEquityForCall(ctx) &&
-        isPossibleToBluff(ctx) && nbRaises < 2)
+        !PokerMath::hasInsufficientEquityForCall(ctx) && isPossibleToBluff(ctx) && nbRaises < 2)
     {
 
         int rand = 0;
@@ -573,8 +595,8 @@ bool UltraTightBotStrategy::turnCouldCall(const CurrentHandContext& ctx)
     auto turnRaiser = ctx.commonContext.playersContext.turnLastRaiser;
 
     // Equity vs pot odds check using Phase 1 utilities
-    if (PokerMath::hasInsufficientEquityForCall(ctx) &&
-        ctx.personalContext.m_handSimulation.winRanged < 0.94 && ctx.personalContext.m_handSimulation.win < 0.95)
+    if (PokerMath::hasInsufficientEquityForCall(ctx) && ctx.personalContext.m_handSimulation.winRanged < 0.94 &&
+        ctx.personalContext.m_handSimulation.win < 0.95)
     {
         return false;
     }
@@ -607,7 +629,7 @@ bool UltraTightBotStrategy::turnCouldCall(const CurrentHandContext& ctx)
     }
 
     if (ctx.personalContext.m_handSimulation.winRanged < 0.6 && ctx.personalContext.m_handSimulation.win < 0.95 &&
-        (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber > 0 || 
+        (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber > 0 ||
          PokerMath::isOpponentPassive(ctx, PokerMath::PASSIVE_OPPONENT_AGGRESSION_THRESHOLD, turnRaiser)))
     {
         return false;
@@ -615,7 +637,7 @@ bool UltraTightBotStrategy::turnCouldCall(const CurrentHandContext& ctx)
 
     if (!ctx.personalContext.actions.preflopIsAggressor && !ctx.personalContext.actions.flopIsAggressor &&
         ctx.personalContext.m_handSimulation.winRanged < 0.8 && ctx.personalContext.m_handSimulation.win < 0.95 &&
-        PokerMath::isOpponentPassive(ctx, PokerMath::PASSIVE_OPPONENT_AGGRESSION_THRESHOLD, turnRaiser) && 
+        PokerMath::isOpponentPassive(ctx, PokerMath::PASSIVE_OPPONENT_AGGRESSION_THRESHOLD, turnRaiser) &&
         !ctx.personalContext.hasPosition)
     {
         return false;
@@ -668,8 +690,7 @@ int UltraTightBotStrategy::turnCouldRaise(const CurrentHandContext& ctx)
         return PokerMath::calculateValueBetSize(ctx);
     }
 
-    if (PokerMath::hasInsufficientEquityForCall(ctx) &&
-        ctx.personalContext.m_handSimulation.winRanged < 0.94)
+    if (PokerMath::hasInsufficientEquityForCall(ctx) && ctx.personalContext.m_handSimulation.winRanged < 0.94)
     {
         return 0;
     }
@@ -802,8 +823,8 @@ bool UltraTightBotStrategy::riverCouldCall(const CurrentHandContext& ctx)
                           .riverStatistics;
     }
 
-    if (PokerMath::hasInsufficientEquityForCall(ctx) &&
-        ctx.personalContext.m_handSimulation.winRanged < 0.9 && ctx.personalContext.m_handSimulation.winSd < .97)
+    if (PokerMath::hasInsufficientEquityForCall(ctx) && ctx.personalContext.m_handSimulation.winRanged < 0.9 &&
+        ctx.personalContext.m_handSimulation.winSd < .97)
     {
         if (raiserStats.hands > MIN_HANDS_STATISTICS_ACCURATE && raiserStats.getAgressionFrequency() < 40)
         {
@@ -912,8 +933,5 @@ int UltraTightBotStrategy::riverCouldRaise(const CurrentHandContext& ctx)
 
     return 0;
 }
-
-
-
 
 } // namespace pkt::core::player

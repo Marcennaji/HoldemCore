@@ -88,7 +88,8 @@ int CardRangeAnalyzer::getBoardCardsHigherThan(const std::string& stringBoard, c
 
     int n = 0;
 
-    while (getline(oss, boardCard, ' '))
+    // Using >> operator automatically handles multiple spaces and trailing spaces
+    while (oss >> boardCard)
     {
         if (CardUtilities::getCardValue(boardCard) > CardUtilities::getCardValue(card))
         {

@@ -21,72 +21,105 @@ BotStrategyBase::BotStrategyBase(Logger& logger, Randomizer& randomizer) : m_log
 
 PlayerAction BotStrategyBase::decidePreflop(const CurrentHandContext& ctx)
 {
+    m_logger.decisionMaking("\n=== PREFLOP DECISION START ===");
+    m_logger.decisionMaking("Strategy: " + getName() + ", Player: " + std::to_string(ctx.personalContext.id) +
+                            ", Hand: " + ctx.personalContext.holeCards.toString());
+    m_logger.decisionMaking("Position: " + std::to_string(static_cast<int>(ctx.personalContext.position)) +
+                            ", Cash: " + std::to_string(ctx.personalContext.cash) +
+                            ", Pot: " + std::to_string(ctx.commonContext.bettingContext.pot));
+    m_logger.decisionMaking("Preflop raises: " + std::to_string(ctx.commonContext.bettingContext.preflopRaisesNumber) +
+                            ", Preflop calls: " + std::to_string(ctx.commonContext.bettingContext.preflopCallsNumber));
+
     PlayerAction resultingAction;
     resultingAction.playerId = ctx.personalContext.id;
 
     // Strategy methods now handle cash constraints internally
     bool couldCall = preflopCouldCall(ctx);
+    m_logger.decisionMaking("After preflopCouldCall: " + std::string(couldCall ? "YES" : "NO"));
+
     int raiseAmount = preflopCouldRaise(ctx);
+    m_logger.decisionMaking("After preflopCouldRaise: " + std::to_string(raiseAmount));
 
     if (raiseAmount > 0 && canAffordToRaise(ctx, raiseAmount))
     {
         resultingAction.type = ActionType::Raise;
         resultingAction.amount = raiseAmount;
+        m_logger.decisionMaking(">>> FINAL DECISION: RAISE " + std::to_string(raiseAmount));
     }
     else if (couldCall)
     {
         resultingAction.type = ActionType::Call;
+        m_logger.decisionMaking(">>> FINAL DECISION: CALL");
     }
     else if (ctx.commonContext.bettingContext.preflopRaisesNumber == 0 &&
              ctx.personalContext.position == PlayerPosition::BigBlind)
     {
         // If last to speak, hand not good enough to raise/call, and nobody has raised: check
         resultingAction.type = ActionType::Check;
+        m_logger.decisionMaking(">>> FINAL DECISION: CHECK (BB with no raises)");
     }
     else
     {
         resultingAction.type = ActionType::Fold;
+        m_logger.decisionMaking(">>> FINAL DECISION: FOLD");
     }
+
+    m_logger.decisionMaking("=== PREFLOP DECISION END ===\n");
 
     return resultingAction;
 }
 PlayerAction BotStrategyBase::decideFlop(const CurrentHandContext& ctx)
 {
+    m_logger.decisionMaking("\n=== FLOP DECISION START ===");
+    m_logger.decisionMaking("Strategy: " + getName() + ", Player: " + std::to_string(ctx.personalContext.id) +
+                            ", Hand: " + ctx.personalContext.holeCards.toString());
+    m_logger.decisionMaking("Flop bets/raises: " +
+                            std::to_string(ctx.commonContext.bettingContext.flopBetsOrRaisesNumber));
+
     PlayerAction resultingAction;
     resultingAction.playerId = ctx.personalContext.id;
 
     if (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber == 0)
     {
         // No bets yet - decide whether to bet or check
+        m_logger.decisionMaking("No bets yet - checking if should bet");
         int betAmount = flopCouldBet(ctx);
         if (betAmount > 0 && betAmount <= ctx.personalContext.cash)
         {
             resultingAction.type = ActionType::Bet;
             resultingAction.amount = betAmount;
+            m_logger.decisionMaking(">>> FINAL DECISION: BET " + std::to_string(betAmount));
         }
         else
         {
             resultingAction.type = ActionType::Check;
+            m_logger.decisionMaking(">>> FINAL DECISION: CHECK");
         }
     }
     else
     {
         // There are bets/raises - decide whether to call, raise, or fold
+        m_logger.decisionMaking("There are bets/raises - deciding action");
         int raiseAmount = flopCouldRaise(ctx);
         if (raiseAmount > 0 && canAffordToRaise(ctx, raiseAmount))
         {
             resultingAction.type = ActionType::Raise;
             resultingAction.amount = raiseAmount;
+            m_logger.decisionMaking(">>> FINAL DECISION: RAISE " + std::to_string(raiseAmount));
         }
         else if (flopCouldCall(ctx))
         {
             resultingAction.type = ActionType::Call;
+            m_logger.decisionMaking(">>> FINAL DECISION: CALL");
         }
         else
         {
             resultingAction.type = ActionType::Fold;
+            m_logger.decisionMaking(">>> FINAL DECISION: FOLD");
         }
     }
+
+    m_logger.decisionMaking("=== FLOP DECISION END ===\n");
 
     return resultingAction;
 }
