@@ -27,7 +27,7 @@ class TightAggressiveBotStrategy : public BotStrategyBase
     TightAggressiveBotStrategy(pkt::core::Logger& logger, pkt::core::Randomizer& randomizer);
     ~TightAggressiveBotStrategy();
 
-    virtual std::string getName() const override { return "TightAggressiveBot"; }
+    virtual std::string getName() const override { return "Tight"; }
 
   private:
     virtual bool preflopCouldCall(const CurrentHandContext& ctx) override;

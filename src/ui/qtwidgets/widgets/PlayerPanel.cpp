@@ -10,21 +10,10 @@ namespace pkt::ui::qtwidgets
 {
 
 PlayerPanel::PlayerPanel(int playerId, bool isHuman, QWidget* parent)
-    : QGroupBox(parent)
-    , m_playerId(playerId)
-    , m_isHuman(isHuman)
-    , m_playerName(isHuman ? "You" : QString("Bot %1").arg(playerId))
-    , m_currentChips(0)
-    , m_isFolded(false)
-    , m_isActive(false)
-    , m_layout(nullptr)
-    , m_holeCard1(nullptr)
-    , m_holeCard2(nullptr)
-    , m_currentActionLabel(nullptr)
-    , m_winnerLabel(nullptr)
-    , m_dealerButton(nullptr)
-    , m_card1OpacityEffect(nullptr)
-    , m_card2OpacityEffect(nullptr)
+    : QGroupBox(parent), m_playerId(playerId), m_isHuman(isHuman),
+      m_playerName(isHuman ? "You" : QString("Bot %1").arg(playerId)), m_currentChips(0), m_isFolded(false),
+      m_isActive(false), m_layout(nullptr), m_holeCard1(nullptr), m_holeCard2(nullptr), m_currentActionLabel(nullptr),
+      m_winnerLabel(nullptr), m_dealerButton(nullptr), m_card1OpacityEffect(nullptr), m_card2OpacityEffect(nullptr)
 {
     setupUi();
 }
@@ -81,13 +70,13 @@ void PlayerPanel::setupUi()
     m_winnerLabel = new QLabel("WINNER", this);
     m_winnerLabel->setAlignment(Qt::AlignCenter);
     m_winnerLabel->setStyleSheet("QLabel {"
-                                  "  color: #155724;"
-                                  "  background: rgba(212, 237, 218, 0.95);"
-                                  "  border: 1px solid #c3e6cb;"
-                                  "  border-radius: 6px;"
-                                  "  font-weight: 800;"
-                                  "  padding: 2px 4px;"
-                                  "}");
+                                 "  color: #155724;"
+                                 "  background: rgba(212, 237, 218, 0.95);"
+                                 "  border: 1px solid #c3e6cb;"
+                                 "  border-radius: 6px;"
+                                 "  font-weight: 800;"
+                                 "  padding: 2px 4px;"
+                                 "}");
     m_winnerLabel->setVisible(false);
 
     // Create dealer button indicator (positioned by parent, not in layout)
@@ -95,13 +84,13 @@ void PlayerPanel::setupUi()
     m_dealerButton->setFixedSize(18, 18);
     m_dealerButton->setAlignment(Qt::AlignCenter);
     m_dealerButton->setStyleSheet("QLabel {"
-                                   "  background: rgba(255, 215, 0, 0.85);"
-                                   "  border: 1px solid #b8860b;"
-                                   "  border-radius: 9px;"
-                                   "  color: #202020;"
-                                   "  font-weight: 600;"
-                                   "  font-size: 10px;"
-                                   "}");
+                                  "  background: rgba(255, 215, 0, 0.85);"
+                                  "  border: 1px solid #b8860b;"
+                                  "  border-radius: 9px;"
+                                  "  color: #202020;"
+                                  "  font-weight: 600;"
+                                  "  font-size: 10px;"
+                                  "}");
     m_dealerButton->setVisible(false);
 
     m_layout->addLayout(cardLayout);
@@ -109,18 +98,31 @@ void PlayerPanel::setupUi()
     m_layout->addWidget(m_winnerLabel);
 }
 
-void PlayerPanel::updatePlayerInfo(const QString& name, int chips)
+void PlayerPanel::updatePlayerInfo(const QString& name, const QString& strategyName, int chips)
 {
-    m_playerName = name;
-    m_currentChips = chips;
-    setTitle(QString("%1  chips = %2").arg(m_playerName).arg(m_currentChips));
+    if (m_isHuman)
+    {
+        m_playerName = name;
+    }
+    else
+    {
+        if (!strategyName.isEmpty())
+        {
+            m_playerName = strategyName;
+        }
+        else
+        {
+            m_playerName = QString("Bot %1").arg(m_playerId);
+        }
+    }
+
+    updateChips(chips);
 }
 
 void PlayerPanel::updateChips(int chips)
 {
     m_currentChips = chips;
-    QString prefix = m_isHuman ? "You" : QString("Bot %1").arg(m_playerId);
-    setTitle(QString("%1  chips = %2").arg(prefix).arg(m_currentChips));
+    setTitle(QString("%1  chips = %2").arg(m_playerName).arg(m_currentChips));
 }
 
 void PlayerPanel::showHoleCards(const pkt::core::HoleCards& cards)
@@ -291,7 +293,7 @@ QString PlayerPanel::currentActionLabelStyleBase() const
 QString PlayerPanel::currentActionLabelStyleFor(const QString& action) const
 {
     QString base = currentActionLabelStyleBase();
-    
+
     // For folds, keep neutral styling but make it italic and not bold
     if (action.compare("folded", Qt::CaseInsensitive) == 0 || action.compare("FOLD", Qt::CaseInsensitive) == 0)
     {

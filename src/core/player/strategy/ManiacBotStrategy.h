@@ -25,7 +25,7 @@ class ManiacBotStrategy : public BotStrategyBase
     ManiacBotStrategy(pkt::core::Logger& logger, pkt::core::Randomizer& randomizer);
 
     ~ManiacBotStrategy();
-    virtual std::string getName() const override { return "ManiacBot"; }
+    virtual std::string getName() const override { return "Maniac"; }
 
   protected:
     virtual bool preflopCouldCall(const CurrentHandContext& ctx) override;

@@ -12,8 +12,8 @@
 #include <core/player/strategy/TightAggressiveBotStrategy.h>
 #include <core/player/strategy/UltraTightBotStrategy.h>
 #include "core/player/PlayerFactory.h"
-#include "core/player/strategy/StrategyAssigner.h"
 #include "core/player/strategy/HumanStrategy.h"
+#include "core/player/strategy/StrategyAssigner.h"
 
 #include <algorithm>
 #include <random>
@@ -27,14 +27,10 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-Session::Session(const GameEvents& events, 
-    EngineFactory& engineFactory,
-    Logger& logger,
-    HandEvaluationEngine& handEvaluationEngine,
-    PlayersStatisticsStore& playersStatisticsStore,
-    Randomizer& randomizer)
-    : m_events(events), m_engineFactory(engineFactory),
-      m_logger(logger), m_handEvaluationEngine(handEvaluationEngine),
+Session::Session(const GameEvents& events, EngineFactory& engineFactory, Logger& logger,
+                 HandEvaluationEngine& handEvaluationEngine, PlayersStatisticsStore& playersStatisticsStore,
+                 Randomizer& randomizer)
+    : m_events(events), m_engineFactory(engineFactory), m_logger(logger), m_handEvaluationEngine(handEvaluationEngine),
       m_playersStatisticsStore(playersStatisticsStore), m_randomizer(randomizer)
 {
 }
@@ -59,11 +55,10 @@ std::unique_ptr<player::StrategyAssigner> Session::createStrategyAssigner(const 
 }
 
 std::unique_ptr<player::PlayerFactory> Session::createPlayerFactory(const GameEvents& events,
-                                                                           player::StrategyAssigner* strategyAssigner)
+                                                                    player::StrategyAssigner* strategyAssigner)
 {
-    return std::make_unique<player::PlayerFactory>(events, strategyAssigner, 
-                                                  m_logger, m_handEvaluationEngine, 
-                                                  m_playersStatisticsStore, m_randomizer);
+    return std::make_unique<player::PlayerFactory>(events, strategyAssigner, m_logger, m_handEvaluationEngine,
+                                                   m_playersStatisticsStore, m_randomizer);
 }
 
 std::shared_ptr<Board> Session::createBoard(const StartData& startData)
@@ -75,63 +70,73 @@ std::shared_ptr<Board> Session::createBoard(const StartData& startData)
 void Session::startGame(const GameData& gameData, const StartData& startData)
 {
     validateGameParameters(gameData, startData);
-    
+
     // Auto-select dealer if not specified
     StartData adjustedStartData = startData;
-    if (adjustedStartData.startDealerPlayerId == StartData::AUTO_SELECT_DEALER) {
+    if (adjustedStartData.startDealerPlayerId == StartData::AUTO_SELECT_DEALER)
+    {
         int randomDealer = 0;
         m_randomizer.getRand(0, adjustedStartData.numberOfPlayers - 1, 1, &randomDealer);
         adjustedStartData.startDealerPlayerId = randomDealer;
     }
-    
+
     auto gameComponents = createGameComponents(gameData, adjustedStartData);
     initializeGame(std::move(gameComponents), gameData, adjustedStartData);
 }
 
 void Session::validatePlayerConfiguration(const pkt::core::player::PlayerList& playersList)
 {
-    if (!playersList || playersList->empty()) {
+    if (!playersList || playersList->empty())
+    {
         throw std::runtime_error("Player list cannot be empty");
     }
-    
+
     int humanPlayerCount = 0;
     bool hasHumanPlayerWithIdZero = false;
     std::vector<int> humanPlayerIds;
-    
-    for (const auto& player : *playersList) {
-        if (!player) {
+
+    for (const auto& player : *playersList)
+    {
+        if (!player)
+        {
             throw std::runtime_error("Invalid null player in player list");
         }
-        
+
         // Check if this player has a HumanStrategy
-        if (player->hasStrategyType<player::HumanStrategy>()) {
+        if (player->hasStrategyType<player::HumanStrategy>())
+        {
             humanPlayerCount++;
             humanPlayerIds.push_back(player->getId());
-            if (player->getId() == 0) {
+            if (player->getId() == 0)
+            {
                 hasHumanPlayerWithIdZero = true;
             }
         }
     }
-    
+
     // Validate exactly 1 human player
-    if (humanPlayerCount != 1) {
-        std::string errorMsg = "Game must have exactly 1 human player, found " + 
-                              std::to_string(humanPlayerCount);
-        if (!humanPlayerIds.empty()) {
+    if (humanPlayerCount != 1)
+    {
+        std::string errorMsg = "Game must have exactly 1 human player, found " + std::to_string(humanPlayerCount);
+        if (!humanPlayerIds.empty())
+        {
             errorMsg += " (Human player IDs: ";
-            for (size_t i = 0; i < humanPlayerIds.size(); ++i) {
-                if (i > 0) errorMsg += ", ";
+            for (size_t i = 0; i < humanPlayerIds.size(); ++i)
+            {
+                if (i > 0)
+                    errorMsg += ", ";
                 errorMsg += std::to_string(humanPlayerIds[i]);
             }
             errorMsg += ")";
         }
         throw std::runtime_error(errorMsg);
     }
-    
+
     // Validate human player has ID 0
-    if (!hasHumanPlayerWithIdZero) {
-        throw std::runtime_error("Human player must have ID 0, but found human player with ID " + 
-                                std::to_string(humanPlayerIds[0]));
+    if (!hasHumanPlayerWithIdZero)
+    {
+        throw std::runtime_error("Human player must have ID 0, but found human player with ID " +
+                                 std::to_string(humanPlayerIds[0]));
     }
 }
 
@@ -150,7 +155,7 @@ void Session::validateGameParameters(const GameData& gameData, const StartData& 
         throw std::invalid_argument("Start money must be greater than 0");
     }
     // Allow AUTO_SELECT_DEALER (-1), otherwise validate the dealer ID is a valid player index
-    if (startData.startDealerPlayerId != StartData::AUTO_SELECT_DEALER && 
+    if (startData.startDealerPlayerId != StartData::AUTO_SELECT_DEALER &&
         (startData.startDealerPlayerId < 0 || startData.startDealerPlayerId >= startData.numberOfPlayers))
     {
         throw std::invalid_argument("Dealer player ID must be valid player index");
@@ -165,10 +170,6 @@ void Session::fireGameInitializedEvent(int guiSpeed)
     }
 }
 
-
-
-
-
 Session::GameComponents Session::createGameComponents(const GameData& gameData, const StartData& startData)
 {
     GameComponents components;
@@ -179,7 +180,7 @@ Session::GameComponents Session::createGameComponents(const GameData& gameData, 
 
     components.playersList = createPlayersList(*components.playerFactory, startData.numberOfPlayers,
                                                gameData.startMoney, gameData.tableProfile);
-    
+
     // Validate that we have exactly 1 human player with ID 0
     validatePlayerConfiguration(components.playersList);
 
@@ -193,6 +194,12 @@ Session::GameComponents Session::createGameComponents(const GameData& gameData, 
 
 void Session::initializeGame(GameComponents&& components, const GameData& gameData, const StartData& startData)
 {
+    // Fire event with player list before creating the game
+    if (m_events.onPlayersInitialized)
+    {
+        m_events.onPlayersInitialized(components.playersList);
+    }
+
     m_currentGame = std::make_unique<Game>(m_events, m_engineFactory, components.board, components.playersList,
                                            startData.startDealerPlayerId, gameData, startData);
     fireGameInitializedEvent(gameData.guiSpeed);
@@ -201,14 +208,16 @@ void Session::initializeGame(GameComponents&& components, const GameData& gameDa
 
 void Session::handlePlayerAction(const PlayerAction& action)
 {
-    if (m_currentGame) {
+    if (m_currentGame)
+    {
         m_currentGame->handlePlayerAction(action);
     }
 }
 
 void Session::startNewHand()
 {
-    if (m_currentGame) {
+    if (m_currentGame)
+    {
         m_currentGame->startNewHand();
     }
 }

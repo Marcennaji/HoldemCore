@@ -2,14 +2,13 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
-
 #pragma once
 
 #include <QObject>
 #include <core/engine/GameEvents.h>
 #include <core/engine/cards/Card.h>
-#include <core/engine/model/PlayerAction.h>
 #include <core/engine/model/GameState.h>
+#include <core/engine/model/PlayerAction.h>
 
 class PokerTableWindow;
 
@@ -19,16 +18,18 @@ class Session;
 namespace player
 {
 class HumanStrategy;
-}
-}
+class Player;
+} // namespace player
+} // namespace pkt::core
 
 namespace pkt::ui::qtwidgets
 {
 class PokerTableWindow;
+struct PlayerDisplayInfo;
 
 /**
  * @brief Bridge between the poker engine core and Qt Widgets GUI components.
- * 
+ *
  * Handles communication between the game engine and the user interface,
  * translating game events to GUI updates and user interactions back to
  * the poker engine core.
@@ -39,12 +40,12 @@ class GuiBridgeWidgets : public QObject
 
   public:
     GuiBridgeWidgets(pkt::core::Session* session, PokerTableWindow* pokerTableWindow, QObject* parent = nullptr);
-    
+
     void connectEventsToUi(pkt::core::GameEvents& events);
 
   private slots:
     void connectSignalsFromUi();
-    
+
     // Slots to handle user actions from UI
     void onPlayerFold();
     void onPlayerCall();
@@ -56,6 +57,7 @@ class GuiBridgeWidgets : public QObject
 
   private:
     // Event handlers for GameEvents - these will be connected to the game engine events
+    void handlePlayersInitialized(const pkt::core::player::PlayerList& players);
     void handleGameInitialized(int gameSpeed);
     void handleHandCompleted(std::list<unsigned> winnerIds, int totalPot);
     void handleShowdownRevealOrder(const std::vector<unsigned>& revealOrder);
@@ -71,21 +73,24 @@ class GuiBridgeWidgets : public QObject
 
     PokerTableWindow* m_tableWindow = nullptr;
     pkt::core::Session* m_session = nullptr;
-    
+
     // Track the human strategy that's currently waiting for input
     pkt::core::player::HumanStrategy* m_currentHumanStrategy = nullptr;
 
-  // Game speed for UI pacing (higher = faster; used to compute delay between bot actions)
-  int m_gameSpeed = 1;
+    // Game speed for UI pacing (higher = faster; used to compute delay between bot actions)
+    int m_gameSpeed = 1;
 
-  // Track human player's last known chips to enforce auto-fold at 0
-  int m_humanChips = -1;
+    // Track human player's last known chips to enforce auto-fold at 0
+    int m_humanChips = -1;
 
-  // Helper: auto-fold human if out of chips
-  void autoFoldHumanIfBroke();
+    // Helper: auto-fold human if out of chips
+    void autoFoldHumanIfBroke();
 
-  // Compute UI delay in milliseconds based on m_gameSpeed (range: 500ms..3000ms)
-  int computeDelayMsForBots() const;
+    // Compute UI delay in milliseconds based on m_gameSpeed (range: 500ms..3000ms)
+    int computeDelayMsForBots() const;
+
+    // Helper: Convert Player facade to lightweight DTO for UI display
+    PlayerDisplayInfo createPlayerDisplayInfo(const pkt::core::player::Player& player) const;
 };
 
 } // namespace pkt::ui::qtwidgets

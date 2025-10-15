@@ -5,12 +5,12 @@
 // PlayerPanel.h
 #pragma once
 
-#include <QGroupBox>
-#include <QLabel>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
 #include <QGraphicsOpacityEffect>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QLabel>
 #include <QPixmap>
+#include <QVBoxLayout>
 
 #include "core/engine/cards/Card.h"
 #include "core/engine/model/PlayerAction.h"
@@ -20,7 +20,7 @@ namespace pkt::ui::qtwidgets
 
 /**
  * @brief Widget displaying a single player's information in the poker table.
- * 
+ *
  * This widget encapsulates all UI components and logic for displaying:
  * - Player name and chip count
  * - Hole cards (face up or face down)
@@ -44,7 +44,7 @@ class PlayerPanel : public QGroupBox
     ~PlayerPanel() override = default;
 
     // Player information updates
-    void updatePlayerInfo(const QString& name, int chips);
+    void updatePlayerInfo(const QString& name, const QString& strategyName, int chips);
     void updateChips(int chips);
 
     // Card display
@@ -77,7 +77,7 @@ class PlayerPanel : public QGroupBox
     void setupUi();
     void applyFoldVisual();
     void clearFoldVisual();
-    
+
     QString currentActionLabelStyleBase() const;
     QString currentActionLabelStyleFor(const QString& action) const;
     QString defaultPlayerGroupStyle() const;

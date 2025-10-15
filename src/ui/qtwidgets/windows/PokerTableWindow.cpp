@@ -38,15 +38,13 @@ PokerTableWindow::PokerTableWindow(pkt::core::Session* session, QWidget* parent)
     : QWidget(parent), m_session(session), m_maxPlayers(6), m_activePlayerId(-1),
       m_dealerPosition(-1) // Default to 6 players
 {
-    // Add null check for session
     if (!session)
     {
-        // This could cause issues later
+        throw std::invalid_argument("PokerTableWindow constructor: Session pointer cannot be null");
     }
 
-    // Initialize player panels vector for ALL players (including human)
     m_playerPanels.resize(m_maxPlayers, nullptr); // Will be created in createPlayerAreas
-    m_cachedHoleCards.resize(m_maxPlayers);  // Cache dealt cards per player
+    m_cachedHoleCards.resize(m_maxPlayers);       // Cache dealt cards per player
 
     setWindowTitle("Poker Table - HoldemCore");
     setFixedSize(1200, 900); // Increased window size to prevent overlap between human cards and action buttons
@@ -57,9 +55,10 @@ PokerTableWindow::PokerTableWindow(pkt::core::Session* session, QWidget* parent)
         setupUi();
         connectSignals();
     }
-    catch (...)
+    catch (const std::exception& e)
     {
-        // Catch any exception during UI setup
+        throw std::runtime_error(
+            QString("PokerTableWindow constructor: Exception during UI setup: %1").arg(e.what()).toStdString());
     }
 }
 
@@ -67,7 +66,7 @@ void PokerTableWindow::initializeWithGameData(const pkt::core::GameData& gameDat
 {
     // Store the start money for access by other components
     m_startMoney = gameData.startMoney;
-    
+
     // Update max players and resize components if needed
     if (gameData.maxNumberOfPlayers != m_maxPlayers)
     {
@@ -108,11 +107,11 @@ void PokerTableWindow::setupUi()
 
     // Create all UI components properly
     createPlayerAreas();
-    
+
     // Create board area
     m_boardArea = new BoardArea(this);
     positionBoardArea();
-    
+
     // Create action bar
     m_actionBar = new ActionBar(this);
 
@@ -308,21 +307,26 @@ void PokerTableWindow::refreshPot(int amount)
     }
 }
 
-void PokerTableWindow::refreshPlayer(int seat, const pkt::core::player::Player& player)
+void PokerTableWindow::refreshPlayer(int seat, const PlayerDisplayInfo& playerInfo)
 {
     if (seat < 0 || seat >= m_maxPlayers || !m_playerPanels[seat])
         return;
 
-    // Show player panel
+    // Show player panel and update with strategy name
     m_playerPanels[seat]->setVisible(true);
-    m_playerPanels[seat]->updateChips(player.getCash());
+
+    // Convert DTO data to Qt strings
+    QString strategyName = QString::fromStdString(playerInfo.strategyName);
+    QString playerName = QString::fromStdString(playerInfo.playerName);
+
+    m_playerPanels[seat]->updatePlayerInfo(playerName, strategyName, playerInfo.chips);
 }
 
 void PokerTableWindow::updatePlayerCash(unsigned playerId, int newChips)
 {
     if (playerId >= static_cast<unsigned>(m_playerPanels.size()) || !m_playerPanels[playerId])
         return;
-    
+
     m_playerPanels[playerId]->updateChips(newChips);
 }
 
@@ -351,7 +355,7 @@ void PokerTableWindow::showBoardCards(const pkt::core::BoardCards& boardCards)
     {
         m_boardArea->showCommunityCards(boardCards);
     }
-    
+
     // Track river for showdown inference
     if (boardCards.numCards >= 5)
     {
@@ -408,19 +412,8 @@ void PokerTableWindow::clearPlayerActionLabel(int playerId)
 {
     if (playerId < 0 || playerId >= m_maxPlayers || !m_playerPanels[playerId])
         return;
-    
-    m_playerPanels[playerId]->clearAction();
-}
 
-void PokerTableWindow::updatePlayerStatus(int playerId, const QString& status)
-{
-    // We no longer parse player-specific statuses by string; controller calls structured APIs.
-    // Keep this as a no-op for playerId >= 0 to avoid false positives from free-form text.
-    if (playerId == -1)
-    {
-        return; // general game status ignored in this UI variant
-    }
-    return;
+    m_playerPanels[playerId]->clearAction();
 }
 
 void PokerTableWindow::showErrorMessage(const QString& message)
@@ -484,7 +477,7 @@ void PokerTableWindow::showPlayerAction(int playerId, pkt::core::ActionType acti
 {
     if (playerId < 0 || playerId >= m_maxPlayers || !m_playerPanels[playerId])
         return;
-    
+
     m_playerPanels[playerId]->showAction(action, amount);
 }
 
@@ -507,10 +500,6 @@ void PokerTableWindow::onHandCompleted()
     {
         m_actionBar->setVisible(false);
     }
-
-    // Update status to indicate hand is complete
-    // m_statusLabel->setText("Hand completed! Click 'Next Hand' to continue.");
-    // m_statusLabel->setStyleSheet("color: #2d8659; font-weight: bold;");
 }
 
 void PokerTableWindow::resetForNewHand()
@@ -578,7 +567,7 @@ void PokerTableWindow::showWinners(const std::list<unsigned>& winnerIds, int tot
         if (id < m_playerPanels.size() && m_playerPanels[id])
         {
             m_playerPanels[id]->showWinner(true);
-            
+
             // If we reached showdown (not everyone folded), reveal the winner's hole cards
             if ((m_reachedShowdown || m_sawRiver || isSplit) && id < m_cachedHoleCards.size())
             {
@@ -711,17 +700,17 @@ void PokerTableWindow::positionBoardArea()
         const int bottomReserve = reservedBottomHeight();
         const int effectiveHeight = std::max(0, height() - bottomReserve);
         int centerX = (width() - m_boardArea->width()) / 2;
-        
+
         // Move the board area lower in the window by adding an offset
         // Instead of centering it vertically, position it at about 60% down from the top
         int baseY = (effectiveHeight - m_boardArea->height()) / 2;
         int lowerOffset = effectiveHeight / 8; // Move down by 1/8 of the effective height
         int centerY = baseY + lowerOffset;
-        
+
         // Ensure it doesn't go too low and overlap with the bottom controls
         int maxY = effectiveHeight - m_boardArea->height() - 20; // 20px margin from bottom
         centerY = std::min(centerY, maxY);
-        
+
         m_boardArea->move(centerX, centerY);
         // Ensure the board area renders above players if close
         m_boardArea->raise();
@@ -735,7 +724,7 @@ void PokerTableWindow::positionDealerButtons()
     {
         if (!panel || !panel->dealerButton() || !panel->dealerButton()->isVisible())
             continue;
-        
+
         QLabel* badge = panel->dealerButton();
         // Coordinates relative to parent (PokerTableWindow)
         const QPoint panelTopLeft = panel->pos();

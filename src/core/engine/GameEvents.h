@@ -2,11 +2,11 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
-
 #pragma once
 #include "cards/Card.h"
 #include "core/engine/model/GameState.h"
 #include "core/engine/model/PlayerAction.h"
+#include "core/player/typedefs.h"
 
 #include <functional>
 #include <list>
@@ -18,11 +18,13 @@ namespace pkt::core
 namespace player
 {
 class HumanStrategy;
-}
+class Player;
+} // namespace player
 
 struct GameEvents
 {
     std::function<void(int gameSpeed)> onGameInitialized;
+    std::function<void(const player::PlayerList& players)> onPlayersInitialized;
     std::function<void(std::list<unsigned> winnerIds, int totalPot)> onHandCompleted;
     std::function<void(unsigned playerId, int newChips)> onPlayerChipsUpdated;
     std::function<void(GameState)> onBettingRoundStarted;
@@ -40,7 +42,7 @@ struct GameEvents
 
     // Human strategy registration for direct GUI communication
     std::function<void(player::HumanStrategy*)> onHumanStrategyWaiting;
-    
+
     // Event processing for responsive UI during strategy decisions (framework-agnostic)
     mutable std::function<void()> onProcessEvents;
 

@@ -27,7 +27,7 @@ class UltraTightBotStrategy : public BotStrategyBase
     UltraTightBotStrategy(pkt::core::Logger& logger, pkt::core::Randomizer& randomizer);
 
     ~UltraTightBotStrategy();
-    std::string getName() const override { return "UltraTightBot"; }
+    std::string getName() const override { return "Ultra tight"; }
 
   protected:
     virtual bool preflopCouldCall(const CurrentHandContext& ctx) override;
