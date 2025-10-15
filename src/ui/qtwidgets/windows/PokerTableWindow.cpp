@@ -165,14 +165,18 @@ void PokerTableWindow::setupUi()
     // Add stretch space to push action controls to bottom
     m_mainLayout->addStretch();
 
+    // Add "Pause between hands" checkbox above the action bar (left-aligned)
+    auto checkboxLayout = new QHBoxLayout();
+    checkboxLayout->addWidget(m_pauseBetweenHandsCheckbox);
+    checkboxLayout->addStretch();
+    m_mainLayout->addLayout(checkboxLayout);
+
     // Add action bar
     m_mainLayout->addWidget(m_actionBar);
 
-    // Add "Pause between hands" checkbox and Next Hand button (centered)
+    // Add Next Hand button (centered)
     auto nextHandLayout = new QHBoxLayout();
     nextHandLayout->addStretch();
-    nextHandLayout->addWidget(m_pauseBetweenHandsCheckbox);
-    nextHandLayout->addSpacing(10); // Small space between checkbox and button
     nextHandLayout->addWidget(m_nextHandButton);
     nextHandLayout->addStretch();
     m_mainLayout->addLayout(nextHandLayout);

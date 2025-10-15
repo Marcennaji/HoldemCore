@@ -236,8 +236,19 @@ void GuiBridgeWidgets::handleHandCompleted(std::list<unsigned> winnerIds, int to
     m_tableWindow->showWinners(winnerIds, totalPot);
     m_tableWindow->enablePlayerInput(false);
 
-    // Show the Next Hand button when hand is completed
-    m_tableWindow->onHandCompleted();
+    // IMPORTANT: Use QTimer to defer the call to onHandCompleted
+    // This allows the game engine to complete its cleanup (pot distribution, state transitions)
+    // before the UI processes the hand completion and potentially starts a new hand.
+    // Without this delay, we get a race condition where the new hand starts before
+    // the old hand is fully cleaned up, causing access violations.
+    QTimer::singleShot(50, this,
+                       [this]()
+                       {
+                           if (m_tableWindow)
+                           {
+                               m_tableWindow->onHandCompleted();
+                           }
+                       });
 }
 
 void GuiBridgeWidgets::handlePlayerChipsUpdated(unsigned playerId, int newChips)
