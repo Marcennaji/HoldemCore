@@ -2,7 +2,6 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
-
 #pragma once
 
 #include "core/engine/model/PlayerAction.h"
@@ -18,7 +17,7 @@ struct CurrentHandContext;
 
 /**
  * @brief Base implementation class providing common functionality for bot strategies.
- * 
+ *
  * This class serves as the foundation for concrete bot strategy implementations,
  * providing shared decision-making logic, helper methods, and common patterns
  * used across different bot personalities and playing styles.
@@ -37,11 +36,9 @@ class BotStrategyBase : public virtual BotStrategy
     int computePreflopRaiseAmount(const CurrentHandContext&);
     bool shouldPotControl(const CurrentHandContext&);
     bool isPossibleToBluff(const CurrentHandContext& ctx) const;
-    bool m_couldCall;
-    bool m_couldRaise;
 
     Logger& m_logger;
-    mutable Randomizer* m_randomizer; 
+    mutable Randomizer* m_randomizer;
 
   private:
     virtual bool preflopCouldCall(const CurrentHandContext& ctx) = 0;

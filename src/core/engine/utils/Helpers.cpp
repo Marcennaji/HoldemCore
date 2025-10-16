@@ -6,9 +6,9 @@
 #include "core/engine/cards/CardUtilities.h"
 #include "core/engine/hand/Hand.h"
 #include "core/engine/model/PlayerPosition.h"
-#include "core/ports/Logger.h"
 #include "core/player/Helpers.h"
 #include "core/player/Player.h"
+#include "core/ports/Logger.h"
 // Include FSM states for the helper function
 #include "core/engine/state/FlopState.h"
 #include "core/engine/state/PostRiverState.h"
@@ -133,19 +133,19 @@ std::shared_ptr<player::Player> getFirstPlayerToActPostFlop(const Hand& hand)
 }
 
 std::unique_ptr<pkt::core::HandState> computeBettingRoundNextState(pkt::core::Hand& hand,
-                                                                    const pkt::core::GameEvents& events,
-                                                                    pkt::core::GameState currentState,
-                                                                    pkt::core::Logger& logger)
+                                                                   const pkt::core::GameEvents& events,
+                                                                   pkt::core::GameState currentState,
+                                                                   pkt::core::Logger& logger)
 {
     // If less than 2 players are still in hand (haven't folded), go directly to showdown
-    if (hand.getPlayersInHandList()->size() < 2)
+    auto playersInHandList = hand.getPlayersInHandList();
+    if (!playersInHandList || playersInHandList->size() < 2)
     {
         return std::make_unique<pkt::core::PostRiverState>(events, logger);
     }
 
     // Check if any player went all-in during this hand
     bool hasAllInPlayer = false;
-    auto playersInHandList = hand.getPlayersInHandList();
     if (playersInHandList)
     {
         for (const auto& player : *playersInHandList)
@@ -163,14 +163,15 @@ std::unique_ptr<pkt::core::HandState> computeBettingRoundNextState(pkt::core::Ha
     // we should deal all remaining cards and skip directly to showdown.
     bool actingListEmpty = hand.getActingPlayersList()->empty();
     bool roundCompleteWithAllIn = false;
-    
+
     if (!actingListEmpty && hasAllInPlayer && hand.getActingPlayersList()->size() <= 1)
     {
         roundCompleteWithAllIn = isRoundComplete(hand, logger);
     }
-    
-    bool allInCondition = (actingListEmpty && hand.getPlayersInHandList()->size() >= 1) || roundCompleteWithAllIn;
-    
+
+    bool allInCondition =
+        (actingListEmpty && playersInHandList && playersInHandList->size() >= 1) || roundCompleteWithAllIn;
+
     if (allInCondition)
     {
         // Inform board that showdown is due to all-in; affects reveal ordering later.
@@ -179,37 +180,40 @@ std::unique_ptr<pkt::core::HandState> computeBettingRoundNextState(pkt::core::Ha
         // Deal all remaining community cards at once
         BoardCards board = hand.getBoard().getBoardCards();
         int numCards = board.getNumCards();
-        
+
         // Deal flop if not yet dealt (3 cards)
         if (numCards == 0)
         {
             auto flopCards = hand.dealCardsFromDeck(3);
             board = BoardCards(flopCards[0], flopCards[1], flopCards[2]);
             numCards = 3;
-            if (events.onBoardCardsDealt) events.onBoardCardsDealt(board);
+            if (events.onBoardCardsDealt)
+                events.onBoardCardsDealt(board);
         }
-        
+
         // Deal turn if not yet dealt (4th card)
         if (numCards == 3)
         {
             auto turnCards = hand.dealCardsFromDeck(1);
             board.dealTurn(turnCards[0]);
             numCards = 4;
-            if (events.onBoardCardsDealt) events.onBoardCardsDealt(board);
+            if (events.onBoardCardsDealt)
+                events.onBoardCardsDealt(board);
         }
-        
+
         // Deal river if not yet dealt (5th card)
         if (numCards == 4)
         {
             auto riverCards = hand.dealCardsFromDeck(1);
             board.dealRiver(riverCards[0]);
             numCards = 5;
-            if (events.onBoardCardsDealt) events.onBoardCardsDealt(board);
+            if (events.onBoardCardsDealt)
+                events.onBoardCardsDealt(board);
         }
-        
+
         // Update the board with all cards
         hand.getBoard().setBoardCards(board);
-        
+
         // Skip directly to showdown (PostRiver state)
         return std::make_unique<pkt::core::PostRiverState>(events, logger);
     }
@@ -250,7 +254,7 @@ bool isRoundComplete(const Hand& hand, pkt::core::Logger& logger)
     for (auto player = hand.getActingPlayersList()->begin(); player != hand.getActingPlayersList()->end(); ++player)
     {
         logger.verbose("checking if round " + gameStateToString(hand.getGameState()) +
-                      " is complete : Checking player: " + (*player)->getName());
+                       " is complete : Checking player: " + (*player)->getName());
 
         if ((*player)->getLastAction().type == ActionType::None ||
             (*player)->getLastAction().type == ActionType::PostBigBlind ||
@@ -270,7 +274,7 @@ bool isRoundComplete(const Hand& hand, pkt::core::Logger& logger)
             hand.getBettingActions()->getRoundHighestSet())
         {
             logger.verbose("  ROUND NOT COMPLETE, as player " + (*player)->getName() +
-                          " has not matched the highest bet yet.");
+                           " has not matched the highest bet yet.");
             return false;
         }
     }

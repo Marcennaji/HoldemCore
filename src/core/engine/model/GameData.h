@@ -12,7 +12,7 @@ namespace pkt::core
 struct GameData
 {
     GameData() = default;
-    TableProfile tableProfile;
+    TableProfile tableProfile{TableProfile::RandomOpponents};
     int maxNumberOfPlayers{0};
     int startMoney{0};
     int firstSmallBlind{0};

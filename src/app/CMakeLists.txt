@@ -25,3 +25,6 @@ if(USE_WIDGETS)
         Qt6::Gui
     )
 endif()
+
+# Add tools subdirectory
+add_subdirectory(tools)

@@ -84,6 +84,54 @@ void Session::startGame(const GameData& gameData, const StartData& startData)
     initializeGame(std::move(gameComponents), gameData, adjustedStartData);
 }
 
+void Session::startBotOnlyGameWithCustomStrategies(const BotGameData& botGameData, const StartData& startData)
+{
+    // Validate strategy distribution
+    int totalPlayers = 0;
+    for (const auto& [strategyName, count] : botGameData.strategyDistribution)
+    {
+        if (count <= 0)
+        {
+            throw std::runtime_error("Strategy count must be positive for strategy: " + strategyName);
+        }
+        totalPlayers += count;
+    }
+
+    if (totalPlayers == 0)
+    {
+        throw std::runtime_error("Total player count must be positive");
+    }
+
+    if (totalPlayers != startData.numberOfPlayers)
+    {
+        throw std::runtime_error("Strategy distribution total (" + std::to_string(totalPlayers) +
+                                 ") must match numberOfPlayers (" + std::to_string(startData.numberOfPlayers) + ")");
+    }
+
+    // Auto-select dealer if needed
+    StartData adjustedStartData = startData;
+    if (adjustedStartData.startDealerPlayerId == StartData::AUTO_SELECT_DEALER)
+    {
+        int randomDealer = 0;
+        m_randomizer.getRand(0, adjustedStartData.numberOfPlayers - 1, 1, &randomDealer);
+        adjustedStartData.startDealerPlayerId = randomDealer;
+    }
+
+    // Convert BotGameData to GameData
+    GameData gameData;
+    gameData.startMoney = botGameData.startMoney;
+    gameData.firstSmallBlind = botGameData.firstSmallBlind;
+    gameData.guiSpeed = 0;                                 // Bot-only games are headless (no GUI)
+    gameData.tableProfile = TableProfile::RandomOpponents; // Not used for custom strategies
+    gameData.maxNumberOfPlayers = totalPlayers;
+
+    // Create custom components
+    auto components = createCustomStrategyComponents(botGameData, adjustedStartData);
+
+    // Initialize session with custom components
+    initializeGame(std::move(components), gameData, adjustedStartData);
+}
+
 void Session::validatePlayerConfiguration(const pkt::core::player::PlayerList& playersList)
 {
     if (!playersList || playersList->empty())
@@ -91,17 +139,22 @@ void Session::validatePlayerConfiguration(const pkt::core::player::PlayerList& p
         throw std::runtime_error("Player list cannot be empty");
     }
 
-    int humanPlayerCount = 0;
-    bool hasHumanPlayerWithIdZero = false;
-    std::vector<int> humanPlayerIds;
-
+    // Validate that all players are valid (not null)
     for (const auto& player : *playersList)
     {
         if (!player)
         {
             throw std::runtime_error("Invalid null player in player list");
         }
+    }
 
+    // Validate exactly 1 human player with ID 0
+    int humanPlayerCount = 0;
+    bool hasHumanPlayerWithIdZero = false;
+    std::vector<int> humanPlayerIds;
+
+    for (const auto& player : *playersList)
+    {
         // Check if this player has a HumanStrategy
         if (player->hasStrategyType<player::HumanStrategy>())
         {
@@ -175,7 +228,8 @@ Session::GameComponents Session::createGameComponents(const GameData& gameData, 
     GameComponents components;
 
     // Create dependencies using virtual factory methods (testable)
-    components.strategyAssigner = createStrategyAssigner(gameData.tableProfile, startData.numberOfPlayers - 1);
+    int numberOfBots = startData.numberOfPlayers - 1; // Always 1 human + (n-1) bots
+    components.strategyAssigner = createStrategyAssigner(gameData.tableProfile, numberOfBots);
     components.playerFactory = createPlayerFactory(m_events, components.strategyAssigner.get());
 
     components.playersList = createPlayersList(*components.playerFactory, startData.numberOfPlayers,
@@ -220,6 +274,78 @@ void Session::startNewHand()
     {
         m_currentGame->startNewHand();
     }
+}
+
+Session::GameComponents Session::createCustomStrategyComponents(const BotGameData& botGameData,
+                                                                const StartData& startData)
+{
+    GameComponents components;
+
+    // We don't use StrategyAssigner for custom strategies - create players manually
+    components.strategyAssigner = nullptr;
+
+    // Create a player factory (without strategy assigner since we'll set strategies manually)
+    components.playerFactory = createPlayerFactory(m_events, nullptr);
+
+    // Create players list
+    components.playersList = std::make_shared<std::list<std::shared_ptr<player::Player>>>();
+
+    // Create players with specific strategies based on distribution map
+    int playerId = 0;
+    for (const auto& [strategyName, count] : botGameData.strategyDistribution)
+    {
+        for (int i = 0; i < count; ++i)
+        {
+            // Create bot player manually
+            auto player = std::make_shared<player::Player>(m_events, m_logger, m_handEvaluationEngine,
+                                                           m_playersStatisticsStore, m_randomizer, playerId,
+                                                           "Bot_" + std::to_string(playerId), botGameData.startMoney);
+            playerId++;
+
+            // Create the appropriate strategy based on name
+            std::unique_ptr<player::BotStrategy> strategy;
+
+            std::string lowerStrategyName = strategyName;
+            std::transform(lowerStrategyName.begin(), lowerStrategyName.end(), lowerStrategyName.begin(), ::tolower);
+
+            if (lowerStrategyName == "tight")
+            {
+                strategy = std::make_unique<player::TightAggressiveBotStrategy>(m_logger, m_randomizer);
+            }
+            else if (lowerStrategyName == "loose")
+            {
+                strategy = std::make_unique<player::LooseAggressiveBotStrategy>(m_logger, m_randomizer);
+            }
+            else if (lowerStrategyName == "maniac")
+            {
+                strategy = std::make_unique<player::ManiacBotStrategy>(m_logger, m_randomizer);
+            }
+            else if (lowerStrategyName == "ultratight")
+            {
+                strategy = std::make_unique<player::UltraTightBotStrategy>(m_logger, m_randomizer);
+            }
+            else
+            {
+                throw std::runtime_error("Unknown strategy name: " + strategyName);
+            }
+
+            // Set the strategy on the player
+            player->setStrategy(std::move(strategy));
+
+            // Add to players list
+            components.playersList->push_back(player);
+        }
+    }
+
+    // Create board
+    components.board = createBoard(startData);
+    components.board->setSeatsList(components.playersList);
+
+    // Create a copy for acting players list
+    auto actingPlayersList = std::make_shared<std::list<std::shared_ptr<player::Player>>>(*components.playersList);
+    components.board->setActingPlayersList(actingPlayersList);
+
+    return components;
 }
 
 } // namespace pkt::core

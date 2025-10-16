@@ -9,7 +9,7 @@
 #include <core/engine/model/Ranges.h>
 #include <core/player/Helpers.h>
 #include <core/player/strategy/CurrentHandContext.h>
-#include <core/player/strategy/PokerMath.h>  // Phase 1-4 utilities
+#include <core/player/strategy/PokerMath.h> // Phase 1-4 utilities
 #include "Exception.h"
 
 #include <fstream>
@@ -22,14 +22,11 @@ namespace pkt::core::player
 
 using namespace std;
 
-
-
 // ISP-compliant constructor - only accepts what it actually needs (Logger + Randomizer)
-ManiacBotStrategy::ManiacBotStrategy(pkt::core::Logger& logger, 
-                                   pkt::core::Randomizer& randomizer)
+ManiacBotStrategy::ManiacBotStrategy(pkt::core::Logger& logger, pkt::core::Randomizer& randomizer)
     : BotStrategyBase(logger, randomizer)
 {
-    // initialize utg starting range, in a full table  
+    // initialize utg starting range, in a full table
     int utgFullTableRange = 0;
     m_randomizer->getRand(30, 35, 1, &utgFullTableRange);
     initializeRanges(50, utgFullTableRange);
@@ -202,8 +199,7 @@ int ManiacBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
                 {
 
                     speculativeHandedAdded = true;
-                    m_logger.verbose(
-                        "\t\tManiac adding this speculative hand to our initial raising range");
+                    m_logger.verbose("\t\tManiac adding this speculative hand to our initial raising range");
                 }
                 else
                 {
@@ -214,8 +210,7 @@ int ManiacBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
                         if (PokerMath::shouldDefendAgainst3Bet(*m_randomizer))
                         {
                             speculativeHandedAdded = true;
-                            m_logger.verbose(
-                                "\t\tManiac adding this junk hand to our initial raising range");
+                            m_logger.verbose("\t\tManiac adding this junk hand to our initial raising range");
                         }
                     }
                 }
@@ -248,8 +243,7 @@ int ManiacBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
                 if (rand == 1)
                 {
                     speculativeHandedAdded = true;
-                    m_logger.verbose(
-                        "\t\tManiac adding this speculative hand to our initial raising range");
+                    m_logger.verbose("\t\tManiac adding this speculative hand to our initial raising range");
                 }
             }
         }
@@ -271,13 +265,12 @@ int ManiacBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
                        RangeEstimator::getStringRange(ctx.commonContext.playersContext.nbPlayers, 4)))
     {
 
-        // ISP-compliant probability check: 10% chance  
+        // ISP-compliant probability check: 10% chance
         int rand = 0;
         m_randomizer->getRand(1, 10, 1, &rand);
         if (rand == 1)
         {
             m_logger.verbose("\t\twon't raise, to hide the hand strength");
-            m_couldCall = true;
             return 0;
         }
     }
@@ -310,7 +303,7 @@ int ManiacBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
             {
                 if (PokerMath::shouldBluffFrequently(*m_randomizer))
                 {
-                    return PokerMath::calculateValueBetSize(ctx);  // Was: pot * 0.6
+                    return PokerMath::calculateValueBetSize(ctx); // Was: pot * 0.6
                 }
             }
 
@@ -350,7 +343,7 @@ int ManiacBotStrategy::flopCouldBet(const CurrentHandContext& ctx)
         // always bet if my hand will lose a lot of its value on next betting rounds
         if (ctx.personalContext.m_handSimulation.winRanged - ctx.personalContext.m_handSimulation.winSd > 0.1)
         {
-            return PokerMath::calculateBluffBetSize(ctx);  // Was: pot * 0.8 (maniac aggressive)
+            return PokerMath::calculateBluffBetSize(ctx); // Was: pot * 0.8 (maniac aggressive)
         }
 
         // if no raise preflop, or if more than 1 opponent
@@ -480,8 +473,7 @@ int ManiacBotStrategy::flopCouldRaise(const CurrentHandContext& ctx)
     if ((isDrawingProbOk(ctx.personalContext.postFlopAnalysisFlags, ctx.commonContext.bettingContext.potOdd) ||
          ctx.personalContext.hasPosition) &&
         ctx.commonContext.playersContext.actingPlayersList->size() == 2 &&
-        !PokerMath::hasInsufficientEquityForCall(ctx) &&
-        isPossibleToBluff(ctx) && nbRaises < 2)
+        !PokerMath::hasInsufficientEquityForCall(ctx) && isPossibleToBluff(ctx) && nbRaises < 2)
     {
 
         int rand = 0;
@@ -590,8 +582,7 @@ bool ManiacBotStrategy::turnCouldCall(const CurrentHandContext& ctx)
                           .turnStatistics;
     }
 
-    if (PokerMath::hasInsufficientEquityForCall(ctx) &&
-        ctx.personalContext.m_handSimulation.winRanged < 0.94)
+    if (PokerMath::hasInsufficientEquityForCall(ctx) && ctx.personalContext.m_handSimulation.winRanged < 0.94)
     {
         return false;
     }
@@ -681,8 +672,7 @@ int ManiacBotStrategy::turnCouldRaise(const CurrentHandContext& ctx)
         return PokerMath::calculateValueBetSize(ctx);
     }
 
-    if (PokerMath::hasInsufficientEquityForCall(ctx) &&
-        ctx.personalContext.m_handSimulation.winRanged < 0.94)
+    if (PokerMath::hasInsufficientEquityForCall(ctx) && ctx.personalContext.m_handSimulation.winRanged < 0.94)
     {
         return 0;
     }

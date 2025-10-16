@@ -233,7 +233,6 @@ int UltraTightBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
         if (rand == 1)
         {
             m_logger.verbose("\t\twon't raise, to hide the hand strength");
-            m_couldCall = true;
             return 0;
         }
     }

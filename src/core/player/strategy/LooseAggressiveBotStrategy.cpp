@@ -9,7 +9,7 @@
 #include <core/engine/model/Ranges.h>
 #include <core/player/Helpers.h>
 #include <core/player/strategy/CurrentHandContext.h>
-#include <core/player/strategy/PokerMath.h>  // Phase 1-4 utilities
+#include <core/player/strategy/PokerMath.h> // Phase 1-4 utilities
 #include "Exception.h"
 
 #include <fstream>
@@ -22,18 +22,16 @@ namespace pkt::core::player
 
 using namespace std;
 
-LooseAggressiveBotStrategy::LooseAggressiveBotStrategy(pkt::core::Logger& logger, 
-                                                     pkt::core::Randomizer& randomizer)
+LooseAggressiveBotStrategy::LooseAggressiveBotStrategy(pkt::core::Logger& logger, pkt::core::Randomizer& randomizer)
     : BotStrategyBase(logger, randomizer)
 {
-    // initialize utg starting range, in a full table  
+    // initialize utg starting range, in a full table
     int utgFullTableRange = 0;
     m_randomizer->getRand(13, 15, 1, &utgFullTableRange);
     initializeRanges(48, utgFullTableRange);
 }
 
 LooseAggressiveBotStrategy::~LooseAggressiveBotStrategy() = default;
-
 
 bool LooseAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
 {
@@ -95,9 +93,8 @@ bool LooseAggressiveBotStrategy::preflopCouldCall(const CurrentHandContext& ctx)
             stringCallingRange += SUITED_CONNECTORS;
             stringCallingRange += SUITED_ONE_GAPED;
             stringCallingRange += SUITED_TWO_GAPED;
-            m_logger.verbose(
-                "\t\tLAG adding suited connectors, suited one-gaped and suited two-gaped to the initial "
-                "calling range.");
+            m_logger.verbose("\t\tLAG adding suited connectors, suited one-gaped and suited two-gaped to the initial "
+                             "calling range.");
         }
     }
 
@@ -278,7 +275,6 @@ int LooseAggressiveBotStrategy::preflopCouldRaise(const CurrentHandContext& ctx)
         if (rand <= 3)
         {
             m_logger.verbose("\t\twon't raise, to hide the hand strength");
-            m_couldCall = true;
             return 0;
         }
     }
@@ -436,8 +432,7 @@ bool LooseAggressiveBotStrategy::flopCouldCall(const CurrentHandContext& ctx)
         return true;
     }
 
-    if (PokerMath::hasInsufficientEquityForCall(ctx, 0.9f) &&
-        ctx.personalContext.m_handSimulation.win < 0.92)
+    if (PokerMath::hasInsufficientEquityForCall(ctx, 0.9f) && ctx.personalContext.m_handSimulation.win < 0.92)
     {
         return false;
     }
@@ -494,15 +489,15 @@ int LooseAggressiveBotStrategy::flopCouldRaise(const CurrentHandContext& ctx)
         }
     }
 
-    if (PokerMath::hasInsufficientEquityForCall(ctx))  // Was: winRanged * 100 < potOdd
+    if (PokerMath::hasInsufficientEquityForCall(ctx)) // Was: winRanged * 100 < potOdd
     {
 
         if (ctx.commonContext.bettingContext.potOdd < 30 &&
             ctx.commonContext.playersContext.actingPlayersList->size() < 4)
         {
 
-            if (PokerMath::shouldAddSpeculativeHand(*m_randomizer) && ctx.personalContext.m_handSimulation.winRanged > 0.3 &&
-                ctx.personalContext.m_handSimulation.win > 0.5)
+            if (PokerMath::shouldAddSpeculativeHand(*m_randomizer) &&
+                ctx.personalContext.m_handSimulation.winRanged > 0.3 && ctx.personalContext.m_handSimulation.win > 0.5)
             {
                 return ctx.commonContext.bettingContext.pot;
                 ;
@@ -613,8 +608,7 @@ bool LooseAggressiveBotStrategy::turnCouldCall(const CurrentHandContext& ctx)
                           .turnStatistics;
     }
 
-    if (PokerMath::hasInsufficientEquityForCall(ctx) &&
-        ctx.personalContext.m_handSimulation.winRanged < 0.94)
+    if (PokerMath::hasInsufficientEquityForCall(ctx) && ctx.personalContext.m_handSimulation.winRanged < 0.94)
     {
         return false;
     }
@@ -645,14 +639,16 @@ bool LooseAggressiveBotStrategy::turnCouldCall(const CurrentHandContext& ctx)
     }
 
     if (ctx.personalContext.m_handSimulation.winRanged < 0.6 && ctx.personalContext.m_handSimulation.win < 0.9 &&
-        (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber > 0 || PokerMath::isOpponentPassive(ctx, 30.0f, ctx.commonContext.playersContext.turnLastRaiser)))
+        (ctx.commonContext.bettingContext.flopBetsOrRaisesNumber > 0 ||
+         PokerMath::isOpponentPassive(ctx, 30.0f, ctx.commonContext.playersContext.turnLastRaiser)))
     {
         return false;
     }
 
     if (!ctx.personalContext.actions.preflopIsAggressor && !ctx.personalContext.actions.flopIsAggressor &&
         ctx.personalContext.m_handSimulation.winRanged < 0.8 && ctx.personalContext.m_handSimulation.win < 0.9 &&
-        PokerMath::isOpponentPassive(ctx, 30.0f, ctx.commonContext.playersContext.turnLastRaiser) && !ctx.personalContext.hasPosition)
+        PokerMath::isOpponentPassive(ctx, 30.0f, ctx.commonContext.playersContext.turnLastRaiser) &&
+        !ctx.personalContext.hasPosition)
     {
         return false;
     }
@@ -700,8 +696,7 @@ int LooseAggressiveBotStrategy::turnCouldRaise(const CurrentHandContext& ctx)
         return PokerMath::calculateValueBetSize(ctx);
     }
 
-    if (PokerMath::hasInsufficientEquityForCall(ctx) &&
-        ctx.personalContext.m_handSimulation.winRanged < 0.94)
+    if (PokerMath::hasInsufficientEquityForCall(ctx) && ctx.personalContext.m_handSimulation.winRanged < 0.94)
     {
         return 0;
     }
@@ -819,8 +814,7 @@ bool LooseAggressiveBotStrategy::riverCouldCall(const CurrentHandContext& ctx)
         return true;
     }
 
-    if (PokerMath::hasInsufficientEquityForCall(ctx) &&
-        ctx.personalContext.m_handSimulation.winSd < 0.97)
+    if (PokerMath::hasInsufficientEquityForCall(ctx) && ctx.personalContext.m_handSimulation.winSd < 0.97)
     {
         return false;
     }
