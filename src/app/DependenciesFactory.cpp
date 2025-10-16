@@ -2,7 +2,7 @@
 // Copyright (c) 2025 Marc Ennaji
 // Licensed under the MIT License — see LICENSE file for details.
 
-#include "AppFactory.h"
+#include "DependenciesFactory.h"
 
 // Core interfaces
 #include <core/ports/HandEvaluationEngine.h>
@@ -19,9 +19,6 @@
 #include <adapters/infrastructure/statistics/sqlite/SqliteDb.h>
 #include <adapters/infrastructure/statistics/sqlite/SqlitePlayersStatisticsStore.h>
 
-// UI controller
-#include <ui/qtwidgets/controller/GuiAppController.h>
-
 // Qt includes for database path
 #include <QDir>
 #include <QStandardPaths>
@@ -29,24 +26,7 @@
 namespace pkt::app
 {
 
-std::unique_ptr<pkt::ui::qtwidgets::GuiAppController>
-AppFactory::createApplication(LoggerType loggerType, HandEvaluatorType evaluatorType, DatabaseType dbType)
-{
-
-    auto logger = createLogger(loggerType);
-    auto handEvaluator = createHandEvaluator(evaluatorType);
-    auto statisticsStore = createStatisticsStore(dbType);
-    auto randomizer = createRandomizer();
-
-    return std::make_unique<pkt::ui::qtwidgets::GuiAppController>(logger, handEvaluator, statisticsStore, randomizer);
-}
-
-std::unique_ptr<pkt::ui::qtwidgets::GuiAppController> AppFactory::createTestApp()
-{
-    return createApplication(LoggerType::Null, HandEvaluatorType::Psim, DatabaseType::Sqlite);
-}
-
-std::shared_ptr<pkt::core::Logger> AppFactory::createLogger(LoggerType type)
+std::shared_ptr<pkt::core::Logger> DependenciesFactory::createLogger(LoggerType type)
 {
     switch (type)
     {
@@ -68,7 +48,7 @@ std::shared_ptr<pkt::core::Logger> AppFactory::createLogger(LoggerType type)
     }
 }
 
-std::shared_ptr<pkt::core::HandEvaluationEngine> AppFactory::createHandEvaluator(HandEvaluatorType type)
+std::shared_ptr<pkt::core::HandEvaluationEngine> DependenciesFactory::createHandEvaluator(HandEvaluatorType type)
 {
     switch (type)
     {
@@ -78,7 +58,7 @@ std::shared_ptr<pkt::core::HandEvaluationEngine> AppFactory::createHandEvaluator
     }
 }
 
-std::shared_ptr<pkt::core::PlayersStatisticsStore> AppFactory::createStatisticsStore(DatabaseType type)
+std::shared_ptr<pkt::core::PlayersStatisticsStore> DependenciesFactory::createStatisticsStore(DatabaseType type)
 {
     switch (type)
     {
@@ -94,12 +74,12 @@ std::shared_ptr<pkt::core::PlayersStatisticsStore> AppFactory::createStatisticsS
     }
 }
 
-std::shared_ptr<pkt::core::Randomizer> AppFactory::createRandomizer()
+std::shared_ptr<pkt::core::Randomizer> DependenciesFactory::createRandomizer()
 {
     return std::make_shared<pkt::core::DefaultRandomizer>();
 }
 
-std::string AppFactory::getDatabasePath()
+std::string DependenciesFactory::getDatabasePath()
 {
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QDir().mkpath(appDataPath);

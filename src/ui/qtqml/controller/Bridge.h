@@ -10,8 +10,6 @@
 #include <core/engine/model/GameState.h>
 #include <core/engine/model/PlayerAction.h>
 
-class PokerTableWindow;
-
 namespace pkt::core
 {
 class Session;
@@ -22,31 +20,30 @@ class Player;
 } // namespace player
 } // namespace pkt::core
 
-namespace pkt::ui::qtwidgets
+namespace pkt::ui::qtqml::controller
 {
-class PokerTableWindow;
-struct PlayerDisplayInfo;
+class TableViewModel;
 
 /**
- * @brief Bridge between the poker engine core and Qt Widgets GUI components.
+ * @brief Bridge between the poker engine core and QML UI via TableViewModel.
  *
- * Handles communication between the game engine and the user interface,
- * translating game events to GUI updates and user interactions back to
- * the poker engine core.
+ * Handles communication between the game engine and the QML interface,
+ * translating game events to view model updates and user interactions
+ * back to the poker engine core.
+ *
+ * Similar to Bridge but updates a view model instead of direct UI.
  */
-class GuiBridgeWidgets : public QObject
+class Bridge : public QObject
 {
     Q_OBJECT
 
   public:
-    GuiBridgeWidgets(pkt::core::Session* session, PokerTableWindow* pokerTableWindow, QObject* parent = nullptr);
+    Bridge(pkt::core::Session* session, TableViewModel* viewModel, QObject* parent = nullptr);
 
-    void connectEventsToUi(pkt::core::GameEvents& events);
+    void connectEventsToViewModel(pkt::core::GameEvents& events);
 
-  private slots:
-    void connectSignalsFromUi();
-
-    // Slots to handle user actions from UI
+  public slots:
+    // Slots to handle user actions from QML UI
     void onPlayerFold();
     void onPlayerCall();
     void onPlayerCheck();
@@ -56,7 +53,7 @@ class GuiBridgeWidgets : public QObject
     void onNextHandRequested();
 
   private:
-    // Event handlers for GameEvents - these will be connected to the game engine events
+    // Event handlers for GameEvents - connected to game engine events
     void handlePlayersInitialized(const pkt::core::player::PlayerList& players);
     void handleGameInitialized(int gameSpeed);
     void handleHandCompleted(std::list<unsigned> winnerIds, int totalPot);
@@ -71,26 +68,15 @@ class GuiBridgeWidgets : public QObject
     void handleInvalidPlayerAction(unsigned playerId, pkt::core::PlayerAction invalidAction, std::string reason);
     void handleEngineError(std::string errorMessage);
 
-    PokerTableWindow* m_tableWindow = nullptr;
+    // Helper methods
+    QString cardToString(const pkt::core::Card& card) const;
+    QString gameStateToString(pkt::core::GameState state) const;
+    QString actionTypeToString(pkt::core::ActionType action) const;
+
+    TableViewModel* m_viewModel = nullptr;
     pkt::core::Session* m_session = nullptr;
-
-    // Track the human strategy that's currently waiting for input
     pkt::core::player::HumanStrategy* m_currentHumanStrategy = nullptr;
-
-    // Game speed for UI pacing (higher = faster; used to compute delay between bot actions)
     int m_gameSpeed = 1;
-
-    // Track human player's last known chips to enforce auto-fold at 0
-    int m_humanChips = -1;
-
-    // Helper: auto-fold human if out of chips
-    void autoFoldHumanIfBroke();
-
-    // Compute UI delay in milliseconds based on m_gameSpeed (range: 500ms..3000ms)
-    int computeDelayMsForBots() const;
-
-    // Helper: Convert Player facade to lightweight DTO for UI display
-    PlayerDisplayInfo createPlayerDisplayInfo(const pkt::core::player::Player& player) const;
 };
 
-} // namespace pkt::ui::qtwidgets
+} // namespace pkt::ui::qtqml::controller

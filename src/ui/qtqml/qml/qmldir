@@ -1,0 +1,4 @@
+module HoldemCore
+Main 1.0 Main.qml
+SetupScreen 1.0 SetupScreen.qml
+TableScreen 1.0 TableScreen.qml

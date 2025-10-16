@@ -1,5 +1,5 @@
 @startuml
-title HoldemCore – Hexagonal Architecture with AppFactory Composition Root
+title HoldemCore – Hexagonal Architecture with Factory Composition Root
 
 skinparam packageStyle rectangle
 skinparam shadowing false
@@ -17,9 +17,19 @@ package "Core (Domain)" as Core #LightYellow {
 }
 
 package "Application (Composition Root)" as App #LightBlue {
-  [main_qt_widgets.cpp] as Main
-  [AppFactory] as AppFactory
-  [GuiAppController] as GuiController
+  package "qtwidgets/" as WidgetsApp #LightSteelBlue {
+    [main.cpp] as WidgetsMain
+    [AppFactory] as WidgetsFactory
+    [AppController] as WidgetsController
+  }
+  
+  package "qtqml/" as QmlApp #LightSteelBlue {
+    [main.cpp] as QmlMain
+    [AppFactory] as QmlFactory
+    [AppController] as QmlController
+  }
+  
+  [DependenciesFactory] as DepsFactory
 }
 
 package "Infrastructure (Secondary Adapters)" as Infra #LightGreen {
@@ -30,10 +40,19 @@ package "Infrastructure (Secondary Adapters)" as Infra #LightGreen {
   [SqliteDb] as SqliteDb
 }
 
-package "UI (Primary Adapters)" as UI #LightCyan {
+package "UI Widgets (Primary Adapter)" as UIWidgets #LightCyan {
   [StartWindow] as StartWindow
   [PokerTableWindow] as TableWindow
-  [GuiBridgeWidgets] as Bridge
+  [Bridge] as Bridge
+}
+
+package "UI QML (Primary Adapter)" as UIQML #PowderBlue {
+  [SetupScreen.qml] as SetupScreen
+  [TableScreen.qml] as TableScreen
+  [Bridge] as QmlBridge
+  [TableViewModel] as ViewModel
+  [PokerTable.qml] as PokerTable
+  [ActionPanel.qml] as ActionPanel
 }
 
 package "Third-party" as ThirdParty #LightGray {
@@ -58,13 +77,22 @@ Session -[#green]-> Ports : depends on
 EngineFactory -[#green]-> Ports : depends on
 PlayerFactory -[#green]-> Ports : depends on
 
-' Application Layer (Composition Root via AppFactory)
-Main -[#red]-> AppFactory : delegates to factory
-AppFactory -[#red]-> Infra : creates concrete adapters
-AppFactory -[#red]-> GuiController : injects adapters via constructor
-GuiController -[#red]-> Session : creates with injected deps
-GuiController -[#red]-> EngineFactory : creates with injected deps
-GuiController -[#red]-> UI : creates
+' Application Layer - Widgets (Composition Root)
+WidgetsMain -[#red]-> WidgetsFactory : delegates to factory
+WidgetsFactory -[#red]-> DepsFactory : uses shared infrastructure
+DepsFactory -[#red]-> Infra : creates concrete adapters
+WidgetsFactory -[#red]-> WidgetsController : injects adapters via constructor
+WidgetsController -[#red]-> Session : creates with injected deps
+WidgetsController -[#red]-> EngineFactory : creates with injected deps
+WidgetsController -[#red]-> UIWidgets : creates
+
+' Application Layer - QML (Composition Root)
+QmlMain -[#darkblue]-> QmlFactory : delegates to factory
+QmlFactory -[#darkblue]-> DepsFactory : uses shared infrastructure
+QmlFactory -[#darkblue]-> QmlController : injects adapters via constructor
+QmlController -[#darkblue]-> Session : creates with injected deps
+QmlController -[#darkblue]-> EngineFactory : creates with injected deps
+QmlController -[#darkblue]-> UIQML : creates
 
 ' Secondary Adapters (implement core interfaces - driven by application)
 ConsoleLogger -[#orange]-> Ports : implements Logger
@@ -73,24 +101,36 @@ PsimEngine -[#orange]-> Ports : implements HandEvaluationEngine
 DefaultRandomizer -[#orange]-> Ports : implements Randomizer
 SqliteStore -[#orange]-> SqliteDb : uses
 
-' Primary Adapters (drive the application - user interfaces)
-UI -[#purple]-> GameEvents : subscribes to
+' Primary Adapters - Widgets (drive the application - desktop UI)
 StartWindow -[#purple]-> Session : drives application
 Bridge -[#purple]-> GameEvents : handles events
 Bridge -[#purple]-> TableWindow : updates UI
 
+' Primary Adapters - QML (drive the application - mobile/modern UI)
+SetupScreen -[#mediumpurple]-> QmlController : starts game
+QmlBridge -[#mediumpurple]-> GameEvents : handles events
+QmlBridge -[#mediumpurple]-> ViewModel : updates
+ViewModel -[#mediumpurple]-> TableScreen : data binding
+TableScreen -[#mediumpurple]-> PokerTable : displays
+TableScreen -[#mediumpurple]-> ActionPanel : user actions
+
 ' Third-party Dependencies
 SqliteDb -[#gray]-> SQLite3 : uses
 PsimEngine -[#gray]-> psim : uses  
-UI -[#gray]-> Qt6 : framework
+UIWidgets -[#gray]-> Qt6 : framework
+UIQML -[#gray]-> Qt6 : framework
 
-' AppFactory Composition Root Pattern
-note right of Main : Clean Entry Point:\n• No concrete dependencies\n• Delegates to AppFactory\n• Single responsibility
-note right of AppFactory : Composition Root:\n• Creates all concrete adapters\n• Configurable implementations\n• Pure dependency injection\n• Single point of change
+' Factory Composition Root Pattern
+note right of WidgetsMain : Widgets Entry Point:\n• No concrete dependencies\n• Delegates to AppFactory\n• Creates AppController
+note right of QmlMain : QML Entry Point:\n• No concrete dependencies\n• Delegates to AppFactory\n• Creates AppController
+note bottom of DepsFactory : Shared Dependencies Factory:\n• Creates infrastructure adapters\n• Logger, HandEvaluator,\n  StatisticsStore, Randomizer\n• Used by both UI factories\n• No UI dependencies
+note right of WidgetsFactory : Widgets AppFactory:\n• Creates AppController\n• Uses DependenciesFactory\n• No QML dependencies\n• Namespace: pkt::app::qtwidgets
+note right of QmlFactory : QML AppFactory:\n• Creates AppController\n• Uses DependenciesFactory\n• No Widgets dependencies\n• Namespace: pkt::app::qtqml
 note bottom of Ports : Abstract Interfaces:\n• Logger\n• HandEvaluationEngine\n• PlayersStatisticsStore\n• Randomizer
 note bottom of Core : Pure Domain Logic:\n• Zero infrastructure knowledge\n• All dependencies injected\n• Constructor injection only\n• Facades coordinate components
 note left of Core : Hand Facade:\nDelegates to 6 managers:\n• HandPlayersManager\n• HandActionHandler\n• HandCardDealer\n• HandCalculator\n• HandStateManager\n• HandLifecycleManager\n\nPlayer Facade:\nDelegates to:\n• PlayerStrategy\n• PlayerStatisticsUpdater\n• RangeEstimator\n• CurrentHandContext
-note left of UI : Primary Adapters:\n• Drive the application\n• User interfaces\n• Trigger use cases
+note left of UIWidgets : Widgets UI (Desktop):\n• Traditional Qt Widgets\n• StartWindow (setup)\n• PokerTableWindow (game)\n• Bridge (events)\n• Controllers in pkt::ui::qtwidgets::controller
+note left of UIQML : QML UI (Mobile/Modern):\n• Qt Quick/QML\n• SetupScreen (setup)\n• TableScreen (game)\n• Bridge + ViewModel (MVVM)\n• Material-inspired design\n• Controllers in pkt::ui::qtqml::controller
 note right of Infra : Secondary Adapters:\n• Driven by application\n• Implement core interfaces\n• Infrastructure concerns
 
 @enduml

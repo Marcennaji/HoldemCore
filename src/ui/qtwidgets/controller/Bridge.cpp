@@ -1,4 +1,4 @@
-#include "GuiBridgeWidgets.h"
+#include "Bridge.h"
 #include "core/engine/GameEvents.h"
 #include "core/engine/model/PlayerAction.h"
 #include "core/player/Player.h"
@@ -17,28 +17,29 @@
 
 using namespace pkt::core;
 
-namespace pkt::ui::qtwidgets
+namespace pkt::ui::qtwidgets::controller
 {
 
-GuiBridgeWidgets::GuiBridgeWidgets(pkt::core::Session* session, PokerTableWindow* pokerTableWindow, QObject* parent)
+Bridge::Bridge(pkt::core::Session* session, pkt::ui::qtwidgets::PokerTableWindow* pokerTableWindow, QObject* parent)
     : QObject(parent), m_session(session), m_tableWindow(pokerTableWindow)
 {
     connectSignalsFromUi();
 }
 
-void GuiBridgeWidgets::connectSignalsFromUi()
+void Bridge::connectSignalsFromUi()
 {
     // Connect UI signals to our slots for handling user actions
-    connect(m_tableWindow, &PokerTableWindow::foldClicked, this, &GuiBridgeWidgets::onPlayerFold);
-    connect(m_tableWindow, &PokerTableWindow::callClicked, this, &GuiBridgeWidgets::onPlayerCall);
-    connect(m_tableWindow, &PokerTableWindow::checkClicked, this, &GuiBridgeWidgets::onPlayerCheck);
-    connect(m_tableWindow, &PokerTableWindow::betClicked, this, &GuiBridgeWidgets::onPlayerBet);
-    connect(m_tableWindow, &PokerTableWindow::raiseClicked, this, &GuiBridgeWidgets::onPlayerRaise);
-    connect(m_tableWindow, &PokerTableWindow::allInClicked, this, &GuiBridgeWidgets::onPlayerAllIn);
-    connect(m_tableWindow, &PokerTableWindow::nextHandRequested, this, &GuiBridgeWidgets::onNextHandRequested);
+    connect(m_tableWindow, &pkt::ui::qtwidgets::PokerTableWindow::foldClicked, this, &Bridge::onPlayerFold);
+    connect(m_tableWindow, &pkt::ui::qtwidgets::PokerTableWindow::callClicked, this, &Bridge::onPlayerCall);
+    connect(m_tableWindow, &pkt::ui::qtwidgets::PokerTableWindow::checkClicked, this, &Bridge::onPlayerCheck);
+    connect(m_tableWindow, &pkt::ui::qtwidgets::PokerTableWindow::betClicked, this, &Bridge::onPlayerBet);
+    connect(m_tableWindow, &pkt::ui::qtwidgets::PokerTableWindow::raiseClicked, this, &Bridge::onPlayerRaise);
+    connect(m_tableWindow, &pkt::ui::qtwidgets::PokerTableWindow::allInClicked, this, &Bridge::onPlayerAllIn);
+    connect(m_tableWindow, &pkt::ui::qtwidgets::PokerTableWindow::nextHandRequested, this,
+            &Bridge::onNextHandRequested);
 }
 
-void GuiBridgeWidgets::connectEventsToUi(pkt::core::GameEvents& events)
+void Bridge::connectEventsToUi(pkt::core::GameEvents& events)
 {
     // Connect game engine events to UI update methods using lambdas to capture 'this'
 
@@ -86,7 +87,7 @@ void GuiBridgeWidgets::connectEventsToUi(pkt::core::GameEvents& events)
 }
 
 // User action handlers (UI → Game Engine)
-void GuiBridgeWidgets::onPlayerFold()
+void Bridge::onPlayerFold()
 {
     qDebug() << "Player clicked Fold";
     PlayerAction action{0, ActionType::Fold, 0}; // Human player is always ID 0
@@ -97,7 +98,7 @@ void GuiBridgeWidgets::onPlayerFold()
     }
 }
 
-void GuiBridgeWidgets::onPlayerCall()
+void Bridge::onPlayerCall()
 {
     qDebug() << "Player clicked Call";
     PlayerAction action{0, ActionType::Call, 0};
@@ -108,7 +109,7 @@ void GuiBridgeWidgets::onPlayerCall()
     }
 }
 
-void GuiBridgeWidgets::onPlayerCheck()
+void Bridge::onPlayerCheck()
 {
     qDebug() << "Player clicked Check";
     PlayerAction action{0, ActionType::Check, 0};
@@ -119,7 +120,7 @@ void GuiBridgeWidgets::onPlayerCheck()
     }
 }
 
-void GuiBridgeWidgets::onPlayerBet(int amount)
+void Bridge::onPlayerBet(int amount)
 {
     qDebug() << "Player clicked Bet with amount:" << amount;
     PlayerAction action{0, ActionType::Bet, amount};
@@ -130,7 +131,7 @@ void GuiBridgeWidgets::onPlayerBet(int amount)
     }
 }
 
-void GuiBridgeWidgets::onPlayerRaise(int amount)
+void Bridge::onPlayerRaise(int amount)
 {
     qDebug() << "Player clicked Raise with amount:" << amount;
     PlayerAction action{0, ActionType::Raise, amount};
@@ -141,7 +142,7 @@ void GuiBridgeWidgets::onPlayerRaise(int amount)
     }
 }
 
-void GuiBridgeWidgets::onPlayerAllIn()
+void Bridge::onPlayerAllIn()
 {
     qDebug() << "Player clicked All-In";
     PlayerAction action{0, ActionType::Allin, 0};
@@ -152,7 +153,7 @@ void GuiBridgeWidgets::onPlayerAllIn()
     }
 }
 
-void GuiBridgeWidgets::onNextHandRequested()
+void Bridge::onNextHandRequested()
 {
     qDebug() << "Next hand requested by user";
 
@@ -167,7 +168,7 @@ void GuiBridgeWidgets::onNextHandRequested()
 }
 
 // Game event handlers (Game Engine → UI)
-void GuiBridgeWidgets::handlePlayersInitialized(const pkt::core::player::PlayerList& players)
+void Bridge::handlePlayersInitialized(const pkt::core::player::PlayerList& players)
 {
     qDebug() << "Players initialized, updating UI with player information";
 
@@ -180,7 +181,7 @@ void GuiBridgeWidgets::handlePlayersInitialized(const pkt::core::player::PlayerL
         if (player)
         {
             // Convert Player to DTO and refresh UI
-            PlayerDisplayInfo displayInfo = createPlayerDisplayInfo(*player);
+            pkt::ui::qtwidgets::PlayerDisplayInfo displayInfo = createPlayerDisplayInfo(*player);
             m_tableWindow->refreshPlayer(seat, displayInfo);
             qDebug() << "  Seat" << seat << ":" << QString::fromStdString(displayInfo.playerName) << "("
                      << QString::fromStdString(displayInfo.strategyName) << ")"
@@ -190,7 +191,7 @@ void GuiBridgeWidgets::handlePlayersInitialized(const pkt::core::player::PlayerL
     }
 }
 
-void GuiBridgeWidgets::handleGameInitialized(int gameSpeed)
+void Bridge::handleGameInitialized(int gameSpeed)
 {
     qDebug() << "Game initialized with speed:" << gameSpeed;
     m_gameSpeed = gameSpeed;
@@ -214,7 +215,7 @@ void GuiBridgeWidgets::handleGameInitialized(int gameSpeed)
     m_tableWindow->enablePlayerInput(false); // Wait for cards to be dealt
 }
 
-void GuiBridgeWidgets::handleShowdownRevealOrder(const std::vector<unsigned>& revealOrder)
+void Bridge::handleShowdownRevealOrder(const std::vector<unsigned>& revealOrder)
 {
     if (!m_tableWindow)
         return;
@@ -222,7 +223,7 @@ void GuiBridgeWidgets::handleShowdownRevealOrder(const std::vector<unsigned>& re
     m_tableWindow->revealShowdownOrder(revealOrder);
 }
 
-void GuiBridgeWidgets::handleHandCompleted(std::list<unsigned> winnerIds, int totalPot)
+void Bridge::handleHandCompleted(std::list<unsigned> winnerIds, int totalPot)
 {
     qDebug() << "Hand completed. Total pot:" << totalPot;
 
@@ -251,7 +252,7 @@ void GuiBridgeWidgets::handleHandCompleted(std::list<unsigned> winnerIds, int to
                        });
 }
 
-void GuiBridgeWidgets::handlePlayerChipsUpdated(unsigned playerId, int newChips)
+void Bridge::handlePlayerChipsUpdated(unsigned playerId, int newChips)
 {
     qDebug() << "Player" << playerId << "chips updated to:" << newChips;
     // Update the player's displayed stack immediately
@@ -271,7 +272,7 @@ void GuiBridgeWidgets::handlePlayerChipsUpdated(unsigned playerId, int newChips)
     }
 }
 
-void GuiBridgeWidgets::handleBettingRoundStarted(pkt::core::GameState gameState)
+void Bridge::handleBettingRoundStarted(pkt::core::GameState gameState)
 {
     qDebug() << "Betting round started. Game state: " << gameStateToString(gameState);
 
@@ -284,13 +285,13 @@ void GuiBridgeWidgets::handleBettingRoundStarted(pkt::core::GameState gameState)
     m_tableWindow->enablePlayerInput(false);
 }
 
-void GuiBridgeWidgets::handlePotUpdated(int newPotAmount)
+void Bridge::handlePotUpdated(int newPotAmount)
 {
     qDebug() << "Pot updated to:" << newPotAmount;
     m_tableWindow->refreshPot(newPotAmount);
 }
 
-void GuiBridgeWidgets::handlePlayerActed(pkt::core::PlayerAction action)
+void Bridge::handlePlayerActed(pkt::core::PlayerAction action)
 {
     qDebug() << "Player" << action.playerId << "acted:" << actionTypeToString(action.type)
              << ", amount:" << action.amount;
@@ -321,7 +322,7 @@ void GuiBridgeWidgets::handlePlayerActed(pkt::core::PlayerAction action)
     }
 }
 
-void GuiBridgeWidgets::handleAwaitingHumanInput(unsigned playerId, std::vector<pkt::core::ActionType> validActions)
+void Bridge::handleAwaitingHumanInput(unsigned playerId, std::vector<pkt::core::ActionType> validActions)
 {
     qDebug() << "Awaiting input from player:" << playerId << "Valid actions count:" << validActions.size();
 
@@ -347,7 +348,7 @@ void GuiBridgeWidgets::handleAwaitingHumanInput(unsigned playerId, std::vector<p
     m_tableWindow->showPlayerTurn(static_cast<int>(playerId));
 }
 
-void GuiBridgeWidgets::autoFoldHumanIfBroke()
+void Bridge::autoFoldHumanIfBroke()
 {
     if (m_humanChips != 0)
         return; // only trigger at exactly 0
@@ -362,7 +363,7 @@ void GuiBridgeWidgets::autoFoldHumanIfBroke()
     }
 }
 
-void GuiBridgeWidgets::handleHoleCardsDealt(unsigned playerId, pkt::core::HoleCards holeCards)
+void Bridge::handleHoleCardsDealt(unsigned playerId, pkt::core::HoleCards holeCards)
 {
     qDebug() << "Hole cards dealt to player " << playerId << "are" << holeCards.toString();
 
@@ -376,14 +377,13 @@ void GuiBridgeWidgets::handleHoleCardsDealt(unsigned playerId, pkt::core::HoleCa
     m_tableWindow->cacheHoleCards(static_cast<int>(playerId), holeCards);
 }
 
-void GuiBridgeWidgets::handleBoardCardsDealt(pkt::core::BoardCards boardCards)
+void Bridge::handleBoardCardsDealt(pkt::core::BoardCards boardCards)
 {
     qDebug() << "Board cards dealt are: " << boardCards.toString();
     m_tableWindow->showBoardCards(boardCards);
 }
 
-void GuiBridgeWidgets::handleInvalidPlayerAction(unsigned playerId, pkt::core::PlayerAction invalidAction,
-                                                 std::string reason)
+void Bridge::handleInvalidPlayerAction(unsigned playerId, pkt::core::PlayerAction invalidAction, std::string reason)
 {
     qDebug() << "Invalid action from player:" << playerId << "Reason:" << QString::fromStdString(reason);
 
@@ -391,13 +391,13 @@ void GuiBridgeWidgets::handleInvalidPlayerAction(unsigned playerId, pkt::core::P
     m_tableWindow->showErrorMessage(errorMsg);
 }
 
-void GuiBridgeWidgets::handleEngineError(std::string errorMessage)
+void Bridge::handleEngineError(std::string errorMessage)
 {
     qDebug() << "Engine error:" << QString::fromStdString(errorMessage);
     m_tableWindow->showErrorMessage(QString::fromStdString(errorMessage));
 }
 
-int GuiBridgeWidgets::computeDelayMsForBots() const
+int Bridge::computeDelayMsForBots() const
 {
     // Normalize m_gameSpeed to a reasonable range [1..10] if out of bounds
     int speed = m_gameSpeed <= 0 ? 1 : m_gameSpeed;
@@ -424,9 +424,10 @@ int GuiBridgeWidgets::computeDelayMsForBots() const
     return delay;
 }
 
-PlayerDisplayInfo GuiBridgeWidgets::createPlayerDisplayInfo(const pkt::core::player::Player& player) const
+pkt::ui::qtwidgets::PlayerDisplayInfo Bridge::createPlayerDisplayInfo(const pkt::core::player::Player& player) const
 {
-    return PlayerDisplayInfo(player.getId(), player.getName(), player.getStrategyName(), player.getCash());
+    return pkt::ui::qtwidgets::PlayerDisplayInfo(player.getId(), player.getName(), player.getStrategyName(),
+                                                 player.getCash());
 }
 
-} // namespace pkt::ui::qtwidgets
+} // namespace pkt::ui::qtwidgets::controller
