@@ -183,8 +183,15 @@ class OpponentsStrengthsEvaluatorTest : public EngineTest
     {
         const auto& hc = player->getHoleCards();
         const auto& bc = m_board->getBoardCards();
+        // BoardCards::toString() returns the board string WITHOUT a leading space
+        // The hand evaluator expects format: "As Ah 2h 3h 4h" (with space between hole cards and board)
         std::string handStr = hc.toString() + " " + bc.toString();
-        player->setHandRanking(getHandEvaluationEngineService()->rankHand(handStr.c_str()));
+        int ranking = getHandEvaluationEngineService()->rankHand(handStr.c_str());
+        if (ranking <= 0)
+        {
+            FAIL() << "Hand ranking is invalid (" << ranking << ") for hand: '" << handStr << "'. Check test setup.";
+        }
+        player->setHandRanking(ranking);
     }
 
     std::unique_ptr<OpponentsStrengthsEvaluator> m_evaluator;

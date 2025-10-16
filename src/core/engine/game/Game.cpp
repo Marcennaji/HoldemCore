@@ -5,10 +5,9 @@
 #include "Game.h"
 
 #include "EngineFactory.h"
-#include "Exception.h"
 #include "core/player/Helpers.h"
-#include "model/EngineError.h"
 #include "model/StartData.h"
+#include "utils/ExceptionUtils.h"
 
 #include <iostream>
 
@@ -24,7 +23,7 @@ Game::Game(const GameEvents& events, EngineFactory& factory, std::shared_ptr<Boa
       m_dealerPlayerId(dealerId), m_gameData(gameData), m_startData(startData)
 {
     if (!board || !seatsList || seatsList->empty())
-        throw Exception(__FILE__, __LINE__, EngineError::MissingParameter);
+        utils::throwLogicError("Missing parameter: board, seatsList, or seatsList is empty");
 
     // Acting players list starts identical to seats list
     m_actingPlayersList = std::make_shared<std::list<std::shared_ptr<Player>>>(*m_seatsList);
@@ -32,7 +31,7 @@ Game::Game(const GameEvents& events, EngineFactory& factory, std::shared_ptr<Boa
     // Validate dealer exists
     auto it = getPlayerListIteratorById(m_seatsList, dealerId);
     if (it == m_seatsList->end())
-        throw Exception(__FILE__, __LINE__, EngineError::DealerNotFound);
+        utils::throwLogicError("Dealer not found with ID: " + std::to_string(dealerId));
 }
 
 void Game::startNewHand()
@@ -83,7 +82,7 @@ void Game::findNextDealer()
     auto dealerPos = getPlayerListIteratorById(m_seatsList, m_dealerPlayerId);
 
     if (dealerPos == m_seatsList->end())
-        throw Exception(__FILE__, __LINE__, EngineError::DealerNotFound);
+        utils::throwLogicError("Dealer not found with ID: " + std::to_string(m_dealerPlayerId));
 
     for (size_t i = 0; i < m_seatsList->size(); ++i)
     {
@@ -101,7 +100,7 @@ void Game::findNextDealer()
     }
 
     if (!nextDealerFound)
-        throw Exception(__FILE__, __LINE__, EngineError::NextDealerNotFound);
+        utils::throwLogicError("Next dealer not found, current dealer ID: " + std::to_string(m_dealerPlayerId));
 }
 
 void Game::handlePlayerAction(const PlayerAction& action)

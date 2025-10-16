@@ -17,6 +17,7 @@
 #include <QVBoxLayout>
 #include <algorithm>
 #include <cmath>
+#include "core/engine/utils/ExceptionUtils.h"
 
 namespace pkt::ui::qtwidgets
 {
@@ -40,7 +41,7 @@ PokerTableWindow::PokerTableWindow(pkt::core::Session* session, QWidget* parent)
 {
     if (!session)
     {
-        throw std::invalid_argument("PokerTableWindow constructor: Session pointer cannot be null");
+        pkt::core::utils::throwInvalidArgument("PokerTableWindow constructor: Session pointer cannot be null");
     }
 
     m_playerPanels.resize(m_maxPlayers, nullptr); // Will be created in createPlayerAreas
@@ -49,7 +50,6 @@ PokerTableWindow::PokerTableWindow(pkt::core::Session* session, QWidget* parent)
     setWindowTitle("Poker Table - HoldemCore");
     setFixedSize(1200, 900); // Increased window size to prevent overlap between human cards and action buttons
 
-    // Add try-catch around UI setup to catch any crashes
     try
     {
         setupUi();
@@ -57,7 +57,7 @@ PokerTableWindow::PokerTableWindow(pkt::core::Session* session, QWidget* parent)
     }
     catch (const std::exception& e)
     {
-        throw std::runtime_error(
+        pkt::core::utils::throwRuntimeError(
             QString("PokerTableWindow constructor: Exception during UI setup: %1").arg(e.what()).toStdString());
     }
 }

@@ -1,11 +1,11 @@
 #include "SqlitePlayersStatisticsStore.h"
 #include "SqliteDb.h"
 #include "SqliteStatement.h"
+#include "core/engine/utils/ExceptionUtils.h"
 #include "core/player/Player.h"
 #include "core/player/strategy/PlayerStrategy.h"
 
 #include <sstream>
-#include <stdexcept>
 
 namespace pkt::infra
 {
@@ -17,7 +17,7 @@ SqlitePlayersStatisticsStore::SqlitePlayersStatisticsStore(std::unique_ptr<Sqlit
 {
     if (!m_db)
     {
-        throw std::invalid_argument("SqlitePlayersStatisticsStore requires a valid SqliteDb");
+        pkt::core::utils::throwInvalidArgument("SqlitePlayersStatisticsStore requires a valid SqliteDb");
     }
 
     // Ensure schema exists

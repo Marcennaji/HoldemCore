@@ -1,6 +1,6 @@
 #include "SqliteDb.h"
+#include "core/engine/utils/ExceptionUtils.h"
 
-#include <stdexcept>
 #include <string>
 
 namespace pkt::infra
@@ -14,7 +14,7 @@ SqliteDb::SqliteDb(const std::filesystem::path& file)
         std::string msg = sqlite3_errmsg(m_db);
         sqlite3_close(m_db);
         m_db = nullptr;
-        throw std::runtime_error("Failed to open SQLite database: " + msg);
+        pkt::core::utils::throwRuntimeError("Failed to open SQLite database: " + msg);
     }
 }
 
@@ -35,7 +35,7 @@ void SqliteDb::exec(const std::string& sql)
     {
         std::string msg = errMsg ? errMsg : "Unknown SQLite error";
         sqlite3_free(errMsg);
-        throw std::runtime_error("SQLite exec failed: " + msg);
+        pkt::core::utils::throwRuntimeError("SQLite exec failed: " + msg);
     }
 }
 
@@ -45,7 +45,7 @@ std::unique_ptr<SqliteStatement> SqliteDb::prepare(const std::string& sql)
     int rc = sqlite3_prepare_v2(m_db, sql.c_str(), -1, &stmt, nullptr);
     if (rc != SQLITE_OK)
     {
-        throw std::runtime_error("SQLite prepare failed: " + std::string(sqlite3_errmsg(m_db)));
+        pkt::core::utils::throwRuntimeError("SQLite prepare failed: " + std::string(sqlite3_errmsg(m_db)));
     }
     return std::make_unique<SqliteStatement>(stmt);
 }

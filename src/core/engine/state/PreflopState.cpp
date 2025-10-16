@@ -3,7 +3,6 @@
 #include "GameEvents.h"
 #include "Hand.h"
 #include "PostRiverState.h"
-#include "core/engine/Exception.h"
 #include "core/engine/model/PlayerAction.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/engine/utils/Helpers.h"
@@ -14,8 +13,7 @@ namespace pkt::core
 using namespace pkt::core::player;
 
 // ISP-compliant constructor using focused service interface
-PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsigned dealerPlayerId,
-                           Logger& logger)
+PreflopState::PreflopState(const GameEvents& events, const int smallBlind, unsigned dealerPlayerId, Logger& logger)
     : m_events(events), m_smallBlind(smallBlind), m_dealerPlayerId(dealerPlayerId), m_logger(logger)
 {
     if (smallBlind <= 0)
@@ -70,14 +68,13 @@ std::unique_ptr<HandState> PreflopState::computeNextState(Hand& hand)
 
 void PreflopState::logStateInfo(Hand& hand)
 {
-    m_logger.info("Blinds: SB=" + std::to_string(m_smallBlind) +
-                     ", BB=" + std::to_string(2 * m_smallBlind));
+    m_logger.info("Blinds: SB=" + std::to_string(m_smallBlind) + ", BB=" + std::to_string(2 * m_smallBlind));
     // Log dealer and positions to help diagnose acting order
     m_logger.info("Dealer: Player " + std::to_string(hand.getDealerPlayerId()));
-    for (const auto& player : *hand.getSeatsList()) {
-        m_logger.info(
-            "Player " + std::to_string(player->getId()) + " (" + player->getName() + ") position=" +
-            positionToString(player->getPosition()));
+    for (const auto& player : *hand.getSeatsList())
+    {
+        m_logger.info("Player " + std::to_string(player->getId()) + " (" + player->getName() +
+                      ") position=" + positionToString(player->getPosition()));
     }
     logHoleCards(hand);
 }
@@ -91,12 +88,11 @@ void PreflopState::logHoleCards(Hand& hand)
         if (holeCards.isValid())
         {
             m_logger.info("Player " + std::to_string(player->getId()) + " (" + player->getName() +
-                            "): " + holeCards.toString());
+                          "): " + holeCards.toString());
         }
         else
         {
-            m_logger.info("Player " + std::to_string(player->getId()) + " (" + player->getName() +
-                            "): No hole cards");
+            m_logger.info("Player " + std::to_string(player->getId()) + " (" + player->getName() + "): No hole cards");
         }
     }
 }

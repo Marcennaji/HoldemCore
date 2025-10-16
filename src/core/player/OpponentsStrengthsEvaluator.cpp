@@ -7,6 +7,7 @@
 #include "Helpers.h"
 #include "Player.h"
 #include "core/engine/model/Ranges.h"
+#include "core/engine/utils/ExceptionUtils.h"
 #include "core/player/range/RangeParser.h"
 #include "core/player/strategy/CurrentHandContext.h"
 
@@ -18,20 +19,15 @@ namespace pkt::core::player
 
 using namespace std;
 
-OpponentsStrengthsEvaluator::OpponentsStrengthsEvaluator(
-    int playerId,
-    core::Logger& logger,
-    core::HandEvaluationEngine& handEvaluator)
-    : m_playerId(playerId)
-    , m_logger(logger)
-    , m_handEvaluator(handEvaluator)
+OpponentsStrengthsEvaluator::OpponentsStrengthsEvaluator(int playerId, core::Logger& logger,
+                                                         core::HandEvaluationEngine& handEvaluator)
+    : m_playerId(playerId), m_logger(logger), m_handEvaluator(handEvaluator)
 {
 }
 
-OpponentsStrengthsEvaluator::EvaluationResult OpponentsStrengthsEvaluator::evaluateOpponents(
-    const CurrentHandContext& ctx,
-    const HoleCards& playerHand,
-    int playerHandRanking) const
+OpponentsStrengthsEvaluator::EvaluationResult
+OpponentsStrengthsEvaluator::evaluateOpponents(const CurrentHandContext& ctx, const HoleCards& playerHand,
+                                               int playerHandRanking) const
 {
     EvaluationResult result;
 
@@ -42,21 +38,21 @@ OpponentsStrengthsEvaluator::EvaluationResult OpponentsStrengthsEvaluator::evalu
         const Player& opponent = **it;
 
         // Skip ourselves and players who are not active
-        if (opponent.getId() == m_playerId ||
-            opponent.getLastAction().type == ActionType::Fold ||
+        if (opponent.getId() == m_playerId || opponent.getLastAction().type == ActionType::Fold ||
             opponent.getLastAction().type == ActionType::None)
         {
             continue;
         }
 
-        const float opponentStrength = calculateOpponentWinningPercentage(
-            opponent,
-            playerHand,
-            playerHandRanking,
-            ctx.commonContext.stringBoard,
-            ctx);
+        const float opponentStrength = calculateOpponentWinningPercentage(opponent, playerHand, playerHandRanking,
+                                                                          ctx.commonContext.stringBoard, ctx);
 
-        assert(opponentStrength <= 1.0f);
+        if (opponentStrength > 1.0f)
+        {
+            pkt::core::utils::throwLogicError("Opponent strength calculation error: strength > 1.0 (" +
+                                              std::to_string(opponentStrength) + ") for opponent " +
+                                              std::to_string(opponent.getId()));
+        }
 
         result.opponentStrengths[opponent.getId()] = opponentStrength;
 
@@ -71,14 +67,17 @@ OpponentsStrengthsEvaluator::EvaluationResult OpponentsStrengthsEvaluator::evalu
     return result;
 }
 
-float OpponentsStrengthsEvaluator::calculateOpponentWinningPercentage(
-    const Player& opponent,
-    const HoleCards& playerHand,
-    int playerHandRanking,
-    const std::string& board,
-    const CurrentHandContext& ctx) const
+float OpponentsStrengthsEvaluator::calculateOpponentWinningPercentage(const Player& opponent,
+                                                                      const HoleCards& playerHand,
+                                                                      int playerHandRanking, const std::string& board,
+                                                                      const CurrentHandContext& ctx) const
 {
-    assert(playerHandRanking > 0);
+    if (playerHandRanking <= 0)
+    {
+        pkt::core::utils::throwInvalidArgument(
+            "Invalid player hand ranking (" + std::to_string(playerHandRanking) +
+            "). Player may not have hole cards yet. Player hand: " + playerHand.toString() + ", Board: " + board);
+    }
 
     // Ensure opponent has an estimated range
     if (opponent.getRangeEstimator()->getEstimatedRange().empty())
@@ -88,8 +87,7 @@ float OpponentsStrengthsEvaluator::calculateOpponentWinningPercentage(
     }
 
     // Get all possible hands in opponent's estimated range
-    vector<string> allRanges = 
-        RangeParser::getRangeAtomicValues(opponent.getRangeEstimator()->getEstimatedRange());
+    vector<string> allRanges = RangeParser::getRangeAtomicValues(opponent.getRangeEstimator()->getEstimatedRange());
 
     // Filter to only plausible hands given the board and known cards
     vector<string> plausibleHands = filterPlausibleHands(allRanges, board, playerHand);
@@ -104,7 +102,13 @@ float OpponentsStrengthsEvaluator::calculateOpponentWinningPercentage(
     int nbWinningHands = 0;
     for (const string& hand : plausibleHands)
     {
-        const int opponentHandRank = m_handEvaluator.rankHand((hand + board).c_str());
+        // Build hand string: "As Ah 2h 3h 4h" (need space between hole cards and board)
+        std::string fullHand = hand;
+        if (!board.empty())
+        {
+            fullHand += " " + board;
+        }
+        const int opponentHandRank = m_handEvaluator.rankHand(fullHand.c_str());
         if (opponentHandRank > playerHandRanking)
         {
             nbWinningHands++;
@@ -121,10 +125,9 @@ float OpponentsStrengthsEvaluator::calculateOpponentWinningPercentage(
     return static_cast<float>(nbWinningHands) / static_cast<float>(plausibleHands.size());
 }
 
-std::vector<std::string> OpponentsStrengthsEvaluator::filterPlausibleHands(
-    const std::vector<std::string>& ranges,
-    const std::string& board,
-    const HoleCards& playerHand) const
+std::vector<std::string> OpponentsStrengthsEvaluator::filterPlausibleHands(const std::vector<std::string>& ranges,
+                                                                           const std::string& board,
+                                                                           const HoleCards& playerHand) const
 {
     vector<string> plausibleHands;
     plausibleHands.reserve(ranges.size()); // Optimize memory allocation

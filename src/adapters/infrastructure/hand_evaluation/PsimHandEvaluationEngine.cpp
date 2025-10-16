@@ -1,6 +1,6 @@
 #include "PsimHandEvaluationEngine.h"
-#include "core/ports/HandEvaluationEngine.h"
 #include "adapters/infrastructure/logger/NullLogger.h"
+#include "core/ports/HandEvaluationEngine.h"
 #include "third_party/psim/psim.hpp"
 
 namespace pkt::infra
@@ -9,8 +9,7 @@ namespace pkt::infra
 using namespace pkt::core;
 using namespace std;
 
-PsimHandEvaluationEngine::PsimHandEvaluationEngine(std::shared_ptr<pkt::core::Logger> logger)
-    : m_logger(logger)
+PsimHandEvaluationEngine::PsimHandEvaluationEngine(std::shared_ptr<pkt::core::Logger> logger) : m_logger(logger)
 {
 }
 
@@ -66,13 +65,14 @@ HandSimulationStats PsimHandEvaluationEngine::simulateHandEquity(const std::stri
     SimResults r;
     const string cards = (hand + " " + board).c_str();
 
-    if (m_logger) {
-        m_logger->verbose("Calling psim for hand equity computing, cards = " + cards +
-                                     ", nbOpponents = " + to_string(nbOpponents) +
-                                     ", maxOpponentsStrengths = " + to_string(maxOpponentsStrengths));
+    if (m_logger)
+    {
+        m_logger->verbose("Calling psim for hand equity computing, cards = " + cards + ", nbOpponents = " +
+                          to_string(nbOpponents) + ", maxOpponentsStrengths = " + to_string(maxOpponentsStrengths));
     }
 
-    if (m_logger) {
+    if (m_logger)
+    {
         m_logger->verbose("  --> Calling psim for SimulateHand");
     }
 
@@ -80,7 +80,8 @@ HandSimulationStats PsimHandEvaluationEngine::simulateHandEquity(const std::stri
 
     float win = r.win; // save the value
 
-    if (m_logger) {
+    if (m_logger)
+    {
         m_logger->verbose("  --> Calling psim for SimulateHandMulti");
     }
     SimulateHandMulti(cards.c_str(), &r, 1000, 300, nbOpponents);
@@ -96,7 +97,8 @@ HandSimulationStats PsimHandEvaluationEngine::simulateHandEquity(const std::stri
         r.winRanged = r.win / 4;
     }
     HandSimulationStats stats = convertSimResults(r);
-    if (m_logger) {
+    if (m_logger)
+    {
         m_logger->debug("hand equity is computed");
     }
     return stats;
@@ -104,15 +106,23 @@ HandSimulationStats PsimHandEvaluationEngine::simulateHandEquity(const std::stri
 pkt::core::PostFlopAnalysisFlags PsimHandEvaluationEngine::analyzeHand(const std::string& hand,
                                                                        const std::string& board)
 {
-    if (m_logger) {
+    if (m_logger)
+    {
         m_logger->debug("Calling psim for postflop hand analysis");
     }
 
     PostFlopState r;
-    GetHandState((hand + board).c_str(), &r);
+    // Build full hand string with space between hole cards and board for consistency
+    std::string fullHand = hand;
+    if (!board.empty())
+    {
+        fullHand += " " + board;
+    }
+    GetHandState(fullHand.c_str(), &r);
     PostFlopAnalysisFlags flags = convertPostFlopState(r);
 
-    if (m_logger) {
+    if (m_logger)
+    {
         m_logger->debug("postflop hand analysis is done");
     }
 

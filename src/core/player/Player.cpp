@@ -183,11 +183,22 @@ std::string Player::getCardsValueString() const
 const HandSimulationStats Player::computeHandSimulation() const
 {
     const int nbOpponents = m_currentHandContext->commonContext.playersContext.nbPlayers - 1;
-    // Evaluate strength against opponents' guessed ranges
-    auto evaluation =
-        m_opponentsStrengthsEvaluator->evaluateOpponents(*m_currentHandContext, getHoleCards(), getHandRanking());
+
+    // Check if we have a valid hand ranking before evaluating opponents
+    // Hand ranking is 0 when cards haven't been dealt yet or hand hasn't been evaluated
+    const int handRanking = getHandRanking();
+    float maxOpponentStrength = 0.0f;
+
+    if (handRanking > 0)
+    {
+        // Evaluate strength against opponents' guessed ranges
+        auto evaluation =
+            m_opponentsStrengthsEvaluator->evaluateOpponents(*m_currentHandContext, getHoleCards(), handRanking);
+        maxOpponentStrength = evaluation.maxStrength;
+    }
+
     return m_handEvaluator.simulateHandEquity(getCardsValueString(), m_currentHandContext->commonContext.stringBoard,
-                                              nbOpponents, evaluation.maxStrength);
+                                              nbOpponents, maxOpponentStrength);
 }
 
 bool Player::isInVeryLooseMode(const int nbPlayers) const

@@ -5,12 +5,10 @@
 
 #include <core/engine/hand/HandEvaluator.h>
 
-#include <core/engine/model/EngineError.h>
 #include <core/engine/model/Ranges.h>
 #include <core/player/Helpers.h>
 #include <core/player/strategy/CurrentHandContext.h>
 #include <core/player/strategy/PokerMath.h> // Phase 1-4 utilities
-#include "Exception.h"
 
 #include <fstream>
 #include <iostream>

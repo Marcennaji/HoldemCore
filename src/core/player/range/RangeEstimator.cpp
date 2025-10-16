@@ -1,11 +1,11 @@
 #include "RangeEstimator.h"
 
 #include <core/engine/model/Ranges.h>
-#include <core/ports/PlayersStatisticsStore.h>
 #include <core/player/Helpers.h>
 #include <core/player/PlayerStatistics.h>
 #include <core/player/range/HandPlausibilityChecker.h>
 #include <core/player/strategy/CurrentHandContext.h>
+#include <core/ports/PlayersStatisticsStore.h>
 #include "RangeParser.h"
 #include "RangeRefiner.h"
 
@@ -19,12 +19,11 @@ namespace pkt::core::player
 
 using namespace std;
 
-RangeEstimator::RangeEstimator(int playerId, pkt::core::Logger& logger, 
-                               pkt::core::HandEvaluationEngine& handEvaluator)
+RangeEstimator::RangeEstimator(int playerId, pkt::core::Logger& logger, pkt::core::HandEvaluationEngine& handEvaluator)
     : m_playerId(playerId), m_logger(logger), m_handEvaluator(handEvaluator)
 {
     assert(m_playerId >= 0);
-     m_preflopRangeEstimator = make_unique<PreflopRangeEstimator>(m_playerId, logger);
+    m_preflopRangeEstimator = make_unique<PreflopRangeEstimator>(m_playerId, logger);
 }
 
 void RangeEstimator::updateUnplausibleRanges(pkt::core::GameState state, const CurrentHandContext& ctx)
@@ -169,30 +168,29 @@ void RangeEstimator::updateUnplausibleRangesGivenPreflopActions(const CurrentHan
 
     // if no raise and the BB checks : guard against empty action list before accessing back()
     {
-        const auto& preActions =
-            ctx.personalContext.actions.currentHandActions.getActions(GameState::Preflop);
+        const auto& preActions = ctx.personalContext.actions.currentHandActions.getActions(GameState::Preflop);
         if (!preActions.empty() && preActions.back().type == ActionType::Check)
-    {
+        {
 
-        if (preflop.hands >= MIN_HANDS_STATISTICS_ACCURATE)
-        {
-            setEstimatedRange(
-                RangeRefiner::deduceRange(getEstimatedRange(), getStringRange(nbPlayers, preflop.getPreflopRaise())));
+            if (preflop.hands >= MIN_HANDS_STATISTICS_ACCURATE)
+            {
+                setEstimatedRange(RangeRefiner::deduceRange(getEstimatedRange(),
+                                                            getStringRange(nbPlayers, preflop.getPreflopRaise())));
+            }
+            else
+            {
+                setEstimatedRange(RangeRefiner::deduceRange(
+                    getEstimatedRange(), getStringRange(nbPlayers, getStandardRaisingRange(nbPlayers))));
+            }
         }
-        else
-        {
-            setEstimatedRange(RangeRefiner::deduceRange(getEstimatedRange(),
-                                                        getStringRange(nbPlayers, getStandardRaisingRange(nbPlayers))));
-        }
-    }
     }
 
     if (getEstimatedRange() == "")
     {
         setEstimatedRange(originalEstimatedRange);
     }
-    m_logger.info("\tPlausible range on preflop for player " + std::to_string(ctx.personalContext.id) +
-                              " :\t" + getEstimatedRange());
+    m_logger.verbose("\tPlausible range on preflop for player " + std::to_string(ctx.personalContext.id) + " :\t" +
+                     getEstimatedRange());
 }
 
 void RangeEstimator::updateUnplausibleRangesGivenFlopActions(const CurrentHandContext& ctx)
@@ -212,7 +210,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(const CurrentHandCo
     if (ctx.personalContext.actions.isInVeryLooseMode)
     {
         m_logger.verbose("\tSeems to be (temporarily ?) on very loose mode : estimated range is\t" +
-                                     getEstimatedRange());
+                         getEstimatedRange());
         return;
     }
 
@@ -225,8 +223,7 @@ void RangeEstimator::updateUnplausibleRangesGivenFlopActions(const CurrentHandCo
         string s2 = (*i).substr(2, 4);
 
         std::string stringHand = s1 + " " + s2;
-        PostFlopAnalysisFlags postFlopFlags =
-            m_handEvaluator.analyzeHand(stringHand, ctx.commonContext.stringBoard);
+        PostFlopAnalysisFlags postFlopFlags = m_handEvaluator.analyzeHand(stringHand, ctx.commonContext.stringBoard);
 
         bool removeHand = false;
 
@@ -311,7 +308,7 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(const CurrentHandCo
     if (ctx.personalContext.actions.isInVeryLooseMode)
     {
         m_logger.verbose("\tSeems to be (temporarily ?) on very loose mode : estimated range is\t" +
-                                     getEstimatedRange());
+                         getEstimatedRange());
         return;
     }
 
@@ -324,12 +321,10 @@ void RangeEstimator::updateUnplausibleRangesGivenTurnActions(const CurrentHandCo
         string s2 = (*i).substr(2, 4);
 
         std::string stringHand = s1 + " " + s2;
-        PostFlopAnalysisFlags postFlopFlags =
-            m_handEvaluator.analyzeHand(stringHand, ctx.commonContext.stringBoard);
+        PostFlopAnalysisFlags postFlopFlags = m_handEvaluator.analyzeHand(stringHand, ctx.commonContext.stringBoard);
 
         bool removeHand = false;
-        const auto& turnActions =
-            ctx.personalContext.actions.currentHandActions.getActions(GameState::Turn);
+        const auto& turnActions = ctx.personalContext.actions.currentHandActions.getActions(GameState::Turn);
         if (turnActions.empty())
         {
             // no turn action, so we can't remove any hand
@@ -422,12 +417,10 @@ void RangeEstimator::updateUnplausibleRangesGivenRiverActions(const CurrentHandC
         string s2 = (*i).substr(2, 4);
 
         std::string stringHand = s1 + " " + s2;
-        PostFlopAnalysisFlags postFlopFlags =
-            m_handEvaluator.analyzeHand(stringHand, ctx.commonContext.stringBoard);
+        PostFlopAnalysisFlags postFlopFlags = m_handEvaluator.analyzeHand(stringHand, ctx.commonContext.stringBoard);
 
         bool removeHand = false;
-        const auto& riverActions =
-            ctx.personalContext.actions.currentHandActions.getActions(GameState::River);
+        const auto& riverActions = ctx.personalContext.actions.currentHandActions.getActions(GameState::River);
         if (riverActions.empty())
         {
             // no river action, so we can't remove any hand

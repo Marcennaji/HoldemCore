@@ -73,13 +73,43 @@ Detailed explanation and diagrams:
 - [SQLite3](https://www.sqlite.org/)
 - [GoogleTest](https://github.com/google/googletest)
 
-**License:** MIT — free for commercial and personal use.
+---
+
+## �️ Tools
+
+### Bot Statistics Generator
+
+HoldemCore includes a command-line tool to generate comprehensive statistics for different bot strategies:
+
+```bash
+# Build the project first
+cmake --preset release-widgets
+cmake --build build/release-widgets
+
+# Run simulations
+.\build\release-widgets\src\app\tools\bot_statistics_generator.exe \
+  --hands 10000 \
+  --strategy tight:2 \
+  --strategy loose:2 \
+  --strategy maniac:1 \
+  --strategy ultratight:1 \
+  --output stats_report.txt
+```
+
+**Features:**
+- Simulate thousands of poker hands with configurable bot mixes
+- Generate detailed statistics for each tested strategy (VPIP, PFR, aggression factor, ....)
+- Export results to text reports and SQLite database
+- Four bot strategies: Tight, Loose, Maniac, Ultra-Tight
+- Customizable initial cash, hand counts, and logging levels
+
+For full usage: `bot_statistics_generator.exe --help`
 
 ---
 
-## 📈 Next steps
+## �📈 Next steps
 
-- 🧠 Add QML front-end (mobile)
+- 🧠 Add QML front-end (mobile). Work on progress.
 
 ---
 
@@ -92,5 +122,12 @@ Detailed explanation and diagrams:
 - Modern C++
 - Software Architecture & Design
 - Legacy System Modernization
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — free for commercial and personal use.  
+See the [LICENSE](LICENSE) file for details.
 
 

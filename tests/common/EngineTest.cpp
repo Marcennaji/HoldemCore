@@ -1,19 +1,18 @@
 #include "common/EngineTest.h"
 #include "FakeRandomizer.h"
 #include "Player.h"
+#include "adapters/infrastructure/hand_evaluation/PsimHandEvaluationEngine.h"
+#include "adapters/infrastructure/logger/ConsoleLogger.h"
+#include "adapters/infrastructure/statistics/NullPlayersStatisticsStore.h"
 #include "common/DummyPlayer.h"
-#include "core/engine/Exception.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
-#include "adapters/infrastructure/statistics/NullPlayersStatisticsStore.h"
 #include "core/player/Player.h"
-#include "adapters/infrastructure/logger/ConsoleLogger.h"
-#include "adapters/infrastructure/hand_evaluation/PsimHandEvaluationEngine.h"
 
 #include <memory>
 #ifdef _WIN32
-#include <windows.h>
 #include <crtdbg.h>
+#include <windows.h>
 #endif
 
 using namespace pkt::core;
@@ -27,28 +26,29 @@ void EngineTest::SetUp()
 #ifdef _DEBUG
     // In debug mode, disable gtest exception catching to get proper stack traces
     testing::GTEST_FLAG(catch_exceptions) = false;
-    
-    // Windows-specific: Disable error dialog boxes, let debugger handle crashes
-    #ifdef _WIN32
+
+// Windows-specific: Disable error dialog boxes, let debugger handle crashes
+#ifdef _WIN32
     SetErrorMode(SEM_NOGPFAULTERRORBOX | SEM_FAILCRITICALERRORS | SEM_NOALIGNMENTFAULTEXCEPT);
     _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
-    #endif
+#endif
 #endif
 
     auto logger = std::make_unique<pkt::infra::ConsoleLogger>();
-    logger->setLogLevel(getTestLogLevel()); 
+    logger->setLogLevel(getTestLogLevel());
     m_logger = std::move(logger);
-    
+
     m_handEvaluationEngine = std::make_unique<pkt::infra::PsimHandEvaluationEngine>();
-    
+
     auto randomizer = std::make_unique<FakeRandomizer>();
     randomizer->values = {3, 5, 7};
     m_randomizer = std::move(randomizer);
-    
+
     // By default, use NullPlayersStatisticsStore
     m_playersStatisticsStore = std::make_shared<pkt::infra::NullPlayersStatisticsStore>();
 
-    m_factory = std::make_unique<EngineFactory>(m_events, *m_logger, *m_handEvaluationEngine, *m_playersStatisticsStore, *m_randomizer);
+    m_factory = std::make_unique<EngineFactory>(m_events, *m_logger, *m_handEvaluationEngine, *m_playersStatisticsStore,
+                                                *m_randomizer);
 
     gameData.maxNumberOfPlayers = MAX_NUMBER_OF_PLAYERS;
     gameData.startMoney = 1000;
@@ -65,7 +65,8 @@ void EngineTest::createPlayersLists(size_t playerCount)
     m_seatsList = std::make_shared<std::list<std::shared_ptr<pkt::core::player::Player>>>();
     for (size_t i = 0; i < playerCount; ++i)
     {
-        auto player = std::make_shared<DummyPlayer>(i, m_events, m_logger, m_handEvaluationEngine, m_playersStatisticsStore, m_randomizer);
+        auto player = std::make_shared<DummyPlayer>(i, m_events, m_logger, m_handEvaluationEngine,
+                                                    m_playersStatisticsStore, m_randomizer);
         m_seatsList->push_back(player);
     }
 
@@ -103,7 +104,7 @@ void EngineTest::setupHandWithoutInitialize(size_t activePlayerCount, GameData g
     startData.numberOfPlayers = static_cast<int>(activePlayerCount);
 
     m_hand = m_factory->createHand(m_board, m_seatsList, m_actingPlayersList, gameData, startData);
-    
+
     // Note: m_hand->initialize() is NOT called - caller must do it after modifying players
 }
 

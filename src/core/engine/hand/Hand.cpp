@@ -1,19 +1,16 @@
 #include "Hand.h"
 
-#include "core/engine/EngineFactory.h"
 #include "CardUtilities.h"
 #include "DeckManager.h"
 #include "GameEvents.h"
-#include "HandCardDealer.h"
-#include "HandCalculator.h"
-#include "HandPlayersManager.h"
 #include "HandActionHandler.h"
+#include "HandCalculator.h"
+#include "HandCardDealer.h"
+#include "HandPlayersManager.h"
+#include "core/engine/EngineFactory.h"
 #include "core/engine/actions/ActionApplier.h"
 #include "core/engine/model/PlayerPosition.h"
 #include "core/player/Helpers.h"
-
-#include "Exception.h"
-#include "model/EngineError.h"
 
 #include "Helpers.h"
 #include "core/engine/state/PreflopState.h"
@@ -27,14 +24,12 @@ namespace pkt::core
 using namespace std;
 using namespace pkt::core::player;
 
-Hand::Hand(const GameEvents& events, std::shared_ptr<Board> board,
-           PlayerList seats, PlayerList actingPlayers, GameData gameData, StartData startData,
-           Logger& logger, PlayersStatisticsStore& statisticsStore,
+Hand::Hand(const GameEvents& events, std::shared_ptr<Board> board, PlayerList seats, PlayerList actingPlayers,
+           GameData gameData, StartData startData, Logger& logger, PlayersStatisticsStore& statisticsStore,
            Randomizer& randomizer, HandEvaluationEngine& handEvaluationEngine)
-    : m_events(events), m_board(board),
-      m_logger(&logger), m_statisticsStore(&statisticsStore), m_randomizer(&randomizer),
-      m_handEvaluationEngine(&handEvaluationEngine),
-      m_startQuantityPlayers(startData.numberOfPlayers), m_smallBlind(gameData.firstSmallBlind), 
+    : m_events(events), m_board(board), m_logger(&logger), m_statisticsStore(&statisticsStore),
+      m_randomizer(&randomizer), m_handEvaluationEngine(&handEvaluationEngine),
+      m_startQuantityPlayers(startData.numberOfPlayers), m_smallBlind(gameData.firstSmallBlind),
       m_startCash(gameData.startMoney)
 {
     // Initialize all component managers using helper methods
@@ -46,9 +41,8 @@ Hand::Hand(const GameEvents& events, std::shared_ptr<Board> board,
 
 Hand::~Hand() = default;
 
-void Hand::initializePlayersManager(const pkt::core::player::PlayerList& seats, 
-                                   const pkt::core::player::PlayerList& actingPlayers, 
-                                   const StartData& startData)
+void Hand::initializePlayersManager(const pkt::core::player::PlayerList& seats,
+                                    const pkt::core::player::PlayerList& actingPlayers, const StartData& startData)
 {
     // Create HandPlayersManager to handle all player-related operations
     m_playersManager = std::make_unique<HandPlayersManager>(seats, actingPlayers, m_events, *m_logger);
@@ -61,18 +55,17 @@ void Hand::initializeActionHandler()
 {
     // Create ActionValidator and InvalidActionHandler with callbacks
     auto actionValidator = std::make_unique<ActionValidator>();
-    
+
     // Create callbacks for InvalidActionHandler
-    auto errorProvider = [this](const PlayerAction& action) -> std::string { 
-        return m_actionHandler->getActionValidationError(action, *this, *m_playersManager); 
-    };
-    auto autoFoldCallback = [this](unsigned playerId) { 
-        m_actionHandler->handleAutoFold(playerId, *this); 
-    };
-    auto invalidActionHandler = std::make_unique<InvalidActionHandler>(m_events, errorProvider, autoFoldCallback, *m_logger);
-    
+    auto errorProvider = [this](const PlayerAction& action) -> std::string
+    { return m_actionHandler->getActionValidationError(action, *this, *m_playersManager); };
+    auto autoFoldCallback = [this](unsigned playerId) { m_actionHandler->handleAutoFold(playerId, *this); };
+    auto invalidActionHandler =
+        std::make_unique<InvalidActionHandler>(m_events, errorProvider, autoFoldCallback, *m_logger);
+
     // Create HandActionHandler to handle all action processing
-    m_actionHandler = std::make_unique<HandActionHandler>(m_events, *m_logger, std::move(actionValidator), std::move(invalidActionHandler));
+    m_actionHandler = std::make_unique<HandActionHandler>(m_events, *m_logger, std::move(actionValidator),
+                                                          std::move(invalidActionHandler));
 }
 
 void Hand::initializeCardAndStateComponents(const StartData& startData)
@@ -85,10 +78,11 @@ void Hand::initializeCardAndStateComponents(const StartData& startData)
             m_events.onEngineError(error);
         }
     };
-    
+
     // Create card dealing and calculation components
     auto deckManager = std::make_unique<DeckManager>(*m_randomizer);
-    m_cardDealer = std::make_unique<HandCardDealer>(std::move(deckManager), m_events, *m_logger, *m_handEvaluationEngine);
+    m_cardDealer =
+        std::make_unique<HandCardDealer>(std::move(deckManager), m_events, *m_logger, *m_handEvaluationEngine);
     m_calculator = std::make_unique<HandCalculator>(*m_logger);
     m_stateManager = std::make_unique<HandStateManager>(m_events, m_smallBlind, startData.startDealerPlayerId,
                                                         gameLoopErrorCallback, *m_logger);
@@ -99,7 +93,6 @@ void Hand::initializeLifecycleManager()
     // Create HandLifecycleManager to handle lifecycle operations
     m_lifecycleManager = std::make_unique<HandLifecycleManager>(*m_logger, *m_statisticsStore);
 }
-
 
 Logger& Hand::getLogger() const
 {
@@ -153,11 +146,11 @@ std::vector<Card> Hand::dealCardsFromDeck(int numCards)
 HandCommonContext Hand::updateHandCommonContext()
 {
     HandCommonContext handContext;
-    
+
     populateGeneralGameContext(handContext);
     populatePlayersContextInfo(handContext);
     populateBettingContextInfo(handContext);
-    
+
     return handContext;
 }
 
@@ -173,15 +166,15 @@ void Hand::populatePlayersContextInfo(HandCommonContext& context)
 {
     context.playersContext.actingPlayersList = getActingPlayersList();
     context.playersContext.nbPlayers = getSeatsList()->size();
-    
+
     // Get last VPIP player - keep existing logic for now since BettingActions::getLastRaiserId() is more complex
     int lastVPIPPlayerId = getBettingActions()->getLastRaiserId();
-    context.playersContext.lastVPIPPlayer = 
+    context.playersContext.lastVPIPPlayer =
         (lastVPIPPlayerId != -1) ? getPlayerById(getSeatsList(), lastVPIPPlayerId) : nullptr;
-        
+
     context.playersContext.callersPositions = getBettingActions()->getCallersPositions();
     context.playersContext.raisersPositions = getBettingActions()->getRaisersPositions();
-    
+
     // Directly assign last raiser pointers - they're already validated by the BettingRoundActions
     context.playersContext.preflopLastRaiser = getBettingActions()->getPreflop().getLastRaiser();
     context.playersContext.flopLastRaiser = getBettingActions()->getFlop().getLastRaiser();
@@ -215,7 +208,7 @@ int Hand::getPotOdd(const int playerCash, const int playerSet) const
     int pot = m_board->getPot(*this);
     int sets = m_board->getSets(*this);
     int roundHighestSet = getBettingActions()->getRoundHighestSet();
-    
+
     return m_calculator->calculatePotOdd(playerCash, playerSet, pot, sets, roundHighestSet, getLogger());
 }
 

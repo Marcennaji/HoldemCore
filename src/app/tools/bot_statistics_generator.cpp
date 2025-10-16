@@ -18,6 +18,7 @@
 #include "core/engine/model/BotGameData.h"
 #include "core/engine/model/GameData.h"
 #include "core/engine/model/StartData.h"
+#include "core/engine/utils/ExceptionUtils.h"
 #include "core/session/Session.h"
 
 // Infrastructure
@@ -287,7 +288,7 @@ void generateReport(const std::string& dbPath, const std::string& outputFile, in
 
     if (!report.is_open())
     {
-        throw std::runtime_error("Could not open output file: " + outputFile);
+        pkt::core::utils::throwRuntimeError("Could not open output file: " + outputFile);
     }
 
     // Report header
@@ -404,7 +405,7 @@ SimulationConfig parseCommandLineArgs(int argc, char* argv[])
         {
             if (i + 1 >= argc)
             {
-                throw std::runtime_error("Error: " + arg + " requires an argument");
+                pkt::core::utils::throwRuntimeError("Error: " + arg + " requires an argument");
             }
             config.numHands = std::stoi(argv[++i]);
         }
@@ -412,13 +413,13 @@ SimulationConfig parseCommandLineArgs(int argc, char* argv[])
         {
             if (i + 1 >= argc)
             {
-                throw std::runtime_error("Error: " + arg + " requires an argument");
+                pkt::core::utils::throwRuntimeError("Error: " + arg + " requires an argument");
             }
             StrategySpec spec;
             if (!parseStrategyArg(argv[++i], spec))
             {
-                throw std::runtime_error("Error: Invalid strategy format. Use: strategy:count\n"
-                                         "Available strategies: tight, loose, maniac, ultratight");
+                pkt::core::utils::throwRuntimeError("Error: Invalid strategy format. Use: strategy:count\n"
+                                                    "Available strategies: tight, loose, maniac, ultratight");
             }
             config.customStrategies.push_back(spec);
         }
@@ -426,7 +427,7 @@ SimulationConfig parseCommandLineArgs(int argc, char* argv[])
         {
             if (i + 1 >= argc)
             {
-                throw std::runtime_error("Error: " + arg + " requires an argument");
+                pkt::core::utils::throwRuntimeError("Error: " + arg + " requires an argument");
             }
             config.startMoney = std::stoi(argv[++i]);
         }
@@ -434,7 +435,7 @@ SimulationConfig parseCommandLineArgs(int argc, char* argv[])
         {
             if (i + 1 >= argc)
             {
-                throw std::runtime_error("Error: " + arg + " requires an argument");
+                pkt::core::utils::throwRuntimeError("Error: " + arg + " requires an argument");
             }
             config.loggerType = argv[++i];
         }
@@ -442,7 +443,7 @@ SimulationConfig parseCommandLineArgs(int argc, char* argv[])
         {
             if (i + 1 >= argc)
             {
-                throw std::runtime_error("Error: " + arg + " requires an argument");
+                pkt::core::utils::throwRuntimeError("Error: " + arg + " requires an argument");
             }
             config.outputFile = argv[++i];
         }
@@ -450,13 +451,13 @@ SimulationConfig parseCommandLineArgs(int argc, char* argv[])
         {
             if (i + 1 >= argc)
             {
-                throw std::runtime_error("Error: " + arg + " requires an argument");
+                pkt::core::utils::throwRuntimeError("Error: " + arg + " requires an argument");
             }
             config.dbPath = argv[++i];
         }
         else
         {
-            throw std::runtime_error("Error: Unknown argument: " + arg);
+            pkt::core::utils::throwRuntimeError("Error: Unknown argument: " + arg);
         }
     }
 
@@ -468,18 +469,18 @@ void validateAndAdjustConfig(SimulationConfig& config)
 {
     if (config.numHands <= 0)
     {
-        throw std::runtime_error("Error: Number of hands must be positive");
+        pkt::core::utils::throwRuntimeError("Error: Number of hands must be positive");
     }
 
     if (config.startMoney <= 0)
     {
-        throw std::runtime_error("Error: Start money must be positive");
+        pkt::core::utils::throwRuntimeError("Error: Start money must be positive");
     }
 
     // Custom strategies are required
     if (config.customStrategies.empty())
     {
-        throw std::runtime_error("Error: At least one strategy must be specified with -s/--strategy");
+        pkt::core::utils::throwRuntimeError("Error: At least one strategy must be specified with -s/--strategy");
     }
 
     // Calculate total players from custom strategies
@@ -491,7 +492,7 @@ void validateAndAdjustConfig(SimulationConfig& config)
 
     if (config.numPlayers < 2 || config.numPlayers > 10)
     {
-        throw std::runtime_error("Error: Total number of players must be between 2 and 10");
+        pkt::core::utils::throwRuntimeError("Error: Total number of players must be between 2 and 10");
     }
 }
 

@@ -7,6 +7,7 @@
 #include <core/engine/game/Game.h>
 
 #include <core/engine/EngineFactory.h>
+#include <core/engine/utils/ExceptionUtils.h>
 #include <core/player/strategy/LooseAggressiveBotStrategy.h>
 #include <core/player/strategy/ManiacBotStrategy.h>
 #include <core/player/strategy/TightAggressiveBotStrategy.h>
@@ -18,7 +19,6 @@
 #include <algorithm>
 #include <random>
 #include <sstream>
-#include <stdexcept>
 #include <vector>
 
 namespace pkt::core
@@ -92,19 +92,19 @@ void Session::startBotOnlyGameWithCustomStrategies(const BotGameData& botGameDat
     {
         if (count <= 0)
         {
-            throw std::runtime_error("Strategy count must be positive for strategy: " + strategyName);
+            utils::throwRuntimeError("Strategy count must be positive for strategy: " + strategyName);
         }
         totalPlayers += count;
     }
 
     if (totalPlayers == 0)
     {
-        throw std::runtime_error("Total player count must be positive");
+        utils::throwRuntimeError("Total player count must be positive");
     }
 
     if (totalPlayers != startData.numberOfPlayers)
     {
-        throw std::runtime_error("Strategy distribution total (" + std::to_string(totalPlayers) +
+        utils::throwRuntimeError("Strategy distribution total (" + std::to_string(totalPlayers) +
                                  ") must match numberOfPlayers (" + std::to_string(startData.numberOfPlayers) + ")");
     }
 
@@ -136,7 +136,7 @@ void Session::validatePlayerConfiguration(const pkt::core::player::PlayerList& p
 {
     if (!playersList || playersList->empty())
     {
-        throw std::runtime_error("Player list cannot be empty");
+        utils::throwRuntimeError("Player list cannot be empty");
     }
 
     // Validate that all players are valid (not null)
@@ -144,7 +144,7 @@ void Session::validatePlayerConfiguration(const pkt::core::player::PlayerList& p
     {
         if (!player)
         {
-            throw std::runtime_error("Invalid null player in player list");
+            utils::throwRuntimeError("Invalid null player in player list");
         }
     }
 
@@ -182,13 +182,13 @@ void Session::validatePlayerConfiguration(const pkt::core::player::PlayerList& p
             }
             errorMsg += ")";
         }
-        throw std::runtime_error(errorMsg);
+        utils::throwRuntimeError(errorMsg);
     }
 
     // Validate human player has ID 0
     if (!hasHumanPlayerWithIdZero)
     {
-        throw std::runtime_error("Human player must have ID 0, but found human player with ID " +
+        utils::throwRuntimeError("Human player must have ID 0, but found human player with ID " +
                                  std::to_string(humanPlayerIds[0]));
     }
 }
@@ -197,21 +197,21 @@ void Session::validateGameParameters(const GameData& gameData, const StartData& 
 {
     if (startData.numberOfPlayers < 2)
     {
-        throw std::invalid_argument("Game requires at least 2 players");
+        utils::throwInvalidArgument("Game requires at least 2 players");
     }
     if (startData.numberOfPlayers > 10)
     {
-        throw std::invalid_argument("Game supports maximum 10 players");
+        utils::throwInvalidArgument("Game supports maximum 10 players");
     }
     if (gameData.startMoney <= 0)
     {
-        throw std::invalid_argument("Start money must be greater than 0");
+        utils::throwInvalidArgument("Start money must be greater than 0");
     }
     // Allow AUTO_SELECT_DEALER (-1), otherwise validate the dealer ID is a valid player index
     if (startData.startDealerPlayerId != StartData::AUTO_SELECT_DEALER &&
         (startData.startDealerPlayerId < 0 || startData.startDealerPlayerId >= startData.numberOfPlayers))
     {
-        throw std::invalid_argument("Dealer player ID must be valid player index");
+        utils::throwInvalidArgument("Dealer player ID must be valid player index");
     }
 }
 
@@ -326,7 +326,7 @@ Session::GameComponents Session::createCustomStrategyComponents(const BotGameDat
             }
             else
             {
-                throw std::runtime_error("Unknown strategy name: " + strategyName);
+                utils::throwRuntimeError("Unknown strategy name: " + strategyName);
             }
 
             // Set the strategy on the player

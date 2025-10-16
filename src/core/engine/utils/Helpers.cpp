@@ -2,7 +2,6 @@
 #include "Helpers.h"
 #include "actions/ActionValidator.h"
 #include "actions/BettingActions.h"
-#include "core/engine/Exception.h"
 #include "core/engine/cards/CardUtilities.h"
 #include "core/engine/hand/Hand.h"
 #include "core/engine/model/PlayerPosition.h"

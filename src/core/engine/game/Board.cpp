@@ -4,88 +4,101 @@
 
 #include "Board.h"
 
-#include "Exception.h"
 #include "Pot.h"
+#include "core/engine/cards/CardUtilities.h"
 #include "core/player/Player.h"
 #include "hand/Hand.h"
 #include "hand/HandEvaluator.h"
-#include "core/engine/cards/CardUtilities.h"
-#include "model/EngineError.h"
 
 #include <algorithm>
 #include <unordered_set>
 
 // Helper methods for showdown reveal logic encapsulated in this translation unit
-namespace {
-    
-    inline bool isNonFolded(const pkt::core::player::Player& p) {
-        return p.getLastAction().type != pkt::core::ActionType::Fold;
+namespace
+{
+
+inline bool isNonFolded(const pkt::core::player::Player& p)
+{
+    return p.getLastAction().type != pkt::core::ActionType::Fold;
+}
+
+inline int contribution(const pkt::core::player::Player& p)
+{
+    return p.getCashAtHandStart() - p.getCash();
+}
+
+using Level = std::pair<int, int>; // (handRank, maxContributionAtLevel)
+
+// Update "levels" with a candidate (rank, contrib) and decide whether they must reveal per domain rules.
+// Returns true if candidate must reveal and mutates levels accordingly.
+bool processCandidateLevels(std::list<Level>& levels, int rank, int contrib)
+{
+    if (levels.empty())
+    {
+        levels.emplace_back(rank, contrib);
+        return true;
     }
+    for (auto it = levels.begin(); it != levels.end(); ++it)
+    {
+        const bool higherRank = rank > it->first;
+        const bool equalRank = rank == it->first;
 
-    inline int contribution(const pkt::core::player::Player& p) {
-        return p.getCashAtHandStart() - p.getCash();
-    }
-
-    using Level = std::pair<int,int>; // (handRank, maxContributionAtLevel)
-
-    // Update "levels" with a candidate (rank, contrib) and decide whether they must reveal per domain rules.
-    // Returns true if candidate must reveal and mutates levels accordingly.
-    bool processCandidateLevels(std::list<Level>& levels, int rank, int contrib) {
-        if (levels.empty()) {
-            levels.emplace_back(rank, contrib);
-            return true;
-        }
-        for (auto it = levels.begin(); it != levels.end(); ++it) {
-            const bool higherRank = rank > it->first;
-            const bool equalRank = rank == it->first;
-
-            if (higherRank) {
-                auto next = it; ++next;
-                if (next == levels.end()) {
-                    // Higher than the last known level → reveal, create a new top level.
-                    levels.emplace_back(rank, contrib);
-                    return true;
-                }
-                // Otherwise, a higher rank exists before a stronger top level; continue scanning.
-                continue;
-            }
-
-            if (equalRank) {
-                auto next = it; ++next;
-                // Reveal if this equals the current level and either there is no stricter next level,
-                // or the contribution exceeds the next level's threshold.
-                if (next == levels.end() || contrib > next->second) {
-                    if (contrib > it->second) it->second = contrib; // raise current level threshold
-                    return true;
-                }
-                return false;
-            }
-
-            // Lower rank: reveal only if contribution exceeds the current level's threshold;
-            // insert a new level before current.
-            if (contrib > it->second) {
-                levels.insert(it, Level{rank, contrib});
+        if (higherRank)
+        {
+            auto next = it;
+            ++next;
+            if (next == levels.end())
+            {
+                // Higher than the last known level → reveal, create a new top level.
+                levels.emplace_back(rank, contrib);
                 return true;
             }
-            // Otherwise, no reveal; lower rank with insufficient contribution.
+            // Otherwise, a higher rank exists before a stronger top level; continue scanning.
+            continue;
+        }
+
+        if (equalRank)
+        {
+            auto next = it;
+            ++next;
+            // Reveal if this equals the current level and either there is no stricter next level,
+            // or the contribution exceeds the next level's threshold.
+            if (next == levels.end() || contrib > next->second)
+            {
+                if (contrib > it->second)
+                    it->second = contrib; // raise current level threshold
+                return true;
+            }
             return false;
         }
+
+        // Lower rank: reveal only if contribution exceeds the current level's threshold;
+        // insert a new level before current.
+        if (contrib > it->second)
+        {
+            levels.insert(it, Level{rank, contrib});
+            return true;
+        }
+        // Otherwise, no reveal; lower rank with insufficient contribution.
         return false;
     }
-
-    // Advance iterator circularly by one within [begin,end)
-    template <typename It, typename C>
-    inline void advanceCircular(It& it, const C& cont) {
-        ++it; if (it == cont->end()) it = cont->begin();
-    }
+    return false;
 }
+
+// Advance iterator circularly by one within [begin,end)
+template <typename It, typename C> inline void advanceCircular(It& it, const C& cont)
+{
+    ++it;
+    if (it == cont->end())
+        it = cont->begin();
+}
+} // namespace
 
 namespace pkt::core
 {
 using namespace pkt::core::player;
 
-Board::Board(int dp, const GameEvents& events,
-             Logger& logger, HandEvaluationEngine& handEvaluator)
+Board::Board(int dp, const GameEvents& events, Logger& logger, HandEvaluationEngine& handEvaluator)
     : m_dealerPlayerId(dp), m_events(events), m_logger(logger), m_handEvaluator(handEvaluator)
 {
     m_boardCards.reset();
@@ -125,7 +138,7 @@ void Board::distributePot(Hand& hand)
             // Skip folded players - they cannot win
             if (player->getLastAction().type == ActionType::Fold)
                 continue;
-            
+
             const auto& hc = player->getHoleCards();
             // In real games, hole cards are valid; recompute to ensure final ranks.
             // In unit tests that preset ranks, hole cards may be invalid; skip recompute to respect presets.
@@ -137,11 +150,9 @@ void Board::distributePot(Hand& hand)
                 m_logger.debug(std::string("Recompute showdown with: \"") + handStr + "\"");
                 player->setHandRanking(m_handEvaluator.rankHand(handStr.c_str()));
             }
-            m_logger.info(
-                std::string("Player ") + std::to_string(player->getId()) +
-                " showdown hand: \"" + player->getHoleCards().toString() + "\" rank=" + std::to_string(player->getHandRanking()) +
-                " (higher is better)"
-            );
+            m_logger.info(std::string("Player ") + std::to_string(player->getId()) + " showdown hand: \"" +
+                          player->getHoleCards().toString() + "\" rank=" + std::to_string(player->getHandRanking()) +
+                          " (higher is better)");
         }
     }
 
@@ -160,30 +171,49 @@ void Board::determineShowdownRevealOrder()
     m_showdownRevealOrder.clear();
     std::unordered_set<unsigned> seen; // maintain order uniqueness
 
-    auto appendReveal = [&](unsigned id) {
-        if (!seen.count(id)) { m_showdownRevealOrder.push_back(id); seen.insert(id); }
+    auto appendReveal = [&](unsigned id)
+    {
+        if (!seen.count(id))
+        {
+            m_showdownRevealOrder.push_back(id);
+            seen.insert(id);
+        }
     };
 
     // All-in condition: everyone who didn't fold reveals, in seat order
     if (m_allInCondition)
     {
-        for (auto it = m_seatsList->begin(); it != m_seatsList->end(); ++it) {
-            if (isNonFolded(**it)) appendReveal((*it)->getId());
+        for (auto it = m_seatsList->begin(); it != m_seatsList->end(); ++it)
+        {
+            if (isNonFolded(**it))
+                appendReveal((*it)->getId());
         }
         return;
     }
 
     // Find the last acting player who didn't fold; fallback to first non-folder
     PlayerListConstIterator lastIt = m_seatsList->end();
-    for (auto it = m_seatsList->begin(); it != m_seatsList->end(); ++it) {
-        if ((*it)->getId() == m_lastActionPlayerId && isNonFolded(**it)) { lastIt = it; break; }
-    }
-    if (lastIt == m_seatsList->end()) {
-        for (auto it = m_seatsList->begin(); it != m_seatsList->end(); ++it) {
-            if (isNonFolded(**it)) { lastIt = it; break; }
+    for (auto it = m_seatsList->begin(); it != m_seatsList->end(); ++it)
+    {
+        if ((*it)->getId() == m_lastActionPlayerId && isNonFolded(**it))
+        {
+            lastIt = it;
+            break;
         }
     }
-    if (lastIt == m_seatsList->end()) {
+    if (lastIt == m_seatsList->end())
+    {
+        for (auto it = m_seatsList->begin(); it != m_seatsList->end(); ++it)
+        {
+            if (isNonFolded(**it))
+            {
+                lastIt = it;
+                break;
+            }
+        }
+    }
+    if (lastIt == m_seatsList->end())
+    {
         // No players to reveal (all folded?)
         return;
     }
@@ -196,13 +226,17 @@ void Board::determineShowdownRevealOrder()
     levels.emplace_back((*lastIt)->getHandRanking(), contribution(**lastIt));
 
     // Iterate circularly over the table, starting after last actor, up to N players
-    auto it = lastIt; advanceCircular(it, m_seatsList);
+    auto it = lastIt;
+    advanceCircular(it, m_seatsList);
     const unsigned n = static_cast<unsigned>(m_seatsList->size());
-    for (unsigned k = 0; k < n; ++k) {
-        if (isNonFolded(**it)) {
+    for (unsigned k = 0; k < n; ++k)
+    {
+        if (isNonFolded(**it))
+        {
             const int rank = (*it)->getHandRanking();
             const int contrib = contribution(**it);
-            if (processCandidateLevels(levels, rank, contrib)) {
+            if (processCandidateLevels(levels, rank, contrib))
+            {
                 appendReveal((*it)->getId());
             }
         }
@@ -238,7 +272,6 @@ void Board::setWinners(const std::list<unsigned>& w)
     m_winners = w;
 }
 
- 
 int Board::getPot(const Hand& hand) const
 {
     int totalPot = 0;
@@ -265,10 +298,10 @@ std::string Board::getStringRepresentation() const
 {
     if (m_boardCards.isPreflop() || !m_boardCards.isValid())
     {
-        return ""; 
+        return "";
     }
 
-    return " " + m_boardCards.toString();
+    return m_boardCards.toString();
 }
 
 } // namespace pkt::core
