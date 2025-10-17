@@ -7,6 +7,9 @@
 #include <memory>
 #include "../DependenciesFactory.h"
 
+// Qt forward declaration
+class QQmlApplicationEngine;
+
 // Forward declarations from core interfaces
 namespace pkt::core
 {
@@ -45,6 +48,27 @@ class AppFactory
     createApplication(LoggerType loggerType = LoggerType::Console,
                       HandEvaluatorType evaluatorType = HandEvaluatorType::Psim,
                       DatabaseType dbType = DatabaseType::Sqlite);
+
+    /**
+     * @brief Registers all QML types and singletons needed by the application.
+     *
+     * Should be called before creating QQmlApplicationEngine.
+     * Registers utility classes like CardHelper as QML singletons.
+     */
+    static void registerQmlTypes();
+
+    /**
+     * @brief Configures the QML engine with application context properties.
+     *
+     * Sets up all context properties needed by QML, including:
+     * - Application controller and view models
+     * - Resource paths (card images, etc.)
+     *
+     * @param engine The QML engine to configure
+     * @param appController The application controller instance
+     */
+    static void configureQmlEngine(QQmlApplicationEngine& engine,
+                                   pkt::ui::qtqml::controller::AppController* appController);
 };
 
 } // namespace pkt::app::qtqml
