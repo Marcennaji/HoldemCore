@@ -57,15 +57,38 @@ Item {
             playerData: modelData
 
             // Position players in an ellipse around the table
+            // Swap index 0 (human) with bottom position for better visibility
             x: {
-                let angle = (index / tableViewModel.players.length) * Math.PI * 2 - Math.PI / 2;
-                let radiusX = tableEllipse.width / 2 + 80;
+                let totalPlayers = tableViewModel.players.length;
+                let adjustedIndex = index;
+
+                // If this is the human player (index 0), put them at the bottom (index totalPlayers/2)
+                // If this is the player at bottom position, put them at top
+                if (index === 0) {
+                    adjustedIndex = Math.floor(totalPlayers / 2);
+                } else if (index === Math.floor(totalPlayers / 2)) {
+                    adjustedIndex = 0;
+                }
+
+                let angle = (adjustedIndex / totalPlayers) * Math.PI * 2 - Math.PI / 2;
+                let radiusX = tableEllipse.width / 2 + 100;
                 return tableEllipse.x + tableEllipse.width / 2 + Math.cos(angle) * radiusX - width / 2;
             }
 
             y: {
-                let angle = (index / tableViewModel.players.length) * Math.PI * 2 - Math.PI / 2;
-                let radiusY = tableEllipse.height / 2 + 60;
+                let totalPlayers = tableViewModel.players.length;
+                let adjustedIndex = index;
+
+                // If this is the human player (index 0), put them at the bottom (index totalPlayers/2)
+                // If this is the player at bottom position, put them at top
+                if (index === 0) {
+                    adjustedIndex = Math.floor(totalPlayers / 2);
+                } else if (index === Math.floor(totalPlayers / 2)) {
+                    adjustedIndex = 0;
+                }
+
+                let angle = (adjustedIndex / totalPlayers) * Math.PI * 2 - Math.PI / 2;
+                let radiusY = tableEllipse.height / 2 + 80;
                 return tableEllipse.y + tableEllipse.height / 2 + Math.sin(angle) * radiusY - height / 2;
             }
 

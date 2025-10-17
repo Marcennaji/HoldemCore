@@ -29,7 +29,7 @@ if(USE_WIDGETS)
 endif()
 
 if(USE_QML)
-    find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui Qml Quick)
+    find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui Qml Quick QuickControls2)
 
     add_executable(HoldemCore-qml
         qtqml/main.cpp
@@ -53,6 +53,18 @@ if(USE_QML)
         Qt6::Gui
         Qt6::Qml
         Qt6::Quick
+        Qt6::QuickControls2
+    )
+
+    # Copy card images to build directory for runtime access
+    set(CARDS_SOURCE_DIR "${CMAKE_SOURCE_DIR}/src/ui/shared/resources/images/cards")
+    set(CARDS_DEST_DIR "${CMAKE_CURRENT_BINARY_DIR}/cards")
+
+    add_custom_command(TARGET HoldemCore-qml POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CARDS_SOURCE_DIR}
+        ${CARDS_DEST_DIR}
+        COMMENT "Copying card images to build directory"
     )
 endif()
 

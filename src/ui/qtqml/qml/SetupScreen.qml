@@ -44,24 +44,182 @@ Page {
             SpinBox {
                 id: playerCount
                 from: 2
-                to: 9
+                to: 10
                 value: 6
-                editable: true
+                editable: false
+                Layout.preferredWidth: 120
 
-                contentItem: TextInput {
-                    text: playerCount.displayText
-                    font: playerCount.font
-                    color: "#ffffff"
-                    horizontalAlignment: Qt.AlignHCenter
-                    verticalAlignment: Qt.AlignVCenter
-                    readOnly: !playerCount.editable
-                }
+                // Hide default up/down indicators by setting width to 0
+                up.indicator.width: 0
+                down.indicator.width: 0
 
-                background: Rectangle {
-                    color: "#2d2d30"
-                    border.color: "#3e3e42"
-                    border.width: 1
+                contentItem: Rectangle {
+                    color: "#1e1e1e"
+                    border.color: "#007acc"
+                    border.width: 2
                     radius: 4
+
+                    // Minus button
+                    Rectangle {
+                        id: playerCountMinus
+                        anchors.left: parent.left
+                        width: 40
+                        height: parent.height
+                        color: playerCountMinusArea.pressed ? "#3e3e42" : "#2d2d30"
+                        border.color: "#007acc"
+                        radius: 4
+
+                        Text {
+                            text: "-"
+                            font.pixelSize: 20
+                            color: "#ffffff"
+                            anchors.centerIn: parent
+                        }
+
+                        MouseArea {
+                            id: playerCountMinusArea
+                            anchors.fill: parent
+                            onClicked: {
+                                if (playerCount.value > playerCount.from) {
+                                    playerCount.value--;
+                                }
+                            }
+                        }
+                    }
+
+                    // Value display
+                    Text {
+                        anchors.centerIn: parent
+                        text: playerCount.value
+                        font.pixelSize: 18
+                        color: "#ffffff"
+                    }
+
+                    // Plus button
+                    Rectangle {
+                        id: playerCountPlus
+                        anchors.right: parent.right
+                        width: 40
+                        height: parent.height
+                        color: playerCountPlusArea.pressed ? "#3e3e42" : "#2d2d30"
+                        border.color: "#007acc"
+                        radius: 4
+
+                        Text {
+                            text: "+"
+                            font.pixelSize: 20
+                            color: "#ffffff"
+                            anchors.centerIn: parent
+                        }
+
+                        MouseArea {
+                            id: playerCountPlusArea
+                            anchors.fill: parent
+                            onClicked: {
+                                if (playerCount.value < playerCount.to) {
+                                    playerCount++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Start cash
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 10
+
+            Text {
+                text: "Start Cash:"
+                color: "#cccccc"
+                font.pixelSize: 16
+                Layout.fillWidth: true
+            }
+
+            SpinBox {
+                id: startCash
+                from: 1000
+                to: 1000000
+                value: 2000
+                stepSize: 50
+                editable: false
+                Layout.preferredWidth: 120
+
+                property string prefix: "$"
+
+                // Hide default up/down indicators
+                up.indicator.width: 0
+                down.indicator.width: 0
+
+                contentItem: Rectangle {
+                    color: "#1e1e1e"
+                    border.color: "#007acc"
+                    border.width: 2
+                    radius: 4
+
+                    // Minus button
+                    Rectangle {
+                        anchors.left: parent.left
+                        width: 40
+                        height: parent.height
+                        color: startCashMinusArea.pressed ? "#3e3e42" : "#2d2d30"
+                        border.color: "#007acc"
+                        radius: 4
+
+                        Text {
+                            text: "-"
+                            font.pixelSize: 20
+                            color: "#ffffff"
+                            anchors.centerIn: parent
+                        }
+
+                        MouseArea {
+                            id: startCashMinusArea
+                            anchors.fill: parent
+                            onClicked: {
+                                if (startCash.value > startCash.from) {
+                                    startCash.value -= startCash.stepSize;
+                                }
+                            }
+                        }
+                    }
+
+                    // Value display
+                    Text {
+                        anchors.centerIn: parent
+                        text: startCash.prefix + startCash.value
+                        font.pixelSize: 18
+                        color: "#ffffff"
+                    }
+
+                    // Plus button
+                    Rectangle {
+                        anchors.right: parent.right
+                        width: 40
+                        height: parent.height
+                        color: startCashPlusArea.pressed ? "#3e3e42" : "#2d2d30"
+                        border.color: "#007acc"
+                        radius: 4
+
+                        Text {
+                            text: "+"
+                            font.pixelSize: 20
+                            color: "#ffffff"
+                            anchors.centerIn: parent
+                        }
+
+                        MouseArea {
+                            id: startCashPlusArea
+                            anchors.fill: parent
+                            onClicked: {
+                                if (startCash.value < startCash.to) {
+                                    startCash.value += startCash.stepSize;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -80,64 +238,86 @@ Page {
 
             SpinBox {
                 id: smallBlind
-                from: 5
-                to: 500
-                value: 25
-                stepSize: 5
-                editable: true
-
-                contentItem: TextInput {
-                    text: smallBlind.displayText
-                    font: smallBlind.font
-                    color: "#ffffff"
-                    horizontalAlignment: Qt.AlignHCenter
-                    verticalAlignment: Qt.AlignVCenter
-                    readOnly: !smallBlind.editable
-                }
-
-                background: Rectangle {
-                    color: "#2d2d30"
-                    border.color: "#3e3e42"
-                    border.width: 1
-                    radius: 4
-                }
-            }
-        }
-
-        // Big blind
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: 10
-
-            Text {
-                text: "Big Blind:"
-                color: "#cccccc"
-                font.pixelSize: 16
-                Layout.fillWidth: true
-            }
-
-            SpinBox {
-                id: bigBlind
-                from: 10
+                from: 1
                 to: 1000
-                value: 50
-                stepSize: 10
-                editable: true
+                value: 10
+                stepSize: 5
+                editable: false
+                Layout.preferredWidth: 120
 
-                contentItem: TextInput {
-                    text: bigBlind.displayText
-                    font: bigBlind.font
-                    color: "#ffffff"
-                    horizontalAlignment: Qt.AlignHCenter
-                    verticalAlignment: Qt.AlignVCenter
-                    readOnly: !bigBlind.editable
-                }
+                property string prefix: "$"
 
-                background: Rectangle {
-                    color: "#2d2d30"
-                    border.color: "#3e3e42"
-                    border.width: 1
+                // Hide default up/down indicators
+                up.indicator.width: 0
+                down.indicator.width: 0
+
+                contentItem: Rectangle {
+                    color: "#1e1e1e"
+                    border.color: "#007acc"
+                    border.width: 2
                     radius: 4
+
+                    // Minus button
+                    Rectangle {
+                        anchors.left: parent.left
+                        width: 40
+                        height: parent.height
+                        color: smallBlindMinusArea.pressed ? "#3e3e42" : "#2d2d30"
+                        border.color: "#007acc"
+                        radius: 4
+
+                        Text {
+                            text: "-"
+                            font.pixelSize: 20
+                            color: "#ffffff"
+                            anchors.centerIn: parent
+                        }
+
+                        MouseArea {
+                            id: smallBlindMinusArea
+                            anchors.fill: parent
+                            onClicked: {
+                                if (smallBlind.value > smallBlind.from) {
+                                    smallBlind.value -= smallBlind.stepSize;
+                                }
+                            }
+                        }
+                    }
+
+                    // Value display
+                    Text {
+                        anchors.centerIn: parent
+                        text: smallBlind.prefix + smallBlind.value
+                        font.pixelSize: 18
+                        color: "#ffffff"
+                    }
+
+                    // Plus button
+                    Rectangle {
+                        anchors.right: parent.right
+                        width: 40
+                        height: parent.height
+                        color: smallBlindPlusArea.pressed ? "#3e3e42" : "#2d2d30"
+                        border.color: "#007acc"
+                        radius: 4
+
+                        Text {
+                            text: "+"
+                            font.pixelSize: 20
+                            color: "#ffffff"
+                            anchors.centerIn: parent
+                        }
+
+                        MouseArea {
+                            id: smallBlindPlusArea
+                            anchors.fill: parent
+                            onClicked: {
+                                if (smallBlind.value < smallBlind.to) {
+                                    smallBlind.value += smallBlind.stepSize;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -162,15 +342,15 @@ Page {
                 contentItem: Text {
                     leftPadding: 10
                     text: botProfile.displayText
-                    font: botProfile.font
+                    font.pixelSize: 18
                     color: "#ffffff"
                     verticalAlignment: Text.AlignVCenter
                 }
 
                 background: Rectangle {
-                    color: "#2d2d30"
-                    border.color: "#3e3e42"
-                    border.width: 1
+                    color: "#3d3d40"
+                    border.color: "#007acc"
+                    border.width: 2
                     radius: 4
                 }
 
@@ -292,8 +472,8 @@ Page {
             onClicked: {
                 setupScreen.startGame({
                     playerCount: playerCount.value,
+                    startCash: startCash.value,
                     smallBlind: smallBlind.value,
-                    bigBlind: bigBlind.value,
                     botProfile: botProfile.currentText,
                     speed: speedSlider.value
                 });

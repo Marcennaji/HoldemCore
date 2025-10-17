@@ -13,7 +13,7 @@ Rectangle {
     property bool isHuman: false
 
     width: 140
-    height: 160
+    height: 145
     color: isActive ? "#3e3e42" : "#2d2d30"
     border.color: isHuman ? "#ffd700" : (isActive ? "#007acc" : "#555555")
     border.width: isActive ? 3 : 2
@@ -24,24 +24,27 @@ Rectangle {
         anchors.margins: 8
         spacing: 6
 
-        // Player name
-        Text {
+        // Player name and chips on same line
+        RowLayout {
             Layout.fillWidth: true
-            text: playerData ? playerData.name : ""
-            color: "#ffffff"
-            font.pixelSize: 14
-            font.bold: isHuman
-            horizontalAlignment: Text.AlignHCenter
-            elide: Text.ElideRight
-        }
+            spacing: 4
 
-        // Chips
-        Text {
-            Layout.fillWidth: true
-            text: playerData ? "$" + playerData.chips : ""
-            color: "#4ec9b0"
-            font.pixelSize: 12
-            horizontalAlignment: Text.AlignHCenter
+            Text {
+                Layout.fillWidth: true
+                text: playerData ? playerData.name : ""
+                color: "#ffffff"
+                font.pixelSize: 14
+                font.bold: isHuman
+                horizontalAlignment: Text.AlignLeft
+                elide: Text.ElideRight
+            }
+
+            Text {
+                text: playerData ? "$" + playerData.chips : ""
+                color: "#4ec9b0"
+                font.pixelSize: 12
+                horizontalAlignment: Text.AlignRight
+            }
         }
 
         // Hole cards

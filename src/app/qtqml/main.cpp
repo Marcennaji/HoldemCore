@@ -7,11 +7,13 @@
 #include <ui/qtqml/controller/TableViewModel.h>
 #include "AppFactory.h"
 
+#include <QDir>
 #include <QtCore>
 #include <QtGui>
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlContext>
 #include <QtQuick/QQuickView>
+#include <QtQuickControls2/QQuickStyle>
 #include <QtWidgets/QApplication>
 
 using namespace std;
@@ -23,6 +25,9 @@ int main(int argc, char** argv)
 
     QCoreApplication::setApplicationName("HoldemCore Mobile");
     QCoreApplication::setApplicationVersion("0.9");
+
+    // Set Qt Quick style to Fusion to support custom styling
+    QQuickStyle::setStyle("Fusion");
 
     // Create application using the QML factory
     auto qmlController = pkt::app::qtqml::AppFactory::createApplication(
@@ -37,8 +42,14 @@ int main(int argc, char** argv)
     rootContext->setContextProperty("tableViewModel", qmlController->getTableViewModel());
     rootContext->setContextProperty("bridge", qmlController->getBridge());
 
+    // Expose card images path for QML (cards are copied to build directory by CMake)
+    QString cardsPath = QCoreApplication::applicationDirPath() + "/cards";
+    QString cleanPath = QDir::cleanPath(cardsPath);
+    QString fileUrl = "file:///" + cleanPath.replace("\\", "/");
+    rootContext->setContextProperty("cardsImagePath", fileUrl);
+
     // Load the main QML file
-    const QUrl url(QStringLiteral("qrc:/qml/Main.qml"));
+    const QUrl url(QStringLiteral("qrc:/HoldemCore/qml/Main.qml"));
 
     QObject::connect(
         &engine, &QQmlApplicationEngine::objectCreated, &app,

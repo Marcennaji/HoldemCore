@@ -81,6 +81,7 @@ Page {
                 id: pokerTable
                 anchors.fill: parent
                 anchors.margins: 20
+                anchors.bottomMargin: 100  // Extra space for human player cards at bottom
             }
         }
 

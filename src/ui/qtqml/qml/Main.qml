@@ -22,13 +22,13 @@ ApplicationWindow {
 
         initialItem: SetupScreen {
             onStartGame: config => {
-                // Call C++ controller to start game
-                appController.startGame(config.playerCount, config.smallBlind, config.bigBlind, config.botProfile, config.speed);
-
-                // Navigate to table screen
                 stack.push(tableScreenComponent, {
                     "configuration": config
                 });
+
+                // Big blind is always 2x small blind
+                var bigBlind = config.smallBlind * 2;
+                appController.startGame(config.playerCount, config.smallBlind, bigBlind, config.botProfile, config.speed);
             }
         }
 
