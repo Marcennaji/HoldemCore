@@ -12,6 +12,8 @@ Rectangle {
     property bool isActive: false
     property bool isHuman: false
     property bool isFolded: playerData && playerData.folded ? playerData.folded : false
+    property bool isDealer: playerData && playerData.isDealer ? playerData.isDealer : false
+    property string dealerButtonPosition: "bottom"  // "top", "bottom", "left", or "right"
 
     width: 140
     height: 145
@@ -107,6 +109,56 @@ Rectangle {
 
         Item {
             Layout.fillHeight: true
+        }
+    }
+
+    // Dealer button indicator (positioned based on player's location around table)
+    Rectangle {
+        visible: isDealer
+        width: 32
+        height: 32
+        radius: 16
+        color: "#ffffff"
+        border.color: "#000000"
+        border.width: 2
+        z: 10  // Ensure it's above other elements
+
+        // Position based on dealerButtonPosition property
+        anchors.horizontalCenter: {
+            if (dealerButtonPosition === "left" || dealerButtonPosition === "right") {
+                return undefined;
+            }
+            return parent.horizontalCenter;
+        }
+        anchors.verticalCenter: {
+            if (dealerButtonPosition === "top" || dealerButtonPosition === "bottom") {
+                return undefined;
+            }
+            return parent.verticalCenter;
+        }
+
+        // Horizontal positioning
+        // "left" means button should be on the left side (player is on right side of table)
+        anchors.left: dealerButtonPosition === "left" ? parent.left : undefined
+        anchors.leftMargin: dealerButtonPosition === "left" ? -36 : 0  // Button width (32) + margin (4)
+        // "right" means button should be on the right side (player is on left side of table)
+        anchors.right: dealerButtonPosition === "right" ? parent.right : undefined
+        anchors.rightMargin: dealerButtonPosition === "right" ? -36 : 0
+
+        // Vertical positioning
+        // "top" means button should be on top (player is on bottom side of table)
+        anchors.top: dealerButtonPosition === "top" ? parent.top : undefined
+        anchors.topMargin: dealerButtonPosition === "top" ? -36 : 0
+        // "bottom" means button should be on bottom (player is on top side of table)
+        anchors.bottom: dealerButtonPosition === "bottom" ? parent.bottom : undefined
+        anchors.bottomMargin: dealerButtonPosition === "bottom" ? -36 : 0
+
+        Text {
+            anchors.centerIn: parent
+            text: "D"
+            color: "#000000"
+            font.pixelSize: 16
+            font.bold: true
         }
     }
 

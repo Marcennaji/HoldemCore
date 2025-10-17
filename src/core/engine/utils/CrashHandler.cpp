@@ -4,6 +4,7 @@
 
 #include "CrashHandler.h"
 
+#include <cstdint>
 #include <cstring>
 #include <iostream>
 #include <sstream>
@@ -148,6 +149,10 @@ std::string CrashHandler::getStackTrace(int skip)
             oss << "0x" << std::hex << address << std::dec;
         }
 
+        // Always include the raw address in hex so tests and consumers
+        // have a reliable frame indicator (addresses are platform-agnostic).
+        oss << " (0x" << std::hex << address << std::dec << ")";
+
         // Try to get file and line info
         DWORD displacement;
         IMAGEHLP_LINE64 line;
@@ -205,6 +210,8 @@ std::string CrashHandler::getStackTrace(int skip)
                 oss << mangledName;
             }
 
+            // Also append the raw pointer address to aid detection and tests
+            oss << " (0x" << std::hex << reinterpret_cast<uintptr_t>(buffer[i]) << std::dec << ")";
             oss << "\n";
         }
 

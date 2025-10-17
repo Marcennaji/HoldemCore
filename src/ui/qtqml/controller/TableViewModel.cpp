@@ -208,6 +208,28 @@ void TableViewModel::updatePlayerFolded(int playerId, bool folded)
     }
 }
 
+void TableViewModel::setDealerPosition(int playerId)
+{
+    // Clear dealer flag from all players
+    for (int i = 0; i < m_players.size(); ++i)
+    {
+        QVariantMap player = m_players[i].toMap();
+        player["isDealer"] = false;
+        m_players[i] = player;
+    }
+
+    // Set dealer flag for the specified player
+    int index = findPlayerIndex(playerId);
+    if (index >= 0 && index < m_players.size())
+    {
+        QVariantMap player = m_players[index].toMap();
+        player["isDealer"] = true;
+        m_players[index] = player;
+    }
+
+    emit playersChanged();
+}
+
 int TableViewModel::findPlayerIndex(int playerId) const
 {
     for (int i = 0; i < m_players.size(); ++i)

@@ -72,11 +72,13 @@ class Bridge : public QObject
     QString cardToString(const pkt::core::Card& card) const;
     QString gameStateToString(pkt::core::GameState state) const;
     QString actionTypeToString(pkt::core::ActionType action) const;
+    void setDealerFromSmallBlind(unsigned smallBlindId);
 
     TableViewModel* m_viewModel = nullptr;
     pkt::core::Session* m_session = nullptr;
     pkt::core::player::HumanStrategy* m_currentHumanStrategy = nullptr;
     int m_gameSpeed = 1;
+    int m_playerCount = 0;
 
     // Cache hole cards for all players for potential showdown reveal
     std::map<unsigned, pkt::core::HoleCards> m_cachedHoleCards;

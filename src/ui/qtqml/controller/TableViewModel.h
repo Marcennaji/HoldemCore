@@ -101,6 +101,7 @@ class TableViewModel : public QObject
     void updatePlayerChips(int playerId, int chips);
     void updatePlayerAction(int playerId, const QString& action, int amount);
     void updatePlayerFolded(int playerId, bool folded);
+    void setDealerPosition(int playerId);
 
     // Reset all state
     void reset();

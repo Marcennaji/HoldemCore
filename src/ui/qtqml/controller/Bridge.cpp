@@ -212,6 +212,9 @@ void Bridge::handlePlayersInitialized(const pkt::core::player::PlayerList& playe
         ++seat;
     }
 
+    // Store player count for dealer position calculation
+    m_playerCount = static_cast<int>(players->size());
+
     m_viewModel->setPlayers(playerList);
 }
 
@@ -308,6 +311,12 @@ void Bridge::handlePlayerActed(pkt::core::PlayerAction action)
     if (action.type == pkt::core::ActionType::Fold)
     {
         m_viewModel->updatePlayerFolded(action.playerId, true);
+    }
+
+    // Track dealer position from small blind (like Qt Widgets)
+    if (action.type == pkt::core::ActionType::PostSmallBlind)
+    {
+        setDealerFromSmallBlind(action.playerId);
     }
 }
 
@@ -446,6 +455,29 @@ QString Bridge::actionTypeToString(pkt::core::ActionType action) const
     default:
         return "Unknown";
     }
+}
+
+void Bridge::setDealerFromSmallBlind(unsigned smallBlindId)
+{
+    if (m_playerCount <= 0)
+        return;
+
+    // Heads-up (2 players): Button is also Small Blind
+    int dealerId = static_cast<int>(smallBlindId);
+
+    if (m_playerCount > 2)
+    {
+        // 3+ players: Dealer is immediately to the right of Small Blind
+        // (previous seat modulo N)
+        dealerId = static_cast<int>(smallBlindId) - 1;
+        if (dealerId < 0)
+            dealerId = m_playerCount - 1;
+    }
+
+    qDebug() << "QML: Setting dealer position to player" << dealerId << "(small blind was player" << smallBlindId
+             << ")";
+
+    m_viewModel->setDealerPosition(dealerId);
 }
 
 } // namespace pkt::ui::qtqml::controller
