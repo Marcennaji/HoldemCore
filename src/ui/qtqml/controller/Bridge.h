@@ -77,6 +77,9 @@ class Bridge : public QObject
     pkt::core::Session* m_session = nullptr;
     pkt::core::player::HumanStrategy* m_currentHumanStrategy = nullptr;
     int m_gameSpeed = 1;
+
+    // Cache hole cards for all players for potential showdown reveal
+    std::map<unsigned, pkt::core::HoleCards> m_cachedHoleCards;
 };
 
 } // namespace pkt::ui::qtqml::controller

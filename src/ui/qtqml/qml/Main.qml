@@ -40,10 +40,18 @@ ApplicationWindow {
                     // Call C++ controller to cleanup
                     appController.exitToSetup();
 
-                    // Navigate back to setup
-                    stack.pop();
+                    // Defer stack navigation to avoid destroying object while signal handler is running
+                    exitTimer.start();
                 }
             }
         }
+    }
+
+    // Timer to defer exit navigation to avoid crash when destroying object during signal handler
+    Timer {
+        id: exitTimer
+        interval: 0
+        repeat: false
+        onTriggered: stack.pop()
     }
 }

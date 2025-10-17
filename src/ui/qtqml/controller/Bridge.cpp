@@ -15,6 +15,7 @@
 #include <QDebug>
 #include <QEventLoop>
 #include <QVariantMap>
+#include <map>
 
 using namespace pkt::core;
 
@@ -143,9 +144,32 @@ void Bridge::onPlayerAllIn()
 
 void Bridge::onNextHandRequested()
 {
-    qDebug() << "QML: Next hand requested by user";
+    qDebug() << "QML: Next hand requested by user - resetting UI for new hand";
     m_viewModel->setHandResult("");
     m_viewModel->setWinners(QVariantList());
+
+    // Clear board cards explicitly (fix bug where 2nd hand showed all community cards at preflop)
+    m_viewModel->setBoardCards(QVariantList());
+
+    // Clear cached hole cards for new hand
+    m_cachedHoleCards.clear();
+
+    // Reset all players for new hand
+    for (int i = 0; i < m_viewModel->players().size(); ++i)
+    {
+        QVariantMap player = m_viewModel->players()[i].toMap();
+        int playerId = player["id"].toInt();
+
+        // Reset folded state
+        m_viewModel->updatePlayerFolded(playerId, false);
+
+        // Hide cards (show card backs)
+        m_viewModel->updatePlayerCards(playerId, "??", "??");
+
+        // Clear last action
+        m_viewModel->updatePlayerAction(playerId, "", 0);
+    }
+
     m_session->startNewHand();
 }
 
@@ -223,9 +247,23 @@ void Bridge::handleHandCompleted(std::list<unsigned> winnerIds, int totalPot)
 
 void Bridge::handleShowdownRevealOrder(const std::vector<unsigned>& revealOrder)
 {
-    qDebug() << "QML: Showdown reveal order received";
-    // In QML version, cards are already revealed as they're dealt
-    // This is mainly for animation/sequencing which can be added later
+    qDebug() << "QML: Showdown reveal order received. Revealing" << revealOrder.size() << "players";
+
+    // Reveal cards for all non-folded players in showdown order
+    for (unsigned playerId : revealOrder)
+    {
+        // Check if we have cached hole cards for this player
+        auto it = m_cachedHoleCards.find(playerId);
+        if (it != m_cachedHoleCards.end())
+        {
+            const auto& holeCards = it->second;
+            QString card1 = cardToString(holeCards.card1);
+            QString card2 = cardToString(holeCards.card2);
+
+            qDebug() << "QML: Revealing player" << playerId << "cards:" << card1 << card2;
+            m_viewModel->updatePlayerCards(playerId, card1, card2);
+        }
+    }
 }
 
 void Bridge::handlePlayerChipsUpdated(unsigned playerId, int newChips)
@@ -241,6 +279,15 @@ void Bridge::handleBettingRoundStarted(pkt::core::GameState gameState)
 
     m_viewModel->setGameStateText(stateText);
     m_viewModel->setAwaitingHumanInput(false);
+
+    // Clear action labels from previous betting round (like Qt Widgets clearActionLabelsForNewRound)
+    // This ensures each round shows only current actions, not previous round's actions
+    for (int i = 0; i < m_viewModel->players().size(); ++i)
+    {
+        QVariantMap player = m_viewModel->players()[i].toMap();
+        int playerId = player["id"].toInt();
+        m_viewModel->updatePlayerAction(playerId, "", 0);
+    }
 }
 
 void Bridge::handlePotUpdated(int newPotAmount)
@@ -256,6 +303,12 @@ void Bridge::handlePlayerActed(pkt::core::PlayerAction action)
 
     m_viewModel->updatePlayerAction(action.playerId, actionText, action.amount);
     m_viewModel->setCurrentPlayerId(action.playerId);
+
+    // Mark player as folded for visual effects
+    if (action.type == pkt::core::ActionType::Fold)
+    {
+        m_viewModel->updatePlayerFolded(action.playerId, true);
+    }
 }
 
 void Bridge::handleAwaitingHumanInput(unsigned playerId, std::vector<pkt::core::ActionType> validActions)
@@ -284,6 +337,9 @@ void Bridge::handleHoleCardsDealt(unsigned playerId, pkt::core::HoleCards holeCa
     QString card2 = cardToString(holeCards.card2);
 
     qDebug() << "QML: Hole cards dealt to player" << playerId << ":" << card1 << card2;
+
+    // Cache hole cards for all players (needed for showdown reveal)
+    m_cachedHoleCards[playerId] = holeCards;
 
     // Only show cards for human player (ID 0)
     if (playerId == 0)

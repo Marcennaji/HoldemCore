@@ -100,6 +100,7 @@ class TableViewModel : public QObject
     void updatePlayerCards(int playerId, const QString& card1, const QString& card2);
     void updatePlayerChips(int playerId, int chips);
     void updatePlayerAction(int playerId, const QString& action, int amount);
+    void updatePlayerFolded(int playerId, bool folded);
 
     // Reset all state
     void reset();

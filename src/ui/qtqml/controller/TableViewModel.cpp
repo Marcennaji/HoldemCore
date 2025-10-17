@@ -196,6 +196,18 @@ void TableViewModel::updatePlayerAction(int playerId, const QString& action, int
     }
 }
 
+void TableViewModel::updatePlayerFolded(int playerId, bool folded)
+{
+    int index = findPlayerIndex(playerId);
+    if (index >= 0 && index < m_players.size())
+    {
+        QVariantMap player = m_players[index].toMap();
+        player["folded"] = folded;
+        m_players[index] = player;
+        emit playersChanged();
+    }
+}
+
 int TableViewModel::findPlayerIndex(int playerId) const
 {
     for (int i = 0; i < m_players.size(); ++i)

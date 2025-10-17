@@ -11,6 +11,7 @@ Rectangle {
     property var playerData
     property bool isActive: false
     property bool isHuman: false
+    property bool isFolded: playerData && playerData.folded ? playerData.folded : false
 
     width: 140
     height: 145
@@ -18,6 +19,13 @@ Rectangle {
     border.color: isHuman ? "#ffd700" : (isActive ? "#007acc" : "#555555")
     border.width: isActive ? 3 : 2
     radius: 8
+    opacity: isFolded ? 0.5 : 1.0
+
+    Behavior on opacity {
+        NumberAnimation {
+            duration: 300
+        }
+    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -52,6 +60,13 @@ Rectangle {
             Layout.alignment: Qt.AlignHCenter
             spacing: 4
             visible: playerData && playerData.hasCards
+            opacity: isFolded ? 0.35 : 1.0
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: 300
+                }
+            }
 
             CardWidget {
                 cardText: playerData && playerData.card1 ? playerData.card1 : ""

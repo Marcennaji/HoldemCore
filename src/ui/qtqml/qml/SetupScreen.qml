@@ -117,7 +117,7 @@ Page {
                             anchors.fill: parent
                             onClicked: {
                                 if (playerCount.value < playerCount.to) {
-                                    playerCount++;
+                                    playerCount.value++;
                                 }
                             }
                         }
